@@ -377,9 +377,7 @@ public class NoPosTacletApp extends TacletApp {
         MatchConditions res = null;
 	if (taclet() instanceof FindTaclet) {
 		res = ((FindTaclet)taclet())
-		    .matchFind ( t,
-				 mc,
-				 services );
+		    .getMatcher().matchFind ( t, mc, services );
 		// the following check will partly be repeated within the
 		// constructor; this could be optimised
 		if ( res == null ||
@@ -415,9 +413,13 @@ public class NoPosTacletApp extends TacletApp {
 	SVInstantiations svInst = taclet() instanceof NoFindTaclet ? 
                 instantiations   () : instantiations   ().clearUpdateContext ();
         
-                MatchConditions mc  =
-	    new MatchConditions ( svInst,
-				  RenameTable.EMPTY_TABLE);
+        MatchConditions mc;
+        if (svInst.isEmpty()) {
+            mc = MatchConditions.EMPTY_MATCHCONDITIONS;
+        } else {
+            mc = new MatchConditions ( svInst,
+                    RenameTable.EMPTY_TABLE);
+        }
         
 	if ( taclet() instanceof RewriteTaclet ) {
 	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,

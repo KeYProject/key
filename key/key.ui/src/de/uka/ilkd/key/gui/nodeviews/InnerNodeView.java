@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
 import java.awt.Insets;
-import java.util.Iterator;
 
 import javax.swing.JTextArea;
 import javax.swing.border.CompoundBorder;
@@ -159,17 +158,16 @@ public class InnerNodeView extends SequentView {
     private static void writeTacletSchemaVariablesHelper(StringBuffer out,
             final Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
-        ImmutableList<NewVarcond> lnew = t.varsNew();
-        while (!lnew.isEmpty()) {
-            schemaVars = schemaVars.add(lnew.head().getSchemaVariable());
-            lnew = lnew.tail();
-        }
-        Iterator<NewDependingOn> newDepIt = t.varsNewDependingOn();
-        while (newDepIt.hasNext()) {
-            schemaVars = schemaVars.add(newDepIt.next().first());
+
+        for (final NewVarcond nvc: t.varsNew()) {
+            schemaVars = schemaVars.add(nvc.getSchemaVariable());
         }
 
-        if (schemaVars.size() > 0) {
+        for (final NewDependingOn ndo : t.varsNewDependingOn()) {
+            schemaVars = schemaVars.add(ndo.first());
+        }
+
+        if (!schemaVars.isEmpty()) {
             out.append("\\schemaVariables {\n");
             for (SchemaVariable schemaVar1 : schemaVars) {
                 final SchemaVariable schemaVar = schemaVar1;
@@ -255,12 +253,8 @@ public class InnerNodeView extends SequentView {
             // This seems to make cause the find one to be painted
             // over the if one.
 
-            final Range r;
-            if (app.posInOccurrence() == null) {
-                // rule does not have a find-part
-                r = null;
-            } else {
-                r = highlightPos(app.posInOccurrence(), RULEAPP_HIGHLIGHTER);
+            if (app.posInOccurrence() != null) {
+                highlightPos(app.posInOccurrence(), RULEAPP_HIGHLIGHTER);
             }
 
             if (app instanceof TacletApp) {
@@ -297,7 +291,7 @@ public class InnerNodeView extends SequentView {
                     = new PosInOccurrence(inst.getConstrainedFormula(),
                     PosInTerm.getTopLevel(),
                     inst.inAntec());
-            final Range r = highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
+            highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
         }
     }
 
@@ -305,7 +299,7 @@ public class InnerNodeView extends SequentView {
             throws BadLocationException {
         final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
         for (PosInOccurrence pio : ifs) {
-            final Range r = highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
+            highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
         }
     }
 

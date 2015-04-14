@@ -578,7 +578,7 @@ options {
                File path = new File(parent, filename);
                source = RuleSourceFactory.initRuleFile(path); 
         } else {
-            source = RuleSourceFactory.fromBuildInRule(filename+".key"); 
+            source = RuleSourceFactory.fromDefaultLocation(filename+".key"); 
         }
         if (ldt) {
             includes.putLDT(filename, source);

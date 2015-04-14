@@ -209,7 +209,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                           ImmutableList<ProgramVariable> paramVars,
                           Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
-       return contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
+        final Term freePre = contract.getFreePre(modHeaps, selfVar, paramVars, atPreVars, services);
+        final Term pre = contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
+        return freePre != null ? services.getTermBuilder().and(pre, freePre) : pre;
     }
 
     /**

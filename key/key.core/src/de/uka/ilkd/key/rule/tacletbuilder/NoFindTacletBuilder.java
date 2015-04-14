@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.BoundUniquenessChecker;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -70,17 +65,7 @@ public class NoFindTacletBuilder extends TacletBuilder {
     }
 
 
-    public void addGoalTerm(Term goalTerm) {
-        final SequentFormula axiomSf = new SequentFormula(goalTerm);
-        final Semisequent axiomSemiSeq =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(axiomSf).semisequent();
-        final Sequent axiomSeq = Sequent.createAnteSequent(axiomSemiSeq);
-        final TacletGoalTemplate axiomTemplate =
-                new AntecSuccTacletGoalTemplate(
-                axiomSeq, ImmutableSLList.<Taclet>nil(), Sequent.EMPTY_SEQUENT);
-        addTacletGoalTemplate(axiomTemplate);
-    }
-
+  
 
     /**
      * checks that a variableSV occurrs at most once in a quantifier of the

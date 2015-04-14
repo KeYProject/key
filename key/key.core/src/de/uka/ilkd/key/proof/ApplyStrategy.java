@@ -223,7 +223,7 @@ public class ApplyStrategy {
                                   int countApplied,
                                   SingleRuleApplicationInfo singleRuleApplicationInfo) {
             return countApplied >= maxApplications ||
-                   timeout >= 0 && System.currentTimeMillis() - startTime >= timeout;
+                   timeout >= 0 && System.nanoTime() - startTime >= timeout;
         }
 
         /**
@@ -299,18 +299,18 @@ public class ApplyStrategy {
 
         private final Throwable error;
 
-        private final long time;
+        private final long timeInNano;
         private final int appliedRuleAppsCount;
         private final int nrClosedGoals;
         private final Proof proof;
 
         public ApplyStrategyInfo(String message, Proof proof, Throwable error, Goal nonCloseableGoal,
-                long time, int appliedRuleAppsCount, int nrClosedGoals) {
+                long timeInNano, int appliedRuleAppsCount, int nrClosedGoals) {
             this.message = message;
             this.proof = proof;
             this.error   = error;
             this.nonCloseableGoal = nonCloseableGoal;
-            this.time    = time;
+            this.timeInNano    = timeInNano;
             this.appliedRuleAppsCount = appliedRuleAppsCount;
             this.nrClosedGoals = nrClosedGoals;
         }
@@ -332,7 +332,7 @@ public class ApplyStrategy {
         }
 
         public long getTime() {
-            return time;
+            return timeInNano;
         }
 
         public int getClosedGoals() {
@@ -356,7 +356,7 @@ public class ApplyStrategy {
                 sb.append("\n ").append(error.getMessage());
             }
             sb.append("\n Applied Rules: ").append(appliedRuleAppsCount);
-            sb.append("\n Time: ").append(time);
+            sb.append("\n Time: ").append(timeInNano);
             sb.append("\n Closed Goals: ").append(nrClosedGoals);
             return sb.toString();
         }
@@ -457,7 +457,7 @@ public class ApplyStrategy {
      */
     private synchronized ApplyStrategyInfo doWork(final IGoalChooser goalChooser,
                                                   final IStopCondition stopCondition) {
-        time = System.currentTimeMillis();
+        time = System.nanoTime();
         SingleRuleApplicationInfo srInfo = null;
         try{
             Debug.out("Strategy started.");
@@ -468,7 +468,7 @@ public class ApplyStrategy {
                 srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonCloseableGoal);
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
-                                                 System.currentTimeMillis()-time, countApplied,
+                                                 System.nanoTime()-time, countApplied,
                                                  closedGoals);
                 }
                 countApplied++;
@@ -483,19 +483,19 @@ public class ApplyStrategy {
                 return new ApplyStrategyInfo(
                         stopCondition.getStopMessage(maxApplications, timeout, proof, goalChooser,
                                                      time, countApplied, srInfo),
-                        proof, null, (Goal) null, System.currentTimeMillis()-time,
+                        proof, null, (Goal) null, System.nanoTime()-time,
                         countApplied, closedGoals);
             }
         } catch (InterruptedException e) {
             cancelled = true;
             return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
-                                         System.currentTimeMillis()-time, countApplied, closedGoals);
+                                         System.nanoTime()-time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             t.printStackTrace();
             return new ApplyStrategyInfo("Error.", proof, t, null, System.currentTimeMillis()-time,
                                          countApplied, closedGoals);
         } finally{
-            time = System.currentTimeMillis()-time;
+            time = (System.nanoTime()-time)/1000;
             Debug.out("Strategy stopped.");
             Debug.out("Applied ", countApplied);
             Debug.out("Time elapsed: ", time);

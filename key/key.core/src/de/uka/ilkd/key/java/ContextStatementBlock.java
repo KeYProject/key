@@ -43,13 +43,14 @@ public class ContextStatementBlock extends StatementBlock {
     /** 
      * the last execution context of the context term 
      */
-    private IExecutionContext executionContext;
+    private final IExecutionContext executionContext;
 
     /** creates a ContextStatementBlock 
      * @param children the body of the context term
      */
     public ContextStatementBlock(ExtList children) {
 	super(children);
+	executionContext = null;
     }
 
     /** creates a ContextStatementBlock 

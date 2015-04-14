@@ -71,9 +71,9 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     private final Constraint metavariableInst;
     private ImmutableMap<SchemaVariable,Term> newInstantiations =
                                 DefaultImmutableMap.<SchemaVariable,Term>nilMap();
-    private Services services;
+    private final Services services;
     private Term computedResult = null;
-    private TypeConverter typeConverter = null;
+    private final TypeConverter typeConverter;
     private final boolean allowPartialReplacement;
     private final boolean resolveSubsts;
     private final PosInOccurrence applicationPosInOccurrence;
@@ -110,6 +110,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                                      Goal goal) {
    this.termLabelState   = termLabelState;
 	this.services         = services;
+	this.typeConverter    = services.getTypeConverter();
 	this.svInst           = svInst;
 	this.metavariableInst = metavariableInst;
 	this.allowPartialReplacement = allowPartialReplacement;
@@ -168,34 +169,25 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 	return pe;
     }
 
-    private Services getServices () {
-       return services;
-    }
-
-    private TypeConverter getTypeConverter () {
-	if ( typeConverter == null )
-	    typeConverter = getServices ().getTypeConverter();
-	return typeConverter;
-    }
-
     private JavaBlock replacePrg(SVInstantiations svInst, JavaBlock jb) {
         if ( svInst.isEmpty() ) {
 	    return jb;
 	}
-	ProgramReplaceVisitor trans;
+	
+    ProgramReplaceVisitor trans;
 	ProgramElement result = null;
 
 	if (jb.program() instanceof ContextStatementBlock) {
 	    trans = new ProgramReplaceVisitor
 		(new StatementBlock(((ContextStatementBlock)jb.program()).getBody()), // TODO
-		 getServices (),
+		 services,
 		 svInst,
 		 allowPartialReplacement);
 	    trans.start();
 	    result = addContext((StatementBlock)trans.result());
 	} else {
 	    trans = new ProgramReplaceVisitor(jb.program(),
-					      getServices (),
+					      services,
 					      svInst,
 					      allowPartialReplacement);
 	    trans.start();
@@ -238,7 +230,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 // use the visitor recursively for replacing metavariables that
                 // might occur in the term (if possible)
                 final SyntacticalReplaceVisitor srv =
-                    new SyntacticalReplaceVisitor (termLabelState, getServices(), metavariableInst, applicationPosInOccurrence, rule, labelHint, goal);
+                    new SyntacticalReplaceVisitor (termLabelState, services, metavariableInst, applicationPosInOccurrence, rule, labelHint, goal);
                 t.execPostOrder ( srv );
                 return srv.getTerm ();
             }
@@ -249,7 +241,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 		? null
 		: svInst.getContextInstantiation()
 		               .activeStatementContext();
-	    return getTypeConverter().
+	    return typeConverter.
 		convertToLogicElement((ProgramElement)o, ec);
 	}
         de.uka.ilkd.key.util.Debug.fail("Wrong instantiation in SRVisitor: " + o);
@@ -301,50 +293,57 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
         return newOp;
     }
 
-    private Operator instantiateOperator(Operator op) {
-	if (op instanceof ModalOperatorSV){
-            return instantiateOperatorSV((ModalOperatorSV) op);
-        } else if (op instanceof SortDependingFunction) {
-            return handleSortDependingSymbol((SortDependingFunction)op);
-        } else if (op instanceof ElementaryUpdate) {
-	    return instantiateElementaryUpdate((ElementaryUpdate)op);
-	}  else if (op instanceof ProgramSV && ((ProgramSV)op).isListSV()){
-            return op;
-        } else if (op instanceof SchemaVariable) {
-	    return (Operator)svInst.getInstantiation((SchemaVariable)op);
-	}
-	return op;
+    private Operator instantiateOperator(Operator p_operatorToBeInstantiated) {
+        Operator instantiatedOp = p_operatorToBeInstantiated;
+        if (p_operatorToBeInstantiated instanceof ModalOperatorSV){
+            instantiatedOp = instantiateOperatorSV((ModalOperatorSV) p_operatorToBeInstantiated);
+        } else if (p_operatorToBeInstantiated instanceof ProgramSV && ((ProgramSV)p_operatorToBeInstantiated).isListSV()){
+            instantiatedOp = p_operatorToBeInstantiated;
+        } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
+            instantiatedOp = (Operator)svInst.getInstantiation((SchemaVariable)p_operatorToBeInstantiated);
+        } else if (p_operatorToBeInstantiated instanceof SortDependingFunction) {
+            instantiatedOp = handleSortDependingSymbol((SortDependingFunction)p_operatorToBeInstantiated);
+        } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
+            instantiatedOp = instantiateElementaryUpdate((ElementaryUpdate)p_operatorToBeInstantiated);
+        }
+
+        if (instantiatedOp == null) {
+            // only partial instantiation information available
+            // use original op
+            instantiatedOp = p_operatorToBeInstantiated;
+        }
+        return instantiatedOp;
     }
 
     private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(Term visited) {
-        final ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
-        final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)?
-        	new QuantifiableVariable[vBoundVars.size()]
-        	                         : EMPTY_QUANTIFIABLE_VARS;
-        boolean varsChanged = false;
+        ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
+        if (!vBoundVars.isEmpty()) {
+            final QuantifiableVariable[] newVars = 
+                    new QuantifiableVariable[vBoundVars.size()];
+            boolean varsChanged = false;
 
-        for(int j = 0, size = vBoundVars.size(); j < size; j++) {
-            QuantifiableVariable boundVar = vBoundVars.get(j);
-            if (boundVar instanceof SchemaVariable) {
-        	final SchemaVariable boundSchemaVariable =
-        	    (SchemaVariable) boundVar;
-        	if (svInst.isInstantiated(boundSchemaVariable)) {
-        	    boundVar = ((QuantifiableVariable) ((Term) svInst
-        		    .getInstantiation(boundSchemaVariable))
-        		    .op());
-        	} else {
-        	    // this case may happen for PO generation of
-        	    // taclets
-        	    boundVar = (QuantifiableVariable)boundSchemaVariable;
-        	}
-        	varsChanged = true;
+            for(int j = 0, size = vBoundVars.size(); j < size; j++) {
+                QuantifiableVariable boundVar = vBoundVars.get(j);
+                if (boundVar instanceof SchemaVariable) {
+                    final SchemaVariable boundSchemaVariable = (SchemaVariable) boundVar;
+                    final Term instantiationForBoundSchemaVariable = (Term) svInst
+                            .getInstantiation(boundSchemaVariable);
+                    if (instantiationForBoundSchemaVariable != null) {
+                        boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
+                    } else {
+                        // this case may happen for PO generation of taclets
+                        boundVar = (QuantifiableVariable) boundSchemaVariable;
+                    }
+                    varsChanged = true;
+                }
+                newVars[j] = boundVar;
             }
-            newVars[j] = boundVar;
-        }
 
-        return  varsChanged
-        	? new ImmutableArray<QuantifiableVariable>(newVars)
-                : vBoundVars;
+            if (varsChanged) {
+                vBoundVars = new ImmutableArray<QuantifiableVariable>(newVars);
+            }
+        }
+        return vBoundVars;
     }
     
     /**
@@ -370,11 +369,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
         } else {
             Operator newOp = instantiateOperator(visitedOp);
 
-            if (newOp == null) {
-                // only partial instantiation information available
-                // use original op
-                newOp = visitedOp;
-            }
+
 
             boolean operatorInst = (newOp != visitedOp);
 
@@ -455,7 +450,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 
         final Sort realDepSort =
             svInst.getGenericSortInstantiations ()
-                                       .getRealSort ( depSort, getServices() );
+                                       .getRealSort ( depSort, services );
 
 
         final Operator res = depOp.getInstanceFor ( realDepSort, services );
@@ -518,7 +513,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     public void subtreeLeft(Term subtreeRoot){
 	if (subtreeRoot.op() instanceof TermTransformer) {
 	    TermTransformer mop = (TermTransformer) subtreeRoot.op();
-	    Term newTerm = mop.transform((Term)subStack.pop(),svInst, getServices());
+	    Term newTerm = mop.transform((Term)subStack.pop(),svInst, services);
 	    pushNew(services.getTermBuilder().label(newTerm,
 	                                 instantiateLabels(subtreeRoot, newTerm.op(),
 	                                                   newTerm.subs(), newTerm.boundVars(),

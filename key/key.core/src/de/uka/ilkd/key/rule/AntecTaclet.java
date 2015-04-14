@@ -64,7 +64,7 @@ public class AntecTaclet extends FindTaclet{
 	super(name, applPart, goalTemplates, heuristics, attrs, 
 	      find, prefixMap, choices);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
-	cacheMatchInfo();
+	createAndInitializeMatcher();
     }
 
    
@@ -74,7 +74,7 @@ public class AntecTaclet extends FindTaclet{
      * @return true if top level updates shall be ignored 
      */
     @Override
-    protected boolean ignoreTopLevelUpdates() {
+    public boolean ignoreTopLevelUpdates() {
 	return ignoreTopLevelUpdates;
     }
 

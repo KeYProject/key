@@ -82,7 +82,7 @@ public class TestTacletIndex extends TestCase{
 	notfreeconflict = NoPosTacletApp.createNoPosTacletApp(taclet("not_free_conflict"));
 	
 
-	variante_one = new TacletIndex();
+	variante_one = TacletIndexKit.getKit().createTacletIndex();
 	variante_one.add(ruleRewriteNonH1H2);
 	variante_one.add(ruleNoFindNonH1H2H3);
 	variante_one.add(ruleAntecH1);
@@ -213,7 +213,7 @@ public class TestTacletIndex extends TestCase{
 
     public void testMatchConflictOccurs() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
-        TacletIndex ruleIdx=new TacletIndex();
+        TacletIndex ruleIdx=TacletIndexKit.getKit().createTacletIndex();
 	ruleIdx.add(ruleRewriteNonH1H2);
 	ruleIdx.add(ruleNoFindNonH1H2H3);
 	ruleIdx.add(ruleAntecH1);
@@ -234,7 +234,7 @@ public class TestTacletIndex extends TestCase{
     }
 
     public void testNotFreeInYConflict() {
-	TacletIndex ruleIdx=new TacletIndex();
+	TacletIndex ruleIdx=TacletIndexKit.getKit().createTacletIndex();
 	ruleIdx.add(notfreeconflict);
 
 	Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");

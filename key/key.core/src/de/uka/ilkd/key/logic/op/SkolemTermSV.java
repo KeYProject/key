@@ -13,10 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
 
 /**
  * Schema variable that is instantiated with fresh Skolem constants. At the
@@ -38,19 +36,6 @@ public final class SkolemTermSV extends AbstractSV {
 	assert sort != Sort.UPDATE;
     }
 	
-    
-    @Override
-    public MatchConditions match(SVSubstitute subst, 
-	    			 MatchConditions mc,
-	    			 Services services) {
-	if(subst.equals(mc.getInstantiations().getInstantiation(this))) {
-	    return mc;
-	} else {
-	    return null;
-	}
-    }
-    
-    
     @Override
     public String toString() {
 	return toString(sort().toString() + " skolem term");

@@ -53,6 +53,7 @@ tokens {
     DEPENDS         = "depends";  // internal translation for 'accessible' on model fields
     DETERMINES      = "determines";  //KeY extension, not official JML
     ENSURES         = "ensures";
+    ENSURES_FREE    = "ensures_free";
     LOOP_DETERMINES = "loop_determines";  // internal translation for 'determines' in loop invariants
     LOOP_SEPARATES  = "loop_separates";  //KeY extension, deprecated
     MODEL_METHOD_AXIOM    = "model_method_axiom";  //KeY extension, not official JML
@@ -60,6 +61,7 @@ tokens {
     NULLABLE        = "nullable";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
+    REQUIRES_FREE   = "requires_free";
     RETURNS         = "returns";  //KeY extension, not official JML
     SEPARATES       = "separates";  //KeY extension, not official JML
     SIGNALS         = "signals";

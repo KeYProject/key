@@ -92,6 +92,17 @@ public class TacletGenerator {
         return instance;
     }
 
+    
+    private TacletGoalTemplate createAxiomGoalTemplate(Term goalTerm) {
+        final SequentFormula axiomSf = new SequentFormula(goalTerm);
+        final Semisequent axiomSemiSeq =
+                Semisequent.EMPTY_SEMISEQUENT.insertFirst(axiomSf).semisequent();
+        final Sequent axiomSeq = Sequent.createAnteSequent(axiomSemiSeq);
+        final TacletGoalTemplate axiomTemplate =
+                new TacletGoalTemplate(axiomSeq, ImmutableSLList.<Taclet>nil());
+        return axiomTemplate;
+    }
+
 
     /**
      * Returns a no-find taclet to the passed axiom.
@@ -113,7 +124,7 @@ public class TacletGenerator {
         //create taclet
         NoFindTacletBuilder tacletBuilder = new NoFindTacletBuilder();
         tacletBuilder.setName(tacletName);
-        tacletBuilder.addGoalTerm(schemaAxiom.term);
+        tacletBuilder.addTacletGoalTemplate(createAxiomGoalTemplate(schemaAxiom.term));
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, schemaVars);
         tacletBuilder.addRuleSet(ruleSet);
         return tacletBuilder.getTaclet();

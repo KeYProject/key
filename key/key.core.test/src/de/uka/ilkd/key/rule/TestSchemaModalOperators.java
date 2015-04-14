@@ -46,6 +46,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -174,10 +175,9 @@ public class TestSchemaModalOperators extends TestCase {
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
             TB.ff());
-         MatchConditions mc=(t.match                                                   
+         MatchConditions mc=t.getMatcher().matchFind                                                   
                             (goal,                                                        
-                             find,                                                
-                             MatchConditions.EMPTY_MATCHCONDITIONS, null));
+                             MatchConditions.EMPTY_MATCHCONDITIONS, null);
 	 assertNotNull(mc);
 	 assertNotNull(mc.getInstantiations().getInstantiation(osv));
 	 Debug.out("Match conditions: ", mc.getInstantiations());
@@ -193,7 +193,7 @@ public class TestSchemaModalOperators extends TestCase {
     public void testSchemaModalities2() {
 	//	Debug.ENABLE_DEBUG = true;
 	NoPosTacletApp testmodal1=TacletForTests.getRules().lookup("testSchemaModal1");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal1 );
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
@@ -227,7 +227,7 @@ public class TestSchemaModalOperators extends TestCase {
     public void testSchemaModalities3() {
 	//	Debug.ENABLE_DEBUG = true;
 	NoPosTacletApp testmodal2=TacletForTests.getRules().lookup("testSchemaModal2");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal2 );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
@@ -257,7 +257,7 @@ public class TestSchemaModalOperators extends TestCase {
     public void testSchemaModalities4() {
 	//	Debug.ENABLE_DEBUG = true;
 	NoPosTacletApp testmodal3=TacletForTests.getRules().lookup("testSchemaModal3");
-	TacletIndex tacletIndex = new TacletIndex ();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	tacletIndex.add ( testmodal3 );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos= new 

@@ -47,7 +47,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -159,7 +159,7 @@ public class TestTermLabelManager extends TestCase {
    protected Goal createGoal(InitConfig initConfig, Sequent sequent) {
       Proof proof = new Proof("TestTermLabelManager", initConfig.deepCopy());
       Node node = new Node(proof, sequent);
-      return new Goal(node, new RuleAppIndex(new TacletAppIndex(new TacletIndex(), initConfig.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), initConfig.getServices()));
+      return new Goal(node, new RuleAppIndex(new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(), initConfig.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), initConfig.getServices()));
    }
 
    protected void compareSequents(Sequent expected, Sequent current, boolean changed, RefactoringScope scope) {

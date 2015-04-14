@@ -64,7 +64,7 @@ public class SuccTaclet extends FindTaclet{
 	super(name, applPart, goalTemplates, heuristics, attrs,
 	      find, prefixMap, choices);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
-	cacheMatchInfo();
+	createAndInitializeMatcher();
     }	
 
     /** this method is used to determine if top level updates are
@@ -73,7 +73,7 @@ public class SuccTaclet extends FindTaclet{
      * @return true if top level updates shall be ignored 
      */
     @Override
-    protected boolean ignoreTopLevelUpdates() {
+    public boolean ignoreTopLevelUpdates() {
 	return ignoreTopLevelUpdates;
     }
 

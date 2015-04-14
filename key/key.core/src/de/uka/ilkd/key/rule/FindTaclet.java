@@ -27,16 +27,12 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.tacletbuilder.FindTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.util.Pair;
 
 
 /** 
@@ -60,7 +56,7 @@ public abstract class FindTaclet extends Taclet {
      * SuccTaclet but not for a RewriteTaclet
      * @return true if top level updates shall be ignored 
      */
-    protected abstract boolean ignoreTopLevelUpdates();
+    public abstract boolean ignoreTopLevelUpdates();
 
     
     /** creates a FindTaclet 
@@ -124,63 +120,7 @@ public abstract class FindTaclet extends Taclet {
 	return find;
     }
     
-    /**
-     * ignores a possible update prefix
-     * @param term the term to be matched
-     * @param template the pattern term
-     * @param matchCond the accumulated match conditions for a successful match
-     * @param services the Services
-     * @return a pair of updated match conditions and the unwrapped term without the ignored updates (Which have been added to the update context in the match conditions)
-     */
-    private Pair<Term,MatchConditions> matchAndIgnoreUpdatePrefix(final Term term,
-            final Term template, MatchConditions matchCond, final TermServices services) {
-
-        final Operator sourceOp   = term.op ();
-        final Operator templateOp = template.op ();
-
-        if ( sourceOp instanceof UpdateApplication
-                && !(templateOp instanceof UpdateApplication) ) {
-            // updates can be ignored
-            Term update = UpdateApplication.getUpdate(term);
-            matchCond = matchCond
-                    .setInstantiations ( matchCond.getInstantiations ().
-                            addUpdate (update, term.getLabels()) );
-            return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), 
-                    template, matchCond, services);       
-        } else {
-            return new Pair<Term, MatchConditions>(term, matchCond);
-        }
-    }
-
-
-    /** 
-     * matches the given term against the taclet's find term and
-     * @param term the Term to be matched against the find expression 
-     * of the taclet
-     * @param matchCond the MatchConditions with side conditions to be 
-     * satisfied, eg. partial instantiations of schema variables; before
-     * calling this method the constraint contained in the match conditions
-     * must be ensured to be satisfiable, i.e.
-     *       <tt> matchCond.getConstraint ().isSatisfiable () </tt>
-     * must return true
-     * @param services the Services 
-     * @return the found schema variable mapping or <tt>null</tt> if 
-     * the matching failed
-     */
-    public MatchConditions matchFind(Term term,
-            MatchConditions matchCond,
-            Services services) {
-        
-        if (ignoreTopLevelUpdates()) {
-        	Pair</* term below updates */Term, MatchConditions> resultUpdateMatch = 
-                    matchAndIgnoreUpdatePrefix(term, find(), matchCond, services);
-            term = resultUpdateMatch.first;
-            matchCond = resultUpdateMatch.second;
-        }
-        
-        return match(term, find(), matchCond, services);
-    }
-
+ 
     /** CONSTRAINT NOT USED 
      * applies the replacewith part of Taclets
      * @param termLabelState The {@link TermLabelState} of the current rule application.

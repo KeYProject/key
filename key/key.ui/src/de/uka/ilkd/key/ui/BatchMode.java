@@ -113,10 +113,10 @@ public class BatchMode {
                 statPrinter.println (statistics.totalRuleApps + " | " +
                                      statistics.nodes + " | " +
                                      statistics.branches + " | " +
-                                     statistics.time + " | " +
-                                     statistics.autoModeTime + " | " +
+                                     (statistics.timeInNano/1000000) + " | " +
+                                     (statistics.autoModeTimeInNano/1000000) + " | " +
                                      (proofClosed ? 1 : 0) + " | " +
-                                     statistics.timePerStep + " | " +
+                                     (statistics.timePerStepInNano/1000000) + " | " +
                                      memory);
             statPrinter.close();
         } catch ( IOException e ) {

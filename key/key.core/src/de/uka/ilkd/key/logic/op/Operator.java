@@ -15,11 +15,9 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
 
 
 /** 
@@ -68,20 +66,4 @@ public interface Operator extends Named, SVSubstitute {
      * the {@link Term} is valid.
      */
     boolean validTopLevel(Term term);
-    
-    
-    /**
-     * Tests if this operator (plays role of a template) matches 
-     * the given operator with respect to the given match 
-     * conditions. 
-     * If matching fails <code>null</code> is returned.
-     * @param subst the Operator to match 
-     * @param mc the MatchConditions to pay respect to
-     * @param services the Services to access model information
-     * @return the resulting match conditions (e.g. with new added
-     * instantiations of schema variables)
-     */
-    MatchConditions match(SVSubstitute subst, 
-	                  MatchConditions mc, 
-	                  Services services); 
 }

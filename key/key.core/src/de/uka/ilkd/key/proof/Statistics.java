@@ -32,9 +32,9 @@ public class Statistics {
     public final int dependencyContractApps;
     public final int operationContractApps;
     public final int loopInvApps;
-    public final long autoModeTime;
-    public final long time;
-    public final float timePerStep;
+    public final long autoModeTimeInNano;
+    public final long timeInNano;
+    public final float timePerStepInNano;
 
     private List<Pair<String, String>> summaryList =
                     new ArrayList<Pair<String, String>>(14);
@@ -49,9 +49,9 @@ public class Statistics {
                        int dependencyContractApps,
                        int operationContractApps,
                        int loopInvApps,
-                       long autoModeTime,
-                       long time,
-                       float timePerStep) {
+                       long autoModeTimeInNano,
+                       long timeInNano,
+                       float timePerStepInNano) {
         this.nodes = nodes;
         this.branches = branches;
         this.interactiveSteps = interactiveSteps;
@@ -62,9 +62,9 @@ public class Statistics {
         this.dependencyContractApps = dependencyContractApps;
         this.operationContractApps = operationContractApps;
         this.loopInvApps = loopInvApps;
-        this.autoModeTime = autoModeTime;
-        this.time = time;
-        this.timePerStep = timePerStep;
+        this.autoModeTimeInNano = autoModeTimeInNano;
+        this.timeInNano = timeInNano/1000000;
+        this.timePerStepInNano = timePerStepInNano;
     }
 
     static Statistics create(Statistics side, long creationTime) {
@@ -78,9 +78,9 @@ public class Statistics {
                                   side.dependencyContractApps,
                                   side.operationContractApps,
                                   side.loopInvApps,
-                                  side.autoModeTime,
-                                  System.currentTimeMillis() - creationTime,
-                                  side.timePerStep);
+                                  side.autoModeTimeInNano,
+                                  System.nanoTime() - creationTime,
+                                  side.timePerStepInNano);
     }
 
     Statistics(Proof proof) {
@@ -149,9 +149,9 @@ public class Statistics {
         this.dependencyContractApps = tmpDep;
         this.operationContractApps = tmpContr;
         this.loopInvApps = tmpInv;
-        this.autoModeTime = proof.getAutoModeTime();
-        this.time = System.currentTimeMillis() - proof.creationTime;
-        timePerStep = nodes<=1? .0f: (autoModeTime/(float)(nodes-1));
+        this.autoModeTimeInNano = proof.getAutoModeTime();
+        this.timeInNano = (System.nanoTime() - proof.creationTime);
+        timePerStepInNano = nodes<=1? .0f: (autoModeTimeInNano/(float)(nodes-1));
 
         generateSummary(proof);
     }
@@ -164,7 +164,7 @@ public class Statistics {
             sideProofs = ((InfFlowProof) proof).hasSideProofs();
             if (sideProofs) {
                 final long autoTime = proof.getAutoModeTime()
-                        + ((InfFlowProof)proof).getSideProofStatistics().autoModeTime;
+                        + ((InfFlowProof)proof).getSideProofStatistics().autoModeTimeInNano;
                 final SideProofStatistics side = ((InfFlowProof) proof).getSideProofStatistics().add(this).setAutoModeTime(autoTime);
                 stat = Statistics.create(side, proof.creationTime);
             } 
@@ -179,17 +179,17 @@ public class Statistics {
                         stat.interactiveSteps));
         
         
-        final long time = sideProofs ? stat.autoModeTime : proof.getAutoModeTime();
+        final long time = sideProofs ? stat.autoModeTimeInNano : proof.getAutoModeTime();
         
         summaryList.add(new Pair<String, String>("Automode time",
-                        EnhancedStringBuffer.formatTime(time).toString()));
-        if (time >= 10000) {
+                        EnhancedStringBuffer.formatTime(time/1000000).toString()));
+        if (time >= 10000000000L) {
             summaryList.add(new Pair<String, String>("Automode time", "" +
-                            time +
+                            (time/1000000) +
                             "ms"));
         }
         if (stat.nodes > 0) {
-            String avgTime = "" + stat.timePerStep;
+            String avgTime = "" + (stat.timePerStepInNano/1000000);
             // round to 3 digits after point
             int i = avgTime.indexOf('.')+4;
             if (i > avgTime.length()) i = avgTime.length();

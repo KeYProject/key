@@ -61,7 +61,7 @@ public class NoFindTaclet extends Taclet {
 		      ImmutableSet<Choice> choices){
 	super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, 
 	      choices);
-	cacheMatchInfo();
+	createAndInitializeMatcher();
     } 
 
    /**

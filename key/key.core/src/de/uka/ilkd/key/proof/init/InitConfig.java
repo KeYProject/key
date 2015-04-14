@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
@@ -328,7 +329,7 @@ public class InitConfig {
      * taclets contained in this initial configuration
      */
     public TacletIndex createTacletIndex() {
-        return new TacletIndex(activatedTaclets());
+        return TacletIndexKit.getKit().createTacletIndex(activatedTaclets());
     }
 
 
@@ -448,4 +449,6 @@ public class InitConfig {
             "Taclets:" + getTaclets() +"\n"+
             "Built-In:" + builtInRules() +"\n";
     }
+
+
 }

@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import java.util.Iterator;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -56,13 +54,10 @@ class TacletConditions {
       
     
     public TacletConditions(Taclet t) throws IllegalTacletException{
-	
-	Iterator<VariableCondition> it = t.getVariableConditions();
-	
+		
 
-	while(it.hasNext()){
+	for(final VariableCondition cond: t.getVariableConditions()) {
 	    boolean supported = false;
-	    VariableCondition cond = it.next();
 
 	    if(cond instanceof TypeComparisonCondition){
 		comparisionCondition = 

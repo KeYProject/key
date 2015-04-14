@@ -50,7 +50,7 @@ public class MethodFrame extends JavaStatement implements
     
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
     
-    private PosInProgram firstActiveChildPos = null;
+    private final PosInProgram firstActiveChildPos;
     
     /**
      *      Labeled statement.
@@ -64,8 +64,13 @@ public class MethodFrame extends JavaStatement implements
         this.resultVar   = resultVar;
         this.body        = body;
         this.execContext = execContext;
-     
+               
         prefixElementArray = computePrefix(body);
+        
+        firstActiveChildPos = 
+                body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.
+                down(getChildCount()-1).down(0);
+
 	Debug.assertTrue(execContext != null, 
 			 "methodframe: executioncontext missing");
 	Debug.assertTrue(body != null, 
@@ -88,6 +93,12 @@ public class MethodFrame extends JavaStatement implements
         this.execContext = execContext;
      
         prefixElementArray = computePrefix(body);
+        
+        firstActiveChildPos = 
+                body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.
+                down(getChildCount()-1).down(0);
+
+        
 	Debug.assertTrue(execContext != null, 
 			 "methodframe: executioncontext missing");
 	Debug.assertTrue(body != null, 
@@ -114,9 +125,7 @@ public class MethodFrame extends JavaStatement implements
     
     public PosInProgram getFirstActiveChildPos() {        
         if (firstActiveChildPos == null) {
-            firstActiveChildPos = 
-                body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.
-                down(getChildCount()-1).down(0);
+            
         }
         return firstActiveChildPos;
     }

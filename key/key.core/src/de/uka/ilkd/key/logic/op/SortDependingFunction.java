@@ -15,16 +15,11 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.SortException;
-import de.uka.ilkd.key.util.Debug;
 
 
 /**
@@ -92,48 +87,7 @@ public final class SortDependingFunction extends Function {
     
     
 
-    /**
-     * tries to match sort <code>s1</code> to fit sort <code>s2</code>
-     * @param s1 Sort tried to matched (maybe concrete or (contain) generic)
-     * @param s2 concrete Sort 
-     * @param mc the MatchConditions up to now
-     * @return <code>null</code> if failed the resulting match conditions 
-     * otherwise 
-     */
-    private static MatchConditions matchSorts(Sort s1, 
-	    			              Sort s2, 
-	    			              MatchConditions mc,
-	    			              Services services) {
-// This restriction has been dropped for free generic sorts to prove taclets correct
-//        assert !(s2 instanceof GenericSort)
-//               : "Sort s2 is not allowed to be of type generic.";
-        if (!(s1 instanceof GenericSort)) {
-            if (s1 == s2) {
-                return mc;
-            } else {
-                Debug.out("FAIL. Sorts not identical.", s1, s2);
-                return null;
-            }
-        } else {        
-            final GenericSort gs = (GenericSort)s1;
-            final GenericSortCondition c 
-            	= GenericSortCondition.createIdentityCondition(gs, s2);                                               
-            if(c == null) {
-                Debug.out("FAILED. Generic sort condition");
-                return null;
-            } else {
-                try {                   
-                    mc = mc.setInstantiations(mc.getInstantiations()
-                	                        .add(c, services));
-                } catch(SortException e) {
-                    Debug.out("FAILED. Sort mismatch.", s1, s2);
-                    return null;
-                }
-            }                  
-        }               
-        return mc;
-    }
-    
+ 
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
@@ -221,44 +175,6 @@ public final class SortDependingFunction extends Function {
     public Name getKind() {
 	return template.kind;
     }
-
-
-    
-    /**
-     * Taking this sortdepending function as template to be matched against <code>op</code>, 
-     * the necessary conditions are returned or null if not unifiable (matchable).
-     * A sortdepending function is matched successfully against another sortdepending function
-     * if the sorts can be matched and they are of same kind.      
-     */
-    @Override    
-    public MatchConditions match(SVSubstitute subst, 
-                                 MatchConditions mc,
-                                 Services services) {  
-        if(!(subst instanceof SortDependingFunction)) {
-            Debug.out("FAILED. Given operator cannot be matched by a sort" +
-            		"depending function (template, orig)", this, subst);
-            return null;
-        }
-
-        final SortDependingFunction sdp = (SortDependingFunction)subst;   
-        if(!isSimilar(sdp)) {
-            Debug.out("FAILED. Sort depending symbols not similar.", this, subst);
-            return null;
-        }
-        
-        final MatchConditions result =  matchSorts(getSortDependingOn(), 
-        		      	                   sdp.getSortDependingOn(), 
-        		      	                   mc,
-        		      	                   services);        
-        if (result == null) {
-            Debug.out("FAILED. Depending sorts not unifiable.", this, subst);
-            return null;
-        }
-        
-        return result;
-    }
-    
-    
     
     //-------------------------------------------------------------------------
     //inner classes

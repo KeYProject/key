@@ -133,7 +133,7 @@ public class InfoTreeModel extends DefaultTreeModel {
             InfoTreeNode proveableTacletsRoot = new InfoTreeNode(LEMMAS, ruleExplanations);
             insertAsLast(proveableTacletsRoot, this);
 
-            if (goal != null) {
+            if (goal != null && goal.proof() != null && goal.proof().mgt() != null) {
                 for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
                     insertAsLast(new InfoTreeNode(br.displayName(), ruleExplanations), builtInRoot);
                 }

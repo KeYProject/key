@@ -196,10 +196,12 @@ public class JMLSpecFactory {
 
         public ImmutableList<Term> abbreviations = ImmutableSLList.<Term>nil();
         public Map<LocationVariable,Term> requires = new LinkedHashMap<LocationVariable,Term>();
+        public Map<LocationVariable,Term> requiresFree = new LinkedHashMap<LocationVariable,Term>();
         public Term measuredBy;
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
         public Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable,Term>();
         public Map<LocationVariable,Term> ensures = new LinkedHashMap<LocationVariable,Term>();
+        public Map<LocationVariable,Term> ensuresFree = new LinkedHashMap<LocationVariable,Term>();
         public Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
         public Term signals;
         public Term signalsOnly;
@@ -373,6 +375,19 @@ public class JMLSpecFactory {
                                                             textualSpecCase.getRequires(
                                                                     heap.name().toString())));
            }
+
+            if (heap == savedHeap
+                    && textualSpecCase.getRequiresFree(heap.name().toString()).isEmpty()) {
+                clauses.requiresFree.put(heap, null);
+            } else {
+                clauses.requiresFree.put(
+                        heap,
+                        translateAndClauses(pm, progVars.selfVar,
+                                progVars.paramVars, null, null,
+                                progVars.atPres, textualSpecCase
+                                        .getRequiresFree(heap.name().toString())));
+            }
+
            if(heap == savedHeap && textualSpecCase.getEnsures(heap.name().toString()).isEmpty()) {
              clauses.ensures.put(heap, null);
            }else{
@@ -383,6 +398,22 @@ public class JMLSpecFactory {
                                            originalBehavior,
                                            textualSpecCase.getEnsures(heap.name().toString())));
           }
+
+            if (heap == savedHeap
+                    && textualSpecCase.getEnsuresFree(heap.name().toString()).isEmpty()) {
+                clauses.ensuresFree.put(heap, null);
+            } else {
+                clauses.ensuresFree.put(
+                        heap,
+                        translateAndClauses(
+                                pm, progVars.selfVar,
+                                progVars.paramVars, progVars.resultVar,
+                                progVars.excVar, progVars.atPres,
+                                textualSpecCase
+                                        .getEnsuresFree(heap.name().toString())));
+            }
+
+
           if(textualSpecCase.getAxioms(heap.name().toString()).isEmpty()) {
         	  clauses.axioms.put(heap, null);
           }else{
@@ -883,15 +914,17 @@ public class JMLSpecFactory {
         if (clauses.diverges.equals(TB.ff())) {
             // create diamond modality contract
             FunctionalOperationContract contract =
-                    cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    cf.func(name, pm, true, pres, clauses.requiresFree, clauses.measuredBy, posts,
+                            clauses.ensuresFree, axioms, clauses.assignables,
+                            clauses.accessibles, clauses.hasMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             // create box modality contract
             FunctionalOperationContract contract =
-                    cf.func(name, pm, false, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    cf.func(name, pm, false, pres, clauses.requiresFree, clauses.measuredBy, posts,
+                            clauses.ensuresFree, axioms, clauses.assignables,
+                            clauses.accessibles, clauses.hasMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
@@ -904,11 +937,13 @@ public class JMLSpecFactory {
               }
             }
             FunctionalOperationContract contract1 =
-                    cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    cf.func(name, pm, true, pres, clauses.requiresFree, clauses.measuredBy, posts,
+                            clauses.ensuresFree, axioms, clauses.assignables,
+                            clauses.accessibles, clauses.hasMod, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 =
-                    cf.func(name, pm, false, clauses.requires, clauses.measuredBy, posts, axioms,
+                    cf.func(name, pm, false, clauses.requires, clauses.requiresFree,
+                            clauses.measuredBy, posts ,clauses.ensuresFree, axioms,
                         clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);

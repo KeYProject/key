@@ -41,7 +41,7 @@ public interface IBreakpoint {
     * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
     * @param proof The current {@link Proof}.
     * @param goalChooser The current {@link IGoalChooser}.
-    * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
+    * @param startTime The timestamp when the apply strategy has started, computed via {@link System#nanoTime()}
     * @param countApplied The number of already applied rules.
     * @param goal The current {@link Goal} on which the next rule will be applied.
     */

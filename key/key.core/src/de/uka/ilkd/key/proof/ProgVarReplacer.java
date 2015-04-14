@@ -100,7 +100,6 @@ public final class ProgVarReplacer {
         base.addedFormula(idx, addCf);
 
         base.setFormulaList(next.getFormulaList());
-        base.setSemisequent(next.semisequent());
     }
 
     /**
@@ -246,8 +245,7 @@ public final class ProgVarReplacer {
      */
     public SemisequentChangeInfo replace(Semisequent s) {
     	  SemisequentChangeInfo result = new SemisequentChangeInfo();
-        result.setFormulaList(s.toList());
-        result.setSemisequent(s);
+        result.setFormulaList(s.asList());
 
         final Iterator<SequentFormula> it = s.iterator();
         

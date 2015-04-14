@@ -19,22 +19,18 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SemisequentChangeInfo;
@@ -47,22 +43,20 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.util.Debug;
 
 
 /** 
@@ -121,11 +115,12 @@ public abstract class Taclet implements Rule, Named {
     
     /** the set of taclet options for this taclet */
     protected final ImmutableSet<Choice> choices;
-
+    
     /**
      * the <tt>if</tt> sequent of the taclet
      */
     private final Sequent ifSequent;
+    
     /** 
      * Variables that have to be created each time the taclet is applied. 
      * Those variables occur in the varcond part of a taclet description.
@@ -154,7 +149,7 @@ public abstract class Taclet implements Rule, Named {
     private final ImmutableList<TacletGoalTemplate> goalTemplates;
 
     /**
-     * list of rulesets (formerly known as heuristica) the taclet belongs to
+     * list of rulesets (formerly known as heuristics) the taclet belongs to
      */
     protected final ImmutableList<RuleSet> ruleSets;
 
@@ -174,10 +169,6 @@ public abstract class Taclet implements Rule, Named {
     private boolean contextInfoComputed = false;
     private boolean contextIsInPrefix   = false;
     
-    /** true if one of the goal descriptions is a replacewith */
-    private boolean hasReplaceWith      = false;
-     
-    
     protected String tacletAsString;
 
     /** Set of schemavariables of the if part */
@@ -185,8 +176,7 @@ public abstract class Taclet implements Rule, Named {
 
     /** This map contains (a, b) if there is a substitution {b a}
      * somewhere in this taclet */
-    private ImmutableMap<SchemaVariable,SchemaVariable>
-	svNameCorrespondences = null;
+    private ImmutableMap<SchemaVariable,SchemaVariable> svNameCorrespondences = null;
 	
     /** Integer to cache the hashcode */
     private int hashcode = 0;    
@@ -196,11 +186,13 @@ public abstract class Taclet implements Rule, Named {
     /* TODO: find better solution*/
     private final boolean surviveSymbExec;
     
-    
+    /** 
+     * The taclet matcher
+     */
+    private TacletMatcher matcher;
 
     /**
-     * creates a Schematic Theory Specific Rule (Taclet) with the given
-     * parameters.  
+     * creates a Taclet (originally known as Schematic Theory Specific Rules)
      * @param name the name of the Taclet 
      * @param applPart contains the application part of an Taclet that is
      * the if-sequence, the variable conditions
@@ -243,6 +235,10 @@ public abstract class Taclet implements Rule, Named {
         return trigger;
     }
 
+    public final TacletMatcher getMatcher() {
+       return matcher;
+    }
+    
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
      * parameters.
@@ -262,22 +258,12 @@ public abstract class Taclet implements Rule, Named {
            TacletAttributes attrs,
            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
            ImmutableSet<Choice> choices) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
-             false);
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false);
     }
     
-    protected void cacheMatchInfo() {
-	boundVariables = getBoundVariables();
-        
-	final Iterator<TacletGoalTemplate> goalDescriptions = 
-	    goalTemplates.iterator();
-	
-	while (!hasReplaceWith && goalDescriptions.hasNext()) {
-	    if (goalDescriptions.next().
-		replaceWithExpressionAsObject() != null) {
-		hasReplaceWith = true;
-	    }
-	}	
+    protected void createAndInitializeMatcher() {      
+      
+        this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
     }
 
     
@@ -316,20 +302,6 @@ public abstract class Taclet implements Rule, Named {
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper(); 
 
     /**
-     * looks if a variable is declared as not free in
-     * @param var the SchemaVariable to look for
-     * @return true iff declared not free
-     */
-    private boolean varDeclaredNotFree(SchemaVariable var) {
-	for (final NotFreeIn nfi : varsNotFreeIn) {
-	    if (nfi.first() == var) {
-		return true;
-	    }
-	}
-	return false;
-    }
-
-    /**
      * returns true iff the taclet contains a "close goal"-statement
      * @return true iff the taclet contains a "close goal"-statement
      */
@@ -357,362 +329,9 @@ public abstract class Taclet implements Rule, Named {
     /**
      * @return the generic variable conditions of this taclet
      */
-    public Iterator<VariableCondition> getVariableConditions () {
-	return variableConditions.iterator ();
+    public ImmutableList<VariableCondition> getVariableConditions () {
+	return variableConditions;
     }
-
-    /**
-     * returns true iff the given variable is bound either in the
-     * ifSequent or in 
-     * any part of the TacletGoalTemplates
-     * @param v the bound variable to be searched 
-     */
-    protected boolean varIsBound(SchemaVariable v) {
-        return (v instanceof QuantifiableVariable) && getBoundVariables().contains((QuantifiableVariable) v);
-    }
-
- 
-    /**
-     * returns a SVInstantiations object iff the given Term
-     * template can be instantiated to 
-     * match the given Term term using the known instantiations stored in
-     * svInst.  If a
-     * matching cannot be found null is returned.
-     * The not free in condition is checked in TacletApp. Collisions are
-     * resolved there as well, if necessary.
-     * @param term the Term that has to be matched
-     * @param template the Term that is checked if it can match term
-     * @param matchCond the SVInstantiations/Constraint that are
-     * required because of formerly matchings
-     * @param services the Services object encapsulating information
-     * about the java datastructures like (static)types etc.
-     * @return the new MatchConditions needed to match template with
-     * term , if possible, null otherwise
-     */
-    protected MatchConditions match(Term            term,
-				    Term            template,
-				    MatchConditions matchCond,
-				    Services        services) {
-	Debug.out("Start Matching rule: ", name);
-	matchCond = matchHelp(term, template, matchCond, services);	
-	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
-	return matchCond == null ? null : checkConditions(matchCond, services);
-    }
-
-    /**
-     * checks if the conditions for a correct instantiation are satisfied
-     * @param var the SchemaVariable to be instantiated
-     * @param instantiationCandidate the SVSubstitute, which is a
-     * candidate for a possible instantiation of var
-     * @param matchCond the MatchConditions which have to be respected
-     * for the new match
-     * @param services the Services object encapsulating information
-     * about the Java type model
-     * @return the match conditions resulting from matching
-     * <code>var</code> with <code>instantiationCandidate</code> or
-     * <code>null</code> if a match was not possible
-     */
-    public MatchConditions checkVariableConditions(SchemaVariable var, 
-                                                   SVSubstitute instantiationCandidate,
-                                                   MatchConditions matchCond,
-                                                   Services services) {
-	if (instantiationCandidate instanceof Term) {
-	    Term term = (Term) instantiationCandidate;
-	    if (!(term.op() instanceof QuantifiableVariable)) {
-		if (varIsBound(var) || varDeclaredNotFree(var)) {
-		    // match(x) is not a variable, but the
-		    // corresponding template variable is bound
-		    // or declared non free (so it has to be
-		    // matched to a variable) 		
-		    return null; // FAILED
-		}
-	    }
-	}
-	// check generic conditions
-	for (final VariableCondition vc : variableConditions) {
-	    matchCond = vc.check(var, instantiationCandidate, matchCond, services);	    
-	    if (matchCond == null) {	     
-		return null; // FAILED
-	    }
-	}
-
-	return matchCond;	
-    }
-
-
-    public MatchConditions checkConditions(MatchConditions cond, Services services) {
-        if (cond == null) {
-            return null;
-        }
-        MatchConditions result = cond;
-        final Iterator<SchemaVariable> svIterator = 
-            cond.getInstantiations().svIterator();
-        
-        if(!svIterator.hasNext()) {
-            return checkVariableConditions(null, null, cond, services);//XXX
-        }
-        
-        while (svIterator.hasNext()) {
-            final SchemaVariable sv = svIterator.next();
-            final Object o = result.getInstantiations().getInstantiation(sv);
-            if (o instanceof SVSubstitute) {
-                result = checkVariableConditions
-                   (sv, (SVSubstitute)o , result, services);
-            }
-            if (result == null) {                
-                Debug.out("FAILED. InstantiationEntry failed condition for ", sv, o);
-                return null;
-            }
-        }
-        return result;
-    }
-    
-
-    /**
-     * tries to match the bound variables of the given term against the one
-     * described by the template
-     * @param term the Term whose bound variables are matched against the
-     * JavaBlock of the template
-     * (marked as final to help the compiler inlining methods)
-     * @param template the Term whose bound variables are the template that have
-     * to be matched
-     * @param matchCond the MatchConditions that has to be paid respect when
-     * trying to match
-     * @return the new matchconditions if a match is possible, otherwise null
-     */
-    private final MatchConditions matchBoundVariables(Term term, 
-						      Term template, 
-						      MatchConditions matchCond,
-						      Services services) {
-	
-        matchCond = matchCond.extendRenameTable();
-        
-        for (int j=0, arity = term.arity(); j<arity; j++) {		
-	    
-	    ImmutableArray<QuantifiableVariable> bound    = term.varsBoundHere(j);
-	    ImmutableArray<QuantifiableVariable> tplBound = template.varsBoundHere(j); 
-	    
-	    if (bound.size() != tplBound.size()) {
-		return null; //FAILED
-	    }
-	    
-	    for (int i=0, boundSize = bound.size(); i<boundSize; i++) {		
-	        final QuantifiableVariable templateQVar = tplBound.get(i);
-                final QuantifiableVariable qVar = bound.get(i);
-                if (templateQVar instanceof LogicVariable) {
-                    final RenameTable rt = matchCond.renameTable();                   
-                    if (!rt.containsLocally(templateQVar) && !rt.containsLocally(qVar)) {                           
-                        matchCond = matchCond.addRenaming(templateQVar, qVar);
-                    }
-                }
-                matchCond = templateQVar.match(qVar, matchCond, services);					  
-                
-                if (matchCond == null) {	              
-                    return null;        
-	       }
-	    }
-	}
-	return matchCond;
-    }
-
-    /**
-     * returns the matchconditions that are required if the java block of the
-     * given term matches the schema given by the template term or null if no
-     * match is possible
-     * (marked as final to help the compiler inlining methods)
-     * @param term the Term whose JavaBlock is matched against the JavaBlock of
-     * the template
-     * @param template the Term whose JavaBlock is the template that has to
-     * be matched
-     * @param matchCond the MatchConditions that has to be paid respect when
-     * trying to match the JavaBlocks
-     * @param services the Services object encapsulating information about the
-     * program context
-     * @return the new matchconditions if a match is possible, otherwise null
-     */
-    protected final MatchConditions matchJavaBlock(Term term, 
-						   Term template, 
-						   MatchConditions matchCond,
-						   Services services) {
-      
-	if (term.javaBlock().isEmpty()) { // this.name().toString().startsWith("unfold_computed_formula")
-	    if (!template.javaBlock().isEmpty()){
-		Debug.out("Match Failed. No program to match.");
-		return null; //FAILED
-	    }
-            if (template.javaBlock().program()
-                    instanceof ContextStatementBlock) {
-                // we must match empty context blocks too
-                matchCond = template.javaBlock().program().
-                    match(new SourceData(term.javaBlock().program(), -1, services), matchCond);
-            }
-	} else { //both javablocks != null                            
-            matchCond = template.javaBlock().program().
-            match(new SourceData(term.javaBlock().program(), -1, services), matchCond);
-        }        
-	return matchCond;
-    }
-    
-    /** returns a SVInstantiations object with the needed SchemaVariable to Term
-     * mappings to match the given Term template to the Term term or
-     * null if no matching is possible.
-     * (marked as final to help the compiler inlining methods)
-     * @param term the Term the Template should match
-     * @param template the Term tried to be instantiated so that it matches term
-     * @param matchCond the MatchConditions to be obeyed by a
-     * successful match
-     * @return the new MatchConditions needed to match template with
-     * term, if possible, null otherwise
-     *
-     * PRECONDITION: matchCond.getConstraint ().isSatisfiable ()
-     */
-
-    private MatchConditions matchHelp(final Term             term,
-				      final Term             template, 
-				      MatchConditions  	     matchCond,
-				      final Services         services) {
-	Debug.out("Match: ", template);
-	Debug.out("With: ",  term);
-        
-	final Operator sourceOp   =     term.op ();
-	final Operator templateOp = template.op ();
-                
-	if (template.hasLabels()) {
-	    final ImmutableArray<TermLabel> labels = template.getLabels();
-	    for (TermLabel l: labels) {
-	        // ignore all labels which are not schema variables
-	        // if intended to match concrete label, match against schema label
-	        // and use an appropriate variable condition
-	        if (l instanceof SchemaVariable) {
-	            final SchemaVariable schemaLabel = (SchemaVariable) l;
-	            final MatchConditions cond =
-	                    schemaLabel.match(term, matchCond, services);
-	            if (cond == null) {
-	                return null;
-	            }
-	            matchCond = cond;
-	        }
-	    }
-	}
-
-	if (templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
-	    return templateOp.match(term, matchCond, services);
-	}
-
-	matchCond = templateOp.match (sourceOp, matchCond, services);
-	if(matchCond == null) {
-	    Debug.out("FAILED 3x.");
-	    return null; ///FAILED
-	}
-
-	//match java blocks:
-	matchCond = matchJavaBlock(term, template, matchCond, services);
-	if (matchCond == null) {
-	    Debug.out("FAILED. 9: Java Blocks not matching");
-	    return null;  //FAILED
-	}
-
-	//match bound variables:
-	matchCond = matchBoundVariables(term, template, matchCond, services);
-	if (matchCond == null) {
-	    Debug.out("FAILED. 10: Bound Vars");
-	    return null;  //FAILED
-	}
-
-	for (int i = 0, arity = term.arity(); i < arity; i++) {
-	    matchCond = matchHelp(term.sub(i),
-	                          template.sub(i),
-	                          matchCond,
-	                          services);
-	    if (matchCond == null) {
-	        return null; //FAILED
-	    }
-	}
-
-        return matchCond.shrinkRenameTable();
-    }
-
-
-    /**
-     * Match the given template (which is probably a formula of the if
-     * sequence) against a list of constraint formulas (probably the
-     * formulas of the antecedent or the succedent), starting with the
-     * given instantiations and constraint p_matchCond.
-     * @param p_toMatch list of constraint formulas to match p_template to
-     * @param p_template template formula as in "match"
-     * @param p_matchCond already performed instantiations
-     * @param p_services the Services object encapsulating information
-     * about the java datastructures like (static)types etc.
-     * @return Two lists (in an IfMatchResult object), containing the
-     * the elements of p_toMatch that could successfully be matched
-     * against p_template, and the corresponding MatchConditions.
-     */
-    public IfMatchResult matchIf ( Iterator<IfFormulaInstantiation> p_toMatch,
-				   Term                             p_template,
-				   MatchConditions                  p_matchCond,
-				   Services                         p_services ) {
-	ImmutableList<IfFormulaInstantiation> resFormulas = ImmutableSLList
-	        .<IfFormulaInstantiation> nil();
-	ImmutableList<MatchConditions> resMC = ImmutableSLList
-	        .<MatchConditions> nil();
-
-	Term updateFormula;
-	if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
-	    updateFormula = p_template;
-	else
-	    updateFormula = p_services.getTermBuilder().applyUpdatePairsSequential(p_matchCond.getInstantiations()
-		    .getUpdateContext(), p_template);
-
-	IfFormulaInstantiation cf;
-	MatchConditions newMC;
-
-	while (p_toMatch.hasNext()) {
-	    cf = p_toMatch.next();
-
-	    newMC = match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services);
-	    if (newMC != null) {
-		resFormulas = resFormulas.prepend(cf);
-		resMC = resMC.prepend(newMC);
-	    }
-	}
-
-	return new IfMatchResult ( resFormulas, resMC );
-    }
-
-
-    /**
-     * Match the whole if sequent using the given list of
-     * instantiations of all if sequent formulas, starting with the
-     * instantiations given by p_matchCond.
-     * PRECONDITION: p_toMatch.size () == ifSequent ().size ()
-     * @return resulting MatchConditions or null if the given list
-     * p_toMatch does not match
-     */
-    public MatchConditions matchIf ( Iterator<IfFormulaInstantiation> p_toMatch,
-				     MatchConditions                  p_matchCond,
-				     Services                         p_services ) {
-
-	Iterator<SequentFormula>     itIfSequent   = ifSequent () .iterator ();
-
-	ImmutableList<MatchConditions>            newMC;	
-	
-	while ( itIfSequent.hasNext () ) {
-	    newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
-				.prepend ( p_toMatch.next () ).iterator (),
-			      itIfSequent.next ().formula (),
-			      p_matchCond,
-			      p_services ).getMatchConditions ();
-
-	    if ( newMC.isEmpty() )
-		return null;
-
-	    p_matchCond = newMC.head ();
-	}
-
-	return p_matchCond;
-
-    }
-
 
     /** returns the name of the Taclet
      */
@@ -750,12 +369,13 @@ public abstract class Taclet implements Rule, Named {
     /** returns an iterator over the variable pairs that indicate that are 
      * new in the Taclet. 
      */
-    public Iterator<NotFreeIn> varsNotFreeIn() { 
-	return varsNotFreeIn.iterator();
+    public ImmutableList<NotFreeIn> varsNotFreeIn() { 
+	return varsNotFreeIn;
     } 
+    
 
-    public Iterator<NewDependingOn> varsNewDependingOn() { 
-	return varsNewDependingOn.iterator();
+    public ImmutableList<NewDependingOn> varsNewDependingOn() { 
+	return varsNewDependingOn;
     } 
     
     /** returns an iterator over the goal descriptions.
@@ -777,14 +397,6 @@ public abstract class Taclet implements Rule, Named {
 	return ruleSets;
     }
 
-//    /** 
-//     * returns true iff the Taclet is to be applied only noninteractive
-//     */
-//    public boolean noninteractive() {
-//	return noninteractive;
-//    }
-
-
     public ImmutableMap<SchemaVariable,TacletPrefix> prefixMap() {
 	return prefixMap;
     }
@@ -794,7 +406,12 @@ public abstract class Taclet implements Rule, Named {
      * computed and cached by method cacheMatchInfo
      */
     public boolean hasReplaceWith() {
-	return hasReplaceWith;
+        for (final TacletGoalTemplate goalDescr: goalTemplates) {
+            if (goalDescr.replaceWithExpressionAsObject() != null) {
+                return true;
+            }
+        }     
+        return false;
     }
     
     /**
@@ -1164,6 +781,7 @@ public abstract class Taclet implements Rule, Named {
           SVInstantiations neededInstances = SVInstantiations.
                 EMPTY_SVINSTANTIATIONS.addUpdateList
                 (matchCond.getInstantiations ().getUpdateContext());
+          
           final TacletSchemaVariableCollector collector = new
                 TacletSchemaVariableCollector(); 
           collector.visit(tacletToAdd, true);// true, because
@@ -1357,8 +975,7 @@ public abstract class Taclet implements Rule, Named {
 
 	return ifVariables;
     }
-
-
+    
     /**
      * @return set of schemavariables of the if and the (optional)
      * find part
@@ -1388,54 +1005,57 @@ public abstract class Taclet implements Rule, Named {
 
 
     StringBuffer toStringIf(StringBuffer sb) {
-	if (!ifSequent.isEmpty()) {
-	    sb = sb.append("\\assumes (").append(ifSequent).append(") ");
-	    sb = sb.append("\n");
-	}
-	return sb;
+        if (!ifSequent.isEmpty()) {
+            sb = sb.append("\\assumes (").append(ifSequent).append(") ");
+            sb = sb.append("\n");
+        }
+        return sb;
     }
 
     StringBuffer toStringVarCond(StringBuffer sb) {
-	Iterator<NewVarcond> itVarsNew=varsNew().iterator();
-	Iterator<NotFreeIn> itVarsNotFreeIn=varsNotFreeIn();
-	Iterator<VariableCondition> itVC=getVariableConditions();
-	if (itVarsNew.hasNext() ||
-	    itVarsNotFreeIn.hasNext() ||
-	    itVC.hasNext()) {
-	    sb = sb.append("\\varcond(");
-	    while (itVarsNew.hasNext()) {
-	    sb=sb.append(itVarsNew.next());
-		if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext())
-		    sb=sb.append(", "); 
-	    }
-	    while (itVarsNotFreeIn.hasNext()) {
-		NotFreeIn pair=itVarsNotFreeIn.next();
-                sb=sb.append("\\notFreeIn(").append(pair.first()).append
-		  (", ").append(pair.second()).append(")");	 
-		if (itVarsNotFreeIn.hasNext()) sb=sb.append(", ");
-	    }
-	    while (itVC.hasNext()) {
-		sb.append("" + itVC.next());
-		if (itVC.hasNext())
-		    sb.append(", ");
-	    }
-	    sb=sb.append(")\n");	    
-	}
-	return sb;
+
+        if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
+            sb = sb.append("\\varcond(");
+
+            int countVarsNew = varsNew.size() - 1;
+            for (final NewVarcond nvc: varsNew) {
+                sb = sb.append(nvc);
+                if (countVarsNew > 0 || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
+                    sb=sb.append(", "); 
+                }
+                --countVarsNew;
+            }
+
+            int countVarsNotFreeIn = varsNotFreeIn.size() - 1;
+            for (NotFreeIn pair: varsNotFreeIn) {
+                sb = sb.append("\\notFreeIn(").append(pair.first()).append(", ").append(pair.second()).append(")");	 
+                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) sb = sb.append(", ");
+                --countVarsNotFreeIn;
+            }
+
+            int countVariableConditions = variableConditions.size();
+            for (final VariableCondition vc: variableConditions) {
+                sb.append(vc);
+                if (countVariableConditions > 0) sb.append(", ");
+                --countVariableConditions;
+            }
+            sb = sb.append(")\n");	    
+        }
+        return sb;
     }
 
     StringBuffer toStringGoalTemplates(StringBuffer sb) {
-	if (goalTemplates.isEmpty()) {
-	    sb.append("\\closegoal");
-	} else {
-	    Iterator<TacletGoalTemplate> it=goalTemplates().iterator();
-	    while (it.hasNext()) {
-		sb=sb.append(it.next());
-		if (it.hasNext()) sb = sb.append(";");
-		sb = sb.append("\n");
-	    }
-	}
-	return sb;
+        if (goalTemplates.isEmpty()) {
+            sb.append("\\closegoal");
+        } else {
+            Iterator<TacletGoalTemplate> it=goalTemplates().iterator();
+            while (it.hasNext()) {
+                sb=sb.append(it.next());
+                if (it.hasNext()) sb = sb.append(";");
+                sb = sb.append("\n");
+            }
+        }
+        return sb;
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {

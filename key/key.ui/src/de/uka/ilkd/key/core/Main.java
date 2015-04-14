@@ -32,6 +32,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -63,6 +64,7 @@ public final class Main {
     private static final String DEBUG = "--debug";
     private static final String MACRO = "--macro";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
+    private static final String TACLET_DIR = "--tacletDir";
     public static final String JUSTIFY_RULES ="--justify-rules";
     private static final String PRINT_STATISTICS ="--print-statistics";
     private static final String SAVE_ALL_CONTRACTS = "--save-all";
@@ -128,7 +130,10 @@ public final class Main {
      */
     private static boolean loadRecentFile=false;
     
-    public static List<File> fileArguments;
+    /**
+     * The file names provided on the command line
+     */
+    private static List<File> fileArguments;
 
     /** Lists all features currently marked as experimental.
      * Unless invoked with command line option --experimental ,
@@ -161,12 +166,13 @@ public final class Main {
 
     public static void main(final String[] args) {
         // this property overrides the default
-        if (Boolean.getBoolean("key.verbose-ui")) verbosity = Verbosity.DEBUG;
+        if (Boolean.getBoolean("key.verbose-ui")) {
+            verbosity = Verbosity.DEBUG;
+        }
 
         // does no harm on non macs
-        // broken under Java 8 u40 when starting from jar files
-        // disabling the Apple Menu Bar support for the meantime
-        //System.setProperty("apple.laf.useScreenMenuBar","true");
+        // uncommented as Oracle seems to have broken that with 1.8_u40
+        //        System.setProperty("apple.laf.useScreenMenuBar","true");
 
         try {
             cl = createCommandLine();
@@ -222,6 +228,7 @@ public final class Main {
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addSection("Batchmode options:");
+        cl.addOption(TACLET_DIR, "<dir>", "load base taclets from a directory, not from internal structures");
         cl.addOption(DEBUG, null, "start KeY in debug mode");
         cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
@@ -316,13 +323,15 @@ public final class Main {
         }
 
         if(cl.isSet(TIMEOUT)){
-            if (verbosity >= Verbosity.HIGH)
+            if (verbosity >= Verbosity.HIGH) {
             System.out.println("Timeout is set");
+            }
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
-                if (verbosity >= Verbosity.HIGH)
+                if (verbosity >= Verbosity.HIGH) {
                 System.out.println("Timeout is: "+ timeout+" ms");
+                }
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
@@ -354,8 +363,9 @@ public final class Main {
         }
 
         if(cl.isSet(EXPERIMENTAL)){
-            if (verbosity > Verbosity.SILENT)
+            if (verbosity > Verbosity.SILENT) {
             System.out.println("Running in experimental mode ...");
+            }
         } else {
             deactivateExperimentalFeatures();
         }
@@ -398,12 +408,18 @@ public final class Main {
             saveAllContracts = true;
         }
 
+        if(cl.isSet(TACLET_DIR)) {
+            System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY,
+                    cl.getString(TACLET_DIR, ""));
+        }
+
     }
 
     /** Deactivate experimental features. */
     private static void deactivateExperimentalFeatures () {
-        for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES)
+        for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
             feature.deactivate();
+    }
     }
 
 
@@ -433,15 +449,20 @@ public final class Main {
                     if (verbosity > Verbosity.SILENT) {
                         System.out.println("Auto mode was terminated by an exception:"
                                             + e.getClass().toString().substring(5));
-                        if (verbosity >= Verbosity.DEBUG) e.printStackTrace();
+                        if (verbosity >= Verbosity.DEBUG) {
+                            e.printStackTrace();
+                        }
                         final String msg = e.getMessage();
-                        if (msg!=null) System.out.println(msg);
+                        if (msg!=null) {
+                            System.out.println(msg);
+                        }
                     }
                     System.exit(-1);
                 }
             });
-            if (fileArguments.isEmpty())
+            if (fileArguments.isEmpty()) {
                 printUsageAndExit(true, "Error: No file to load from.", -4);
+            }
 
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
@@ -479,9 +500,12 @@ public final class Main {
     private static void updateSplashScreen() {
         try {
             final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
-            if (sp == null) return;
+            if (sp == null)
+             {
+                return;
             // insert customization code here
             // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
+            }
         } catch (Exception e) {}
     }
 

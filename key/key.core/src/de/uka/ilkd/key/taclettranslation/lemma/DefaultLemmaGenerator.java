@@ -15,7 +15,6 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -43,7 +42,6 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
@@ -123,8 +121,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
        }
         
        public static String checkForIllegalConditions(Taclet taclet){
-                Iterator<VariableCondition> it = taclet.getVariableConditions();
-                if(it.hasNext()){
+                if (!taclet.getVariableConditions().isEmpty()){
                       return "The given taclet " + taclet.name() 
                                         + " contains variable conditions that are not supported.";    
                 }

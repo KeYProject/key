@@ -583,12 +583,20 @@ public class SVInstantiations {
     }
     
     public SVInstantiations addUpdateList(ImmutableList<UpdateLabelPair> updates) {
-       return new SVInstantiations(map, interesting(), updates,
+        if (updates.isEmpty() && updateContext.isEmpty()) {
+            // avoid unnecessary creation of SVInstantiations
+            return this;
+        }       
+        return new SVInstantiations(map, interesting(), updates,
                getGenericSortInstantiations(), getGenericSortConditions());
    }
 
 
     public SVInstantiations clearUpdateContext() {
+        if (updateContext.isEmpty()) {
+            // avoid unnecessary creation of SVInstantiations
+            return this;
+        }       
         return new SVInstantiations(map, interesting(),
                 ImmutableSLList.<UpdateLabelPair>nil(), getGenericSortInstantiations(),
                 getGenericSortConditions());
@@ -635,7 +643,9 @@ public class SVInstantiations {
      * returns true iff no instantiation of SchemaVariables are known
      */
     public boolean isEmpty() {
-        return map.isEmpty();
+        // the interesting map needs not to be checked
+        return this == EMPTY_SVINSTANTIATIONS || 
+                (map.isEmpty() && updateContext.isEmpty() && genericSortConditions.isEmpty() && genericSortInstantiations.isEmpty());
     }
 
     /**

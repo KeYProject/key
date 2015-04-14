@@ -268,26 +268,6 @@ public final class ProgramSV extends AbstractSV
     }
   
     
-    @Override
-    public MatchConditions match(SVSubstitute substitute, 
-				 MatchConditions mc, 
-				 Services services) {
-
-        final ProgramSVSort svSort = (ProgramSVSort)sort();
-     
-	if (substitute instanceof Term && svSort.canStandFor((Term)substitute)) {
-            return addInstantiation((Term)substitute, mc, services);
-        } else if (substitute instanceof ProgramElement && 
-		   svSort.canStandFor((ProgramElement)substitute, 
-				      mc.getInstantiations().getExecutionContext(), services)) {
-            return addInstantiation((ProgramElement)substitute, mc, services);
-        }        
-        Debug.out("FAILED. Cannot match ProgramSV with given " +
-		  "instantiation(template, orig)", this, substitute);
-        return null;
-    }
-
-        
     /**
      * adds a found mapping from schema variable <code>var</code> to
      * program element <code>pe</code> and returns the updated match
