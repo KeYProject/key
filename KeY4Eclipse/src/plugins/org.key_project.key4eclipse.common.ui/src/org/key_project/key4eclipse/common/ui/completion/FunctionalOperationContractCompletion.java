@@ -1,5 +1,7 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import java.util.List;
+
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelection;
@@ -171,7 +173,8 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
        * @return The selected {@link Contract} or {@code null} if not available.
        */
       protected Contract getSelectedContract() {
-         final Object[] selection = SWTUtil.toArray(viewer.getSelection());
+         @SuppressWarnings("unchecked")
+         final List<Contract> selection = (List<Contract>)SWTUtil.toList(viewer.getSelection());
          return ContractSelectionPanel.computeContract(services, selection);
       }
 
