@@ -4535,9 +4535,16 @@ classPaths returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 :
   ( (
     CLASSPATH 
-    s=string_literal {
+    s=string_literal 
+    {
       ids = ids.append(s);
     }
+    (COMMA s=string_literal
+    {
+      ids = ids.append(s);
+    }
+    )*
+    
     SEMI
     )
   | 
