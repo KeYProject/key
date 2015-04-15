@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="InnerTypeTest" source="true" extends="//@types.0" package="" simpleName="InnerTypeTest"/>
-  <types xsi:type="dependencymodel:Type" name="A" source="true" visibility="DEFAULT" extends="//@types.0" package="" simpleName="A">
-    <innerTypes name="A.InnerA" source="true" visibility="DEFAULT" extends="//@types.0" package="" simpleName="InnerA">
-      <fields name="value" type="//@types.3"/>
-    </innerTypes>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="InnerTypeTest" source="true" simpleName="InnerTypeTest">
+    <methods name="main" static="true">
+      <returnType type="int" genericFreeType="int"/>
+      <parameterTypes type="A.InnerA" genericFreeType="A.InnerA"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="int"/>
+  <types visibility="DEFAULT" package="" name="A" source="true" simpleName="A">
+    <innerTypes visibility="DEFAULT" package="" name="A.InnerA" source="true" simpleName="InnerA">
+      <fields name="value">
+        <type type="int" genericFreeType="int"/>
+      </fields>
+      <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </innerTypes>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
 </dependencymodel:DependencyModel>

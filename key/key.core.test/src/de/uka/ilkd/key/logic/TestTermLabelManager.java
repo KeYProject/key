@@ -610,7 +610,7 @@ public class TestTermLabelManager extends TestCase {
    throws ProblemLoaderException {
       KeYEnvironment<?> env = null;
       try {
-         env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY, "termLabels/flatSteps/FlatSteps.java"), null, null);
+         env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY, "termLabels/flatSteps/FlatSteps.java"), null, null, null);
          Profile profile = new JavaProfile() {
             @Override
             protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {

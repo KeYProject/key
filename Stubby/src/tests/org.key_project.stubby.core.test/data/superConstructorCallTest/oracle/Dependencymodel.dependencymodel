@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="SuperConstructorCall" source="true" extends="//@types.0" package="" simpleName="SuperConstructorCall">
-    <methods name="SuperConstructorCall" returnType="//@types.2" constructor="true"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="SuperConstructorCall" source="true" simpleName="SuperConstructorCall">
+    <methods name="SuperConstructorCall" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
-  <types xsi:type="dependencymodel:Type" name="SuperConstructorB" source="true" visibility="DEFAULT" extends="//@types.1" package="" simpleName="SuperConstructorB">
-    <methods name="SuperConstructorB" returnType="//@types.2" constructor="true"/>
+  <types visibility="DEFAULT" package="" name="SuperConstructorB" source="true" simpleName="SuperConstructorB">
+    <methods name="SuperConstructorB" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <extends type="SuperConstructorCall" genericFreeType="SuperConstructorCall"/>
   </types>
 </dependencymodel:DependencyModel>

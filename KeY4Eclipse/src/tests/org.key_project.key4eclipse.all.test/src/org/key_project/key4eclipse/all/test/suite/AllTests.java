@@ -39,6 +39,7 @@ import de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests;
    AllSymbolicExecutionTests.class,
    AllTestGenTests.class,
    AllUITests.class,
+   de.uka.ilkd.key.util.removegenerics.AllTests.class,
    AllStarterCoreTests.class,
    AllCommonUiTests.class,
    AllStarterUITests.class,

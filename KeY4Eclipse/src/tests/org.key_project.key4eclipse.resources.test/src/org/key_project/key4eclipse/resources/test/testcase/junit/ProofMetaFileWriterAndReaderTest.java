@@ -170,7 +170,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
       IFile metaFile = mainProofs.getFile("Main[Main__magic(A)]_JML_normal_behavior_operation_contract_0.proofmeta");
       IFile anotherProofFile = aProofs.getFile("A[A__contractMagic()]_JML_normal_behavior_operation_contract_0.proof");
       // Load existing proof
-      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null);
+      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null, null);
       try {
          // Create ProofElement
          Proof proof = env.getLoadedProof();

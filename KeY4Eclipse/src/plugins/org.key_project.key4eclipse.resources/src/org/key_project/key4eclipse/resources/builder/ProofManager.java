@@ -132,7 +132,8 @@ public class ProofManager {
          File location = KeYResourceProperties.getSourceClassPathLocation(project);
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
          List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-         environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+         List<File> includes = KeYResourceProperties.getKeYIncludes(project);
+         environment = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
       }
       catch (ProblemLoaderException e) {
          handleProblemLoaderException(e);

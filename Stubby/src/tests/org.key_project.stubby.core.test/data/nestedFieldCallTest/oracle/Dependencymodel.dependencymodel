@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="NestedFieldCallTest" source="true" extends="//@types.0" package="" simpleName="NestedFieldCallTest">
-    <methods name="callStringField" returnType="//@types.3"/>
-    <fields name="intField" visibility="DEFAULT" type="//@types.2"/>
-    <fields name="next" visibility="DEFAULT" type="//@types.1"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="NestedFieldCallTest" source="true" simpleName="NestedFieldCallTest">
+    <methods name="callStringField">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <fields name="intField" visibility="DEFAULT">
+      <type type="int" genericFreeType="int"/>
+    </fields>
+    <fields name="next" visibility="DEFAULT">
+      <type type="NestedFieldCallTest" genericFreeType="NestedFieldCallTest"/>
+    </fields>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="int"/>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
 </dependencymodel:DependencyModel>

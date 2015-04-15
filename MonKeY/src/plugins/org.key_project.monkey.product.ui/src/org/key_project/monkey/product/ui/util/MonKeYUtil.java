@@ -90,10 +90,10 @@ public final class MonKeYUtil {
       monitor.beginTask("Loading in KeY", IProgressMonitor.UNKNOWN);
       KeYEnvironment<?> environment;
       if (showKeYMainWindow) {
-         environment = WindowUserInterfaceControl.loadInMainWindow(location, null, bootClassPath, true);
+         environment = WindowUserInterfaceControl.loadInMainWindow(location, null, bootClassPath, null, true);
       }
       else {
-         environment = KeYEnvironment.load(location, null, bootClassPath);
+         environment = KeYEnvironment.load(location, null, bootClassPath, null);
       }
       try {
          boolean skipLibraryClasses = true;

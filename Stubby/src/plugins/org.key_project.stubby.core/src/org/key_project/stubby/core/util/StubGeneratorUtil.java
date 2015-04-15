@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
@@ -28,14 +29,13 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.stubby.core.Activator;
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
 import org.key_project.stubby.core.jdt.DependencyAnalyzer;
 import org.key_project.stubby.core.template.TypeTemplate;
-import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
 import org.key_project.stubby.model.dependencymodel.DependencymodelFactory;
 import org.key_project.stubby.model.dependencymodel.Type;
@@ -94,7 +94,7 @@ public final class StubGeneratorUtil {
             monitor = new NullProgressMonitor();
          }
          // Create dependency model
-         DependencyModel dependencyModel = createDependencyModel(project, monitor);
+         DependencyModel dependencyModel = createDependencyModel(project, monitor, customizations);
          // Inform customizations
          for (IGeneratorCustomization customization : customizations) {
             customization.dependencyModelCreated(project, stubFolderPath, dependencyModel);
@@ -119,7 +119,7 @@ public final class StubGeneratorUtil {
          return ignoredTypes;
       }
       catch (IOException e) {
-         throw new CoreException(new Status(IStatus.ERROR, "BUNDLE_ID", e.getMessage(), e));
+         throw new CoreException(new Status(IStatus.ERROR, Activator.BUNDLE_ID, e.getMessage(), e));
       }
    }
    
@@ -127,39 +127,68 @@ public final class StubGeneratorUtil {
     * Creates the {@link DependencyModel} of the given {@link IJavaProject}.
     * @param project The {@link IJavaProject} to create its {@link DependencyModel}.
     * @param monitor The {@link IProgressMonitor} to use.
+    * @param customizations Optional {@link IGeneratorCustomization} to consider.
     * @return The {@link DependencyModel} or {@code null} if no {@link IJavaProject} was given.
     * @throws CoreException Occurred Exception.
     */
-   public static DependencyModel createDependencyModel(IJavaProject project, IProgressMonitor monitor) throws CoreException {
-      if (monitor == null) {
-         monitor = new NullProgressMonitor();
-      }
-      if (project != null) {
-         // Find compilation units in source folders
-         monitor.beginTask("Listing source files", IProgressMonitor.UNKNOWN);
-         List<IPackageFragmentRoot> sourceFolders = JDTUtil.getSourceFolders(project);
-         List<ICompilationUnit> compilationUnits = JDTUtil.listCompilationUnit(sourceFolders);
-         monitor.done();
-         // Create dependency model
-         monitor.beginTask("Analyzing dependencies", compilationUnits.size());
-         DependencyModel dependencyModel = DependencymodelFactory.eINSTANCE.createDependencyModel();
-         DependencyAnalyzer analyzer = new DependencyAnalyzer();
-         for (ICompilationUnit unit : compilationUnits) {
-            SWTUtil.checkCanceled(monitor);
-            ASTNode ast = JDTUtil.parse(unit);
-            if (ast != null) {
-               ast.accept(analyzer);
-            }
-            monitor.worked(1);
+   public static DependencyModel createDependencyModel(IJavaProject project, 
+                                                       IProgressMonitor monitor,
+                                                       IGeneratorCustomization... customizations) throws CoreException {
+      try {
+         if (monitor == null) {
+            monitor = new NullProgressMonitor();
          }
-         monitor.done();
-         monitor.beginTask("Creating dependency model", IProgressMonitor.UNKNOWN);
-         dependencyModel.getTypes().addAll(analyzer.getOuterTypes());
-         monitor.done();
-         return dependencyModel;
+         if (project != null) {
+            // Check if specific IJavaElements are given.
+            List<? extends IJavaElement> sourceFolders = null;
+            int i = 0;
+            while (sourceFolders == null && i < customizations.length) {
+               sourceFolders = customizations[i].defineSources(project);
+               i++;
+            }
+            if (sourceFolders == null) {
+               sourceFolders = JDTUtil.getSourceFolders(project);
+            }
+            // Find compilation units in source folders
+            monitor.beginTask("Listing source files", IProgressMonitor.UNKNOWN);
+            List<ICompilationUnit> compilationUnits = JDTUtil.listCompilationUnit(sourceFolders);
+            monitor.done();
+            // Analyze dependencies of found source files
+            monitor.beginTask("Analyzing dependencies", compilationUnits.size());
+            DependencyModel dependencyModel = DependencymodelFactory.eINSTANCE.createDependencyModel();
+            DependencyAnalyzer analyzer = new DependencyAnalyzer();
+            for (ICompilationUnit unit : compilationUnits) {
+               SWTUtil.checkCanceled(monitor);
+               ASTNode ast = JDTUtil.parse(unit);
+               if (ast != null) {
+                  ast.accept(analyzer);
+               }
+               monitor.worked(1);
+            }
+            monitor.done();
+            // Inform customizations
+            if (!ArrayUtil.isEmpty(customizations)) {
+               monitor.beginTask("Adding additional content", IProgressMonitor.UNKNOWN);
+               for (IGeneratorCustomization customization : customizations) {
+                  customization.addAdditionalContent(project, analyzer);
+               }
+               monitor.done();
+            }
+            // Create dependency model
+            monitor.beginTask("Creating dependency model", IProgressMonitor.UNKNOWN);
+            dependencyModel.getTypes().addAll(analyzer.getOuterTypes());
+            monitor.done();
+            return dependencyModel;
+         }
+         else {
+            return null;
+         }
       }
-      else {
-         return null;
+      catch (OperationCanceledException e) {
+         throw e;
+      }
+      catch (RuntimeException e) {
+         throw new CoreException(new Status(IStatus.ERROR, Activator.BUNDLE_ID, e.getMessage(), e));
       }
    }
 
@@ -186,22 +215,31 @@ public final class StubGeneratorUtil {
             customization.stubFolderCreated(stubFolder);
          }
       }
+      // Check if generics should be included
+      boolean genericFree = false;
+      int i = 0;
+      while (!genericFree && i < customizations.length) {
+         if (!customizations[i].canSupportGenerics(javaProject, dependencyModel)) {
+            genericFree = true;
+         }
+         i++;
+      }
       // Generate files
       List<IgnoredType> ignoredTypes = new LinkedList<IgnoredType>();
       if (dependencyModel != null && JDTUtil.isJavaProject(javaProject)) {
          monitor.beginTask("Creating stub files", dependencyModel.getTypes().size());
-         for (AbstractType abstractType : dependencyModel.getTypes()) {
+         for (Type type : dependencyModel.getTypes()) {
             SWTUtil.checkCanceled(monitor);
-            if (abstractType instanceof Type && !abstractType.isSource()) {
+            if (!type.isSource()) {
                String ignoreReason = null;
-               for (int i = 0; ignoreReason == null && i < customizations.length; i++) {
-                  ignoreReason = customizations[i].getIgnoreReason(javaProject, stubFolderPath, abstractType);
+               for (int j = 0; ignoreReason == null && j < customizations.length; j++) {
+                  ignoreReason = customizations[j].getIgnoreReason(javaProject, stubFolderPath, type);
                }
                if (ignoreReason == null) {
-                  generateType((Type) abstractType, javaProject.getProject(), stubFolderPath);
+                  generateType(type, genericFree, javaProject.getProject(), stubFolderPath);
                }
                else {
-                  ignoredTypes.add(new IgnoredType((Type) abstractType, ignoreReason));
+                  ignoredTypes.add(new IgnoredType(type, ignoreReason));
                }
             }
             monitor.worked(1);
@@ -214,16 +252,18 @@ public final class StubGeneratorUtil {
    /**
     * Generates the stub file for the given {@link Type}.
     * @param type The {@link Type} to generate its stub file.
+    * @param genericFree If {@code true} generated stubs are generic free, otherwise generics might be contained.
     * @param stubProject The target {@link IJavaProject}.
     * @param stubFolderPath The path to the stub folder.
     * @return The created or updated {@link IFile}.
     * @throws CoreException Occurred Exception.
     */
    public static IFile generateType(Type type, 
+                                    boolean genericFree,
                                     IProject stubProject, 
                                     String stubFolderPath) throws CoreException {
       // Create new content
-      String content = generateContent(type);
+      String content = generateContent(type, genericFree);
       // Save file
       String[] res = type.getPackage().split("\\.");
       String projectSimpleName = type.getSimpleName() + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT;  
@@ -260,10 +300,11 @@ public final class StubGeneratorUtil {
    /**
     * Generates the java stub source code of the given {@link Type}.
     * @param type The {@link Type}.
+    * @param genericFree If {@code true} generated stubs are generic free, otherwise generics might be contained.
     * @return The generated java stub source code.
     */
-   public static String generateContent(Type type) {
-      TypeTemplate template = new TypeTemplate();
+   public static String generateContent(Type type, boolean genericFree) {
+      TypeTemplate template = new TypeTemplate(genericFree);
       return template.generate(type);
    }
 

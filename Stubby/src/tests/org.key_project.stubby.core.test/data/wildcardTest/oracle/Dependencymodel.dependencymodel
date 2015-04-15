@@ -1,38 +1,64 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Iterator" kind="INTERFACE" package="java.util" simpleName="Iterator">
-    <typeVariables name="E" type="//@types.0"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Iterator" simpleName="Iterator">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Iterable" kind="INTERFACE" package="java.lang" simpleName="Iterable">
-    <typeVariables name="T" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Iterable" simpleName="Iterable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Iterable" baseType="//@types.2" typeArguments="//@types.4/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Collection" kind="INTERFACE" extends="//@types.3" package="java.util" simpleName="Collection">
-    <typeVariables name="E" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Collection" simpleName="Collection">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.lang.Iterable&lt;E>" genericFreeType="java.lang.Iterable"/>
   </types>
-  <types xsi:type="dependencymodel:WildcardType" name="?"/>
-  <types xsi:type="dependencymodel:GenericType" name="Collection" baseType="//@types.4" typeArguments="//@types.5"/>
-  <types xsi:type="dependencymodel:Type" name="WildcardTest" source="true" extends="//@types.0" package="" simpleName="WildcardTest">
-    <typeVariables name="T" type="//@types.6"/>
-    <methods name="main" static="true" returnType="//@types.9" parameterTypes="//@types.7/@methods.0/@typeVariables.0">
-      <typeVariables name="S" type="//@types.8"/>
+  <types package="" name="WildcardTest" source="true" simpleName="WildcardTest">
+    <typeVariables name="T">
+      <type type="java.util.Collection&lt;?>" genericFreeType="java.util.Collection"/>
+    </typeVariables>
+    <methods name="main" static="true">
+      <typeVariables name="S">
+        <type type="java.lang.Iterable&lt;?>" genericFreeType="java.lang.Iterable"/>
+      </typeVariables>
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="S" genericFreeType="java.lang.Iterable"/>
     </methods>
-    <methods name="mainWildcard" static="true" returnType="//@types.9" parameterTypes="//@types.10"/>
-    <methods name="main" static="true" returnType="//@types.9" throws="//@types.7/@methods.2/@typeVariables.0">
-      <typeVariables name="S" type="//@types.17"/>
+    <methods name="mainWildcard" static="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="java.util.Iterator&lt;? extends java.lang.String>" genericFreeType="java.util.Iterator"/>
     </methods>
+    <methods name="main" static="true">
+      <typeVariables name="S">
+        <type type="java.lang.Exception" genericFreeType="java.lang.Exception"/>
+      </typeVariables>
+      <returnType type="void" genericFreeType="void"/>
+      <throws type="S" genericFreeType="java.lang.Exception"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Iterable" baseType="//@types.2" typeArguments="//@types.5"/>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
-  <types xsi:type="dependencymodel:GenericType" name="Iterator" baseType="//@types.1" typeArguments="//@types.5"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
-    <typeVariables name="T" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.12" typeArguments="//@types.15"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.CharSequence" kind="INTERFACE" package="java.lang" simpleName="CharSequence"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.String" final="true" extends="//@types.0" implements="//@types.11 //@types.13 //@types.14" package="java.lang" simpleName="String"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Throwable" extends="//@types.0" implements="//@types.11" package="java.lang" simpleName="Throwable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Exception" extends="//@types.16" package="java.lang" simpleName="Exception"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.CharSequence" simpleName="CharSequence"/>
+  <types final="true" package="java.lang" name="java.lang.String" simpleName="String">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.lang.String>" genericFreeType="java.lang.Comparable"/>
+    <implements type="java.lang.CharSequence" genericFreeType="java.lang.CharSequence"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types package="java.lang" name="java.lang.Throwable" simpleName="Throwable">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types package="java.lang" name="java.lang.Exception" simpleName="Exception">
+    <extends type="java.lang.Throwable" genericFreeType="java.lang.Throwable"/>
+  </types>
 </dependencymodel:DependencyModel>

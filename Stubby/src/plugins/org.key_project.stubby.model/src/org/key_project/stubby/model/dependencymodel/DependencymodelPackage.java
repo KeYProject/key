@@ -4,7 +4,9 @@ package org.key_project.stubby.model.dependencymodel;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
@@ -58,215 +60,6 @@ public interface DependencymodelPackage extends EPackage {
    DependencymodelPackage eINSTANCE = org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl.init();
 
    /**
-    * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.AbstractTypeImpl <em>Abstract Type</em>}' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see org.key_project.stubby.model.dependencymodel.impl.AbstractTypeImpl
-    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getAbstractType()
-    * @generated
-    */
-   int ABSTRACT_TYPE = 4;
-
-   /**
-    * The feature id for the '<em><b>Name</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ABSTRACT_TYPE__NAME = 0;
-
-   /**
-    * The feature id for the '<em><b>Source</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ABSTRACT_TYPE__SOURCE = 1;
-
-   /**
-    * The number of structural features of the '<em>Abstract Type</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ABSTRACT_TYPE_FEATURE_COUNT = 2;
-
-   /**
-    * The number of operations of the '<em>Abstract Type</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ABSTRACT_TYPE_OPERATION_COUNT = 0;
-
-   /**
-    * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl <em>Type</em>}' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see org.key_project.stubby.model.dependencymodel.impl.TypeImpl
-    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getType()
-    * @generated
-    */
-   int TYPE = 0;
-
-   /**
-    * The feature id for the '<em><b>Name</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__NAME = ABSTRACT_TYPE__NAME;
-
-   /**
-    * The feature id for the '<em><b>Source</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__SOURCE = ABSTRACT_TYPE__SOURCE;
-
-   /**
-    * The feature id for the '<em><b>Type Variables</b></em>' containment reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__TYPE_VARIABLES = ABSTRACT_TYPE_FEATURE_COUNT + 0;
-
-   /**
-    * The feature id for the '<em><b>Methods</b></em>' containment reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__METHODS = ABSTRACT_TYPE_FEATURE_COUNT + 1;
-
-   /**
-    * The feature id for the '<em><b>Fields</b></em>' containment reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__FIELDS = ABSTRACT_TYPE_FEATURE_COUNT + 2;
-
-   /**
-    * The feature id for the '<em><b>Kind</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__KIND = ABSTRACT_TYPE_FEATURE_COUNT + 3;
-
-   /**
-    * The feature id for the '<em><b>Visibility</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__VISIBILITY = ABSTRACT_TYPE_FEATURE_COUNT + 4;
-
-   /**
-    * The feature id for the '<em><b>Final</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__FINAL = ABSTRACT_TYPE_FEATURE_COUNT + 5;
-
-   /**
-    * The feature id for the '<em><b>Static</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__STATIC = ABSTRACT_TYPE_FEATURE_COUNT + 6;
-
-   /**
-    * The feature id for the '<em><b>Extends</b></em>' reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__EXTENDS = ABSTRACT_TYPE_FEATURE_COUNT + 7;
-
-   /**
-    * The feature id for the '<em><b>Implements</b></em>' reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__IMPLEMENTS = ABSTRACT_TYPE_FEATURE_COUNT + 8;
-
-   /**
-    * The feature id for the '<em><b>Inner Types</b></em>' containment reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__INNER_TYPES = ABSTRACT_TYPE_FEATURE_COUNT + 9;
-
-   /**
-    * The feature id for the '<em><b>Abstract</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__ABSTRACT = ABSTRACT_TYPE_FEATURE_COUNT + 10;
-
-   /**
-    * The feature id for the '<em><b>Package</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__PACKAGE = ABSTRACT_TYPE_FEATURE_COUNT + 11;
-
-   /**
-    * The feature id for the '<em><b>Simple Name</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE__SIMPLE_NAME = ABSTRACT_TYPE_FEATURE_COUNT + 12;
-
-   /**
-    * The number of structural features of the '<em>Type</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE_FEATURE_COUNT = ABSTRACT_TYPE_FEATURE_COUNT + 13;
-
-   /**
-    * The number of operations of the '<em>Type</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE_OPERATION_COUNT = ABSTRACT_TYPE_OPERATION_COUNT + 0;
-
-   /**
     * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.ITypeVariableContainer <em>IType Variable Container</em>}' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -274,7 +67,7 @@ public interface DependencymodelPackage extends EPackage {
     * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getITypeVariableContainer()
     * @generated
     */
-   int ITYPE_VARIABLE_CONTAINER = 10;
+   int ITYPE_VARIABLE_CONTAINER = 5;
 
    /**
     * The feature id for the '<em><b>Type Variables</b></em>' containment reference list.
@@ -302,6 +95,187 @@ public interface DependencymodelPackage extends EPackage {
     * @ordered
     */
    int ITYPE_VARIABLE_CONTAINER_OPERATION_COUNT = 0;
+
+   /**
+    * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl <em>Type</em>}' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see org.key_project.stubby.model.dependencymodel.impl.TypeImpl
+    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getType()
+    * @generated
+    */
+   int TYPE = 0;
+
+   /**
+    * The feature id for the '<em><b>Type Variables</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__TYPE_VARIABLES = ITYPE_VARIABLE_CONTAINER__TYPE_VARIABLES;
+
+   /**
+    * The feature id for the '<em><b>Methods</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__METHODS = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 0;
+
+   /**
+    * The feature id for the '<em><b>Fields</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__FIELDS = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 1;
+
+   /**
+    * The feature id for the '<em><b>Kind</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__KIND = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 2;
+
+   /**
+    * The feature id for the '<em><b>Visibility</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__VISIBILITY = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 3;
+
+   /**
+    * The feature id for the '<em><b>Final</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__FINAL = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 4;
+
+   /**
+    * The feature id for the '<em><b>Static</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__STATIC = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 5;
+
+   /**
+    * The feature id for the '<em><b>Inner Types</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__INNER_TYPES = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 6;
+
+   /**
+    * The feature id for the '<em><b>Abstract</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__ABSTRACT = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 7;
+
+   /**
+    * The feature id for the '<em><b>Package</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__PACKAGE = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 8;
+
+   /**
+    * The feature id for the '<em><b>Name</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__NAME = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 9;
+
+   /**
+    * The feature id for the '<em><b>Source</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__SOURCE = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 10;
+
+   /**
+    * The feature id for the '<em><b>Implements</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__IMPLEMENTS = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 11;
+
+   /**
+    * The feature id for the '<em><b>Extends</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__EXTENDS = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 12;
+
+   /**
+    * The feature id for the '<em><b>Simple Name</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__SIMPLE_NAME = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 13;
+
+   /**
+    * The number of structural features of the '<em>Type</em>' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE_FEATURE_COUNT = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 14;
+
+   /**
+    * The operation id for the '<em>Contains Field</em>' operation.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE___CONTAINS_FIELD__STRING = ITYPE_VARIABLE_CONTAINER_OPERATION_COUNT + 0;
+
+   /**
+    * The operation id for the '<em>Contains Method</em>' operation.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE___CONTAINS_METHOD__STRING_STRING = ITYPE_VARIABLE_CONTAINER_OPERATION_COUNT + 1;
+
+   /**
+    * The number of operations of the '<em>Type</em>' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE_OPERATION_COUNT = ITYPE_VARIABLE_CONTAINER_OPERATION_COUNT + 2;
 
    /**
     * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl <em>Method</em>}' class.
@@ -368,25 +342,25 @@ public interface DependencymodelPackage extends EPackage {
    int METHOD__ABSTRACT = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 4;
 
    /**
-    * The feature id for the '<em><b>Return Type</b></em>' reference.
+    * The feature id for the '<em><b>Constructor</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int METHOD__RETURN_TYPE = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 5;
+   int METHOD__CONSTRUCTOR = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 5;
 
    /**
-    * The feature id for the '<em><b>Parameter Types</b></em>' reference list.
+    * The feature id for the '<em><b>Return Type</b></em>' containment reference.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int METHOD__PARAMETER_TYPES = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 6;
+   int METHOD__RETURN_TYPE = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 6;
 
    /**
-    * The feature id for the '<em><b>Throws</b></em>' reference list.
+    * The feature id for the '<em><b>Throws</b></em>' containment reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
@@ -395,13 +369,13 @@ public interface DependencymodelPackage extends EPackage {
    int METHOD__THROWS = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 7;
 
    /**
-    * The feature id for the '<em><b>Constructor</b></em>' attribute.
+    * The feature id for the '<em><b>Parameter Types</b></em>' containment reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int METHOD__CONSTRUCTOR = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 8;
+   int METHOD__PARAMETER_TYPES = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 8;
 
    /**
     * The number of structural features of the '<em>Method</em>' class.
@@ -477,7 +451,7 @@ public interface DependencymodelPackage extends EPackage {
    int FIELD__CONSTANT_VALUE = 4;
 
    /**
-    * The feature id for the '<em><b>Type</b></em>' reference.
+    * The feature id for the '<em><b>Type</b></em>' containment reference.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
@@ -541,171 +515,6 @@ public interface DependencymodelPackage extends EPackage {
    int DEPENDENCY_MODEL_OPERATION_COUNT = 0;
 
    /**
-    * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.ArrayTypeImpl <em>Array Type</em>}' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see org.key_project.stubby.model.dependencymodel.impl.ArrayTypeImpl
-    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getArrayType()
-    * @generated
-    */
-   int ARRAY_TYPE = 5;
-
-   /**
-    * The feature id for the '<em><b>Name</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ARRAY_TYPE__NAME = ABSTRACT_TYPE__NAME;
-
-   /**
-    * The feature id for the '<em><b>Source</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ARRAY_TYPE__SOURCE = ABSTRACT_TYPE__SOURCE;
-
-   /**
-    * The feature id for the '<em><b>Base Type</b></em>' reference.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ARRAY_TYPE__BASE_TYPE = ABSTRACT_TYPE_FEATURE_COUNT + 0;
-
-   /**
-    * The number of structural features of the '<em>Array Type</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ARRAY_TYPE_FEATURE_COUNT = ABSTRACT_TYPE_FEATURE_COUNT + 1;
-
-   /**
-    * The number of operations of the '<em>Array Type</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int ARRAY_TYPE_OPERATION_COUNT = ABSTRACT_TYPE_OPERATION_COUNT + 0;
-
-   /**
-    * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.DatatypeImpl <em>Datatype</em>}' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see org.key_project.stubby.model.dependencymodel.impl.DatatypeImpl
-    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getDatatype()
-    * @generated
-    */
-   int DATATYPE = 6;
-
-   /**
-    * The feature id for the '<em><b>Name</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int DATATYPE__NAME = ABSTRACT_TYPE__NAME;
-
-   /**
-    * The feature id for the '<em><b>Source</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int DATATYPE__SOURCE = ABSTRACT_TYPE__SOURCE;
-
-   /**
-    * The number of structural features of the '<em>Datatype</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int DATATYPE_FEATURE_COUNT = ABSTRACT_TYPE_FEATURE_COUNT + 0;
-
-   /**
-    * The number of operations of the '<em>Datatype</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int DATATYPE_OPERATION_COUNT = ABSTRACT_TYPE_OPERATION_COUNT + 0;
-
-   /**
-    * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.GenericTypeImpl <em>Generic Type</em>}' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see org.key_project.stubby.model.dependencymodel.impl.GenericTypeImpl
-    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getGenericType()
-    * @generated
-    */
-   int GENERIC_TYPE = 7;
-
-   /**
-    * The feature id for the '<em><b>Name</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int GENERIC_TYPE__NAME = ABSTRACT_TYPE__NAME;
-
-   /**
-    * The feature id for the '<em><b>Source</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int GENERIC_TYPE__SOURCE = ABSTRACT_TYPE__SOURCE;
-
-   /**
-    * The feature id for the '<em><b>Base Type</b></em>' reference.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int GENERIC_TYPE__BASE_TYPE = ABSTRACT_TYPE_FEATURE_COUNT + 0;
-
-   /**
-    * The feature id for the '<em><b>Type Arguments</b></em>' reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int GENERIC_TYPE__TYPE_ARGUMENTS = ABSTRACT_TYPE_FEATURE_COUNT + 1;
-
-   /**
-    * The number of structural features of the '<em>Generic Type</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int GENERIC_TYPE_FEATURE_COUNT = ABSTRACT_TYPE_FEATURE_COUNT + 2;
-
-   /**
-    * The number of operations of the '<em>Generic Type</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int GENERIC_TYPE_OPERATION_COUNT = ABSTRACT_TYPE_OPERATION_COUNT + 0;
-
-   /**
     * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.TypeVariableImpl <em>Type Variable</em>}' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -713,7 +522,7 @@ public interface DependencymodelPackage extends EPackage {
     * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getTypeVariable()
     * @generated
     */
-   int TYPE_VARIABLE = 8;
+   int TYPE_VARIABLE = 4;
 
    /**
     * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -722,25 +531,16 @@ public interface DependencymodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int TYPE_VARIABLE__NAME = ABSTRACT_TYPE__NAME;
+   int TYPE_VARIABLE__NAME = 0;
 
    /**
-    * The feature id for the '<em><b>Source</b></em>' attribute.
+    * The feature id for the '<em><b>Type</b></em>' containment reference.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int TYPE_VARIABLE__SOURCE = ABSTRACT_TYPE__SOURCE;
-
-   /**
-    * The feature id for the '<em><b>Type</b></em>' reference.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int TYPE_VARIABLE__TYPE = ABSTRACT_TYPE_FEATURE_COUNT + 0;
+   int TYPE_VARIABLE__TYPE = 1;
 
    /**
     * The number of structural features of the '<em>Type Variable</em>' class.
@@ -749,7 +549,7 @@ public interface DependencymodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int TYPE_VARIABLE_FEATURE_COUNT = ABSTRACT_TYPE_FEATURE_COUNT + 1;
+   int TYPE_VARIABLE_FEATURE_COUNT = 2;
 
    /**
     * The number of operations of the '<em>Type Variable</em>' class.
@@ -758,53 +558,53 @@ public interface DependencymodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int TYPE_VARIABLE_OPERATION_COUNT = ABSTRACT_TYPE_OPERATION_COUNT + 0;
+   int TYPE_VARIABLE_OPERATION_COUNT = 0;
 
    /**
-    * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.WildcardTypeImpl <em>Wildcard Type</em>}' class.
+    * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.impl.TypeUsageImpl <em>Type Usage</em>}' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @see org.key_project.stubby.model.dependencymodel.impl.WildcardTypeImpl
-    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getWildcardType()
+    * @see org.key_project.stubby.model.dependencymodel.impl.TypeUsageImpl
+    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getTypeUsage()
     * @generated
     */
-   int WILDCARD_TYPE = 9;
+   int TYPE_USAGE = 6;
 
    /**
-    * The feature id for the '<em><b>Name</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int WILDCARD_TYPE__NAME = ABSTRACT_TYPE__NAME;
-
-   /**
-    * The feature id for the '<em><b>Source</b></em>' attribute.
+    * The feature id for the '<em><b>Type</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int WILDCARD_TYPE__SOURCE = ABSTRACT_TYPE__SOURCE;
+   int TYPE_USAGE__TYPE = 0;
 
    /**
-    * The number of structural features of the '<em>Wildcard Type</em>' class.
+    * The feature id for the '<em><b>Generic Free Type</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int WILDCARD_TYPE_FEATURE_COUNT = ABSTRACT_TYPE_FEATURE_COUNT + 0;
+   int TYPE_USAGE__GENERIC_FREE_TYPE = 1;
 
    /**
-    * The number of operations of the '<em>Wildcard Type</em>' class.
+    * The number of structural features of the '<em>Type Usage</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int WILDCARD_TYPE_OPERATION_COUNT = ABSTRACT_TYPE_OPERATION_COUNT + 0;
+   int TYPE_USAGE_FEATURE_COUNT = 2;
+
+   /**
+    * The number of operations of the '<em>Type Usage</em>' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE_USAGE_OPERATION_COUNT = 0;
 
    /**
     * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.TypeKind <em>Type Kind</em>}' enum.
@@ -814,7 +614,7 @@ public interface DependencymodelPackage extends EPackage {
     * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getTypeKind()
     * @generated
     */
-   int TYPE_KIND = 11;
+   int TYPE_KIND = 7;
 
    /**
     * The meta object id for the '{@link org.key_project.stubby.model.dependencymodel.Visibility <em>Visibility</em>}' enum.
@@ -824,7 +624,17 @@ public interface DependencymodelPackage extends EPackage {
     * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getVisibility()
     * @generated
     */
-   int VISIBILITY = 12;
+   int VISIBILITY = 8;
+
+
+   /**
+    * The meta object id for the '<em>String Array</em>' data type.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getStringArray()
+    * @generated
+    */
+   int STRING_ARRAY = 9;
 
 
    /**
@@ -904,10 +714,10 @@ public interface DependencymodelPackage extends EPackage {
    EAttribute getType_Static();
 
    /**
-    * Returns the meta object for the reference list '{@link org.key_project.stubby.model.dependencymodel.Type#getExtends <em>Extends</em>}'.
+    * Returns the meta object for the containment reference list '{@link org.key_project.stubby.model.dependencymodel.Type#getExtends <em>Extends</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @return the meta object for the reference list '<em>Extends</em>'.
+    * @return the meta object for the containment reference list '<em>Extends</em>'.
     * @see org.key_project.stubby.model.dependencymodel.Type#getExtends()
     * @see #getType()
     * @generated
@@ -915,10 +725,41 @@ public interface DependencymodelPackage extends EPackage {
    EReference getType_Extends();
 
    /**
-    * Returns the meta object for the reference list '{@link org.key_project.stubby.model.dependencymodel.Type#getImplements <em>Implements</em>}'.
+    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.Type#getSimpleName <em>Simple Name</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @return the meta object for the reference list '<em>Implements</em>'.
+    * @return the meta object for the attribute '<em>Simple Name</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.Type#getSimpleName()
+    * @see #getType()
+    * @generated
+    */
+   EAttribute getType_SimpleName();
+
+   /**
+    * Returns the meta object for the '{@link org.key_project.stubby.model.dependencymodel.Type#containsField(java.lang.String) <em>Contains Field</em>}' operation.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the '<em>Contains Field</em>' operation.
+    * @see org.key_project.stubby.model.dependencymodel.Type#containsField(java.lang.String)
+    * @generated
+    */
+   EOperation getType__ContainsField__String();
+
+   /**
+    * Returns the meta object for the '{@link org.key_project.stubby.model.dependencymodel.Type#containsMethod(java.lang.String, java.lang.String[]) <em>Contains Method</em>}' operation.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the '<em>Contains Method</em>' operation.
+    * @see org.key_project.stubby.model.dependencymodel.Type#containsMethod(java.lang.String, java.lang.String[])
+    * @generated
+    */
+   EOperation getType__ContainsMethod__String_String();
+
+   /**
+    * Returns the meta object for the containment reference list '{@link org.key_project.stubby.model.dependencymodel.Type#getImplements <em>Implements</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference list '<em>Implements</em>'.
     * @see org.key_project.stubby.model.dependencymodel.Type#getImplements()
     * @see #getType()
     * @generated
@@ -959,15 +800,26 @@ public interface DependencymodelPackage extends EPackage {
    EAttribute getType_Package();
 
    /**
-    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.Type#getSimpleName <em>Simple Name</em>}'.
+    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.Type#getName <em>Name</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @return the meta object for the attribute '<em>Simple Name</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.Type#getSimpleName()
+    * @return the meta object for the attribute '<em>Name</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.Type#getName()
     * @see #getType()
     * @generated
     */
-   EAttribute getType_SimpleName();
+   EAttribute getType_Name();
+
+   /**
+    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.Type#isSource <em>Source</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Source</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.Type#isSource()
+    * @see #getType()
+    * @generated
+    */
+   EAttribute getType_Source();
 
    /**
     * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.Method <em>Method</em>}'.
@@ -1035,39 +887,6 @@ public interface DependencymodelPackage extends EPackage {
    EAttribute getMethod_Abstract();
 
    /**
-    * Returns the meta object for the reference '{@link org.key_project.stubby.model.dependencymodel.Method#getReturnType <em>Return Type</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the reference '<em>Return Type</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.Method#getReturnType()
-    * @see #getMethod()
-    * @generated
-    */
-   EReference getMethod_ReturnType();
-
-   /**
-    * Returns the meta object for the reference list '{@link org.key_project.stubby.model.dependencymodel.Method#getParameterTypes <em>Parameter Types</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the reference list '<em>Parameter Types</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.Method#getParameterTypes()
-    * @see #getMethod()
-    * @generated
-    */
-   EReference getMethod_ParameterTypes();
-
-   /**
-    * Returns the meta object for the reference list '{@link org.key_project.stubby.model.dependencymodel.Method#getThrows <em>Throws</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the reference list '<em>Throws</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.Method#getThrows()
-    * @see #getMethod()
-    * @generated
-    */
-   EReference getMethod_Throws();
-
-   /**
     * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.Method#isConstructor <em>Constructor</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1077,6 +896,39 @@ public interface DependencymodelPackage extends EPackage {
     * @generated
     */
    EAttribute getMethod_Constructor();
+
+   /**
+    * Returns the meta object for the containment reference '{@link org.key_project.stubby.model.dependencymodel.Method#getReturnType <em>Return Type</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference '<em>Return Type</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.Method#getReturnType()
+    * @see #getMethod()
+    * @generated
+    */
+   EReference getMethod_ReturnType();
+
+   /**
+    * Returns the meta object for the containment reference list '{@link org.key_project.stubby.model.dependencymodel.Method#getThrows <em>Throws</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference list '<em>Throws</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.Method#getThrows()
+    * @see #getMethod()
+    * @generated
+    */
+   EReference getMethod_Throws();
+
+   /**
+    * Returns the meta object for the containment reference list '{@link org.key_project.stubby.model.dependencymodel.Method#getParameterTypes <em>Parameter Types</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference list '<em>Parameter Types</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.Method#getParameterTypes()
+    * @see #getMethod()
+    * @generated
+    */
+   EReference getMethod_ParameterTypes();
 
    /**
     * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.Field <em>Field</em>}'.
@@ -1144,10 +996,10 @@ public interface DependencymodelPackage extends EPackage {
    EAttribute getField_ConstantValue();
 
    /**
-    * Returns the meta object for the reference '{@link org.key_project.stubby.model.dependencymodel.Field#getType <em>Type</em>}'.
+    * Returns the meta object for the containment reference '{@link org.key_project.stubby.model.dependencymodel.Field#getType <em>Type</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @return the meta object for the reference '<em>Type</em>'.
+    * @return the meta object for the containment reference '<em>Type</em>'.
     * @see org.key_project.stubby.model.dependencymodel.Field#getType()
     * @see #getField()
     * @generated
@@ -1176,101 +1028,6 @@ public interface DependencymodelPackage extends EPackage {
    EReference getDependencyModel_Types();
 
    /**
-    * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.AbstractType <em>Abstract Type</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for class '<em>Abstract Type</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.AbstractType
-    * @generated
-    */
-   EClass getAbstractType();
-
-   /**
-    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.AbstractType#getName <em>Name</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the attribute '<em>Name</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.AbstractType#getName()
-    * @see #getAbstractType()
-    * @generated
-    */
-   EAttribute getAbstractType_Name();
-
-   /**
-    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.AbstractType#isSource <em>Source</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the attribute '<em>Source</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.AbstractType#isSource()
-    * @see #getAbstractType()
-    * @generated
-    */
-   EAttribute getAbstractType_Source();
-
-   /**
-    * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.ArrayType <em>Array Type</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for class '<em>Array Type</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.ArrayType
-    * @generated
-    */
-   EClass getArrayType();
-
-   /**
-    * Returns the meta object for the reference '{@link org.key_project.stubby.model.dependencymodel.ArrayType#getBaseType <em>Base Type</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the reference '<em>Base Type</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.ArrayType#getBaseType()
-    * @see #getArrayType()
-    * @generated
-    */
-   EReference getArrayType_BaseType();
-
-   /**
-    * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.Datatype <em>Datatype</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for class '<em>Datatype</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.Datatype
-    * @generated
-    */
-   EClass getDatatype();
-
-   /**
-    * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.GenericType <em>Generic Type</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for class '<em>Generic Type</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.GenericType
-    * @generated
-    */
-   EClass getGenericType();
-
-   /**
-    * Returns the meta object for the reference '{@link org.key_project.stubby.model.dependencymodel.GenericType#getBaseType <em>Base Type</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the reference '<em>Base Type</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.GenericType#getBaseType()
-    * @see #getGenericType()
-    * @generated
-    */
-   EReference getGenericType_BaseType();
-
-   /**
-    * Returns the meta object for the reference list '{@link org.key_project.stubby.model.dependencymodel.GenericType#getTypeArguments <em>Type Arguments</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the reference list '<em>Type Arguments</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.GenericType#getTypeArguments()
-    * @see #getGenericType()
-    * @generated
-    */
-   EReference getGenericType_TypeArguments();
-
-   /**
     * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.TypeVariable <em>Type Variable</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1281,25 +1038,26 @@ public interface DependencymodelPackage extends EPackage {
    EClass getTypeVariable();
 
    /**
-    * Returns the meta object for the reference '{@link org.key_project.stubby.model.dependencymodel.TypeVariable#getType <em>Type</em>}'.
+    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.TypeVariable#getName <em>Name</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @return the meta object for the reference '<em>Type</em>'.
+    * @return the meta object for the attribute '<em>Name</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.TypeVariable#getName()
+    * @see #getTypeVariable()
+    * @generated
+    */
+   EAttribute getTypeVariable_Name();
+
+   /**
+    * Returns the meta object for the containment reference '{@link org.key_project.stubby.model.dependencymodel.TypeVariable#getType <em>Type</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference '<em>Type</em>'.
     * @see org.key_project.stubby.model.dependencymodel.TypeVariable#getType()
     * @see #getTypeVariable()
     * @generated
     */
    EReference getTypeVariable_Type();
-
-   /**
-    * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.WildcardType <em>Wildcard Type</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for class '<em>Wildcard Type</em>'.
-    * @see org.key_project.stubby.model.dependencymodel.WildcardType
-    * @generated
-    */
-   EClass getWildcardType();
 
    /**
     * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.ITypeVariableContainer <em>IType Variable Container</em>}'.
@@ -1323,6 +1081,38 @@ public interface DependencymodelPackage extends EPackage {
    EReference getITypeVariableContainer_TypeVariables();
 
    /**
+    * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.TypeUsage <em>Type Usage</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for class '<em>Type Usage</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.TypeUsage
+    * @generated
+    */
+   EClass getTypeUsage();
+
+   /**
+    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.TypeUsage#getType <em>Type</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Type</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.TypeUsage#getType()
+    * @see #getTypeUsage()
+    * @generated
+    */
+   EAttribute getTypeUsage_Type();
+
+   /**
+    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.TypeUsage#getGenericFreeType <em>Generic Free Type</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Generic Free Type</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.TypeUsage#getGenericFreeType()
+    * @see #getTypeUsage()
+    * @generated
+    */
+   EAttribute getTypeUsage_GenericFreeType();
+
+   /**
     * Returns the meta object for enum '{@link org.key_project.stubby.model.dependencymodel.TypeKind <em>Type Kind</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1341,6 +1131,16 @@ public interface DependencymodelPackage extends EPackage {
     * @generated
     */
    EEnum getVisibility();
+
+   /**
+    * Returns the meta object for data type '<em>String Array</em>'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for data type '<em>String Array</em>'.
+    * @model instanceClass="java.lang.String[]"
+    * @generated
+    */
+   EDataType getStringArray();
 
    /**
     * Returns the factory that creates the instances of the model.
@@ -1424,7 +1224,7 @@ public interface DependencymodelPackage extends EPackage {
       EAttribute TYPE__STATIC = eINSTANCE.getType_Static();
 
       /**
-       * The meta object literal for the '<em><b>Extends</b></em>' reference list feature.
+       * The meta object literal for the '<em><b>Extends</b></em>' containment reference list feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
@@ -1432,7 +1232,31 @@ public interface DependencymodelPackage extends EPackage {
       EReference TYPE__EXTENDS = eINSTANCE.getType_Extends();
 
       /**
-       * The meta object literal for the '<em><b>Implements</b></em>' reference list feature.
+       * The meta object literal for the '<em><b>Simple Name</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute TYPE__SIMPLE_NAME = eINSTANCE.getType_SimpleName();
+
+      /**
+       * The meta object literal for the '<em><b>Contains Field</b></em>' operation.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EOperation TYPE___CONTAINS_FIELD__STRING = eINSTANCE.getType__ContainsField__String();
+
+      /**
+       * The meta object literal for the '<em><b>Contains Method</b></em>' operation.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EOperation TYPE___CONTAINS_METHOD__STRING_STRING = eINSTANCE.getType__ContainsMethod__String_String();
+
+      /**
+       * The meta object literal for the '<em><b>Implements</b></em>' containment reference list feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
@@ -1464,12 +1288,20 @@ public interface DependencymodelPackage extends EPackage {
       EAttribute TYPE__PACKAGE = eINSTANCE.getType_Package();
 
       /**
-       * The meta object literal for the '<em><b>Simple Name</b></em>' attribute feature.
+       * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
        */
-      EAttribute TYPE__SIMPLE_NAME = eINSTANCE.getType_SimpleName();
+      EAttribute TYPE__NAME = eINSTANCE.getType_Name();
+
+      /**
+       * The meta object literal for the '<em><b>Source</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute TYPE__SOURCE = eINSTANCE.getType_Source();
 
       /**
        * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl <em>Method</em>}' class.
@@ -1522,7 +1354,15 @@ public interface DependencymodelPackage extends EPackage {
       EAttribute METHOD__ABSTRACT = eINSTANCE.getMethod_Abstract();
 
       /**
-       * The meta object literal for the '<em><b>Return Type</b></em>' reference feature.
+       * The meta object literal for the '<em><b>Constructor</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute METHOD__CONSTRUCTOR = eINSTANCE.getMethod_Constructor();
+
+      /**
+       * The meta object literal for the '<em><b>Return Type</b></em>' containment reference feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
@@ -1530,15 +1370,7 @@ public interface DependencymodelPackage extends EPackage {
       EReference METHOD__RETURN_TYPE = eINSTANCE.getMethod_ReturnType();
 
       /**
-       * The meta object literal for the '<em><b>Parameter Types</b></em>' reference list feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EReference METHOD__PARAMETER_TYPES = eINSTANCE.getMethod_ParameterTypes();
-
-      /**
-       * The meta object literal for the '<em><b>Throws</b></em>' reference list feature.
+       * The meta object literal for the '<em><b>Throws</b></em>' containment reference list feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
@@ -1546,12 +1378,12 @@ public interface DependencymodelPackage extends EPackage {
       EReference METHOD__THROWS = eINSTANCE.getMethod_Throws();
 
       /**
-       * The meta object literal for the '<em><b>Constructor</b></em>' attribute feature.
+       * The meta object literal for the '<em><b>Parameter Types</b></em>' containment reference list feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
        */
-      EAttribute METHOD__CONSTRUCTOR = eINSTANCE.getMethod_Constructor();
+      EReference METHOD__PARAMETER_TYPES = eINSTANCE.getMethod_ParameterTypes();
 
       /**
        * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.FieldImpl <em>Field</em>}' class.
@@ -1604,7 +1436,7 @@ public interface DependencymodelPackage extends EPackage {
       EAttribute FIELD__CONSTANT_VALUE = eINSTANCE.getField_ConstantValue();
 
       /**
-       * The meta object literal for the '<em><b>Type</b></em>' reference feature.
+       * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
@@ -1630,86 +1462,6 @@ public interface DependencymodelPackage extends EPackage {
       EReference DEPENDENCY_MODEL__TYPES = eINSTANCE.getDependencyModel_Types();
 
       /**
-       * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.AbstractTypeImpl <em>Abstract Type</em>}' class.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @see org.key_project.stubby.model.dependencymodel.impl.AbstractTypeImpl
-       * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getAbstractType()
-       * @generated
-       */
-      EClass ABSTRACT_TYPE = eINSTANCE.getAbstractType();
-
-      /**
-       * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EAttribute ABSTRACT_TYPE__NAME = eINSTANCE.getAbstractType_Name();
-
-      /**
-       * The meta object literal for the '<em><b>Source</b></em>' attribute feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EAttribute ABSTRACT_TYPE__SOURCE = eINSTANCE.getAbstractType_Source();
-
-      /**
-       * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.ArrayTypeImpl <em>Array Type</em>}' class.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @see org.key_project.stubby.model.dependencymodel.impl.ArrayTypeImpl
-       * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getArrayType()
-       * @generated
-       */
-      EClass ARRAY_TYPE = eINSTANCE.getArrayType();
-
-      /**
-       * The meta object literal for the '<em><b>Base Type</b></em>' reference feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EReference ARRAY_TYPE__BASE_TYPE = eINSTANCE.getArrayType_BaseType();
-
-      /**
-       * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.DatatypeImpl <em>Datatype</em>}' class.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @see org.key_project.stubby.model.dependencymodel.impl.DatatypeImpl
-       * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getDatatype()
-       * @generated
-       */
-      EClass DATATYPE = eINSTANCE.getDatatype();
-
-      /**
-       * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.GenericTypeImpl <em>Generic Type</em>}' class.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @see org.key_project.stubby.model.dependencymodel.impl.GenericTypeImpl
-       * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getGenericType()
-       * @generated
-       */
-      EClass GENERIC_TYPE = eINSTANCE.getGenericType();
-
-      /**
-       * The meta object literal for the '<em><b>Base Type</b></em>' reference feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EReference GENERIC_TYPE__BASE_TYPE = eINSTANCE.getGenericType_BaseType();
-
-      /**
-       * The meta object literal for the '<em><b>Type Arguments</b></em>' reference list feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EReference GENERIC_TYPE__TYPE_ARGUMENTS = eINSTANCE.getGenericType_TypeArguments();
-
-      /**
        * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.TypeVariableImpl <em>Type Variable</em>}' class.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
@@ -1720,22 +1472,20 @@ public interface DependencymodelPackage extends EPackage {
       EClass TYPE_VARIABLE = eINSTANCE.getTypeVariable();
 
       /**
-       * The meta object literal for the '<em><b>Type</b></em>' reference feature.
+       * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute TYPE_VARIABLE__NAME = eINSTANCE.getTypeVariable_Name();
+
+      /**
+       * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
        */
       EReference TYPE_VARIABLE__TYPE = eINSTANCE.getTypeVariable_Type();
-
-      /**
-       * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.WildcardTypeImpl <em>Wildcard Type</em>}' class.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @see org.key_project.stubby.model.dependencymodel.impl.WildcardTypeImpl
-       * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getWildcardType()
-       * @generated
-       */
-      EClass WILDCARD_TYPE = eINSTANCE.getWildcardType();
 
       /**
        * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.ITypeVariableContainer <em>IType Variable Container</em>}' class.
@@ -1756,6 +1506,32 @@ public interface DependencymodelPackage extends EPackage {
       EReference ITYPE_VARIABLE_CONTAINER__TYPE_VARIABLES = eINSTANCE.getITypeVariableContainer_TypeVariables();
 
       /**
+       * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.TypeUsageImpl <em>Type Usage</em>}' class.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @see org.key_project.stubby.model.dependencymodel.impl.TypeUsageImpl
+       * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getTypeUsage()
+       * @generated
+       */
+      EClass TYPE_USAGE = eINSTANCE.getTypeUsage();
+
+      /**
+       * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute TYPE_USAGE__TYPE = eINSTANCE.getTypeUsage_Type();
+
+      /**
+       * The meta object literal for the '<em><b>Generic Free Type</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute TYPE_USAGE__GENERIC_FREE_TYPE = eINSTANCE.getTypeUsage_GenericFreeType();
+
+      /**
        * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.TypeKind <em>Type Kind</em>}' enum.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
@@ -1774,6 +1550,15 @@ public interface DependencymodelPackage extends EPackage {
        * @generated
        */
       EEnum VISIBILITY = eINSTANCE.getVisibility();
+
+      /**
+       * The meta object literal for the '<em>String Array</em>' data type.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @see org.key_project.stubby.model.dependencymodel.impl.DependencymodelPackageImpl#getStringArray()
+       * @generated
+       */
+      EDataType STRING_ARRAY = eINSTANCE.getStringArray();
 
    }
 

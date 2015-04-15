@@ -84,32 +84,16 @@ public class DependencymodelAdapterFactory extends AdapterFactoryImpl {
             return createDependencyModelAdapter();
          }
          @Override
-         public Adapter caseAbstractType(AbstractType object) {
-            return createAbstractTypeAdapter();
-         }
-         @Override
-         public Adapter caseArrayType(ArrayType object) {
-            return createArrayTypeAdapter();
-         }
-         @Override
-         public Adapter caseDatatype(Datatype object) {
-            return createDatatypeAdapter();
-         }
-         @Override
-         public Adapter caseGenericType(GenericType object) {
-            return createGenericTypeAdapter();
-         }
-         @Override
          public Adapter caseTypeVariable(TypeVariable object) {
             return createTypeVariableAdapter();
          }
          @Override
-         public Adapter caseWildcardType(WildcardType object) {
-            return createWildcardTypeAdapter();
-         }
-         @Override
          public Adapter caseITypeVariableContainer(ITypeVariableContainer object) {
             return createITypeVariableContainerAdapter();
+         }
+         @Override
+         public Adapter caseTypeUsage(TypeUsage object) {
+            return createTypeUsageAdapter();
          }
          @Override
          public Adapter defaultCase(EObject object) {
@@ -188,62 +172,6 @@ public class DependencymodelAdapterFactory extends AdapterFactoryImpl {
    }
 
    /**
-    * Creates a new adapter for an object of class '{@link org.key_project.stubby.model.dependencymodel.AbstractType <em>Abstract Type</em>}'.
-    * <!-- begin-user-doc -->
-    * This default implementation returns null so that we can easily ignore cases;
-    * it's useful to ignore a case when inheritance will catch all the cases anyway.
-    * <!-- end-user-doc -->
-    * @return the new adapter.
-    * @see org.key_project.stubby.model.dependencymodel.AbstractType
-    * @generated
-    */
-   public Adapter createAbstractTypeAdapter() {
-      return null;
-   }
-
-   /**
-    * Creates a new adapter for an object of class '{@link org.key_project.stubby.model.dependencymodel.ArrayType <em>Array Type</em>}'.
-    * <!-- begin-user-doc -->
-    * This default implementation returns null so that we can easily ignore cases;
-    * it's useful to ignore a case when inheritance will catch all the cases anyway.
-    * <!-- end-user-doc -->
-    * @return the new adapter.
-    * @see org.key_project.stubby.model.dependencymodel.ArrayType
-    * @generated
-    */
-   public Adapter createArrayTypeAdapter() {
-      return null;
-   }
-
-   /**
-    * Creates a new adapter for an object of class '{@link org.key_project.stubby.model.dependencymodel.Datatype <em>Datatype</em>}'.
-    * <!-- begin-user-doc -->
-    * This default implementation returns null so that we can easily ignore cases;
-    * it's useful to ignore a case when inheritance will catch all the cases anyway.
-    * <!-- end-user-doc -->
-    * @return the new adapter.
-    * @see org.key_project.stubby.model.dependencymodel.Datatype
-    * @generated
-    */
-   public Adapter createDatatypeAdapter() {
-      return null;
-   }
-
-   /**
-    * Creates a new adapter for an object of class '{@link org.key_project.stubby.model.dependencymodel.GenericType <em>Generic Type</em>}'.
-    * <!-- begin-user-doc -->
-    * This default implementation returns null so that we can easily ignore cases;
-    * it's useful to ignore a case when inheritance will catch all the cases anyway.
-    * <!-- end-user-doc -->
-    * @return the new adapter.
-    * @see org.key_project.stubby.model.dependencymodel.GenericType
-    * @generated
-    */
-   public Adapter createGenericTypeAdapter() {
-      return null;
-   }
-
-   /**
     * Creates a new adapter for an object of class '{@link org.key_project.stubby.model.dependencymodel.TypeVariable <em>Type Variable</em>}'.
     * <!-- begin-user-doc -->
     * This default implementation returns null so that we can easily ignore cases;
@@ -258,20 +186,6 @@ public class DependencymodelAdapterFactory extends AdapterFactoryImpl {
    }
 
    /**
-    * Creates a new adapter for an object of class '{@link org.key_project.stubby.model.dependencymodel.WildcardType <em>Wildcard Type</em>}'.
-    * <!-- begin-user-doc -->
-    * This default implementation returns null so that we can easily ignore cases;
-    * it's useful to ignore a case when inheritance will catch all the cases anyway.
-    * <!-- end-user-doc -->
-    * @return the new adapter.
-    * @see org.key_project.stubby.model.dependencymodel.WildcardType
-    * @generated
-    */
-   public Adapter createWildcardTypeAdapter() {
-      return null;
-   }
-
-   /**
     * Creates a new adapter for an object of class '{@link org.key_project.stubby.model.dependencymodel.ITypeVariableContainer <em>IType Variable Container</em>}'.
     * <!-- begin-user-doc -->
     * This default implementation returns null so that we can easily ignore cases;
@@ -282,6 +196,20 @@ public class DependencymodelAdapterFactory extends AdapterFactoryImpl {
     * @generated
     */
    public Adapter createITypeVariableContainerAdapter() {
+      return null;
+   }
+
+   /**
+    * Creates a new adapter for an object of class '{@link org.key_project.stubby.model.dependencymodel.TypeUsage <em>Type Usage</em>}'.
+    * <!-- begin-user-doc -->
+    * This default implementation returns null so that we can easily ignore cases;
+    * it's useful to ignore a case when inheritance will catch all the cases anyway.
+    * <!-- end-user-doc -->
+    * @return the new adapter.
+    * @see org.key_project.stubby.model.dependencymodel.TypeUsage
+    * @generated
+    */
+   public Adapter createTypeUsageAdapter() {
       return null;
    }
 

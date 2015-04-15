@@ -56,8 +56,8 @@ import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.util.event.IKeYResourcePropertyListener;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.XMLUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -486,7 +486,7 @@ public class KeYResourcesUtil {
     */
    public static IFile getProofFile(String name, IPath path) {
       if (path != null && name != null) {
-         name = ResourceUtil.validateWorkspaceFileName(name);
+         name = IOUtil.validateOSIndependentFileName(name);
          name = name + "." + KeYResourcesUtil.PROOF_FILE_EXTENSION;
          path = path.append(name);
          IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);

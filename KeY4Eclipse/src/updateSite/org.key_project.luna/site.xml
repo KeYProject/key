@@ -27,6 +27,12 @@
    <feature url="features/org.key_project.stubby.feature_1.0.0.qualifier.jar" id="org.key_project.stubby.feature" version="1.0.0.qualifier">
       <category name="org.key_project.category.utilities"/>
    </feature>
+   <feature url="features/org.key_project.jmlediting.feature_1.0.0.qualifier.jar" id="org.key_project.jmlediting.feature" version="1.0.0.qualifier">
+      <category name="org.key_project.category.editing"/>
+   </feature>
+   <feature url="features/org.key_project.removegenerics.feature_1.0.0.qualifier.jar" id="org.key_project.removegenerics.feature" version="1.0.0.qualifier">
+      <category name="org.key_project.category.utilities"/>
+   </feature>
    <category-def name="org.key_project.category.verification" label="Verification">
       <description>
          Provides tools for verification.
@@ -45,6 +51,11 @@
    <category-def name="org.key_project.category.utilities" label="Utilities">
       <description>
          Provides general utilities.
+      </description>
+   </category-def>
+   <category-def name="org.key_project.category.editing" label="Editing">
+      <description>
+         Provides tools for editing source code.
       </description>
    </category-def>
 </site>

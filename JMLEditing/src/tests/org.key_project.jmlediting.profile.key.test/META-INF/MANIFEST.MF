@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JML Editing KeY Profile Test
+Bundle-SymbolicName: org.key_project.jmlediting.profile.key.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.jmlediting.profile.key.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.key_project.jmlediting.profile.key;bundle-version="1.0.0",
+ org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0",
+ org.key_project.jmlediting.core;bundle-version="1.0.0",
+ org.key_project.jmlediting.core.test;bundle-version="1.0.0",
+ org.key_project.jmlediting.ui;bundle-version="1.0.0",
+ org.junit,
+ org.key_project.jmlediting.profile.jmlref.test;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: org.key_project.jmlediting.profile.key.test.suite
+Bundle-Vendor: KeY Project

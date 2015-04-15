@@ -38,6 +38,5 @@ Export-Package: de.uka.ilkd.key.java,
  de.uka.ilkd.key.taclettranslation.lemma,
  de.uka.ilkd.key.util,
  de.uka.ilkd.key.util.pp,
- de.uka.ilkd.key.util.removegenerics,
  org.key_project.core.test.suite,
  org.key_project.core.test.util

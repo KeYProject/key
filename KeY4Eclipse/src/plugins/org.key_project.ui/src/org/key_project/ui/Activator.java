@@ -44,7 +44,7 @@ public class Activator extends AbstractUIPlugin {
 	   PathConfig.setKeyConfigDir(keyConfigDir + File.separator + PathConfig.KEY_DIRECTORY_NAME);
 	   // Check if a local example directory is available. This is true if the plug-in is used inside a development IDE
 	   String exampleDir = KeYExampleUtil.getLocalExampleDirectory();
-	   if (exampleDir == null || exampleDir.isEmpty()) {
+	   if (exampleDir == null || !new File(exampleDir).isDirectory()) {
          // Extract KeY examples into workspace, this is required to use them.
          exampleDir = keyConfigDir + File.separator + "examples";
          String keyExampleFile = keyConfigDir + File.separator + "examples.properties";

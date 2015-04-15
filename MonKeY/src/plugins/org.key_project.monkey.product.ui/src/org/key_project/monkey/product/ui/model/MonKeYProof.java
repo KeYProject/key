@@ -566,13 +566,13 @@ public class MonKeYProof extends Bean {
                           KeYUtil.runWithoutResultDialog(new KeYUtil.IRunnableWithMainWindow() {
                              @Override
                              public void run(MainWindow main) throws Exception {
-                                AbstractProblemLoader loader = main.getUserInterface().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null, false);
+                                AbstractProblemLoader loader = main.getUserInterface().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null, null, false);
                                 setResult(loader.getProof());
                              }
                           });
                        }
                        else {
-                          AbstractProblemLoader loader = environment.getUi().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null, false);
+                          AbstractProblemLoader loader = environment.getUi().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null, null, false);
                           setResult(loader.getProof());  
                        }
                    }

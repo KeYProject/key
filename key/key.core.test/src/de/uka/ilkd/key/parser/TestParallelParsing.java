@@ -120,7 +120,7 @@ public class TestParallelParsing extends TestCase {
       @Override
       public void run() {
          try {
-            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(new JavaProfile(), location, null, null, false);
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(new JavaProfile(), location, null, null, null, false);
             env.dispose();
          }
          catch (Exception e) {

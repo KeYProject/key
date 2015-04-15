@@ -18,11 +18,13 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getVisibility <em>Visibility</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#isFinal <em>Final</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#isStatic <em>Static</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getExtends <em>Extends</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getImplements <em>Implements</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getInnerTypes <em>Inner Types</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#isAbstract <em>Abstract</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getPackage <em>Package</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getName <em>Name</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#isSource <em>Source</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getImplements <em>Implements</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getExtends <em>Extends</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getSimpleName <em>Simple Name</em>}</li>
  * </ul>
  * </p>
@@ -31,7 +33,7 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Type extends AbstractType, ITypeVariableContainer {
+public interface Type extends ITypeVariableContainer {
    /**
     * Returns the value of the '<em><b>Methods</b></em>' containment reference list.
     * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.Method}.
@@ -175,36 +177,78 @@ public interface Type extends AbstractType, ITypeVariableContainer {
    void setStatic(boolean value);
 
    /**
-    * Returns the value of the '<em><b>Extends</b></em>' reference list.
-    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.AbstractType}.
+    * Returns the value of the '<em><b>Extends</b></em>' containment reference list.
+    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.TypeUsage}.
     * <!-- begin-user-doc -->
     * <p>
     * If the meaning of the '<em>Extends</em>' reference list isn't clear,
     * there really should be more of a description here...
     * </p>
     * <!-- end-user-doc -->
-    * @return the value of the '<em>Extends</em>' reference list.
+    * @return the value of the '<em>Extends</em>' containment reference list.
     * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getType_Extends()
+    * @model containment="true"
+    * @generated
+    */
+   EList<TypeUsage> getExtends();
+
+   /**
+    * Returns the value of the '<em><b>Simple Name</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Simple Name</em>' attribute isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Simple Name</em>' attribute.
+    * @see #setSimpleName(String)
+    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getType_SimpleName()
     * @model
     * @generated
     */
-   EList<AbstractType> getExtends();
+   String getSimpleName();
 
    /**
-    * Returns the value of the '<em><b>Implements</b></em>' reference list.
-    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.AbstractType}.
+    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Type#getSimpleName <em>Simple Name</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @param value the new value of the '<em>Simple Name</em>' attribute.
+    * @see #getSimpleName()
+    * @generated
+    */
+   void setSimpleName(String value);
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @model
+    * @generated
+    */
+   boolean containsField(String name);
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @model parametersDataType="org.key_project.stubby.model.dependencymodel.StringArray"
+    * @generated
+    */
+   boolean containsMethod(String name, String[] parameters);
+
+   /**
+    * Returns the value of the '<em><b>Implements</b></em>' containment reference list.
+    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.TypeUsage}.
     * <!-- begin-user-doc -->
     * <p>
     * If the meaning of the '<em>Implements</em>' reference list isn't clear,
     * there really should be more of a description here...
     * </p>
     * <!-- end-user-doc -->
-    * @return the value of the '<em>Implements</em>' reference list.
+    * @return the value of the '<em>Implements</em>' containment reference list.
     * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getType_Implements()
-    * @model
+    * @model containment="true"
     * @generated
     */
-   EList<AbstractType> getImplements();
+   EList<TypeUsage> getImplements();
 
    /**
     * Returns the value of the '<em><b>Inner Types</b></em>' containment reference list.
@@ -275,29 +319,55 @@ public interface Type extends AbstractType, ITypeVariableContainer {
    void setPackage(String value);
 
    /**
-    * Returns the value of the '<em><b>Simple Name</b></em>' attribute.
+    * Returns the value of the '<em><b>Name</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <p>
-    * If the meaning of the '<em>Simple Name</em>' attribute isn't clear,
+    * If the meaning of the '<em>Name</em>' attribute isn't clear,
     * there really should be more of a description here...
     * </p>
     * <!-- end-user-doc -->
-    * @return the value of the '<em>Simple Name</em>' attribute.
-    * @see #setSimpleName(String)
-    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getType_SimpleName()
+    * @return the value of the '<em>Name</em>' attribute.
+    * @see #setName(String)
+    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getType_Name()
     * @model
     * @generated
     */
-   String getSimpleName();
+   String getName();
 
    /**
-    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Type#getSimpleName <em>Simple Name</em>}' attribute.
+    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Type#getName <em>Name</em>}' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @param value the new value of the '<em>Simple Name</em>' attribute.
-    * @see #getSimpleName()
+    * @param value the new value of the '<em>Name</em>' attribute.
+    * @see #getName()
     * @generated
     */
-   void setSimpleName(String value);
+   void setName(String value);
+
+   /**
+    * Returns the value of the '<em><b>Source</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Source</em>' attribute isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Source</em>' attribute.
+    * @see #setSource(boolean)
+    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getType_Source()
+    * @model
+    * @generated
+    */
+   boolean isSource();
+
+   /**
+    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Type#isSource <em>Source</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @param value the new value of the '<em>Source</em>' attribute.
+    * @see #isSource()
+    * @generated
+    */
+   void setSource(boolean value);
 
 } // Type

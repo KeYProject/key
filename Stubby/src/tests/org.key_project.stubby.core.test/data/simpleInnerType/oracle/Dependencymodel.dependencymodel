@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="OuterClass" source="true" extends="//@types.0" package="" simpleName="OuterClass">
-    <innerTypes name="OuterClass.InnerClass" source="true" extends="//@types.0" package="" simpleName="InnerClass"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="OuterClass" source="true" simpleName="OuterClass">
+    <innerTypes package="" name="OuterClass.InnerClass" source="true" simpleName="InnerClass">
+      <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </innerTypes>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

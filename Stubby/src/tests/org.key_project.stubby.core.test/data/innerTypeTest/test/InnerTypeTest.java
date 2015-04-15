@@ -1,5 +1,5 @@
 public class InnerTypeTest {
-   public static int main(InnerA obj) {
+   public static int main(A.InnerA obj) {
       return obj.value;
    }
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<project name="key.removegenerics" default="deploy" basedir=".">
+	<property name="src.dir"   value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/bin" />
+	<property name="lib.dir" value="${basedir}/../key.core/lib"/>
+	<property name="dist.dir"  value="${basedir}/../deployment" />
+
+	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/components"/>
+		<jar destfile="${dist.dir}/components/key.removegenerics.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+
+	<target name="compile" description="Compile all source files into the build directory.">
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir= "${src.dir}" 
+		       destdir="${build.dir}" 
+		       sourcepath="${src.dir}" 
+		       includeantruntime="false" 
+		       source="1.7" 
+		       deprecation="off" 
+		       debug="on" 
+		       depend="${build.depend}" 
+		       optimize="off">
+			<classpath>
+				<pathelement path="${basedir}/../key.core/bin"/>
+				<pathelement path="${basedir}/../key.util/bin"/>
+				<pathelement location="${lib.dir}/antlr.jar"/>
+				<pathelement location="${lib.dir}/recoderKey.jar"/>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="clean" description="Deletes all generated files and folders.">
+		<delete failonerror="false" includeemptydirs="true"> 
+			<fileset dir="${build.dir}" includes="**/*" />
+			<fileset file="${dist.dir}/components/key.removegenerics.jar" />
+		</delete>
+	</target>
+</project>

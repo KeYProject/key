@@ -3,6 +3,7 @@
 package org.key_project.stubby.model.dependencymodel.impl;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -10,9 +11,9 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
-import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencymodelPackage;
 import org.key_project.stubby.model.dependencymodel.Field;
+import org.key_project.stubby.model.dependencymodel.TypeUsage;
 import org.key_project.stubby.model.dependencymodel.Visibility;
 
 /**
@@ -135,14 +136,14 @@ public class FieldImpl extends MinimalEObjectImpl.Container implements Field {
    protected String constantValue = CONSTANT_VALUE_EDEFAULT;
 
    /**
-    * The cached value of the '{@link #getType() <em>Type</em>}' reference.
+    * The cached value of the '{@link #getType() <em>Type</em>}' containment reference.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @see #getType()
     * @generated
     * @ordered
     */
-   protected AbstractType type;
+   protected TypeUsage type;
 
    /**
     * <!-- begin-user-doc -->
@@ -273,15 +274,7 @@ public class FieldImpl extends MinimalEObjectImpl.Container implements Field {
     * <!-- end-user-doc -->
     * @generated
     */
-   public AbstractType getType() {
-      if (type != null && type.eIsProxy()) {
-         InternalEObject oldType = (InternalEObject)type;
-         type = (AbstractType)eResolveProxy(oldType);
-         if (type != oldType) {
-            if (eNotificationRequired())
-               eNotify(new ENotificationImpl(this, Notification.RESOLVE, DependencymodelPackage.FIELD__TYPE, oldType, type));
-         }
-      }
+   public TypeUsage getType() {
       return type;
    }
 
@@ -290,20 +283,47 @@ public class FieldImpl extends MinimalEObjectImpl.Container implements Field {
     * <!-- end-user-doc -->
     * @generated
     */
-   public AbstractType basicGetType() {
-      return type;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public void setType(AbstractType newType) {
-      AbstractType oldType = type;
+   public NotificationChain basicSetType(TypeUsage newType, NotificationChain msgs) {
+      TypeUsage oldType = type;
       type = newType;
-      if (eNotificationRequired())
-         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.FIELD__TYPE, oldType, type));
+      if (eNotificationRequired()) {
+         ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DependencymodelPackage.FIELD__TYPE, oldType, newType);
+         if (msgs == null) msgs = notification; else msgs.add(notification);
+      }
+      return msgs;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public void setType(TypeUsage newType) {
+      if (newType != type) {
+         NotificationChain msgs = null;
+         if (type != null)
+            msgs = ((InternalEObject)type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DependencymodelPackage.FIELD__TYPE, null, msgs);
+         if (newType != null)
+            msgs = ((InternalEObject)newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DependencymodelPackage.FIELD__TYPE, null, msgs);
+         msgs = basicSetType(newType, msgs);
+         if (msgs != null) msgs.dispatch();
+      }
+      else if (eNotificationRequired())
+         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.FIELD__TYPE, newType, newType));
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   @Override
+   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+      switch (featureID) {
+         case DependencymodelPackage.FIELD__TYPE:
+            return basicSetType(null, msgs);
+      }
+      return super.eInverseRemove(otherEnd, featureID, msgs);
    }
 
    /**
@@ -325,8 +345,7 @@ public class FieldImpl extends MinimalEObjectImpl.Container implements Field {
          case DependencymodelPackage.FIELD__CONSTANT_VALUE:
             return getConstantValue();
          case DependencymodelPackage.FIELD__TYPE:
-            if (resolve) return getType();
-            return basicGetType();
+            return getType();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -355,7 +374,7 @@ public class FieldImpl extends MinimalEObjectImpl.Container implements Field {
             setConstantValue((String)newValue);
             return;
          case DependencymodelPackage.FIELD__TYPE:
-            setType((AbstractType)newValue);
+            setType((TypeUsage)newValue);
             return;
       }
       super.eSet(featureID, newValue);
@@ -385,7 +404,7 @@ public class FieldImpl extends MinimalEObjectImpl.Container implements Field {
             setConstantValue(CONSTANT_VALUE_EDEFAULT);
             return;
          case DependencymodelPackage.FIELD__TYPE:
-            setType((AbstractType)null);
+            setType((TypeUsage)null);
             return;
       }
       super.eUnset(featureID);

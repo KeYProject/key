@@ -35,6 +35,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
@@ -69,6 +70,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.results.ArrayResult;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.IntResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
@@ -85,6 +87,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarPushButton;
@@ -451,6 +454,42 @@ public class TestUtilsUtil {
       });
       // Open preference page
       SWTBotShell shell = bot.shell("Preferences");
+      TestUtilsUtil.selectInTree(shell.bot().tree(), preferencePagePath);
+      return shell;
+   }
+
+   /**
+    * Opens the properties page in the properties dialog of the given {@link IResource}.
+    * @param bot The {@link SWTBot} to use.
+    * @param resource The {@link IResource} to open its properties page.
+    * @param preferencePagePath The path to the preference page to open.
+    * @return The opened preference dialog shell.
+    */
+   public static SWTBotShell openPropertiesPage(SWTWorkbenchBot bot, final IResource resource, String... preferencePagePath) {
+      assertNotNull(resource);
+      return openPropertiesPage(bot, resource, resource.getName(), preferencePagePath);
+   }
+
+   /**
+    * Opens the properties page in the properties dialog of the given {@link IAdaptable}.
+    * @param bot The {@link SWTBot} to use.
+    * @param element The {@link IAdaptable} to open its properties page.
+    * @param elementName The name of the element.
+    * @param preferencePagePath The path to the preference page to open.
+    * @return The opened preference dialog shell.
+    */
+   public static SWTBotShell openPropertiesPage(SWTWorkbenchBot bot, final IAdaptable element, String elementName, String... preferencePagePath) {
+      // Open preference dialog
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            Shell shell = WorkbenchUtil.getActiveShell();
+            PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(shell, element, null, null, null);
+            dialog.open();
+         }
+      });
+      // Open preference page
+      SWTBotShell shell = bot.shell("Properties for " + elementName);
       TestUtilsUtil.selectInTree(shell.bot().tree(), preferencePagePath);
       return shell;
    }
@@ -1718,6 +1757,68 @@ public class TestUtilsUtil {
    public static void assertEqualsIgnoreWhitespace(String expected, String actual) {
       if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
          TestCase.assertEquals(expected, actual);
+      }
+   }
+
+   /**
+    * Checks if the given {@link SWTBotText} is editable or not.
+    * @param text The {@link SWTBotText} to check.
+    * @return {@code true} editable, {@code false} read-only.
+    */
+   public static boolean isEditable(final SWTBotText text) {
+      assertNotNull(text);
+      int style = syncExec(new IntResult() {
+         @Override
+         public Integer run() {
+            return text.widget.getStyle();
+         }
+      });
+      return (style & SWT.READ_ONLY) != SWT.READ_ONLY;
+   }
+   
+   /**
+    * Ensures that the given {@link IResource}s have the same content.
+    * @param expected The expected {@link IResource}s.
+    * @param current The current {@link IResource}s.
+    * @throws Exception Occurred Exception.
+    */
+   public static void assertResources(IResource[] expected, IResource[] current) throws Exception {
+      if (expected != null) {
+         assertNotNull(current);
+         assertEquals(expected.length, current.length);
+         for (int i = 0; i < expected.length; i++) {
+            assertResource(expected[i], current[i]);
+         }
+      }
+      else {
+         assertNull(current);
+      }
+   }
+  
+   /**
+    * Ensures the same content of the given {@link IResource}s.
+    * @param expected The expected {@link IResource}.
+    * @param current The current {@link IResource}.
+    * @throws Exception Occurred Exception.
+    */
+   public static void assertResource(IResource expected, IResource current) throws Exception {
+      assertEquals(expected.getName(), current.getName());
+      assertEquals(expected.getType(), current.getType());
+      if (expected instanceof IFolder) {
+         TestCase.assertTrue(current instanceof IFolder);
+         assertResources(((IFolder) expected).members(), ((IFolder) current).members());
+      }
+      else {
+         TestCase.assertFalse(current instanceof IFolder);
+      }
+      if (expected instanceof IFile) {
+         TestCase.assertTrue(current instanceof IFile);
+         String expectedContent = IOUtil.readFrom(((IFile) expected).getContents());
+         String currentContent = IOUtil.readFrom(((IFile) current).getContents());
+         assertEquals(expectedContent, currentContent);
+      }
+      else {
+         TestCase.assertFalse(current instanceof IFile);
       }
    }
 }

@@ -36,8 +36,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.launching.sourcelookup.containers.JavaProjectSourceContainer;
 import org.junit.Test;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.sed.key.core.launch.KeYSourcePathComputerDelegate;
@@ -78,12 +78,12 @@ public class KeYSourcePathComputerDelegateTest extends AbstractSetupTestCase {
          // Set class path entries
          tempFile = File.createTempFile("KeYSourcePathComputerDelegateTest", ".jar");
          IFile workspaceFile = (IFile)method.getResource();
-         List<KeYClassPathEntry> entries = new LinkedList<KeYClassPathEntry>();
-         entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, tempFile.getAbsolutePath())); // External file
-         entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, tempFile.getParent())); // External folder
-         entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, workspaceFile.getFullPath().toString())); // Workspace file
-         entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, workspaceFile.getParent().getFullPath().toString())); // Workspace folder
-         entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, project.getProject().getFullPath().toString())); // Workspace project
+         List<KeYPathEntry> entries = new LinkedList<KeYPathEntry>();
+         entries.add(new KeYPathEntry(KeYPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, tempFile.getAbsolutePath())); // External file
+         entries.add(new KeYPathEntry(KeYPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, tempFile.getParent())); // External folder
+         entries.add(new KeYPathEntry(KeYPathEntryKind.WORKSPACE, workspaceFile.getFullPath().toString())); // Workspace file
+         entries.add(new KeYPathEntry(KeYPathEntryKind.WORKSPACE, workspaceFile.getParent().getFullPath().toString())); // Workspace folder
+         entries.add(new KeYPathEntry(KeYPathEntryKind.WORKSPACE, project.getProject().getFullPath().toString())); // Workspace project
          KeYResourceProperties.setClassPathEntries(project.getProject(), entries);
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());

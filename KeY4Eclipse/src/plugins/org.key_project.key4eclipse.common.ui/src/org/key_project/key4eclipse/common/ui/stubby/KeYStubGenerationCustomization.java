@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,8 +16,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
@@ -106,9 +107,17 @@ public class KeYStubGenerationCustomization extends AbstractStubGenerationCustom
          bootClassPathButton.setSelection(false);
       }
       else {
-         doNotUseButton.setSelection(true);
-         classPathButton.setSelection(false);         
-         bootClassPathButton.setSelection(false);
+         if (hasDefaultBootClassPath() &&
+             getProject().findMember(new Path(stubFolderPath)) == null) {
+            doNotUseButton.setSelection(false);
+            classPathButton.setSelection(false);         
+            bootClassPathButton.setSelection(true);
+         }
+         else {
+            doNotUseButton.setSelection(true);
+            classPathButton.setSelection(false);         
+            bootClassPathButton.setSelection(false);
+         }
       }
       updateExplanation();
    }
@@ -118,15 +127,19 @@ public class KeYStubGenerationCustomization extends AbstractStubGenerationCustom
     */
    protected void updateExplanation() {
       if (classPathButton.getSelection()) {
-         explanationLabel.setText("Stub folder is part of KeY's class path.\n\n" + 
-                                  "No stubs will be generated for types contained in KeY's boot class path.");
+         explanationLabel.setText("Stub folder is part of KeY's class path.\n" + 
+                                  "- No stubs will be generated for types contained in KeY's boot class path.\n" +
+                                  "- Stubs will not contain any generics.\n" +
+                                  "- Stubs are only generated for source files contained in KeY's source class path.");
       }
       else if (bootClassPathButton.getSelection()) {
-         explanationLabel.setText("Stub folder is the boot class path of KeY.\n\n" + 
-                                  "An empty stub folder will be filled with types of KeY's default boot class path.");
+         explanationLabel.setText("Stub folder is the boot class path of KeY.\n" + 
+                                  "- General Java types and methods required for verification with KeY are included.\n" +
+                                  "- Stubs will not contain any generics.\n" +
+                                  "- Stubs are only generated for source files contained in KeY's source class path.");
       }
       else {
-         explanationLabel.setText("Stub folder is not used by KeY.\n\n ");
+         explanationLabel.setText("Stub folder is not used by KeY.\n\n\n ");
       }
    }
 
@@ -138,10 +151,24 @@ public class KeYStubGenerationCustomization extends AbstractStubGenerationCustom
    protected boolean isPartOfClassPath(String stubFolderPath) {
       try {
          String fullPath = computeFullPath(stubFolderPath);
-         List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(getProject());
+         List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(getProject());
          return KeYResourceProperties.searchClassPathEntry(entries, 
-                                                           KeYClassPathEntryKind.WORKSPACE, 
+                                                           KeYPathEntryKind.WORKSPACE, 
                                                            fullPath) != null;
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the default boot class path option is used.
+    * @return {@code true} default boot class path, {@code false} other boot class path.
+    */
+   protected boolean hasDefaultBootClassPath() {
+      try {
+         return UseBootClassPathKind.KEY_DEFAULT.equals(KeYResourceProperties.getUseBootClassPathKind(getProject()));
       }
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);

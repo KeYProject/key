@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.key_project.jmlediting.core.profiles">
+      <profile
+            class="org.key_project.jmlediting.profile.key.KeYProfile">
+      </profile>
+   </extension>
+
+</plugin>

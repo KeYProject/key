@@ -6,10 +6,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Test;
-import org.key_project.stubby.core.test.testcase.StubGeneratorUtilTest;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
 import org.key_project.stubby.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@code GenerateStubsHandler}.
@@ -49,7 +49,7 @@ public class SWTBotGenerateStubsHandlerTest extends AbstractSWTBotGenerateStubsT
                              BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/helloWorldExample/oracleStubs", oracleFolder);
                              // Compare generated stubs with oracle stubs
                              IFolder stubFolder = javaProject.getProject().getFolder(new Path("new/stub folder"));
-                             StubGeneratorUtilTest.assertResources(oracleFolder.members(), stubFolder.members());
+                             TestUtilsUtil.assertResources(oracleFolder.members(), stubFolder.members());
                           }
                        });
    }

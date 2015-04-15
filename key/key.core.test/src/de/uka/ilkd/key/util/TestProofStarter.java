@@ -45,7 +45,7 @@ public class TestProofStarter extends TestCase {
       boolean originalOneStepSimplification = HelperClassForTests.isOneStepSimplificationEnabled(null);
       try {
          File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "proofStarter/CC/project.key");
-         env = KeYEnvironment.load(file, null, null);
+         env = KeYEnvironment.load(file, null, null, null);
          Proof proof = env.getLoadedProof();
          assertNotNull(proof);
          ProofStarter ps = new ProofStarter(false);

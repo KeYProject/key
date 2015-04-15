@@ -29,7 +29,7 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     * Tests {@link KeYTypeUtil#isInnerType(Services, KeYJavaType)}.
     */
    public void testIsInnerType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -64,7 +64,7 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     * Tests {@link KeYTypeUtil#getParentName(Services, KeYJavaType)}.
     */
    public void testGetParentName() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -99,7 +99,7 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     * Tests {@link KeYTypeUtil#isType(Services, String)}.
     */
    public void testIsType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -131,7 +131,7 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     * Tests {@link KeYTypeUtil#getType(de.uka.ilkd.key.java.Services, String)}.
     */
    public void testGetType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);

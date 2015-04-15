@@ -17,10 +17,10 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#isStatic <em>Static</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#isFinal <em>Final</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#isAbstract <em>Abstract</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getReturnType <em>Return Type</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getParameterTypes <em>Parameter Types</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getThrows <em>Throws</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#isConstructor <em>Constructor</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getReturnType <em>Return Type</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getThrows <em>Throws</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getParameterTypes <em>Parameter Types</em>}</li>
  * </ul>
  * </p>
  *
@@ -163,64 +163,6 @@ public interface Method extends ITypeVariableContainer {
    void setAbstract(boolean value);
 
    /**
-    * Returns the value of the '<em><b>Return Type</b></em>' reference.
-    * <!-- begin-user-doc -->
-    * <p>
-    * If the meaning of the '<em>Return Type</em>' reference isn't clear,
-    * there really should be more of a description here...
-    * </p>
-    * <!-- end-user-doc -->
-    * @return the value of the '<em>Return Type</em>' reference.
-    * @see #setReturnType(AbstractType)
-    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getMethod_ReturnType()
-    * @model
-    * @generated
-    */
-   AbstractType getReturnType();
-
-   /**
-    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Method#getReturnType <em>Return Type</em>}' reference.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @param value the new value of the '<em>Return Type</em>' reference.
-    * @see #getReturnType()
-    * @generated
-    */
-   void setReturnType(AbstractType value);
-
-   /**
-    * Returns the value of the '<em><b>Parameter Types</b></em>' reference list.
-    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.AbstractType}.
-    * <!-- begin-user-doc -->
-    * <p>
-    * If the meaning of the '<em>Parameter Types</em>' reference list isn't clear,
-    * there really should be more of a description here...
-    * </p>
-    * <!-- end-user-doc -->
-    * @return the value of the '<em>Parameter Types</em>' reference list.
-    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getMethod_ParameterTypes()
-    * @model
-    * @generated
-    */
-   EList<AbstractType> getParameterTypes();
-
-   /**
-    * Returns the value of the '<em><b>Throws</b></em>' reference list.
-    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.AbstractType}.
-    * <!-- begin-user-doc -->
-    * <p>
-    * If the meaning of the '<em>Throws</em>' reference list isn't clear,
-    * there really should be more of a description here...
-    * </p>
-    * <!-- end-user-doc -->
-    * @return the value of the '<em>Throws</em>' reference list.
-    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getMethod_Throws()
-    * @model
-    * @generated
-    */
-   EList<AbstractType> getThrows();
-
-   /**
     * Returns the value of the '<em><b>Constructor</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <p>
@@ -245,5 +187,63 @@ public interface Method extends ITypeVariableContainer {
     * @generated
     */
    void setConstructor(boolean value);
+
+   /**
+    * Returns the value of the '<em><b>Return Type</b></em>' containment reference.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Return Type</em>' containment reference isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Return Type</em>' containment reference.
+    * @see #setReturnType(TypeUsage)
+    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getMethod_ReturnType()
+    * @model containment="true"
+    * @generated
+    */
+   TypeUsage getReturnType();
+
+   /**
+    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Method#getReturnType <em>Return Type</em>}' containment reference.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @param value the new value of the '<em>Return Type</em>' containment reference.
+    * @see #getReturnType()
+    * @generated
+    */
+   void setReturnType(TypeUsage value);
+
+   /**
+    * Returns the value of the '<em><b>Throws</b></em>' containment reference list.
+    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.TypeUsage}.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Throws</em>' containment reference list isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Throws</em>' containment reference list.
+    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getMethod_Throws()
+    * @model containment="true"
+    * @generated
+    */
+   EList<TypeUsage> getThrows();
+
+   /**
+    * Returns the value of the '<em><b>Parameter Types</b></em>' containment reference list.
+    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.TypeUsage}.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Parameter Types</em>' containment reference list isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Parameter Types</em>' containment reference list.
+    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getMethod_ParameterTypes()
+    * @model containment="true"
+    * @generated
+    */
+   EList<TypeUsage> getParameterTypes();
 
 } // Method

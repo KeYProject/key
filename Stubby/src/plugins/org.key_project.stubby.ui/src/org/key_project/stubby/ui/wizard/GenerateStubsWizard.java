@@ -64,6 +64,7 @@ public class GenerateStubsWizard extends Wizard {
       this.customizations = StubGenerationCustomizationUtil.createCustomizations(javaProject);
       this.generatePage = new GenerateStubsWizardPage("generatePage", javaProject, customizations);
       setWindowTitle("Generate Stubs");
+      setNeedsProgressMonitor(true);
    }
 
    /**
@@ -98,12 +99,15 @@ public class GenerateStubsWizard extends Wizard {
                   List<IgnoredType> ignoredTypes = StubGeneratorUtil.generateStubs(javaProject, stubFolderPath, monitor, generationCustomizations.toArray(new IGeneratorCustomization[generationCustomizations.size()]));
                   setResult(ignoredTypes);
                }
+               catch (OperationCanceledException e) {
+                  // Nothing to do.
+               }
                catch (CoreException e) {
                   throw new InvocationTargetException(e, e.getMessage());
                }
             }
          };
-         getContainer().run(true, false, run);
+         getContainer().run(true, true, run);
          WorkbenchUtil.selectAndReveal(javaProject.getProject().getFolder(new Path(stubFolderPath)));
          if (!CollectionUtil.isEmpty(run.getResult())) {
             ControlMessageDialog.openInformation(getShell(), 

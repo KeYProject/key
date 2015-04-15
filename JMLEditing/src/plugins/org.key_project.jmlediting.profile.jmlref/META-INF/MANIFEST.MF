@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JML Editing JML Reference Profile
+Bundle-SymbolicName: org.key_project.jmlediting.profile.jmlref;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.jmlediting.profile.jmlref.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.key_project.jmlediting.core;bundle-version="1.0.0",
+ org.eclipse.jdt.ui;bundle-version="3.10.1",
+ org.eclipse.jface.text,
+ org.eclipse.ui;bundle-version="3.106.0",
+ org.eclipse.jdt.core;bundle-version="3.10.0",
+ org.key_project.jmlediting.ui;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: org.key_project.jmlediting.profile.jmlref,
+ org.key_project.jmlediting.profile.jmlref.bound_mod,
+ org.key_project.jmlediting.profile.jmlref.loop,
+ org.key_project.jmlediting.profile.jmlref.parser,
+ org.key_project.jmlediting.profile.jmlref.primary,
+ org.key_project.jmlediting.profile.jmlref.quantifier,
+ org.key_project.jmlediting.profile.jmlref.spec_keyword,
+ org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression,
+ org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref,
+ org.key_project.jmlediting.profile.jmlref.spec_statement,
+ org.key_project.jmlediting.profile.jmlref.type
+Import-Package: org.eclipse.core.resources
+Bundle-Vendor: KeY Project

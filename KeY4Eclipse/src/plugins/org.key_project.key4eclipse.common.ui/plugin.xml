@@ -31,6 +31,29 @@
             </or>
          </enabledWhen>
       </page>
+      <page
+            category="org.key_project.key4eclipse.common.ui.keyProjectProperties"
+            class="org.key_project.key4eclipse.common.ui.property.KeYIncludesPropertyPage"
+            id="org.key_project.key4eclipse.common.ui.keyIncludesProperties"
+            name="Includes">
+         <enabledWhen>
+            <or>
+               <and>
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.jdt.core.javanature">
+                  </test>
+               </and>
+               <instanceof
+                     value="org.eclipse.jdt.core.IJavaProject">
+               </instanceof>
+            </or>
+         </enabledWhen>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

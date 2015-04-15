@@ -21,12 +21,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.swt.ImageUtil;
 
 /**
- * Provides a special {@link ILabelProvider} for {@link KeYClassPathEntry} instances.
+ * Provides a special {@link ILabelProvider} for {@link KeYPathEntry} instances.
  * @author Martin Hentschel
  */
 public class KeYClassPathEntryLabelProvider extends LabelProvider {
@@ -40,8 +40,8 @@ public class KeYClassPathEntryLabelProvider extends LabelProvider {
      */
     @Override
     public String getText(Object element) {
-        if (element instanceof KeYClassPathEntry) {
-            return ((KeYClassPathEntry)element).getPath();
+        if (element instanceof KeYPathEntry) {
+            return ((KeYPathEntry)element).getPath();
         }
         else {
             return super.getText(element);
@@ -55,8 +55,8 @@ public class KeYClassPathEntryLabelProvider extends LabelProvider {
     public Image getImage(Object element) {
         Image image = imageCache.get(element);
         if (image == null) {
-            if (element instanceof KeYClassPathEntry) {
-                KeYClassPathEntry entry = (KeYClassPathEntry)element;
+            if (element instanceof KeYPathEntry) {
+                KeYPathEntry entry = (KeYPathEntry)element;
                 IResource resource = entry.getResource();
                 if (resource != null) {
                     image = ResourceUtil.getImage(resource);

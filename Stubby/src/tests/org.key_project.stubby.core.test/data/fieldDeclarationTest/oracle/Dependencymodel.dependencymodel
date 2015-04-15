@@ -1,23 +1,45 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Transparency" kind="INTERFACE" package="java.awt" simpleName="Transparency"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Paint" kind="INTERFACE" extends="//@types.1" package="java.awt" simpleName="Paint"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Color" extends="//@types.0" implements="//@types.2 //@types.3" package="java.awt" simpleName="Color">
-    <fields name="BLACK" final="true" static="true" type="//@types.4"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.awt" name="java.awt.Transparency" simpleName="Transparency"/>
+  <types kind="INTERFACE" package="java.awt" name="java.awt.Paint" simpleName="Paint">
+    <extends type="java.awt.Transparency" genericFreeType="java.awt.Transparency"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="FieldDeclarationTest" source="true" extends="//@types.0" package="" simpleName="FieldDeclarationTest">
-    <fields name="x" visibility="PRIVATE" type="//@types.6"/>
-    <fields name="CONST" final="true" static="true" constantValue="42" type="//@types.6"/>
-    <fields name="color" visibility="PRIVATE" static="true" type="//@types.4"/>
-    <fields name="CONST_AGAIN" visibility="PRIVATE" final="true" static="true" type="//@types.6"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.awt" name="java.awt.Color" simpleName="Color">
+    <fields name="BLACK" final="true" static="true">
+      <type type="java.awt.Color" genericFreeType="java.awt.Color"/>
+    </fields>
+    <implements type="java.awt.Paint" genericFreeType="java.awt.Paint"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="int"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Throwable" extends="//@types.0" implements="//@types.3" package="java.lang" simpleName="Throwable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Exception" extends="//@types.7" package="java.lang" simpleName="Exception"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.RuntimeException" extends="//@types.8" package="java.lang" simpleName="RuntimeException">
-    <methods name="RuntimeException" returnType="//@types.10" constructor="true"/>
+  <types package="" name="FieldDeclarationTest" source="true" simpleName="FieldDeclarationTest">
+    <fields name="x" visibility="PRIVATE">
+      <type type="int" genericFreeType="int"/>
+    </fields>
+    <fields name="CONST" final="true" static="true" constantValue="42">
+      <type type="int" genericFreeType="int"/>
+    </fields>
+    <fields name="color" visibility="PRIVATE" static="true">
+      <type type="java.awt.Color" genericFreeType="java.awt.Color"/>
+    </fields>
+    <fields name="CONST_AGAIN" visibility="PRIVATE" final="true" static="true">
+      <type type="int" genericFreeType="int"/>
+    </fields>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
+  <types package="java.lang" name="java.lang.Throwable" simpleName="Throwable">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types package="java.lang" name="java.lang.Exception" simpleName="Exception">
+    <extends type="java.lang.Throwable" genericFreeType="java.lang.Throwable"/>
+  </types>
+  <types package="java.lang" name="java.lang.RuntimeException" simpleName="RuntimeException">
+    <methods name="RuntimeException" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <extends type="java.lang.Exception" genericFreeType="java.lang.Exception"/>
+  </types>
 </dependencymodel:DependencyModel>
