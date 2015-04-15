@@ -51,6 +51,8 @@ import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.KeYCrossReferenceSourceInfo;
 import recoder.service.UnresolvedReferenceException;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.NullType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -73,10 +75,13 @@ import de.uka.ilkd.key.java.recoderext.ObjectTypeIdentifier;
 import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
 import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -797,6 +802,18 @@ public class Recoder2KeY implements JavaReader {
             DataLocation dl = cu.getOriginalDataLocation();
             assert dl != null : "DataLocation not set on " + cu.toSource();
             getConverter().processCompilationUnit(cu, dl.toString());
+        }
+        
+        // Ensure that rec2key is complete (at least the NullType needs to be available!)
+        if (!rec2key().mapped(servConf.getNameInfo().getNullType())) {
+           Sort objectSort = (Sort)services.getNamespaces().sorts().lookup(new Name("java.lang.Object"));
+           assert objectSort != null;
+           NullSort nullSort = new NullSort(objectSort);
+           KeYJavaType result = new KeYJavaType(NullType.JAVA_NULL, nullSort);
+           if(services.getNamespaces().sorts().lookup(nullSort.name()) == null) {
+              services.getNamespaces().sorts().add(nullSort);
+           }
+           rec2key().put(servConf.getNameInfo().getNullType(), result);
         }
         
         // tell the mapping that we have parsed the special classes
