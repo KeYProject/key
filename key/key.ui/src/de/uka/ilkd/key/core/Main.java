@@ -170,9 +170,8 @@ public final class Main {
             verbosity = Verbosity.DEBUG;
         }
 
-        // does no harm on non macs
-        // uncommented as Oracle seems to have broken that with 1.8_u40
-        //        System.setProperty("apple.laf.useScreenMenuBar","true");
+        // does no harm on non macs        
+        System.setProperty("apple.laf.useScreenMenuBar","true");
 
         try {
             cl = createCommandLine();
