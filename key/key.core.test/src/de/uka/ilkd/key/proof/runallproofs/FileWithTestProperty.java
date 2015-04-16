@@ -27,6 +27,7 @@ public class FileWithTestProperty implements Serializable {
     * object.
     */
    public static File getAbsoluteFile(File initialDirectory, String pathName) {
+      initialDirectory = initialDirectory.getParentFile();
 
       /*
        * Caller of this method must provide an absolute path as initial
@@ -57,7 +58,7 @@ public class FileWithTestProperty implements Serializable {
    }
 
    public File getFile(ProofCollectionSettings settings) throws IOException {
-      File initialDirectory = settings.baseDirectory;
+      File initialDirectory = settings.proofCollectionFile;
 
       if (keyFile == null) {
          keyFile = getAbsoluteFile(initialDirectory, path);

@@ -6,50 +6,42 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 @parser::header {
 package de.uka.ilkd.key.proof.runallproofs;
-
-import java.util.Map;
-import java.util.HashMap;
 }
 
 /*
  * Section for parser rules. Parser rules start with lowercase letters.
  */
 
-parserEntryPoint returns [List<ProofCollectionUnit> units, ProofCollectionSettings settings]
+parserEntryPoint returns [List<ProofCollectionUnit> units, ProofCollectionSettings globalSettings]
 @init {
     $units = new ArrayList<>();
-    Map<String, String> settingsMap = new HashMap<>();
+    //$globalSettings = ProofCollectionSettings.getDefaultSettings(getTokenStream().getSourceName());
+    $globalSettings = new ProofCollectionSettings(getTokenStream().getSourceName());
 }
-    : settingAssignment[settingsMap]*
+    : settingAssignment[$globalSettings]*
     
-      ( g=group {$units.add(g);}
+      ( g=group[$globalSettings] {$units.add(g);}
       | t=testDeclaration {$units.add(new SingletonProofCollectionUnit(t));} )*
       
       EOF
-      
-      /*
-       * Parsing is finished at this point. We can now convert our
-       * mutable settingsMap object into an immutable settings object.
-       */
-      {$settings = new ProofCollectionSettings(settingsMap, getTokenStream().getSourceName());}
 ;
 
-group returns [ProofCollectionUnit unit]
+group[ProofCollectionSettings globalSettings] returns [ProofCollectionUnit unit]
 @init{
-    Map<String, String> localSettingsMap = new HashMap<>();
+    ProofCollectionSettings localSettings = new ProofCollectionSettings(globalSettings);
     List<FileWithTestProperty> files = new ArrayList<>();
 }
     : 'group' nameToken=Identifier
       '{'
-          settingAssignment[localSettingsMap]*
+          settingAssignment[localSettings]*
           (t=testDeclaration {files.add(t);} )*
       '}'
-      {unit = new GroupedProofCollectionUnit(nameToken.getText(), localSettingsMap, files);}
+      {unit = new GroupedProofCollectionUnit(nameToken.getText(), localSettings, files);}
 ;
 
-settingAssignment[Map<String, String> settingsMap]
+settingAssignment[ProofCollectionSettings settings]
     : key=Identifier '=' value=(Identifier | PathString | QuotedString | Number)
-      {settingsMap.put(key.getText(), value.getText());}
+      {settings.put(key.getText(), value.getText());}
 ;
 
 testDeclaration returns [FileWithTestProperty file]

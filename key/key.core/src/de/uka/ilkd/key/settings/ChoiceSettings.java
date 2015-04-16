@@ -161,6 +161,8 @@ public class ChoiceSettings implements Settings, Cloneable {
      * represents the stored settings
      */
     public void readSettings(Object sender,Properties props) {
+       System.out.println(props);
+       new Throwable().printStackTrace();
 	String choiceSequence = props.getProperty(DEFAULTCHOICES_KEY);
 	// set choices
 	if (choiceSequence != null) {

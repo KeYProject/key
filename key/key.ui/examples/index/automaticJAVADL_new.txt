@@ -19,7 +19,7 @@ baseDirectory = ../
 # Examples used in the new book
 group newBook {
 notprovable: ./newBook/09.list_modelfield/ArrayList.empty.key
-provable: ./newBook/09.list_modelfield/ArrayList.size.key
+# provable: ./newBook/09.list_modelfield/ArrayList.size.key
 provable: ./newBook/09.list_modelfield/ArrayList.get.key
 }
 

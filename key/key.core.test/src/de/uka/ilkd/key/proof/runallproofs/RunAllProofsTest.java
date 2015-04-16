@@ -178,7 +178,7 @@ public class RunAllProofsTest {
         // create list of constructor parameters that will be returned by this method
         Collection<Object[]> data = new LinkedList<Object[]>();
         for(ProofCollectionUnit unit : parseResult.units){
-           data.add(new Object[]{unit, defaultHeader, parseResult.settings});
+           data.add(new Object[]{unit, defaultHeader, parseResult.globalSettings});
         }
         return data;
     }

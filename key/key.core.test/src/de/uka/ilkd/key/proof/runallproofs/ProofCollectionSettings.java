@@ -2,22 +2,27 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
-import static de.uka.ilkd.key.proof.runallproofs.FileWithTestProperty.getAbsoluteFile;
 
 public class ProofCollectionSettings implements Serializable {
 
-   public final File baseDirectory;
    private static final String BASE_DIRECTORY_KEY = "baseDirectory";
 
-   public ProofCollectionSettings(Map<String, String> settingsMap,
-         String sourceFileName) {
+   public final File proofCollectionFile;
+   private final Map<String, Object> settingsMap = new HashMap<>();
 
-      File sourceFileDir = new File(sourceFileName).getParentFile();
-      assert sourceFileDir.isAbsolute() : "Expecting antlr to provide absolute path to source "
-            + "file, but found" + sourceFileName;
-
-      baseDirectory = settingsMap.containsKey(BASE_DIRECTORY_KEY) ? getAbsoluteFile(
-            sourceFileDir, settingsMap.get(BASE_DIRECTORY_KEY)) : sourceFileDir;
+   public ProofCollectionSettings(String proofCollectionFileLocaton) {
+      proofCollectionFile = new File(proofCollectionFileLocaton)
+            .getParentFile();
    }
+
+   public Object put(String key, Object value) {
+      if (settingsMap.containsKey(key)) {
+         throw new RuntimeException("Overwriting keys not allowed in "
+               + ProofCollectionSettings.class.getSimpleName());
+      }
+      return settingsMap.put(key, value);
+   }
+
 }
