@@ -7,7 +7,7 @@ public interface Map<K extends java.lang.Object, V extends java.lang.Object> {
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;

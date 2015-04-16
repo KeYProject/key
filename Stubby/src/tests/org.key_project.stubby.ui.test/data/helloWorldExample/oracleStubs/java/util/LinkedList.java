@@ -7,7 +7,7 @@ public class LinkedList<E extends java.lang.Object> extends java.util.AbstractSe
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
