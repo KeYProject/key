@@ -37,6 +37,7 @@ import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.ui.util.KeYExampleUtil;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -125,7 +126,15 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
                      if (jdtType != null) { // Types like '<Default>' are ignored.
                         ASTNode ast = JDTUtil.parse(jdtType.getCompilationUnit());
                         if (ast == null) {
-                           ast = JDTUtil.parse(jdtType.getClassFile());
+                           if (jdtType.getClassFile().getSource() != null) {
+                              ast = JDTUtil.parse(jdtType.getClassFile());
+                           }
+                           else {
+                              List<String> container = JDTUtil.getJavaContainerDescriptions(javaProject);
+                              throw new IllegalStateException("The 'Boot Class Path' option can only be used if the JRE source code is available.\n" + 
+                                                              "This is currently not the case for: " + CollectionUtil.toString(container) + "\n\n" +
+                                                              "May configure project '" + javaProject.getElementName() + "' to use a JDK. ");
+                           }
                         }
                         // Search elements
                         SearchVisitor search = new SearchVisitor(environment.getJavaInfo(), kjt);

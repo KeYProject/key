@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClassFile;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -1168,5 +1169,25 @@ public class JDTUtil {
       else {
          return null;
       }
+   }
+
+   /**
+    * Lists all Java container (JRE) of the given {@link IJavaProject}s.
+    * @param javaProject The {@link IJavaProject}.
+    * @return The descriptions of the avilable Java container.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static List<String> getJavaContainerDescriptions(IJavaProject javaProject) throws JavaModelException {
+      List<String> result = new LinkedList<String>();
+      if (javaProject != null && javaProject.isOpen()) {
+         IClasspathEntry[] cps = javaProject.getRawClasspath();
+         for (IClasspathEntry entry : cps) {
+            if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+               IClasspathContainer container= JavaCore.getClasspathContainer(entry.getPath(), javaProject);
+               result.add(container.getDescription());
+            }
+         }
+      }
+      return result;
    }
 }
