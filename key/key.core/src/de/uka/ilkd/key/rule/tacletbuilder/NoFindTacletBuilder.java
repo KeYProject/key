@@ -26,7 +26,7 @@ import de.uka.ilkd.key.rule.TacletApplPart;
  * {@link NoFindTaclet} rules. Besides this some tests are performed that avoid 
  * some common errors on applicability of taclets.  
  */
-public class NoFindTacletBuilder extends TacletBuilder {
+public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
 
 
     /** builds and returns the RewriteTaclet that is specified by
@@ -93,7 +93,7 @@ public class NoFindTacletBuilder extends TacletBuilder {
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if
      * and find.
      */
-    public Taclet getTaclet(){
+    public NoFindTaclet getTaclet(){
 	checkBoundInIfAndFind();
 	return getNoFindTaclet();
     }

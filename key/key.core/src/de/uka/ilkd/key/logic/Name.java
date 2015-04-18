@@ -26,7 +26,7 @@ public class Name implements Comparable<Name> {
 
     private static final String NONAME = "_noname_";
 
-    private final /*@Interned*/ String nameString;
+    private final /** Interned */ String nameString;
     
     /**
      * creates a name object

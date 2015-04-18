@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletPrefix;
 import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
@@ -197,7 +198,8 @@ public class TacletPrefixBuilder {
     
 
     private boolean atMostOneRepl() {
-       RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
+       @SuppressWarnings("unchecked")
+       RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder=(RewriteTacletBuilder<? extends RewriteTaclet>)tacletBuilder;
        int count=0;
        for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
           if (tmpl instanceof RewriteTacletGoalTemplate) {
@@ -211,21 +213,22 @@ public class TacletPrefixBuilder {
     }
 
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
-	RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
-	TacletSchemaVariableCollector svc=new TacletSchemaVariableCollector();
-	svc.visit(rwtacletBuilder.ifSequent());
+        @SuppressWarnings("unchecked")
+        RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder=(RewriteTacletBuilder<? extends RewriteTaclet>)tacletBuilder;
+        TacletSchemaVariableCollector svc=new TacletSchemaVariableCollector();
+        svc.visit(rwtacletBuilder.ifSequent());
         for (TacletGoalTemplate tacletGoalTemplate : rwtacletBuilder.goalTemplates()) {
             TacletGoalTemplate tmpl = tacletGoalTemplate;
-//	    if (tmpl instanceof RewriteTacletGoalTemplate) {	    
-//		RewriteTacletGoalTemplate
-//		    gt=(RewriteTacletGoalTemplate)tmpl; 
+            //	    if (tmpl instanceof RewriteTacletGoalTemplate) {	    
+            //		RewriteTacletGoalTemplate
+            //		    gt=(RewriteTacletGoalTemplate)tmpl; 
             svc.visit(tmpl.sequent());
             for (Taclet taclet : tmpl.rules()) { // addrules
                 svc.visit(taclet, true);
             }
         }
         //	    }	
-	return !svc.contains(sv);
+        return !svc.contains(sv);
     }
 
     private void considerContext() {

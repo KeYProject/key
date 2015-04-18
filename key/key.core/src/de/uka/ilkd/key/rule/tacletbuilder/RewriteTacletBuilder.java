@@ -15,11 +15,10 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
 /** class builds RewriteTaclet objects.*/
-public class RewriteTacletBuilder extends FindTacletBuilder{
+public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T>{
 
 
     /**
@@ -38,7 +37,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      */
     protected int applicationRestriction;
 
-    public RewriteTacletBuilder setApplicationRestriction
+    public RewriteTacletBuilder<T> setApplicationRestriction
 	( int p_applicationRestriction ) {
 	applicationRestriction = p_applicationRestriction;
 	return this;
@@ -57,7 +56,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * term.
      * @return this RewriteTacletBuilder
      */ 
-    public RewriteTacletBuilder setFind(Term findTerm) {
+    public RewriteTacletBuilder<T> setFind(Term findTerm) {
 	checkContainsFreeVarSV(findTerm, this.getName(), "find term");
 	find=findTerm;
 	return this;
@@ -77,14 +76,15 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * and find or an InvalidPrefixException if the building of the Taclet 
      * Prefix fails.
      */
-    public RewriteTaclet getRewriteTaclet(){
+    @SuppressWarnings("unchecked")
+    public T getRewriteTaclet(){
 	if (find==null) {
 	    throw new TacletBuilderException(this, "No find part specified");
 	}
 	checkBoundInIfAndFind();
 	TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
 	prefixBuilder.build();
-	return new RewriteTaclet(name, 
+	return (T) new RewriteTaclet(name, 
 				 new TacletApplPart(ifseq,
 						    varsNew,
 						    varsNotFreeIn,
@@ -134,7 +134,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * No specified find part causes an IllegalStateException.
      */
     @Override
-    public Taclet getTaclet(){
+    public T getTaclet(){
 	return getRewriteTaclet();
     }
 }

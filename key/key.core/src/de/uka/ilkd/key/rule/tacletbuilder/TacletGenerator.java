@@ -416,7 +416,7 @@ public class TacletGenerator {
             IObserverFunction target, TermServices services,
             List<SchemaVariable> heapSVs, final SchemaVariable selfSV, ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
-            final RewriteTacletBuilder tacletBuilder) {
+            final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
         final Term axiomSatisfiable = functionalRepresentsSatisfiability(
               target, services, heapSVs, selfSV, paramSVs, schemaRepresents,
               tacletBuilder);
@@ -451,7 +451,7 @@ public class TacletGenerator {
             final SchemaVariable selfSV,
             ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
-            final RewriteTacletBuilder tacletBuilder) {
+            final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
     	ImmutableList<Term> vars = ImmutableSLList.<Term>nil();
       TermBuilder TB = services.getTermBuilder();
     	for(SchemaVariable heapSV : heapSVs) {

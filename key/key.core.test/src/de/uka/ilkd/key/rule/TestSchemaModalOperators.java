@@ -184,8 +184,8 @@ public class TestSchemaModalOperators extends TestCase {
 	 Debug.out("Find: ", find);
 	 Debug.out("Replace: ", replace);
 	 Debug.out("Goal: ", goal);
-	 Term instreplace = t.syntacticalReplace(new TermLabelState(), replace, services, mc, null, null, null, NoPosTacletApp.createNoPosTacletApp(t));
-	 Term instfind = t.syntacticalReplace(new TermLabelState(), replace, services, mc, null, null, null, NoPosTacletApp.createNoPosTacletApp(t));
+	 Term instreplace = t.getExecutor().syntacticalReplace(new TermLabelState(), replace, services, mc, null, null, null, NoPosTacletApp.createNoPosTacletApp(t));
+	 Term instfind = t.getExecutor().syntacticalReplace(new TermLabelState(), replace, services, mc, null, null, null, NoPosTacletApp.createNoPosTacletApp(t));
 	 Debug.out("Instantiated replace: ", instreplace);
 	 Debug.out("Instantiated find: ", instfind);
     }
