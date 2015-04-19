@@ -59,27 +59,22 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
-public final class SyntacticalReplaceVisitor extends DefaultVisitor {
-    private final TermLabelState termLabelState;
-    private final SVInstantiations svInst;
-    @Deprecated
-    private final Constraint metavariableInst;
+public class SyntacticalReplaceVisitor extends DefaultVisitor {
+    protected final TermLabelState termLabelState;
+    protected final SVInstantiations svInst;
     private ImmutableMap<SchemaVariable,Term> newInstantiations =
                                 DefaultImmutableMap.<SchemaVariable,Term>nilMap();
-    private final Services services;
+    protected final Services services;
     private Term computedResult = null;
     private final TypeConverter typeConverter;
     private final boolean allowPartialReplacement;
     private final boolean resolveSubsts;
-    private final PosInOccurrence applicationPosInOccurrence;
-    private final Rule rule;
-    private final Object labelHint;
-    private final Goal goal;
+    protected final PosInOccurrence applicationPosInOccurrence;
+    protected final Rule rule;
+    protected final Object labelHint;
+    protected final Goal goal;
 
     /**
      * the stack contains the subterms that will be added in the next step of
@@ -91,11 +86,6 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     private final Stack<Object> subStack; //of Term (and Boolean)
     private final Boolean newMarker = new Boolean(true);
 
-    /** an empty array for resource optimisation*/
-    private static final
-      QuantifiableVariable[] EMPTY_QUANTIFIABLE_VARS = new QuantifiableVariable[0];
-
-
     /**
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
@@ -103,7 +93,6 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                                      SVInstantiations svInst,
                                      PosInOccurrence applicationPosInOccurrence,
                                      Rule rule,
-                                     Constraint metavariableInst,
                                      boolean allowPartialReplacement,
                                      boolean  resolveSubsts,
                                      Object labelHint,
@@ -112,7 +101,6 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 	this.services         = services;
 	this.typeConverter    = services.getTypeConverter();
 	this.svInst           = svInst;
-	this.metavariableInst = metavariableInst;
 	this.allowPartialReplacement = allowPartialReplacement;
 	this.resolveSubsts    = resolveSubsts;
 	this.applicationPosInOccurrence = applicationPosInOccurrence;
@@ -129,12 +117,11 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                                      Rule rule,
                                      Object labelHint,
                                      Goal goal) {
-       this(termLabelState, services, svInst, applicationPosInOccurrence, rule, Constraint.BOTTOM, false, true, labelHint, goal);
+       this(termLabelState, services, svInst, applicationPosInOccurrence, rule, false, true, labelHint, goal);
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
                                      Services services,
-                                     Constraint metavariableInst,
                                      PosInOccurrence applicationPosInOccurrence,
                                      Rule rule,
                                      Object labelHint, 
@@ -144,7 +131,6 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             SVInstantiations.EMPTY_SVINSTANTIATIONS,
             applicationPosInOccurrence,
             rule,
-            metavariableInst, 
             false, 
             true,
             labelHint,
@@ -216,25 +202,17 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
 
-    private void pushNew(Object t) {
+    protected void pushNew(Object t) {
 	if (subStack.empty() || subStack.peek() != newMarker) {
 	    subStack.push(newMarker);
 	}
 	subStack.push(t);
     }
 
-    private Term toTerm(Object o) {
+    protected Term toTerm(Object o) {
 	if (o instanceof Term) {
 	    final Term t = (Term)o;
-            if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
-                // use the visitor recursively for replacing metavariables that
-                // might occur in the term (if possible)
-                final SyntacticalReplaceVisitor srv =
-                    new SyntacticalReplaceVisitor (termLabelState, services, metavariableInst, applicationPosInOccurrence, rule, labelHint, goal);
-                t.execPostOrder ( srv );
-                return srv.getTerm ();
-            }
-            return t;
+	    return t;
 	} else if (o instanceof ProgramElement) {
 	    ExecutionContext ec
 		= (svInst.getContextInstantiation()==null)
@@ -362,15 +340,8 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             pushNew(services.getTermBuilder().label(
                     newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(),
                                                newTerm.boundVars(), newTerm.javaBlock(), newTerm.getLabels())));
-        } else if ((visitedOp instanceof Metavariable)
-                && metavariableInst.getInstantiation((Metavariable) visitedOp, services)
-                        .op() != visitedOp) {
-            pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp, services));
         } else {
             Operator newOp = instantiateOperator(visitedOp);
-
-
-
             boolean operatorInst = (newOp != visitedOp);
 
             // instantiation of java block
