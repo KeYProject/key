@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.executor.javadl.SuccTacletExecutor;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
@@ -81,14 +80,6 @@ public class SuccTaclet extends FindTaclet {
     protected StringBuffer toStringFind(StringBuffer sb) {
 	return sb.append("\\find(==>").
 	    append(find().toString()).append(")\n");
-    }
-
-    /**
-     * @deprecated Use {@link #setName(String)} instead
-     */
-    @Override
-    public SuccTaclet setName(String s, TacletBuilder<?> b) {
-        return setName(s);
     }
 
     @Override

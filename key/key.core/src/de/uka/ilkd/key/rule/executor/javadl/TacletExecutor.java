@@ -37,7 +37,6 @@ import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.executor.RuleExecutor;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleExecutor {
 

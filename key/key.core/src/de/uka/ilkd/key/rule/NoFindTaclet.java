@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
@@ -77,14 +76,6 @@ public class NoFindTaclet extends Taclet {
      */
     protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {        
         return DefaultImmutableSet.<QuantifiableVariable>nil();
-    }
-
-    /**
-     * @deprecated Use {@link #setName(String)} instead
-     */
-    @Override
-    public NoFindTaclet setName(String s, TacletBuilder<?> b) {
-        return setName(s);
     }
 
     @Override

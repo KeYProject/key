@@ -41,7 +41,6 @@ import de.uka.ilkd.key.rule.executor.javadl.TacletExecutor;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 
@@ -881,10 +880,5 @@ public abstract class Taclet implements Rule, Named {
         return executor;
     }
     
-    /**
-     * @deprecated Use {@link #setName(String)} instead
-     */
-    public abstract Taclet setName(String s, TacletBuilder<?> b);
-
     public abstract Taclet setName(String s);
 }

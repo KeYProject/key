@@ -36,7 +36,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
@@ -282,16 +281,8 @@ public class RewriteTaclet extends FindTaclet {
         return getExecutor().getRewriteResult(goal, termLabelState, services, app);
     }
     
-    /**
-     * @deprecated Use {@link #setName(String)} instead
-     */
     @Override
-    public RewriteTaclet setName(String s, TacletBuilder<?> b) {
-        return setName(s);
-    }
-
-    @Override
-    public RewriteTaclet setName(String s) {        
+    public RewriteTaclet setName(String s) {
         final TacletApplPart applPart = 
                 new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(), 
                 varsNewDependingOn(), getVariableConditions());
