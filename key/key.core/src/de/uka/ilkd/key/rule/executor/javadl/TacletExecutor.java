@@ -39,6 +39,12 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+
+/**
+ * Encapsulates the application engine of taclets. 
+ *
+ * @param <TacletKind> The kind of taclet that is executed.
+ */
 public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleExecutor {
 
     private static final String AUTONAME = "_taclet";
