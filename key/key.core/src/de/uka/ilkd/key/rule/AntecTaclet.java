@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.executor.javadl.AntecTacletExecutor;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
@@ -84,5 +85,25 @@ public class AntecTaclet extends FindTaclet{
         executor = new AntecTacletExecutor<AntecTaclet>(this);
     }
 
-  
+
+    /**
+     * @deprecated Use {@link #setName(String)} instead
+     */
+    @Override
+    public AntecTaclet setName(String s, TacletBuilder<?> b) {
+        return setName(s);
+    }
+
+
+    @Override
+    public AntecTaclet setName(String s) {        
+        final TacletApplPart applPart = 
+                new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(), 
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes();
+        attrs.setDisplayName(displayName());
+        
+        return new AntecTaclet(new Name(s), 
+                applPart, goalTemplates(), getRuleSets(), attrs, find, ignoreTopLevelUpdates, prefixMap, choices);
+    }
 }

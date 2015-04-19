@@ -12,11 +12,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
@@ -111,12 +109,4 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
 
         return newGoals;
     }
-
-    @Override
-    protected Taclet setName(String s) {
-        NoFindTacletBuilder b=new NoFindTacletBuilder();
-        return super.setName(s, taclet, b);
-    }
-
-
 }

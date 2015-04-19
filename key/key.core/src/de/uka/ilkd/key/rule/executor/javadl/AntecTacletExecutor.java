@@ -8,12 +8,10 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 public class AntecTacletExecutor<TacletKind extends AntecTaclet> 
@@ -72,13 +70,5 @@ extends FindTacletExecutor<TacletKind> {
         addToAntec(termLabelState, add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
         addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
     }
-
-    @Override
-    protected Taclet setName(String s) {
-        AntecTacletBuilder b=new AntecTacletBuilder();
-        b.setFind(taclet.find());
-        return TacletExecutor.<AntecTaclet>setName(s, taclet, b);
-    }
-
 
 }

@@ -8,7 +8,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -53,20 +52,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     @Override
     public abstract ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp);
 
-    
-    protected abstract Taclet setName(String s);
-    
-     protected static <S extends Taclet> S setName(String s, S taclet, TacletBuilder<S> b) {   
-        b.setTacletGoalTemplates(taclet.goalTemplates());
-        b.setRuleSets(taclet.getRuleSets());
-        b.setName(new Name(s));
-        b.setDisplayName(taclet.displayName());
-        b.setIfSequent(taclet.ifSequent());
-        b.addVarsNew(taclet.varsNew());
-        b.addVarsNotFreeIn(taclet.varsNotFreeIn());
-        return b.getTaclet();
-    }
-    
+        
     /** 
      * a new term is created by replacing variables of term whose replacement is
      * found in the given SVInstantiations 
@@ -323,7 +309,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
           final Node n = goal.node();
           final StringBuilder uniqueTail = new StringBuilder(tacletToAdd.name().toString());                   
           uniqueTail.append(AUTONAME).append(n.getUniqueTacletId());
-          tacletToAdd = tacletToAdd.getExecutor().setName(uniqueTail.toString());
+          tacletToAdd = tacletToAdd.setName(uniqueTail.toString());
 
 
           // the new Taclet may contain variables with a known

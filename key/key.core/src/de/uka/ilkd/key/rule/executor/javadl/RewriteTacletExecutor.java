@@ -14,11 +14,9 @@ import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
@@ -193,14 +191,4 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
          addToSucc(termLabelState, add.succedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
       }
    }
-    
-    @Override
-    protected Taclet setName(String s) {
-        final RewriteTacletBuilder<RewriteTaclet> b = new RewriteTacletBuilder<RewriteTaclet>();
-        b.setFind(taclet.find());
-        b.setApplicationRestriction ( taclet.getApplicationRestriction() );
-        return super.setName(s, taclet, b);
-    }
-
-
 }

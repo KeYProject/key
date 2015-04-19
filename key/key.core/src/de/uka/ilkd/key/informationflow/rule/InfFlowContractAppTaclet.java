@@ -20,6 +20,7 @@ import de.uka.ilkd.key.rule.TacletApplPart;
 import de.uka.ilkd.key.rule.TacletAttributes;
 import de.uka.ilkd.key.rule.TacletPrefix;
 import de.uka.ilkd.key.rule.executor.javadl.InfFlowContractAppTacletExecutor;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 
@@ -95,5 +96,26 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
         executor = new InfFlowContractAppTacletExecutor(this);
     }
   
+    /**
+     * @deprecated Use {@link #setName(String)} instead
+     */
+    @Override
+    public InfFlowContractAppTaclet setName(String s, TacletBuilder<?> b) {
+        return setName(s);
+    }
+
+
+    @Override
+    public InfFlowContractAppTaclet setName(String s) {        
+        final TacletApplPart applPart = 
+                new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(), 
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes();
+        attrs.setDisplayName(displayName());
+        
+        return new InfFlowContractAppTaclet(new Name(s), 
+                applPart, goalTemplates(), getRuleSets(), attrs, find, prefixMap, 
+                getApplicationRestriction(), choices, getSurviveSymbExec());
+    }
   
 }

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
@@ -78,4 +79,25 @@ public class NoFindTaclet extends Taclet {
         return DefaultImmutableSet.<QuantifiableVariable>nil();
     }
 
+    /**
+     * @deprecated Use {@link #setName(String)} instead
+     */
+    @Override
+    public NoFindTaclet setName(String s, TacletBuilder<?> b) {
+        return setName(s);
+    }
+
+    @Override
+    public NoFindTaclet setName(String s) {        
+        final TacletApplPart applPart = 
+                new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(), 
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes();
+        attrs.setDisplayName(displayName());
+        
+        return new NoFindTaclet(new Name(s), 
+                applPart, goalTemplates(), getRuleSets(), attrs, prefixMap, choices);
+    }
+
+    
 }

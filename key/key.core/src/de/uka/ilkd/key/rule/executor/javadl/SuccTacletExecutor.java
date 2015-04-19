@@ -8,12 +8,10 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.SuccTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacletExecutor<TacletKind> {
@@ -64,12 +62,5 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
             TacletApp tacletApp) {
         addToAntec(termLabelState, add.antecedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
         addToSucc(termLabelState, add.succedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
-    }
-
-    @Override
-    protected Taclet setName(String s) {
-        SuccTacletBuilder b=new SuccTacletBuilder();
-        b.setFind(taclet.find());
-        return TacletExecutor.<SuccTaclet>setName(s, taclet, b);
     }
 }
