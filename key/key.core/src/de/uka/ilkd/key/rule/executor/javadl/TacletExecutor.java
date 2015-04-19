@@ -63,14 +63,14 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @return the (partially) instantiated term  
      */
-    public Term syntacticalReplace(TermLabelState termLabelState, Term term,
+    protected Term syntacticalReplace(TermLabelState termLabelState, Term term,
                       Services services,
                       MatchConditions mc,
                       PosInOccurrence applicationPosInOccurrence,
                       TacletLabelHint labelHint,
                       Goal goal, 
                       TacletApp tacletApp) {
-       final SyntacticalReplaceVisitor srVisitor =
+        final SyntacticalReplaceVisitor srVisitor =
              new SyntacticalReplaceVisitor(termLabelState, 
                                                 services,
                                                 mc.getInstantiations(),

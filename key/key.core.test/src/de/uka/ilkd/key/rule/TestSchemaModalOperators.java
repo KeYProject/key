@@ -50,7 +50,6 @@ import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.util.Debug;
 
 
 
@@ -141,7 +140,7 @@ public class TestSchemaModalOperators extends TestCase {
     public void testSchemaModalities1() {
 	//	Debug.ENABLE_DEBUG = true;
 	
-	RewriteTacletBuilder rtb = new RewriteTacletBuilder();
+	RewriteTacletBuilder<RewriteTaclet> rtb = new RewriteTacletBuilder<>();
 
 	SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
 	ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
@@ -164,8 +163,8 @@ public class TestSchemaModalOperators extends TestCase {
 
 	rtb.setName(new Name("test_schema_modal1"));
 	rtb.setFind(find); 
-        rtb.addTacletGoalTemplate(new                                            
-            RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,                           
+	rtb.addTacletGoalTemplate(new                                            
+	        RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,                           
                                     ImmutableSLList.<Taclet>nil(),                   
                                     replace));                                 
 
@@ -180,14 +179,16 @@ public class TestSchemaModalOperators extends TestCase {
                              MatchConditions.EMPTY_MATCHCONDITIONS, null);
 	 assertNotNull(mc);
 	 assertNotNull(mc.getInstantiations().getInstantiation(osv));
-	 Debug.out("Match conditions: ", mc.getInstantiations());
-	 Debug.out("Find: ", find);
-	 Debug.out("Replace: ", replace);
-	 Debug.out("Goal: ", goal);
-	 Term instreplace = t.getExecutor().syntacticalReplace(new TermLabelState(), replace, services, mc, null, null, null, NoPosTacletApp.createNoPosTacletApp(t));
-	 Term instfind = t.getExecutor().syntacticalReplace(new TermLabelState(), replace, services, mc, null, null, null, NoPosTacletApp.createNoPosTacletApp(t));
-	 Debug.out("Instantiated replace: ", instreplace);
-	 Debug.out("Instantiated find: ", instfind);
+	 assertTrue("Schemamodality " + osv + " has not been instantiated", 
+	         mc.getInstantiations().isInstantiated(osv));
+	 assertTrue(mc.getInstantiations().getInstantiation(osv) == Modality.DIA);
+
+	 PosInOccurrence pos = new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
+	 PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
+	 Term instReplace = 
+	         t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
+	 assertNotNull(instReplace);
+	 assertTrue(instReplace.op() == Modality.DIA);
     }
 
     public void testSchemaModalities2() {
