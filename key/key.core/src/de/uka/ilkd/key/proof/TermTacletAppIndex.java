@@ -604,11 +604,10 @@ public class TermTacletAppIndex {
         
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         
-        final Iterator<ImmutableMapEntry<PosInOccurrence, ImmutableList<NoPosTacletApp>>> it = collectAllTacletAppsHereAndBelow( pos, 
-                DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap() ).entryIterator();
+        final ImmutableMap<PosInOccurrence,ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
+                collectAllTacletAppsHereAndBelow( pos,  DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap() );
         
-        while (it.hasNext()) {
-            final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair = it.next();
+        for (final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             result = convert(pair.value(), pair.key(), p_filter, result, services);
         }
 
@@ -628,10 +627,11 @@ public class TermTacletAppIndex {
     void reportTacletApps ( PosInOccurrence pos,
                             NewRuleListener listener ) {
                 
-        final ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> result = DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap();
-        final Iterator<ImmutableMapEntry<PosInOccurrence, ImmutableList<NoPosTacletApp>>> it = collectAllTacletAppsHereAndBelow( pos, result ).entryIterator();
-        while (it.hasNext()) {
-            final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair = it.next();
+        final ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> result = 
+                DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap();
+        final ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
+                collectAllTacletAppsHereAndBelow( pos, result );
+        for (final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
             fireRulesAdded ( listener, pair.value(), pair.key() );
         }
     }
@@ -672,11 +672,11 @@ public class TermTacletAppIndex {
      */
     private void reportTacletApps ( PIOPathIterator pathToModification,
                                     NewRuleListener listener ) {
-        final Iterator<ImmutableMapEntry<PosInOccurrence, ImmutableList<NoPosTacletApp>>> it = collectAllTacletAppsAffectedByModification ( pathToModification, 
-                DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap() ).entryIterator(); 
+        final ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
+                collectAllTacletAppsAffectedByModification ( pathToModification, 
+                DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap() ); 
         
-        while ( it.hasNext() ) {
-            final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair = it.next();
+        for (final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair  : allTacletsHereAndBelow ) {
             fireRulesAdded ( listener, pair.value(), pair.key() );
         }
     }

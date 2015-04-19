@@ -315,11 +315,7 @@ public class SemisequentTacletAppIndex {
      * every cached taclet app.
      */
     void reportRuleApps ( NewRuleListener l ) {
-        final Iterator<ImmutableMapEntry<SequentFormula,TermTacletAppIndex>> it =
-            termIndices.entryIterator();
-        
-        while ( it.hasNext() ) {
-            final ImmutableMapEntry<SequentFormula,TermTacletAppIndex> entry = it.next();
+        for (final ImmutableMapEntry<SequentFormula,TermTacletAppIndex> entry : termIndices) {
             final SequentFormula cfma = entry.key (); 
             final TermTacletAppIndex index = entry.value ();
             final PosInOccurrence pio = 

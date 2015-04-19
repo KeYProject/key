@@ -213,13 +213,13 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     }
 
     /** @return iterator for entries */
-    public Iterator<ImmutableMapEntry<S,T>> entryIterator() {
+    public Iterator<ImmutableMapEntry<S,T>> iterator() {
 	return new MapEntryIterator<S,T>(this);
     }
 
     public String toString() {
 	final StringBuffer sb = new StringBuffer("[");
-	final Iterator<ImmutableMapEntry<S,T>> it = entryIterator();
+	final Iterator<ImmutableMapEntry<S,T>> it = iterator();
 	while (it.hasNext()) {
 	    sb.append(""+it.next());
 	    if (it.hasNext()) {
@@ -248,7 +248,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	}
 
 
-	final Iterator<ImmutableMapEntry<S,T>> p = entryIterator();
+	final Iterator<ImmutableMapEntry<S,T>> p = iterator();
 	while ( p.hasNext() ) {
 	    final ImmutableMapEntry<S,T> e = p.next();
 	    if ( !e.value().equals(o1.get(e.key())) ) {
@@ -261,7 +261,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     public int hashCode() {
         int hashCode = 1;
-        final Iterator<ImmutableMapEntry<S,T>> p = entryIterator();
+        final Iterator<ImmutableMapEntry<S,T>> p = iterator();
         while ( p.hasNext() ) {
             hashCode += 7*p.next().hashCode();
         }
@@ -321,7 +321,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	}
 
 	/** @return iterator for entries */
-	public Iterator<ImmutableMapEntry<S,T>> entryIterator() {
+	public Iterator<ImmutableMapEntry<S,T>> iterator() {
 	    return ImmutableSLList.<ImmutableMapEntry<S,T>>nil().iterator();
 	}
 
@@ -460,4 +460,5 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	    return nextEntry().key();
 	}
     }
+
 }

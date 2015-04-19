@@ -150,13 +150,8 @@ public class InfFlowContractAppFeature implements Feature {
     private boolean subset(
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-                insts0.entryIterator();
 
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 =
-                    it.next();
-
+        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
             if (entry0.key() instanceof SkolemTermSV ||
                 entry0.key() instanceof VariableSV) {
                 continue;
