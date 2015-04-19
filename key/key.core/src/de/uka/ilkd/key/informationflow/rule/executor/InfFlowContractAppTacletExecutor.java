@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.executor.javadl;
+package de.uka.ilkd.key.informationflow.rule.executor;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
+import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.properties.Properties;
 
