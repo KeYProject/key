@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
@@ -21,28 +20,6 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
 
     @Deprecated
     private final Constraint metavariableInst;
-
-    public ConstraintAwareSyntacticalReplaceVisitor(
-            TermLabelState termLabelState, Services services,
-            SVInstantiations svInst,
-            PosInOccurrence applicationPosInOccurrence, Rule rule,
-            Constraint metavariableInst, boolean allowPartialReplacement,
-            boolean resolveSubsts, Object labelHint, Goal goal) {
-        super(termLabelState, services, svInst, applicationPosInOccurrence,
-                rule, allowPartialReplacement, resolveSubsts,
-                labelHint, goal);
-        this.metavariableInst = metavariableInst;
-    }
-
-    public ConstraintAwareSyntacticalReplaceVisitor(
-            TermLabelState termLabelState, Services services,
-            SVInstantiations svInst,
-            PosInOccurrence applicationPosInOccurrence, Rule rule,
-            Object labelHint, Goal goal) {
-        super(termLabelState, services, svInst, applicationPosInOccurrence,
-                rule, labelHint, goal);
-        this.metavariableInst = Constraint.BOTTOM;
-    }
 
     public ConstraintAwareSyntacticalReplaceVisitor(
             TermLabelState termLabelState, Services services,

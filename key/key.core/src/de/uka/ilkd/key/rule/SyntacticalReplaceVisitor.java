@@ -21,9 +21,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Stack;
 
-import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -59,18 +57,16 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalR
 import de.uka.ilkd.key.util.Debug;
 
 public class SyntacticalReplaceVisitor extends DefaultVisitor {
-    protected final TermLabelState termLabelState;
+
     protected final SVInstantiations svInst;
-    private ImmutableMap<SchemaVariable,Term> newInstantiations =
-                                DefaultImmutableMap.<SchemaVariable,Term>nilMap();
     protected final Services services;
     private Term computedResult = null;
-    private final boolean allowPartialReplacement;
-    private final boolean resolveSubsts;
     protected final PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
-    protected final Object labelHint;
     protected final Goal goal;
+
+    protected final TermLabelState termLabelState;
+    protected final Object labelHint;
 
     /**
      * the stack contains the subterms that will be added in the next step of
@@ -88,31 +84,17 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                                      Services services,
                                      SVInstantiations svInst,
                                      PosInOccurrence applicationPosInOccurrence,
-                                     Rule rule,
-                                     boolean allowPartialReplacement,
-                                     boolean  resolveSubsts,
+                                     Rule rule,                                     
                                      Object labelHint,
                                      Goal goal) {
-   this.termLabelState   = termLabelState;
+    this.termLabelState   = termLabelState;
 	this.services         = services;
 	this.svInst           = svInst;
-	this.allowPartialReplacement = allowPartialReplacement;
-	this.resolveSubsts    = resolveSubsts;
 	this.applicationPosInOccurrence = applicationPosInOccurrence;
 	this.rule = rule;
 	this.labelHint = labelHint;
 	this.goal = goal;
 	subStack = new Stack<Object>(); // of Term
-    }
-
-    public SyntacticalReplaceVisitor(TermLabelState termLabelState,
-                                     Services services,
-                                     SVInstantiations svInst,
-                                     PosInOccurrence applicationPosInOccurrence,
-                                     Rule rule,
-                                     Object labelHint,
-                                     Goal goal) {
-       this(termLabelState, services, svInst, applicationPosInOccurrence, rule, false, true, labelHint, goal);
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
@@ -125,9 +107,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             services,
             SVInstantiations.EMPTY_SVINSTANTIATIONS,
             applicationPosInOccurrence,
-            rule,
-            false, 
-            true,
+            rule,          
             labelHint,
             goal);
     }
@@ -162,15 +142,13 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 	    trans = new ProgramReplaceVisitor
 		(new StatementBlock(((ContextStatementBlock)jb.program()).getBody()), // TODO
 		 services,
-		 svInst,
-		 allowPartialReplacement);
+		 svInst);
 	    trans.start();
 	    result = addContext((StatementBlock)trans.result());
 	} else {
 	    trans = new ProgramReplaceVisitor(jb.program(),
 					      services,
-					      svInst,
-					      allowPartialReplacement);
+					      svInst);
 	    trans.start();
 	    result = trans.result();
 	}
@@ -395,7 +373,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
     private Term resolveSubst(Term t) {
-	if (resolveSubsts && t.op() instanceof SubstOp)
+	if (t.op() instanceof SubstOp)
 	    return ((SubstOp)t.op ()).apply ( t, services );
 	return t;
     }
@@ -423,17 +401,6 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     public SVInstantiations getSVInstantiations () {
 	return svInst;
     }
-
-
-    /**
-     * @return introduced metavariables for instantiation of schema
-     * variables, or null if some schema variables could not be
-     * instantiated
-     */
-    public ImmutableMap<SchemaVariable,Term> getNewInstantiations () {
-	return newInstantiations;
-    }
-
 
 
     /**
