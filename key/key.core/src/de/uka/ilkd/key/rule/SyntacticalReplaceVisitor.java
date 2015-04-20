@@ -365,7 +365,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
 
         final Operator res = depOp.getInstanceFor ( realDepSort, services );
-        assert res == null : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
+        assert res != null : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
         return res;
     }
 
