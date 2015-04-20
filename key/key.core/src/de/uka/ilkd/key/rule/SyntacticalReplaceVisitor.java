@@ -31,7 +31,6 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -213,9 +212,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
 
-    private Term elementaryUpdateLhs; //HACK
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
-        elementaryUpdateLhs = null;
         final UpdateableOperator originalLhs = op.lhs();
         if(!(originalLhs instanceof SchemaVariable)) {
             return op;
@@ -245,10 +242,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
 
-    private Operator instantiateOperatorSV(ModalOperatorSV op) {
-        Operator newOp = (Operator) svInst.getInstantiation(op);
-        Debug.assertTrue(newOp != null, "No instantiation found for " + op);
-        return newOp;
+    private Operator instantiateOperatorSV(ModalOperatorSV op) {       
+        return (Operator) svInst.getInstantiation(op);
     }
 
     private Operator instantiateOperator(Operator p_operatorToBeInstantiated) {
@@ -342,19 +337,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             
             // instantiate sub terms
             Term[] neededsubs = neededSubs(newOp.arity());
-            if (visitedOp instanceof ElementaryUpdate
-                    && elementaryUpdateLhs != null) {
-                assert neededsubs.length == 1;
-                Term newTerm = services.getTermBuilder().elementary(elementaryUpdateLhs,
-                        neededsubs[0]);
-                ImmutableArray<TermLabel> labels =
-                        instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(),
-                                          newTerm.javaBlock(), newTerm.getLabels());
-                if (labels.size() != 0) {
-                    newTerm = services.getTermBuilder().label(newTerm, labels);
-                }
-                pushNew(newTerm);
-            } else if (boundVars != visited.boundVars() || jblockChanged
+            if (boundVars != visited.boundVars() || jblockChanged
                     || operatorInst
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 ImmutableArray<TermLabel> labels =
