@@ -116,8 +116,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 	final ContextInstantiationEntry cie =
 	    svInst.getContextInstantiation();
 	if (cie == null) {
-	    throw new IllegalStateException("Context should also "
-					    +"be instantiated");
+	    throw new IllegalStateException("Context should also be instantiated");
 	}
 
 	if (cie.prefix() != null) {
@@ -366,9 +365,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
 
         final Operator res = depOp.getInstanceFor ( realDepSort, services );
-        Debug.assertFalse ( res == null,
-                            "Did not find instance of symbol "
-                            + depOp + " for sort " + realDepSort );
+        assert res == null : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
         return res;
     }
 
