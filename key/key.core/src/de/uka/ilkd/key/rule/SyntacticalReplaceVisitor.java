@@ -31,11 +31,9 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -44,7 +42,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -59,6 +56,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 import de.uka.ilkd.key.util.Debug;
 
 public class SyntacticalReplaceVisitor extends DefaultVisitor {
@@ -68,7 +66,6 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                                 DefaultImmutableMap.<SchemaVariable,Term>nilMap();
     protected final Services services;
     private Term computedResult = null;
-    private final TypeConverter typeConverter;
     private final boolean allowPartialReplacement;
     private final boolean resolveSubsts;
     protected final PosInOccurrence applicationPosInOccurrence;
@@ -99,7 +96,6 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                                      Goal goal) {
    this.termLabelState   = termLabelState;
 	this.services         = services;
-	this.typeConverter    = services.getTypeConverter();
 	this.svInst           = svInst;
 	this.allowPartialReplacement = allowPartialReplacement;
 	this.resolveSubsts    = resolveSubsts;
@@ -209,59 +205,43 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 	subStack.push(t);
     }
 
-    protected Term toTerm(Object o) {
-	if (o instanceof Term) {
-	    final Term t = (Term)o;
-	    return t;
-	} else if (o instanceof ProgramElement) {
-	    ExecutionContext ec
-		= (svInst.getContextInstantiation()==null)
-		? null
-		: svInst.getContextInstantiation()
-		               .activeStatementContext();
-	    return typeConverter.
-		convertToLogicElement((ProgramElement)o, ec);
-	}
-        de.uka.ilkd.key.util.Debug.fail("Wrong instantiation in SRVisitor: " + o);
-	return null;
+    /** the method is only still invoked to allow the {@link ConstraintAwareSyntacticalReplaceVisitor}
+     * to recursively replace meta variables
+     */
+    protected Term toTerm(Term o) {
+        return o;
     }
 
 
     private Term elementaryUpdateLhs; //HACK
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
-	elementaryUpdateLhs = null;
-	final UpdateableOperator originalLhs = op.lhs();
-	if(!(originalLhs instanceof SchemaVariable)) {
-	    return op;
-	}
+        elementaryUpdateLhs = null;
+        final UpdateableOperator originalLhs = op.lhs();
+        if(!(originalLhs instanceof SchemaVariable)) {
+            return op;
+        }
 
-	final Object lhsInst
-		= svInst.getInstantiation((SchemaVariable) originalLhs);
-	final UpdateableOperator newLhs;
-	if(lhsInst instanceof UpdateableOperator) {
-	    newLhs = (UpdateableOperator) lhsInst;
-	} else if(lhsInst == null) {
-	    // we have only a partial instantiation
-	    // continue with schema
-	    newLhs = originalLhs;
-	} else {
-	    Term termInst = toTerm(lhsInst);
-	    HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	    if(termInst.op() instanceof UpdateableOperator) {
-		newLhs = (UpdateableOperator)termInst.op();
-	    } else if(heapLDT.getSortOfSelect(termInst.op()) != null
-		    && termInst.sub(0).op().equals(heapLDT.getHeap())) {
-		newLhs = (LocationVariable) termInst.sub(0).op();
-		elementaryUpdateLhs = termInst;
-	    } else {
-		assert false : "not updateable: " + termInst;
-	    	newLhs = null;
-	    }
-	}
-
-	return newLhs == originalLhs
-	       ? op
-	       : ElementaryUpdate.getInstance(newLhs);
+        final Object lhsInst
+        = svInst.getInstantiation((SchemaVariable) originalLhs);
+        final UpdateableOperator newLhs;
+        if(lhsInst instanceof UpdateableOperator) {
+            newLhs = (UpdateableOperator) lhsInst;
+        } else if(lhsInst == null) {
+            // we have only a partial instantiation
+            // continue with schema
+            newLhs = originalLhs;
+        } else {
+            if (lhsInst instanceof UpdateableOperator) {
+                newLhs = (UpdateableOperator) lhsInst;
+            } else if (lhsInst instanceof Term &&
+                    ((Term)lhsInst).op() instanceof UpdateableOperator) {
+                newLhs = (UpdateableOperator) ((Term)lhsInst).op();
+            } else {
+                assert false : "not updateable: " + lhsInst;
+                throw new IllegalStateException("Encountered non-updateable operator " + lhsInst + " on left-hand side of update.");
+            }
+        }
+        return newLhs == originalLhs ? op : ElementaryUpdate.getInstance(newLhs);
     }
 
 
@@ -336,7 +316,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp)
                         .isListSV()))) {
-            Term newTerm = toTerm(svInst.getInstantiation((SchemaVariable) visitedOp));
+            Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp, svInst.getExecutionContext(), services));
             pushNew(services.getTermBuilder().label(
                     newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(),
                                                newTerm.boundVars(), newTerm.javaBlock(), newTerm.getLabels())));

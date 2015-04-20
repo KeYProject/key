@@ -34,7 +34,6 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
-
     private ProgramElement result = null;
 
     private SVInstantiations svinsts;

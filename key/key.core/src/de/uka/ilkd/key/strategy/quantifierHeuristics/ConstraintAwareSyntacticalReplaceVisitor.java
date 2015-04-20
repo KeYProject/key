@@ -54,22 +54,18 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
         this.metavariableInst = metavariableInst;
     }
     
-    protected Term toTerm(Object o) {
-        if (o instanceof Term) {
-            final Term t = (Term) o;
-            if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
-                // use the visitor recursively for replacing metavariables that
-                // might occur in the term (if possible)
-                final ConstraintAwareSyntacticalReplaceVisitor srv =
+    protected Term toTerm(Term t) {
+        if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
+            // use the visitor recursively for replacing metavariables that
+            // might occur in the term (if possible)
+            final ConstraintAwareSyntacticalReplaceVisitor srv =
                     new ConstraintAwareSyntacticalReplaceVisitor (termLabelState, services, metavariableInst, 
                             applicationPosInOccurrence, rule, labelHint, goal);
-                t.execPostOrder ( srv );
-                return srv.getTerm ();
-            } else {
-                return t;
-            }
+            t.execPostOrder ( srv );
+            return srv.getTerm ();
+        } else {
+            return t;
         }
-        return super.toTerm(o);
     }
 
     public void visited(Term visited) {
