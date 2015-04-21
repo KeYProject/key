@@ -45,6 +45,15 @@ keySettings = "#Proof-Settings-Config-File
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 "
 
+# Added one failing group for testing purpose 
+group newBookFAIL {
+provable: ./newBook/09.list_modelfield/ArrayList.add.key
+notprovable: ./newBook/09.list_modelfield/ArrayList.remFirst.key
+provable: ./newBook/09.list_modelfield/ArrayList.empty.key
+notprovable: ./newBook/09.list_modelfield/ArrayList.size.key
+provable: ./newBook/09.list_modelfield/ArrayList.get.key
+}
+
 # Examples used in the new book
 group newBook {
 provable: ./newBook/09.list_modelfield/ArrayList.add.key
