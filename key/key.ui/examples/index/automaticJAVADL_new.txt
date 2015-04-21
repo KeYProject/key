@@ -14,8 +14,8 @@
 # It is used by bin/runAllProofs.pl.
 #
 
-baseDirectory = ../
 baseDirectory = "../"
+baseDirectoryNotRecognized = ../
 
 /*KeYSettings {
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT

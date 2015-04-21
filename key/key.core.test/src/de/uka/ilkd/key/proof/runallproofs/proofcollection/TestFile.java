@@ -27,23 +27,22 @@ public class TestFile implements Serializable {
     * directory, this method can be used to return an absolute {@link File}
     * object.
     */
-   public static File getAbsoluteFile(File initialDirectory, String pathName) {
-      initialDirectory = initialDirectory.getParentFile();
+   public static File getAbsoluteFile(File baseDirectory, String pathName) {
 
       /*
        * Caller of this method must provide an absolute path as initial
        * directory.
        */
-      if (!initialDirectory.isAbsolute()) {
+      if (!baseDirectory.isAbsolute()) {
          throw new RuntimeException("Expecting an absolute path but found: "
-               + initialDirectory);
+               + baseDirectory);
       }
 
       /*
        * Initial directory is ignored in case provided path name is absolute.
        */
       File tmp = new File(pathName);
-      File ret = tmp.isAbsolute() ? tmp : new File(initialDirectory, pathName);
+      File ret = tmp.isAbsolute() ? tmp : new File(baseDirectory, pathName);
 
       /*
        * Resulting file object should be absolute. This is just a safety check.
