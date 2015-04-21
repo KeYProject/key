@@ -10,7 +10,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestResult;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
@@ -75,16 +75,16 @@ public class TestFile implements Serializable {
       return keyFile;
    }
 
-   private RunAllProofsTestResult getRunAllProofsTestResult(boolean success,
+   private TestResult getRunAllProofsTestResult(boolean success,
          ProofCollectionSettings settings) throws IOException {
       String message = (success ? "pass: " : "FAIL: ")
             + "Verifying property \"" + testProperty.toString().toLowerCase()
             + "\"" + (success ? " was successful " : " failed ") + "for file: "
             + getFile(settings).toString();
-      return new RunAllProofsTestResult(message, success);
+      return new TestResult(message, success);
    }
 
-   public RunAllProofsTestResult runKey(ProofCollectionSettings settings)
+   public TestResult runKey(ProofCollectionSettings settings)
          throws Exception {
       try {
          String gks = settings.getGlobalKeYSettings();

@@ -32,6 +32,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit.TestResult;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
 import de.uka.ilkd.key.util.removegenerics.Main;
@@ -121,7 +122,7 @@ public class RunAllProofsTest implements Serializable {
    @Test
    public void testWithKeYAutoMode() throws Exception {
       // ProofCollectionSubProcess.executeRunAllProofsTest(this);
-      RunAllProofsTestResult report = unit.runTest();
+      TestResult report = unit.runTest();
 //      System.out.println(report.message);
 //      System.gc(); System.out.println("Memory " + Runtime.getRuntime().totalMemory());
 //      System.out.println("Time " + System.currentTimeMillis());
@@ -147,7 +148,7 @@ public class RunAllProofsTest implements Serializable {
        * Parse index file containing declarations for proof obligations.
        */
       File automaticJAVADL = new File(EXAMPLE_DIR,
-            "index/automaticJAVADL_new.txt");
+            "index/automaticJAVADL.txt");
       List<RunAllProofsTestUnit> units = parseFile(automaticJAVADL);
 
       /*

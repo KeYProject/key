@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit.TestResult;
+
 /**
  * {@link #main(String[])} method of this class will be executed in a separate
  * thread in case RunAllProofsTest is configured to run each
@@ -119,7 +121,7 @@ public class RunAllProofsTestSubProcess {
       try {
          RunAllProofsTest runAllProofsTest = (RunAllProofsTest) convertToObject(Files
                .readAllBytes(getLocationOfSerializedRunAllProofsTest(tempDirectory)));
-         RunAllProofsTestResult report = runAllProofsTest.unit.runTest();
+         TestResult report = runAllProofsTest.unit.runTest();
          Files.write(getLocationOfSerializedMessage(tempDirectory),
                convertToByteArray(report.message));
       }

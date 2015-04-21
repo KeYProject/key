@@ -14,6 +14,20 @@ import java.io.Serializable;
 public abstract class RunAllProofsTestUnit implements Serializable {
 
    /**
+    * Data structure for test results consisting of a string message and a
+    * boolean value which specifies whether a test run was successful or not.
+    */
+   public static class TestResult implements Serializable {
+      public final String message;
+      public final boolean success;
+
+      public TestResult(String message, boolean success) {
+         this.message = message;
+         this.success = success;
+      }
+   }
+
+   /**
     * Note: This is only relevant in case {@link RunAllProofsTestUnit}s are
     * configured (in {@link RunAllProofsTest}) to be exexecuted in separate
     * threads each. Test results will be stored in a temporary directory. Each
@@ -28,7 +42,7 @@ public abstract class RunAllProofsTestUnit implements Serializable {
    }
 
    /**
-    * Run the test of this unit and return a {@link RunAllProofsTestResult}.
+    * Run the test of this unit and return a {@link TestResult}.
     */
-   public abstract RunAllProofsTestResult runTest() throws Exception;
+   public abstract TestResult runTest() throws Exception;
 }
