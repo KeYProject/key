@@ -10,11 +10,11 @@ import java.util.Map;
 public class GroupedProofCollectionUnit extends ProofCollectionUnit {
 
    final String groupName;
-   List<FileWithTestProperty> files;
+   List<TestFile> files;
    private final Map<String, String> settingsMap;
 
    public GroupedProofCollectionUnit(String groupName,
-         Map<String, String> settingsMap, List<FileWithTestProperty> files) {
+         Map<String, String> settingsMap, List<TestFile> files) {
       this.groupName = groupName;
       this.settingsMap = settingsMap;
 
@@ -34,8 +34,8 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
 
       boolean success = true;
       String message = "group " + groupName + "\n";
-      for (FileWithTestProperty file : files) {
-         SuccessReport report = file.verifyTestProperty(settings);
+      for (TestFile file : files) {
+         SuccessReport report = file.runKey(settings);
          success &= report.success;
          message += report.message + "\n";
       }

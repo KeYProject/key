@@ -29,7 +29,7 @@ parserEntryPoint returns [List<ProofCollectionUnit> units, ProofCollectionSettin
 group[ProofCollectionSettings globalSettings] returns [ProofCollectionUnit unit]
 @init{
     ProofCollectionSettings localSettings = new ProofCollectionSettings(globalSettings);
-    List<FileWithTestProperty> files = new ArrayList<>();
+    List<TestFile> files = new ArrayList<>();
 }
     : 'group' nameToken=Identifier
       '{'
@@ -44,7 +44,7 @@ settingAssignment[ProofCollectionSettings settings]
       {settings.put(key.getText(), value.getText());}
 ;
 
-testDeclaration returns [FileWithTestProperty file]
+testDeclaration returns [TestFile file]
 @init{TestProperty testProperty = null;}
     : 
       ('provable' {testProperty=TestProperty.PROVABLE;}
@@ -56,7 +56,7 @@ testDeclaration returns [FileWithTestProperty file]
       pathToken=(PathString | Identifier | Number)
       {
         assert testProperty != null: "Parser should have assigned a value other that null to variable testProperty at this point.";
-        file = new FileWithTestProperty(testProperty, pathToken);
+        file = new TestFile(testProperty, pathToken);
       }
 ;
 

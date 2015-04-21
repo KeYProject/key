@@ -7,16 +7,16 @@ package de.uka.ilkd.key.proof.runallproofs;
  */
 public class SingletonProofCollectionUnit extends ProofCollectionUnit {
 
-   private final FileWithTestProperty file;
+   private final TestFile file;
 
-   public SingletonProofCollectionUnit(FileWithTestProperty fileWithTestProperty) {
+   public SingletonProofCollectionUnit(TestFile fileWithTestProperty) {
       this.file = fileWithTestProperty;
    }
 
    @Override
    public SuccessReport processProofObligations(ProofCollectionSettings settings)
          throws Exception {
-      return file.verifyTestProperty(settings);
+      return file.runKey(settings);
    }
 
 }

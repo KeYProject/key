@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class FileWithTestProperty implements Serializable {
+public class TestFile implements Serializable {
 
    final TestProperty testProperty;
    private final String path;
@@ -52,7 +52,7 @@ public class FileWithTestProperty implements Serializable {
       return ret;
    }
 
-   public FileWithTestProperty(TestProperty testProperty, Token pathToken) {
+   public TestFile(TestProperty testProperty, Token pathToken) {
       this.path = pathToken.getText();
       this.testProperty = testProperty;
    }
@@ -78,7 +78,7 @@ public class FileWithTestProperty implements Serializable {
       return keyFile;
    }
 
-   public SuccessReport verifyTestProperty(ProofCollectionSettings settings)
+   public SuccessReport runKey(ProofCollectionSettings settings)
          throws Exception {
       try {
          KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
