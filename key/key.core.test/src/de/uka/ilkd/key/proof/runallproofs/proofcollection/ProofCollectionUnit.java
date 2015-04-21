@@ -3,7 +3,6 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 import java.io.Serializable;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.settings.ProofCollectionSettings;
 
 /**
  * Parser {@link ProofCollectionParser} splits a file into several

@@ -7,7 +7,6 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 @parser::header {
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.settings.*;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 }
 

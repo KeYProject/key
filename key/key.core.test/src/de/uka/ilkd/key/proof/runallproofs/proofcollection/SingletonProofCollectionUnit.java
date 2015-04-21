@@ -2,7 +2,6 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.SuccessReport;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.settings.ProofCollectionSettings;
 
 /**
  * A {@link ProofCollectionUnit} that is created from a separate

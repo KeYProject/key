@@ -17,7 +17,7 @@
 baseDirectory = ../
 baseDirectory = "../"
 
-KeYSettings {
+/*KeYSettings {
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
 [StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
@@ -43,7 +43,7 @@ KeYSettings {
 [View]HideIntermediateProofsteps=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
-}
+}*/
 
 # Examples used in the new book
 group newBook {

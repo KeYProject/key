@@ -6,8 +6,6 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSubProcess;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.SuccessReport;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.settings.ProofCollectionSettings;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.settings.ProofCollectionSettingsFactory;
 
 /**
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s

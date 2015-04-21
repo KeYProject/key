@@ -11,7 +11,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.runallproofs.SuccessReport;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.settings.ProofCollectionSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
