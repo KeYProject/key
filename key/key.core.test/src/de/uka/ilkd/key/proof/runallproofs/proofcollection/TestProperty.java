@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.proof.runallproofs;
+package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 /**
  *

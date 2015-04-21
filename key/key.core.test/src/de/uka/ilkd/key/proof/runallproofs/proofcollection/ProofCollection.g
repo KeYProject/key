@@ -1,51 +1,72 @@
 grammar ProofCollection;
 
 @lexer::header {
-package de.uka.ilkd.key.proof.runallproofs;
+package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 }
 
 @parser::header {
-package de.uka.ilkd.key.proof.runallproofs;
+package de.uka.ilkd.key.proof.runallproofs.proofcollection;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.settings.*;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 }
 
 /*
  * Section for parser rules. Parser rules start with lowercase letters.
  */
 
-parserEntryPoint returns [List<ProofCollectionUnit> units, ProofCollectionSettings globalSettings]
+parserEntryPoint returns [List<RunAllProofsTestUnit> units, ProofCollectionSettings globalSettings]
 @init {
     $units = new ArrayList<>();
-    //$globalSettings = ProofCollectionSettings.getDefaultSettings(getTokenStream().getSourceName());
-    $globalSettings = new ProofCollectionSettings(getTokenStream().getSourceName());
+    List<ProofCollectionUnit> proofCollectionUnits = new ArrayList<>();
+    List<ProofCollectionSettings.Entry> settingsEntries = new ArrayList<>();
+    String globalKeYSettings = "";
 }
-    : settingAssignment[$globalSettings]*
+    : settingAssignment[settingsEntries]*
     
-      ( g=group[$globalSettings] {$units.add(g);}
-      | t=testDeclaration {$units.add(new SingletonProofCollectionUnit(t));} )*
+      ( g=group {proofCollectionUnits.add(g);}
+      | t=testDeclaration {proofCollectionUnits.add(new SingletonProofCollectionUnit(t));} )*
       
       EOF
+      { 
+         /*
+          * Because settings objects are immutable, we have to collect all settings entries
+          * in a list first and process them when parsing is finished.
+          */ 
+         $globalSettings =
+         ProofCollectionSettingsFactory.createSettings(getTokenStream().getSourceName(), globalKeYSettings, settingsEntries);
+         for(ProofCollectionUnit unit : proofCollectionUnits) {
+            $units.add(unit.createRunAllProofsTestUnit($globalSettings));
+         }
+      }
 ;
 
-group[ProofCollectionSettings globalSettings] returns [ProofCollectionUnit unit]
+group returns [ProofCollectionUnit unit]
 @init{
-    ProofCollectionSettings localSettings = new ProofCollectionSettings(globalSettings);
     List<TestFile> files = new ArrayList<>();
+    
+    // groups can have their own local settings 
+    List<ProofCollectionSettings.Entry> settingsEntries = new ArrayList<>();
 }
     : 'group' nameToken=Identifier
       '{'
-          settingAssignment[localSettings]*
+          settingAssignment[settingsEntries]*
           (t=testDeclaration {files.add(t);} )*
       '}'
-      {unit = new GroupedProofCollectionUnit(nameToken.getText(), localSettings, files);}
+      {unit = new GroupedProofCollectionUnit(nameToken.getText(), settingsEntries, files);}
 ;
 
-settingAssignment[ProofCollectionSettings settings]
+settingAssignment[List<ProofCollectionSettings.Entry> settingsEntries]
     @init {
-      String key, value;
+      String key;
+      String value = null;
     }
     : k = Identifier { key = k.getText(); } '=' 
       ( v = (Identifier | PathString | Number) { value = v.getText(); }
       | v = QuotedString { String tmp = v.getText(); value = tmp.substring(1, tmp.length() - 1); } )
+      { 
+         settingsEntries.add(new ProofCollectionSettings.Entry(key, value));
+      }
 ;
 
 testDeclaration returns [TestFile file]

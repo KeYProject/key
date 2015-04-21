@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.proof.runallproofs;
+package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,9 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.runallproofs.SuccessReport;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.settings.ProofCollectionSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  *
@@ -19,7 +22,6 @@ public class TestFile implements Serializable {
 
    final TestProperty testProperty;
    private final String path;
-   private File keyFile = null;
 
    /**
     * In order to ensure that the implementation is independent of working
@@ -58,11 +60,8 @@ public class TestFile implements Serializable {
    }
 
    public File getFile(ProofCollectionSettings settings) throws IOException {
-      File initialDirectory = settings.proofCollectionFile;
-
-      if (keyFile == null) {
-         keyFile = getAbsoluteFile(initialDirectory, path);
-      }
+      File baseDirectory = settings.getBaseDirectory();
+      File keyFile = getAbsoluteFile(baseDirectory, path);
 
       if (keyFile.isDirectory()) {
          String exceptionMessage = "Expecting a file, but found a directory: "
@@ -81,6 +80,9 @@ public class TestFile implements Serializable {
    public SuccessReport runKey(ProofCollectionSettings settings)
          throws Exception {
       try {
+         String gks = settings.getGlobalKeYSettings();
+         ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
+
          KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
                new JavaProfile(), getFile(settings), null, null, false);
          Proof loadedProof = env.getLoadedProof();

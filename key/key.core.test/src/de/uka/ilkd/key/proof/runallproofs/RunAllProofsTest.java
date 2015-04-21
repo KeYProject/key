@@ -14,9 +14,8 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -29,10 +28,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.proof.runallproofs.CustomParameterized.CustomParameters;
-import de.uka.ilkd.key.proof.runallproofs.ProofCollectionParser.parserEntryPoint_return;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser.parserEntryPoint_return;
 import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
@@ -70,7 +69,7 @@ import de.uka.ilkd.key.util.removegenerics.Main;
  * @author Martin Hentschel
  */
 @RunWith(Parameterized.class)
-public class RunAllProofsTest {
+public class RunAllProofsTest implements Serializable {
     /**
      * The path to the KeY repository. 
      * Configurable via system property {@code key.home}.
@@ -102,20 +101,14 @@ public class RunAllProofsTest {
       }
    }
     
-    public final String defaultHeader;
-    public final ProofCollectionUnit unit;
-    public final ProofCollectionSettings settings;
+    final RunAllProofsTestUnit unit;
 
     /**
      * Constructor.
-     * @param testFile The current file to test.
-     * @param defaultHeader The default header to use.
-     * @param successExpected The expected result.
+     * @param unit {@link RunAllProofsTestUnit} whose test will be executed.
      */
-    public RunAllProofsTest(ProofCollectionUnit unit, String defaultHeader, ProofCollectionSettings settings) {
+    public RunAllProofsTest(RunAllProofsTestUnit unit) {
        this.unit = unit;
-       this.defaultHeader = defaultHeader;
-       this.settings = settings;
     }
 
     /**
@@ -126,33 +119,11 @@ public class RunAllProofsTest {
    @Test
    public void testWithKeYAutoMode() throws Exception {
       // ProofCollectionSubProcess.executeRunAllProofsTest(this);
-      SuccessReport report = unit.processProofObligations(settings);
+      SuccessReport report = unit.runTest();
       System.out.println(report.message);
       System.gc(); System.out.println("Memory " + Runtime.getRuntime().totalMemory());
       System.out.println("Time " + System.currentTimeMillis());
    }
-    
-    /**
-     * Utility method to create a copy of the given file with file extension
-     * {@code .auto.key}. The file contains the same content as the given one
-     * but is may enriched with the default settings defined via
-     * {@code examples/index/headerJavaDL.txt}.
-     * @param toPrepare The {@link File} to prepare.
-     * @return The prepared {@link File}.
-     * @throws IOException Occurred Exception.
-     */
-    protected File prepareFile(File toPrepare) throws IOException {
-        String originalContent = IOUtil.readFrom(new FileInputStream(toPrepare));
-        if (!originalContent.contains("\\settings")) {
-            originalContent = defaultHeader + originalContent;
-        }
-        File preparedFile = new File(toPrepare.toString() + ".auto.key");
-        if (preparedFile.exists()) {
-            IOUtil.delete(preparedFile);
-        }
-        IOUtil.writeTo(new FileOutputStream(preparedFile, false), originalContent);
-        return preparedFile;
-    }
     
     /**
      * Collects all test files. Instances of this class are automatically
@@ -162,32 +133,41 @@ public class RunAllProofsTest {
      * @throws IOException Occurred Exception.
     * @throws RecognitionException 
      */
-    @Parameters
-    public static Collection<Object[]> data() throws IOException, RecognitionException {
-       assertDirectoryExists(KEY_HOME);
-       assertDirectoryExists(KEY_CORE_TEST);
-       assertDirectoryExists(EXAMPLE_DIR);
-        
-        // Read default header
-        String defaultHeader = IOUtil.readFrom(new FileInputStream(new File(EXAMPLE_DIR, "index/headerJavaDL.txt")));
-        
-        // parse index file containing declarations for proof obligations
-        File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL.txt");
-        parserEntryPoint_return parseResult= parseFile(automaticJAVADL);
-        
-        // create list of constructor parameters that will be returned by this method
-        Collection<Object[]> data = new LinkedList<Object[]>();
-        for(ProofCollectionUnit unit : parseResult.units){
-           data.add(new Object[]{unit, defaultHeader, parseResult.globalSettings});
-        }
-        return data;
-    }
+   @Parameters
+   public static Collection<Object[]> data() throws IOException,
+         RecognitionException {
+      assertDirectoryExists(KEY_HOME);
+      assertDirectoryExists(KEY_CORE_TEST);
+      assertDirectoryExists(EXAMPLE_DIR);
 
-   private static parserEntryPoint_return parseFile(File file) throws IOException, RecognitionException {
-       CharStream charStream = new ANTLRFileStream(file.getAbsolutePath());
-       ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
-       TokenStream tokenStream = new CommonTokenStream(lexer);
-       ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
-       return parser.parserEntryPoint();
+      /*
+       * Parse index file containing declarations for proof obligations.
+       */
+      File automaticJAVADL = new File(EXAMPLE_DIR,
+            "index/automaticJAVADL_new.txt");
+      parserEntryPoint_return parseResult = parseFile(automaticJAVADL);
+
+      /*
+       * Create list of constructor parameters that will be returned by this method.
+       * Suitable constructor is automatically determined by JUnit.
+       */
+      Collection<Object[]> data = new LinkedList<Object[]>();
+      for (RunAllProofsTestUnit unit : parseResult.units) {
+         data.add(new Object[] { unit });
+      }
+      return data;
+   }
+
+   /**
+    * Uses {@link ProofCollectionParser} to parse the given file and returns a
+    * parse result that is received from main parser entry point.
+    */
+   private static parserEntryPoint_return parseFile(File file)
+         throws IOException, RecognitionException {
+      CharStream charStream = new ANTLRFileStream(file.getAbsolutePath());
+      ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
+      TokenStream tokenStream = new CommonTokenStream(lexer);
+      ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
+      return parser.parserEntryPoint();
    }
 }

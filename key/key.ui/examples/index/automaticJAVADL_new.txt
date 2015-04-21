@@ -14,6 +14,7 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+baseDirectory = ../
 baseDirectory = "../"
 
 KeYSettings {
