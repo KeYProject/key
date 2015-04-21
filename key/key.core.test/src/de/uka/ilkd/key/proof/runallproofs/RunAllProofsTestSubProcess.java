@@ -119,7 +119,7 @@ public class RunAllProofsTestSubProcess {
       try {
          RunAllProofsTest runAllProofsTest = (RunAllProofsTest) convertToObject(Files
                .readAllBytes(getLocationOfSerializedRunAllProofsTest(tempDirectory)));
-         SuccessReport report = runAllProofsTest.unit.runTest();
+         RunAllProofsTestResult report = runAllProofsTest.unit.runTest();
          Files.write(getLocationOfSerializedMessage(tempDirectory),
                convertToByteArray(report.message));
       }

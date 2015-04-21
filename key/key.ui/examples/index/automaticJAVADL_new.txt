@@ -17,7 +17,8 @@
 baseDirectory = "../"
 baseDirectoryNotRecognized = ../
 
-/*KeYSettings {
+keySettings = "#Proof-Settings-Config-File
+#Mon Aug 03 16:58:18 CEST 2009
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
 [StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
@@ -36,14 +37,14 @@ baseDirectoryNotRecognized = ../
 [General]OneStepSimplification=true
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
-[Choice]DefaultChoices=assertions-assertions\:on, intRules-intRules\:arithmeticSemanticsIgnoringOF,initialisation-initialisation\:disableStaticInitialisation,programRules-programRules\:Java,runtimeExceptions-runtimeExceptions\:ban,JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off, permissions-permissions\\:off
+[Choice]DefaultChoices=assertions-assertions:on, intRules-intRules:arithmeticSemanticsIgnoringOF,initialisation-initialisation:disableStaticInitialisation,programRules-programRules:Java,runtimeExceptions-runtimeExceptions:ban,JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , optimisedSelectRules-optimisedSelectRules:on , wdOperator-wdOperator:L , wdChecks-wdChecks:off, permissions-permissions:off
 [DecisionProcedure]ActiveRule=_noname_
 [General]UseJML=true
 [View]HideClosedSubtrees=false
 [View]HideIntermediateProofsteps=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
-}*/
+"
 
 # Examples used in the new book
 group newBook {
@@ -59,4 +60,5 @@ notprovable: ./heap/comprehensions/bsumSplitInvalid.key
 
 provable: ./heap/permissions/threads/Sampler_run.key
 notprovable: ./heap/comprehensions/bsumSplitInvalid.key
+provable: ./heap/comprehensions/bsumSplitInvalid.key
 

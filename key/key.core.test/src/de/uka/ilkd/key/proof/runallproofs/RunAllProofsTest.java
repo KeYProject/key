@@ -13,11 +13,14 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CharStream;
@@ -31,7 +34,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser.parserEntryPoint_return;
 import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
@@ -119,10 +121,11 @@ public class RunAllProofsTest implements Serializable {
    @Test
    public void testWithKeYAutoMode() throws Exception {
       // ProofCollectionSubProcess.executeRunAllProofsTest(this);
-      SuccessReport report = unit.runTest();
-      System.out.println(report.message);
-      System.gc(); System.out.println("Memory " + Runtime.getRuntime().totalMemory());
-      System.out.println("Time " + System.currentTimeMillis());
+      RunAllProofsTestResult report = unit.runTest();
+//      System.out.println(report.message);
+//      System.gc(); System.out.println("Memory " + Runtime.getRuntime().totalMemory());
+//      System.out.println("Time " + System.currentTimeMillis());
+      assertTrue(report.message, report.success);
    }
     
     /**
@@ -145,14 +148,14 @@ public class RunAllProofsTest implements Serializable {
        */
       File automaticJAVADL = new File(EXAMPLE_DIR,
             "index/automaticJAVADL_new.txt");
-      parserEntryPoint_return parseResult = parseFile(automaticJAVADL);
+      List<RunAllProofsTestUnit> units = parseFile(automaticJAVADL);
 
       /*
        * Create list of constructor parameters that will be returned by this method.
        * Suitable constructor is automatically determined by JUnit.
        */
       Collection<Object[]> data = new LinkedList<Object[]>();
-      for (RunAllProofsTestUnit unit : parseResult.units) {
+      for (RunAllProofsTestUnit unit : units) {
          data.add(new Object[] { unit });
       }
       return data;
@@ -162,7 +165,7 @@ public class RunAllProofsTest implements Serializable {
     * Uses {@link ProofCollectionParser} to parse the given file and returns a
     * parse result that is received from main parser entry point.
     */
-   private static parserEntryPoint_return parseFile(File file)
+   private static List<RunAllProofsTestUnit> parseFile(File file)
          throws IOException, RecognitionException {
       CharStream charStream = new ANTLRFileStream(file.getAbsolutePath());
       ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);

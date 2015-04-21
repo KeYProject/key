@@ -10,7 +10,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.runallproofs.SuccessReport;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
@@ -75,7 +75,16 @@ public class TestFile implements Serializable {
       return keyFile;
    }
 
-   public SuccessReport runKey(ProofCollectionSettings settings)
+   private RunAllProofsTestResult getRunAllProofsTestResult(boolean success,
+         ProofCollectionSettings settings) throws IOException {
+      String message = (success ? "pass: " : "FAIL: ")
+            + "Verifying property \"" + testProperty.toString().toLowerCase()
+            + "\"" + (success ? " was successful " : " failed ") + "for file: "
+            + getFile(settings).toString();
+      return new RunAllProofsTestResult(message, success);
+   }
+
+   public RunAllProofsTestResult runKey(ProofCollectionSettings settings)
          throws Exception {
       try {
          String gks = settings.getGlobalKeYSettings();
@@ -87,9 +96,7 @@ public class TestFile implements Serializable {
 
          if (testProperty == TestProperty.LOADABLE) {
             loadedProof.dispose();
-            return new SuccessReport("success "
-                  + testProperty.toString().toLowerCase() + " "
-                  + getFile(settings), true);
+            getRunAllProofsTestResult(true, settings);
          }
 
          boolean success;
@@ -102,9 +109,7 @@ public class TestFile implements Serializable {
             loadedProof.dispose();
          }
 
-         return new SuccessReport((success ? "success " : "FAILED ")
-               + testProperty.toString().toLowerCase() + " "
-               + getFile(settings), success);
+         return getRunAllProofsTestResult(success, settings);
       }
       catch (Throwable t) {
          throw new Exception(

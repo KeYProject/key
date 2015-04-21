@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-import de.uka.ilkd.key.proof.runallproofs.SuccessReport;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestResult;
 
 /**
  * A {@link ProofCollectionUnit} that is created from a separate
@@ -23,7 +23,7 @@ public class SingletonProofCollectionUnit implements ProofCollectionUnit {
       return new RunAllProofsTestUnit() {
 
          @Override
-         public SuccessReport runTest() throws Exception {
+         public RunAllProofsTestResult runTest() throws Exception {
             return file.runKey(settings);
          }
 

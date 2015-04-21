@@ -14,17 +14,15 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * Section for parser rules. Parser rules start with lowercase letters.
  */
 
-parserEntryPoint returns [List<RunAllProofsTestUnit> units, ProofCollectionSettings globalSettings]
+parserEntryPoint returns [List<RunAllProofsTestUnit> units]
 @init {
-    $units = new ArrayList<>();
     List<ProofCollectionUnit> proofCollectionUnits = new ArrayList<>();
     List<ProofCollectionSettings.Entry> settingsEntries = new ArrayList<>();
-    String globalKeYSettings = "";
 }
     : settingAssignment[settingsEntries]*
     
-      ( g=group {proofCollectionUnits.add(g);}
-      | t=testDeclaration {proofCollectionUnits.add(new SingletonProofCollectionUnit(t));} )*
+      ( g=group { proofCollectionUnits.add(g); }
+      | t=testDeclaration { proofCollectionUnits.add(new SingletonProofCollectionUnit(t)); } )*
       
       EOF
       { 
@@ -32,10 +30,15 @@ parserEntryPoint returns [List<RunAllProofsTestUnit> units, ProofCollectionSetti
           * Because settings objects are immutable, we have to collect all settings entries
           * in a list first and process them when parsing is finished.
           */ 
-         $globalSettings =
-         ProofCollectionSettingsFactory.createSettings(getTokenStream().getSourceName(), globalKeYSettings, settingsEntries);
+         ProofCollectionSettings globalSettings =
+         ProofCollectionSettingsFactory.createSettings(getTokenStream().getSourceName(), settingsEntries);
+         
+         /*
+          * Compute return value.
+          */
+         $units = new ArrayList<>();
          for(ProofCollectionUnit unit : proofCollectionUnits) {
-            $units.add(unit.createRunAllProofsTestUnit($globalSettings));
+            $units.add(unit.createRunAllProofsTestUnit(globalSettings));
          }
       }
 ;

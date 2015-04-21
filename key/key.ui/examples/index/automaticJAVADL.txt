@@ -16,14 +16,46 @@
 
 baseDirectory = ../
 
+keySettings = "#Proof-Settings-Config-File
+#Mon Aug 03 16:58:18 CEST 2009
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[DecisionProcedure]Timeout=60
+[View]ShowWholeTaclet=false
+[View]MaxTooltipLines=40
+[General]DnDDirectionSensitive=true
+[General]StupidMode=true
+[General]OneStepSimplification=true
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[Choice]DefaultChoices=assertions-assertions:on, intRules-intRules:arithmeticSemanticsIgnoringOF,initialisation-initialisation:disableStaticInitialisation,programRules-programRules:Java,runtimeExceptions-runtimeExceptions:ban,JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , optimisedSelectRules-optimisedSelectRules:on , wdOperator-wdOperator:L , wdChecks-wdChecks:off, permissions-permissions:off
+[DecisionProcedure]ActiveRule=_noname_
+[General]UseJML=true
+[View]HideClosedSubtrees=false
+[View]HideIntermediateProofsteps=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+
 # Examples used in the new book
+group newBook {
 provable: ./newBook/09.list_modelfield/ArrayList.add.key
 provable: ./newBook/09.list_modelfield/ArrayList.remFirst.key
 provable: ./newBook/09.list_modelfield/ArrayList.empty.key
 provable: ./newBook/09.list_modelfield/ArrayList.size.key
 provable: ./newBook/09.list_modelfield/ArrayList.get.key
+}
 
 # Comprehension Tests
+group comprehensions {
 provable: ./heap/comprehensions/general_sum.key
 provable: ./heap/comprehensions/sum0.key
 provable: ./heap/comprehensions/sum1.key
@@ -35,8 +67,10 @@ provable: ./heap/comprehensions/bsum_neg2.key
 provable: ./heap/comprehensions/bsumSplit.key
 provable: ./heap/comprehensions/bprodSplit.key
 notprovable: ./heap/comprehensions/bsumSplitInvalid.key
+}
 
 # Performance tests
+group performance {
 provable: ./performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key
 provable: ./performance-test/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key
 provable: ./performance-test/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key
@@ -46,8 +80,10 @@ provable: ./performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0
 provable: ./performance-test/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key
 provable: ./performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key
 provable: ./performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key
+}
 
 # Tests for rule application restrictions
+group applicationRestrictions {
 provable: ./heap/polarity_tests/wellformed1.key
 notprovable: ./heap/polarity_tests/wellformed2.key
 provable: ./heap/polarity_tests/wellformed3.key
@@ -59,9 +95,11 @@ notprovable: ./heap/polarity_tests/wellformed8.key
 provable: ./heap/polarity_tests/wellformed9.key
 notprovable: ./heap/polarity_tests/wellformed10.key
 notprovable: ./heap/polarity_tests/wellformed11.key
+}
 
 
 # Tests for block contracts:
+group blockContracts {
 provable: ./heap/block_contracts/Simple__add.key
 provable: ./heap/block_contracts/Simple__addAbsoluteValues.key
 provable: ./heap/block_contracts/Simple__addWithJump.key
@@ -74,15 +112,17 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
+}
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)
-
+group javaCard{
 provable: ./heap/javacard/updateBalance0.key
 provable: ./heap/javacard/updateBalance1.key
 provable: ./heap/javacard/setArray1.key
 provable: ./heap/javacard/setArray2.key
 # For this only "half" of the proof is done (see bug #1475), but it makes sure that the PO with two subproofs is initialisable:
 provable: ./heap/javacard/arrayFillNonAtomic.key
+}
 
 # Other tests:
 provable: ./heap/coincidence_count/project.key
@@ -507,7 +547,7 @@ notprovable: ./standard_key/java_dl/danglingElse.key
 # Model methods tests:
 # (Note: some of the problems are trivial, but they should be kept
 # here as these problems provide the only test base for model methods)
-
+group modelMethods {
 provable: ./heap/model_methods/Cell_footprint_acc.key
 provable: ./heap/model_methods/Cell_footprint.key
 provable: ./heap/model_methods/Cell_get_acc.key
@@ -536,9 +576,10 @@ provable: ./heap/model_methods/Recell_Recell_footprint.key
 provable: ./heap/model_methods/Recell_Recell_post_set.key
 provable: ./heap/model_methods/Recell_set.key
 provable: ./heap/model_methods/Recell_undo.key
+}
 
 # Permission heap problems:
-
+group permissionHeap {
 provable: ./heap/permissions/permissions_method0.key
 provable: ./heap/permissions/permissions_method1.key
 provable: ./heap/permissions/permissions_method3.key
@@ -607,6 +648,7 @@ provable: ./heap/permissions/threads/Sampler_startTransfer_contract.key
 provable: ./heap/permissions/threads/Sampler_stateInv_accessible.key
 provable: ./heap/permissions/threads/Sampler_staticPermissions_accessible.key
 provable: ./heap/permissions/threads/Sampler_workingPermissions_accessible.key
+}
 
 # These need (a lot of) interaction at the moment:
 # provable: ./heap/permissions/threads/AFilter_run.key

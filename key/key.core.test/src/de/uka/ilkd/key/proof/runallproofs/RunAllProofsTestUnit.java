@@ -28,7 +28,7 @@ public abstract class RunAllProofsTestUnit implements Serializable {
    }
 
    /**
-    * Run the test of this unit and return a {@link SuccessReport}.
+    * Run the test of this unit and return a {@link RunAllProofsTestResult}.
     */
-   public abstract SuccessReport runTest() throws Exception;
+   public abstract RunAllProofsTestResult runTest() throws Exception;
 }

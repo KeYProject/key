@@ -5,7 +5,7 @@ import java.util.List;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSubProcess;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-import de.uka.ilkd.key.proof.runallproofs.SuccessReport;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestResult;
 
 /**
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s
@@ -48,15 +48,15 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
          }
 
          @Override
-         public SuccessReport runTest() throws Exception {
+         public RunAllProofsTestResult runTest() throws Exception {
             boolean success = true;
-            String message = "group " + groupName + "\n";
+            String message = "group " + groupName + ":\n";
             for (TestFile file : files) {
-               SuccessReport report = file.runKey(settings);
+               RunAllProofsTestResult report = file.runKey(settings);
                success &= report.success;
                message += report.message + "\n";
             }
-            return new SuccessReport(message, success);
+            return new RunAllProofsTestResult(message, success);
          }
 
       };
