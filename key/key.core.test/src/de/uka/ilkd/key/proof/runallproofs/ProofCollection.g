@@ -40,8 +40,12 @@ group[ProofCollectionSettings globalSettings] returns [ProofCollectionUnit unit]
 ;
 
 settingAssignment[ProofCollectionSettings settings]
-    : key=Identifier '=' value=(Identifier | PathString | QuotedString | Number)
-      {settings.put(key.getText(), value.getText());}
+    @init {
+      String key, value;
+    }
+    : k = Identifier { key = k.getText(); } '=' 
+      ( v = (Identifier | PathString | Number) { value = v.getText(); }
+      | v = QuotedString { String tmp = v.getText(); value = tmp.substring(1, tmp.length() - 1); } )
 ;
 
 testDeclaration returns [TestFile file]
