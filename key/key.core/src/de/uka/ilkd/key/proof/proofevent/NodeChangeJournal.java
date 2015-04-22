@@ -65,12 +65,10 @@ public class NodeChangeJournal implements GoalListener {
      * within this object; remove all listeners
      */
     public RuleAppInfo getRuleAppInfo ( RuleApp p_ruleApp ) {
-	Iterator<ImmutableMapEntry<Node,NodeChangesHolder>> it  = changeObjIterator ();
 	ImmutableList<NodeReplacement>                     nrs =
 	    ImmutableSLList.<NodeReplacement>nil();
 
-	while ( it.hasNext () ) {
-	    final ImmutableMapEntry<Node,NodeChangesHolder> entry = it.next ();
+	for (final ImmutableMapEntry<Node,NodeChangesHolder> entry : changes) {
 	    final Node newNode = entry.key ();
 	    final Goal newGoal = proof.getGoal ( newNode );
 
@@ -140,10 +138,5 @@ public class NodeChangeJournal implements GoalListener {
 	changes = changes.remove ( p_node );
         return res;
     }
-
-    private Iterator<ImmutableMapEntry<Node,NodeChangesHolder>> changeObjIterator () {
-	return changes.entryIterator ();
-    }
-
 
 }

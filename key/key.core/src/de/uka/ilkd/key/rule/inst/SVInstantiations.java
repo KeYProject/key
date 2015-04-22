@@ -304,7 +304,7 @@ public class SVInstantiations {
 
     private SVInstantiations rebuildSorts(Services services) {
         genericSortInstantiations 
-        	= GenericSortInstantiations.create(map.entryIterator(), 
+        	= GenericSortInstantiations.create(map.iterator(), 
         					   getGenericSortConditions(),
         					   services);
         return this;
@@ -626,7 +626,7 @@ public class SVInstantiations {
      * @return the Iterator<IEntry><SchemaVariable,InstantiationEntry<?>>
      */
     public Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> pairIterator() {
-        return map.entryIterator();
+        return map.iterator();
     }
 
     /**
@@ -703,7 +703,7 @@ public class SVInstantiations {
         ImmutableMap<SchemaVariable,InstantiationEntry<?>> result = map;
 
         final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>>
-	    it = other.map.entryIterator();
+	    it = other.map.iterator();
         
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry = it.next();
@@ -758,7 +758,7 @@ public class SVInstantiations {
     
     public ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> lookupEntryForSV(Name name) {
         final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
-            map.entryIterator();
+            map.iterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
             if (e.key().name().equals(name)) return e;

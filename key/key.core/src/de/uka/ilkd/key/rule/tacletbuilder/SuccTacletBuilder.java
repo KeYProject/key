@@ -16,12 +16,11 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SuccTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
 
 /** class builds SuccTaclet objects.*/
-public class SuccTacletBuilder extends FindTacletBuilder {
+public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
 
     private boolean ignoreTopLevelUpdates = true;
 
@@ -100,7 +99,7 @@ public class SuccTacletBuilder extends FindTacletBuilder {
      * recursive flags imply that the flags are not set. 
      * No specified find part causes an IllegalStateException.
      */
-    public Taclet getTaclet(){
+    public SuccTaclet getTaclet(){
 	return getSuccTaclet();
     }
 
