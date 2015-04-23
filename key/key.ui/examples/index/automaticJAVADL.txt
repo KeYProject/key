@@ -45,15 +45,6 @@ keySettings = "#Proof-Settings-Config-File
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 "
 
-# Added one failing group for testing purpose 
-group newBookFAIL {
-provable: ./newBook/09.list_modelfield/ArrayList.add.key
-notprovable: ./newBook/09.list_modelfield/ArrayList.remFirst.key
-provable: ./newBook/09.list_modelfield/ArrayList.empty.key
-notprovable: ./newBook/09.list_modelfield/ArrayList.size.key
-provable: ./newBook/09.list_modelfield/ArrayList.get.key
-}
-
 # Examples used in the new book
 group newBook {
 provable: ./newBook/09.list_modelfield/ArrayList.add.key
@@ -124,7 +115,7 @@ provable: ./standard_key/java_dl/jml-assert/assert.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)
-group javaCard{
+group javaCard {
 provable: ./heap/javacard/updateBalance0.key
 provable: ./heap/javacard/updateBalance1.key
 provable: ./heap/javacard/setArray1.key
