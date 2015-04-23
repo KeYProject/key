@@ -199,7 +199,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * Deactivate one-step simplification: clear caches, restore taclets to
      * the goals' taclet indices.
      */
-    public void shutdownIndices() {
+    public synchronized void shutdownIndices() {
         if (lastProof != null) {
             if (!lastProof.isDisposed()) {
                 for(Goal g : lastProof.openGoals()) {
@@ -528,7 +528,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private void refresh(Proof proof) {        
+    private synchronized void refresh(Proof proof) {        
         ProofIndependentSettings settings = proof.getProofIndependentSettings();
         if (settings == null) {
             settings = ProofIndependentSettings.DEFAULT_INSTANCE;
@@ -583,7 +583,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal,
+    public synchronized ImmutableList<Goal> apply(Goal goal,
                     Services services,
                     RuleApp ruleApp) {
 
