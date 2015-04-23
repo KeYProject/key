@@ -4,6 +4,12 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 /**
  * Represents a location like a local variable, method parameter, static field
  * or an instance field on a specified object.
@@ -108,5 +114,46 @@ public class Location {
     */
    public Location append(Access sub) {
       return new Location(accesses.append(sub));
+   }
+
+   /**
+    * Converts this {@link Location} into a {@link Term}.
+    * @param services The {@link Services} to use.
+    * @return The created {@link Term}.
+    */
+   public Term toTerm(Services services) {
+      Term parent = null;
+      for (Access access : accesses) {         
+         if (access.isArrayIndex()) {
+            // Special handling for array indices.
+            assert parent != null;
+            assert access.getDimensionExpressions().size() == 1;
+            parent = services.getTermBuilder().dotArr(parent, access.getDimensionExpressions().get(0));
+         }
+         else if (SymbolicExecutionUtil.isStaticVariable(access.getProgramVariable())) {
+            // Static field access
+            assert parent == null;
+            Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)access.getProgramVariable(), services);
+            parent =  services.getTermBuilder().staticDot(access.getProgramVariable().sort(), function);
+         }
+         else if (parent == null) {
+            // Direct access to a variable
+            assert parent == null;
+            parent = services.getTermBuilder().var(access.getProgramVariable());
+         }
+         else if (services.getJavaInfo().getArrayLength() == access.getProgramVariable()) {
+            // Special handling for length attribute of arrays
+            assert parent != null;
+            Function function = services.getTypeConverter().getHeapLDT().getLength();
+            parent = services.getTermBuilder().func(function, parent);
+         }
+         else {
+            // Field access on the parent variable
+            assert parent != null;
+            Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)access.getProgramVariable(), services);
+            parent = services.getTermBuilder().dot(access.getProgramVariable().sort(), parent, function);
+         }
+      }
+      return parent;
    }
 }

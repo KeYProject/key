@@ -29,17 +29,60 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public static final boolean PRINT_SLICE = false;
 
-// TODO: Support anonymizing locations
-//   /** 
-//    * Tests slicing on the example {@code simpleStatiLoopInvariantTest}.
-//    * @throws Exception Occurred Exception.
-//    */
-//   public void testSimpleStatiLoopInvariantTest() throws Exception {
-//      doSlicingTest("/slicing/simpleStatiLoopInvariantTest/SimpleStatiLoopInvariantTest.proof", 
-//                    new ReturnSelector(224),
-//                    true,
-//                    12);
-//   }
+   /** 
+    * Tests slicing on the example {@code loopInvariantNestedListFieldsTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testLoopInvariantNestedListFieldsTest() throws Exception {
+      doSlicingTest("/slicing/loopInvariantNestedListFieldsTest/LoopInvariantNestedListFieldsTest.proof", 
+                    new ReturnSelector(422),
+                    true,
+                    67);
+   }
+
+   /** 
+    * Tests slicing on the example {@code loopInvariantNotInListFieldsTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testLoopInvariantNotInListFieldsTest() throws Exception {
+      doSlicingTest("/slicing/loopInvariantNotInListFieldsTest/LoopInvariantNotInListFieldsTest.proof", 
+                    new ReturnSelector(282),
+                    true,
+                    13);
+   }
+
+   /** 
+    * Tests slicing on the example {@code loopInvariantInListFieldsTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testLoopInvariantInListFieldsTest() throws Exception {
+      doSlicingTest("/slicing/loopInvariantInListFieldsTest/LoopInvariantInListFieldsTest.proof", 
+                    new ReturnSelector(282),
+                    true,
+                    15);
+   }
+
+   /** 
+    * Tests slicing on the example {@code loopInvariantStarFieldsTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testLoopInvariantStarFieldsTest() throws Exception {
+      doSlicingTest("/slicing/loopInvariantStarFieldsTest/LoopInvariantStarFieldsTest.proof", 
+                    new ReturnSelector(233),
+                    true,
+                    13);
+   }
+
+   /** 
+    * Tests slicing on the example {@code simpleStaticLoopInvariantTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleStaticLoopInvariantTest() throws Exception {
+      doSlicingTest("/slicing/simpleStaticLoopInvariantTest/SimpleStatiLoopInvariantTest.proof", 
+                    new ReturnSelector(224),
+                    true,
+                    12);
+   }
 
    /**
     * Tests slicing on the example {@code simpleLoopInvariantTest}.
