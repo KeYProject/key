@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -105,6 +106,12 @@ public final class RuleAppIndex  {
             public void ruleAdded( RuleApp         taclet,
         			   PosInOccurrence pos ) {
         	informNewRuleListener(taclet, pos);			   	
+            }
+
+            @Override
+            public void rulesAdded(ImmutableList<? extends RuleApp> rules,
+                    PosInOccurrence pos) {
+                informNewRuleListener(rules, pos);
             }
         };
         interactiveTacletAppIndex.setNewRuleListener ( newRuleListener );
@@ -316,6 +323,22 @@ public final class RuleAppIndex  {
 	 return builtInRuleAppIndex().getBuiltInRule(g, pos);
      }
 
+    
+    /**
+     * adds a new Taclet with instantiation information to the Taclet Index 
+     * of this TacletAppIndex.
+     * @param tacletApp the NoPosTacletApp describing a partial instantiated Taclet to add
+     */
+    public void addNoPosTacletApp(ImmutableSet<NoPosTacletApp> tacletApps) {
+        tacletIndex.addTaclets ( tacletApps );
+
+        if ( autoMode )
+            interactiveTacletAppIndex.clearIndexes ();
+    
+        interactiveTacletAppIndex.addedNoPosTacletApps ( tacletApps );
+        automatedTacletAppIndex.addedNoPosTacletApps ( tacletApps );
+    }
+    
     /**
      * adds a new Taclet with instantiation information to the Taclet Index 
      * of this TacletAppIndex.
@@ -417,6 +440,17 @@ public final class RuleAppIndex  {
 	for (final NewRuleListener listener : listenerList) {
 	    listener.ruleAdded(p_app, p_pos);
 	}
+    }
+
+    /** 
+     * informs all observers, if a formula has been added, changed or 
+     * removed
+     */ 
+    private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
+                                       PosInOccurrence p_pos) {
+        for (final NewRuleListener listener : listenerList) {
+            listener.rulesAdded(p_apps, p_pos);
+        }
     }
 
     

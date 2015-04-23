@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types abstract="true" package="" name="ImmutableLeftistHeap" source="true" simpleName="ImmutableLeftistHeap">
+    <typeVariables name="T">
+      <type type="java.lang.Comparable&lt;T>" genericFreeType="java.lang.Comparable"/>
+    </typeVariables>
+    <innerTypes visibility="PRIVATE" static="true" package="" name="ImmutableLeftistHeap.Node" source="true" simpleName="Node">
+      <typeVariables name="S">
+        <type type="java.lang.Comparable&lt;S>" genericFreeType="java.lang.Comparable"/>
+      </typeVariables>
+      <extends type="ImmutableLeftistHeap&lt;S>" genericFreeType="ImmutableLeftistHeap"/>
+    </innerTypes>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+</dependencymodel:DependencyModel>

@@ -116,7 +116,7 @@ public class TestTermTacletAppIndex extends TestCase{
     private void doTestIndex0(TermTacletAppIndexCacheSet cache) {
         Services serv = TacletForTests.services ();
 
-        TacletIndex ruleIdx = new TacletIndex ();
+        TacletIndex ruleIdx = TacletIndexKit.getKit().createTacletIndex();
         ruleIdx.add ( remove_f );
         ruleIdx.add ( remove_zero );
 

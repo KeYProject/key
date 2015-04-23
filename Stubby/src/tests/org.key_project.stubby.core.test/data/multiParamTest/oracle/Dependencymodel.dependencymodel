@@ -1,26 +1,52 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Transparency" kind="INTERFACE" package="java.awt" simpleName="Transparency"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Paint" kind="INTERFACE" extends="//@types.1" package="java.awt" simpleName="Paint"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Color" extends="//@types.0" implements="//@types.2 //@types.3" package="java.awt" simpleName="Color">
-    <methods name="Color" returnType="//@types.6" parameterTypes="//@types.7 //@types.8" constructor="true"/>
-    <methods name="getColor" static="true" returnType="//@types.4" parameterTypes="//@types.12"/>
-    <methods name="getColor" static="true" returnType="//@types.4" parameterTypes="//@types.12 //@types.7"/>
-    <methods name="getHSBColor" static="true" returnType="//@types.4" parameterTypes="//@types.13 //@types.13 //@types.13"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.awt" name="java.awt.Transparency" simpleName="Transparency"/>
+  <types kind="INTERFACE" package="java.awt" name="java.awt.Paint" simpleName="Paint">
+    <extends type="java.awt.Transparency" genericFreeType="java.awt.Transparency"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="MultiParamTest" source="true" extends="//@types.4" package="" simpleName="MultiParamTest">
-    <methods name="MultiParamTest" returnType="//@types.6" constructor="true"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.awt" name="java.awt.Color" simpleName="Color">
+    <methods name="Color" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="int" genericFreeType="int"/>
+      <parameterTypes type="boolean" genericFreeType="boolean"/>
+    </methods>
+    <methods name="getColor" static="true">
+      <returnType type="java.awt.Color" genericFreeType="java.awt.Color"/>
+      <parameterTypes type="java.lang.String" genericFreeType="java.lang.String"/>
+    </methods>
+    <methods name="getColor" static="true">
+      <returnType type="java.awt.Color" genericFreeType="java.awt.Color"/>
+      <parameterTypes type="java.lang.String" genericFreeType="java.lang.String"/>
+      <parameterTypes type="int" genericFreeType="int"/>
+    </methods>
+    <methods name="getHSBColor" static="true">
+      <returnType type="java.awt.Color" genericFreeType="java.awt.Color"/>
+      <parameterTypes type="float" genericFreeType="float"/>
+      <parameterTypes type="float" genericFreeType="float"/>
+      <parameterTypes type="float" genericFreeType="float"/>
+    </methods>
+    <implements type="java.awt.Paint" genericFreeType="java.awt.Paint"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
-  <types xsi:type="dependencymodel:Datatype" name="int"/>
-  <types xsi:type="dependencymodel:Datatype" name="boolean"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
-    <typeVariables name="T" type="//@types.0"/>
+  <types package="" name="MultiParamTest" source="true" simpleName="MultiParamTest">
+    <methods name="MultiParamTest" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <extends type="java.awt.Color" genericFreeType="java.awt.Color"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.9" typeArguments="//@types.12"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.CharSequence" kind="INTERFACE" package="java.lang" simpleName="CharSequence"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.String" final="true" extends="//@types.0" implements="//@types.3 //@types.10 //@types.11" package="java.lang" simpleName="String"/>
-  <types xsi:type="dependencymodel:Datatype" name="float"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.CharSequence" simpleName="CharSequence"/>
+  <types final="true" package="java.lang" name="java.lang.String" simpleName="String">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.lang.String>" genericFreeType="java.lang.Comparable"/>
+    <implements type="java.lang.CharSequence" genericFreeType="java.lang.CharSequence"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
 </dependencymodel:DependencyModel>

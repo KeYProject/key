@@ -49,7 +49,7 @@ public class RefreshProofSaverListenerTest extends TestCase {
       IFile file = TestUtilsUtil.createFile(project, "Test.proof", "Replace me!");
       File location = ResourceUtil.getLocation(file);
       // Do proof
-      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null);
+      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null, null);
       try {
          Proof proof = env.getLoadedProof();
          assertNotNull(proof);

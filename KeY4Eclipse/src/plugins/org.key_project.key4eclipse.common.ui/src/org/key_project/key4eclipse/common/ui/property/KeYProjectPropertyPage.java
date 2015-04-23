@@ -13,27 +13,20 @@
 
 package org.key_project.key4eclipse.common.ui.property;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -46,21 +39,19 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
-import org.key_project.key4eclipse.common.ui.provider.KeYClassPathEntryLabelProvider;
+import org.key_project.key4eclipse.common.ui.composite.ManageKeYClassPathComposite;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.util.eclipse.ProjectViewFilter;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -96,44 +87,9 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
     private Button selectBootClassPathButton;
     
     /**
-     * Shows all class path entries.
+     * Allows to manage {@link KeYPathEntry}s.
      */
-    private TableViewer classPathTableViewer; 
-    
-    /**
-     * Adds a directory class path entry from the workspace.
-     */
-    private Button addWorkspaceButton;
-    
-    /**
-     * Adds an external directory class path entry.
-     */
-    private Button addExternalButton;
-    
-    /**
-     * Adds a file class path entry from the workspace.
-     */
-    private Button addWorkspaceFileButton;
-    
-    /**
-     * Adds an external file class path entry.
-     */
-    private Button addExternalFileButton;
-    
-    /**
-     * Removes all selected class path entries.
-     */
-    private Button removeButton;
-    
-    /**
-     * Moves the selected class path entries one up.
-     */
-    private Button upButton;
-    
-    /**
-     * Moves the selected class path entries one down.
-     */
-    private Button downButton;
+    private ManageKeYClassPathComposite classPathComposite;
     
     /**
      * The previously selected {@link UseBootClassPathKind}.
@@ -149,11 +105,6 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
      * The previously defined external boot class path.
      */
     private String oldExternalBootPath;
-    
-    /**
-     * Contains the shown class path entries.
-     */
-    private List<KeYClassPathEntry> classPathEntries;
     
     /**
      * The source location to load in KeY.
@@ -248,88 +199,13 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
             }
         });
         // class path
-        Group classPathGroup = new Group(root, SWT.NONE);
-        classPathGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
-        classPathGroup.setLayout(new GridLayout(2, false));
-        classPathGroup.setText("Class path");
-        Composite classPathComposite = new Composite(classPathGroup, SWT.NONE);
+        classPathComposite = new ManageKeYClassPathComposite(root, SWT.NONE, "Class path", true, true, "jar");
         classPathComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        classPathComposite.setLayout(createGridLayout(2, false));
-        classPathTableViewer = new TableViewer(classPathComposite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
-        classPathTableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
-        classPathTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-        classPathTableViewer.setLabelProvider(new KeYClassPathEntryLabelProvider());
-        classPathTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                handleClassPathViewerSelectionChanged();
-            }
-        });
-        Composite classPathButtonComposite = new Composite(classPathGroup, SWT.NONE);
-        classPathButtonComposite.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false));
-        classPathButtonComposite.setLayout(createGridLayout(1, true));
-        addWorkspaceButton = new Button(classPathButtonComposite, SWT.PUSH);
-        addWorkspaceButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addWorkspaceButton.setText("Add Works&pace");
-        addWorkspaceButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                addWorkspaceClassPathEntry();
-            }
-        });
-        addWorkspaceFileButton = new Button(classPathButtonComposite, SWT.PUSH);
-        addWorkspaceFileButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addWorkspaceFileButton.setText("Add Workspace F&ile");
-        addWorkspaceFileButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                addWorkspaceFileClassPathEntry();
-            }
-        });
-        addExternalButton = new Button(classPathButtonComposite, SWT.PUSH);
-        addExternalButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addExternalButton.setText("Add Externa&l");
-        addExternalButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                addExternalClassPathEntry();
-            }
-        });
-        addExternalFileButton = new Button(classPathButtonComposite, SWT.PUSH);
-        addExternalFileButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addExternalFileButton.setText("Add Exter&nal File");
-        addExternalFileButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                addExternalFileClassPathEntry();
-            }
-        });
-        removeButton = new Button(classPathButtonComposite, SWT.PUSH);
-        removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        removeButton.setText("&Remove");
-        removeButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                removeSelectedClassPathEntries();
-            }
-        });
-        upButton = new Button(classPathButtonComposite, SWT.PUSH);
-        upButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        upButton.setText("&Up");
-        upButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                moveSelectedClassPathEntriesUp();
-            }
-        });
-        downButton = new Button(classPathButtonComposite, SWT.PUSH);
-        downButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        downButton.setText("D&own");
-        downButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                moveSelectedClassPathEntriesDown();
-            }
+        classPathComposite.addPropertyChangeListener(ManageKeYClassPathComposite.PROP_CLASS_PATH_ENTRIES, new PropertyChangeListener() {
+           @Override
+           public void propertyChange(PropertyChangeEvent evt) {
+              updateValidState();
+           }
         });
         // Initialize UI controls
         try {
@@ -338,11 +214,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
                 SWTUtil.setText(sourceClassPathText, KeYResourceProperties.getSourceClassPath(project));
                 setUseKind(KeYResourceProperties.getUseBootClassPathKind(project));
                 SWTUtil.setText(bootClassPathText, KeYResourceProperties.getBootClassPath(project));
-                classPathEntries = KeYResourceProperties.getClassPathEntries(project);
-                if (classPathEntries == null) {
-                    classPathEntries = new LinkedList<KeYClassPathEntry>();
-                }
-                updateClassPathViewer();
+                classPathComposite.setClassPathEntries(KeYResourceProperties.getClassPathEntries(project));
                 setEnabled(true);
             }
             else {
@@ -365,197 +237,11 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
      * @param makeColumnsEqualWidt Make columns equal width.
      * @return The created {@link GridLayout}.
      */
-    protected GridLayout createGridLayout(int numColumns, boolean makeColumnsEqualWidt) {
+    public static GridLayout createGridLayout(int numColumns, boolean makeColumnsEqualWidt) {
         GridLayout layout = new GridLayout(numColumns, makeColumnsEqualWidt);
         layout.marginWidth = 0;
         layout.marginHeight = 0;
         return layout;
-    }
-
-    /**
-     * Moves the selected entries one up if possible.
-     */
-    public void moveSelectedClassPathEntriesDown() {
-        ISelection selection = classPathTableViewer.getSelection();
-        if (selection instanceof IStructuredSelection) {
-            Object[] elements = ((IStructuredSelection)selection).toArray();
-            for (int i = elements.length - 1; i >= 0; i--) {
-                if (elements[i] instanceof KeYClassPathEntry) {
-                    KeYClassPathEntry entry = (KeYClassPathEntry)elements[i];
-                    int index = classPathEntries.indexOf(entry);
-                    if (index < classPathEntries.size() - 1) {
-                        classPathEntries.remove(index);
-                        classPathEntries.add(index + 1, entry);
-                    }
-                }
-            }
-        }
-        updateClassPathViewer();
-        classPathTableViewer.setSelection(selection);
-    }
-
-    /**
-     * Moves the selected entries one down if possible.
-     */
-    public void moveSelectedClassPathEntriesUp() {
-        ISelection selection = classPathTableViewer.getSelection();
-        if (selection instanceof IStructuredSelection) {
-            Object[] elements = ((IStructuredSelection)selection).toArray();
-            for (Object element : elements) {
-                if (element instanceof KeYClassPathEntry) {
-                    KeYClassPathEntry entry = (KeYClassPathEntry)element;
-                    int index = classPathEntries.indexOf(entry);
-                    if (index >= 1) {
-                        classPathEntries.remove(index);
-                        classPathEntries.add(index - 1, entry);
-                    }
-                }
-            }
-        }
-        updateClassPathViewer();
-        classPathTableViewer.setSelection(selection);
-    }
-
-    /**
-     * Removes the selected class path entries from the viewer.
-     */
-    public void removeSelectedClassPathEntries() {
-        ISelection selection = classPathTableViewer.getSelection();
-        if (selection instanceof IStructuredSelection) {
-            classPathEntries.removeAll(((IStructuredSelection)selection).toList());
-            updateClassPathViewer();
-            updateValidState();
-        }
-    }
-
-    /**
-     * Updates the viewer.
-     */
-    protected void updateClassPathViewer() {
-        classPathTableViewer.setInput(classPathEntries);
-        handleClassPathViewerSelectionChanged();
-    }
-    
-    /**
-     * Handles the event that new elements are selected.
-     */
-    protected void handleClassPathViewerSelectionChanged() {
-        ISelection selection = classPathTableViewer.getSelection();
-        removeButton.setEnabled(!selection.isEmpty());
-        upButton.setEnabled(!selection.isEmpty());
-        downButton.setEnabled(!selection.isEmpty());
-    }
-
-    /**
-     * Opens the dialog to add external class path entries.
-     */
-    public void addExternalClassPathEntry() {
-        DirectoryDialog dialog = new DirectoryDialog(getShell());
-        dialog.setText("Select class path to add");
-        dialog.setMessage("Select a directory or create a new one.");
-        String directory = dialog.open();
-        if (directory != null) {
-            KeYClassPathEntry newEntry = new KeYClassPathEntry(KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, directory);
-            if (!classPathEntries.contains(newEntry)) {
-                classPathEntries.add(newEntry);
-                updateClassPathViewer();
-            }
-            selectClassPathEntry(newEntry);
-        }
-        updateValidState();
-    }
-
-    /**
-     * Opens the dialog to add external file class path entries.
-     */    
-    public void addExternalFileClassPathEntry() {
-        FileDialog dialog = new FileDialog(getShell(), SWT.MULTI);
-        dialog.setText("Select class path file to add");
-        dialog.setFilterExtensions(new String[] {"*.*", "*.jar"});
-        dialog.setFilterIndex(1);
-        dialog.open();
-        String[] files = dialog.getFileNames();
-        String path = dialog.getFilterPath();
-        if (files != null && path != null) {
-            for (String file : files) {
-                KeYClassPathEntry newEntry = new KeYClassPathEntry(KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, path + File.separator + file);
-                if (!classPathEntries.contains(newEntry)) {
-                    classPathEntries.add(newEntry);
-                    updateClassPathViewer();
-                }
-                selectClassPathEntry(newEntry);
-            }
-        }
-        updateValidState();
-    }
-
-    /**
-     * Opens the dialog to add workspace class path entries.
-     */
-    public void addWorkspaceClassPathEntry() {
-        IContainer[] result = WorkbenchUtil.openFolderSelection(getShell(), 
-                                                                "Select class path to add", 
-                                                                "Select a folder, project or create a new one.", 
-                                                                true,
-                                                                null,
-                                                                null);
-        if (result != null) {
-            List<KeYClassPathEntry> toSelect = new ArrayList<KeYClassPathEntry>(result.length);
-            for (IContainer container : result) {
-                KeYClassPathEntry newEntry = new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, container.getFullPath().toString());
-                toSelect.add(newEntry);
-                if (!classPathEntries.contains(newEntry)) {
-                    classPathEntries.add(newEntry);
-                    updateClassPathViewer();
-                }
-            }
-            selectClassPathEntries(toSelect);
-        }
-        updateValidState();
-    }
-
-    /**
-     * Opens the dialog to add workspace file class path entries.
-     */    
-    public void addWorkspaceFileClassPathEntry() {
-        
-        IFile[] result = WorkbenchUtil.openFileSelection(getShell(),
-                                                         "Select class path file to add",
-                                                         "Select a file.", 
-                                                         true, 
-                                                         null,
-                                                         Collections.singleton(new FileExtensionViewerFilter(false, new String[] {"jar", "zip"})));
-        if (result != null) {
-            List<KeYClassPathEntry> toSelect = new ArrayList<KeYClassPathEntry>(result.length);
-            for (IFile file : result) {
-                KeYClassPathEntry newEntry = new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, file.getFullPath().toString());
-                toSelect.add(newEntry);
-                if (!classPathEntries.contains(newEntry)) {
-                    classPathEntries.add(newEntry);
-                    updateClassPathViewer();
-                }
-            }
-            selectClassPathEntries(toSelect);
-        }
-        updateValidState();
-    }
-
-    /**
-     * Selects the given {@link KeYClassPathEntry} instances in the viewer.
-     * @param toSelect The {@link KeYClassPathEntry} instances to select.
-     */
-    protected void selectClassPathEntries(List<KeYClassPathEntry> toSelect) {
-        ISelection selection = SWTUtil.createSelection(toSelect);
-        classPathTableViewer.setSelection(selection);
-    }
-
-    /**
-     * Selects the given {@link KeYClassPathEntry} in the viewer.
-     * @param toSelect The {@link KeYClassPathEntry} to select.
-     */
-    protected void selectClassPathEntry(KeYClassPathEntry toSelect) {
-       ISelection selection = SWTUtil.createSelection(toSelect);
-       classPathTableViewer.setSelection(selection);
     }
 
     /**
@@ -586,7 +272,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
         if (valid) {
            UseBootClassPathKind kind = getUseKind();
            if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
-               valid = new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, bootClassPathText.getText()).isValid();
+               valid = new KeYPathEntry(KeYPathEntryKind.WORKSPACE, bootClassPathText.getText()).isValid();
                if (!valid) {
                    if (StringUtil.isEmpty(bootClassPathText.getText())) {
                        setErrorMessage("No workspace boot class path defined.");
@@ -597,7 +283,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
                }
            }
            else if (UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM.equals(kind)) {
-               valid = new KeYClassPathEntry(KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, bootClassPathText.getText()).isValid();
+               valid = new KeYPathEntry(KeYPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, bootClassPathText.getText()).isValid();
                if (!valid) {
                    if (StringUtil.isEmpty(bootClassPathText.getText())) {
                        setErrorMessage("No external boot class path defined.");
@@ -609,13 +295,14 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
            }
         }
         // Validate class paths
+        List<KeYPathEntry> classPathEntries = classPathComposite.getClassPathEntries();
         if (valid && classPathEntries != null) {
-            Iterator<KeYClassPathEntry> iter = classPathEntries.iterator();
+            Iterator<KeYPathEntry> iter = classPathEntries.iterator();
             while (valid && iter.hasNext()) {
-                KeYClassPathEntry next = iter.next();
+                KeYPathEntry next = iter.next();
                 if (!next.isValid()) {
                     valid = false;
-                    setErrorMessage("The class path entry \"" + next.getPath() + "\" refers to a not existing " + (KeYClassPathEntryKind.WORKSPACE.equals(next.getKind()) ? "workspace resource" : "external resource") + ".");
+                    setErrorMessage("The class path entry \"" + next.getPath() + "\" refers to a not existing " + (KeYPathEntryKind.WORKSPACE.equals(next.getKind()) ? "workspace resource" : "external resource") + ".");
                 }
             }
         }
@@ -765,20 +452,12 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
      * @param enabled The enabled state to set.
      */
     public void setEnabled(boolean enabled) {
-        addWorkspaceButton.setEnabled(enabled);
-        addWorkspaceFileButton.setEnabled(enabled);
-        addExternalButton.setEnabled(enabled);
-        addExternalFileButton.setEnabled(enabled);
         bootClassPathText.setEditable(enabled && !useDefaultBootClassPathButton.getSelection());
-        classPathTableViewer.getTable().setEnabled(enabled);
         useDefaultBootClassPathButton.setEnabled(enabled);
         useWorkspaceBootClassPathButton.setEnabled(enabled);
         useExternalBootClassPathButton.setEnabled(enabled);
         selectBootClassPathButton.setEnabled(enabled && !useDefaultBootClassPathButton.getSelection());
-        ISelection selection = classPathTableViewer.getSelection();
-        removeButton.setEnabled(enabled && !selection.isEmpty());
-        upButton.setEnabled(enabled && !selection.isEmpty());
-        downButton.setEnabled(enabled && !selection.isEmpty());
+        classPathComposite.setEnabled(enabled);
     }
 
     /**
@@ -790,7 +469,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
             IProject project = getProject();
             KeYResourceProperties.setSourceClassPath(project, sourceClassPathText.getText());
             KeYResourceProperties.setBootClassPath(project, getUseKind(), bootClassPathText.getText());
-            KeYResourceProperties.setClassPathEntries(project, classPathEntries);
+            KeYResourceProperties.setClassPathEntries(project, classPathComposite.getClassPathEntries());
             return super.performOk();
         }
         catch (CoreException e) {
@@ -808,8 +487,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
         SWTUtil.setText(sourceClassPathText, KeYResourceProperties.getDefaultSourceClassPath(getProject()));
         setUseKind(UseBootClassPathKind.KEY_DEFAULT);
         SWTUtil.setText(bootClassPathText, null);
-        classPathEntries.clear();
-        updateClassPathViewer();
+        classPathComposite.setClassPathEntries(new LinkedList<KeYPathEntry>());
         super.performDefaults();
     }
 }

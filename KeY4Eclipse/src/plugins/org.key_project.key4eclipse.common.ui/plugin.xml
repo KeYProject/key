@@ -31,6 +31,29 @@
             </or>
          </enabledWhen>
       </page>
+      <page
+            category="org.key_project.key4eclipse.common.ui.keyProjectProperties"
+            class="org.key_project.key4eclipse.common.ui.property.KeYIncludesPropertyPage"
+            id="org.key_project.key4eclipse.common.ui.keyIncludesProperties"
+            name="Includes">
+         <enabledWhen>
+            <or>
+               <and>
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.jdt.core.javanature">
+                  </test>
+               </and>
+               <instanceof
+                     value="org.eclipse.jdt.core.IJavaProject">
+               </instanceof>
+            </or>
+         </enabledWhen>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -606,6 +629,23 @@
       <customization
             class="org.key_project.key4eclipse.common.ui.stubby.KeYStubGenerationCustomization">
       </customization>
+   </extension>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="org.key_project.key4eclipse.common.ui.key.export.category"
+            name="KeY">
+      </category>
+      <wizard
+            category="org.key_project.key4eclipse.common.ui.key.export.category"
+            class="org.key_project.key4eclipse.common.ui.wizard.ExportProjectFileWizard"
+            icon="icons/prooffile_export16.gif"
+            id="org.key_project.key4eclipse.common.ui.wizard.ExportProjectFileWizard"
+            name="Project.key File">
+         <description>
+            Export KeY&apos;s project settings as &apos;project.key&apos; file.
+         </description>
+      </wizard>
    </extension>
    <!--
    <extension

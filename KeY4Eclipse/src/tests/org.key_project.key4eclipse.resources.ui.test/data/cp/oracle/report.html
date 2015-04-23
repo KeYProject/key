@@ -343,8 +343,11 @@ us.US#<prepareEnter>()
 <li>System in which the source code will be used</li>
 </ol>
 </li>
-<li><i>Source code is compiled using a correct Java compiler.</i></li>
-<li><i>Program is run on a correct JVM.</i></li>
+<li>No VirtualMachineError can occur during execution, e.g. OutOfMemoryError or StackOverflowError.</li>
+<li>Threading does not influence sequential execution.</li>
+<li>Garbage collection does not influence program execution.</li>
+<li><i>The used Java compiler is correct.</i></li>
+<li><i>The Java Virtual Machine (JVM) is correct.</i></li>
 </ol>
 </body>
 </html>

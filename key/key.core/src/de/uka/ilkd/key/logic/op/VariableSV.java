@@ -13,12 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Schema variable that is instantiated with logical variables.
@@ -35,34 +31,7 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
 	super(name, sort, true, false); 	
     }
 
-    
-    @Override
-    public MatchConditions match(SVSubstitute subst, 
-	    			 MatchConditions mc, 
-	    			 Services services) {                
-        final Term substTerm;
-        if(subst instanceof LogicVariable) {
-            substTerm = services.getTermBuilder().var((LogicVariable)subst);
-        } else if(subst instanceof Term && 
-                 ((Term)subst).op() instanceof QuantifiableVariable) {
-            substTerm = (Term) subst;
-        } else {
-            Debug.out("Strange Exit of match in VariableSV. Check for bug");
-            return null;
-        }
-        final Term foundMapping 
-        	= (Term)mc.getInstantiations().getInstantiation(this);
-        if(foundMapping == null) {
-            return addInstantiation(substTerm, mc, services);
-        } else if (foundMapping.op() == substTerm.op()) {
-            return mc;
-        } else {
-            Debug.out("FAILED. Already instantiated with different variable.");
-            return null;	    
-        }
-    } 
-    
-    
+     
     @Override
     public String toString() {
 	return toString("variable");

@@ -2,7 +2,7 @@
 		*         Symbolic Execution Debugger (SED)         *
 		*****************************************************
 
-This folder contains all content of the KeYIDE.
+This folder contains all content of the Symbolic Execution Debugger.
 
 Fore more details about this project visit 
 http://www.key-project.org/eclipse/SED

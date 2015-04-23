@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -39,9 +39,7 @@ public final class EditMostRecentFileAction extends MainWindowAction {
 	setIcon(IconFactory.editFile(MainWindow.TOOLBAR_ICON_SIZE));
 	setTooltip("Open the last opened file with the default external editor");
 	
-	if (!Desktop.isDesktopSupported()
-	        || (!Desktop.getDesktop().isSupported(Desktop.Action.EDIT) && !Desktop
-	                .getDesktop().isSupported(Desktop.Action.OPEN))) {
+	if (!Main.getKeyDesktop().supportsEdit() && !Main.getKeyDesktop().supportsOpen()) {
 	    setEnabled(false);
 	}
     }
@@ -88,11 +86,10 @@ public final class EditMostRecentFileAction extends MainWindowAction {
          * @throws IOException Occurred Exception.
          */
         public void workWithFile(File file) throws IOException {
-            Desktop d = Desktop.getDesktop();
-            if (d.isSupported(Desktop.Action.EDIT) && file.isFile()) {
-                d.edit(file);
+            if (Main.getKeyDesktop().supportsEdit() && file.isFile()) {
+               Main.getKeyDesktop().edit(file);
             } else {
-                d.open(file);
+               Main.getKeyDesktop().open(file);
             }
         }
         

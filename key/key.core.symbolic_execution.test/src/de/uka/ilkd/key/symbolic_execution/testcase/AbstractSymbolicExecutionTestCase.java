@@ -1175,7 +1175,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile, null, null, true);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile, null, null, null, true);
       // Start proof
       final Contract contract = environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
@@ -1229,7 +1229,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
@@ -1277,7 +1277,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File proofFile = new File(baseDir, proofPathInBaseDir);
       assertTrue(proofFile.exists());
       // Load java file
-      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), proofFile, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), proofFile, null, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
@@ -1331,7 +1331,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
@@ -1396,7 +1396,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
          assertNull(saver.save());
          // Load proof from saved *.proof file
-         reloadedEnv = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), tempFile, null, null, true);
+         reloadedEnv = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), tempFile, null, null, null, true);
          Proof reloadedProof = reloadedEnv.getLoadedProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree

@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="SimpleGenericTypeArgument" source="true" extends="//@types.1" package="" simpleName="SimpleGenericTypeArgument">
-    <typeVariables name="T" type="//@types.0"/>
-    <typeVariables name="X" type="//@types.1"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="SimpleGenericTypeArgument" source="true" simpleName="SimpleGenericTypeArgument">
+    <typeVariables name="T">
+      <type type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    </typeVariables>
+    <typeVariables name="X">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="MyClass" source="true" visibility="DEFAULT" extends="//@types.1" package="" simpleName="MyClass"/>
-  <types xsi:type="dependencymodel:Type" name="Blub" source="true" visibility="DEFAULT" extends="//@types.1" package="" simpleName="Blub">
-    <typeVariables name="T" type="//@types.3"/>
+  <types visibility="DEFAULT" package="" name="MyClass" source="true" simpleName="MyClass">
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types visibility="DEFAULT" package="" name="Blub" source="true" simpleName="Blub">
+    <typeVariables name="T">
+      <type type="MyClass" genericFreeType="MyClass"/>
+    </typeVariables>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

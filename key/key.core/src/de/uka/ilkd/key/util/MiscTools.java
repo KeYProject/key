@@ -414,7 +414,7 @@ public final class MiscTools {
      *
      * @author mattias ulbrich
      */
-    public static /*@NonNull*/ String filterAlphabetic(/*@NonNull*/ String string) {
+    public static /*@ non_null @*/ String filterAlphabetic(/*@ non_null @*/ String string) {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);

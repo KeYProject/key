@@ -116,7 +116,7 @@ public class TestCE extends TestCommons {
    @Test
 	public void testMiddle() throws Exception {
 		File file = new File(testFile + "middle.key");
-		KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null);
+		KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null, null);
 		try {
 		   Proof proof = env.getLoadedProof();
 		   assertNotNull(proof);

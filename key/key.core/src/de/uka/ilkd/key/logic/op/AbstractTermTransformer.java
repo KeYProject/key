@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.metaconstruct.AddCast;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
 import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
@@ -205,12 +204,4 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 	
 	return result.toString();
     }
-
-            
-    @Override    
-    public MatchConditions match(SVSubstitute subst, MatchConditions mc,
-            Services services) {
-	// by default meta operators do not match anything 	
-        return null;
-    }    
 }

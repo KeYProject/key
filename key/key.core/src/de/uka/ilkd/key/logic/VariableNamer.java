@@ -715,10 +715,9 @@ public abstract class VariableNamer implements InstantiationProposer {
     private ProgramElement instantiateExpression(ProgramElement e,
                                                  SVInstantiations svInst,
 						 Services services) {
-        ProgramReplaceVisitor trans =
-	    new ProgramReplaceVisitor(e, services, svInst, false);
-	trans.start();
-	return trans.result();
+        ProgramReplaceVisitor trans = new ProgramReplaceVisitor(e, services, svInst);
+        trans.start();
+        return trans.result();
     }
 
 

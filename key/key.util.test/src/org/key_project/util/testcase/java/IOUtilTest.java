@@ -957,4 +957,17 @@ public class IOUtilTest extends TestCase {
       catch (IllegalArgumentException e) {
       }
    }
+   
+   /**
+    * Tests {@link IOUtil#validateOSIndependentFileName(String)}
+    */
+   @Test
+   public void testValidateOSIndependentFileName() {
+      assertEquals(null, IOUtil.validateOSIndependentFileName(null));
+      assertEquals("Hello_World", IOUtil.validateOSIndependentFileName("Hello World"));
+      assertEquals("Hello_World_txt", IOUtil.validateOSIndependentFileName("Hello World.txt"));
+      assertEquals("Hello__World_txt", IOUtil.validateOSIndependentFileName("Hello<>World.txt"));
+      assertEquals("Hello__World_txt", IOUtil.validateOSIndependentFileName("Hello::World.txt"));
+      assertEquals("_Hello_World___txt_", IOUtil.validateOSIndependentFileName(".Hello.World...txt."));
+   }
 }

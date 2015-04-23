@@ -233,10 +233,12 @@ public final class KeYUtil {
             final File location;
             final File bootClassPath;
             final List<File> classPaths;
+            final List<File> includes;
             if (locationToLoad instanceof IFile) {
                 location = ResourceUtil.getLocation(locationToLoad);
                 bootClassPath = null;
                 classPaths = null;
+                includes = null;
             }
             else {
                 // Make sure that the location is contained in a Java project
@@ -249,6 +251,7 @@ public final class KeYUtil {
                 // Get KeY project settings
                 bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                 classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+                includes = KeYResourceProperties.getKeYIncludes(project);
             }
             Assert.isNotNull(location, "The resource \"" + locationToLoad + "\" is not local.");
             IRunnableWithException run = new AbstractRunnableWithException() {
@@ -267,7 +270,7 @@ public final class KeYUtil {
                         }
                         else {
                             // Load local file
-                            MainWindow.getInstance().loadProblem(location, classPaths, bootClassPath);
+                            MainWindow.getInstance().loadProblem(location, classPaths, bootClassPath, includes);
                         }
                     }
                     catch (Exception e) {
@@ -360,6 +363,7 @@ public final class KeYUtil {
             // Get KeY project settings
             final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
             final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+            final List<File> includes = KeYResourceProperties.getKeYIncludes(project);
             Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
             // Open main window to avoid repaint bugs
             openMainWindow();
@@ -376,7 +380,7 @@ public final class KeYUtil {
                             main.setVisible(true);
                         }
                         // Check if location is already loaded
-                        AbstractProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, null, false);
+                        AbstractProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, includes, null, false);
                         InitConfig initConfig = loader.getInitConfig();
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());

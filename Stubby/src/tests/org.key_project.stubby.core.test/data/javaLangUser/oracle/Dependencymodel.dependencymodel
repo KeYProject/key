@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="JavaLangUser" source="true" simpleName="JavaLangUser">
+    <methods name="main" static="true">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.lang" name="java.lang.Throwable" simpleName="Throwable">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types package="java.lang" name="java.lang.Exception" simpleName="Exception">
+    <extends type="java.lang.Throwable" genericFreeType="java.lang.Throwable"/>
+  </types>
+  <types package="java.lang" name="java.lang.RuntimeException" simpleName="RuntimeException">
+    <extends type="java.lang.Exception" genericFreeType="java.lang.Exception"/>
+  </types>
+  <types package="java.lang" name="java.lang.NullPointerException" simpleName="NullPointerException">
+    <extends type="java.lang.RuntimeException" genericFreeType="java.lang.RuntimeException"/>
+  </types>
+</dependencymodel:DependencyModel>

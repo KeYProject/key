@@ -17,19 +17,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.executor.javadl.AntecTacletExecutor;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
@@ -61,10 +53,10 @@ public class AntecTaclet extends FindTaclet{
 		     Term find,
                      boolean ignoreTopLevelUpdates,
 		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, heuristics, attrs, 
-	      find, prefixMap, choices);
+        super(name, applPart, goalTemplates, heuristics, attrs, 
+                find, prefixMap, choices);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
-	cacheMatchInfo();
+        createTacletServices();
     }
 
    
@@ -74,70 +66,33 @@ public class AntecTaclet extends FindTaclet{
      * @return true if top level updates shall be ignored 
      */
     @Override
-    protected boolean ignoreTopLevelUpdates() {
+    public boolean ignoreTopLevelUpdates() {
 	return ignoreTopLevelUpdates;
     }
 
 
-    /** CONSTRAINT NOT USED 
-     * applies the replacewith part of Taclets
-     * @param gt TacletGoalTemplate used to get the replaceexpression in the Taclet
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence belonging to the find expression
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
-    * @return 
-     */
-    @Override
-    protected void applyReplacewith(Goal goal, TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
-				    PosInOccurrence posOfFind,
-				    Services services, 
-				    MatchConditions matchCond,
-				    TacletApp tacletApp) {
-       if (gt instanceof AntecSuccTacletGoalTemplate) {
-          final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
-
-          replaceAtPos(termLabelState, replWith.antecedent(), currentSequent, posOfFind, services, matchCond, new TacletLabelHint(TacletOperation.REPLACE_AT_ANTECEDENT, replWith), goal, tacletApp);
-          addToSucc(termLabelState, replWith.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.REPLACE_TO_SUCCEDENT, replWith), goal, tacletApp);	   	    	    
-       } else {
-          // Then there was no replacewith...
-       }
-    }
-
-    
-    /**
-     * adds the sequent of the add part of the Taclet to the goal sequent
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param add the Sequent to be added
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence describes the place where to add
-     * the semisequent 
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
-     */
-    @Override
-    protected void applyAdd(TermLabelState termLabelState, Sequent add, 
-             SequentChangeInfo currentSequent,
-			    PosInOccurrence posOfFind,
-			    Services services,
-			    MatchConditions matchCond,
-			    Goal goal,
-			    TacletApp tacletApp) {
-       addToAntec(termLabelState, add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
-       addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
-    }
         
     /** toString for the find part */
-    StringBuffer toStringFind(StringBuffer sb) {
+    protected StringBuffer toStringFind(StringBuffer sb) {
 	return sb.append("\\find(").
 	    append(find().toString()).append("==>)\n");
     }
 
-    protected Taclet setName(String s) {
-	AntecTacletBuilder b=new AntecTacletBuilder();
-	b.setFind(find());
-	return super.setName(s, b);
+
+    @Override
+    protected void createAndInitializeExecutor() {
+        executor = new AntecTacletExecutor<AntecTaclet>(this);
     }
 
-  
+    @Override
+    public AntecTaclet setName(String s) {        
+        final TacletApplPart applPart = 
+                new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(), 
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes();
+        attrs.setDisplayName(displayName());
+        
+        return new AntecTaclet(new Name(s), 
+                applPart, goalTemplates(), getRuleSets(), attrs, find, ignoreTopLevelUpdates, prefixMap, choices);
+    }
 }

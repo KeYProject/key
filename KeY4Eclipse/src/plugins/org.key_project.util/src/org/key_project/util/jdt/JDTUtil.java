@@ -31,6 +31,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IClassFile;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -786,7 +788,7 @@ public class JDTUtil {
     * @return The found locations.
     * @throws JavaModelException 
     */
-   private static List<File> getLocationFor(IJavaProject javaProject, 
+   public static List<File> getLocationFor(IJavaProject javaProject, 
                                             IClasspathEntry entry,
                                             int expectedKind,
                                             Set<IProject> alreadyHandledProjects) throws JavaModelException {
@@ -1008,7 +1010,7 @@ public class JDTUtil {
     * @param project The {@link IProject} to build in background.
     */
    public static void buildInBackground(IProject project) {
-      CoreUtility.startBuildInBackground(project.getProject());
+      CoreUtility.startBuildInBackground(project);
    }
 
    /**
@@ -1061,15 +1063,15 @@ public class JDTUtil {
    }
    
    /**
-    * Lists all {@link ICompilationUnit}s recursively within given {@link IPackageFragmentRoot}s
-    * @param sourceFolders The {@link IPackageFragmentRoot}s to list its contained {@link ICompilationUnit}s.
+    * Lists all {@link ICompilationUnit}s recursively within given {@link IJavaElement}s
+    * @param javaElements The {@link IJavaElement}s to list its contained {@link ICompilationUnit}s.
     * @return The recursively found {@link ICompilationUnit}s.
     * @throws JavaModelException Occurred Exception.
     */
-   public static List<ICompilationUnit> listCompilationUnit(List<IPackageFragmentRoot> sourceFolders) throws JavaModelException{
+   public static List<ICompilationUnit> listCompilationUnit(List<? extends IJavaElement> javaElements) throws JavaModelException{
       List<ICompilationUnit> result = new LinkedList<ICompilationUnit>();
-      if (sourceFolders != null) {
-         for (IPackageFragmentRoot root : sourceFolders) {
+      if (javaElements != null) {
+         for (IJavaElement root : javaElements) {
             findCompilationUnitsRecursively(root, result);
          }
       }
@@ -1116,6 +1118,27 @@ public class JDTUtil {
    }
    
    /**
+    * Parses the given {@link IClassFile}.
+    * @param classFile The {@link IClassFile} to parse.
+    * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
+    */
+   public static ASTNode parse(IClassFile classFile) {
+      if (classFile != null) {
+         ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
+         parser.setResolveBindings(true);
+         parser.setSource(classFile);
+         Map<?, ?> options = JavaCore.getOptions();
+         JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
+         parser.setCompilerOptions(options);
+         ASTNode result = parser.createAST(null);
+         return result;
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
     * Parses the given {@link ICompilationUnit}.
     * @param in The {@link InputStream} to parse.
     * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
@@ -1146,5 +1169,25 @@ public class JDTUtil {
       else {
          return null;
       }
+   }
+
+   /**
+    * Lists all Java container (JRE) of the given {@link IJavaProject}s.
+    * @param javaProject The {@link IJavaProject}.
+    * @return The descriptions of the avilable Java container.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static List<String> getJavaContainerDescriptions(IJavaProject javaProject) throws JavaModelException {
+      List<String> result = new LinkedList<String>();
+      if (javaProject != null && javaProject.isOpen()) {
+         IClasspathEntry[] cps = javaProject.getRawClasspath();
+         for (IClasspathEntry entry : cps) {
+            if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+               IClasspathContainer container= JavaCore.getClasspathContainer(entry.getPath(), javaProject);
+               result.add(container.getDescription());
+            }
+         }
+      }
+      return result;
    }
 }

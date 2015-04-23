@@ -206,6 +206,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
          // Make sure that *.key and *.proof files are valid
          final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
          final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+         final List<File> includes = KeYResourceProperties.getKeYIncludes(project);
          project.accept(new IResourceVisitor() {
             @Override
             public boolean visit(IResource resource) throws CoreException {
@@ -216,7 +217,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
                   Assert.isTrue(location.exists());
                   try {
                      if (!BROKEN_PROOF_FILE_PATHES.contains(resource.getFullPath().toString())) {
-                        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(location, classPaths, bootClassPath);
+                        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
                         env.dispose();
                      }
                   }

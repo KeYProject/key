@@ -105,6 +105,10 @@
             commandId="org.key_project.keyide.ui.commands.counterexample"
             icon="icons/counterExample.png">
       </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
+            icon="icons/stopAtBreakpoints.gif">
+      </image>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -275,7 +279,7 @@
                  </command>
                  <command
                        commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
-                       icon="icons/breakpoints.gif"
+                       icon="icons/stopAtBreakpoints.gif"
                        id="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
                        label="Stop at Breakpoints"
                        style="toggle">

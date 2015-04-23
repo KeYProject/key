@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
-    <typeVariables name="T" type="//@types.0"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.3" typeArguments="//@types.5"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Date" extends="//@types.0" implements="//@types.1 //@types.2 //@types.4" package="java.util" simpleName="Date">
-    <methods name="after" returnType="//@types.8" parameterTypes="//@types.5"/>
+  <types package="java.util" name="java.util.Date" simpleName="Date">
+    <methods name="after">
+      <returnType type="boolean" genericFreeType="boolean"/>
+      <parameterTypes type="java.util.Date" genericFreeType="java.util.Date"/>
+    </methods>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.lang.Comparable&lt;java.util.Date>" genericFreeType="java.lang.Comparable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="MethodCallTest" source="true" extends="//@types.0" package="" simpleName="MethodCallTest">
-    <methods name="testmethod1" returnType="//@types.7" parameterTypes="//@types.5"/>
+  <types package="" name="MethodCallTest" source="true" simpleName="MethodCallTest">
+    <methods name="testmethod1">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="java.util.Date" genericFreeType="java.util.Date"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
-  <types xsi:type="dependencymodel:Datatype" name="boolean"/>
 </dependencymodel:DependencyModel>

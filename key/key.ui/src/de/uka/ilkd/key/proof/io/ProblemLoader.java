@@ -44,13 +44,14 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
    public ProblemLoader(File file, 
                         List<File> classPath, 
                         File bootClassPath,
+                        List<File> includes,
                         Profile profileOfNewProofs, 
                         boolean forceNewProfileOfNewProofs,
                         KeYMediator mediator,
                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
                         Properties poPropertiesToForce, 
                         ProverTaskListener ptl) {
-      super(file, classPath, bootClassPath, profileOfNewProofs, forceNewProfileOfNewProofs, mediator.getUI(),
+      super(file, classPath, bootClassPath, includes, profileOfNewProofs, forceNewProfileOfNewProofs, mediator.getUI(),
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
       this.mediator = mediator;
       this.ptl = ptl;
@@ -60,7 +61,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
        mediator.stopInterface(true);
        fireTaskStarted();
 
-       final long currentTime = System.currentTimeMillis();
+       final long currentTime = System.nanoTime();
        Throwable message;
        try {
            message = doWork();
@@ -68,7 +69,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
            message = ex;
        }
 
-       long runTime = System.currentTimeMillis() - currentTime;
+       long runTime = System.nanoTime() - currentTime;
        fireTaskFinished(runTime, message);
    }
 
@@ -119,9 +120,9 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
            @Override
            protected Throwable doInBackground() throws Exception {
-               long currentTime = System.currentTimeMillis();
+               long currentTime = System.nanoTime();
                final Throwable message = doWork();
-               runTime = System.currentTimeMillis() - currentTime;
+               runTime = System.nanoTime() - currentTime;
                return message;
            }
 

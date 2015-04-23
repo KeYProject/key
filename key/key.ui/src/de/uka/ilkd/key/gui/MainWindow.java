@@ -290,10 +290,13 @@ public final class MainWindow extends JFrame  {
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         addWindowListener(exitMainAction.windowListener);
-        setVisible(true);
     }
 
     public static MainWindow getInstance() {
+       return getInstance(true);
+    }
+
+    public static MainWindow getInstance(boolean ensureIsVisible) {
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
             System.err.println("Please use the --auto option to start KeY in batch mode.");
@@ -302,6 +305,9 @@ public final class MainWindow extends JFrame  {
         }
         if (instance == null) {
             instance = new MainWindow();
+            if (ensureIsVisible) {
+               instance.setVisible(true);
+            }
         }
         return instance;
     }
@@ -1527,8 +1533,8 @@ public final class MainWindow extends JFrame  {
         getUserInterface().loadProblem(file);
     }
 
-   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      getUserInterface().loadProblem(file, classPath, bootClassPath);
+   public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
+      getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
    }
 
     /*
@@ -1558,4 +1564,14 @@ public final class MainWindow extends JFrame  {
         });
         return labelNames;
     }
+
+   /**
+    * Returns the {@link JToolBar} with the proof control.
+    * <p>
+    * This method is used by the Eclipse world to add additional features!
+    * @return The {@link JToolBar} with the proof control.
+    */
+   public JToolBar getControlToolBar() {
+      return controlToolBar;
+   }
 }

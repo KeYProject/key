@@ -1,36 +1,68 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Iterator" kind="INTERFACE" package="java.util" simpleName="Iterator">
-    <typeVariables name="E" type="//@types.0"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Iterator" simpleName="Iterator">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
-  <types xsi:type="dependencymodel:Type" name="GenericTests" source="true" extends="//@types.0" package="" simpleName="GenericTests">
-    <typeVariables name="T" type="//@types.2"/>
-    <methods name="main" static="true" returnType="//@types.11" parameterTypes="//@types.3/@methods.0/@typeVariables.0">
-      <typeVariables name="S" type="//@types.10"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types package="" name="GenericTests" source="true" simpleName="GenericTests">
+    <typeVariables name="T">
+      <type type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    </typeVariables>
+    <methods name="main" static="true">
+      <typeVariables name="S">
+        <type type="java.lang.Iterable&lt;java.lang.String>" genericFreeType="java.lang.Iterable"/>
+      </typeVariables>
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="S" genericFreeType="java.lang.Iterable"/>
     </methods>
-    <methods name="main" static="true" returnType="//@types.11" parameterTypes="//@types.14"/>
-    <methods name="main" static="true" returnType="//@types.11" throws="//@types.3/@methods.2/@typeVariables.0">
-      <typeVariables name="S" type="//@types.16"/>
+    <methods name="main" static="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="java.util.Iterator&lt;java.util.Date>" genericFreeType="java.util.Iterator"/>
     </methods>
-    <fields name="cloneable" visibility="PRIVATE" type="//@types.3/@typeVariables.0"/>
+    <methods name="main" static="true">
+      <typeVariables name="S">
+        <type type="java.lang.Exception" genericFreeType="java.lang.Exception"/>
+      </typeVariables>
+      <returnType type="void" genericFreeType="void"/>
+      <throws type="S" genericFreeType="java.lang.Exception"/>
+    </methods>
+    <fields name="cloneable" visibility="PRIVATE">
+      <type type="T" genericFreeType="java.lang.Cloneable"/>
+    </fields>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Iterable" kind="INTERFACE" package="java.lang" simpleName="Iterable">
-    <typeVariables name="T" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
-    <typeVariables name="T" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.CharSequence" simpleName="CharSequence"/>
+  <types final="true" package="java.lang" name="java.lang.String" simpleName="String">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.lang.String>" genericFreeType="java.lang.Comparable"/>
+    <implements type="java.lang.CharSequence" genericFreeType="java.lang.CharSequence"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.6" typeArguments="//@types.9"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.CharSequence" kind="INTERFACE" package="java.lang" simpleName="CharSequence"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.String" final="true" extends="//@types.0" implements="//@types.5 //@types.7 //@types.8" package="java.lang" simpleName="String"/>
-  <types xsi:type="dependencymodel:GenericType" name="Iterable" baseType="//@types.4" typeArguments="//@types.9"/>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.6" typeArguments="//@types.13"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Date" extends="//@types.0" implements="//@types.5 //@types.2 //@types.12" package="java.util" simpleName="Date"/>
-  <types xsi:type="dependencymodel:GenericType" name="Iterator" baseType="//@types.1" typeArguments="//@types.13"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Throwable" extends="//@types.0" implements="//@types.5" package="java.lang" simpleName="Throwable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Exception" extends="//@types.15" package="java.lang" simpleName="Exception"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Iterable" simpleName="Iterable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types package="java.util" name="java.util.Date" simpleName="Date">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.lang.Comparable&lt;java.util.Date>" genericFreeType="java.lang.Comparable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types package="java.lang" name="java.lang.Throwable" simpleName="Throwable">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types package="java.lang" name="java.lang.Exception" simpleName="Exception">
+    <extends type="java.lang.Throwable" genericFreeType="java.lang.Throwable"/>
+  </types>
 </dependencymodel:DependencyModel>

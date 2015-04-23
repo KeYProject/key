@@ -8,6 +8,14 @@
 		<isset property="env.KEY_VERSION"/>
 	</condition>
 
+	<condition property="taclet.match" value="${taclet.match}" else="legacy">
+		<isset property="taclet.match"/>
+	</condition>
+
+		<condition property="tacletindex.threading.enabled" value="${tacletindex.threading.enabled}" else="false">
+		<isset property="tacletindex.threading.enabled"/>
+	</condition>
+
 	 <!-- The following tasks are for KeY -->
 	<target name="start" depends="compileAll" description="Starts KeY.">
 		<ant antfile="${key.dir}/key.ui/build.xml" target="start" dir="${key.dir}/key.ui" inheritall="false"/>
@@ -20,7 +28,8 @@
 		<ant antfile="${key.dir}/key.ui/build.xml" target="compile" dir="${key.dir}/key.ui" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="compile" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-      <ant antfile="${key.dir}/key.core.example/build.xml" target="compile" dir="${key.dir}/key.core.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.example/build.xml" target="compile" dir="${key.dir}/key.core.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="compile" dir="${key.dir}/key.removegenerics" inheritall="false"/>
 	</target>
 
 	<target name="deployAll">
@@ -41,7 +50,8 @@
 		<ant antfile="${key.dir}/key.ui/build.xml" target="deploy" dir="${key.dir}/key.ui" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="deploy" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-      <ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
 		<!-- Deploy license -->
 		<copy todir="${key.dir}/deployment">
 			<fileset file="${key.dir}/LICENSE.TXT"/>
@@ -65,7 +75,8 @@
 		<ant antfile="${key.dir}/key.ui/build.xml" target="clean" dir="${key.dir}/key.ui" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-      <ant antfile="${key.dir}/key.core.example/build.xml" target="clean" dir="${key.dir}/key.core.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.example/build.xml" target="clean" dir="${key.dir}/key.core.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="clean" dir="${key.dir}/key.removegenerics" inheritall="false"/>
 		<!-- Delete deployed files -->
 		<delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false" />
 		<delete file="${key.dir}/deployment/KeY.jar" failonerror="false" />
@@ -79,6 +90,7 @@
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="runTests" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="runTests" dir="${key.dir}/key.core.proof_references.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="runTests" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
+		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="runTests" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
 	</target>
 
 	<target name="test-deploy-all" depends="deployAll, compileAllTests">
@@ -87,6 +99,7 @@
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.proof_references.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
+		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="test-deploy" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
 	</target>
 
 	<target name="compileAllTests" depends="compileAll">
@@ -95,6 +108,7 @@
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="compile" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="compile" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
+		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="compile" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
 	</target>
 
 	<target name="cleanAllTests">
@@ -103,6 +117,7 @@
 		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="clean" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
+		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="clean" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
 	</target>
 
 

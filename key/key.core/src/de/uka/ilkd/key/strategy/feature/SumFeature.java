@@ -43,9 +43,7 @@ public class SumFeature implements Feature {
     }
     
     private SumFeature(Feature[] p_features) {
-        LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
-        flatten(p_features, featureSet);
-        features = featureSet.toArray(new Feature[featureSet.size()]);
+        features = p_features;
     }
 
     static void flatten(Feature[] sumF, LinkedHashSet<Feature> p_features) {
@@ -61,9 +59,14 @@ public class SumFeature implements Feature {
     public static Feature createSum (Feature... fs) {
         Debug.assertFalse ( fs.length == 0,
                             "Cannot compute the sum of zero features" );
-        final Feature[] fsCopy = new Feature [ fs.length ];
-        System.arraycopy ( fs, 0, fsCopy, 0, fs.length );
-        return new SumFeature ( fsCopy );
+
+       if (fs.length == 1) {
+           return fs[0];
+       }
+       LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
+       flatten(fs, featureSet);
+       
+       return new SumFeature ( featureSet.toArray( new Feature [ fs.length ] ) );
     }
 
     private final Feature[] features;

@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -71,26 +72,58 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     	return cost;
     }
 
-
     /**
-     * Create containers for RuleApps.
-     * @return list of containers for currently applicable RuleApps, the cost
+     * Create container for a RuleApp.
+     * @return container for the currently applicable RuleApp, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    public static ImmutableList<RuleAppContainer> createAppContainers
+    public static RuleAppContainer createAppContainer
         ( RuleApp p_app, PosInOccurrence p_pio, Goal p_goal, Strategy p_strategy ) {
-
+        
 	if ( p_app instanceof NoPosTacletApp )
 	    return TacletAppContainer.createAppContainers
 		( (NoPosTacletApp)p_app, p_pio, p_goal, p_strategy );
 
 	if ( p_app instanceof IBuiltInRuleApp )
-	    return BuiltInRuleAppContainer.createAppContainers
+	    return BuiltInRuleAppContainer.createAppContainer
 		( (IBuiltInRuleApp)p_app, p_pio, p_goal, p_strategy );
 
 	Debug.fail ( "Unexpected kind of rule." );
 
 	return null;
+    }
+
+    /**
+     * Create containers for RuleApps.
+     * @return list of containers for the currently applicable RuleApps, the cost
+     * may be an instance of <code>TopRuleAppCost</code>.
+     */
+    public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules, 
+            PosInOccurrence pos, Goal goal, Strategy strategy) {
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+
+        if (rules.size() == 1) {
+            result = result.prepend( createAppContainer(rules.head(), pos, goal, strategy));
+        } else if (rules.size() > 1) {
+            ImmutableList<NoPosTacletApp> tacletApplications = ImmutableSLList.<NoPosTacletApp>nil();
+            ImmutableList<IBuiltInRuleApp> builtInRuleApplications = ImmutableSLList.<IBuiltInRuleApp>nil();
+
+            for (RuleApp rule : rules) {
+                if (rule instanceof NoPosTacletApp) {
+                    tacletApplications = tacletApplications.prepend((NoPosTacletApp) rule);
+                } else {
+                    builtInRuleApplications = builtInRuleApplications.prepend((IBuiltInRuleApp) rule);
+                }
+            }
+
+            if ( !builtInRuleApplications.isEmpty() ) {
+                result = result.append( BuiltInRuleAppContainer.createInitialAppContainers
+                        ( builtInRuleApplications, pos, goal, strategy ) );
+            }        
+            result = result.prepend( TacletAppContainer.createInitialAppContainers
+                    ( tacletApplications, pos, goal, strategy ) );
+        }
+        return result;
     }
 
 }

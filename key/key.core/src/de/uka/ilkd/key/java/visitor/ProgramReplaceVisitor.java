@@ -34,24 +34,19 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
-
     private ProgramElement result = null;
 
     private SVInstantiations svinsts;
-
-    private boolean allowPartialReplacement;
-
+    
     /** 
      * create the  ProgramReplaceVisitor
      * @param root the ProgramElement where to begin
      */
     public ProgramReplaceVisitor(ProgramElement root,
 				 Services services, 
-				 SVInstantiations svi,
-				 boolean allowPartialReplacement) {
+				 SVInstantiations svi) {
 	super(root, false, services);
 	svinsts = svi;
-	this.allowPartialReplacement=allowPartialReplacement;
     }
 
     /** the action that is performed just before leaving the node the
@@ -104,21 +99,14 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 		   && ((Term)inst).op() instanceof ProgramInLogic) {
 	    addChild(services.getTypeConverter().convertToProgramElement((Term)inst));
 	} else {
-	    if ( inst == null && allowPartialReplacement &&
-		 sv instanceof SourceElement ) {
-		doDefaultAction ( (SourceElement)sv );
-		return;
-	    }
-	    Debug.fail("programreplacevisitor: Instantiation missing " + 
-		       "for schema variable ", sv);
+	    throw new IllegalStateException("programreplacevisitor: Instantiation missing " + 
+		       "for schema variable " + sv);
 	}
 	changed();
     }
 
     public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
-	ProgramReplaceVisitor trans = new ProgramReplaceVisitor(x.body(), services,
-								svinsts,
-								allowPartialReplacement);
+	ProgramReplaceVisitor trans = new ProgramReplaceVisitor(x.body(), services, svinsts);
 	trans.start();
 	ProgramElement localresult = trans.result();
 	localresult = x.transform(localresult, services, svinsts);

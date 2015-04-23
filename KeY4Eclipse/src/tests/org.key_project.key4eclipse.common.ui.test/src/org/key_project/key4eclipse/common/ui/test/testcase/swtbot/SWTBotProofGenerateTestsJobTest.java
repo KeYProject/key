@@ -56,7 +56,7 @@ public class SWTBotProofGenerateTestsJobTest extends AbstractGenerateTestsJobTes
          IFile proofFile = src.getFile("IntegerUtil.proof");
          assertTrue(proofFile.exists());
          // Open Proof
-         env = WindowUserInterfaceControl.loadInMainWindow(ResourceUtil.getLocation(proofFile), null, null, false);
+         env = WindowUserInterfaceControl.loadInMainWindow(ResourceUtil.getLocation(proofFile), null, null, null, false);
          KeYMediator mediator = env.getUi().getMediator();
          assertNotNull(mediator);
          Proof proof = env.getLoadedProof();

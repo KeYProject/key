@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Comparator" simpleName="Comparator">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types final="true" package="" name="ObjectUtil" source="true" simpleName="ObjectUtil">
+    <methods name="createEqualsComparator" static="true">
+      <typeVariables name="T">
+        <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+      </typeVariables>
+      <returnType type="java.util.Comparator&lt;T>" genericFreeType="java.util.Comparator"/>
+    </methods>
+    <innerTypes visibility="DEFAULT" package="" name="" source="true" simpleName="">
+      <methods name="" visibility="DEFAULT" constructor="true">
+        <returnType type="void" genericFreeType="void"/>
+      </methods>
+      <methods name="compare">
+        <returnType type="int" genericFreeType="int"/>
+        <parameterTypes type="T" genericFreeType="java.lang.Object"/>
+        <parameterTypes type="T" genericFreeType="java.lang.Object"/>
+      </methods>
+      <implements type="java.util.Comparator&lt;T>" genericFreeType="java.util.Comparator"/>
+      <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </innerTypes>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang.annotation" name="java.lang.annotation.Annotation" simpleName="Annotation"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Override" simpleName="Override">
+    <extends type="java.lang.annotation.Annotation" genericFreeType="java.lang.annotation.Annotation"/>
+  </types>
+</dependencymodel:DependencyModel>

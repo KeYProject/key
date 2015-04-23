@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY RemoveGenerics UI Tests
+Bundle-SymbolicName: org.key_project.removegenerics.ui.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.removegenerics.ui.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.core.resources,
+ org.eclipse.jdt.core,
+ org.junit,
+ org.eclipse.swtbot.go,
+ org.key_project.util,
+ org.key_project.util.test
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.removegenerics.ui.test.suite.swtbot

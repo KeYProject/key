@@ -8,6 +8,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
@@ -19,11 +20,10 @@ import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.stubby.KeYGeneratorCustomization;
 import org.key_project.key4eclipse.common.ui.stubby.KeYStubGenerationCustomization;
 import org.key_project.key4eclipse.common.ui.test.Activator;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
-import org.key_project.stubby.core.test.testcase.StubGeneratorUtilTest;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
 import org.key_project.stubby.ui.test.testcase.swtbot.AbstractSWTBotGenerateStubsTest;
 import org.key_project.util.eclipse.BundleUtil;
@@ -37,80 +37,76 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGenerateStubsTest {
    /**
-    * Tests the extraction of the boot class path content.
+    * Tests the removing of generics in the boot class path.
     * @throws Exception Occurred Exception
     */
    @Test
-   public void testBootClassPath_StubFolderDoesNotExist() throws Exception {
-      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testBootClassPath_StubFolderDoesNotExist", 
+   public void testWithoutGenerics_BootClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testWithoutGenerics_BootClassPath", 
                        Activator.PLUGIN_ID, 
-                       null, 
-                       new BootClassPathExtractionTestSteps(false, true));
-   }
-   /**
-    * Tests the extraction of the boot class path content.
-    * @throws Exception Occurred Exception
-    */
-   @Test
-   public void testBootClassPath_StubFolderIsEmpty() throws Exception {
-      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testBootClassPath_StubFolderIsEmpty", 
-                       Activator.PLUGIN_ID, 
-                       null, 
-                       new BootClassPathExtractionTestSteps(true, true));
-   }
-   /**
-    * Tests the extraction of the boot class path content.
-    * @throws Exception Occurred Exception
-    */
-   @Test
-   public void testBootClassPath_StubFolderIsNotEmpty() throws Exception {
-      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testBootClassPath_StubFolderIsNotEmpty", 
-                       Activator.PLUGIN_ID, 
-                       null, 
-                       new BootClassPathExtractionTestSteps(true, false));
+                       "data/stubbyGenericsExample/src", 
+                       new GenericsTestSteps(false, true));
    }
    
    /**
-    * Test steps to test that the boot class path is correctly extracted.
+    * Tests the removing of generics in the class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testWithoutGenerics_ClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testWithoutGenerics_ClassPath", 
+                       Activator.PLUGIN_ID, 
+                       "data/stubbyGenericsExample/src", 
+                       new GenericsTestSteps(true, false));
+   }
+   
+   /**
+    * Tests the including of generics.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testWithGenerics() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testWithGenerics", 
+                       Activator.PLUGIN_ID, 
+                       "data/stubbyGenericsExample/src", 
+                       new GenericsTestSteps(false, false));
+   }
+   
+   /**
+    * Test steps to test that generics are included or removed.
     * @author Martin Hentschel
     */
-   private static class BootClassPathExtractionTestSteps extends PathGeneratorTestSteps {
+   private static class GenericsTestSteps extends PathGeneratorTestSteps {
       /**
-       * Does the stub folder already exist?
+       * Stubs are part of class path?
        */
-      private final boolean stubFolderExists;
-      
-      /**
-       * Is the stub folder empty?
-       */
-      private final boolean stubFolderIsEmpty;
+      private final boolean classPath;
 
       /**
-       * Constructor.
-       * @param stubFolderExists Does the stub folder already exist?
-       * @param stubFolderIsEmpty Is the stub folder empty?
+       * Stubs are part of boot class path?
        */
-      public BootClassPathExtractionTestSteps(boolean stubFolderExists, boolean stubFolderIsEmpty) {
-         super(false, false, false, true);
-         this.stubFolderExists = stubFolderExists;
-         this.stubFolderIsEmpty = stubFolderIsEmpty;
+      private final boolean bootClassPath;
+      
+      /**
+       * Constructor.
+       */
+      public GenericsTestSteps(boolean classPath, boolean bootClassPath) {
+         super(false, classPath, false, bootClassPath);
+         this.classPath = classPath;
+         this.bootClassPath = bootClassPath;
       }
 
       /**
        * {@inheritDoc}
        */
       @Override
-      public void initProject(IJavaProject javaProject) throws Exception {
-         super.initProject(javaProject);
-         if (stubFolderExists) {
-            IFolder stubFolder = javaProject.getProject().getFolder(new Path(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH));
-            ResourceUtil.ensureExists(stubFolder);
-            if (!stubFolderIsEmpty) {
-               TestUtilsUtil.createFile(stubFolder, "Readme.txt", "Folder is not empty!");
-            }
+      public void wizardFinished(SWTBotShell shell) {
+         if (classPath) {
+            SWTBotShell informationShell = shell.bot().shell("Information");
+            informationShell.close();
          }
       }
-
+      
       /**
        * {@inheritDoc}
        */
@@ -118,16 +114,52 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       public void testResults(IJavaProject javaProject) throws Exception {
          super.testResults(javaProject);
          IFolder stubFolder = javaProject.getProject().getFolder(new Path(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH));
-         if (!stubFolderExists || stubFolderIsEmpty) {
-            assertEquals(1, stubFolder.members().length); // The Readme.txt file
-            assertTrue(stubFolder.members()[0] instanceof IFolder);
-            assertEquals("java", stubFolder.members()[0].getName());
+         IFile linkedListFile = stubFolder.getFile(new Path("java/util/LinkedList.java"));
+         assertTrue(linkedListFile.exists());
+         String content = ResourceUtil.readFrom(linkedListFile);
+         if (classPath || bootClassPath) {
+            assertFalse(content.contains("<"));
+            assertFalse(content.contains(">"));
          }
          else {
-            assertEquals(1, stubFolder.members().length); // The Readme.txt file
-            assertTrue(stubFolder.members()[0] instanceof IFile);
-            assertEquals("Readme.txt", stubFolder.members()[0].getName());
+            assertTrue(content.contains("<"));
+            assertTrue(content.contains(">"));
          }
+      }
+   }
+   
+   /**
+    * Tests the preservation of the boot class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testBootClassPathPreserveStubFolder() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testBootClassPathPreserveStubFolder", 
+                       Activator.PLUGIN_ID, 
+                       null, 
+                       new BootClassPathPreservingTestSteps());
+   }
+   
+   /**
+    * Test steps to test that the boot class path is correctly preserved.
+    * @author Martin Hentschel
+    */
+   private static class BootClassPathPreservingTestSteps extends PathGeneratorTestSteps {
+      /**
+       * Constructor.
+       */
+      public BootClassPathPreservingTestSteps() {
+         super(false, false, false, true);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void testResults(IJavaProject javaProject) throws Exception {
+         super.testResults(javaProject);
+         IFolder stubFolder = javaProject.getProject().getFolder(new Path(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH));
+         assertTrue(stubFolder.getFile(new Path("java/lang/NullPointerException.java")).exists());
       }
    }
    
@@ -250,7 +282,7 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/stubbyExample/classPathStubs", oracleFolder);
          // Compare generated stubs with oracle stubs
          IFolder stubFolder = javaProject.getProject().getFolder(new Path(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH));
-         StubGeneratorUtilTest.assertResources(oracleFolder.members(), stubFolder.members());
+         TestUtilsUtil.assertResources(oracleFolder.members(), stubFolder.members());
       }
       
       /**
@@ -409,6 +441,11 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
        * Should be after generation part of the boot class path?
        */
       private final boolean afterBootClassPath;
+      
+      /**
+       * The full path to the stub folder.
+       */
+      private String stubFolderfullPath;
 
       /**
        * Constructor
@@ -433,14 +470,14 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       @Override
       public void initProject(IJavaProject javaProject) throws Exception {
          IProject project = javaProject.getProject();
-         String fullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
+         stubFolderfullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
          if (beforeClassPath) {
-            List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
-            entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, fullPath));
+            List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
+            entries.add(new KeYPathEntry(KeYPathEntryKind.WORKSPACE, stubFolderfullPath));
             KeYResourceProperties.setClassPathEntries(project, entries);
          }
          if (beforeBootClassPath) {
-            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.WORKSPACE, fullPath);
+            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.WORKSPACE, stubFolderfullPath);
          }
       }
 
@@ -464,9 +501,16 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
             assertFalse(bootClassPath.isSelected());
          }
          else {
-            assertTrue(notUsed.isSelected());
-            assertFalse(classPath.isSelected());            
-            assertFalse(bootClassPath.isSelected());
+            if (ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(stubFolderfullPath)) == null) {
+               assertFalse(notUsed.isSelected());
+               assertFalse(classPath.isSelected());
+               assertTrue(bootClassPath.isSelected());
+            }
+            else {
+               assertTrue(notUsed.isSelected());
+               assertFalse(classPath.isSelected());            
+               assertFalse(bootClassPath.isSelected());
+            }
          }
          // Set values to test
          if (afterBootClassPath) {
@@ -490,9 +534,9 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       @Override
       public void testResults(IJavaProject javaProject) throws Exception {
          IProject project = javaProject.getProject();
-         List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
+         List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
          String fullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
-         KeYClassPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYClassPathEntryKind.WORKSPACE, fullPath);
+         KeYPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYPathEntryKind.WORKSPACE, fullPath);
          if (afterClassPath) {
             assertNotNull(entry);
          }

@@ -2,31 +2,30 @@
  */
 package org.key_project.stubby.model.dependencymodel.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
+import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-
-import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencymodelPackage;
 import org.key_project.stubby.model.dependencymodel.Field;
-import org.key_project.stubby.model.dependencymodel.ITypeVariableContainer;
 import org.key_project.stubby.model.dependencymodel.Method;
 import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.stubby.model.dependencymodel.TypeKind;
+import org.key_project.stubby.model.dependencymodel.TypeUsage;
 import org.key_project.stubby.model.dependencymodel.TypeVariable;
 import org.key_project.stubby.model.dependencymodel.Visibility;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * <!-- begin-user-doc -->
@@ -42,18 +41,20 @@ import org.key_project.stubby.model.dependencymodel.Visibility;
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getVisibility <em>Visibility</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#isFinal <em>Final</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#isStatic <em>Static</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getExtends <em>Extends</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getImplements <em>Implements</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getInnerTypes <em>Inner Types</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#isAbstract <em>Abstract</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getPackage <em>Package</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getName <em>Name</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#isSource <em>Source</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getImplements <em>Implements</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getExtends <em>Extends</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getSimpleName <em>Simple Name</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class TypeImpl extends AbstractTypeImpl implements Type {
+public class TypeImpl extends MinimalEObjectImpl.Container implements Type {
    /**
     * The cached value of the '{@link #getTypeVariables() <em>Type Variables</em>}' containment reference list.
     * <!-- begin-user-doc -->
@@ -165,26 +166,6 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
    protected boolean static_ = STATIC_EDEFAULT;
 
    /**
-    * The cached value of the '{@link #getExtends() <em>Extends</em>}' reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see #getExtends()
-    * @generated
-    * @ordered
-    */
-   protected EList<AbstractType> extends_;
-
-   /**
-    * The cached value of the '{@link #getImplements() <em>Implements</em>}' reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see #getImplements()
-    * @generated
-    * @ordered
-    */
-   protected EList<AbstractType> implements_;
-
-   /**
     * The cached value of the '{@link #getInnerTypes() <em>Inner Types</em>}' containment reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -233,6 +214,66 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
     * @ordered
     */
    protected String package_ = PACKAGE_EDEFAULT;
+
+   /**
+    * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getName()
+    * @generated
+    * @ordered
+    */
+   protected static final String NAME_EDEFAULT = null;
+
+   /**
+    * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getName()
+    * @generated
+    * @ordered
+    */
+   protected String name = NAME_EDEFAULT;
+
+   /**
+    * The default value of the '{@link #isSource() <em>Source</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #isSource()
+    * @generated
+    * @ordered
+    */
+   protected static final boolean SOURCE_EDEFAULT = false;
+
+   /**
+    * The cached value of the '{@link #isSource() <em>Source</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #isSource()
+    * @generated
+    * @ordered
+    */
+   protected boolean source = SOURCE_EDEFAULT;
+
+   /**
+    * The cached value of the '{@link #getImplements() <em>Implements</em>}' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getImplements()
+    * @generated
+    * @ordered
+    */
+   protected EList<TypeUsage> implements_;
+
+   /**
+    * The cached value of the '{@link #getExtends() <em>Extends</em>}' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getExtends()
+    * @generated
+    * @ordered
+    */
+   protected EList<TypeUsage> extends_;
 
    /**
     * The default value of the '{@link #getSimpleName() <em>Simple Name</em>}' attribute.
@@ -398,9 +439,9 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
     * <!-- end-user-doc -->
     * @generated
     */
-   public EList<AbstractType> getExtends() {
+   public EList<TypeUsage> getExtends() {
       if (extends_ == null) {
-         extends_ = new EObjectResolvingEList<AbstractType>(AbstractType.class, this, DependencymodelPackage.TYPE__EXTENDS);
+         extends_ = new EObjectContainmentEList<TypeUsage>(TypeUsage.class, this, DependencymodelPackage.TYPE__EXTENDS);
       }
       return extends_;
    }
@@ -410,9 +451,76 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
     * <!-- end-user-doc -->
     * @generated
     */
-   public EList<AbstractType> getImplements() {
+   public String getSimpleName() {
+      return simpleName;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public void setSimpleName(String newSimpleName) {
+      String oldSimpleName = simpleName;
+      simpleName = newSimpleName;
+      if (eNotificationRequired())
+         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.TYPE__SIMPLE_NAME, oldSimpleName, simpleName));
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated NOT
+    */
+   public boolean containsField(final String name) {
+      Field field = CollectionUtil.search(getFields(), new IFilter<Field>() {
+         @Override
+         public boolean select(Field element) {
+            return ObjectUtil.equals(element.getName(), name);
+         }
+      });
+      return field != null;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated NOT
+    */
+   public boolean containsMethod(final String name, final String[] parameters) {
+      Method method = CollectionUtil.search(getMethods(), new IFilter<Method>() {
+         @Override
+         public boolean select(Method element) {
+            if (ObjectUtil.equals(element.getName(), name) &&
+                element.getParameterTypes().size() == parameters.length) {
+               boolean equals = true;
+               Iterator<TypeUsage> iter = element.getParameterTypes().iterator();
+               int i = 0;
+               while (equals && i < parameters.length) {
+                  TypeUsage next = iter.next();
+                  if (!ObjectUtil.equals(next.getType(), parameters[i])) {
+                     equals = false;
+                  }
+                  i++;
+               }
+               return equals;
+            }
+            else {
+               return false;
+            }
+         }
+      });
+      return method != null;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EList<TypeUsage> getImplements() {
       if (implements_ == null) {
-         implements_ = new EObjectResolvingEList<AbstractType>(AbstractType.class, this, DependencymodelPackage.TYPE__IMPLEMENTS);
+         implements_ = new EObjectContainmentEList<TypeUsage>(TypeUsage.class, this, DependencymodelPackage.TYPE__IMPLEMENTS);
       }
       return implements_;
    }
@@ -476,8 +584,8 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
     * <!-- end-user-doc -->
     * @generated
     */
-   public String getSimpleName() {
-      return simpleName;
+   public String getName() {
+      return name;
    }
 
    /**
@@ -485,11 +593,32 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
     * <!-- end-user-doc -->
     * @generated
     */
-   public void setSimpleName(String newSimpleName) {
-      String oldSimpleName = simpleName;
-      simpleName = newSimpleName;
+   public void setName(String newName) {
+      String oldName = name;
+      name = newName;
       if (eNotificationRequired())
-         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.TYPE__SIMPLE_NAME, oldSimpleName, simpleName));
+         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.TYPE__NAME, oldName, name));
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public boolean isSource() {
+      return source;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public void setSource(boolean newSource) {
+      boolean oldSource = source;
+      source = newSource;
+      if (eNotificationRequired())
+         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.TYPE__SOURCE, oldSource, source));
    }
 
    /**
@@ -508,6 +637,10 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
             return ((InternalEList<?>)getFields()).basicRemove(otherEnd, msgs);
          case DependencymodelPackage.TYPE__INNER_TYPES:
             return ((InternalEList<?>)getInnerTypes()).basicRemove(otherEnd, msgs);
+         case DependencymodelPackage.TYPE__IMPLEMENTS:
+            return ((InternalEList<?>)getImplements()).basicRemove(otherEnd, msgs);
+         case DependencymodelPackage.TYPE__EXTENDS:
+            return ((InternalEList<?>)getExtends()).basicRemove(otherEnd, msgs);
       }
       return super.eInverseRemove(otherEnd, featureID, msgs);
    }
@@ -534,16 +667,20 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
             return isFinal();
          case DependencymodelPackage.TYPE__STATIC:
             return isStatic();
-         case DependencymodelPackage.TYPE__EXTENDS:
-            return getExtends();
-         case DependencymodelPackage.TYPE__IMPLEMENTS:
-            return getImplements();
          case DependencymodelPackage.TYPE__INNER_TYPES:
             return getInnerTypes();
          case DependencymodelPackage.TYPE__ABSTRACT:
             return isAbstract();
          case DependencymodelPackage.TYPE__PACKAGE:
             return getPackage();
+         case DependencymodelPackage.TYPE__NAME:
+            return getName();
+         case DependencymodelPackage.TYPE__SOURCE:
+            return isSource();
+         case DependencymodelPackage.TYPE__IMPLEMENTS:
+            return getImplements();
+         case DependencymodelPackage.TYPE__EXTENDS:
+            return getExtends();
          case DependencymodelPackage.TYPE__SIMPLE_NAME:
             return getSimpleName();
       }
@@ -583,14 +720,6 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
          case DependencymodelPackage.TYPE__STATIC:
             setStatic((Boolean)newValue);
             return;
-         case DependencymodelPackage.TYPE__EXTENDS:
-            getExtends().clear();
-            getExtends().addAll((Collection<? extends AbstractType>)newValue);
-            return;
-         case DependencymodelPackage.TYPE__IMPLEMENTS:
-            getImplements().clear();
-            getImplements().addAll((Collection<? extends AbstractType>)newValue);
-            return;
          case DependencymodelPackage.TYPE__INNER_TYPES:
             getInnerTypes().clear();
             getInnerTypes().addAll((Collection<? extends Type>)newValue);
@@ -600,6 +729,20 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
             return;
          case DependencymodelPackage.TYPE__PACKAGE:
             setPackage((String)newValue);
+            return;
+         case DependencymodelPackage.TYPE__NAME:
+            setName((String)newValue);
+            return;
+         case DependencymodelPackage.TYPE__SOURCE:
+            setSource((Boolean)newValue);
+            return;
+         case DependencymodelPackage.TYPE__IMPLEMENTS:
+            getImplements().clear();
+            getImplements().addAll((Collection<? extends TypeUsage>)newValue);
+            return;
+         case DependencymodelPackage.TYPE__EXTENDS:
+            getExtends().clear();
+            getExtends().addAll((Collection<? extends TypeUsage>)newValue);
             return;
          case DependencymodelPackage.TYPE__SIMPLE_NAME:
             setSimpleName((String)newValue);
@@ -637,12 +780,6 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
          case DependencymodelPackage.TYPE__STATIC:
             setStatic(STATIC_EDEFAULT);
             return;
-         case DependencymodelPackage.TYPE__EXTENDS:
-            getExtends().clear();
-            return;
-         case DependencymodelPackage.TYPE__IMPLEMENTS:
-            getImplements().clear();
-            return;
          case DependencymodelPackage.TYPE__INNER_TYPES:
             getInnerTypes().clear();
             return;
@@ -651,6 +788,18 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
             return;
          case DependencymodelPackage.TYPE__PACKAGE:
             setPackage(PACKAGE_EDEFAULT);
+            return;
+         case DependencymodelPackage.TYPE__NAME:
+            setName(NAME_EDEFAULT);
+            return;
+         case DependencymodelPackage.TYPE__SOURCE:
+            setSource(SOURCE_EDEFAULT);
+            return;
+         case DependencymodelPackage.TYPE__IMPLEMENTS:
+            getImplements().clear();
+            return;
+         case DependencymodelPackage.TYPE__EXTENDS:
+            getExtends().clear();
             return;
          case DependencymodelPackage.TYPE__SIMPLE_NAME:
             setSimpleName(SIMPLE_NAME_EDEFAULT);
@@ -681,16 +830,20 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
             return final_ != FINAL_EDEFAULT;
          case DependencymodelPackage.TYPE__STATIC:
             return static_ != STATIC_EDEFAULT;
-         case DependencymodelPackage.TYPE__EXTENDS:
-            return extends_ != null && !extends_.isEmpty();
-         case DependencymodelPackage.TYPE__IMPLEMENTS:
-            return implements_ != null && !implements_.isEmpty();
          case DependencymodelPackage.TYPE__INNER_TYPES:
             return innerTypes != null && !innerTypes.isEmpty();
          case DependencymodelPackage.TYPE__ABSTRACT:
             return abstract_ != ABSTRACT_EDEFAULT;
          case DependencymodelPackage.TYPE__PACKAGE:
             return PACKAGE_EDEFAULT == null ? package_ != null : !PACKAGE_EDEFAULT.equals(package_);
+         case DependencymodelPackage.TYPE__NAME:
+            return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+         case DependencymodelPackage.TYPE__SOURCE:
+            return source != SOURCE_EDEFAULT;
+         case DependencymodelPackage.TYPE__IMPLEMENTS:
+            return implements_ != null && !implements_.isEmpty();
+         case DependencymodelPackage.TYPE__EXTENDS:
+            return extends_ != null && !extends_.isEmpty();
          case DependencymodelPackage.TYPE__SIMPLE_NAME:
             return SIMPLE_NAME_EDEFAULT == null ? simpleName != null : !SIMPLE_NAME_EDEFAULT.equals(simpleName);
       }
@@ -703,30 +856,14 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
     * @generated
     */
    @Override
-   public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
-      if (baseClass == ITypeVariableContainer.class) {
-         switch (derivedFeatureID) {
-            case DependencymodelPackage.TYPE__TYPE_VARIABLES: return DependencymodelPackage.ITYPE_VARIABLE_CONTAINER__TYPE_VARIABLES;
-            default: return -1;
-         }
+   public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
+      switch (operationID) {
+         case DependencymodelPackage.TYPE___CONTAINS_FIELD__STRING:
+            return containsField((String)arguments.get(0));
+         case DependencymodelPackage.TYPE___CONTAINS_METHOD__STRING_STRING:
+            return containsMethod((String)arguments.get(0), (String[])arguments.get(1));
       }
-      return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   @Override
-   public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
-      if (baseClass == ITypeVariableContainer.class) {
-         switch (baseFeatureID) {
-            case DependencymodelPackage.ITYPE_VARIABLE_CONTAINER__TYPE_VARIABLES: return DependencymodelPackage.TYPE__TYPE_VARIABLES;
-            default: return -1;
-         }
-      }
-      return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);
+      return super.eInvoke(operationID, arguments);
    }
 
    /**
@@ -751,6 +888,10 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
       result.append(abstract_);
       result.append(", package: ");
       result.append(package_);
+      result.append(", name: ");
+      result.append(name);
+      result.append(", source: ");
+      result.append(source);
       result.append(", simpleName: ");
       result.append(simpleName);
       result.append(')');

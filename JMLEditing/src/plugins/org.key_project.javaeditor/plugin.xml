@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="org.key_project.javaeditor.javaConfigurationExtensions" name="Java Configuration Extensions" schema="schema/org.key_project.javaeditor.javaConfigurationExtensions.exsd"/>
+   <extension-point id="org.key_project.javaeditor.javaEditorPreferenceListener" name="Java Editor Preference Listener" schema="schema/org.key_project.javaeditor.javaEditorPreferenceListener.exsd"/>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.key_project.javaeditor.management.JavaEditorStartup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.key_project.javaeditor.util.PreferenceUtilInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.jdt.ui.preferences.JavaBasePreferencePage"
+            class="org.key_project.javaeditor.preference.page.JavaExtensionsPreferencePage"
+            id="org.key_project.javaeditor.preference.page.JavaExtensionsPreferencePage"
+            name="Java Editor Extensions">
+      </page>
+   </extension>
+
+</plugin>

@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.strategy;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.FormulaTag;
@@ -101,6 +104,13 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     }
 
     public void ruleAdded (RuleApp rule, PosInOccurrence pos) {
+        if ( isRuleApplicationForFocussedFormula(rule, pos) ) {            
+            delegate.ruleAdded ( rule, pos );
+        }         
+    }
+
+    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
+            PosInOccurrence pos) {
         // filter the rule applications, only allow applications within the
         // focussed subterm or to other formulas that have been added after creation
         // of the manager (we rely on the fact that the caching rule indexes only
@@ -115,17 +125,29 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
                 		  compute(rule, pos, goal).equals(BinaryFeature.TOP_COST))
                     // rule app within the focussed formula, but not within the
                     // focussed subterm
-                    return;
+                    return false;
             } else {
-                if ( onlyModifyFocussedFormula ) return;
+                if ( onlyModifyFocussedFormula ) return false;
             }
         } else if ( onlyModifyFocussedFormula ) {
-            return;
+            return false;
         }
-            
-        delegate.ruleAdded ( rule, pos );
+        return true;
     }
 
+    
+    public void rulesAdded (ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+        ImmutableList<RuleApp> applicableRules = ImmutableSLList.<RuleApp>nil();
+        for (RuleApp r : rules) {
+            if (isRuleApplicationForFocussedFormula(r, pos)) {
+                applicableRules = applicableRules.prepend(r);
+            }
+        }
+        
+        delegate.rulesAdded ( applicableRules, pos );
+    }
+
+    
     private boolean isSameFormula (PosInOccurrence pio1,
                                    PosInOccurrence pio2) {
         return pio2.isInAntec () == pio1.isInAntec ()

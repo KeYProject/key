@@ -61,11 +61,8 @@ public class DependencymodelFactoryImpl extends EFactoryImpl implements Dependen
          case DependencymodelPackage.METHOD: return createMethod();
          case DependencymodelPackage.FIELD: return createField();
          case DependencymodelPackage.DEPENDENCY_MODEL: return createDependencyModel();
-         case DependencymodelPackage.ARRAY_TYPE: return createArrayType();
-         case DependencymodelPackage.DATATYPE: return createDatatype();
-         case DependencymodelPackage.GENERIC_TYPE: return createGenericType();
          case DependencymodelPackage.TYPE_VARIABLE: return createTypeVariable();
-         case DependencymodelPackage.WILDCARD_TYPE: return createWildcardType();
+         case DependencymodelPackage.TYPE_USAGE: return createTypeUsage();
          default:
             throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
       }
@@ -83,6 +80,8 @@ public class DependencymodelFactoryImpl extends EFactoryImpl implements Dependen
             return createTypeKindFromString(eDataType, initialValue);
          case DependencymodelPackage.VISIBILITY:
             return createVisibilityFromString(eDataType, initialValue);
+         case DependencymodelPackage.STRING_ARRAY:
+            return createStringArrayFromString(eDataType, initialValue);
          default:
             throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
       }
@@ -100,6 +99,8 @@ public class DependencymodelFactoryImpl extends EFactoryImpl implements Dependen
             return convertTypeKindToString(eDataType, instanceValue);
          case DependencymodelPackage.VISIBILITY:
             return convertVisibilityToString(eDataType, instanceValue);
+         case DependencymodelPackage.STRING_ARRAY:
+            return convertStringArrayToString(eDataType, instanceValue);
          default:
             throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
       }
@@ -150,36 +151,6 @@ public class DependencymodelFactoryImpl extends EFactoryImpl implements Dependen
     * <!-- end-user-doc -->
     * @generated
     */
-   public ArrayType createArrayType() {
-      ArrayTypeImpl arrayType = new ArrayTypeImpl();
-      return arrayType;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public Datatype createDatatype() {
-      DatatypeImpl datatype = new DatatypeImpl();
-      return datatype;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public GenericType createGenericType() {
-      GenericTypeImpl genericType = new GenericTypeImpl();
-      return genericType;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
    public TypeVariable createTypeVariable() {
       TypeVariableImpl typeVariable = new TypeVariableImpl();
       return typeVariable;
@@ -190,9 +161,9 @@ public class DependencymodelFactoryImpl extends EFactoryImpl implements Dependen
     * <!-- end-user-doc -->
     * @generated
     */
-   public WildcardType createWildcardType() {
-      WildcardTypeImpl wildcardType = new WildcardTypeImpl();
-      return wildcardType;
+   public TypeUsage createTypeUsage() {
+      TypeUsageImpl typeUsage = new TypeUsageImpl();
+      return typeUsage;
    }
 
    /**
@@ -233,6 +204,24 @@ public class DependencymodelFactoryImpl extends EFactoryImpl implements Dependen
     */
    public String convertVisibilityToString(EDataType eDataType, Object instanceValue) {
       return instanceValue == null ? null : instanceValue.toString();
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public String[] createStringArrayFromString(EDataType eDataType, String initialValue) {
+      return (String[])super.createFromString(initialValue);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public String convertStringArrayToString(EDataType eDataType, Object instanceValue) {
+      return super.convertToString(instanceValue);
    }
 
    /**

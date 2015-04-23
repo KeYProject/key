@@ -39,7 +39,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     * Tests {@link SymbolicExecutionUtil#improveReadability(de.uka.ilkd.key.logic.Term)}
     */
    public void testImproveReadability() throws ProblemLoaderException {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/readability/InnerAndAnonymousTypeTest.java"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/readability/InnerAndAnonymousTypeTest.java"), null, null, null);
       Services services = environment.getServices();
       IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
       Sort intSort = integerLDT.targetSort();

@@ -69,7 +69,6 @@ public class DependencymodelSwitch<T> extends Switch<T> {
          case DependencymodelPackage.TYPE: {
             Type type = (Type)theEObject;
             T result = caseType(type);
-            if (result == null) result = caseAbstractType(type);
             if (result == null) result = caseITypeVariableContainer(type);
             if (result == null) result = defaultCase(theEObject);
             return result;
@@ -93,50 +92,21 @@ public class DependencymodelSwitch<T> extends Switch<T> {
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
-         case DependencymodelPackage.ABSTRACT_TYPE: {
-            AbstractType abstractType = (AbstractType)theEObject;
-            T result = caseAbstractType(abstractType);
-            if (result == null) result = defaultCase(theEObject);
-            return result;
-         }
-         case DependencymodelPackage.ARRAY_TYPE: {
-            ArrayType arrayType = (ArrayType)theEObject;
-            T result = caseArrayType(arrayType);
-            if (result == null) result = caseAbstractType(arrayType);
-            if (result == null) result = defaultCase(theEObject);
-            return result;
-         }
-         case DependencymodelPackage.DATATYPE: {
-            Datatype datatype = (Datatype)theEObject;
-            T result = caseDatatype(datatype);
-            if (result == null) result = caseAbstractType(datatype);
-            if (result == null) result = defaultCase(theEObject);
-            return result;
-         }
-         case DependencymodelPackage.GENERIC_TYPE: {
-            GenericType genericType = (GenericType)theEObject;
-            T result = caseGenericType(genericType);
-            if (result == null) result = caseAbstractType(genericType);
-            if (result == null) result = defaultCase(theEObject);
-            return result;
-         }
          case DependencymodelPackage.TYPE_VARIABLE: {
             TypeVariable typeVariable = (TypeVariable)theEObject;
             T result = caseTypeVariable(typeVariable);
-            if (result == null) result = caseAbstractType(typeVariable);
-            if (result == null) result = defaultCase(theEObject);
-            return result;
-         }
-         case DependencymodelPackage.WILDCARD_TYPE: {
-            WildcardType wildcardType = (WildcardType)theEObject;
-            T result = caseWildcardType(wildcardType);
-            if (result == null) result = caseAbstractType(wildcardType);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
          case DependencymodelPackage.ITYPE_VARIABLE_CONTAINER: {
             ITypeVariableContainer iTypeVariableContainer = (ITypeVariableContainer)theEObject;
             T result = caseITypeVariableContainer(iTypeVariableContainer);
+            if (result == null) result = defaultCase(theEObject);
+            return result;
+         }
+         case DependencymodelPackage.TYPE_USAGE: {
+            TypeUsage typeUsage = (TypeUsage)theEObject;
+            T result = caseTypeUsage(typeUsage);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
@@ -205,66 +175,6 @@ public class DependencymodelSwitch<T> extends Switch<T> {
    }
 
    /**
-    * Returns the result of interpreting the object as an instance of '<em>Abstract Type</em>'.
-    * <!-- begin-user-doc -->
-    * This implementation returns null;
-    * returning a non-null result will terminate the switch.
-    * <!-- end-user-doc -->
-    * @param object the target of the switch.
-    * @return the result of interpreting the object as an instance of '<em>Abstract Type</em>'.
-    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-    * @generated
-    */
-   public T caseAbstractType(AbstractType object) {
-      return null;
-   }
-
-   /**
-    * Returns the result of interpreting the object as an instance of '<em>Array Type</em>'.
-    * <!-- begin-user-doc -->
-    * This implementation returns null;
-    * returning a non-null result will terminate the switch.
-    * <!-- end-user-doc -->
-    * @param object the target of the switch.
-    * @return the result of interpreting the object as an instance of '<em>Array Type</em>'.
-    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-    * @generated
-    */
-   public T caseArrayType(ArrayType object) {
-      return null;
-   }
-
-   /**
-    * Returns the result of interpreting the object as an instance of '<em>Datatype</em>'.
-    * <!-- begin-user-doc -->
-    * This implementation returns null;
-    * returning a non-null result will terminate the switch.
-    * <!-- end-user-doc -->
-    * @param object the target of the switch.
-    * @return the result of interpreting the object as an instance of '<em>Datatype</em>'.
-    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-    * @generated
-    */
-   public T caseDatatype(Datatype object) {
-      return null;
-   }
-
-   /**
-    * Returns the result of interpreting the object as an instance of '<em>Generic Type</em>'.
-    * <!-- begin-user-doc -->
-    * This implementation returns null;
-    * returning a non-null result will terminate the switch.
-    * <!-- end-user-doc -->
-    * @param object the target of the switch.
-    * @return the result of interpreting the object as an instance of '<em>Generic Type</em>'.
-    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-    * @generated
-    */
-   public T caseGenericType(GenericType object) {
-      return null;
-   }
-
-   /**
     * Returns the result of interpreting the object as an instance of '<em>Type Variable</em>'.
     * <!-- begin-user-doc -->
     * This implementation returns null;
@@ -280,21 +190,6 @@ public class DependencymodelSwitch<T> extends Switch<T> {
    }
 
    /**
-    * Returns the result of interpreting the object as an instance of '<em>Wildcard Type</em>'.
-    * <!-- begin-user-doc -->
-    * This implementation returns null;
-    * returning a non-null result will terminate the switch.
-    * <!-- end-user-doc -->
-    * @param object the target of the switch.
-    * @return the result of interpreting the object as an instance of '<em>Wildcard Type</em>'.
-    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-    * @generated
-    */
-   public T caseWildcardType(WildcardType object) {
-      return null;
-   }
-
-   /**
     * Returns the result of interpreting the object as an instance of '<em>IType Variable Container</em>'.
     * <!-- begin-user-doc -->
     * This implementation returns null;
@@ -306,6 +201,21 @@ public class DependencymodelSwitch<T> extends Switch<T> {
     * @generated
     */
    public T caseITypeVariableContainer(ITypeVariableContainer object) {
+      return null;
+   }
+
+   /**
+    * Returns the result of interpreting the object as an instance of '<em>Type Usage</em>'.
+    * <!-- begin-user-doc -->
+    * This implementation returns null;
+    * returning a non-null result will terminate the switch.
+    * <!-- end-user-doc -->
+    * @param object the target of the switch.
+    * @return the result of interpreting the object as an instance of '<em>Type Usage</em>'.
+    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+    * @generated
+    */
+   public T caseTypeUsage(TypeUsage object) {
       return null;
    }
 

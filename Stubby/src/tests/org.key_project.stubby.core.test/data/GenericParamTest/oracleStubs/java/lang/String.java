@@ -3,5 +3,5 @@ package java.lang;
 /**
  * @generated
  */
-public class String {
+public final class String extends java.lang.Object implements java.io.Serializable, java.lang.Comparable<java.lang.String>, java.lang.CharSequence {
 }

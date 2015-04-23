@@ -22,11 +22,15 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
  org.key_project.stubby.model;bundle-version="0.1.0";resolution:=optional,
  org.key_project.stubby.core;bundle-version="1.0.0";resolution:=optional,
- org.key_project.stubby.ui;bundle-version="1.0.0";resolution:=optional
+ org.key_project.stubby.ui;bundle-version="1.0.0";resolution:=optional,
+ org.eclipse.debug.core;bundle-version="3.9.1",
+ org.eclipse.jdt.debug,
+ org.eclipse.debug.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.key4eclipse.common.ui.composite,
+Export-Package: org.key_project.key4eclipse.common.ui.breakpoints,
+ org.key_project.key4eclipse.common.ui.composite,
  org.key_project.key4eclipse.common.ui.counterExample,
  org.key_project.key4eclipse.common.ui.decorator,
  org.key_project.key4eclipse.common.ui.dialog,

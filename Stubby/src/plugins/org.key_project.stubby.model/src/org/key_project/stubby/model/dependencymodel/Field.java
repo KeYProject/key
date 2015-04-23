@@ -160,29 +160,29 @@ public interface Field extends EObject {
    void setConstantValue(String value);
 
    /**
-    * Returns the value of the '<em><b>Type</b></em>' reference.
+    * Returns the value of the '<em><b>Type</b></em>' containment reference.
     * <!-- begin-user-doc -->
     * <p>
-    * If the meaning of the '<em>Type</em>' reference isn't clear,
+    * If the meaning of the '<em>Type</em>' containment reference isn't clear,
     * there really should be more of a description here...
     * </p>
     * <!-- end-user-doc -->
-    * @return the value of the '<em>Type</em>' reference.
-    * @see #setType(AbstractType)
+    * @return the value of the '<em>Type</em>' containment reference.
+    * @see #setType(TypeUsage)
     * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getField_Type()
-    * @model
+    * @model containment="true"
     * @generated
     */
-   AbstractType getType();
+   TypeUsage getType();
 
    /**
-    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Field#getType <em>Type</em>}' reference.
+    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Field#getType <em>Type</em>}' containment reference.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @param value the new value of the '<em>Type</em>' reference.
+    * @param value the new value of the '<em>Type</em>' containment reference.
     * @see #getType()
     * @generated
     */
-   void setType(AbstractType value);
+   void setType(TypeUsage value);
 
 } // Field

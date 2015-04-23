@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Iterator" simpleName="Iterator">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types kind="INTERFACE" package="org.key_project.util.collection" name="org.key_project.util.collection.ImmutableMap" source="true" simpleName="ImmutableMap">
+    <typeVariables name="S">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <methods name="put" abstract="true">
+      <returnType type="org.key_project.util.collection.ImmutableMap&lt;S,T>" genericFreeType="org.key_project.util.collection.ImmutableMap"/>
+      <parameterTypes type="S" genericFreeType="java.lang.Object"/>
+      <parameterTypes type="T" genericFreeType="java.lang.Object"/>
+    </methods>
+    <methods name="get" abstract="true">
+      <returnType type="T" genericFreeType="java.lang.Object"/>
+      <parameterTypes type="S" genericFreeType="java.lang.Object"/>
+    </methods>
+    <methods name="size" abstract="true">
+      <returnType type="int" genericFreeType="int"/>
+    </methods>
+    <methods name="isEmpty" abstract="true">
+      <returnType type="boolean" genericFreeType="boolean"/>
+    </methods>
+    <methods name="containsKey" abstract="true">
+      <returnType type="boolean" genericFreeType="boolean"/>
+      <parameterTypes type="S" genericFreeType="java.lang.Object"/>
+    </methods>
+    <methods name="containsValue" abstract="true">
+      <returnType type="boolean" genericFreeType="boolean"/>
+      <parameterTypes type="T" genericFreeType="java.lang.Object"/>
+    </methods>
+    <methods name="remove" abstract="true">
+      <returnType type="org.key_project.util.collection.ImmutableMap&lt;S,T>" genericFreeType="org.key_project.util.collection.ImmutableMap"/>
+      <parameterTypes type="S" genericFreeType="java.lang.Object"/>
+    </methods>
+    <methods name="removeAll" abstract="true">
+      <returnType type="org.key_project.util.collection.ImmutableMap&lt;S,T>" genericFreeType="org.key_project.util.collection.ImmutableMap"/>
+      <parameterTypes type="T" genericFreeType="java.lang.Object"/>
+    </methods>
+    <methods name="keyIterator" abstract="true">
+      <returnType type="java.util.Iterator&lt;S>" genericFreeType="java.util.Iterator"/>
+    </methods>
+    <methods name="valueIterator" abstract="true">
+      <returnType type="java.util.Iterator&lt;T>" genericFreeType="java.util.Iterator"/>
+    </methods>
+    <methods name="entryIterator" abstract="true">
+      <returnType type="java.util.Iterator&lt;org.key_project.util.collection.ImmutableMapEntry&lt;S,T>>" genericFreeType="java.util.Iterator"/>
+    </methods>
+    <extends type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+  </types>
+  <types kind="INTERFACE" package="org.key_project.util.collection" name="org.key_project.util.collection.ImmutableMapEntry" source="true" simpleName="ImmutableMapEntry">
+    <typeVariables name="S">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <methods name="key" abstract="true">
+      <returnType type="S" genericFreeType="java.lang.Object"/>
+    </methods>
+    <methods name="value" abstract="true">
+      <returnType type="T" genericFreeType="java.lang.Object"/>
+    </methods>
+    <extends type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+  </types>
+</dependencymodel:DependencyModel>

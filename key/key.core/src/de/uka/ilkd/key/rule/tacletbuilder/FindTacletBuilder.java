@@ -15,11 +15,12 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.BoundUniquenessChecker;
+import de.uka.ilkd.key.rule.FindTaclet;
 /** Superclass of TacletBuilder objects that have a non-empty find clause.
  * This should be all of them except NoFindTacletBuilder.
  */
 
-public abstract class FindTacletBuilder extends TacletBuilder {
+public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuilder<T> {
 
     protected Term find=null;
 

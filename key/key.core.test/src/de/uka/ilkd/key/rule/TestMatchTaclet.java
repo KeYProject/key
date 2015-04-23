@@ -21,11 +21,9 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -34,7 +32,6 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -47,10 +44,10 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -137,207 +134,6 @@ public class TestMatchTaclet extends TestCase {
         services = null;
     }
     
-    public void testStatementListMatch() {
-	Term match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break; "
-					      +"int k=1; {int j = 1; j++;} int c = 56;}}} }\\> true");
-
-	FindTaclet break_while =  (FindTaclet)TacletForTests
-	    .getTaclet("TestMatchTaclet_break_while").taclet();   
-	
-	MatchConditions svi = break_while.matchJavaBlock
-	    (match, break_while.find(), 
-	     MatchConditions.EMPTY_MATCHCONDITIONS, 
-	     services);
-	
-	assertNotNull("Matches have been expected.", svi);
-
-	SchemaVariable sv = TacletForTests.svLookup("#stmnt_list");
-	assertTrue("Expected list of statement to be instantiated.",
-		   svi.getInstantiations().isInstantiated(sv));
-	assertTrue("The three statements behind the break should be matched.",
-		   ((ImmutableArray<?>)svi.getInstantiations().getInstantiation(sv)).size() == 3);
-    }
-
-    public void testProgramMatch0() {
-	Term match = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {break;} "
-					      +"int k=1;}} }\\> true");
-	FindTaclet taclet=(FindTaclet)TacletForTests
-	    .getTaclet("TestMatchTaclet_whileright").taclet();   
-	MatchConditions svi = taclet.matchJavaBlock
-	    (match, taclet.find(),
-	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-
-	assertNotNull("There should be instantiations",svi);
-	assertTrue("#e2 should be instantiated",
-		   svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#e2")));
-	assertTrue("#p1 should be instantiated",
-		   svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#p1")));
-	
-	Term matchTwo = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {boolean b=true; break;} "
-						 +"}int k=1;} }\\> true");
-	FindTaclet tacletTwo=(FindTaclet)TacletForTests
-	    .getTaclet("TestMatchTaclet_whileright_labeled").taclet(); 
-	
-	svi = tacletTwo.matchJavaBlock
-	       (matchTwo, tacletTwo.find(),
-		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-	assertNotNull(svi);
-
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#e2")));
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#p1")));
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#lab")));
-
-	Term match3 = TacletForTests.parseTerm("\\<{ l1:{l2:{while (true) {boolean b=false; break;} "
-					       +"int k=1;}} }\\> true");
-	FindTaclet taclet3=(FindTaclet)TacletForTests
-	    .getTaclet("TestMatchTaclet_whileright_labeled").taclet(); 
-	
-	svi = taclet3.matchJavaBlock
-	       (match3, taclet3.find(),
-		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-	assertNull(svi);
-
-	Term emptyBlock = 
-	    TacletForTests.parseTerm("\\<{ { {} int i = 0; } }\\> true");
-	FindTaclet empty_block_taclet=(FindTaclet)TacletForTests
-	    .getTaclet("TestMatchTaclet_empty_block").taclet(); 
-	
- 	svi = empty_block_taclet.matchJavaBlock
-	       (emptyBlock, empty_block_taclet.find(),
-		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
- 	assertTrue(svi != null);
-
-	Term emptyBlock2 = 
-	    TacletForTests.parseTerm("\\<{ { {} } }\\> true");
-
- 	svi = empty_block_taclet.matchJavaBlock
-	       (emptyBlock2, empty_block_taclet.find(),
-		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-
-	assertNotNull(svi);
-
-	Debug.out("%%%%%%%%%%%%");
-	Term emptyBlock3 = 
-	    TacletForTests.parseTerm("\\<{ { {} l1:{} } }\\> true");
- 	svi = empty_block_taclet.matchJavaBlock
-	       (emptyBlock3, empty_block_taclet.find(),
-		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-	assertNotNull(svi);
-
-
-	FindTaclet var_decl_taclet=(FindTaclet)TacletForTests
-	    .getTaclet("TestMatchTaclet_variable_declaration").taclet(); 
-
-	svi = var_decl_taclet.matchJavaBlock
-	    (emptyBlock, var_decl_taclet.find(),
-	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-	assertNull(svi);	
-
-	Term emptyLabel = 
-	    TacletForTests.parseTerm("\\<{ { l1:{} } }\\> true");
-	FindTaclet empty_label_taclet=(FindTaclet)TacletForTests
-	    .getTaclet("TestMatchTaclet_empty_label").taclet(); 
-	svi = empty_label_taclet.matchJavaBlock
-	    (emptyLabel, 
-	     empty_label_taclet.find(),
-	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-	assertNotNull(svi);
-
-	Term emptyLabel2 = 
-	    TacletForTests.parseTerm("\\<{ l2:{ l1:{} } }\\> true");
-	svi = empty_label_taclet.matchJavaBlock
-	       (emptyLabel2, 
-		empty_label_taclet.find(),
-		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-	assertNotNull(svi);
-
-	Term emptyLabel3 = 
-	    TacletForTests.parseTerm("\\<{ {l3:{{l2:{l1:{}}}} int i = 0;} }\\> true");
-	svi = empty_label_taclet.matchJavaBlock
-	       (emptyLabel3, 
-		empty_label_taclet.find(),
-		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-	assertNotNull(svi);
-    }
-
-        
-    public void testProgramMatch1() {
-	Services services = TacletForTests.services();
-	de.uka.ilkd.key.java.Recoder2KeY c2k
-	    = new de.uka.ilkd.key.java.Recoder2KeY(services,
-						  new NamespaceSet());
-	JavaBlock jb=c2k.readBlock("{ int i; int j; i=++j;"
-				   +" while(true) {break;}}", 
-				   c2k.createEmptyContext());
-
-	de.uka.ilkd.key.java.StatementBlock sb
-	    =(de.uka.ilkd.key.java.StatementBlock)jb.program();
-
-	JavaBlock javaBlock = JavaBlock.createJavaBlock
-	    (new de.uka.ilkd.key.java.StatementBlock
-		(new ImmutableArray<Statement>
-		    (new de.uka.ilkd.key.java.Statement[]{
-			(de.uka.ilkd.key.java.Statement)sb.getChildAt(2),
-			(de.uka.ilkd.key.java.Statement)sb.getChildAt(3)
-		    })));
-
-
-	Term match = TB.dia(javaBlock, TB.tt());
-	
-	FindTaclet taclet=(FindTaclet)TacletForTests
-	    .getTaclet("TestMatchTaclet_preincrement").taclet();   
-
-	MatchConditions svi =
-	    taclet.matchJavaBlock
-	    (match, taclet.find(), 
-	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-
-
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#slhs1")));
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#slhs2")));
-    }
-    
-    public void testProgramMatch2() {
-	Term match = TacletForTests.parseTerm("\\<{int i; int k;}\\>(\\<{for (int i=0;"
-					      +" i<2; i++) {break;} "
-					      +"int k=1; }\\> true)");
-	FindTaclet taclet
-	    =(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_for_right").taclet();   
-	MatchConditions svi = taclet.matchJavaBlock
-	    (match.sub(0), taclet.find(), 
-	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
-
-
-	assertNotNull(svi);
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#loopInit")));
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#guard")));
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#forupdates")));
-	assertTrue(svi.getInstantiations().isInstantiated(TacletForTests
-				      .svLookup("#p1")));
-    }
-    /*
-      public void testProgramMatch3() {
-      Term match = TacletForTests.parseTerm("<{ {int i=0; break; }  }> true");
-      FindTaclet taclet
-      =(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_local_variable_rename").taclet();   
-      SVInstantiations svi=(taclet.matchJavaProgram
-      (match.javaBlock(), 
-      (ContextStatementBlock)taclet.find().javaBlock().program(), 
-      taclet.createInitialInstantiation())); 
-
-      System.out.println(svi);
-      }
-    */
         
     public void testProgramMatch4() {
 	Term match = TacletForTests.parseTerm
@@ -346,9 +142,8 @@ public class TestMatchTaclet extends TestCase {
 	FindTaclet taclet
 	    =(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_while0").taclet();   
 
-	MatchConditions mc=(taclet.match
-			    (match, 
-			     taclet.find(), 
+	MatchConditions mc=(taclet.getMatcher().matchFind
+			    (match,  
 			     MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
 	assertNotNull(mc);
     }
@@ -393,8 +188,7 @@ public class TestMatchTaclet extends TestCase {
 
 	PosTacletApp app = PosTacletApp.createPosTacletApp
 	(find_addrule_conflict,
-	        find_addrule_conflict.match(match.sub(0), 
-	                find_addrule_conflict.find(), 
+	        find_addrule_conflict.getMatcher().matchFind(match.sub(0), 
 	                MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new SequentFormula(match),
                             PosInTerm.getTopLevel().down(0), true), services);
@@ -408,8 +202,7 @@ public class TestMatchTaclet extends TestCase {
 	// var is not free, match should be found 
 	app = PosTacletApp.createPosTacletApp
 	(find_addrule_conflict,
-            find_addrule_conflict.match(match, 
-                    find_addrule_conflict.find(), 
+            find_addrule_conflict.getMatcher().matchFind(match, 
                     MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new SequentFormula(match),
                             PosInTerm.getTopLevel(), true), services);
@@ -429,7 +222,7 @@ public class TestMatchTaclet extends TestCase {
 	Term match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
 	TacletApp app = PosTacletApp.createPosTacletApp
 	(if_find_clash,
-            if_find_clash.match(match.sub(0), if_find_clash.find(),  
+            if_find_clash.getMatcher().matchFind(match.sub(0),  
                MatchConditions.EMPTY_MATCHCONDITIONS, 
                services).getInstantiations(),
                new PosInOccurrence(new SequentFormula(match.sub(0)),
@@ -441,7 +234,7 @@ public class TestMatchTaclet extends TestCase {
 
 
 	assertTrue("Match not found", 
-		   if_find_clash.match(match, if_find_clash.find(), 
+		   if_find_clash.getMatcher().matchFind(match,  
 				       MatchConditions.EMPTY_MATCHCONDITIONS, services) != null);	           
     }
 
@@ -452,7 +245,7 @@ public class TestMatchTaclet extends TestCase {
 
 	assertTrue("Match not found but should exist"+
 		   " because add and if are same area",
-                   if_add_no_clash.match(match.sub(0), if_add_no_clash.find(),
+                   if_add_no_clash.getMatcher().matchFind(match.sub(0),
 					 MatchConditions.EMPTY_MATCHCONDITIONS, services) != null); 
     }
     
@@ -466,16 +259,16 @@ public class TestMatchTaclet extends TestCase {
 	assertTrue("Match should not be found because of conflict with "+
 		   "..not free in..", NoPosTacletApp.createNoPosTacletApp
 		   (not_free_conflict,
-		    not_free_conflict.match
-		    (free_in, not_free_conflict.find(),
+		    not_free_conflict.getMatcher().matchFind
+		    (free_in, 
 		     MatchConditions.EMPTY_MATCHCONDITIONS, services), services) == null);
 
 	Term not_free_in = TacletForTests.parseTerm("\\forall testSort z; (p(z) & p(c))");
  	assertTrue("Match should be found because .. not free in.. "+
 		   "is not relevant", NoPosTacletApp.createNoPosTacletApp
 		   (not_free_conflict,
-		    not_free_conflict.match
-		    (not_free_in, not_free_conflict.find(),
+		    not_free_conflict.getMatcher().matchFind
+		    (not_free_in,
 		     MatchConditions.EMPTY_MATCHCONDITIONS, services), services) != null);
     }
 
@@ -488,7 +281,7 @@ public class TestMatchTaclet extends TestCase {
 	     (0, new SequentFormula(closeable_one)).semisequent(), 
 	     Semisequent.EMPTY_SEMISEQUENT.insert
 	     (0, new SequentFormula(closeable_two)).semisequent()); 	
-	TacletIndex index = new TacletIndex();
+	TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
 	index.add(close_rule.taclet());
         PosInOccurrence pio = new PosInOccurrence(new SequentFormula(closeable_two),
                 PosInTerm.getTopLevel(), false);
@@ -505,8 +298,8 @@ public class TestMatchTaclet extends TestCase {
 	Term match = TacletForTests.parseTerm("p1(m1(n))");
 	for (int i=0; i<conflict.length; i++) {
 	    assertTrue("Match should not be found because of area conflict:"+i,
-		       conflict[i].match
-		       (match, ((FindTaclet)conflict[i]).find(), 
+		       conflict[i].getMatcher().matchFind
+		       (match,
 			MatchConditions.EMPTY_MATCHCONDITIONS, services)==null);	    
 	}
     }
@@ -522,12 +315,12 @@ public class TestMatchTaclet extends TestCase {
 	assertTrue("Instantiations should be found as updates can be ignored if "+
 		   "only the term that is matched has an update and the "+
 		   "template it is matched to has none.",
-		   all_left.matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
+		   all_left.getMatcher().matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
 		
 	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
 	match2 = match2.sub(0);
 	assertTrue("Instantiations should be found.",
-		   assign_n.matchFind(match2, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
+		   assign_n.getMatcher().matchFind(match2, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
     }
 
 
@@ -535,9 +328,8 @@ public class TestMatchTaclet extends TestCase {
 	Term match = TacletForTests.parseTerm("\\<{ }\\>true ");
 	FindTaclet taclet
 	    =(FindTaclet)TacletForTests.getTaclet("empty_diamond").taclet();   
-	MatchConditions mc=(taclet.match
+	MatchConditions mc=(taclet.getMatcher().matchFind
 			    (match, 
-			     taclet.find(), 
 			     MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
 
 	assertNotNull(mc);
@@ -545,15 +337,14 @@ public class TestMatchTaclet extends TestCase {
 	match = TacletForTests.parseTerm("\\<{ {} }\\>true ");
 	taclet=(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_empty_block").taclet();   
 
-	mc=(taclet.match(match, 
-			 taclet.find(), 
+	mc=(taclet.getMatcher().matchFind(match, 
 			 MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
 
 	assertNotNull(mc);
 
 	match = TacletForTests.parseTerm("\\<{ {int i = 0;} }\\>true ");
-	mc=(taclet.match(match, 
-			 taclet.find(), MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
+	mc=(taclet.getMatcher().matchFind(match, 
+			  MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
 
 	assertNull("The block is not empty",mc);
 
@@ -572,8 +363,7 @@ public class TestMatchTaclet extends TestCase {
 	Term match=TB.tf().createTerm(v4);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_termSV").taclet();   
-	MatchConditions mc=taclet.match(match, 
-					taclet.find(), 
+	MatchConditions mc=taclet.getMatcher().matchFind(match, 
 					MatchConditions.EMPTY_MATCHCONDITIONS, services);
 	assertNotNull(mc);
     }
@@ -593,9 +383,8 @@ public class TestMatchTaclet extends TestCase {
 					   sub);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_variableSV").taclet();   
-	MatchConditions mc=taclet.match(match, 
-					taclet.find(), 
-					MatchConditions.EMPTY_MATCHCONDITIONS, services);
+	MatchConditions mc=taclet.getMatcher().matchFind(match, 
+	        MatchConditions.EMPTY_MATCHCONDITIONS, services);
 	assertNull(mc);
     }
 
@@ -603,8 +392,7 @@ public class TestMatchTaclet extends TestCase {
 	Term match = TacletForTests.parseTerm("\\<{{ int i = 0;}}\\>true ");
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_nocontext").taclet();   
-	MatchConditions mc=(taclet.match(match, 
-					 taclet.find(), 
+	MatchConditions mc=(taclet.getMatcher().matchFind(match, 
 					 MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
 	assertNotNull("No context matching corrupt.", mc);
     }
@@ -625,8 +413,7 @@ public class TestMatchTaclet extends TestCase {
 	     match.sub(0));
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_methodframe").taclet();
-	MatchConditions mc = (taclet.match(match, 
-					   taclet.find(), 
+	MatchConditions mc = (taclet.getMatcher().matchFind(match, 
 					   MatchConditions.EMPTY_MATCHCONDITIONS,
 					   services));
 	assertNotNull("Method-Frame should match", mc);
@@ -639,8 +426,7 @@ public class TestMatchTaclet extends TestCase {
 	match = TB.dia(JavaBlock.createJavaBlock(new StatementBlock(mframe)), match.sub(0));
 	taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_methodframe_value").taclet();	
-	mc=(taclet.match(match, 
-			 taclet.find(), 
+	mc=(taclet.getMatcher().matchFind(match, 
 			 MatchConditions.EMPTY_MATCHCONDITIONS,
 			 services));
 	assertNotNull("Method-Frame with return value should match",mc);
@@ -652,8 +438,7 @@ public class TestMatchTaclet extends TestCase {
 	Term match = TacletForTests.parseTerm("\\<{ int i = 0; }\\>true ");
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_eliminate_variable_declaration").taclet();   
-	MatchConditions mc=(taclet.match(match, 
-					 taclet.find(), 
+	MatchConditions mc=(taclet.getMatcher().matchFind(match, 
 					 MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
 
  	assertNull("The reason for this bug was related to the introduction of "+
@@ -666,8 +451,7 @@ public class TestMatchTaclet extends TestCase {
 
  	match = TacletForTests.parseTerm("\\<{ {{throw null;} int i = 0;} }\\>true ");
  	taclet=(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_throw_in_block").taclet();   
- 	mc=(taclet.match(match, 
-			 taclet.find(), 
+ 	mc=(taclet.getMatcher().matchFind(match, 
 			 MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
  	assertNull("No match expected.", mc);
 
@@ -675,37 +459,32 @@ public class TestMatchTaclet extends TestCase {
  	    ("\\<{{ int l1=1;} if (true);}\\>true");
  	taclet=(FindTaclet)TacletForTests.getTaclet
  	    ("TestMatchTaclet_elim_double_block").taclet();   
- 	mc=(taclet.match(match, 
- 			 taclet.find(), 
+ 	mc=(taclet.getMatcher().matchFind(match, 
  			 MatchConditions.EMPTY_MATCHCONDITIONS, services));
  	assertNull("Removed bug #118. No match expected.", mc);
 
  	match = TacletForTests.parseTerm("\\<{ {} {int i;} }\\> true");
  	taclet=(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_wrap_blocks").taclet();   
- 	mc=(taclet.match(match, 
- 			 taclet.find(), 
+ 	mc=(taclet.getMatcher().matchFind(match, 
  			 MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
  	assertNotNull("Bug originally failed to match the first empty block.", mc);
 
  	match = TacletForTests.parseTerm("\\<{ {} {int i;} }\\> true");
  	taclet=(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_wrap_blocks_two_empty_lists").taclet();   
- 	mc=(taclet.match(match, 
- 			 taclet.find(), 
+ 	mc=(taclet.getMatcher().matchFind(match, 
  			 MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
  	assertNotNull("Bug originally failed to match the first empty block,"+
  		      " because of he was not able to match two succeeding empty lists.", mc);
 
 	match = TacletForTests.parseTerm("\\<{ {{}} {} }\\> true");
 	taclet=(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_remove_empty_blocks").taclet();   
-	mc=(taclet.match(match, 
-			 taclet.find(), 
+	mc=(taclet.getMatcher().matchFind(match, 
 			 MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
 	assertNotNull("Bug matching empty blocks using list svs.", mc);
 
 	match = TacletForTests.parseTerm("\\<{ { int i; } {} }\\> true");
 	taclet=(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_bug_matching_lists").taclet();   
-	mc=(taclet.match(match, 
-			 taclet.find(), 
+	mc=(taclet.getMatcher().matchFind(match, 
 			 MatchConditions.EMPTY_MATCHCONDITIONS, services)); 
 	assertNotNull("List matching bug.", mc);
 	
@@ -718,23 +497,23 @@ public class TestMatchTaclet extends TestCase {
                 (FindTaclet) TacletForTests.getTaclet("testInsequentState_2").taclet();
 
         Term match = TacletForTests.parseTerm("{ i := 0 } (i = 0)");
-	MatchConditions mc=(restrictedTaclet.matchFind(match,
+	MatchConditions mc=(restrictedTaclet.getMatcher().matchFind(match,
                                                        MatchConditions.EMPTY_MATCHCONDITIONS,
                                                        services));
 	assertNull("Test inSequentState failed: matched on term with update prefix", mc);
 
-        mc=(unrestrictedTaclet.matchFind(match,
+        mc=(unrestrictedTaclet.getMatcher().matchFind(match,
                                          MatchConditions.EMPTY_MATCHCONDITIONS,
                                          services));
         assertNotNull("Test inSequentState failed: did not match on term with update prefix", mc);
 
         match = TacletForTests.parseTerm("i = 0");
-	mc=(restrictedTaclet.matchFind(match,
+	mc=(restrictedTaclet.getMatcher().matchFind(match,
                                        MatchConditions.EMPTY_MATCHCONDITIONS,
                                        services));
 	assertNotNull("Test inSequentState failed: did not match on term with without update prefix", mc);
 
-        mc=(unrestrictedTaclet.matchFind(match,
+        mc=(unrestrictedTaclet.getMatcher().matchFind(match,
                                          MatchConditions.EMPTY_MATCHCONDITIONS,
                                          services));
         assertNotNull("Test inSequentState failed: did not match on term with without update prefix", mc);

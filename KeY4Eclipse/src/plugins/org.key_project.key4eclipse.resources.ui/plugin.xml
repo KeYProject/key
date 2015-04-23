@@ -274,7 +274,7 @@
             default="true"
             extensions="proofmeta"
             icon="icons/proofmetafile16.png"
-            id="org.key_project.key4eclipse.common.ui.keyTextEditor"
+            id="org.key_project.key4eclipse.resources.ui.proofMetaTextEditor"
             name="Proof Meta Text Editor">
       </editor>
    </extension>

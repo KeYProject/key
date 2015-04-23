@@ -16,9 +16,9 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
-import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
 import org.key_project.stubby.model.dependencymodel.DependencymodelPackage;
+import org.key_project.stubby.model.dependencymodel.Type;
 
 /**
  * <!-- begin-user-doc -->
@@ -42,7 +42,7 @@ public class DependencyModelImpl extends MinimalEObjectImpl.Container implements
     * @generated
     * @ordered
     */
-   protected EList<AbstractType> types;
+   protected EList<Type> types;
 
    /**
     * <!-- begin-user-doc -->
@@ -68,9 +68,9 @@ public class DependencyModelImpl extends MinimalEObjectImpl.Container implements
     * <!-- end-user-doc -->
     * @generated
     */
-   public EList<AbstractType> getTypes() {
+   public EList<Type> getTypes() {
       if (types == null) {
-         types = new EObjectContainmentEList<AbstractType>(AbstractType.class, this, DependencymodelPackage.DEPENDENCY_MODEL__TYPES);
+         types = new EObjectContainmentEList<Type>(Type.class, this, DependencymodelPackage.DEPENDENCY_MODEL__TYPES);
       }
       return types;
    }
@@ -114,7 +114,7 @@ public class DependencyModelImpl extends MinimalEObjectImpl.Container implements
       switch (featureID) {
          case DependencymodelPackage.DEPENDENCY_MODEL__TYPES:
             getTypes().clear();
-            getTypes().addAll((Collection<? extends AbstractType>)newValue);
+            getTypes().addAll((Collection<? extends Type>)newValue);
             return;
       }
       super.eSet(featureID, newValue);

@@ -179,7 +179,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
     }    
     
-    
     protected Feature setupGlobalF(Feature dispatcher) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
@@ -212,8 +211,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         } else {
                 queryF = null;
                 assert false;
-        }
-        
+        }    
 
         final Feature depSpecF;
         final String depProp
@@ -513,7 +511,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
 
         if (classAxiomApplicationEnabled()) {
-            bindRuleSet ( d, "classAxiom", add ( longConst(-250) ) );
+            bindRuleSet ( d, "classAxiom", longConst(-250) );
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
         }
@@ -852,8 +850,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		ifZero ( MatchedIfFeature.INSTANCE,
                 DiffFindAndIfFeature.INSTANCE ) );
 
-	bindRuleSet ( d, "stringsExpandDefNormalOp", 
-        	SumFeature.createSum ( new Feature[] { longConst(500) } ));
+	bindRuleSet ( d, "stringsExpandDefNormalOp", longConst(500) );
 	
 	bindRuleSet ( d, "stringsContainsDefInline", 
         	SumFeature.createSum ( new Feature[] {
@@ -1446,7 +1443,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inEqSimp_propagation", -2400 );
         bindRuleSet ( d, "inEqSimp_pullOutGcd", -2150);
         bindRuleSet ( d, "inEqSimp_saturate", -1900 );
-        bindRuleSet ( d, "inEqSimp_forNormalisation", -1000);
+        bindRuleSet ( d, "inEqSimp_forNormalisation", -1100);
         bindRuleSet ( d, "inEqSimp_special_nonLin", -1400);
         
         if ( arithNonLinInferences () )
@@ -2442,8 +2439,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             setupMultiplyInequations ( d, inftyConst () );
 
         // these taclets are not supposed to be applied with metavariable
-        // instantiations
-        bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
+        // instantiations 
+        // I'll keep it here for the moment as documentation, but comment it out
+        // as meta variables are no longer part of KeY 2.x
+        /* bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
         bindRuleSet ( d, "polySimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
 
         bindRuleSet ( d, "inEqSimp_nonNegSquares", isInstantiated ( "squareFac" ) );
@@ -2452,6 +2451,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inEqSimp_nonLin_neg", isInstantiated ( "divY" ) );
 
         bindRuleSet ( d, "inEqSimp_signCases", isInstantiated ( "signCasesLeft" ) );
+        */
 
         setupNewSymApproval ( d, numbers );
 
@@ -2515,8 +2515,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                        the outer 'not' then ensures that the costs are infinite
                        in the first and 0 in the latter case */
                     not ( sum(tb, HeapGenerator.INSTANCE, 
-                            not ( eq(instOf("sv_heap"), tb) ) ) ),
-                    longConst(0));            
+                            not ( eq(instOf("sv_heap"), tb) ) ) ) );            
             
             if (classAxiomDelayedApplication()) {
                 bindRuleSet (d, "classAxiom", add(sequentContainsNoPrograms(), 
@@ -2618,11 +2617,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public final RuleAppCost computeCost (RuleApp app,
                                           PosInOccurrence pio,
                                           Goal goal) {
-//	if(app.rule()==UseDependencyContractRule.INSTANCE/* && (goal.node().serialNr() == 433 || goal.node().serialNr() == 421)*/) {
-//	    RuleAppCost result = costComputationF.compute ( app, pio, goal );
-//	    System.out.println("Cost for node " + goal.node().serialNr() + ": " + result);
-//	    return result;
-//	}
         return costComputationF.compute ( app, pio, goal );
     }
 

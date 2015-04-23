@@ -17,10 +17,17 @@
 	  <path refid="key.ui.class.path"/>
 	</path>
 
-	  
+	<condition property="taclet.match" value="${taclet.match}" else="legacy">
+                <isset property="taclet.match"/>
+        </condition>
+
+	<condition property="tacletindex.threading.enabled" value="${tacletindex.threading.enabled}" else="false">
+		<isset property="tacletindex.threading.enabled"/>
+	</condition>
+
 	<target name="start" depends="compile" description="Starts KeY.">
 		<java classname="de.uka.ilkd.key.core.Main"
-		      classpathref="key.ui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
+		      classpathref="key.ui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea -Dtaclet.match=${taclet.match} -Dtacletindex.threading.enabled=${tacletindex.threading.enabled} " />
 	</target>
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">

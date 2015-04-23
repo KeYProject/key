@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -21,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -34,7 +34,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 public class KeYProjectHomepageAction extends MainWindowAction {
 
     private static final long serialVersionUID = 8657661861116034536L;
-    private final static Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
     private final static String url = "http://www.key-project.org/";
 
     public KeYProjectHomepageAction(MainWindow mainWindow) {
@@ -46,7 +45,7 @@ public class KeYProjectHomepageAction extends MainWindowAction {
     }
     
     private static boolean desktopEnabled() {
-        return desktop != null && desktop.isSupported(Desktop.Action.BROWSE);
+        return Main.getKeyDesktop().supportsBrowse();
     }
     
     @SuppressWarnings("finally")
@@ -66,7 +65,7 @@ public class KeYProjectHomepageAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            desktop.browse(getURI());
+            Main.getKeyDesktop().browse(getURI());
         } catch (IOException e1) {
             // todo Auto-generated catch block
         }

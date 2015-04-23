@@ -116,7 +116,8 @@ public class TestGoal extends TestCase {
                                 root,
                                 new RuleAppIndex(
                                                 new TacletAppIndex(
-                                                                new TacletIndex(),
+                                                                TacletIndexKit.getKit()
+                                                                        .createTacletIndex(),
                                                                 proof.getServices()),
                                                 new BuiltInRuleAppIndex(
                                                                 new BuiltInRuleIndex()),

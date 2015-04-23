@@ -3,16 +3,14 @@ package java.util;
 /**
  * @generated
  */
-public interface Map {
-
-   /*@ normal_behavior
+public interface Map<K extends java.lang.Object, V extends java.lang.Object> {
+   /**
+    * @generated
+    */
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
      @*/
-   /**
-    * @generated
-    */
-   public abstract int size(
-   );
+   public abstract int size();
 }

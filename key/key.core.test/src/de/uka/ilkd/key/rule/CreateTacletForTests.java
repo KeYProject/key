@@ -158,7 +158,7 @@ public class CreateTacletForTests extends TestCase {
 						new Term[]{t_0});
 
 	// help rule r1: find(rn) replacewith(0) replacewith(0)
-	RewriteTacletBuilder rwb1=new RewriteTacletBuilder();	
+	RewriteTacletBuilder<RewriteTaclet> rwb1=new RewriteTacletBuilder<RewriteTaclet>();	
 	rwb1.setName(new Name("r1"));
 	rwb1.setFind(t_rn);
 	rwb1.addTacletGoalTemplate(new
@@ -170,7 +170,7 @@ public class CreateTacletForTests extends TestCase {
 
 	//pred-succ-elim-rule
 	// find(rn -1 +1) replacewith(rn) replacewith(0 +1) addrule(r1)
-	RewriteTacletBuilder rwbuilder=new RewriteTacletBuilder();
+	RewriteTacletBuilder<RewriteTaclet> rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(t_rnminus1plus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -186,7 +186,7 @@ public class CreateTacletForTests extends TestCase {
 
 	//plus-zero-elim
 	// find(rn + 0) replacewith(rn)
-	rwbuilder=new RewriteTacletBuilder();
+	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_plus,
 						new Term[]{t_rn, t_0}));
 	rwbuilder.addTacletGoalTemplate(new
@@ -198,7 +198,7 @@ public class CreateTacletForTests extends TestCase {
 
 	//zero-plus-elim
 	// find(0 + rn) replacewith(rn)
-	rwbuilder=new RewriteTacletBuilder();
+	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_plus,
 						new Term[]{t_0, t_rn}));
 	rwbuilder.addTacletGoalTemplate(new
@@ -231,7 +231,7 @@ public class CreateTacletForTests extends TestCase {
 	Term t_rnplusrmplus1=tf.createTerm(func_plus1, 
 					   new Term[]{t_rnplusrm});
 
-	rwbuilder=new RewriteTacletBuilder();
+	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(t_rnplus1plusrm);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -248,7 +248,7 @@ public class CreateTacletForTests extends TestCase {
 					   new Term[]{t_rm});
 	Term t_rnplus_rmplus1=tf.createTerm(func_plus, 
 					   new Term[]{t_rn, t_rmplus1});
-	rwbuilder=new RewriteTacletBuilder();
+	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(t_rnplus_rmplus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -261,7 +261,7 @@ public class CreateTacletForTests extends TestCase {
 	// find(rn +1 = rm +1) replacewith(rn=rm)
 	Term t_rneqrm=tf.createTerm(func_eq,
 					    new Term[]{t_rn, t_rm});
-	rwbuilder=new RewriteTacletBuilder();
+	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_eq,
 						new Term[]{t_rnplus1,
 							   t_rmplus1}));

@@ -39,10 +39,6 @@ public class SemisequentChangeInfo {
     /** */
     private int lastFormulaIndex = -1;
     
-    /** the resulting semisequent */
-    private Semisequent semisequent;   
-    
-
     public SemisequentChangeInfo() {
     }
 
@@ -210,7 +206,6 @@ public class SemisequentChangeInfo {
 
        predecessor.lastFormulaIndex = succ.lastFormulaIndex;
        predecessor.modifiedSemisequent = succ.modifiedSemisequent;
-       predecessor.semisequent = succ.semisequent;
     }
     
     /**
@@ -219,20 +214,19 @@ public class SemisequentChangeInfo {
     public int getIndex() {
 	return lastFormulaIndex;
     }
-
-    /** 
-     * sets the resulting semisequent
-     */
-    public void setSemisequent(Semisequent semisequent) {
-	this.semisequent = semisequent;
-    }
     
     /** 
      * returns the semisequent that is the result of the change
      * operation
      */
-    public Semisequent semisequent() {
-	return semisequent;
+    public Semisequent semisequent() {        
+        final Semisequent semisequent;
+        if (modifiedSemisequent.isEmpty()) {
+            semisequent = Semisequent.EMPTY_SEMISEQUENT;
+        } else {
+            semisequent = new Semisequent(modifiedSemisequent);
+        }
+        return semisequent;
     }
 
 
@@ -247,5 +241,4 @@ public class SemisequentChangeInfo {
             "\n  rejected:"+rejected +
 	    "\n  new semisequent:"+modifiedSemisequent;
     }
-
 }

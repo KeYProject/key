@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
 
 /** 
@@ -193,8 +192,8 @@ public class EqualityConstraint implements Constraint {
      * @return the instantiated term 
      */
     private Term instantiate ( Term p ) {
-	SyntacticalReplaceVisitor srVisitor =
-	    new SyntacticalReplaceVisitor(new TermLabelState(),
+	ConstraintAwareSyntacticalReplaceVisitor srVisitor =
+	    new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(),
 	                                  new Services(new JavaProfile()), // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
 	                                  this, 
 	                                  null,

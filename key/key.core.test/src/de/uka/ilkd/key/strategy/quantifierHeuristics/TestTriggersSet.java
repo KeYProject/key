@@ -29,7 +29,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 
@@ -201,7 +201,7 @@ public class TestTriggersSet extends TestCase {
 		
 		proof = new Proof("TestTriggersSet", TacletForTests.initConfig());
 		g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
-				new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()),
+				new RuleAppIndex(new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(), proof.getServices()),
 						new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
 		proof.setRoot(g.node());
 		proof.add(g);

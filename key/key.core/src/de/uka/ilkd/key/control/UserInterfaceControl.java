@@ -62,6 +62,7 @@ public interface UserInterfaceControl {
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
+     * @param includes Optional includes to consider.
      * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or overwrite saved PO {@link Properties}.
      * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      * @return The opened {@link AbstractProblemLoader}.
@@ -71,6 +72,7 @@ public interface UserInterfaceControl {
                                File file, 
                                List<File> classPaths, 
                                File bootClassPath, 
+                               List<File> includes,
                                Properties poPropertiesToForce, 
                                boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
     

@@ -7,7 +7,7 @@ public abstract class Component extends java.lang.Object implements java.awt.ima
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;

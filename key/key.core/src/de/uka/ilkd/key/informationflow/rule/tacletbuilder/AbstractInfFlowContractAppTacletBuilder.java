@@ -245,14 +245,14 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * PrepareInfFlowContractPreBranchesMacro to decide how to prepare the
      * formulas resulting from information flow contract applications.
      */
-    private class InfFlowContractAppRewriteTacletBuilder extends RewriteTacletBuilder {
+    private class InfFlowContractAppRewriteTacletBuilder extends RewriteTacletBuilder<InfFlowContractAppTaclet> {
 
         InfFlowContractAppRewriteTacletBuilder() {
         }
 
 
         @Override
-        public RewriteTaclet getRewriteTaclet() {
+        public InfFlowContractAppTaclet getRewriteTaclet() {
             if (find == null) {
                 throw new TacletBuilder.TacletBuilderException(this, "No find part specified");
 

@@ -60,11 +60,12 @@ public final class TestStarterCoreUtil {
       // Get KeY project settings
       final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
       final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+      final List<File> includes = KeYResourceProperties.getKeYIncludes(project);
       // Get local file for the eclipse resource
       final File location = KeYResourceProperties.getSourceClassPathLocation(project);
       Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
       // Load environment
-      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
       IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
       ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, null, addUninterpretedPredicate, false);
       Proof proof = environment.createProof(input);

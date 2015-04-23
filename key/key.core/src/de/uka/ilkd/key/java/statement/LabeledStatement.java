@@ -55,6 +55,8 @@ public class LabeledStatement extends JavaStatement
 
     
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
+    
+    private final PosInProgram firstActiveChildPos;
 
 
     /**
@@ -70,7 +72,10 @@ public class LabeledStatement extends JavaStatement
 
 	body=children.get(Statement.class);
         prefixElementArray = computePrefix(body);
-        
+        firstActiveChildPos = body instanceof StatementBlock ? 
+                    ((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
+                        PosInProgram.ONE_ZERO : PosInProgram.ONE;
+
         // otherwise it will crash later
         assert body != null;
         assert name != null;
@@ -85,6 +90,9 @@ public class LabeledStatement extends JavaStatement
 	this.name=name;
 	body=new EmptyStatement();
         prefixElementArray = new ImmutableArray<ProgramPrefix>();
+        firstActiveChildPos = body instanceof StatementBlock ? 
+                (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
+                    PosInProgram.ONE_ZERO) : PosInProgram.ONE;
     }
 
     /**
@@ -97,6 +105,9 @@ public class LabeledStatement extends JavaStatement
         this.name=id;
         body=statement;
         prefixElementArray = computePrefix(body);
+        firstActiveChildPos = body instanceof StatementBlock ? 
+                (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
+                    PosInProgram.ONE_ZERO) : PosInProgram.ONE;
     }
 
 
@@ -291,15 +302,7 @@ public class LabeledStatement extends JavaStatement
     }
     
     
-    private PosInProgram firstActiveChildPos = null;
-    
     public PosInProgram getFirstActiveChildPos() {
-        if (firstActiveChildPos == null) {                   
-            firstActiveChildPos = body instanceof StatementBlock ? 
-                    (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
-                        PosInProgram.TOP.down(1).down(0))
-                        : PosInProgram.TOP.down(1);
-        }
         return firstActiveChildPos;
     }
     

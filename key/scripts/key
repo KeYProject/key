@@ -111,7 +111,7 @@ list_help(){
 #
 
 
-keysysprops=""
+keysysprops=" "
 keyoptions=""
 
 #default values for Java Options Xmx and Xms

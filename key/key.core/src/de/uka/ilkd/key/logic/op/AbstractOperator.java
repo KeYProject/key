@@ -15,11 +15,8 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
 
 
 /** 
@@ -111,23 +108,6 @@ abstract class AbstractOperator implements Operator {
 	}
 	
 	return additionalValidTopLevel(term);
-    }
-    
-    
-    /** 
-     * implements the default operator matching rule which means 
-     * that the compared object have to be equal otherwise
-     * matching fails
-     */
-    @Override
-    public MatchConditions match(SVSubstitute subst, 
-	    		         MatchConditions mc,
-	    		         Services services) {
-        if(subst == this) {
-            return mc;
-        }
-        Debug.out("FAILED. Operators are different(template, candidate)", this, subst);
-        return null;
     }
     
     

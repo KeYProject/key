@@ -1,47 +1,72 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Iterable" kind="INTERFACE" package="java.lang" simpleName="Iterable">
-    <typeVariables name="T" type="//@types.0"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Iterable" simpleName="Iterable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Iterable" baseType="//@types.1" typeArguments="//@types.3/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Collection" kind="INTERFACE" extends="//@types.2" package="java.util" simpleName="Collection">
-    <typeVariables name="E" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Collection" simpleName="Collection">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.lang.Iterable&lt;E>" genericFreeType="java.lang.Iterable"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Collection" baseType="//@types.3" typeArguments="//@types.5/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.AbstractCollection" extends="//@types.0" implements="//@types.4" abstract="true" package="java.util" simpleName="AbstractCollection">
-    <typeVariables name="E" type="//@types.0"/>
+  <types abstract="true" package="java.util" name="java.util.AbstractCollection" simpleName="AbstractCollection">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.Collection&lt;E>" genericFreeType="java.util.Collection"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="AbstractCollection" baseType="//@types.5" typeArguments="//@types.9/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.List" kind="INTERFACE" extends="//@types.4" package="java.util" simpleName="List">
-    <typeVariables name="E" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.List" simpleName="List">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.util.Collection&lt;E>" genericFreeType="java.util.Collection"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="List" baseType="//@types.7" typeArguments="//@types.9/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.AbstractList" extends="//@types.6" implements="//@types.8" abstract="true" package="java.util" simpleName="AbstractList">
-    <typeVariables name="E" type="//@types.0"/>
+  <types abstract="true" package="java.util" name="java.util.AbstractList" simpleName="AbstractList">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.List&lt;E>" genericFreeType="java.util.List"/>
+    <extends type="java.util.AbstractCollection&lt;E>" genericFreeType="java.util.AbstractCollection"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="AbstractList" baseType="//@types.9" typeArguments="//@types.11/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.AbstractSequentialList" extends="//@types.10" abstract="true" package="java.util" simpleName="AbstractSequentialList">
-    <typeVariables name="E" type="//@types.0"/>
+  <types abstract="true" package="java.util" name="java.util.AbstractSequentialList" simpleName="AbstractSequentialList">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.util.AbstractList&lt;E>" genericFreeType="java.util.AbstractList"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="AbstractSequentialList" baseType="//@types.11" typeArguments="//@types.19/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Queue" kind="INTERFACE" extends="//@types.4" package="java.util" simpleName="Queue">
-    <typeVariables name="E" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Queue" simpleName="Queue">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.util.Collection&lt;E>" genericFreeType="java.util.Collection"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Queue" baseType="//@types.13" typeArguments="//@types.15/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Deque" kind="INTERFACE" extends="//@types.14" package="java.util" simpleName="Deque">
-    <typeVariables name="E" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Deque" simpleName="Deque">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.util.Queue&lt;E>" genericFreeType="java.util.Queue"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Deque" baseType="//@types.15" typeArguments="//@types.19/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.LinkedList" extends="//@types.12" implements="//@types.8 //@types.16 //@types.17 //@types.18" package="java.util" simpleName="LinkedList">
-    <typeVariables name="E" type="//@types.0"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.util" name="java.util.LinkedList" simpleName="LinkedList">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.List&lt;E>" genericFreeType="java.util.List"/>
+    <implements type="java.util.Deque&lt;E>" genericFreeType="java.util.Deque"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.util.AbstractSequentialList&lt;E>" genericFreeType="java.util.AbstractSequentialList"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="InterfaceInheritenceTest" source="true" extends="//@types.0" package="" simpleName="InterfaceInheritenceTest">
-    <methods name="main" static="true" returnType="//@types.23" parameterTypes="//@types.22"/>
+  <types package="" name="InterfaceInheritenceTest" source="true" simpleName="InterfaceInheritenceTest">
+    <methods name="main" static="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="java.util.LinkedList&lt;?>" genericFreeType="java.util.LinkedList"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:WildcardType" name="?"/>
-  <types xsi:type="dependencymodel:GenericType" name="LinkedList" baseType="//@types.19" typeArguments="//@types.21"/>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
 </dependencymodel:DependencyModel>

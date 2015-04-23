@@ -16,13 +16,12 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
 /** class builds Schematic Theory Specific Rules  (Taclets) with find part
  * int antecedent.
 */
-public class AntecTacletBuilder extends FindTacletBuilder{
+public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
 
     private boolean ignoreTopLevelUpdates = true;
 
@@ -63,7 +62,7 @@ public class AntecTacletBuilder extends FindTacletBuilder{
      * recursive flags imply that the flags are not set. 
      * No specified find part causes an IllegalStateException.
      */
-    public Taclet getTaclet(){
+    public AntecTaclet getTaclet(){
 	return getAntecTaclet();
     } 
 

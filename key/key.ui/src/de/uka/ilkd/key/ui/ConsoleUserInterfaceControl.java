@@ -23,6 +23,7 @@ import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -103,8 +103,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                final Statistics stat = info.getProof().statistics();
                System.out.println("Proof steps: "+stat.nodes);
                System.out.println("Branches: "+stat.branches);
-               System.out.println("Automode Time: "+stat.autoModeTime+"ms");
-               System.out.println("Time per step: "+stat.timePerStep+"ms");
+               System.out.println("Automode Time: "+(stat.autoModeTimeInNano/1000000)+"ms");
+               System.out.println("Time per step: "+(stat.timePerStepInNano/1000000)+"ms");
            }
            System.out.println("Number of goals remaining open: " + openGoals);
            System.out.flush();
@@ -200,7 +200,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          * in which proofs will be written.
          */
         keyProblemFile = file;
-        getProblemLoader(file, null, null, mediator).runSynchronously();
+        getProblemLoader(file, null, null, null, mediator).runSynchronously();
     }
 
     @Override

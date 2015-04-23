@@ -11,8 +11,8 @@ import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.key4eclipse.starter.core.Activator;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.key4eclipse.starter.core.util.LogUtil;
@@ -41,8 +41,8 @@ public abstract class AbstractClassPathLightweightLabelDecorator extends BaseLab
                }
             }
             // Check class path
-            List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
-            KeYClassPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYClassPathEntryKind.WORKSPACE, resourcePath);
+            List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
+            KeYPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYPathEntryKind.WORKSPACE, resourcePath);
             if (entry != null) {
                decoration.addOverlay(AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, getClassPathOverlay()));
             }

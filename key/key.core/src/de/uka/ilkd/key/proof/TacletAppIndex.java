@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -373,6 +374,18 @@ public class TacletAppIndex  {
                                                tacletIndex (),
                                                getNewRulePropagator () );
     }
+    
+    private void updateIndices(final SetRuleFilter newTaclets) {
+        antecIndex = antecIndex.addTaclets ( newTaclets, getSequent (),
+                                             getServices (),
+                                             tacletIndex (),
+                                             getNewRulePropagator () );
+        succIndex = succIndex.addTaclets ( newTaclets, getSequent (),
+                                           getServices (),
+                                           tacletIndex (),
+                                           getNewRulePropagator () );
+    }
+
 
     /**
      * updates the internal caches after a new Taclet with instantiation
@@ -402,16 +415,53 @@ public class TacletAppIndex  {
     	final SetRuleFilter newTaclets = new SetRuleFilter ();
         newTaclets.addRuleToSet ( tacletApp.taclet () );
 
-        antecIndex = antecIndex.addTaclets ( newTaclets, getSequent (),
-                                             getServices (),
-                                             tacletIndex (),
-                                             getNewRulePropagator () );
-        succIndex = succIndex.addTaclets ( newTaclets, getSequent (),
-                                           getServices (),
-                                           tacletIndex (),
-                                           getNewRulePropagator () );
+        updateIndices(newTaclets);
     }
 
+    /**
+     * updates the internal caches after a new Taclet with instantiation
+     * information has been added to the TacletIndex.
+     * @param tacletApps set of partially instantiated {@link Taclet}s to add
+     */
+    public void addedNoPosTacletApps(ImmutableSet<NoPosTacletApp> tacletApps) {
+        for (TacletApp tacletApp : tacletApps) {
+            if ( indexCaches.isRelevantTaclet ( tacletApp.taclet () ) ) {
+                // we must flush the index cache, and we must no longer use a cache
+                // that we share with other instances of <code>TacletAppIndex</code>
+                // (that maybe live of different goals)
+                createNewIndexCache ();            
+                break;
+            }
+        }
+            
+        if ( !isUpToDateForGoal () ) {
+            // we are not up to date and have to rebuild everything (lazy)
+            clearIndexes ();
+            return;
+        }
+         
+        final SetRuleFilter newTaclets = new SetRuleFilter ();
+        for (NoPosTacletApp tacletApp : tacletApps) {
+            if ( tacletApp.taclet() instanceof NoFindTaclet ) {
+                if ( ruleFilter.filter ( tacletApp.taclet() ) ) {
+                    getNewRulePropagator().ruleAdded(tacletApp, null);
+                }
+            } else {
+                newTaclets.addRuleToSet(tacletApp.taclet());
+            }
+        }
+        
+        if (newTaclets.isEmpty()) {
+            return;
+        }
+        
+        updateIndices(newTaclets);
+    }
+
+    
+    
+    
+    
     /**
      * updates the internal caches after a Taclet with instantiation
      * information has been removed from the TacletIndex.
@@ -479,8 +529,6 @@ public class TacletAppIndex  {
         if ( antecIndex != null ) antecIndex.reportRuleApps ( l );
         if ( succIndex != null ) succIndex.reportRuleApps ( l );
 
-        for (NoPosTacletApp noPosTacletApp : getNoFindTaclet(TacletFilter.TRUE,
-                services))
-            l.ruleAdded(noPosTacletApp, null);
+        l.rulesAdded(getNoFindTaclet(TacletFilter.TRUE, services), null);
     }
 }

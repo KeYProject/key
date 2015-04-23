@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.key_project.javaeditor.javaConfigurationExtensions">
+      <javaConfigurationExtensions
+            class="org.key_project.jmlediting.ui.highlighting.JMLSourceViewerConfigurationExtension"
+            id="org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension"
+            name="JML"
+            defaultEnabled="true">
+      </javaConfigurationExtensions>
+   </extension>
+   <extension
+         point="org.key_project.javaeditor.javaEditorPreferenceListener">
+      <listener
+            class="org.key_project.jmlediting.ui.listener.RebuildPreferenceListener">
+      </listener>
+   </extension>
+   <extension
+         id="org.key_project.jmlediting.ui.JMLcompletion"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.jdt.ui.defaultProposalCategory"
+            class="org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer"
+            needsSortingAfterFiltering="false">
+      </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.javaEditorTextHovers">
+      <hover
+            activate="true"
+            class="org.key_project.jmlediting.ui.hover.JMLTextHover"
+            description="JML Text Hovers"
+            id="org.key_project.jmlediting.ui.hover.JMLTextHover"
+            label="JML">
+      </hover>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.key_project.jmlediting.ui.preferencepages.JMLPropertiesParentPage"
+            id="org.key_project.jmlediting.ui.properties.jml"
+            name="JML">
+            <enabledWhen>
+               <adapt type="org.eclipse.core.resources.IProject">
+                  <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.jdt.core.javanature"/>
+               </adapt>         
+            </enabledWhen>
+      </page>
+      <page
+            class="org.key_project.jmlediting.ui.preferencepages.JMLProfilePropertiesPage"
+            id="org.key_project.jmlediting.ui.properties.profile"
+            name="Profile"
+            category="org.key_project.jmlediting.ui.properties.jml">
+            <enabledWhen>
+               <adapt type="org.eclipse.core.resources.IProject">
+                  <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.jdt.core.javanature"/>
+               </adapt>         
+            </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.key_project.jmlediting.ui.preferencepages.JMLPropertiesParentPage"
+            id="org.key_project.jmlediting.ui.preferences.jml"
+            name="JML">
+      </page>
+      <page
+            category="org.key_project.jmlediting.ui.preferences.jml"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLProfilePropertiesPage"
+            id="org.key_project.jmlediting.ui.preferences.profile"
+            name="Profile">
+      </page>
+      <page
+            category="org.key_project.jmlediting.ui.preferences.jml"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLColorPreferencePage"
+            id="org.key_project.jmlediting.ui.preferences.color"
+            name="Colors">
+      </page>
+   </extension>
+</plugin>

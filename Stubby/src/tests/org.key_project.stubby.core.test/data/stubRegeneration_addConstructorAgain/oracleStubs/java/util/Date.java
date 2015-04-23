@@ -3,7 +3,7 @@ package java.util;
 /**
  * @generated
  */
-public class Date extends java.lang.Object implements java.io.Serializable, java.lang.Cloneable, Comparable<java.util.Date> {
+public class Date extends java.lang.Object implements java.io.Serializable, java.lang.Cloneable, java.lang.Comparable<java.util.Date> {
 
   /**
     * @generated
@@ -18,7 +18,7 @@ public class Date extends java.lang.Object implements java.io.Serializable, java
   /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
