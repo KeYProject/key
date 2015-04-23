@@ -9,7 +9,6 @@ import org.antlr.runtime.Token;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -90,8 +89,8 @@ public class TestFile implements Serializable {
          String gks = settings.getGlobalKeYSettings();
          ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
 
-         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
-               new JavaProfile(), getFile(settings), null, null, false);
+         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(getFile(settings),
+               null, null, null);
          Proof loadedProof = env.getLoadedProof();
 
          if (testProperty == TestProperty.LOADABLE) {

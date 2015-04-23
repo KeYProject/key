@@ -35,7 +35,6 @@ import org.junit.runners.Parameterized.Parameters;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit.TestResult;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
  * <p>
