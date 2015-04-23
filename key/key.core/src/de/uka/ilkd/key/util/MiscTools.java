@@ -714,6 +714,7 @@ public final class MiscTools {
        result.put("optimisedSelectRules", "optimisedSelectRules:on");
        result.put("wdChecks", "wdChecks:off");
        result.put("wdOperator", "wdOperator:L");
+       result.put("permissions", "permissions:off"); 
        return result;
     }
     
