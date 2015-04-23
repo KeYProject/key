@@ -30,7 +30,7 @@ public abstract class RunAllProofsTestUnit implements Serializable {
    /**
     * Note: This is only relevant in case {@link RunAllProofsTestUnit}s are
     * configured (in {@link RunAllProofsTest}) to be exexecuted in separate
-    * threads each. Test results will be stored in a temporary directory. Each
+    * processes each. Test results will be stored in a temporary directory. Each
     * {@link RunAllProofsTestUnit} gets a separate subdirectory in that
     * temporary directory. In case the subdirectory belonging to a specific
     * {@link RunAllProofsTestUnit} shall be easily recognizable, one can specify

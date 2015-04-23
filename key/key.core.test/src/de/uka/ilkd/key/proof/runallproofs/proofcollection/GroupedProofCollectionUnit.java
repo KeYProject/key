@@ -34,9 +34,11 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
             .createSettings(parentSettings, settingsEntries);
 
       return new RunAllProofsTestUnit() {
+
          /**
-          * A temp directory prefix is created for each group so that directories for
-          * groups can easily be recognized in the {@link RunAllProofsTest} temp directory.
+          * A temp directory prefix is created for each group so that
+          * directories for groups can easily be recognized in the
+          * {@link RunAllProofsTest} temp directory.
           * 
           * @see de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit#getTempDirectoryPrefix()
           * @see de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSubProcess
