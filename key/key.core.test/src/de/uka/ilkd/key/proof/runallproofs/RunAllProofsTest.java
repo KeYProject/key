@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +33,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit.TestResult;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
 
@@ -72,71 +73,80 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
  */
 @RunWith(Parameterized.class)
 public class RunAllProofsTest implements Serializable {
-    /**
-     * The path to the KeY repository. 
-     * Configurable via system property {@code key.home}.
-     */
-    public static final File KEY_HOME;
-    
-    public static final File EXAMPLE_DIR;
-    
-    public static final File KEY_CORE_TEST;
-    
-    /**
-     * Computes the constant values.
-     */
-    static {
-        String keyHome = System.getenv("KEY_HOME");
-        if (keyHome == null) {
-            throw new RuntimeException("Environment variable KEY_HOME not set. "
-                    + "Cannot test proofs.");
-        }
-        
-        KEY_HOME = new File(keyHome);
-        EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
-        KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
-    }
-    
+   /**
+    * The path to the KeY repository. Configurable via system property
+    * {@code key.home}.
+    */
+   public static final File KEY_HOME;
+
+   public static final File EXAMPLE_DIR;
+
+   public static final File KEY_CORE_TEST;
+
+   /**
+    * Computes the constant values.
+    */
+   static {
+      String keyHome = System.getenv("KEY_HOME");
+      if (keyHome == null) {
+         throw new RuntimeException("Environment variable KEY_HOME not set. "
+               + "Cannot test proofs.");
+      }
+
+      KEY_HOME = new File(keyHome);
+      EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
+      KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
+   }
+
    private static void assertDirectoryExists(File dir) {
       if (!dir.exists()) {
-         throw new RuntimeException("Cannot run tests, directory " + dir + " does not exist.");
+         throw new RuntimeException("Cannot run tests, directory " + dir
+               + " does not exist.");
       }
    }
-    
-    final RunAllProofsTestUnit unit;
 
-    /**
-     * Constructor.
-     * @param unit {@link RunAllProofsTestUnit} whose test will be executed.
-     */
-    public RunAllProofsTest(RunAllProofsTestUnit unit) {
-       this.unit = unit;
-    }
+   final RunAllProofsTestUnit unit;
 
-    /**
-     * Tests each file defined by the instance variables. The tests steps
-     * are described in the constructor of this class.
-     * @throws Exception
-     */
+   /**
+    * Constructor.
+    * 
+    * @param unit
+    *           {@link RunAllProofsTestUnit} whose test will be executed.
+    */
+   public RunAllProofsTest(RunAllProofsTestUnit unit) {
+      this.unit = unit;
+   }
+
+   /**
+    * Tests each file defined by the instance variables. The tests steps are
+    * described in the constructor of this class.
+    * 
+    * @throws Exception
+    */
    @Test
    public void testWithKeYAutoMode() throws Exception {
       // ProofCollectionSubProcess.executeRunAllProofsTest(this);
-      TestResult report = unit.runTest();
-//      System.out.println(report.message);
-//      System.gc(); System.out.println("Memory " + Runtime.getRuntime().totalMemory());
-//      System.out.println("Time " + System.currentTimeMillis());
-      assertTrue(report.message, report.success);
+      // TestResult report = unit.runTest();
+      // System.out.println(report.message);
+      // System.gc(); System.out.println("Memory " +
+      // Runtime.getRuntime().totalMemory());
+      // System.out.println("Time " + System.currentTimeMillis());
+      // assertTrue(report.message, report.success);
    }
-    
-    /**
-     * Collects all test files. Instances of this class are automatically
-     * created with the returned parameters by the JUnit test suite
-     * {@link CustomParameters}.
-     * @return The parameters. Each row will be one test case.
-     * @throws IOException Occurred Exception.
-    * @throws RecognitionException 
-     */
-   @Parameters
+
+   /**
+    * Creates a set of constructor parameters for this class. Uses JUnits
+    * parameterized test case mechanism for to create several test cases from a
+    * set of data. {@link Object.#toString()} of first constructor parameter is
+    * used to determine name of individual test cases, see {@link
+    * RunAllProofsTestUnit.#toString()} for further information.
+    * 
+    * @return The parameters. Each row will be one test case.
+    * @throws IOException
+    *            Occurred Exception.
+    * @throws RecognitionException
+    */
+   @Parameters(name = "{0}")
    public static Collection<Object[]> data() throws IOException,
          RecognitionException {
       assertDirectoryExists(KEY_HOME);
@@ -146,17 +156,18 @@ public class RunAllProofsTest implements Serializable {
       /*
        * Parse index file containing declarations for proof obligations.
        */
-      File automaticJAVADL = new File(EXAMPLE_DIR,
-            "index/automaticJAVADL.txt");
-      List<RunAllProofsTestUnit> units = parseFile(automaticJAVADL);
+      File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL.txt");
+      ProofCollection proofCollection = parseFile(automaticJAVADL);
 
       /*
-       * Create list of constructor parameters that will be returned by this method.
-       * Suitable constructor is automatically determined by JUnit.
+       * Create list of constructor parameters that will be returned by this
+       * method. Suitable constructor is automatically determined by JUnit.
        */
       Collection<Object[]> data = new LinkedList<Object[]>();
+      List<RunAllProofsTestUnit> units = proofCollection
+            .createRunAllProofsTestUnits();
       for (RunAllProofsTestUnit unit : units) {
-         data.add(new Object[] { unit });
+         data.add(new RunAllProofsTestUnit[] { unit });
       }
       return data;
    }
@@ -165,8 +176,8 @@ public class RunAllProofsTest implements Serializable {
     * Uses {@link ProofCollectionParser} to parse the given file and returns a
     * parse result that is received from main parser entry point.
     */
-   private static List<RunAllProofsTestUnit> parseFile(File file)
-         throws IOException, RecognitionException {
+   private static ProofCollection parseFile(File file) throws IOException,
+         RecognitionException {
       CharStream charStream = new ANTLRFileStream(file.getAbsolutePath());
       ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
       TokenStream tokenStream = new CommonTokenStream(lexer);

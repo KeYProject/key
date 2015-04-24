@@ -28,6 +28,25 @@ public abstract class RunAllProofsTestUnit implements Serializable {
    }
 
    /**
+    * The name of this test. 
+    */
+   public String name;
+
+   /**
+    * This method is used by class {@link RunAllProofsTest} to determine the
+    * name of a test case. It is overridden in order to assign a meaningful name
+    * to each test case.
+    */
+   @Override
+   public String toString() {
+      return name;
+   }
+
+   public RunAllProofsTestUnit(String name) {
+      this.name = name;
+   }
+
+   /**
     * Note: This is only relevant in case {@link RunAllProofsTestUnit}s are
     * configured (in {@link RunAllProofsTest}) to be exexecuted in separate
     * processes each. Test results will be stored in a temporary directory. Each

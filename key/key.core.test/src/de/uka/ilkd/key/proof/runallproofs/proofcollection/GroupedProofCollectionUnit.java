@@ -33,7 +33,7 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
       final ProofCollectionSettings settings = ProofCollectionSettingsFactory
             .createSettings(parentSettings, settingsEntries);
 
-      return new RunAllProofsTestUnit() {
+      return new RunAllProofsTestUnit(groupName) {
 
          /**
           * A temp directory prefix is created for each group so that

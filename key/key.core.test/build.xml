@@ -29,6 +29,7 @@
 			</classpath>
 			<formatter type="xml"/>
 			<test name="de.uka.ilkd.key.suite.TestKey" todir="${test.reports}" />
+			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest" todir="${test.reports}" />
 		</junit>
 		<fail message="Test failure detected, check test results." if="test.failedOrError" />
 	</target>
@@ -45,8 +46,11 @@
          <arg value="${src.dir}/de/uka/ilkd/key/proof/runallproofs/proofcollection/ProofCollection.g" />
       </java>
    </target>
+   
+   <target name="runTests" depends="runJavaTests, runAllProofs">
+   </target>
 
-	<target name="runTests" depends="compile">
+	<target name="runJavaTests" depends="compile">
 		<junit printsummary="withOutAndErr" haltonfailure="yes"
 		       fork="yes" forkMode="once" haltonerror="yes"
 		       enableTestListenerEvents="false"
@@ -66,6 +70,29 @@
 			</classpath>
 			<formatter type="brief" usefile="false" />
 			<test name="de.uka.ilkd.key.suite.TestKey" />
+		</junit>
+	</target>
+	
+	<target name="runAllProofs" depends="compile">
+		<junit printsummary="withOutAndErr" haltonfailure="yes"
+		       fork="yes" forkMode="once" haltonerror="yes"
+		       enableTestListenerEvents="false"
+		       showoutput="yes" dir="${basedir}">
+			<jvmarg value="-Xmx2048m"/>
+			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-ea"/>
+			<classpath>
+				<pathelement path="${basedir}/../key.core/bin"/>
+				<pathelement path="${basedir}/../key.util/bin"/>
+				<pathelement location="${lib.dir}/recoderKey.jar"/>
+				<pathelement location="${lib.dir}/antlr.jar"/>
+				<pathelement location="${basedir}/../key.util.test/lib/junit-4.12.jar"/>
+				<pathelement location="${basedir}/../key.util.test/lib/hamcrest-core-1.3.jar"/>
+				<pathelement path="${basedir}/../key.util.test/bin"/>
+				<pathelement path="${build.dir}"/>
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest" />
 		</junit>
 	</target>
 

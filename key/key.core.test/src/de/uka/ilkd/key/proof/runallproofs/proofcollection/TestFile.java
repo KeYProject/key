@@ -123,7 +123,7 @@ public class TestFile implements Serializable {
     *         string that can be printed out on command line to inform the user
     *         about the test result.
     * @throws Exception
-    *            Any exception that may occur during KeY execution will
+    *            Any exception that may occur during KeY execution will be
     *            converted into an {@link Exception} object with original
     *            exception as cause.
     */

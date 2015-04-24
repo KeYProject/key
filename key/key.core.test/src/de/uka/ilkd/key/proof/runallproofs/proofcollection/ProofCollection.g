@@ -14,7 +14,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * Section for parser rules. Parser rules start with lowercase letters.
  */
 
-parserEntryPoint returns [List<RunAllProofsTestUnit> units]
+parserEntryPoint returns [ProofCollection proofCollection]
 @init {
     List<ProofCollectionUnit> proofCollectionUnits = new ArrayList<>();
     List<ProofCollectionSettings.Entry> settingsEntries = new ArrayList<>();
@@ -32,14 +32,7 @@ parserEntryPoint returns [List<RunAllProofsTestUnit> units]
           */ 
          ProofCollectionSettings globalSettings =
          ProofCollectionSettingsFactory.createSettings(getTokenStream().getSourceName(), settingsEntries);
-         
-         /*
-          * Compute return value.
-          */
-         $units = new ArrayList<>();
-         for(ProofCollectionUnit unit : proofCollectionUnits) {
-            $units.add(unit.createRunAllProofsTestUnit(globalSettings));
-         }
+         $proofCollection = new ProofCollection(proofCollectionUnits, globalSettings);
       }
 ;
 
