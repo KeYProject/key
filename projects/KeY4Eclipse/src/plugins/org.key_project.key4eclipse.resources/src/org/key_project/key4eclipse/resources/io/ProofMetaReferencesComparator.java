@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Compares {@link ProofMetaReferences} with the current code state
@@ -125,7 +126,8 @@ public class ProofMetaReferencesComparator {
 
 
    private boolean contractChanged() {
-      if (KeYResourcesUtil.contractToString(pe.getContract()).equals(references.getContract())) {
+      String peContract = KeYResourcesUtil.contractToString(pe.getContract());
+      if (peContract.equals(references.getContract())) {
          return false;
       }
       return true;
@@ -225,9 +227,22 @@ public class ProofMetaReferencesComparator {
    private boolean callMethodChanged(ProofMetaReferenceCallMethod callMethod) {
       KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(callMethod.getKjt());
       if(kjt != null){
-         Map<KeYJavaType, IProgramMethod> implementations = KeYResourcesUtil.getKjtsOfAllImplementations(env, kjt, callMethod.getName(), callMethod.getParameters());
+         List<Pair<KeYJavaType, IProgramMethod>> implementations = KeYResourcesUtil.getKjtsOfAllImplementations(env, kjt, callMethod.getName(), callMethod.getParameters());
          String implementationsString = KeYResourcesUtil.implementationTypesToString(implementations);
-         if(implementationsString.equals(callMethod.getImplementations())) {
+         String[] refSplits = callMethod.getImplementations().split(";");
+         String[] envSplits = implementationsString.split(";");
+         if(refSplits.length == envSplits.length) {
+            for(String refSplit : refSplits) {
+               boolean found = false;
+               for(String envSplit : envSplits) {
+                  if(envSplit.equals(refSplit)) {
+                     found = true;
+                  }
+               }
+               if(!found) {
+                  return true;
+               }
+            }
             return false;
          }
       }

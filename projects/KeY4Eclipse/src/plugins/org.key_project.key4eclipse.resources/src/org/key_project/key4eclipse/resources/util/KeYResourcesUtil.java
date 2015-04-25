@@ -70,6 +70,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.Position;
@@ -961,11 +962,35 @@ public class KeYResourcesUtil {
     * @param str the {@link String} to use
     * @return {@link String} without line breaks
     */
-   public static String removeLineBreaks(String str){
+   private static String removeLineBreaks(String str){
       str = str.replaceAll("\r\n", " ");
       str = str.replaceAll("\r", " ");
       str = str.replaceAll("\n", " ");
       return str;
+   }
+
+   /**
+    * Removes all tabs in a {@link String} and replaces them with a single space
+    * @param str the {@link String} to use
+    * @return {@link String} without tabs
+    */
+   private static String removeTabs(String str){
+      str = str.replaceAll("\t", " ");
+      return str;
+   }
+
+   /**
+    * Removes all multiple spaces and replaces them with a single space
+    * @param str the {@link String} to use
+    * @return {@link String} without tabs
+    */
+   private static String removeMultiSpaces(String str){
+      String[] splits = str.split(" ");
+      String trimmed = "";
+      for(String split : splits) {
+         trimmed += split + " ";
+      }
+      return trimmed.trim();
    }
    
    
@@ -985,6 +1010,8 @@ public class KeYResourcesUtil {
       }
       String src = sw.toString();
       src = KeYResourcesUtil.removeLineBreaks(src);
+      src = KeYResourcesUtil.removeTabs(src);
+      src = KeYResourcesUtil.removeMultiSpaces(src);
       return src;
    }
    
@@ -1021,17 +1048,18 @@ public class KeYResourcesUtil {
     * @param parameters semicolon separated parameters
     * @return {@link Map} with each {@link KeYJavaType} mapping to the associated {@link IProgramMethod}
     */
-   public static Map<KeYJavaType, IProgramMethod> getKjtsOfAllImplementations(KeYEnvironment<?> env, KeYJavaType kjt, String methodName, String parameters) {
-      Map<KeYJavaType, IProgramMethod> types = new HashMap<KeYJavaType, IProgramMethod>();
+   public static List<Pair<KeYJavaType, IProgramMethod>> getKjtsOfAllImplementations(KeYEnvironment<?> env, KeYJavaType kjt, String methodName, String parameters) {
+      List<Pair<KeYJavaType, IProgramMethod>> types = new LinkedList<Pair<KeYJavaType, IProgramMethod>>();
       IProgramMethod pm = KeYResourcesUtil.getMethodForKjt(kjt, methodName, parameters);
       if(pm != null) {
-         types.put(kjt, pm);
+         types.add(new Pair<KeYJavaType, IProgramMethod>(kjt, pm));
       }
-      Iterator<KeYJavaType> it = env.getJavaInfo().getAllSubtypes(kjt).iterator();
+      ImmutableList<KeYJavaType> subTypes = env.getJavaInfo().getAllSubtypes(kjt);
+      Iterator<KeYJavaType> it = subTypes.iterator();
       while(it.hasNext()){
          kjt = it.next();
-         if((pm = KeYResourcesUtil.getMethodForKjt(kjt, methodName, parameters)) != null && !types.containsKey(kjt)){
-            types.put(kjt, pm);
+         if((pm = KeYResourcesUtil.getMethodForKjt(kjt, methodName, parameters)) != null){
+            types.add(new Pair<KeYJavaType, IProgramMethod>(kjt, pm));
          }
       }
       return types;
@@ -1043,11 +1071,11 @@ public class KeYResourcesUtil {
     * @param implementations the {@link Map} to use
     * @return semicolon separated {@link String} of all {@link KeYJavaType}s
     */
-   public static String implementationTypesToString(Map<KeYJavaType, IProgramMethod> implementations) {
+   public static String implementationTypesToString(List<Pair<KeYJavaType, IProgramMethod>> implementations) {
       String implementationTypesString = "";
-      for(KeYJavaType kjt : implementations.keySet()){
+      for(Pair<KeYJavaType, IProgramMethod> pair : implementations){
          if(implementationTypesString != null){
-            implementationTypesString += kjt.getFullName() + ";";
+            implementationTypesString += pair.first.getFullName() + ";";
          }
       }
       return implementationTypesString;

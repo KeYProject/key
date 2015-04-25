@@ -472,7 +472,34 @@ public class BuilderTests extends AbstractResourceTest {
    
    
    //Invariant reference
-   //TODO: how to create a proof that uses an invariant?
+   //Expectation: All proofs using the invariant are done again
+   @Test
+   public void testEfficientBuildSingleThreadChangeInvariant() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadChangeInvariant", true, false, true, false, 1, false);
+      testChangeInvariant(project);
+      project.close(null);
+   }
+   @Test
+   public void testEfficientBuildMultipleThreadsChangeInvariant() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsChangeInvariant", true, false, true, true, 2, false);
+      testChangeInvariant(project);
+      project.close(null);
+   }
+   
+   //Overload
+   //Expectation: Proofs using overloaded methods should be done again
+   @Test
+   public void testEfficientBuildSingleThreadAddOverload() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddOverload", true, false, true, false, 1, false);
+      testAddOverload(project);
+      project.close(null);
+   }
+   @Test
+   public void testEfficientBuildMultipleThreadsAddOverload() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddOverload", true, false, true, true, 2, false);
+      testAddOverload(project);
+      project.close(null);
+   }
    
    
    
@@ -1525,5 +1552,120 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(metaFile2ModStamp == metaFile2.getLocalTimeStamp());
       assertTrue(proofFile3ModStamp == proofFile3.getLocalTimeStamp());
       assertTrue(metaFile3ModStamp == metaFile3.getLocalTimeStamp());
+   }
+   
+
+   private void testChangeInvariant(IProject project) throws CoreException, IOException{
+      IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
+      IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("Child.java"));
+      IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("InvariantInOperationContract.java"));
+      IFile proofFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("Child.java").append("Child[Child__add(int,int)]_JML_operation_contract_0.proof"));
+      IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("InvariantInOperationContract.java").append("InvariantInOperationContract[InvariantInOperationContract__add(int,int)]_JML_operation_contract_0.proof"));
+      IFile proofFile2 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("InvariantInOperationContract.java").append("InvariantInOperationContract[InvariantInOperationContract__main(Child,int)]_JML_operation_contract_0.proof"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile2 = KeY4EclipseResourcesTestUtil.getFile(proofFile2.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+
+      assertTrue(!javaFile0.exists() && !javaFile1.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
+      assertTrue(!proofFile0.exists() && !metaFile0.exists());
+      assertTrue(!proofFile1.exists() && !metaFile1.exists());
+      assertTrue(!proofFile2.exists() && !metaFile2.exists());
+      
+      
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testChangeInvariant/Child.java", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testChangeInvariant/InvariantInOperationContract.java", project.getFolder("src"));
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists());
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists());
+      assertTrue(proofFolder.exists());
+      assertTrue(proofFile0.exists() && metaFile0.exists());
+      assertTrue(proofFile1.exists() && metaFile1.exists());
+      assertTrue(proofFile2.exists() && metaFile2.exists());
+
+      long proofFile0ModStamp = proofFile0.getLocalTimeStamp();
+      long metaFile0ModStamp = metaFile0.getLocalTimeStamp();
+      long proofFile1ModStamp = proofFile1.getLocalTimeStamp();
+      long metaFile1ModStamp = metaFile1.getLocalTimeStamp();
+      long proofFile2ModStamp = proofFile2.getLocalTimeStamp();
+      long metaFile2ModStamp = metaFile2.getLocalTimeStamp();
+
+      
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testChangeInvariant/ChangedChild.java");
+      javaFile0.setContents(is, IResource.FORCE, null);
+      is.close();
+      
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+
+      assertTrue(javaFile0.exists() && javaFile1.exists());
+      assertTrue(proofFolder.exists());
+      assertTrue(proofFile0.exists() && metaFile0.exists());
+      assertTrue(proofFile1.exists() && metaFile1.exists());
+      assertTrue(proofFile2.exists() && metaFile2.exists());
+
+      assertTrue(proofFile0ModStamp != proofFile0.getLocalTimeStamp());
+      assertTrue(metaFile0ModStamp != metaFile0.getLocalTimeStamp());
+      assertTrue(proofFile1ModStamp == proofFile1.getLocalTimeStamp());
+      assertTrue(metaFile1ModStamp == metaFile1.getLocalTimeStamp());
+      assertTrue(proofFile2ModStamp != proofFile2.getLocalTimeStamp());
+      assertTrue(metaFile2ModStamp != metaFile2.getLocalTimeStamp());
+   }
+   
+   
+   private void testAddOverload(IProject project) throws CoreException, IOException{
+      IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
+      IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("Main.java"));
+      IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("A.java"));
+      IFile javaFile2 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("B.java"));
+      IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("Main.java").append("Main[Main__main(B)]_JML_normal_behavior_operation_contract_0.proof"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+
+      assertTrue(!javaFile0.exists() && !javaFile1.exists() && !javaFile2.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
+      assertTrue(!proofFile.exists() && !metaFile.exists());
+      
+
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testAddOverload/Main.java", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testAddOverload/A.java", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testAddOverload/B.java", project.getFolder("src"));
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists() && javaFile2.exists());
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists() && javaFile2.exists());
+      assertTrue(proofFolder.exists());
+      assertTrue(proofFile.exists() && metaFile.exists());
+
+      long proofFileModStamp = proofFile.getLocalTimeStamp();
+      long metaFileModStamp = metaFile.getLocalTimeStamp();
+
+      
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testAddOverload/ChangedMain.java");
+      javaFile0.setContents(is, IResource.FORCE, null);
+      is.close();
+      
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+
+      assertTrue(javaFile0.exists() && javaFile1.exists());
+      assertTrue(proofFolder.exists());
+      assertTrue(proofFile.exists() && metaFile.exists());
+
+      assertTrue(proofFileModStamp != proofFile.getLocalTimeStamp());
+      assertTrue(metaFileModStamp != metaFile.getLocalTimeStamp());
    }
 }

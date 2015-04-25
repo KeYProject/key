@@ -26,6 +26,7 @@ import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Creates the representation of all references used by a particular {@link ProofElement}
@@ -87,7 +88,7 @@ public class ProofMetaReferences {
             Contract c = (Contract) proofRef.getTarget();
             String kjt = c.getKJT().getFullName();
             String name = c.getName();
-            ProofMetaPerTypeReferences ptRefs = perTypeReferences.get(kjt);
+            ProofMetaPerTypeReferences ptRefs = getPerTypeReferences(kjt);
             if(!containsContract(kjt, name, ptRefs)){
                ptRefs.addContract(new ProofMetaReferenceContract(kjt, name, KeYResourcesUtil.contractToString(c)));
             }
@@ -154,15 +155,15 @@ public class ProofMetaReferences {
       if(name.indexOf("<") == -1 || name.indexOf("<init>") >= 0){
          String parameters = KeYResourcesUtil.parametersToString(methodDecl.getParameters());
          if(!containsCallMethod(kjt.getFullName(), name, parameters)){
-            Map<KeYJavaType, IProgramMethod> implementations = KeYResourcesUtil.getKjtsOfAllImplementations(env, kjt, name, parameters);
+            List<Pair<KeYJavaType, IProgramMethod>> implementations = KeYResourcesUtil.getKjtsOfAllImplementations(env, kjt, name, parameters);
             String implementationsString = KeYResourcesUtil.implementationTypesToString(implementations);
             callMethods.add(new ProofMetaReferenceCallMethod(kjt.getFullName(), name, parameters, implementationsString));
-            for(Map.Entry<KeYJavaType, IProgramMethod> implementation : implementations.entrySet()) {
+            for(Pair<KeYJavaType, IProgramMethod> implementation : implementations) {
 //               List<IProgramMethod> overloads = findOverloads(implementation.getValue(), env);
 //               for(IProgramMethod pm : overloads) {
 //                  createInlineMethod(pm);
 //               }
-               createInlineMethod(implementation.getValue());
+               createInlineMethod(implementation.second);
             }
          }
       }
