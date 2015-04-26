@@ -176,7 +176,7 @@ public class TestSchemaModalOperators extends TestCase {
             TB.ff());
          MatchConditions mc=t.getMatcher().matchFind                                                   
                             (goal,                                                        
-                             MatchConditions.EMPTY_MATCHCONDITIONS, null);
+                             MatchConditions.EMPTY_MATCHCONDITIONS, services);
 	 assertNotNull(mc);
 	 assertNotNull(mc.getInstantiations().getInstantiation(osv));
 	 assertTrue("Schemamodality " + osv + " has not been instantiated", 

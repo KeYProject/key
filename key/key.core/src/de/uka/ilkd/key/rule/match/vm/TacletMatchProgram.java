@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -112,8 +113,7 @@ public class TacletMatchProgram {
             program.add(Instruction.matchAndBindVariables(boundVars));
         }
 
-        if (pattern.javaBlock() != JavaBlock.EMPTY_JAVABLOCK
-                || patternPrg instanceof ContextStatementBlock) {
+        if (pattern.op() instanceof Modality || pattern.op() instanceof ModalOperatorSV) {
             program.add(Instruction.matchProgram(patternPrg));
         }
 
