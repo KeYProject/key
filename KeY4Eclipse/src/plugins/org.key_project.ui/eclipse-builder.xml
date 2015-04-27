@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<project name="key" default="copy" basedir=".">
+	<target name="copy">
+		<!-- Call original ant file but with changed build.dir -->
+		<ant antfile="${basedir}/../../../../key/key.ui/build.xml" target="copy" dir="${basedir}/../../../../key/key.ui">
+			<property name="build.dir" value="${basedir}/bin" />
+		</ant>
+		<!-- Copy missing resources -->
+		<copy todir="${basedir}/bin/examples">
+			<fileset dir="${basedir}/../../../../key/key.ui/examples/"/>
+		</copy>
+	</target>
+</project>
