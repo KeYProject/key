@@ -41,6 +41,61 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class ResourceUtilTest extends TestCase {
    /**
+    * Tests {@link ResourceUtil#createFolder(org.eclipse.core.resources.IContainer, String)}.
+    */
+   @Test
+   public void testCreateFolder() throws CoreException {
+      IProject project = TestUtilsUtil.createProject("ResourceUtilTest_testCreateFolder");
+      // Test invalid parameter
+      IFolder folder = ResourceUtil.createFolder(null, null);
+      assertNull(folder);
+      folder = ResourceUtil.createFolder(project, "");
+      assertNull(folder);
+      folder = ResourceUtil.createFolder(null, "myFolder");
+      assertNull(folder);
+      // Test not existing folder
+      folder = ResourceUtil.createFolder(project, "myFolder");
+      assertNotNull(folder);
+      assertTrue(folder.exists());
+      // Test existing folder
+      folder = ResourceUtil.createFolder(project, "myFolder");
+      assertNotNull(folder);
+      assertTrue(folder.exists());
+   }
+   
+   /**
+    * Tests {@link ResourceUtil#createProject(String)}.
+    */
+   @Test
+   public void testCreateProject() throws CoreException {
+      // Test null
+      IProject project = ResourceUtil.createProject(null);
+      assertNull(project);
+      // Test not existing project
+      project = ResourceUtil.createProject("ResourceUtilTest_testCreateProject");
+      assertNotNull(project);
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test existing but closed project
+      project.close(null);
+      project = ResourceUtil.createProject("ResourceUtilTest_testCreateProject");
+      assertNotNull(project);
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test existing and open project
+      project = ResourceUtil.createProject("ResourceUtilTest_testCreateProject");
+      assertNotNull(project);
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test project recreation
+      project.delete(true, null);
+      project = ResourceUtil.createProject("ResourceUtilTest_testCreateProject");
+      assertNotNull(project);
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+   }
+   
+   /**
     * Tests {@link ResourceUtil#getWorkspaceLocation()}
     * @throws CoreException Occurred Exception
     */

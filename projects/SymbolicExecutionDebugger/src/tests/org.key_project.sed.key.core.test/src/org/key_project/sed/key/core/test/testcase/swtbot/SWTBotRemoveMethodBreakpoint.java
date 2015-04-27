@@ -37,7 +37,7 @@ public class SWTBotRemoveMethodBreakpoint extends AbstractKeYDebugTargetTestCase
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {            
             // Get debug target TreeItem
             TestBreakpointsUtil.addSomeBreakpoints(CALLER_PATH, bot, 15, 14, 5, 7, "NullPointerException");
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             //allBreakpoints there
             assertTrue(TestBreakpointsUtil.checkTargetContainsSomeBreakpoints(target, 1, 1, 2, 1));
@@ -62,6 +62,8 @@ public class SWTBotRemoveMethodBreakpoint extends AbstractKeYDebugTargetTestCase
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE,
-            8, executor);   
+            Boolean.FALSE,
+            8, 
+            executor);   
    } 
 }

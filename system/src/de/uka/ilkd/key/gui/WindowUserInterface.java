@@ -26,7 +26,6 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -62,10 +61,10 @@ import de.uka.ilkd.key.util.Pair;
 
 public class WindowUserInterface extends AbstractUserInterface {
 
-    private MainWindow mainWindow;
+    private final MainWindow mainWindow;
     private int numOfInvokedMacros;
 
-    private LinkedList<InteractiveRuleApplicationCompletion> completions =
+    private final LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
 
     public WindowUserInterface(MainWindow mainWindow) {
@@ -77,10 +76,17 @@ public class WindowUserInterface extends AbstractUserInterface {
         this.numOfInvokedMacros = 0;
     }
 
+    /**
+     * loads the problem or proof from the given file
+     *
+     * @param file the File with the problem description or the proof
+     * @param classPath the class path entries to use.
+     * @param bootClassPath the boot class path to use.
+     */
     public void loadProblem(File file, List<File> classPath,
                             File bootClassPath) {
         mainWindow.addRecentFile(file.getAbsolutePath());
-        super.getProblemLoader(file, classPath, bootClassPath,
+        getProblemLoader(file, classPath, bootClassPath,
                                mainWindow.getMediator()).runAsynchronously();
     }
 
@@ -134,7 +140,7 @@ public class WindowUserInterface extends AbstractUserInterface {
                     (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (!proof.closed()) {
+            if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
                     g = proof.openGoals().head();
@@ -155,7 +161,7 @@ public class WindowUserInterface extends AbstractUserInterface {
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
-                if (!proof.closed()) {
+                if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
                     if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
@@ -323,12 +329,10 @@ public class WindowUserInterface extends AbstractUserInterface {
    @Override
    public File saveProof(Proof proof, String fileExtension) {
        final MainWindow mainWindow = MainWindow.getInstance();
-       final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
+       final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
        Pair<File, String> f = fileName(proof, fileExtension);
-       final Pair<Boolean, File> res = jFC.showSaveDialog(mainWindow, f.second);
-       final boolean saved = res.first;
-       final File newDir = res.second;
+       final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
        File file = null;
        if (saved) {
            file = jFC.getSelectedFile();
@@ -347,9 +351,6 @@ public class WindowUserInterface extends AbstractUserInterface {
               proof.setProofFile(file);
            }
        } else {
-           if (newDir != null && !newDir.delete()) {
-               newDir.deleteOnExit();
-           }
            jFC.resetPath();
        }
        return file;

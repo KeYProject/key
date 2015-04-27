@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.ui.workbench.renderers.swt.HandledContributionItem;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
@@ -49,8 +50,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -88,8 +90,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarPushButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarRadioButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarSeparatorButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -118,6 +126,7 @@ import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
@@ -143,6 +152,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * Provides static methods that make testing easier.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class TestUtilsUtil {
    /**
     * Forbid instances.
@@ -216,7 +226,7 @@ public class TestUtilsUtil {
             try {
                JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
                IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(project.getFullPath())};
-               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               entries = ArrayUtil.addAll(entries, JDTUtil.getDefaultJRELibrary());
                page.init(javaProject, project.getFullPath(), entries, false);
                page.configureJavaProject(null);
             }
@@ -247,50 +257,7 @@ public class TestUtilsUtil {
     * @throws InterruptedException Occurred Exception.
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
-      IProject project = createProject(name);
-      final IFolder bin = project.getFolder("bin");
-      if (!bin.exists()) {
-         bin.create(true, true, null);
-      }
-      final IFolder src = project.getFolder("src");
-      if (!src.exists()) {
-         src.create(true, true, null);
-      }
-      final IJavaProject javaProject = JavaCore.create(project); 
-      IRunnableWithException run = new AbstractRunnableWithException() {
-         @Override
-         public void run() {
-            try {
-               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-               IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
-               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
-               page.init(javaProject, bin.getFullPath(), entries, false);
-               page.configureJavaProject(null);
-            }
-            catch (Exception e) {
-               setException(e);
-            }
-         }
-      };
-      Display.getDefault().syncExec(run);
-      if (run.getException() instanceof CoreException) {
-         throw (CoreException)run.getException();
-      }
-      else if (run.getException() instanceof InterruptedException) {
-         throw (InterruptedException)run.getException();
-      }
-      else if (run.getException() != null) {
-         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
-      }
-      return javaProject;
-   }
-   
-   /**
-    * Returns the default JRE library entries.
-    * @return The default JRE library entries.
-    */
-   public static IClasspathEntry[] getDefaultJRELibrary() {
-       return PreferenceConstants.getDefaultJRELibrary();
+      return JDTUtil.createJavaProject(name);
    }
 
    /**
@@ -1618,6 +1585,68 @@ public class TestUtilsUtil {
    }
 
    /**
+    * Searches the {@link SWTBotToolbarButton} with the given ID.
+    * @param view The {@link SWTBotView} to search toolbar button in.
+    * @param id The ID of the toolbar item to search.
+    * @return The found {@link SWTBotToolbarButton}.
+    * @throws Exception Occurred Exception.
+    */
+   public static SWTBotToolbarButton getToolbarButtonWithId(final SWTBotView view, final String id) throws Exception {
+      IRunnableWithResult<IContributionItem> run = new AbstractRunnableWithResult<IContributionItem>() {
+         @Override
+         public void run() {
+            IViewPart viewPart = view.getReference().getView(true);
+            IActionBars bar = viewPart.getViewSite().getActionBars();
+            IContributionItem[] items = bar.getToolBarManager().getItems();
+            IContributionItem item = ArrayUtil.search(items, new org.key_project.util.java.IFilter<IContributionItem>() {
+               @Override
+               public boolean select(IContributionItem element) {
+                  return ObjectUtil.equals(id, element.getId());
+               }
+            });
+            setResult(item);
+         }
+      };
+      view.bot().getDisplay().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      IContributionItem item = run.getResult();
+      Widget widget;
+      if (item instanceof HandledContributionItem) {
+         widget = ((HandledContributionItem)item).getWidget();
+      }
+      else if (item instanceof ActionContributionItem) {
+         widget = ((ActionContributionItem) item).getWidget();
+      }
+      else {
+         throw new IllegalStateException("Unsupported item: " + item);
+      }
+      if (!(widget instanceof ToolItem)) {
+         throw new IllegalStateException("ToolItem expected, but is: " + widget);
+      }
+      ToolItem toolItem = (ToolItem)widget;
+      if (SWTUtils.hasStyle(toolItem, SWT.PUSH)) {
+         return new SWTBotToolbarPushButton(toolItem);
+      }
+      else if(SWTUtils.hasStyle(toolItem, SWT.CHECK)) {
+         return new SWTBotToolbarToggleButton(toolItem);
+      }
+      else if(SWTUtils.hasStyle(toolItem, SWT.RADIO)) {
+         return new SWTBotToolbarRadioButton(toolItem);
+      }
+      else if(SWTUtils.hasStyle(toolItem, SWT.DROP_DOWN)) {
+         return new SWTBotToolbarDropDownButton(toolItem);
+      }
+      else if(SWTUtils.hasStyle(toolItem, SWT.SEPARATOR)) {
+         return new SWTBotToolbarSeparatorButton(toolItem);
+      }
+      else {
+         throw new IllegalStateException("Unsupported tool item: " + toolItem);
+      }
+   }
+   
+   /**
     * Unifies all line breaks of files with the given extensions in the given {@link IProject}.
     * @param project The {@link IProject} to operate on.
     * @param fileExtensions The file extensions of files to modify.
@@ -1903,5 +1932,47 @@ public class TestUtilsUtil {
       if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
          assertEquals(expected, actual);
       }
+   }
+
+   /**
+    * Waits until the given {@link IProject} exists and is open.
+    * @param bot The {@link SWTBot} to use.
+    * @param project The {@link IProject} to wait for.
+    */
+   public static void waitForProject(SWTBot bot, final IProject project) {
+      assertNotNull(project);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return project.exists() && project.isOpen();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Timed out waiting for " + project + " to exist and to be open.";
+         }
+      });
+   }
+
+   /**
+    * Opens the perspective 'Resource'.
+    * @return The {@link IPerspectiveDescriptor} of the perspective 'Resource'.
+    */
+   public static IPerspectiveDescriptor openResourcePerspective() {
+      IPerspectiveDescriptor resourcePerspective = getResourcePerspective();
+      openPerspective(resourcePerspective);
+      return resourcePerspective;
+   }
+
+   /**
+    * Returns the {@link IPerspectiveDescriptor} of the perspective 'Resource'.
+    * @return The {@link IPerspectiveDescriptor} of the perspective 'Resource'.
+    */
+   public static IPerspectiveDescriptor getResourcePerspective() {
+      return TestUtilsUtil.getPerspective("org.eclipse.ui.resourcePerspective");
    }
 }

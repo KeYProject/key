@@ -44,7 +44,7 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
             int originalMaximalNumberOfSetNodesPerBranchOnRun = KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun();
             try {
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Test initial debug target
                String expectedModelPathInBundle = "data/manyStatements/oracle/ManyStatements";
                String expectedModelFileExtension = ".xml";
@@ -84,7 +84,9 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
-                           8, executor);
+                           Boolean.FALSE,
+                           8, 
+                           executor);
    }
 
    /**

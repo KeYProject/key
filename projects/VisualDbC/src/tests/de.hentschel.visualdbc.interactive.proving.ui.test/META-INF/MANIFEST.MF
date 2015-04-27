@@ -7,7 +7,7 @@ Bundle-Activator: de.hentschel.visualdbc.interactive.proving.ui.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.core.resources;bundle-version="3.6.1",
- org.junit4;bundle-version="4.8.1",
+ org.junit;bundle-version="4.8.1",
  org.eclipse.swtbot.go;bundle-version="2.0.4",
  org.eclipse.gef;bundle-version="3.6.2",
  org.eclipse.swtbot.eclipse.gef.finder;bundle-version="2.0.4",

@@ -40,7 +40,7 @@ public class SWTBotChangeConditonWithErrorCancel extends AbstractKeYDebugTargetT
             // Get debug target TreeItem
             ErrorDialog.AUTOMATED_MODE=false;
             TestBreakpointsUtil.addSomeBreakpoints(CALLER_PATH, bot, 14);
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetConditiondofAllBreakpoints(target, null, false));
             assertTrue(TestBreakpointsUtil.checkProofConditionofAllBreakpoints(target,  null, false));
@@ -69,6 +69,8 @@ public class SWTBotChangeConditonWithErrorCancel extends AbstractKeYDebugTargetT
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE,
-            8, executor);   
+            Boolean.FALSE,
+            8, 
+            executor);   
    } 
 }

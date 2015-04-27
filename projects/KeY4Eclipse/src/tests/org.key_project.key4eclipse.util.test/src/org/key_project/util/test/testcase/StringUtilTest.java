@@ -26,6 +26,29 @@ import org.key_project.util.java.StringUtil;
  */
 public class StringUtilTest extends TestCase {
    /**
+    * Tests {@link StringUtil#chop(String, int)}
+    */
+   @Test
+   public void testChop() {
+      assertNull(StringUtil.chop(null, 0));
+      assertNull(StringUtil.chop(null, 10));
+      assertEquals("", StringUtil.chop("1234567890", -1));
+      assertEquals("", StringUtil.chop("1234567890", 0));
+      assertEquals(".", StringUtil.chop("1234567890", 1));
+      assertEquals("..", StringUtil.chop("1234567890", 2));
+      assertEquals("...", StringUtil.chop("1234567890", 3));
+      assertEquals("1...", StringUtil.chop("1234567890", 4));
+      assertEquals("12...", StringUtil.chop("1234567890", 5));
+      assertEquals("123...", StringUtil.chop("1234567890", 6));
+      assertEquals("1234...", StringUtil.chop("1234567890", 7));
+      assertEquals("12345...", StringUtil.chop("1234567890", 8));
+      assertEquals("123456...", StringUtil.chop("1234567890", 9));
+      assertEquals("1234567890", StringUtil.chop("1234567890", 10));
+      assertEquals("1234567890", StringUtil.chop("1234567890", 11));
+      assertEquals("1234567890", StringUtil.chop("1234567890", 12));
+   }
+   
+   /**
     * Tests {@link StringUtil#trimRight(String)}.
     */
    @Test

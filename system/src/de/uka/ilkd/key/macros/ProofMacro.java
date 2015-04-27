@@ -20,6 +20,7 @@ import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
@@ -219,6 +220,40 @@ public interface ProofMacro {
                                           ProverTaskListener listener) throws InterruptedException;
 
     /**
+     * Apply this macro on the given goals.
+     *
+     * This method can change the proof by applying rules to it.
+     *
+     * This method is usually called from a dedicated thread and not the GUI
+     * thread. The thread it runs on may be interrupted. In this case, the macro
+     * may report the interruption by an {@link InterruptedException}.
+     *
+     * A {@link ProverTaskListener} can be provided to which the progress will
+     * be reported. If no reports are desired, <code>null</code> cna be used for
+     * this parameter. If more than one listener is needed, consider combining
+     * them using a single listener object using the composite pattern.
+     *
+     * @param proof
+     *            the {@link Proof} to work with.
+     * @param mediator
+     *            the mediator (not <code>null</code>)
+     * @param goals
+     *            the goals (not <code>null</code>)
+     * @param posInOcc
+     *            the position in occurrence (may be <code>null</code>)
+     * @param listener
+     *            the listener to use for progress reports (may be
+     *            <code>null</code>)
+     * @throws InterruptedException
+     *             if the application of the macro has been interrupted.
+     */
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator, // TODO: Avoid KeYMediator in macros because it is Swing UI specific. Modify other applyTo methods so that they know the Proof
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException;
+
+    /**
      * Apply this macro on the given node.
      *
      * This method can change the proof by applying rules to it.
@@ -281,9 +316,13 @@ public interface ProofMacro {
         @Override
         public void taskStarted(String message, int size) {
             //assert size == numberSteps;
-            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
+            String suffix = getMessageSuffix();
             super.taskStarted(message + suffix, numberGoals * numberSteps);
             super.taskProgress(completedGoals * numberSteps);
+        }
+
+        protected String getMessageSuffix() {
+            return " [" + (completedGoals + 1) + "/" + numberGoals + "]";
         }
 
         @Override

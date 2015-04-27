@@ -67,7 +67,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       
       @Override
       public void selectedNodeChanged(KeYSelectionEvent e) {
-         updateSelectedNodeThreadSafe();
+         if (e.getSource().getSelectedNode().proof() == proof) {
+            updateSelectedNodeThreadSafe();
+         }
       }
    };
    
@@ -131,6 +133,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       labelProvider = new ProofTreeLabelProvider(getTreeViewer(), proof);
       getTreeViewer().setLabelProvider(labelProvider);
       getTreeViewer().setInput(proof);
+      contentProvider.injectTopLevelElements();
       // Create context menu of TreeViewer
       MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
       Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
@@ -154,10 +157,12 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
     * @param e The event.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      // Listen for mediator selection changes caused by the user to synchronize them with the shown TreeViewer 
-      environment.getMediator().addKeYSelectionListener(listener);
-      // Make sure that correct selected node is shown
-      updateSelectedNodeThreadSafe();
+      if (e.getSource() == proof) {
+         // Listen for mediator selection changes caused by the user to synchronize them with the shown TreeViewer 
+         environment.getMediator().addKeYSelectionListener(listener);
+         // Make sure that correct selected node is shown
+         updateSelectedNodeThreadSafe();
+      }
    }
    
    /**

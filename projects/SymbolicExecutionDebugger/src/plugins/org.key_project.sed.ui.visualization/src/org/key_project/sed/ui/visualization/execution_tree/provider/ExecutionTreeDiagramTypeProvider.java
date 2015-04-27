@@ -26,13 +26,13 @@ import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.notification.INotificationService;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramBehavior;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLReader;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
-import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
+import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramBehavior;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -117,17 +117,17 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * {@inheritDoc}
     */
    @Override
-   public void init(Diagram diagram, IDiagramEditor diagramEditor) {
+   public void init(Diagram diagram, IDiagramBehavior diagramBehavior) {
       try {
          // Make sure that the editor is compatible with this diagram
-         Assert.isTrue(diagramEditor instanceof ExecutionTreeDiagramEditor, "The diagram type " + TYPE + " must be used in ExecutionTreeDiagramEditor instances.");
-         boolean readonly = ((ExecutionTreeDiagramEditor)diagramEditor).isReadOnly();
+         Assert.isTrue(diagramBehavior instanceof ExecutionTreeDiagramBehavior, "The diagram type " + TYPE + " must be used in ExecutionTreeDiagramBehavior instances.");
+         boolean readonly = ((ExecutionTreeDiagramBehavior)diagramBehavior).isReadOnly();
          getFeatureProvider().setReadOnly(readonly);
          for (ExecutionTreeToolBehaviorProvider behaviorProvider : getAvailableToolBehaviorProviders()) {
             behaviorProvider.setReadOnly(readonly);
          }
          // Initialize type provider
-         super.init(diagram, diagramEditor);
+         super.init(diagram, diagramBehavior);
          // Load domain model file
          IFeatureProvider featureProvider = getFeatureProvider();
          if(featureProvider instanceof ExecutionTreeFeatureProvider) {

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -66,7 +67,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public RefactoringScope defineRefactoringScope(Services services,
+   public RefactoringScope defineRefactoringScope(TermLabelState state,
+                                                  Services services,
                                                   PosInOccurrence applicationPosInOccurrence,
                                                   Term applicationTerm,
                                                   Rule rule,
@@ -96,7 +98,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(Services services,
+   public void refactoreLabels(TermLabelState state,
+                               Services services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,

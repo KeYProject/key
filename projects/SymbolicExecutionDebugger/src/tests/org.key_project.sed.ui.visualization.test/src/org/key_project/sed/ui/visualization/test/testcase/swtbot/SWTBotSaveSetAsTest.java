@@ -34,14 +34,14 @@ public class SWTBotSaveSetAsTest extends AbstractSymbolicExecutionTreeTest {
          @Override
          public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
             // Test launch
-            assertSavedFile(bot, debugTree, project, "SavedLaunchSetFile", 0);
+            assertSavedFile(bot, debugView, debugTree, project, "SavedLaunchSetFile", 0);
             // Test debug target
-            assertSavedFile(bot, debugTree, project, "SavedDebugTargetSetFile", 0, 0);
+            assertSavedFile(bot, debugView, debugTree, project, "SavedDebugTargetSetFile", 0, 0);
          }
          
-         protected void assertSavedFile(SWTWorkbenchBot bot, SWTBotTree debugTree, IProject project, String fileName, int... toSelect) throws Exception {
+         protected void assertSavedFile(SWTWorkbenchBot bot, SWTBotView debugView, SWTBotTree debugTree, IProject project, String fileName, int... toSelect) throws Exception {
             // Perform save
-            TestSedCoreUtil.selectInDebugTree(debugTree, toSelect);
+            TestSedCoreUtil.selectInDebugTree(debugView, toSelect);
             TestUtilsUtil.clickContextMenu(debugTree, "Save Symbolic Execution Tree as Set File");
             SWTBotShell shell = bot.shell("Save as");
             shell.bot().tree().select("SWTBotSaveSetAsTest_testSaveAs");

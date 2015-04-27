@@ -271,6 +271,7 @@ public class KeYExampleUtil {
                             if (connection.getContentLength() > 0) {
                                 in = connection.getInputStream();
                                 File file = new File(target, pathInTarget);
+                                file.getParentFile().mkdirs();
                                 out = new FileOutputStream(file);
                                 int read;
                                 byte[] buffer = new byte[1024 * 10];

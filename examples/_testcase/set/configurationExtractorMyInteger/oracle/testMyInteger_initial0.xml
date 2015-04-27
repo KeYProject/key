@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="One Step Simplification resulting in {}">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="summand" programVariable="summand" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o2" condition="true"/>
+   </state>
+   <object xml:id="o1" name="summand" type="MyInteger">
+   </object>
+   <object xml:id="o2" name="self" type="MyInteger">
+      <value name="value" programVariable="value" isArrayIndex="false" value="int::select(heap,self,MyInteger::$value)" type="int" condition="true"/>
+   </object>
+</model>

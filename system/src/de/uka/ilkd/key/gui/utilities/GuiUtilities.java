@@ -23,17 +23,10 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 public final class GuiUtilities {
-    
-    /**
-     * The shared instance of the key file chooser.
-     */
-    private static KeYFileChooser fileChooser;
 
     private GuiUtilities() {
         throw new Error("Do not instantiate");
@@ -60,32 +53,6 @@ public final class GuiUtilities {
         toolkit.getSystemClipboard().setContents(ss, ss);
     }
 
-
-    /**
-     * Gets <b>the</b> file chooser for the prover.
-     * 
-     * The chooser is created lazily when first requested. It points to the
-     * directory of the command line argument (if present), otherwise to the
-     * user's home directory.
-     * 
-     * @param title
-     *            the title of the key file chooser
-     * 
-     * @return the key file chooser
-     */
-    public static KeYFileChooser getFileChooser(String title) {
-        if (fileChooser == null) {
-            String initDir = Main.getFileNameOnStartUp() == null 
-                             ? System.getProperty("user.dir")
-                             : Main.getFileNameOnStartUp();
-                             
-            fileChooser = new KeYFileChooser(initDir);
-        }
-        
-        fileChooser.setDialogTitle(title);
-        fileChooser.prepare();
-        return fileChooser;
-    }
 
     /**
      * Center a component on the screen.

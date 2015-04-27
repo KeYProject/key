@@ -15,7 +15,7 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import javax.swing.tree.TreeNode;
 
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * Filters for the proof tree view.
@@ -62,14 +62,14 @@ public abstract class ProofTreeViewFilter {
 	        return false;
 	    }
 
-	    public abstract boolean countChild(GUIProofTreeNode child, TreeNode parent);
+	    public abstract boolean countChild(GUIProofTreeNode child, TreeNode parent, int pos);
 
 	    public int getChildCount(Object parent) {
 	        TreeNode child;
 	        int count = 0;
 	        for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
 	            child = ((TreeNode) parent).getChildAt(i);
-	            if (countChild(child, (TreeNode) parent)) {
+	            if (countChild(child, (TreeNode) parent, i)) {
 	                count++;
 	            }
 	        }
@@ -81,7 +81,7 @@ public abstract class ProofTreeViewFilter {
 	        int count = -1;
 	        for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
 	            child = ((TreeNode) parent).getChildAt(i);
-	            if (countChild(child, (TreeNode) parent)) {
+	            if (countChild(child, (TreeNode) parent, i)) {
 	                count++;
 	                if (index == count) {
 	                    return child;
@@ -96,7 +96,7 @@ public abstract class ProofTreeViewFilter {
 	        TreeNode guiParent = (TreeNode)parent;
 	        int count = -1;
 	        for (int i = 0; i < guiParent.getChildCount();i++) {
-	            if (countChild(guiParent.getChildAt(i), guiParent)) {
+	            if (countChild(guiParent.getChildAt(i), guiParent, i)) {
 	                count++;
 	                if (guiParent.getChildAt(i) == child) {
 	                    return count;
@@ -114,9 +114,9 @@ public abstract class ProofTreeViewFilter {
 	     * Used by getChild, getChildCount and getIndexOfChild (implementing
 	     * TreeModel).
 	     */
-	    protected boolean countChild(TreeNode child, TreeNode parent) {
+	    protected boolean countChild(TreeNode child, TreeNode parent, int pos) {
 	        if (child instanceof GUIProofTreeNode) {
-	            return countChild((GUIProofTreeNode)child, parent);
+	            return countChild((GUIProofTreeNode)child, parent, pos);
 	        } else if (child instanceof GUIBranchNode) {
 	            return true;
 	        }
@@ -142,26 +142,20 @@ public abstract class ProofTreeViewFilter {
 		}
 
 		@Override
-		public boolean countChild(GUIProofTreeNode node, TreeNode parent) {
+		public boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
 
-			int pos = -1;
-			for (int i = 0; i < parent.getChildCount();i++) {
-				if (parent.getChildAt(i) == node) {
-					pos = i;
-					break;
-				}
-			}
 			if (pos == parent.getChildCount() - 1) {
 				return true;
 			}
 			// count if child is inlined by hide closed subtrees
-			if (HIDE_CLOSED_SUBTREES.isActive() && !(parent.getChildAt(pos + 1) instanceof
-					GUIBranchNode) &&node.getNode()
-					.childrenCount() != 1) {
+			if (HIDE_CLOSED_SUBTREES.isActive() &&
+                            !(parent.getChildAt(pos + 1) instanceof GUIBranchNode) &&
+                            node.getNode().childrenCount() != 1) {
 				return true;
 			}
 			return false;
 		}
+
 	}
 
 	private static class OnlyInteractiveFilter extends NodeFilter {
@@ -182,24 +176,17 @@ public abstract class ProofTreeViewFilter {
 		}
 
 		@Override
-		public boolean countChild(GUIProofTreeNode node, TreeNode parent) {
+		public boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
 			final boolean interactive = node.getNode().getNodeInfo().getInteractiveRuleApplication();
 			if (interactive) return true;
 
-			int pos = -1;
-			for (int i = 0; i < parent.getChildCount();i++) {
-				if (parent.getChildAt(i) == node) {
-					pos = i;
-					break;
-				}
-			}
 			if (pos == parent.getChildCount() - 1) {
 				return true;
 			}
 			// count if child is inlined by hide closed subtrees
-			if (HIDE_CLOSED_SUBTREES.isActive() && !(parent.getChildAt(pos + 1) instanceof
-					GUIBranchNode) &&node.getNode()
-					.childrenCount() != 1) {
+			if (HIDE_CLOSED_SUBTREES.isActive() &&
+                            !(parent.getChildAt(pos + 1) instanceof GUIBranchNode) &&
+                            node.getNode().childrenCount() != 1) {
 				return true;
 			}
 			return false;

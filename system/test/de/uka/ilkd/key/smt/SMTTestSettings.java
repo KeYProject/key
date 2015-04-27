@@ -3,9 +3,9 @@ package de.uka.ilkd.key.smt;
 import java.io.File;
 import java.util.Collection;
 
-import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.PathConfig;
 
 public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings{
 

@@ -136,10 +136,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
         // date by the ProgVarReplaceVisitor
 
         if(atPres != null) {
-          for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-             if(atPres.get(h) != null && originalAtPres.get(h) != null) {
-                 assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
-                 result.put(originalAtPres.get(h), atPres.get(h));
+            for (Map.Entry<LocationVariable, Term> en : originalAtPres.entrySet()) {
+                LocationVariable var = en.getKey();
+                Term replace = atPres.get(var);
+                Term origReplace = en.getValue();
+                if(replace != null && origReplace != null) {
+                    assert replace.sort().equals(origReplace.sort());
+                    result.put(origReplace, replace);
              }
           }
         }
@@ -285,9 +288,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public Map<LocationVariable,Term> getInternalAtPres() {
         Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
-        for(LocationVariable h : originalAtPres.keySet()) {
-          result.put(h, originalAtPres.get(h));
-        }
+//        for(LocationVariable h : originalAtPres.keySet()) {
+//          result.put(h, originalAtPres.get(h));
+//        }
+        result.putAll(originalAtPres);
         return result;
     }
 

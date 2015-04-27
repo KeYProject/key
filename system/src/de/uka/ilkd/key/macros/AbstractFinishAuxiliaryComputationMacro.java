@@ -6,6 +6,7 @@ package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -14,11 +15,16 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.InfFlowProgVarRenamer;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.MiscTools;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 
@@ -36,6 +42,30 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
     @Override
     public String getDescription() {
         return "Finish auxiliary computation.";
+    }
+    
+    /**
+     * Try to save a side proof.
+     * Saving does not rely on UI features, but failures are reported to the UI.
+     * @param proof
+     * @param mediator
+     */
+    protected void saveSideProof(Proof proof, KeYMediator mediator) {
+        String proofName = proof.name().toString();
+        if (proofName.endsWith(".key")) {
+            proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
+        } else if (proofName.endsWith(".proof")) {
+            proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
+        }
+        final String filename = MiscTools.toValidFileName(proofName) + ".proof";
+        final File toSave = new File(proof.getProofFile().getParentFile(), filename);
+        final KeYResourceManager krm = KeYResourceManager.getManager();
+        final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
+        try {
+            ps.save();
+        } catch (IOException e) {
+            mediator.getUI().reportException(this, null, e);
+        }
     }
 
     static Term calculateResultingTerm(Proof proof,

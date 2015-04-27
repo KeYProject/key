@@ -55,6 +55,7 @@ import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
+import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
@@ -350,7 +351,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
-        bindRuleSet ( d, "javaIntegerSemantics", -5000 );
+        bindRuleSet ( d, "javaIntegerSemantics", ifZero(sequentContainsNoPrograms(), longConst(-5000), 
+                    ifZero(leq(CountBranchFeature.INSTANCE, longConst(1)), longConst(-5000), inftyConst()) ));
         
         // always give infinite cost to obsolete rules
         bindRuleSet (d, "obsolete", inftyConst());
@@ -1157,7 +1159,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         .create ( right, left, numbers ) ),
                                   TermSmallerThanFeature.create ( right, left ) )
                             ) ) ) ) ) ),
-                 longConst ( -4000 ) } ) );
+                 longConst ( -4000 ),
+                 EqNonDuplicateAppFeature.INSTANCE} ) ); // Without EqNonDuplicateAppFeature.INSTANCE rule 'applyEq' might be applied on the same term without changing the sequent for a really long time. This is tested by TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
     }
 
     
@@ -2257,7 +2260,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                    
             setupDefOpsExpandMod ( d );
             
-            bindRuleSet ( d, "defOps_expandRanges", -5000 );
+            bindRuleSet ( d, "defOps_expandRanges", -8000 );
             bindRuleSet ( d, "defOps_expandJNumericOp", -500 );
             bindRuleSet ( d, "defOps_modHomoEq", -5000 );
         } else {

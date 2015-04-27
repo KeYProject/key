@@ -68,6 +68,7 @@ public abstract class TestSMTSolver extends TestCommons {
 		Assert.assertTrue(correctResult(testFile + "allex1.key", true));
 	}
 
+	// LONG runtime with CVC3 (~300s)
 	public void testAllex2() {
 		Assert.assertTrue(correctResult(testFile + "allex2.key", false));
 	}
@@ -89,6 +90,7 @@ public abstract class TestSMTSolver extends TestCommons {
 			Assert.assertTrue(correctResult(testFile + "termite1.key", true));
 	}
 
+	// LONG runtime in CVC3 (~300s)
 	public void testTermlIte2() {
 		if (getSolverType().supportsIfThenElse())
 			Assert.assertTrue(correctResult(testFile + "termite2.key", false));

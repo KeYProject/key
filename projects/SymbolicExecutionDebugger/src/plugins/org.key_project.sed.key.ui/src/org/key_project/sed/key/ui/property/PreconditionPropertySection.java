@@ -24,7 +24,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class PreconditionPropertySection extends AbstractPredicatePropertySection {
+public class PreconditionPropertySection extends AbstractTruthValuePropertySection {
    /**
     * {@inheritDoc}
     */
@@ -47,7 +47,7 @@ public class PreconditionPropertySection extends AbstractPredicatePropertySectio
     * {@inheritDoc}
     */
    @Override
-   protected AbstractPredicateComposite createContentComposite(Composite parent) {
+   protected AbstractTruthValueComposite createContentComposite(Composite parent) {
       return new PreconditionComposite(parent, getWidgetFactory());
    }
 }

@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
@@ -36,6 +35,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -48,7 +48,28 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * Tests for {@link JDTUtil}
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class JDTUtilTest extends TestCase {
+   /**
+    * Tests {@link JDTUtil#ensureValidJavaTypeName(String, IJavaProject)}
+    */
+   @Test
+   public void testEnsureValidJavaTypeName() throws Exception {
+      IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testEnsureValidJavaTypeName");
+      TestUtilsUtil.createFile(javaProject.getProject().getFolder(JDTUtil.getSourceFolderName()), "MyClass", "public class MyClass {}");
+      // Validate null
+      assertNull(JDTUtil.ensureValidJavaTypeName(null, null));
+      assertNull(JDTUtil.ensureValidJavaTypeName(null, javaProject));
+      // Validate empty String
+      assertEquals("MyClass", JDTUtil.ensureValidJavaTypeName("MyClass", null));
+      assertEquals("MyClass", JDTUtil.ensureValidJavaTypeName("MyClass", javaProject));
+      assertTrue(JavaConventionsUtil.validateJavaTypeName("MyClass", javaProject).isOK());
+      // Validate invalid name
+      assertEquals("_M_y_C_lass__", JDTUtil.ensureValidJavaTypeName("(M)y[C]lass{}", null));
+      assertEquals("_M_y_C_lass__", JDTUtil.ensureValidJavaTypeName("(M)y[C]lass{}", javaProject));
+      assertTrue(JavaConventionsUtil.validateJavaTypeName("_M_y_C_lass__", javaProject).isOK());
+   }
+   
    /**
     * Tests {@link JDTUtil#isInSourceFolder(IResource)}.
     */
@@ -169,34 +190,6 @@ public class JDTUtilTest extends TestCase {
       assertTrue(block.getStartPosition() >= method.getSourceRange().getOffset());
       assertTrue(block.getStartPosition() + block.getLength() <= method.getSourceRange().getOffset() + method.getSourceRange().getLength());
    }
-   
-    /**
-     * Tests {@link JDTUtil#getQualifiedParameterType(IType, org.eclipse.jdt.core.ILocalVariable)}.
-     */
-    @Test
-    public void testGetQualifiedParameterType() throws CoreException, InterruptedException {
-        // Create projects with test content
-        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetQualifiedParameterType");
-        IFolder srcFolder = javaProject.getProject().getFolder("src");
-        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/SignatureLabelTest", srcFolder);
-        // Get type
-        IType type = javaProject.findType("SignatureLabelTest");
-        assertNotNull(type);
-        IMethod[] methods = type.getMethods();
-        IMethod method = JDTUtil.getElementForQualifiedMethodLabel(methods, "ADateBDate(a.Date, b.Date)");
-        assertNotNull(method);
-        ILocalVariable[] parameters = method.getParameters();
-        assertEquals(2, parameters.length);
-        // Test null type
-        assertNull(JDTUtil.getQualifiedParameterType(null, parameters[0]));
-        // Test null parameter
-        assertNull(JDTUtil.getQualifiedParameterType(type, null));
-        // Test both null
-        assertNull(JDTUtil.getQualifiedParameterType(null, null));
-        // Test methods parameter
-        assertEquals("a.Date", JDTUtil.getQualifiedParameterType(type, parameters[0]));
-        assertEquals("b.Date", JDTUtil.getQualifiedParameterType(type, parameters[1]));
-    }
     
     /**
      * Tests {@link JDTUtil#getElementForQualifiedMethodLabel(IMethod[], String)}
@@ -332,7 +325,7 @@ public class JDTUtilTest extends TestCase {
         // Create initial java project
         IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testAddClasspathEntry");
         IFolder src = javaProject.getProject().getFolder("src");
-        IClasspathEntry[] defaultEntries = TestUtilsUtil.getDefaultJRELibrary();
+        IClasspathEntry[] defaultEntries = JDTUtil.getDefaultJRELibrary();
         IClasspathEntry[] entries = javaProject.getRawClasspath();
         assertEquals(1 + defaultEntries.length, entries.length);
         assertEquals(src.getFullPath(), entries[0].getPath());

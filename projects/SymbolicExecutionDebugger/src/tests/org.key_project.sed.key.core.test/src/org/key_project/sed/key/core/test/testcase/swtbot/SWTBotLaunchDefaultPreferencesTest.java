@@ -13,20 +13,29 @@
 
 package org.key_project.sed.key.core.test.testcase.swtbot;
 
+import java.util.Iterator;
+
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
+import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -38,6 +47,170 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
  * @author Martin Hentschel
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
+   /**
+    * Tests the launch with highlighting of reached source code.
+    */
+   @Test
+   public void testHighlightSourcecode() throws Exception {
+      doHiglightSourceCodeTest("SWTBotLaunchDefaultPreferencesTest_testDoNotHighlightSourcecode", true);
+   }
+
+   /**
+    * Tests the launch without highlighting of reached source code.
+    */
+   @Test
+   public void testDoNotHighlightSourcecode() throws Exception {
+      doHiglightSourceCodeTest("SWTBotLaunchDefaultPreferencesTest_testHighlightSourcecode", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testHighlightSourcecode()}
+    * and {@link #testDoNotHighlightSourcecode()}.
+    * @param projectName The project name to use.
+    * @param highlightSourceCode Highlight source code?
+    * @throws Exception Occurred Exception
+    */
+   protected void doHiglightSourceCodeTest(String projectName, 
+                                           final boolean highlightSourceCode) throws Exception {
+      boolean originalHighlightSourceCode = KeYSEDPreferences.isHighlightReachedSourceCode();
+      try {
+         KeYSEDPreferences.setUsePrettyPrinting(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (highlightSourceCode) {
+            preferenceShell.bot().checkBox("Highlight reached source code during symbolic execution").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Highlight reached source code during symbolic execution").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(highlightSourceCode, KeYSEDPreferences.isHighlightReachedSourceCode());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
+               resume(bot, item, target);
+               // Check source code highlighting
+               SWTBotEditor editor = bot.activeEditor();
+               IEditorPart editorPart = editor.getReference().getEditor(true);
+               assertTrue(editorPart instanceof ITextEditor);
+               IDocumentProvider documentProvider = ((ITextEditor) editorPart).getDocumentProvider();
+               IAnnotationModel annotationModel = documentProvider.getAnnotationModel(editorPart.getEditorInput());
+               boolean reachedAnnotationAvailable = false;
+               Iterator<?> iterator = annotationModel.getAnnotationIterator();
+               while (iterator.hasNext()) {
+                  Object next = iterator.next();
+                  if (next instanceof SymbolicallyReachedAnnotation) {
+                     reachedAnnotationAvailable = true;
+                  }
+               }
+               assertEquals(highlightSourceCode, reachedAnnotationAvailable);
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/unicodeTest/test",
+                              true,
+                              true,
+                              createMethodSelector("UnicodeTest", "magic", "Z", "Z"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              8, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setHighlightReachedSourceCode(originalHighlightSourceCode);
+         assertEquals(originalHighlightSourceCode, KeYSEDPreferences.isHighlightReachedSourceCode());
+      }
+   }
+   
+   /**
+    * Tests the launch where truth value evaluation is enabled.
+    */
+   @Test
+   public void testTruthValueEvaluationEnabled() throws Exception {
+      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationEnabled", true);
+   }
+
+   /**
+    * Tests the launch where truth value evaluation is disabled.
+    */
+   @Test
+   public void testTruthValueEvaluationDisabled() throws Exception {
+      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationDisabled", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testTruthValueEvaluationEnabled()}
+    * and {@link #testTruthValueEvaluationDisabled()}.
+    * @param projectName The project name to use.
+    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @throws Exception Occurred Exception
+    */
+   protected void doTruthValueEvaluationTest(String projectName, 
+                                             final boolean truthValueEvaluationEnabled) throws Exception {
+      boolean originalTruthValueEvaluationEnabled = KeYSEDPreferences.isTruthValueEvaluationEnabled();
+      try {
+         KeYSEDPreferences.setUsePrettyPrinting(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (truthValueEvaluationEnabled) {
+            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(truthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
+               // Check launch
+               Object threadObject = TestUtilsUtil.getTreeItemData(item);
+               assertTrue(threadObject instanceof IKeYSEDDebugNode);
+               assertEquals(truthValueEvaluationEnabled, ((IKeYSEDDebugNode<?>) threadObject).isTruthValueEvaluationEnabled());
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/unicodeTest/test",
+                              true,
+                              true,
+                              createMethodSelector("UnicodeTest", "magic", "Z", "Z"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              Boolean.TRUE,
+                              Boolean.TRUE,
+                              Boolean.FALSE,
+                              8, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setTruthValueEvaluationEnabled(originalTruthValueEvaluationEnabled);
+         assertEquals(originalTruthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+      }
+   }
+   
    /**
     * Tests the launch where unicode signs are used.
     */
@@ -82,7 +255,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Do run
                resume(bot, item, target);
                if (useUnicode) {
@@ -107,7 +280,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.TRUE,
                               Boolean.TRUE,
-                              8, executor);
+                              Boolean.FALSE,
+                              8, 
+                              executor);
       }
       finally {
          // Restore original value
@@ -159,7 +334,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Do run
                resume(bot, item, target);
                if (usePrettyPrinting) {
@@ -184,7 +359,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.TRUE,
-                              8, executor);
+                              Boolean.FALSE,
+                              8, 
+                              executor);
       }
       finally {
          // Restore original value
@@ -236,7 +413,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Do run
                resume(bot, item, target);
                if (mergeBranchConditions) {
@@ -261,7 +438,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
-                              8, executor);
+                              Boolean.FALSE,
+                              8, 
+                              executor);
       }
       finally {
          // Restore original value
@@ -315,11 +494,11 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Get variables view
                SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Do run
                resume(bot, item, target);
                // Select statement int result;
-               item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1); 
+               item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1); 
                // Wait for jobs
                variablesView.show();
                TestUtilsUtil.sleep(1000); // Give the UI the chance to show variables.
@@ -344,7 +523,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
-                              8, executor);
+                              Boolean.FALSE,
+                              8, 
+                              executor);
       }
       finally {
          // Restore original value
@@ -426,7 +607,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
-                              8, executor);
+                              Boolean.FALSE,
+                              8, 
+                              executor);
       }
       finally {
          // Restore original value
@@ -501,7 +684,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Do resume and test created tree
                String expectedModelPathInBundle;
                if (showSignature) {
@@ -532,7 +715,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               null,
-                              8, executor);
+                              Boolean.FALSE,
+                              8, 
+                              executor);
       }
       finally {
          // Restore original value
@@ -586,7 +771,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Do run
                resume(bot, item, target);
                if (variablesAreOnlyComputedFromUpdates) {
@@ -606,6 +791,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,

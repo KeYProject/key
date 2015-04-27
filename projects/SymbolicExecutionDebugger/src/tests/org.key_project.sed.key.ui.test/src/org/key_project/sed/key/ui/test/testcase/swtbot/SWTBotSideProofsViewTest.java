@@ -75,6 +75,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(false, false, 0, -1, new int[][] {}));
          // Test with collecting side proofs
@@ -93,6 +94,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(true, true, 4, 0, new int[][] {{1}, {0, 2}, {0}}));
          // Test without collecting side proofs again
@@ -111,6 +113,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(true, false, 0, -1, new int[][] {}));
       }
@@ -194,13 +197,13 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
          // Make sure that no side proofs are available
          assertEquals(0, SideProofStore.DEFAULT_INSTANCE.countEntries());
          // Finish symbolic execution
-         SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+         SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
          resume(bot, item, target);
          TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target);
          // Expand debug tree to initiate side proofs
-         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0, 2);
-         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 1, 2);
-         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 1);
+         TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 0, 0, 2);
+         TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 0, 1, 2);
+         TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 1, 1);
          // Test collected side proofs
          SWTBotView view = bot.viewById(SideProofsView.VIEW_ID);
          view.setFocus();

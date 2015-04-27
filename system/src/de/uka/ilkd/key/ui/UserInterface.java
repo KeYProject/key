@@ -81,21 +81,7 @@ public interface UserInterface
      * @param file the File with the problem description or the proof
      */
     void loadProblem(File file);
-
-    /**
-     * loads the problem or proof from the given file
-     * @param file the File with the problem description or the proof
-     * @param classPath the class path entries to use.
-     * @param bootClassPath the boot class path to use. 
-     */
-    void loadProblem(File file, List<File> classPath, File bootClassPath);
-
-    public void noAutoSave();
-
-    public void resetAutoSave();
-
-    public boolean autoSave();
-
+    
     void setSaveOnly(boolean s);
 
     boolean isSaveOnly();

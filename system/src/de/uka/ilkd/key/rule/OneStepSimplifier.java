@@ -25,7 +25,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -36,6 +35,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -47,6 +47,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.LRUCache;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -223,7 +224,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * locally at the given position using the given taclet index.
      * @param protocol
      */
-    private SequentFormula simplifyPos(Services services,
+    private SequentFormula simplifyPos(Goal goal, Services services,
                     PosInOccurrence pos,
                     int indexNr,
                     Protocol protocol) {
@@ -243,7 +244,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                 }
             }
             RewriteTaclet taclet = (RewriteTaclet) app.rule();
-            SequentFormula result = taclet.getRewriteResult(services, app);
+            SequentFormula result = taclet.getRewriteResult(goal, new TermLabelState(), services, app);
             if(protocol != null) {
                 protocol.add(app);
             }
@@ -260,12 +261,12 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * index.
      * @param protocol
      */
-    private SequentFormula simplifySub(Services services,
+    private SequentFormula simplifySub(Goal goal, Services services,
                     PosInOccurrence pos,
                     int indexNr, Protocol protocol) {
         for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {
             SequentFormula result
-            = simplifyPosOrSub(services, pos.down(i), indexNr, protocol);
+            = simplifyPosOrSub(goal, services, pos.down(i), indexNr, protocol);
             if(result != null) {
                 return result;
             }
@@ -279,7 +280,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * subterms using the given taclet index.
      * @param protocol
      */
-    private SequentFormula simplifyPosOrSub(Services services,
+    private SequentFormula simplifyPosOrSub(Goal goal, Services services,
                     PosInOccurrence pos,
                     int indexNr, Protocol protocol) {
         final Term term = pos.subTerm();
@@ -289,14 +290,14 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
 
         SequentFormula result;
         if(bottomUp[indexNr]) {
-            result = simplifySub(services, pos, indexNr, protocol);
+            result = simplifySub(goal, services, pos, indexNr, protocol);
             if(result == null) {
-                result = simplifyPos(services, pos, indexNr, protocol);
+                result = simplifyPos(goal, services, pos, indexNr, protocol);
             }
         } else {
-            result = simplifyPos(services, pos, indexNr, protocol);
+            result = simplifyPos(goal, services, pos, indexNr, protocol);
             if(result == null) {
-                result = simplifySub(services, pos, indexNr, protocol);
+                result = simplifySub(goal, services, pos, indexNr, protocol);
             }
         }
 
@@ -327,7 +328,8 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                 protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
             }
             Term result = pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
-            ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, 
+            ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), 
+                                                                                  services, 
                                                                                   in,
                                                                                   pos, // TODO: pos.subTerm() == in should be true which is currently not the case (labels are missing)
                                                                                   this, 
@@ -413,7 +415,9 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula), 
                                                             PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
                                                             inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, applicatinPIO, lastProof.getServices());
+        ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
+        ifInst = ifInst.append(new IfFormulaInstDirect(pio.constrainedFormula()));
+        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO, lastProof.getServices());
         return ta;
     }
 
@@ -439,7 +443,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
             PosInOccurrence pos = new PosInOccurrence(cf,
                             PosInTerm.getTopLevel(),
                             inAntecedent);
-            result = simplifyPosOrSub(services, pos, i, protocol);
+            result = simplifyPosOrSub(goal, services, pos, i, protocol);
             if(result != null) {
                 return result;
             }

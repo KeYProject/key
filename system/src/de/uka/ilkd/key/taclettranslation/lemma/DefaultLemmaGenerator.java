@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -39,6 +40,7 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
@@ -94,6 +96,24 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                               if(res !=null){
                                       failureOccurred(res);
                               }
+                       }
+
+                       @Override
+                       public String visit(Taclet taclet, boolean visitAddrules) {
+
+                           if (taclet instanceof RewriteTaclet) {
+                               RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
+                               Sequent assumptions = rwTaclet.ifSequent();
+                               int appRestr = rwTaclet.getApplicationRestriction();
+                               if(!assumptions.isEmpty() && appRestr == 0) {
+                                   // any restriction is fine. The polarity switches are equiv
+                                   // to"inSequentState" in this respect.
+                                   failureOccurred("The given taclet " + taclet.name()
+                                        + " is neither \\sameUpdateLevel nor \\inSequentState.");
+                               }
+                           }
+
+                           return super.visit(taclet, visitAddrules);
                        }
                };
                

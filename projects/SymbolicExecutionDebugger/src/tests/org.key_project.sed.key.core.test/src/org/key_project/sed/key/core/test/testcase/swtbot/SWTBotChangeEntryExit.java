@@ -38,7 +38,7 @@ public class SWTBotChangeEntryExit extends AbstractKeYDebugTargetTestCase {
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {            
             // Get debug target TreeItem
             TestBreakpointsUtil.addSomeBreakpoints(CALLER_PATH, bot, 14, 7);
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetEntryAndExitofAllBreakpoints(target, 2,0));
             assertTrue(TestBreakpointsUtil.checkProofEntryAndExitofAllBreakpoints(target,  2,0));
@@ -64,6 +64,8 @@ public class SWTBotChangeEntryExit extends AbstractKeYDebugTargetTestCase {
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE,
-            8, executor);   
+            Boolean.FALSE,
+            8, 
+            executor);   
    } 
 }

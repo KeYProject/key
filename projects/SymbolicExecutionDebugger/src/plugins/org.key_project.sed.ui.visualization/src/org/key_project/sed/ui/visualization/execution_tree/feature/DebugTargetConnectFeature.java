@@ -29,9 +29,10 @@ import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramBehavior;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramBehavior;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -164,14 +165,15 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
             // Select elements
             Object toSelect = context.getProperty(PROPERTY_ELEMENTS_TO_SELECT);
             if (toSelect instanceof Object[]) {
-               IDiagramEditor editor = getFeatureProvider().getDiagramTypeProvider().getDiagramEditor();
-               if (editor != null) {
+               IDiagramBehavior behavior = getFeatureProvider().getDiagramTypeProvider().getDiagramBehavior();
+               if (behavior != null) {
                   List<PictogramElement> pes = new LinkedList<PictogramElement>();
                   for (Object businessObject : (Object[])toSelect) {
                      PictogramElement[] boPes = getFeatureProvider().getAllPictogramElementsForBusinessObject(businessObject);
                      CollectionUtil.addAll(pes, boPes);
                   }
-                  editor.setPictogramElementsForSelection(pes.toArray(new PictogramElement[pes.size()]));
+                  Assert.isTrue(behavior instanceof ExecutionTreeDiagramBehavior);
+                  ((ExecutionTreeDiagramBehavior)behavior).setPictogramElementsForSelection(pes.toArray(new PictogramElement[pes.size()]));
                }
             }
             monitor.worked(1);

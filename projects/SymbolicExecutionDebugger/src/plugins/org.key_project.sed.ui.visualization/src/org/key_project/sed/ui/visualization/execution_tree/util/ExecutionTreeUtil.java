@@ -19,6 +19,8 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.URIConverter;
@@ -26,9 +28,12 @@ import org.eclipse.emf.ecore.resource.impl.ExtensibleURIConverterImpl;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
@@ -69,6 +74,48 @@ public final class ExecutionTreeUtil {
     * Forbid instances.
     */
    private ExecutionTreeUtil() {
+   }
+   
+   /**
+    * Checks if grouping is supported.
+    * @param fp The {@link IFeatureProvider} to use.
+    * @param context The {@link IPictogramElementContext} to check.
+    * @return {@code false} {@link ISEDGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEDGroupable} might be part of the symbolic execution tree.
+    */
+   public static boolean isGroupingSupported(IFeatureProvider fp, IPictogramElementContext context) {
+      PictogramElement pe = context.getPictogramElement();
+      if (pe != null) {
+         Object bo = fp.getBusinessObjectForPictogramElement(pe);
+         if (bo instanceof IDebugElement) {
+            return isGroupingSupported((IDebugElement) bo);
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if grouping is supported.
+    * @param element The {@link IDebugElement} to check.
+    * @return {@code false} {@link ISEDGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEDGroupable} might be part of the symbolic execution tree.
+    */
+   public static boolean isGroupingSupported(IDebugElement element) {
+      if (element != null) {
+         IDebugTarget target = ((IDebugElement) element).getDebugTarget();
+         if (target instanceof ISEDDebugTarget) {
+            return ((ISEDDebugTarget) target).isGroupingSupported();
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
    }
    
    /**

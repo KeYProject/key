@@ -141,37 +141,55 @@ public abstract class AbstractUpdateExtractor {
     * By default the set will contain the exc variable and the backup
     * of arguments and the heap.
     * </p>
+    * @param ignoreExceptionVariable Ignore exception variable?
+    * @param ignoreOldStateVariables Ignore old state variables?
     * @return The objects to ignore.
     */
-   protected Set<Term> computeInitialObjectsToIgnore() {
+   protected Set<Term> computeInitialObjectsToIgnore(boolean ignoreExceptionVariable, 
+                                                     boolean ignoreOldStateVariables) {
       Set<Term> result = new LinkedHashSet<Term>();
-      // Add exception variable to the ignore list because it is not part of the source code.
-      IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
-      if (excVar instanceof ProgramVariable) {
-         result.add(getServices().getTermBuilder().var((ProgramVariable)excVar));
+      if (ignoreExceptionVariable) {
+         // Add exception variable to the ignore list because it is not part of the source code.
+         IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
+         if (excVar instanceof ProgramVariable) {
+            result.add(getServices().getTermBuilder().var((ProgramVariable)excVar));
+         }
       }
-      // Add initial updates which are used as backup of the heap and method arguments. They are not part of the source code and should be ignored.
-      Sequent sequent = getRoot().sequent();
-      for (SequentFormula sf : sequent.succedent()) {
-         Term term = sf.formula();
-         if (Junctor.IMP.equals(term.op())) {
-            if (term.sub(1).op() instanceof UpdateApplication) {
-               Term updateApplcationTerm = term.sub(1);
-               Term updateTerm = UpdateApplication.getUpdate(updateApplcationTerm);
-               if (updateTerm.op() == UpdateJunctor.PARALLEL_UPDATE) {
-                  for (Term subUpdate : updateTerm.subs()) {
-                     if (subUpdate.op() instanceof ElementaryUpdate) {
-                        ElementaryUpdate eu = (ElementaryUpdate)subUpdate.op();
-                        if (eu.lhs() instanceof ProgramVariable) {
-                           result.add(getServices().getTermBuilder().var((ProgramVariable)eu.lhs()));
-                        }
-                     }
-                  }
-               }
+      if (ignoreOldStateVariables) {
+         // Add initial updates which are used as backup of the heap and method arguments. They are not part of the source code and should be ignored.
+         Sequent sequent = getRoot().sequent();
+         for (SequentFormula sf : sequent.succedent()) {
+            Term term = sf.formula();
+            if (Junctor.IMP.equals(term.op())) {
+               fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
             }
          }
       }
       return result;
+   }
+   
+   /**
+    * Utility method of {@link #computeInitialObjectsToIgnore()} which
+    * computes the objects to ignore recursively.
+    * @param term The current {@link Term}.
+    * @param toFill The {@link Set} with {@link Term}s to ignore to fill.
+    */
+   protected void fillInitialObjectsToIgnoreRecursively(Term term, Set<Term> toFill) {
+      if (term.op() instanceof UpdateApplication) {
+         Term updateTerm = UpdateApplication.getUpdate(term);
+         fillInitialObjectsToIgnoreRecursively(updateTerm, toFill);
+      }
+      else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
+         for (int i = 0; i < term.arity(); i++) {
+            fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill);
+         }
+      }
+      else if (term.op() instanceof ElementaryUpdate) {
+         ElementaryUpdate eu = (ElementaryUpdate)term.op();
+         if (eu.lhs() instanceof ProgramVariable) {
+            toFill.add(term.sub(0));
+         }
+      }
    }
 
    /**
@@ -442,7 +460,9 @@ public abstract class AbstractUpdateExtractor {
     * @param objectsToIgnore The objects to ignore.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void collectLocationsFromTerm(Set<ExtractLocationParameter> toFill, Term term, Set<Term> objectsToIgnore) throws ProofInputException {
+   protected void collectLocationsFromTerm(Set<ExtractLocationParameter> toFill, 
+                                           Term term, 
+                                           Set<Term> objectsToIgnore) throws ProofInputException {
       final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
@@ -456,37 +476,10 @@ public abstract class AbstractUpdateExtractor {
       else {
          Sort sort = heapLDT.getSortOfSelect(term.op());
          if (sort != null) {
-            Term selectTerm = term.sub(1);
-            if (!objectsToIgnore.contains(selectTerm) &&
-                !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
-               ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
-               if (var != null) {
-                  if (!isImplicitProgramVariable(var) &&
-                      !hasFreeVariables(term.sub(2))) {
-                     if (var.isStatic()) {
-                        toFill.add(new ExtractLocationParameter(var, true));
-                     }
-                     else {
-                        if (selectTerm.op() instanceof ProgramVariable) {
-                           toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
-                        }
-                        toFill.add(new ExtractLocationParameter(var, selectTerm));
-                     }
-                  }
-               }
-               else {
-                  Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
-                  if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
-                     if (selectTerm.op() instanceof ProgramVariable) {
-                        toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
-                     }
-                     toFill.add(new ExtractLocationParameter(arrayIndex, selectTerm));
-                  }
-                  else {
-                     // Nothing to do, since program variable and array index is undefined.
-                  }
-               }
-            }
+            collectLocationsFromHeapTerms(term.sub(1), term.sub(2), heapLDT, toFill, objectsToIgnore);
+         }
+         else if (heapLDT.getStore() == term.op()) {
+            collectLocationsFromHeapTerms(term.sub(1), term.sub(2), heapLDT, toFill, objectsToIgnore);
          }
          else if (heapLDT.getLength() == term.op()) {
             if (!objectsToIgnore.contains(term.sub(0)) &&
@@ -501,6 +494,52 @@ public abstract class AbstractUpdateExtractor {
             }
          }
       }
+   }
+   
+   /**
+    * Collects the {@link ExtractLocationParameter} location from the heap {@link Term}s.
+    * @param selectTerm The parent {@link Term}.
+    * @param variableTerm The {@link Term} with the {@link ProgramVariable}.
+    * @param heapLDT The {@link HeapLDT} to use.
+    * @param toFill The result {@link Set} to fill.
+    * @param objectsToIgnore The objects to ignore.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void collectLocationsFromHeapTerms(Term selectTerm, 
+                                                Term variableTerm,
+                                                HeapLDT heapLDT,
+                                                Set<ExtractLocationParameter> toFill, 
+                                                Set<Term> objectsToIgnore) throws ProofInputException {
+      if (!objectsToIgnore.contains(selectTerm) &&
+            !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
+           ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, variableTerm);
+           if (var != null) {
+              if (!isImplicitProgramVariable(var) &&
+                  !hasFreeVariables(variableTerm)) {
+                 if (var.isStatic()) {
+                    toFill.add(new ExtractLocationParameter(var, true));
+                 }
+                 else {
+                    if (selectTerm.op() instanceof ProgramVariable) {
+                       toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
+                    }
+                    toFill.add(new ExtractLocationParameter(var, selectTerm));
+                 }
+              }
+           }
+           else {
+              Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, variableTerm);
+              if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
+                 if (selectTerm.op() instanceof ProgramVariable) {
+                    toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
+                 }
+                 toFill.add(new ExtractLocationParameter(arrayIndex, selectTerm));
+              }
+              else {
+                 // Nothing to do, since program variable and array index is undefined.
+              }
+           }
+        }
    }
 
    /**
@@ -867,28 +906,25 @@ public abstract class AbstractUpdateExtractor {
          originalUpdates = ImmutableSLList.nil();
       }
       else {
-         Term originalModifiedFormula = modalityPio.constrainedFormula().formula();
-         originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         if (node.proof().root() == node) {
+            originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
+         }
+         else {
+            Term originalModifiedFormula = modalityPio.subTerm();
+            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         }
       }
       // Combine memory layout with original updates
       ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
-      for (Term originalUpdate : originalUpdates) {
-         if (UpdateJunctor.PARALLEL_UPDATE == originalUpdate.op()) {
-            additionalUpdates = additionalUpdates.append(originalUpdate.subs());
-         }
-         else if (originalUpdate.op() instanceof ElementaryUpdate) {
-            additionalUpdates = additionalUpdates.append(originalUpdate);
-         }
-         else {
-            throw new ProofInputException("Unexpected update operator \"" + originalUpdate.op() + "\".");
-         }
-      }
       for (ExtractLocationParameter evp : locations) {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
       }
-      ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
+      // Apply updates
+      TermBuilder tb = getServices().getTermBuilder();
+      Term updateLayoutTerm = tb.applyParallel(originalUpdates, layoutTerm);
+      updateLayoutTerm = tb.applyParallel(additionalUpdates, updateLayoutTerm);
       final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-      Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, layoutTerm, newUpdates, false);
+      Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, updateLayoutTerm, null, false);
       // Instantiate and run proof
       ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                           sideProofEnv,
@@ -949,7 +985,7 @@ public abstract class AbstractUpdateExtractor {
          SideProofUtil.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
       }
    }
-   
+
    /**
     * This method computes for all given {@link Goal}s representing the same 
     * value their path conditions. A computed path condition will consists only
@@ -1213,7 +1249,7 @@ public abstract class AbstractUpdateExtractor {
                                          Map<Node, Term> branchConditionCache) throws ProofInputException {
       Term result = branchConditionCache.get(node);
       if (result == null) {
-         result = SymbolicExecutionUtil.computeBranchCondition(node, true);
+         result = SymbolicExecutionUtil.computeBranchCondition(node, true, true);
          branchConditionCache.put(node, result);
       }
       return result;

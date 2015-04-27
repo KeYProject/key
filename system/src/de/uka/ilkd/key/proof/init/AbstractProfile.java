@@ -74,7 +74,7 @@ public abstract class AbstractProfile implements Profile {
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
         assert( this.prototype!=null );
-        this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
+        initTermLabelManager();
     }
 
     public AbstractProfile(String standardRuleFilename) {
@@ -83,6 +83,13 @@ public abstract class AbstractProfile implements Profile {
                 add(new DefaultGoalChooserBuilder()).
                 add(new DepthFirstGoalChooserBuilder()).
                 add(new SymbolicExecutionGoalChooserBuilder()));
+    }
+
+    /**
+     * Initializes the {@link TermLabelManager}.
+     */
+    protected void initTermLabelManager() {
+       this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
     }
 
     /**
@@ -230,6 +237,8 @@ public abstract class AbstractProfile implements Profile {
    public static Profile getDefaultInstanceForName(String name) {
       if (JavaProfile.NAME.equals(name)) {
          return JavaProfile.getDefaultInstance();
+      }else if (JavaProfile.NAME_WITH_PERMISSIONS.equals(name)) {
+         return JavaProfile.getDefaultInstance(true);
       }
       else if (SymbolicExecutionJavaProfile.NAME.equals(name)) {
          return SymbolicExecutionJavaProfile.getDefaultInstance();

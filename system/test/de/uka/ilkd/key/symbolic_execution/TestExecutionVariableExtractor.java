@@ -6,6 +6,31 @@ package de.uka.ilkd.key.symbolic_execution;
  */
 public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/variableVariableMethodContractTest
+    */
+   public void testVariableMethodContractTest() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/variableVariableMethodContractTest/test/VariableMethodContractTest.java", 
+                "VariableMethodContractTest", 
+                "findMax", 
+                null,
+                "examples/_testcase/set/variableVariableMethodContractTest/oracle/VariableMethodContractTest.xml",
+                false,
+                true,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/variablesConditionalCycle
     */
    public void testVariablesConditionalCycle() throws Exception {

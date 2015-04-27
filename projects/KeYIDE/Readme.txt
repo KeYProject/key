@@ -46,9 +46,9 @@ It provides the following file structure:
 
 (4) Setup development IDE
 -------------------------
-1. Download Eclipse 3.7 SR2 (Indigo) (e.g. in 32 bit version) as bundle 
+1. Download Eclipse 4.4 Luna as bundle 
    "Eclipse Modeling Tools" from
-   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/indigosr2
+   https://eclipse.org/downloads/packages/eclipse-modeling-tools/lunar
 2. Install SWTBot
    => Help -> Eclipse Marketplace...
    => Type in Field "Find:" the value "swtbot" and press enter.

@@ -38,6 +38,7 @@ import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
@@ -48,11 +49,14 @@ import org.eclipse.debug.internal.ui.InstructionPointerManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -103,6 +107,7 @@ import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
+import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -482,11 +487,18 @@ public final class TestSedCoreUtil {
          // Terminate all items
          SWTBotTreeItem[] launchItems = debugTree.getAllItems();
          for (SWTBotTreeItem item : launchItems) {
+            boolean terminated = false;
+            Object data = TestUtilsUtil.getTreeItemData(item);
+            if (data instanceof ITerminate) {
+               terminated = ((ITerminate)data).isTerminated();
+            }
             item.select();
             item.contextMenu("Terminate and Remove").click();
             try{
-               SWTBotShell dialog = bot.shell("Terminate and Remove");
-               dialog.bot().button("Yes").click();
+               if (!terminated) {
+                  SWTBotShell dialog = bot.shell("Terminate and Remove");
+                  dialog.bot().button("Yes").click();
+               }
             }catch(Exception e){
             }
          }
@@ -1812,8 +1824,14 @@ public final class TestSedCoreUtil {
     * @param debugTree The debug tree.
     * @param indexPathToItem The indices on parents to select.
     * @return The selected {@link SWTBotTreeItem}.
+    * @throws DebugException Occurred Exception.
     */
-   public static SWTBotTreeItem selectInDebugTree(SWTBotTree debugTree, int... indexPathToItem) {
+   public static SWTBotTreeItem selectInDebugTree(SWTBotView debugView, int... indexPathToItem) throws DebugException {
+      SWTBotTree debugTree = debugView.bot().tree();
+      IDebugView view = (IDebugView)debugView.getReference().getView(true);
+      TreeViewer viewer = (TreeViewer)view.getViewer();
+      ILazyTreePathContentProvider lazyContentProvider = (ILazyTreePathContentProvider)viewer.getContentProvider();
+
       TestCase.assertNotNull(indexPathToItem);
       TestCase.assertTrue(indexPathToItem.length >= 1);
       SWTBotTreeItem item = null;
@@ -1823,7 +1841,7 @@ public final class TestSedCoreUtil {
          if (!item.isExpanded()) {
             item.expand();
          }
-         TestUtilsUtil.waitForJobs();
+         SEDUIUtil.waitForPendingRequests(viewer, lazyContentProvider);
       }
       return item;
    }

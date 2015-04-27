@@ -1,34 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_1fb53e22-623c-46fe-9e3d-dccb3de44e60" name="equals(Number)" modelIdentifier="org.key_project.sed.key.core">
+   <sedTarget xml:id="_0cb6efff-89fc-4377-9d75-76e0105f82bc" name="equals(Number)" modelIdentifier="org.key_project.sed.key.core">
       <sedAnnotation xml:id="AnnotationUniqueID" typeId="org.key_project.sed.core.annotationType.comment" enabled="true" highlightBackground="true" backgroundColor="255,0,0" highlightForeground="true" foregroundColor="0,255,0" content="Comment"/>
-      <sedThread xml:id="_35610221-6779-4503-9ee4-484311de1af1" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_2665da05-b3c1-4fe5-b0ca-31ef160252ae" name="self.equals(n);" pathCondition="true" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testRemoveAnnotationLink\Number.java">
-            <sedBranchStatement xml:id="_b7359669-af12-40c0-850b-115260bcb8ba" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="1364" charEnd="1441" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testRemoveAnnotationLink\Number.java">
-               <sedBranchCondition xml:id="_9421520c-4b67-4dbf-a7c0-04f5ae232c6d" name="!n = null" pathCondition="!n = null">
-                  <sedBranchCondition xml:id="_9295f176-0fed-403f-afa0-691e4af894b1" name="self.content = n.content" pathCondition="!n = null &amp; self.content = n.content">
-                     <sedStatement xml:id="_d2cce5df-8732-4c7f-8fae-65f75cc149cc" name="return true;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1395" charEnd="1407" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testRemoveAnnotationLink\Number.java">
-                        <sedMethodReturn xml:id="_0e992376-4fd1-4f24-bfd6-dda55014632a" name="&lt;return TRUE as result of self.equals(n);&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testRemoveAnnotationLink\Number.java">
-                           <sedTermination xml:id="_257e85c5-bbfc-4398-8761-09c68c2f863a" name="&lt;end&gt;" pathCondition="!n = null &amp; self.content = n.content" verified="true">
+      <sedThread xml:id="_a75a6b28-e1a8-40bd-9041-8c651b0ccba5" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+         <sedMethodCall xml:id="_d6541fdd-f128-4067-a8b0-e4af14d8523d" name="&lt;call self.equals(n)&gt;" pathCondition="true" lineNumber="-1" charStart="1376" charEnd="1382" sourcePath="D:\Forschung\Development\KeY_Master\runtime-SymbolicExecutionDebugger.product\MartinBugs\src\Number.java" groupable="true">
+            <sedBranchStatement xml:id="_133ab07a-43e6-4a14-b8b9-64fd0eaa172a" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="1398" charEnd="1424" sourcePath="D:\Forschung\Development\KeY_Master\runtime-SymbolicExecutionDebugger.product\MartinBugs\src\Number.java" groupable="true">
+               <sedBranchCondition xml:id="_29b140d0-bd41-4c18-85bf-1926fa940011" name="!n = null" pathCondition="!n = null" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedBranchCondition xml:id="_c7280610-fcb3-4e8b-ad0d-bf62e619021f" name="self.content = n.content" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedStatement xml:id="_4f4b7476-bfc4-4b22-ad0d-0d26b4556bcd" name="return true;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1430" charEnd="1442" sourcePath="D:\Forschung\Development\KeY_Master\runtime-SymbolicExecutionDebugger.product\MartinBugs\src\Number.java">
+                        <sedMethodReturn xml:id="_5e35ed5e-19d9-44ff-acd6-6e327acb0899" name="&lt;return TRUE as result of equals&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1376" charEnd="1382" sourcePath="D:\Forschung\Development\KeY_Master\runtime-SymbolicExecutionDebugger.product\MartinBugs\src\Number.java" methodReturnConditionRef="_3bd34415-09b6-4657-ac48-a9dda0eec524">
+                           <sedTermination xml:id="_057c5f94-f7c4-4c82-8d88-5583fb60dbec" name="&lt;end&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                            </sedTermination>
+                           <sedGroupEndConditionReference nodeIdRef="_3bd34415-09b6-4657-ac48-a9dda0eec524"/>
                         </sedMethodReturn>
+                        <sedGroupEndConditionReference nodeIdRef="_7f4747ca-9d63-4e89-8546-3e3cbc9651ed"/>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_dbcec85e-1b70-4f31-807a-40134c8b63c0" name="!self.content = n.content" pathCondition="!n = null &amp; !self.content = n.content">
-                     <sedStatement xml:id="_475c1f0e-28d1-4cd3-8fbf-e5124c3091d7" name="return false;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1424" charEnd="1437" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testRemoveAnnotationLink\Number.java">
-                        <sedMethodReturn xml:id="_185a5b3b-e99b-4858-992f-072cb3caeb37" name="&lt;return FALSE as result of self.equals(n);&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSymbolicExecutionTreeStyleTest_testRemoveAnnotationLink\Number.java">
-                           <sedTermination xml:id="_a6326ac8-dc5e-40bf-af00-7a9e13b6f830" name="&lt;end&gt;" pathCondition="!n = null &amp; !self.content = n.content" verified="true">
+                  <sedBranchCondition xml:id="_4d7eabe0-9a0e-4d06-a880-e051cb2f0aad" name="!self.content = n.content" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedStatement xml:id="_8ca49a17-d31e-4a1a-a980-e42ffcf56442" name="return false;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1462" charEnd="1475" sourcePath="D:\Forschung\Development\KeY_Master\runtime-SymbolicExecutionDebugger.product\MartinBugs\src\Number.java">
+                        <sedMethodReturn xml:id="_a3f335e2-c544-48ba-ad85-4f28d6bbf202" name="&lt;return FALSE as result of equals&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1376" charEnd="1382" sourcePath="D:\Forschung\Development\KeY_Master\runtime-SymbolicExecutionDebugger.product\MartinBugs\src\Number.java" methodReturnConditionRef="_9fee6886-f52c-456f-a4f2-458a6ff2efb1">
+                           <sedTermination xml:id="_40a25840-db60-4841-88cb-c4003b045ebc" name="&lt;end&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                            </sedTermination>
+                           <sedGroupEndConditionReference nodeIdRef="_9fee6886-f52c-456f-a4f2-458a6ff2efb1"/>
                         </sedMethodReturn>
+                        <sedGroupEndConditionReference nodeIdRef="_f0f818dd-70a8-41c2-9fb4-fec7221768b8"/>
                      </sedStatement>
                   </sedBranchCondition>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_b13498fb-eee7-499d-8772-ad74648f8c52" name="n = null" pathCondition="n = null">
-                  <sedExceptionalTermination xml:id="_bb80f334-5a0d-4b30-9726-cab9620fcb37" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="n = null" verified="true">
-                  </sedExceptionalTermination>
+               <sedBranchCondition xml:id="_4e7ca08b-cdec-4a89-9d7a-bc5bd4f73011" name="n = null" pathCondition="n = null" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedExceptionalMethodReturn xml:id="_5214e70a-c4e5-4562-9369-d4f44df24cd3" name="&lt;throw java.lang.NullPointerException&gt;" pathCondition="n = null" lineNumber="-1" charStart="1376" charEnd="1382" sourcePath="D:\Forschung\Development\KeY_Master\runtime-SymbolicExecutionDebugger.product\MartinBugs\src\Number.java" methodReturnConditionRef="_44bb52b7-309c-40c6-8d32-4bac13905673">
+                     <sedExceptionalTermination xml:id="_35bc252f-842b-4a31-bbb9-57fb42d66f04" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="n = null" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
+                     </sedExceptionalTermination>
+                     <sedGroupEndConditionReference nodeIdRef="_44bb52b7-309c-40c6-8d32-4bac13905673"/>
+                     <sedGroupEndConditionReference nodeIdRef="_5ce94106-0688-420e-9e5c-b80b3a0895fb"/>
+                  </sedExceptionalMethodReturn>
                </sedBranchCondition>
+               <sedGroupEndCondition xml:id="_7f4747ca-9d63-4e89-8546-3e3cbc9651ed" name="!n = null &amp; self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedChildReference nodeIdRef="_4f4b7476-bfc4-4b22-ad0d-0d26b4556bcd"/>
+               </sedGroupEndCondition>
+               <sedGroupEndCondition xml:id="_f0f818dd-70a8-41c2-9fb4-fec7221768b8" name="!n = null &amp; !self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedChildReference nodeIdRef="_8ca49a17-d31e-4a1a-a980-e42ffcf56442"/>
+               </sedGroupEndCondition>
+               <sedGroupEndCondition xml:id="_5ce94106-0688-420e-9e5c-b80b3a0895fb" name="n = null" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedChildReference nodeIdRef="_5214e70a-c4e5-4562-9369-d4f44df24cd3"/>
+               </sedGroupEndCondition>
             </sedBranchStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_3bd34415-09b6-4657-ac48-a9dda0eec524" name="!n = null &amp; self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_5e35ed5e-19d9-44ff-acd6-6e327acb0899"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_9fee6886-f52c-456f-a4f2-458a6ff2efb1" name="!n = null &amp; !self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_a3f335e2-c544-48ba-ad85-4f28d6bbf202"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_44bb52b7-309c-40c6-8d32-4bac13905673" name="n = null" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_5214e70a-c4e5-4562-9369-d4f44df24cd3"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_3bd34415-09b6-4657-ac48-a9dda0eec524" name="!n = null &amp; self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_5e35ed5e-19d9-44ff-acd6-6e327acb0899"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_9fee6886-f52c-456f-a4f2-458a6ff2efb1" name="!n = null &amp; !self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_a3f335e2-c544-48ba-ad85-4f28d6bbf202"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_44bb52b7-309c-40c6-8d32-4bac13905673" name="n = null" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_5214e70a-c4e5-4562-9369-d4f44df24cd3"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_057c5f94-f7c4-4c82-8d88-5583fb60dbec"/>
+         <sedTerminationEntry nodeIdRef="_40a25840-db60-4841-88cb-c4003b045ebc"/>
+         <sedTerminationEntry nodeIdRef="_35bc252f-842b-4a31-bbb9-57fb42d66f04"/>
       </sedThread>
    </sedTarget>
 </launch>

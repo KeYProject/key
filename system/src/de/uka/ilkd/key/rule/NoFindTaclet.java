@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -65,6 +66,7 @@ public class NoFindTaclet extends Taclet {
    /**
     * adds the sequent of the add part of the Taclet to the goal sequent
     * 
+    * @param termLabelState The {@link TermLabelState} of the current rule application.
     * @param add
     *           the Sequent to be added
     * @param currentSequent
@@ -75,11 +77,11 @@ public class NoFindTaclet extends Taclet {
     * @param matchCond
     *           the MatchConditions with all required instantiations
     */   
-   protected void applyAdd(Sequent add,
+   protected void applyAdd(TermLabelState termLabelState, Sequent add,
          SequentChangeInfo currentSequent, Services services,
-         MatchConditions matchCond) {
-      addToAntec(add.antecedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
-      addToSucc(add.succedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
+         MatchConditions matchCond, Goal goal, TacletApp tacletApp) {
+      addToAntec(termLabelState, add.antecedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
+      addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
    }    
 
     /**
@@ -92,6 +94,7 @@ public class NoFindTaclet extends Taclet {
     public ImmutableList<Goal> apply(Goal     goal,
 			    Services services, 
 			    RuleApp  ruleApp) {
+   final TermLabelState termLabelState = new TermLabelState();
 
 	// Number without the if-goal eventually needed
 	int                          numberOfNewGoals = goalTemplates().size();
@@ -119,10 +122,13 @@ public class NoFindTaclet extends Taclet {
 	    
 	    SequentChangeInfo currentSequent = newSequentsIt.next();
 	    
-	    applyAdd(   gt.sequent(),
+	    applyAdd(   termLabelState,
+	                gt.sequent(),
 	                currentSequent,
 	                services,
-	                mc);
+	                mc,
+	                goal,
+	                (TacletApp) ruleApp);
 	    
 	    applyAddrule(     gt.rules(),
 			      currentGoal,

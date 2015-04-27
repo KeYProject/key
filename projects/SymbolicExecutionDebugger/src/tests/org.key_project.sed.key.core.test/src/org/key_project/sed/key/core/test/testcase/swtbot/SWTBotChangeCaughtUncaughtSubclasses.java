@@ -38,7 +38,7 @@ public class SWTBotChangeCaughtUncaughtSubclasses extends AbstractKeYDebugTarget
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {            
             // Get debug target TreeItem
             TestBreakpointsUtil.addSomeBreakpoints(CALLER_PATH, bot, "NullpointerException", "ClassCastException", "java.lang.Exception");
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetCaughtUncaughtSubclass(target, 3,3,0));
             assertTrue(TestBreakpointsUtil.checkProofCaughtUncaughtSubclass(target,  3,3,0));
@@ -65,6 +65,8 @@ public class SWTBotChangeCaughtUncaughtSubclasses extends AbstractKeYDebugTarget
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE,
-            8, executor);   
+            Boolean.FALSE,
+            8, 
+            executor);   
    } 
 }

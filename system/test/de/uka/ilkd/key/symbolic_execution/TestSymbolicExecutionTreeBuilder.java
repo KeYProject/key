@@ -45,6 +45,64 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceOfNotInEndlessLoop in the Symbolic Execution Profile
+    * and ensures that no rules are applied forever.
+    */
+   public void testInstanceOfNotInEndlessLoop() throws Exception {
+      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(keyRepDirectory, 
+                                                                        "examples/_testcase/set/instanceOfNotInEndlessLoop/test/Number.java", 
+                                                                        "Number", 
+                                                                        "equals", 
+                                                                        null,
+                                                                        "examples/_testcase/set/instanceOfNotInEndlessLoop/oracle/Number.xml",
+                                                                        false,
+                                                                        false,
+                                                                        false,
+                                                                        false,
+                                                                        ALL_IN_ONE_RUN,
+                                                                        false,
+                                                                        false,
+                                                                        false,
+                                                                        false,
+                                                                        false,
+                                                                        false,
+                                                                        false,
+                                                                        false);
+      try {
+         int nodesCount = env.getProof().countNodes();
+         assertTrue(nodesCount >= 100); // Currently 105 nodes are needed, +-5 are acceptable
+         assertTrue(nodesCount < 110); // Currently 105 nodes are needed, +-5 are acceptable
+      }
+      finally {
+         if (env != null) {
+            env.dispose();
+         }
+      }
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/assumesUserInputTest in the Symbolic Execution Profile
+    */
+   public void testAssumesUserInputTest() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                "examples/_testcase/set/assumesUserInputTest/test/AssumesUserInputTest.proof", 
+                "examples/_testcase/set/assumesUserInputTest/oracle/AssumesUserInputTest.xml", 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false);
+   }
+   
    /**
     * Tests example: examples/_testcase/set/symbolicExecutionCompletionsTest
     */
@@ -1506,6 +1564,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
 
@@ -1529,6 +1588,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
 
@@ -1545,6 +1605,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 ALL_IN_ONE_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1575,6 +1636,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1598,6 +1660,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1614,6 +1677,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 ALL_IN_ONE_RUN,
+                false,
                 false,
                 false,
                 false,

@@ -185,7 +185,7 @@ final class Tree {
              // @ loop_invariant t.footprint() == \set_union(t.footprintUntilLeft(p2), p2.footprint());
              @ loop_invariant \disjoint(t.footprintUntilLeft(p2), p2.footprint());
              @ decreasing tt == null ? 0 : (tt.height+1);
-             @ assignable \less_than_nothing;
+             @ assignable \strictly_nothing;
              @*/
            while (tt != null) {
                p2 = p; p = tt; tt = p.left;

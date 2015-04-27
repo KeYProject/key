@@ -13,7 +13,9 @@
 
 package org.key_project.keyide.ui.providers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.LabelProvider;
@@ -23,6 +25,7 @@ import org.eclipse.swt.graphics.Image;
 import org.key_project.keyide.ui.util.KeYImages;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
@@ -94,6 +97,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
        */
       @Override
       public void proofGoalsAdded(ProofTreeEvent e) {
+         handleProofGoalRemovedOrAdded(e);
       }
       
       /**
@@ -101,6 +105,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
        */
       @Override
       public void proofGoalRemoved(ProofTreeEvent e) {
+         handleProofGoalRemovedOrAdded(e);
       }
       
       /**
@@ -210,16 +215,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void handleProofExpanded(final ProofTreeEvent e) {
-      if (!viewer.getControl().isDisposed()) {
-         viewer.getControl().getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               if (!viewer.getControl().isDisposed()) {
-                  fireLabelProviderChanged(new LabelProviderChangedEvent(ProofTreeLabelProvider.this, e.getNode()));
-               }
-            }
-         });
-      }
+      fireNodeChanged(e.getNode());
    }
    
    /**
@@ -227,6 +223,41 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param e The event.
     */
    protected void handleProofClosed(ProofTreeEvent e) {
+      fireAllNodesChanged();
+   }
+
+   /**
+    * When a {@link Node} was pruned.
+    * @param e The event.
+    */
+   protected void hanldeProofPruned(final ProofTreeEvent e) {
+      fireNodeChanged(e.getNode());
+   }
+
+   /**
+    * When a {@link Goal} is added or removed.
+    * @param e The event.
+    */
+   protected void handleProofGoalRemovedOrAdded(ProofTreeEvent e) {
+      if (e.getGoal() != null) {
+         fireNodeChanged(e.getGoal().node());
+      }
+      else if (e.getGoals() != null && !e.getGoals().isEmpty()) {
+         List<Node> nodes = new ArrayList<Node>(e.getGoals().size());
+         for (Goal goal : e.getGoals()) {
+            nodes.add(goal.node());
+         }
+         fireNodesChanged(nodes.toArray(new Node[nodes.size()]));
+      }
+      else {
+         fireAllNodesChanged();
+      }
+   }
+   
+   /**
+    * Fires the event that all {@link Node}s have changed.
+    */
+   protected void fireAllNodesChanged() {
       if (!viewer.getControl().isDisposed()) {
          viewer.getControl().getDisplay().syncExec(new Runnable() {
             @Override
@@ -238,18 +269,35 @@ public class ProofTreeLabelProvider extends LabelProvider {
          });
       }
    }
-
+   
    /**
-    * When a {@link Node} was pruned.
-    * @param e The event.
+    * Fires the event that the given {@link Node} has changed.
+    * @param node The changed {@link Node}.
     */
-   protected void hanldeProofPruned(final ProofTreeEvent e) {
+   protected void fireNodeChanged(final Node node) {
       if (!viewer.getControl().isDisposed()) {
          viewer.getControl().getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
                if (!viewer.getControl().isDisposed()) {
-                  fireLabelProviderChanged(new LabelProviderChangedEvent(ProofTreeLabelProvider.this, e.getNode()));
+                  fireLabelProviderChanged(new LabelProviderChangedEvent(ProofTreeLabelProvider.this, node));
+               }
+            }
+         });
+      }
+   }
+   
+   /**
+    * Fires the event that the given {@link Node}s have changed.
+    * @param nodes The changed {@link Node}s.
+    */
+   protected void fireNodesChanged(final Node... nodes) {
+      if (!viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!viewer.getControl().isDisposed()) {
+                  fireLabelProviderChanged(new LabelProviderChangedEvent(ProofTreeLabelProvider.this, nodes));
                }
             }
          });

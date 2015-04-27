@@ -65,6 +65,7 @@ public final class TestSEDKeyCoreUtil {
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
+    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IFile file,
@@ -72,7 +73,8 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showVariablesOfSelectedDebugNode,
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
-                                final Boolean usePrettyPrinting) throws Exception {
+                                final Boolean usePrettyPrinting,
+                                final Boolean truthValueEvaluationEnabled) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -93,6 +95,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (usePrettyPrinting != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
+               }
+               if (truthValueEvaluationEnabled != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
@@ -138,6 +143,7 @@ public final class TestSEDKeyCoreUtil {
     * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
+    * @param higlightReachedSourceCode Highlight reached source code?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
@@ -149,7 +155,8 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean mergeBranchConditions,
                                 final Boolean useUnicode,
                                 final Boolean usePrettyPrinting,
-                                final Boolean showSignatureOnMethodReturnNodes) throws Exception {
+                                final Boolean showSignatureOnMethodReturnNodes,
+                                final Boolean higlightReachedSourceCode) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -192,6 +199,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (showSignatureOnMethodReturnNodes != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
+               }
+               if (higlightReachedSourceCode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);

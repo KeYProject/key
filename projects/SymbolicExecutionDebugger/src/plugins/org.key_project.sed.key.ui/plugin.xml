@@ -738,4 +738,10 @@
             markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker">
       </markerResolutionGenerator>
    </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.counterexample.model.contextMenuAction">
+      <action
+            class="org.key_project.sed.key.ui.counterExample.VisualizeModelContextMenuAction">
+      </action>
+   </extension>
 </plugin>

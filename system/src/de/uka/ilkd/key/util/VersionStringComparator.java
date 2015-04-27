@@ -19,12 +19,17 @@ public class VersionStringComparator implements Comparator<String> {
     }
 
     private static Integer[] parseVersionString(String s) {
-        final String[] p = s.split(SEPARATOR_PATTERN);
-        final Integer[] r = new Integer[p.length];
-        for (int i= 0; i < p.length; i++) {
-            r[i] = parseInt(p[i]);
+        if (s != null) {
+            final String[] p = s.split(SEPARATOR_PATTERN);
+            final Integer[] r = new Integer[p.length];
+            for (int i = 0; i < p.length; i++) {
+                r[i] = parseInt(p[i]);
+            }
+            return r;
         }
-        return r;
+        else {
+            return new Integer[0];
+        }
     }
     
     private static Integer parseInt(String s) {

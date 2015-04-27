@@ -34,6 +34,7 @@ import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.object_diagram.provider.IObjectDiagramImageConstants;
+import org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramTypeProvider;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
@@ -101,10 +102,10 @@ public class ValuesPropertySection extends AbstractObjectDiagramPropertySection<
          public Image getColumnImage(Object element, int columnIndex) {
             if (columnIndex == 0) {
                if (element instanceof ODValue) {
-                  return GraphitiUi.getImageService().getImageForId(IObjectDiagramImageConstants.IMG_VALUE);
+                  return GraphitiUi.getImageService().getImageForId(ObjectDiagramTypeProvider.PROVIDER_ID, IObjectDiagramImageConstants.IMG_VALUE);
                }
                else if (element instanceof ODAssociation) {
-                  return GraphitiUi.getImageService().getImageForId(IObjectDiagramImageConstants.IMG_ASSOCIATION);
+                  return GraphitiUi.getImageService().getImageForId(ObjectDiagramTypeProvider.PROVIDER_ID, IObjectDiagramImageConstants.IMG_ASSOCIATION);
                }
                else {
                   return null;

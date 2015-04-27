@@ -77,4 +77,12 @@ public class GraphitiEditorInViewView extends AbstractEditorInViewView<DiagramEd
          throw new RuntimeException(e);
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isDirty() {
+      return false; // It can't be dirty because otherwise the test executin is blocked!
+   }
 }

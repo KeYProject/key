@@ -66,7 +66,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
          TestUtilsUtil.selectInTree(outlineView.bot().tree(), "MethodPartPOTest", "doSomething(int, String, boolean) : int");
          // Start launch
-         outlineView.bot().tree().contextMenu("Debug As").menu("&1 Symbolic Execution Debugger (SED)").click();
+         TestUtilsUtil.clickContextMenu(outlineView.bot().tree(), "Debug As", "&1 Symbolic Execution Debugger (SED)");
          // Open symbolic debug perspective
          TestUtilsUtil.confirmPerspectiveSwitch(bot, SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
          // Find the launched ILaunch in the debug view
@@ -76,7 +76,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          ILaunch launch = target.getLaunch();
          assertNotNull(launch);
          // Resume
-         SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+         SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
          resume(bot, item, target);
          // Make sure that correct tree is created
          assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/methodPartPOTest/oracle/MethodPartPOTest_methodName.xml", false, false, false);
@@ -206,7 +206,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          text.selectRange(lineToSelect, columnToSelect, selectionLength);
          assertTrue("Expected \"" + expectedSelectedText + "\" but is \"" + text.getSelection() + "\".", StringUtil.equalIgnoreWhiteSpace(expectedSelectedText, text.getSelection()));
          // Start launch
-         text.contextMenu("Debug As").menu("&1 Symbolic Execution Debugger (SED)").click();
+         TestUtilsUtil.clickContextMenu(text, "Debug As", "&1 Symbolic Execution Debugger (SED)");
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -214,7 +214,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          ILaunch launch = target.getLaunch();
          assertNotNull(launch);
          // Resume
-         SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+         SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
          resume(bot, item, target);
          // Make sure that correct tree is created
          assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false);

@@ -224,7 +224,8 @@ public class BlockContractRule implements BuiltInRule {
                                                final Goal goal) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract contract : collectedContracts) {
-            if (!contractApplied(contract, goal) || InfFlowCheckInfo.isInfFlow(goal)) {
+            if (!contractApplied(contract, goal) ||
+            		InfFlowCheckInfo.isInfFlow(goal)) {
                 result = result.add(contract);
             }
         }
@@ -236,15 +237,22 @@ public class BlockContractRule implements BuiltInRule {
                                            final Goal goal)
     {
         Node selfOrParentNode = goal.node();
+        Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
             if (app instanceof BlockContractBuiltInRuleApp) {
                 BlockContractBuiltInRuleApp blockRuleApp =
                         (BlockContractBuiltInRuleApp)app;
-                if (blockRuleApp.getBlock().equals(contract.getBlock())) {
-                    return true;
+                if (blockRuleApp.getBlock().equals(contract.getBlock()) && 
+                		selfOrParentNode.getChildNr(previousNode) == 0) {
+                	// prevent application of contract in its own check validity branch
+                	// but not in other branches, e.g., do-while 
+                	// loops might need to apply the same contract 
+                	// twice in its usage branch
+                	return true;
                 }
             }
+            previousNode = selfOrParentNode;
             selfOrParentNode = selfOrParentNode.parent();
         }
 

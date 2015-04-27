@@ -1600,6 +1600,14 @@ public class TermBuilder {
         return wellFormed(var(heap));
     }
 
+    public Term permissionsFor(Term permHeap, Term regularHeap) {
+        return func(services.getTypeConverter().getPermissionLDT().getPermissionsFor(),
+                permHeap, regularHeap);
+    }
+
+    public Term permissionsFor(LocationVariable permHeap, LocationVariable regularHeap) {
+        return permissionsFor(var(permHeap),var(regularHeap));
+    }
 
     public Term inv(Term[] h, Term o) {
         Term[] p = new Term[h.length + 1];
@@ -1951,17 +1959,21 @@ public class TermBuilder {
                 ImmutableSLList.<QuantifiableVariable>nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
+        // selects on permission heaps have to be explicitly typed as field type narrowing
+        // does not follow Java typing for the permission heap
+        boolean permissionHeap =
+            heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
         return all(quantVars,
                 or(elementOf(objVarTerm,
                         fieldVarTerm,
                         modAtPre),
                         and(not(equals(objVarTerm, NULL())),
                                 not(createdAtPre)),
-                                equals(select(Sort.ANY,
+                                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
                                         heapTerm,
                                         objVarTerm,
                                         fieldVarTerm),
-                                        select(Sort.ANY,
+                                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
                                                 or.replace(heapTerm),
                                                 objVarTerm,
                                                 fieldVarTerm))));
@@ -1993,12 +2005,15 @@ public class TermBuilder {
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
 
+        // see above
+        boolean permissionHeap = heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
+
         return all(quantVars,
-                equals(select(Sort.ANY,
+                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
                         heapTerm,
                         objVarTerm,
                         fieldVarTerm),
-                        select(Sort.ANY,
+                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
                                 or.replace(heapTerm),
                                 objVarTerm,
                                 fieldVarTerm)));
@@ -2185,6 +2200,142 @@ public class TermBuilder {
        }
        return result;
     }
+
+   /**
+    * Similar behavior as {@link #imp(Term, Term)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param t1 The left side.
+    * @param t2 The right side.
+    * @return The created {@link Term}.
+    */
+   public Term impPreserveLabels(Term t1, Term t2) {
+      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
+         if (!t1.hasLabels()) {
+            return t2;
+         }
+         else {
+            return tf.createTerm(Junctor.IMP, t1, t2);
+         }
+      }
+      else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
+         return t2;
+      }
+      else if (t2.op() == Junctor.FALSE && !t2.hasLabels()) {
+         return notPreserveLabels(t1);
+      }
+      else {
+         return tf.createTerm(Junctor.IMP, t1, t2);
+      }
+   }
+    
+   /**
+    * Similar behavior as {@link #not(Term)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param t The child {@link Term}.
+    * @return The created {@link Term}.
+    */
+   public Term notPreserveLabels(Term t) {
+      if (t.op() == Junctor.TRUE && !t.hasLabels()) {
+         return ff();
+      }
+      else if (t.op() == Junctor.FALSE && !t.hasLabels()) {
+         return tt();
+      }
+      else if (t.op() == Junctor.NOT && !t.hasLabels()) {
+         return t.sub(0);
+      }
+      else {
+         return tf.createTerm(Junctor.NOT, t);
+      }
+   }
+
+   /**
+    * Similar behavior as {@link #and(Iterable)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param subTerms The sub {@link Term}s.
+    * @return The created {@link Term}.
+    */
+   public Term andPreserveLabels(Iterable<Term> subTerms) {
+      Term result = tt();
+      for (Term sub : subTerms) {
+         result = andPreserveLabels(result, sub);
+      }
+      return result;
+   }
+
+   /**
+    * Similar behavior as {@link #and(Term, Term)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param t1 The left side.
+    * @param t2 The right side.
+    * @return The created {@link Term}.
+    */
+   public Term andPreserveLabels(Term t1, Term t2) {
+      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
+         if (!t1.hasLabels() && !t2.hasLabels()) {
+            return ff();
+         }
+         else if (!t1.hasLabels()) {
+            return t2;
+         }
+         else {
+            return t1;
+         }
+      }
+      else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
+         return t2;
+      }
+      else if (t2.op() == Junctor.TRUE && !t2.hasLabels()) {
+         return t1;
+      }
+      else {
+         return tf.createTerm(Junctor.AND, t1, t2);
+      }
+   }
+
+   /**
+    * Similar behavior as {@link #or(Iterable)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param subTerms The sub {@link Term}s.
+    * @return The created {@link Term}.
+    */
+   public Term orPreserveLabels(Iterable<Term> subTerms) {
+      Term result = ff();
+      for (Term sub : subTerms) {
+         result = orPreserveLabels(result, sub);
+      }
+      return result;
+   }
+
+   /**
+    * Similar behavior as {@link #or(Term, Term)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param t1 The left side.
+    * @param t2 The right side.
+    * @return The created {@link Term}.
+    */
+   public Term orPreserveLabels(Term t1, Term t2) {
+      if (t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
+         if (!t1.hasLabels() && !t2.hasLabels()) {
+            return tt();
+         }
+         else if (!t1.hasLabels()) {
+            return t2;
+         }
+         else {
+            return t1;
+         }
+      }
+      else if (t1.op() == Junctor.FALSE && !t1.hasLabels()) {
+         return t2;
+      }
+      else if (t2.op() == Junctor.FALSE && !t2.hasLabels()) {
+         return t1;
+      }
+      else {
+         return tf.createTerm(Junctor.OR, t1, t2);
+      }
+   }
 
     //-------------------------------------------------------------------------
     // information flow operators

@@ -31,7 +31,7 @@ public abstract class AbstractSort implements Sort {
 
     
     public AbstractSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
-        this.name = name;
+    	this.name = name;
         this.ext = ext;
         this.isAbstract = isAbstract;
     }

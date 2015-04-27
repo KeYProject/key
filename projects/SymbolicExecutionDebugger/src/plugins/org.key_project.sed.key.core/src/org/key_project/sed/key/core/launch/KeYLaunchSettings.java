@@ -138,10 +138,24 @@ public class KeYLaunchSettings {
    private final boolean showSignatureOnMethodReturnNodes;
    
    /**
-    * Checks how variables are computed.
-    * @return {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * Are variables computed based on updates or on the visible type structure instead?
     */
    private final boolean variablesAreOnlyComputedFromUpdates;
+   
+   /**
+    * Is truth value evaluation enabled?
+    */
+   private final boolean truthValueEvaluationEnabled;
+   
+   /**
+    * Is reached source code highlighted?
+    */
+   private final boolean highlightReachedSourceCode;
+   
+   /**
+    * Is grouping enabled?
+    */
+   private final boolean groupingEnabled;
    
    /**
     * Constructor.
@@ -164,6 +178,9 @@ public class KeYLaunchSettings {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param highlightReachedSourceCode Is reached source code highlighted?
+    * @param groupingEnabled Is grouping enabled?
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -185,7 +202,10 @@ public class KeYLaunchSettings {
                             boolean useUnicode,
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes,
-                            boolean variablesAreOnlyComputedFromUpdates) throws JavaModelException {
+                            boolean variablesAreOnlyComputedFromUpdates,
+                            boolean truthValueEvaluationEnabled,
+                            boolean highlightReachedSourceCode,
+                            boolean groupingEnabled) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -207,6 +227,9 @@ public class KeYLaunchSettings {
       this.usePrettyPrinting = usePrettyPrinting;
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
       this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
+      this.truthValueEvaluationEnabled = truthValueEvaluationEnabled;
+      this.highlightReachedSourceCode = highlightReachedSourceCode;
+      this.groupingEnabled = groupingEnabled;
    }
 
    /**
@@ -375,5 +398,29 @@ public class KeYLaunchSettings {
     */
    public boolean isVariablesAreOnlyComputedFromUpdates() {
       return variablesAreOnlyComputedFromUpdates;
+   }
+
+   /**
+    * Checks if truth value evaluation is enabled.
+    * @return {@code true} enabled, {@code false} disabled
+    */
+   public boolean isTruthValueEvaluationEnabled() {
+      return truthValueEvaluationEnabled;
+   }
+
+   /**
+    * Checks if reached source code is highlighted.
+    * @return {@code true} reached source code is higlighted, {@code false} reached source code is not highlighted.
+    */
+   public boolean isHighlightReachedSourceCode() {
+      return highlightReachedSourceCode;
+   }
+
+   /**
+    * Checks if grouping is enabled.
+    * @return Grouping enabled?
+    */
+   public boolean isGroupingEnabled() {
+      return groupingEnabled;
    }
 }

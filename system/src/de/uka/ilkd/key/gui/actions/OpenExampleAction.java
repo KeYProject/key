@@ -20,7 +20,6 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
 /**
  * Opens a file dialog allowing to select the example to be loaded
@@ -40,7 +39,7 @@ public final class OpenExampleAction extends MainWindowAction {
     
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser keYFileChooser =
-                GuiUtilities.getFileChooser("Select file to load proof or problem");
+                KeYFileChooser.getFileChooser("Select file to load proof or problem");
         File file = ExampleChooser.showInstance(Main.getExamplesDir());
         if(file != null) {
             keYFileChooser.selectFile(file);

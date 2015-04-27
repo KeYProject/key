@@ -53,7 +53,10 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /** @return true iff the this set is subset of o and vice versa.
      */
     @Override
-    boolean equals(Object o);
+    public boolean equals(Object o);
+    
+    @Override
+    public int hashCode();
 
     /** adds an element, barfs if the element is already present
      * @param element of type <T> that has to be added to this set
