@@ -1153,11 +1153,20 @@ public class JDTUtil {
     * Parses the given {@link ICompilationUnit}.
     * @param content The {@link String} to parse.
     * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
-    * @throws IOException Occurred Exception
     */
-   public static ASTNode parse(String content) throws IOException {
+   public static ASTNode parse(String content) {
+      return parse(content, ASTParser.K_COMPILATION_UNIT);
+   }
+   
+   /**
+    * Parses the given {@link ICompilationUnit}.
+    * @param content The {@link String} to parse.
+    * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
+    */
+   public static ASTNode parse(String content, int kind) {
       if (content != null) {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
+         parser.setKind(kind);
          parser.setResolveBindings(true);
          parser.setSource(content.toCharArray());
          Map<?, ?> options = JavaCore.getOptions();

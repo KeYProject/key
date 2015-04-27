@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -31,6 +31,7 @@ import org.key_project.jmlediting.core.utilities.MethodDeclarationFinder;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * The StoreRefProposer computes the AutoCompletion for StoreRefKeywords.
@@ -60,7 +61,7 @@ public class JMLStoreRefProposer {
    /**
     * the CompilationUnit to get the AST from.
     */
-   private final CompilationUnit cu;
+   private final ICompilationUnit cu;
 
    /**
     * does the keyword wants to get final variables proposed.
@@ -82,7 +83,7 @@ public class JMLStoreRefProposer {
       this.context = context;
       this.proposeFinal = proposeFinal;
       if (context.getCompilationUnit() instanceof CompilationUnit) {
-         this.cu = (CompilationUnit) context.getCompilationUnit();
+         this.cu = context.getCompilationUnit();
       }
       else {
          this.cu = null;
@@ -101,20 +102,13 @@ public class JMLStoreRefProposer {
    public Collection<ICompletionProposal> propose(final IASTNode expr,
          final boolean hasOtherExpressions) {
       final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-      final org.eclipse.jdt.core.dom.CompilationUnit ast;
-      final ASTParser parser = ASTParser
-            .newParser(ASTParser.K_COMPILATION_UNIT);
-      parser.setKind(ASTParser.K_COMPILATION_UNIT);
-      parser.setSource(this.cu);
-      parser.setResolveBindings(true);
-      ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser.createAST(null);
+      final org.eclipse.jdt.core.dom.CompilationUnit ast = (org.eclipse.jdt.core.dom.CompilationUnit) JDTUtil.parse(this.cu);
 
       // find all TypeDeclarations
       final TypeDeclarationFinder finder = new TypeDeclarationFinder();
       ast.accept(finder);
 
       final List<TypeDeclaration> decls = finder.getDecls();
-      final TypeDeclaration topDecl = decls.get(0);
       TypeDeclaration activeTypeDecl = null;
       // find the activeTypeDeclaration to compute the completion.
       for (final TypeDeclaration decl : decls) {
@@ -135,7 +129,7 @@ public class JMLStoreRefProposer {
       else {
          activeType = null;
       }
-      this.declaringType = topDecl.resolveBinding();
+      this.declaringType = activeType;
       final IASTNode node;
       final List<IASTNode> restNodes;
       final boolean allowKeywords;

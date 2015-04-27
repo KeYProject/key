@@ -34,13 +34,13 @@ import org.key_project.swtbot.swing.util.SaveSwingUtil;
  * </p>
  * @author Martin Hentschel
  */
-public class SwingBotJList extends AbstractSwingBotComponent<JList> {
+public class SwingBotJList extends AbstractSwingBotComponent<JList<?>> {
    /**
     * Constructs an instance of this object with the given {@link JList}.
     * @param component The given {@link JList}.
     * @throws WidgetNotFoundException Is thrown when the given {@link Component} is {@code null}.
     */      
-   public SwingBotJList(JList component) throws WidgetNotFoundException {
+   public SwingBotJList(JList<?> component) throws WidgetNotFoundException {
       super(component);
    }
    
@@ -65,6 +65,7 @@ public class SwingBotJList extends AbstractSwingBotComponent<JList> {
       IRunnableWithResult<Object[]> run = new AbstractRunnableWithResult<Object[]>() {
          @Override
          public void run() {
+            @SuppressWarnings("deprecation")
             Object[] result = component.getSelectedValues();
             if (result != null) {
                setResult(result);
@@ -88,7 +89,7 @@ public class SwingBotJList extends AbstractSwingBotComponent<JList> {
          @Override
          public void run() {
             Object toSelect = null;
-            ListModel model = component.getModel();
+            ListModel<?> model = component.getModel();
             int i = 0;
             while (toSelect == null && i < model.getSize()) {
                Object current = model.getElementAt(i);

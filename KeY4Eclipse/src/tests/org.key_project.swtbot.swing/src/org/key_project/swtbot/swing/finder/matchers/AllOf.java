@@ -73,7 +73,7 @@ public class AllOf<T> extends AbstractMatcher<T> {
     * @return a matcher.
     */
    @Factory
-   public static <T extends Component> Matcher<T> allOf(Matcher<? extends T>... matchers) {
+   public static <T extends Component> Matcher<T> allOf(@SuppressWarnings("unchecked") Matcher<? extends T>... matchers) {
       return new AllOf<T>(Arrays.asList(matchers));
    }
    
