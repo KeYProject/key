@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types kind="INTERFACE" package="" name="ImmutableHeap" source="true" simpleName="ImmutableHeap">
+    <typeVariables name="T">
+      <type type="java.lang.Comparable&lt;T>" genericFreeType="java.lang.Comparable"/>
+    </typeVariables>
+    <extends type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+  </types>
+  <types abstract="true" package="" name="ImmutableLeftistHeap" source="true" simpleName="ImmutableLeftistHeap">
+    <typeVariables name="T">
+      <type type="java.lang.Comparable&lt;T>" genericFreeType="java.lang.Comparable"/>
+    </typeVariables>
+    <methods name="nilHeap" static="true">
+      <typeVariables name="T">
+        <type type="java.lang.Comparable&lt;T>" genericFreeType="java.lang.Comparable"/>
+      </typeVariables>
+      <returnType type="ImmutableLeftistHeap&lt;T>" genericFreeType="ImmutableLeftistHeap"/>
+    </methods>
+    <innerTypes visibility="PRIVATE" static="true" package="" name="ImmutableLeftistHeap.Empty" source="true" simpleName="Empty">
+      <typeVariables name="S">
+        <type type="java.lang.Comparable&lt;S>" genericFreeType="java.lang.Comparable"/>
+      </typeVariables>
+      <methods name="Empty" visibility="PRIVATE" constructor="true">
+        <returnType type="void" genericFreeType="void"/>
+      </methods>
+      <methods name="insert">
+        <returnType type="ImmutableHeap&lt;S>" genericFreeType="ImmutableHeap"/>
+        <parameterTypes type="S" genericFreeType="java.lang.Comparable"/>
+      </methods>
+      <fields name="EMPTY_HEAP" visibility="PRIVATE" final="true" static="true">
+        <type type="ImmutableLeftistHeap&lt;?>" genericFreeType="ImmutableLeftistHeap"/>
+      </fields>
+      <extends type="ImmutableLeftistHeap&lt;S>" genericFreeType="ImmutableLeftistHeap"/>
+    </innerTypes>
+    <implements type="ImmutableHeap&lt;T>" genericFreeType="ImmutableHeap"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang.annotation" name="java.lang.annotation.Annotation" simpleName="Annotation"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.SuppressWarnings" simpleName="SuppressWarnings">
+    <extends type="java.lang.annotation.Annotation" genericFreeType="java.lang.annotation.Annotation"/>
+  </types>
+</dependencymodel:DependencyModel>

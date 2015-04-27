@@ -44,8 +44,6 @@ public class StatementBlock extends JavaStatement
      */
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
 
-    private PosInProgram firstActiveChildPos = null;
-
 
     public StatementBlock() {
 	body = new ImmutableArray<Statement>();
@@ -270,9 +268,6 @@ public class StatementBlock extends JavaStatement
     }
 
     public PosInProgram getFirstActiveChildPos() {
-        if (firstActiveChildPos == null) {
-            firstActiveChildPos = isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(0);
-        }
-        return firstActiveChildPos;
+        return isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO;
     }
 }

@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -69,7 +70,7 @@ public class TestTacletBuild extends TestCase {
 	    TacletForTests.getVariables().lookup(new Name("b")), NO_SUBTERMS);
 	Term t1=tb.ex((QuantifiableVariable)u, b);
 	Term t2=tb.ex((QuantifiableVariable)v, b);
-	RewriteTacletBuilder sb=new RewriteTacletBuilder();
+	RewriteTacletBuilder<RewriteTaclet> sb=new RewriteTacletBuilder<RewriteTaclet>();
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,

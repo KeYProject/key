@@ -648,7 +648,7 @@ public final class TestSedCoreUtil {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return launch.isTerminated();
+            return launch.isTerminated() && !launch.canTerminate();
          }
          
          @Override

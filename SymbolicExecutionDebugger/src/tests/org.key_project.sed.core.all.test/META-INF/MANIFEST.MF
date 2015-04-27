@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Contains all SED Test
+Bundle-Name: All SED Test
 Bundle-SymbolicName: org.key_project.sed.all.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.core.all.test.Activator
@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.ui,
  org.key_project.core.proof_references.test;bundle-version="1.0.0",
  org.key_project.core.symbolic_execution.test;bundle-version="1.0.0",
  org.key_project.core.test;bundle-version="1.0.0",
- org.key_project.core.testgen.test;bundle-version="1.0.0"
+ org.key_project.core.testgen.test;bundle-version="1.0.0",
+ org.key_project.key4eclipse.all.test;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project

@@ -15,7 +15,7 @@ package de.hentschel.visualdbc.all.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.util.test.suite.AllUtilTests;
+import org.key_project.key4eclipse.all.test.suite.AllTests;
 
 import de.hentschel.visualdbc.datasource.key.test.suite.AllKeyDataSourceTests;
 import de.hentschel.visualdbc.datasource.test.suite.AllDataSourceTests;
@@ -41,7 +41,8 @@ import de.hentschel.visualdbc.interactive.proving.ui.test.suite.AllInteractivePr
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   AllUtilTests.class,
+   AllTests.class,
+   
    AllDataSourceTests.class,
    AllDataSourceUITests.class,
    AllGenerationTests.class,

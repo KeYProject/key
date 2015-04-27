@@ -40,7 +40,7 @@ public class MatchConditions {
 			     RenameTable        p_renameTable) {
         assert p_instantiations != null;
         assert p_renameTable != null;
-	instantiations   = p_instantiations;	
+        instantiations   = p_instantiations;	
         renameTable      = p_renameTable; 
     }
 

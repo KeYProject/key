@@ -323,21 +323,23 @@ public final class DLSpecFactory {
 		= ((TypeDeclaration)pm.getContainerType() 
 			              .getJavaType()).isLibraryClass();
 	return cf.func(name,
-					 pm.getContainerType(),		
-					 pm, 
-					 modality, 
-					 pres,
-					 null,// TODO measured_by in DL contracts not supported yet
-					 posts,
-					 null, // TODO no model methods in DL contracts
-					 mods,
-					 new LinkedHashMap<ProgramVariable,Term>(),
-					 hasMod, // TODO strictly pure in DL contracts not supported yet
-					 selfVar, 
-					 paramVars, 
-					 resultVar, 
-					 excVar,
-					 atPreVars,
-					 !isLibraryClass);
+	               pm.getContainerType(),
+	               pm,
+	               modality,
+	               pres,
+	               new LinkedHashMap<LocationVariable,Term>(),
+	               null,// TODO measured_by in DL contracts not supported yet
+	               posts,
+	               new LinkedHashMap<LocationVariable,Term>(),
+	               null, // TODO no model methods in DL contracts
+	               mods,
+	               new LinkedHashMap<ProgramVariable,Term>(),
+	               hasMod, // TODO strictly pure in DL contracts not supported yet
+	               selfVar,
+	               paramVars,
+	               resultVar,
+	               excVar,
+	               atPreVars,
+	               !isLibraryClass);
     }
 }

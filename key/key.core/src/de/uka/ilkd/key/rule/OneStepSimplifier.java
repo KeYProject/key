@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -134,7 +135,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                             || tac.goalTemplates().size() != 1
                             || !tac.goalTemplates().head().sequent().isEmpty()
                             || !tac.varsNew().isEmpty()
-                            || tac.varsNewDependingOn().hasNext()
+                            || !tac.varsNewDependingOn().isEmpty()
                             || ((RewriteTaclet)tac).getApplicationRestriction()!= RewriteTaclet.NONE
                             || !proof.getInitConfig().getJustifInfo().getJustification(tac).isAxiomJustification()) {
                 continue;
@@ -185,7 +186,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 ImmutableSet<Taclet> taclets = tacletsForRuleSet(proof,
                                 ruleSet,
                                 done);
-                indices[i] = new TacletIndex(taclets);
+                indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
                 notSimplifiableCaches[i] = new LRUCache<Term,Term>(DEFAULT_CACHE_SIZE);
                 i++;
                 done = done.prepend(ruleSet);
@@ -198,13 +199,11 @@ public final class OneStepSimplifier implements BuiltInRule {
      * Deactivate one-step simplification: clear caches, restore taclets to
      * the goals' taclet indices.
      */
-    public void shutdownIndices() {
+    public synchronized void shutdownIndices() {
         if (lastProof != null) {
             if (!lastProof.isDisposed()) {
                 for(Goal g : lastProof.openGoals()) {
-                    for(NoPosTacletApp app : appsTakenOver) {
-                        g.ruleAppIndex().addNoPosTacletApp(app);
-                    }
+                    g.ruleAppIndex().addNoPosTacletApp(appsTakenOver);
                     g.getRuleAppManager().clearCache();
                     g.ruleAppIndex().clearIndexes();
                 }
@@ -514,7 +513,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Tells whether the passed formula can be simplified
      */
-    private boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal) {
+    private synchronized boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal) {
         final Boolean b = applicabilityCache.get(cf);
         if(b != null) {
             return b.booleanValue();
@@ -529,7 +528,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private void refresh(Proof proof) {        
+    private synchronized void refresh(Proof proof) {        
         ProofIndependentSettings settings = proof.getProofIndependentSettings();
         if (settings == null) {
             settings = ProofIndependentSettings.DEFAULT_INSTANCE;
@@ -584,7 +583,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal,
+    public synchronized ImmutableList<Goal> apply(Goal goal,
                     Services services,
                     RuleApp ruleApp) {
 

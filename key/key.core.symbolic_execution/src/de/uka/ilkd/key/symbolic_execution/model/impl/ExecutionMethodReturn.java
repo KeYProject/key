@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -236,8 +237,9 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     * @throws ProofInputException Occurred Exception.
     */
    protected IExecutionMethodReturnValue[] lazyComputeReturnValues() throws ProofInputException {
-      if (!isDisposed()) {
-         final Services services = getServices();
+      InitConfig initConfig = getInitConfig();
+      if (initConfig != null) { // Otherwise proof is disposed.
+         final Services services = initConfig.getServices();
          // Check if a result variable is available
          MethodBodyStatement mbs = getMethodCall().getActiveStatement();
          IProgramVariable resultVar = mbs.getResultVariable();
@@ -306,7 +308,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                            }
                            Term condition = services.getTermBuilder().or(conditions);
                            if (conditions.size() >= 2) {
-                              condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
+                              condition = SymbolicExecutionUtil.simplify(initConfig, info.getProof(), condition);
                            }
                            condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
                            result[i] = new ExecutionMethodReturnValue(getSettings(), getProofNode(), getModalityPIO(), entry.getKey(), condition);

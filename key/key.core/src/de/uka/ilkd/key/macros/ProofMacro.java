@@ -15,12 +15,16 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
@@ -153,6 +157,8 @@ public interface ProofMacro {
      * this parameter. If more than one listener is needed, consider combining
      * them using a single listener object using the composite pattern.
      *
+     * @param uic
+     *            the {@link UserInterfaceControl} to use
      * @param proof
      *            the current {@link Proof} (not <code>null</code>)
      * @param goals
@@ -165,10 +171,11 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException;
+                                          ProverTaskListener listener) throws InterruptedException, Exception;
 
     /**
      * Apply this macro on the given node.
@@ -184,6 +191,8 @@ public interface ProofMacro {
      * this parameter. If more than one listener is needed, consider combining
      * them using a single listener object using the composite pattern.
      *
+     * @param uic
+     *            the {@link UserInterfaceControl} to use
      * @param node
      *            the node (not <code>null</code>)
      * @param posInOcc
@@ -194,9 +203,10 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(Node node,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Node node,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException;
+                                          ProverTaskListener listener) throws InterruptedException, Exception;
 
     /**
      * This observer acts as intermediate instance between the reports by the
@@ -221,10 +231,11 @@ public interface ProofMacro {
         }
 
         @Override
-        public void taskStarted(String message, int size) {
+        public void taskStarted(TaskStartedInfo info) {
             //assert size == numberSteps;
             String suffix = getMessageSuffix();
-            super.taskStarted(message + suffix, numberGoals * numberSteps);
+            super.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, 
+                  info.getMessage() + suffix, numberGoals * numberSteps));
             super.taskProgress(completedGoals * numberSteps);
         }
 

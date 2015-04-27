@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="org.key_project.jmlediting.core.profiles" name="JML Profiles" schema="schema/org.key_project.jmlediting.core.profiles.exsd"/>
+   <extension
+         id="org.key_project.jmlediting.core.parseerror"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         id="org.key_project.jmlediting.core.validationerror"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.core.compilationParticipant">
+      <compilationParticipant
+            class="org.key_project.jmlediting.core.compilation.JMLCompilationParticipant"
+            createsProblems="true"
+            id="org.key_project.jmlediting.core.compilationParticipant2"
+            modifiesEnvironment="true">
+      </compilationParticipant>
+   </extension>
+</plugin>

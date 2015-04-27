@@ -578,7 +578,7 @@ options {
                File path = new File(parent, filename);
                source = RuleSourceFactory.initRuleFile(path); 
         } else {
-            source = RuleSourceFactory.fromBuildInRule(filename+".key"); 
+            source = RuleSourceFactory.fromDefaultLocation(filename+".key"); 
         }
         if (ldt) {
             includes.putLDT(filename, source);
@@ -4535,9 +4535,16 @@ classPaths returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 :
   ( (
     CLASSPATH 
-    s=string_literal {
+    s=string_literal 
+    {
       ids = ids.append(s);
     }
+    (COMMA s=string_literal
+    {
+      ids = ids.append(s);
+    }
+    )*
+    
     SEMI
     )
   | 

@@ -95,7 +95,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 	schemaReplaceWith = or.replace(schemaReplaceWith);
 
         //create taclet
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);

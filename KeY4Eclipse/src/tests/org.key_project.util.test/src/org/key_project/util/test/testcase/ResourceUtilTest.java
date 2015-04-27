@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
@@ -40,6 +41,57 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class ResourceUtilTest extends TestCase {
+   /**
+    * {@link ResourceUtil#ensureExists(org.eclipse.core.resources.IContainer)}.
+    * @throws CoreException 
+    */
+   @Test
+   public void testEnsureExists() throws CoreException {
+      // Test null
+      assertFalse(ResourceUtil.ensureExists(null));
+      // Test not existing project
+      IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("ResourceUtilTest_testEnsureExists");
+      assertTrue(ResourceUtil.ensureExists(project));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test existing project
+      assertTrue(ResourceUtil.ensureExists(project));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test not existing folder
+      project.delete(true, null);
+      IFolder folder = project.getFolder("folder");
+      assertTrue(ResourceUtil.ensureExists(folder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      // Test existing folder
+      assertTrue(ResourceUtil.ensureExists(folder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      // Test not existing sub folder
+      IFolder subFolder = folder.getFolder("subFolder");
+      assertTrue(ResourceUtil.ensureExists(subFolder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      assertTrue(subFolder.exists());
+      // Test existing sub folder
+      assertTrue(ResourceUtil.ensureExists(subFolder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      assertTrue(subFolder.exists());
+      // Test not existing project
+      project.delete(true, null);
+      assertTrue(ResourceUtil.ensureExists(subFolder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      assertTrue(subFolder.exists());
+   }
+   
    /**
     * {@link ResourceUtil#encodeURIPath(String)}.
     */
@@ -535,9 +587,13 @@ public class ResourceUtilTest extends TestCase {
       // Create project
       IProject project = TestUtilsUtil.createProject("ResourceUtilTest_testCopyIntoFileSystem");
       IFile file = TestUtilsUtil.createFile(project, "Test.txt", "Hello World!");
+      IFolder folder = TestUtilsUtil.createFolder(project, "folder");
+      IFile subFile = TestUtilsUtil.createFile(folder, "TestSub.txt", "Hello Sub Folder!");
       // Create tmp file
       File tmpFile = File.createTempFile("Test", ".txt");
       tmpFile.delete();
+      // Create temp dir
+      File tempDir = IOUtil.createTempDirectory("Test", "folder");
       try {
          // Test null
          assertFalse(ResourceUtil.copyIntoFileSystem(null, tmpFile));
@@ -554,9 +610,17 @@ public class ResourceUtilTest extends TestCase {
          assertTrue(ResourceUtil.copyIntoFileSystem(file, tmpFile));
          assertTrue(tmpFile.exists());
          assertEquals("Hello World!", IOUtil.readFrom(tmpFile));
+         // Test copy project
+         assertTrue(ResourceUtil.copyIntoFileSystem(project, tempDir));
+         assertTrue(tempDir.exists());
+         assertTrue(new File(tempDir, file.getName()).exists());
+         assertEquals("Hello World!", IOUtil.readFrom(new File(tempDir, file.getName())));
+         assertTrue(new File(tempDir, folder.getName()).exists());
+         assertEquals("Hello Sub Folder!", IOUtil.readFrom(new File(tempDir, folder.getName() + File.separator + subFile.getName())));
       }
       finally {
          tmpFile.delete();
+         tempDir.delete();
       }
    }
 }

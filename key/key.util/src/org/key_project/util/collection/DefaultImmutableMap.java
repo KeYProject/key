@@ -51,7 +51,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /** creates new map with mapping entry */
     protected DefaultImmutableMap(ImmutableMapEntry<S,T> entry) {
 	if (entry == null)
-	    throw new RuntimeException("Invalid entry");
+	    throw new RuntimeException("'null' is not allowed as entry");
 	this.entry = entry;
 	this.parent = DefaultImmutableMap.<S,T>nilMap();
 	this.size = 1;
@@ -60,7 +60,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /** creates new map with mapping entry and parent map */
     protected DefaultImmutableMap(ImmutableMapEntry<S,T> entry, DefaultImmutableMap<S,T> parent) {
 	if (entry == null)
-	    throw new RuntimeException("Invalid entry");
+	    throw new IllegalArgumentException("'null' is not allowed as entry");
 	this.entry = entry;
 	this.parent = parent;
 	this.size = parent.size + 1;
@@ -70,6 +70,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /**
      * inserts mapping <key,val> into the map (old map is not modified)
      * if key exists old entry has to be removed
+     * {@code null} is not allowed for key or value.
      * @param key a S to be used as key
      * @param value a T to be stored as value
      * @return a ImmMap<S,T> including the <key, value> pair and all
@@ -196,28 +197,29 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	    queue = queue.parent;
 
 	}
+	
 	return counter < stack.length ?
 		createMap(stack, counter, DefaultImmutableMap.<S,T>nilMap()) : this;
     }
 
     /** @return iterator for all keys */
     public Iterator<S> keyIterator() {
-	return new MapKeyIterator(this);
+	return new MapKeyIterator<S,T>(this);
     }
 
     /** @return iterator for all values */
     public Iterator<T> valueIterator() {
-	return new MapValueIterator(this);
+	return new MapValueIterator<S,T>(this);
     }
 
     /** @return iterator for entries */
-    public Iterator<ImmutableMapEntry<S,T>> entryIterator() {
-	return new MapEntryIterator(this);
+    public Iterator<ImmutableMapEntry<S,T>> iterator() {
+	return new MapEntryIterator<S,T>(this);
     }
 
     public String toString() {
 	final StringBuffer sb = new StringBuffer("[");
-	final Iterator<ImmutableMapEntry<S,T>> it = entryIterator();
+	final Iterator<ImmutableMapEntry<S,T>> it = iterator();
 	while (it.hasNext()) {
 	    sb.append(""+it.next());
 	    if (it.hasNext()) {
@@ -246,7 +248,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	}
 
 
-	final Iterator<ImmutableMapEntry<S,T>> p = entryIterator();
+	final Iterator<ImmutableMapEntry<S,T>> p = iterator();
 	while ( p.hasNext() ) {
 	    final ImmutableMapEntry<S,T> e = p.next();
 	    if ( !e.value().equals(o1.get(e.key())) ) {
@@ -259,7 +261,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     public int hashCode() {
         int hashCode = 1;
-        final Iterator<ImmutableMapEntry<S,T>> p = entryIterator();
+        final Iterator<ImmutableMapEntry<S,T>> p = iterator();
         while ( p.hasNext() ) {
             hashCode += 7*p.next().hashCode();
         }
@@ -319,7 +321,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	}
 
 	/** @return iterator for entries */
-	public Iterator<ImmutableMapEntry<S,T>> entryIterator() {
+	public Iterator<ImmutableMapEntry<S,T>> iterator() {
 	    return ImmutableSLList.<ImmutableMapEntry<S,T>>nil().iterator();
 	}
 
@@ -402,10 +404,10 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	}
 
 	/** @return next value in list */
-	public ImmutableMapEntry<S,T> nextEntry() {
-	    final DefaultImmutableMap<S,T> oldmap = map;
-	    map = oldmap.parent;
-	    return oldmap.entry;
+	protected final ImmutableMapEntry<S,T> nextEntry() {
+	    final ImmutableMapEntry<S,T> entry = map.entry;
+	    map = map.parent;
+	    return entry;
 	}
 
 	/**
@@ -419,7 +421,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     }
 
     /** iterator for the values */
-    private class MapEntryIterator extends MapIterator<S,T>
+    private static final class MapEntryIterator<S,T> extends MapIterator<S,T>
     implements Iterator<ImmutableMapEntry<S,T>> {
 
 	MapEntryIterator(DefaultImmutableMap<S,T> map) {
@@ -427,13 +429,13 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	}
 
 	/** @return next value in list */
-	public ImmutableMapEntry<S,T> next() {
+	public final ImmutableMapEntry<S,T> next() {
 	    return nextEntry();
 	}
     }
 
 
-    private class MapValueIterator extends MapIterator<S,T>
+    private static final class MapValueIterator<S,T> extends MapIterator<S,T>
     implements Iterator<T> {
 
 	MapValueIterator(DefaultImmutableMap<S,T> map) {
@@ -441,12 +443,12 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	}
 
 	/** @return next value in list */
-	public T next() {
+	public final T next() {
 	    return nextEntry().value();
 	}
     }
 
-    private class MapKeyIterator extends MapIterator<S,T>
+    private static final class MapKeyIterator<S,T> extends MapIterator<S,T>
     implements Iterator<S> {
 
 	MapKeyIterator(DefaultImmutableMap<S,T> map) {
@@ -458,4 +460,5 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	    return nextEntry().key();
 	}
     }
+
 }

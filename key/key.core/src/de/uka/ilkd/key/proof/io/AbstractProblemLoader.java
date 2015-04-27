@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -109,6 +110,11 @@ public abstract class AbstractProblemLoader {
      * An optional boot class path.
      */
     private final File bootClassPath;
+    
+    /**
+     * The global includes to use.
+     */
+    private final List<File> includes;
 
     /**
      * The {@link ProblemLoaderControl} to use.
@@ -156,6 +162,11 @@ public abstract class AbstractProblemLoader {
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
     private Proof proof;
+    
+    /**
+     * The {@link ReplayResult} if available or {@code null} otherwise.
+     */
+    private ReplayResult result;
 
     /**
      * Maps internal error codes of the parser to human readable strings.
@@ -182,6 +193,7 @@ public abstract class AbstractProblemLoader {
      * @param file The file or folder to load.
      * @param classPath The optional class path entries to use.
      * @param bootClassPath An optional boot class path.
+     * @param includes Optional includes to consider.
      * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
      * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      * @param control The {@link ProblemLoaderControl} to use.
@@ -190,6 +202,7 @@ public abstract class AbstractProblemLoader {
     public AbstractProblemLoader(File file, 
                                  List<File> classPath, 
                                  File bootClassPath,
+                                 List<File> includes,
                                  Profile profileOfNewProofs, 
                                  boolean forceNewProfileOfNewProofs,
                                  ProblemLoaderControl control,
@@ -203,6 +216,7 @@ public abstract class AbstractProblemLoader {
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
+        this.includes = includes;
     }
 
     /**
@@ -224,7 +238,6 @@ public abstract class AbstractProblemLoader {
             // Read proof obligation settings
             LoadedPOContainer poContainer = createProofObligationContainer();
             ProofAggregate proofList = null;
-            ReplayResult result = null;
             try {
                 if (poContainer == null) {
                     if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
@@ -323,11 +336,11 @@ public abstract class AbstractProblemLoader {
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
             if (file.getParentFile() == null) {
-                return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs);
+                return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
             }
             else {
                 return new SLEnvInput(file.getParentFile().getAbsolutePath(),
-                                classPath, bootClassPath, profileOfNewProofs);
+                                classPath, bootClassPath, profileOfNewProofs, includes);
             }
         }
         else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
@@ -338,7 +351,7 @@ public abstract class AbstractProblemLoader {
         else if (file.isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications
-            return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs);
+            return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs, includes);
         }
         else {
             if (filename.lastIndexOf('.') != -1) {
@@ -436,7 +449,7 @@ public abstract class AbstractProblemLoader {
             }
             try {
                 // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
-                Class<?> poClassInstance = Class.forName(poClass);
+                Class<?> poClassInstance = ClassLoaderUtil.getClassforName(poClass);
                 Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
                 return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
             }
@@ -550,5 +563,13 @@ public abstract class AbstractProblemLoader {
      */
     public Proof getProof() {
         return proof;
+    }
+
+    /**
+     * Returns the {@link ReplayResult} if available.
+     * @return The {@link ReplayResult} or {@code null} if not available.
+     */
+    public ReplayResult getResult() {
+       return result;
     }
 }

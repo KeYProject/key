@@ -20,6 +20,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import org.key_project.util.reflection.ClassLoaderUtil;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -59,7 +61,7 @@ public class ProofMacroMenu extends JMenu {
     /**
      * The loader used to access the providers for macros.
      */
-    private static ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
+    private static Iterable<ProofMacro> loader = ClassLoaderUtil.loadServices(ProofMacro.class);
 
     /**
      * The number of defined macros.

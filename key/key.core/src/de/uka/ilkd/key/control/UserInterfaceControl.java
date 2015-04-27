@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
- * Provides the user interface independent logic to manage multiple proofs. This inclusdes:
+ * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
  *    <li>Functionality to load files via {@link #load(Profile, File, List, File, Properties, boolean)}.</li>
  *    <li>Functionality to instantiate new {@link Proof}s via {@link #createProof(InitConfig, ProofOblInput)}.</li>
@@ -36,7 +37,19 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * </ul>
  * @author Martin Hentschel
  */
-public interface UserInterfaceControl {  
+public interface UserInterfaceControl {
+   /**
+    * Registers the given {@link ProverTaskListener} which will be informed about all events.
+    * @param ptl The {@link ProverTaskListener} to add.
+    */
+   void addProverTaskListener(ProverTaskListener ptl);
+   
+   /**
+    * Removes the given {@link ProverTaskListener}.
+    * @param ptl The {@link ProverTaskListener} to remove.
+    */
+   void removeProverTaskListener(ProverTaskListener ptl);
+   
     /**
      * <p>
      * Opens a java file in this {@link UserInterfaceControl} and returns the instantiated {@link AbstractProblemLoader}
@@ -49,6 +62,7 @@ public interface UserInterfaceControl {
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
+     * @param includes Optional includes to consider.
      * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or overwrite saved PO {@link Properties}.
      * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      * @return The opened {@link AbstractProblemLoader}.
@@ -58,6 +72,7 @@ public interface UserInterfaceControl {
                                File file, 
                                List<File> classPaths, 
                                File bootClassPath, 
+                               List<File> includes,
                                Properties poPropertiesToForce, 
                                boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
     

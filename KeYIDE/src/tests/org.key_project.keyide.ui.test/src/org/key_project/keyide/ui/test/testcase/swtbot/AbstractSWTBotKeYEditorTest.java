@@ -125,13 +125,13 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
       SWTBotEditor editor = null;
       try {
          if (isContract) {
-            environment = KeYEnvironment.load(ResourceUtil.getLocation(src), null, null, EclipseUserInterfaceCustomization.getInstance());
+            environment = KeYEnvironment.load(ResourceUtil.getLocation(src), null, null, null, EclipseUserInterfaceCustomization.getInstance());
             Contract contract = environment.getSpecificationRepository().getContractByName(contractNameOrProofFile);
             assertNotNull(contract);
             proof = environment.createProof(contract.createProofObl(environment.getInitConfig(), contract));
          }
          else {
-            environment = KeYEnvironment.load(new File(ResourceUtil.getLocation(src), contractNameOrProofFile), null, null, EclipseUserInterfaceCustomization.getInstance());
+            environment = KeYEnvironment.load(new File(ResourceUtil.getLocation(src), contractNameOrProofFile), null, null, null, EclipseUserInterfaceCustomization.getInstance());
             proof = environment.getLoadedProof();
             assertNotNull(proof);
          }

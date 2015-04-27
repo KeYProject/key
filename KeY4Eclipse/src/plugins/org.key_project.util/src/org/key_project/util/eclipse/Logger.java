@@ -148,6 +148,21 @@ public class Logger {
     */
    public int openErrorDialog(Shell parentShell,
                               final Throwable t) {
+      return openErrorDialog(parentShell, "Error", null, t);
+   }
+   
+   /**
+    * Opens an error dialog thread save.
+    * @param parentShell The parent {@link Shell}.
+    * @param dialogTitle The dialog title to show.
+    * @param message The message to show.
+    * @param t The exception to show.
+    * @return The dialog result or {@code -1} if no dialog was opened or {@code -2} if no dialog result was received.
+    */
+   public int openErrorDialog(Shell parentShell,
+                              final String dialogTitle,
+                              final String message,
+                              final Throwable t) {
       if (t != null) {
          if (parentShell == null) {
              parentShell = WorkbenchUtil.getActiveShell();
@@ -156,7 +171,7 @@ public class Logger {
          IRunnableWithResult<Integer> run = new AbstractRunnableWithResult<Integer>() {
             @Override
             public void run() {
-               setResult(ErrorDialog.openError(parentToUse, "Error", null, createErrorStatus(t)));
+               setResult(ErrorDialog.openError(parentToUse, dialogTitle, message, createErrorStatus(t)));
             }
          };
          if (parentShell != null) {

@@ -57,16 +57,29 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 
 public class HelperClassForTests {
-   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(HelperClassForTests.class) + 
-                                                   File.separator + "resources"+ 
-                                                   File.separator + "testcase";
+   public static final String TESTCASE_DIRECTORY;
+   
+   static {
+      File projectRoot = IOUtil.getProjectRoot(HelperClassForTests.class);
+      // Update path in Eclipse Plug-ins executed as JUnit Test.
+      if ("org.key_project.core.test".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
+      }
+      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
+      else if ("tests".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
+      }
+      TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+ File.separator + "testcase";
+   }
 
     
     private static final Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
 	    public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSourceFactory.fromBuildInRule(ldtFile), 
+                                RuleSourceFactory.fromDefaultLocation(ldtFile), 
                                 ImmutableSLList.<BuiltInRule>nil());
             }
         };
@@ -157,7 +170,7 @@ public class HelperClassForTests {
           File javaFile = new File(baseDir, javaPathInBaseDir);
           Assert.assertTrue(javaFile.exists());
           // Load java file
-          KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(javaFile, null, null);
+          KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(javaFile, null, null, null);
           try {
              // Start proof
              ImmutableSet<Contract> contracts = environment.getServices().getSpecificationRepository().getAllContracts();
@@ -192,7 +205,7 @@ public class HelperClassForTests {
           Proof proof = null;
           try {
              // Load java file
-             environment = KeYEnvironment.load(javaFile, null, null);
+             environment = KeYEnvironment.load(javaFile, null, null, null);
              // Search type
              KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
              Assert.assertNotNull(containerKJT);

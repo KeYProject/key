@@ -1,9 +1,12 @@
-Symbolic Execution Debugger (SED)
-=================================
-This folder contains all content of the Symbolic Execution Debugger (SED).
+		*****************************************************
+		*         Symbolic Execution Debugger (SED)         *
+		*****************************************************
 
-For more details about this project feel free to contact the following persons:
-- Martin Hentschel (hentschel@cs.tu-darmstadt.de)
+This folder contains all content of the Symbolic Execution Debugger.
+
+Fore more details about this project visit 
+http://www.key-project.org/eclipse/SED
+or contact Martin Hentschel (hentschel@cs.tu-darmstadt.de).
 
 
 (1) Project Description
@@ -20,112 +23,72 @@ recognized, the debugger can also be used to find the origin of the bug in the
 source code, the reason for the misbehavior and sometimes even possible fixes.
 
 
-(2) File Structure
-------------------
-It provides the following file structure:
-- src: Contains the whole source code
-  - features: Contains the eclipse features
-  - plugins: Contains the plug-ins required to use the tool
-- Readme.txt: This file
+(2) Repository File Structure
+-----------------------------
+The project folder is structured as follows:
+- doc          // Additional documentation
+- src          // Contains the whole source code
+  - features   // Contains the specified Eclipse features
+  - plugins    // Contains the developed Eclipse plug-ins with application logic
+  - tests      // Contains the developed Eclipse plug-ins with tests for the 
+                  application logic
+- Readme.txt:  // This file
 
 
-(3) Provided Eclipse features and plug-ins
-------------------------------------------
-- org.key_project.sed.feature // Contains all SED plug-ins
-  - org.key_project.sed.core // Extension of Debug API for Symbolic Execution
-  - org.key_project.sed.key.core // Implementation of Symbolic Execution with KeY
-  - org.key_project.sed.key.ui // User interface for Symbolic Execution with KeY
-  - org.key_project.sed.product.ui // Product definition and branding
-  - org.key_project.sed.ui // User interface for Debug API with Symbolic Execution
-  - org.key_project.sed.ui.visualization 
-    // Visualization of Debug API for Symbolic Execution
-- <tests>
-  - org.key_project.sed.core.all.test // Allows to execute all tests at once
-  - org.key_project.sed.core.test // Tests for org.key_project.sed.core
-  - org.key_project.sed.key.core.test // Tests for org.key_project.sed.key.core
-  - org.key_project.sed.key.ui.test // Tests for org.key_project.sed.key.ui
-  - org.key_project.sed.ui.test // Tests for org.key_project.sed.ui
-  - org.key_project.sed.ui.visualization.test // Tests for org.key_project.sed.ui.visualization 
-
-
-(4) Setup development IDE
+(3) Setup Development IDE
 -------------------------
-1. Download Eclipse 4.4 Luna as bundle 
-   "Eclipse Modeling Tools" from
-   https://eclipse.org/downloads/packages/eclipse-modeling-tools/lunar
-2. Install Graphiti
-   => Help -> Install New Software...
-   => Select "--All Available Sites--" in field "Work with:"
-   => Select the following subitems of "Modeling":
-      - Graphiti (Incubation) (Version 0.8.2...)
-      - Graphiti SDK (Incubation) (Version 0.8.2...)
-      - Graphiti Examples (Incubation) (Version 0.8.2...)
-   => Install it by finishing the wizard
-3. Install find bugs
-   => Help -> Eclipse Marketplace...
-   => Type in Field "Find:" the value "findbugs" and press enter.
-   => Install "FindBugs Eclipse Plugin" with all features.
-4. Install SWTBot
-   => Help -> Eclipse Marketplace...
-   => Type in Field "Find:" the value "swtbot" and press enter.
-   => Install "SWTBot" with all features.
-5. Install SWTBot IDE
-   => Help -> Install New Software...
-   => Select "--All Available Sites--" in field "Work with:"
-   => Select "SWTBot IDE Support (incubation)/SWTBot IDE Features (incubation)" 
-      (Version 2.0.4...)
-   => Install it by finishing the wizard
+Follow the steps in the sub sections precisely. Notice that you have to use
+the mentioned Eclipse version!
 
 
-(5) Development
----------------
-To develop the project it is recommended to use an empty Eclipse workspace
-which can be stored in any directory. It is recommend to store it outside
-of the checkout of the KeY repository. The workspace should be configured
-with the settings described at:
-http://i12www.ira.uka.de/~klebanov/keywiki/index.cgi?KeYDevelopmentInEclipse
-
-To add the required Eclipse projects follow these steps:
-1. Import the following projects from ../KeY4Eclipse/src/plugins:
-   - org.key_project.key4eclipse
-   - org.key_project.key4eclipse.bugfix_mac_os
-   - org.key_project.key4eclipse.feature
-   - org.key_project.key4eclipse.starter.core
-   - org.key_project.key4eclipse.starter.core.test
-   - org.key_project.key4eclipse.util
-   - org.key_project.key4eclipse.util.test
-   - org.key_project.swtbot.swing
-   Use the import wizard "Existing Projects into Workspace" for the import.
-2. Follow the steps in project org.key_project.key4eclipse/Readme.txt
-   to fix the compiler failures and to make the product deployable.
-3. Import all projects from "src" into the workspace. Use the import wizard
-   "Existing Projects into Workspace" for the import.
-   
-   
-(6) Start the product from development IDE
-------------------------------------------
-1. Open file org.key_project.sed.product.ui/SymbolicExecutionDebugger.product
-2. Click on "Launch an Eclipse application" in tab "Overview" of the
-   opened "Product Configuration Editor"
+(3.1) Setup required KeY-Based Eclipse Projects
+-----------------------------------------------
+1. KeY4Eclipse - Follow the instructions of Section (3) in 
+   '../KeY4Eclipse/Readme.txt' carefully
+2. KeYIDE - Follow the instructions of Section (3) in 
+   '../KeYIDE/Readme.txt' carefully
 
 
-(7) Start automated tests
--------------------------
-- Start JUnit tests:
-  Run class org.key_project.sed.core.all.test.suite.AllSEDTests as 
-  "JUnit Plug-in Test". 
-   
-- Start SWTBot tests:
-  Run class org.key_project.sed.core.all.test.suite.swtbot.SWTBotAllSEDTests
-  as "SWTBot Test". Use the JVM settings defined in the JavaDoc comment of 
-  this class.
+(3.2) Import Eclipse Projects from GIT Repository
+-------------------------------------------------
+1. Select main menu item 'File, Import...'
+2. Select 'General, Existing Projects into Workspace' and press 'Next >'
+3. Set root directory to '<root>/GIT/KeY/SymbolicExecutionDebugger/src'
+4. Ensure that 'Copy projects into workspace' is NOT selected.
+5. Finish the wizard
 
 
-(8) Deploy the product
-----------------------
-1. Open file org.key_project.sed.product.ui/SymbolicExecutionDebugger.product
-2. Click on "Eclipse Product export wizard" in tab "Overview" of the
-   opened "Product Configuration Editor"
-3. Define "Root directory" e.g. "SymbolicExecutionDebugger" and 
-   "Destination Directory" e.g. "C:\Temp".
-4. Finish the wizard.
+(4) Start Symbolic Execution Debugger (SED) as Eclipse Product
+--------------------------------------------------------------
+1. Open 'org.key_project.sed.product.ui/SymbolicExecutionDebugger.product'
+2. Click on 'Launch an Eclipse application'
+   (From now on the created launch configuration can be used)
+
+
+(5) Run JUnit Tests
+-------------------
+1. Open class 'org.key_project.sed.core.all.test.suite.AllSEDTests'
+2. Select main menu item 'Run, Run As, JUnit Plug-in Test'
+   (Terminate the launched JUnit Plug-in Test.)
+3. Select main menu item 'Run, Run Configurations...'
+4. Select tab 'Arguments' and add the following 'VM arguments':
+   -Xmx2048m -XX:MaxPermSize=256m -ea
+
+
+(6) Run SWTBot Tests
+--------------------
+1. Open class 'org.key_project.sed.core.all.test.suite.swtbot.SWTBotAllSEDTests'
+2. Select main menu item 'Run, Run As, SWTBot Test'
+   (Terminate the launched SWTBot Test'.)
+3. Select main menu item 'Run, Run Configurations...'
+4. Select tab 'Arguments' and add the following 'VM arguments':
+   -Xmx2048m -XX:MaxPermSize=256m -ea -Dorg.eclipse.swtbot.search.timeout=10000
+
+
+(7) Deploy Symbolic Execution Debugger (SED) as Eclipse product
+---------------------------------------------------------------
+1. Open 'org.key_project.sed.product.ui/SymbolicExecutionDebugger.product'
+2. Click on 'Eclipse Product export wizard'
+3. Set 'Root directory' to 'SymbolicExecutionDebugger'
+4. Define target 'Directory', e.g. 'C:\Temp'.
+5. Finish the wizard.

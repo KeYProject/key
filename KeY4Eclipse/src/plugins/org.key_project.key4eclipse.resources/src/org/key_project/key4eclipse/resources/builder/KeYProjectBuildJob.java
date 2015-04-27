@@ -34,6 +34,8 @@ import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+
 /**
  * A job for running KeY Project Builds.
  * @author Stefan Käsdorf
@@ -115,6 +117,10 @@ public class KeYProjectBuildJob extends Job{
       }
       catch (OperationCanceledException e) {
          return Status.CANCEL_STATUS;
+      }
+      catch (ProblemLoaderException e) {
+         // Nothing to do, error marker already set by ProofManager.
+         return Status.OK_STATUS;
       }
       catch (Exception e){
          return LogUtil.getLogger().createErrorStatus(e);

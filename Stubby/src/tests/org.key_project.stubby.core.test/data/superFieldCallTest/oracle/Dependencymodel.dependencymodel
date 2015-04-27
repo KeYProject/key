@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="SuperFieldCall" source="true" simpleName="SuperFieldCall">
+    <fields name="integerfieldA" visibility="DEFAULT">
+      <type type="int" genericFreeType="int"/>
+    </fields>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types visibility="DEFAULT" package="" name="SuperFieldB" source="true" simpleName="SuperFieldB">
+    <methods name="superFieldBAccess" visibility="DEFAULT">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <fields name="integerfieldA" visibility="PROTECTED">
+      <type type="int" genericFreeType="int"/>
+    </fields>
+    <extends type="SuperFieldCall" genericFreeType="SuperFieldCall"/>
+  </types>
+</dependencymodel:DependencyModel>

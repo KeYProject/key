@@ -15,7 +15,7 @@ package de.hentschel.visualdbc.all.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
+import org.key_project.key4eclipse.all.test.suite.swtbot.SWTBotAllTests;
 
 import de.hentschel.visualdbc.datasource.key.test.suite.swtbot.SWTBotAllKeyDataSourceTests;
 import de.hentschel.visualdbc.datasource.ui.test.suite.swtbot.SWTBotAllDataSourceUITests;
@@ -38,7 +38,8 @@ import de.hentschel.visualdbc.interactive.proving.ui.test.suite.swtbot.SWTBotAll
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   SWTBotAllUtilTests.class,
+   SWTBotAllTests.class,
+   
    SWTBotAllDataSourceUITests.class,
    SWTBotAllGenerationUiTests.class,
    SWTBotAllDiagramCustomTests.class,

@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -43,13 +46,33 @@ public class SumFeature implements Feature {
         features = p_features;
     }
 
+    static void flatten(Feature[] sumF, LinkedHashSet<Feature> p_features) {
+        for (Feature f : sumF) {
+            if (f instanceof SumFeature) {
+                flatten(((SumFeature) f).features, p_features);
+            } else {
+                p_features.add(f);
+            }
+        }
+    }
+
     public static Feature createSum (Feature... fs) {
         Debug.assertFalse ( fs.length == 0,
                             "Cannot compute the sum of zero features" );
-        final Feature[] fsCopy = new Feature [ fs.length ];
-        System.arraycopy ( fs, 0, fsCopy, 0, fs.length );
-        return new SumFeature ( fsCopy );
+
+       if (fs.length == 1) {
+           return fs[0];
+       }
+       LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
+       flatten(fs, featureSet);
+       
+       return new SumFeature ( featureSet.toArray( new Feature [ fs.length ] ) );
     }
 
     private final Feature[] features;
+    
+    @Override
+    public String toString() {
+        return "SumFeature: " + Arrays.toString(features);
+    }
 }

@@ -2,15 +2,14 @@ package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
-import de.uka.ilkd.key.informationflow.po.InfFlowPO;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -46,7 +45,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(final Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          final Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
@@ -79,12 +79,14 @@ public class FinishAuxiliaryLoopComputationMacro extends
         initiatingProof.addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingProof.unionIFSymbols(((InfFlowPO) proof).getIFSymbols());
+        initiatingProof.unionIFSymbols(((InfFlowProof) proof).getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();
 
         final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
         
-        info.addInfo(IFProofMacroConstants.SIDE_PROOF, proof);
+        // close auxiliary computation proof
+        initiatingProof.addSideProof((InfFlowProof) proof);
+        proof.dispose();
         
         return info;
     }

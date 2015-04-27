@@ -19,9 +19,9 @@ import java.util.Map.Entry;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.junit.Test;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.property.TacletPropertySection;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
 import de.uka.ilkd.key.proof.Node;
@@ -38,7 +38,7 @@ public class SWTBotTacletPropertySectionTest extends AbstractSWTBotKeYEditorProp
    public void testValuesOnDifferentNodes_Editor() throws Exception {
       doPropertiesTest("SWTBotTacletPropertySectionTest_testValuesOnDifferentNodes_Editor", 
                        "data/paycard",
-                       TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
+                       TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                        false,
                        createSteps());
    }
@@ -49,7 +49,7 @@ public class SWTBotTacletPropertySectionTest extends AbstractSWTBotKeYEditorProp
    public void testValuesOnDifferentNodes_OutlineView() throws Exception {
       doPropertiesTest("SWTBotTacletPropertySectionTest_testValuesOnDifferentNodes_PropertiesView", 
                        "data/paycard",
-                       TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
+                       TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                        true,
                        createSteps());
    }

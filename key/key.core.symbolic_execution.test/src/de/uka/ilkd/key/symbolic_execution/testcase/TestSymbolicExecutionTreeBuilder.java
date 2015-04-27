@@ -193,7 +193,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    protected void doJavaProfileTest(String proofFilePathInBaseDir,
                                     String oraclePathInBaseDirFile) throws Exception {
       // Ensure that JavaProfile was used before
-      KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), new File(testCaseDirectory, proofFilePathInBaseDir), null, null, true);
+      KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), new File(testCaseDirectory, proofFilePathInBaseDir), null, null, null, true);
       env.dispose();
       // Test symbolic execution
       doSETTestAndDispose(testCaseDirectory, 

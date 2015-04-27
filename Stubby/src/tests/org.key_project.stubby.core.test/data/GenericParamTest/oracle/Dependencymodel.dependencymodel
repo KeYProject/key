@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Map" simpleName="Map">
+    <typeVariables name="K">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <methods name="size" abstract="true">
+      <returnType type="int" genericFreeType="int"/>
+    </methods>
+  </types>
+  <types abstract="true" package="java.util" name="java.util.AbstractMap" simpleName="AbstractMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.Map&lt;K,V>" genericFreeType="java.util.Map"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.util" name="java.util.HashMap" simpleName="HashMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <methods name="HashMap" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <implements type="java.util.Map&lt;K,V>" genericFreeType="java.util.Map"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.util.AbstractMap&lt;K,V>" genericFreeType="java.util.AbstractMap"/>
+  </types>
+  <types package="" name="GenericParamTest" source="true" simpleName="GenericParamTest">
+    <methods name="main">
+      <returnType type="int" genericFreeType="int"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.CharSequence" simpleName="CharSequence"/>
+  <types final="true" package="java.lang" name="java.lang.String" simpleName="String">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.lang.String>" genericFreeType="java.lang.Comparable"/>
+    <implements type="java.lang.CharSequence" genericFreeType="java.lang.CharSequence"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types final="true" package="java.lang" name="java.lang.Boolean" simpleName="Boolean">
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.lang.Boolean>" genericFreeType="java.lang.Comparable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+</dependencymodel:DependencyModel>

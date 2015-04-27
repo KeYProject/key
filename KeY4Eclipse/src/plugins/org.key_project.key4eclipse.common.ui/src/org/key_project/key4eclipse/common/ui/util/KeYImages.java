@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.common.ui.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -58,6 +59,21 @@ public final class KeYImages {
      * The key for the image that is used for the new KeY Java project wizard.
      */
     public static final String NEW_KEY_JAVA_PROJECT_WIZARD = "org.key_project.key4eclipse.common.ui.newKeYJavaProjectWizard";
+
+    /**
+     * The key for suspend at breakpoints icon.
+     */
+    public static final String STOP_AT_BREAKPOINTS = "org.key_project.key4eclipse.common.ui.suspendAtbreakpoints";
+
+    /**
+     * The key for a key file wizard.
+     */
+    public static final String KEY_FILE_WIZARD = "org.key_project.key4eclipse.common.ui.keyFileWizard";
+
+    /**
+     * The key for a key file export wizard.
+     */
+    public static final String KEY_FILE_EXPORT_WIZARD = "org.key_project.key4eclipse.common.ui.keyFileExportWizard";
     
     /**
      * Forbid instances.
@@ -110,6 +126,16 @@ public final class KeYImages {
        }
        return descriptor;
     }
+    
+    /**
+     * Returns the {@link URL} to the given key.
+     * @param key The key.
+     * @return The {@link URL} to the given key.
+     */
+    public static URL getURL(String key) {
+       String path = getPath(key);
+       return Activator.getDefault().getBundle().getEntry(path);
+    }
 
     /**
      * Creates an {@link Image} for the given key.
@@ -118,22 +144,7 @@ public final class KeYImages {
      */
     protected static Image createImage(String key) {
         // Compute path to image in bundle.
-        String path = null;
-        if (KEY_LOGO.equals(key)) {
-           path = "icons/logo16.gif";
-        }
-        else if (TEST_GENERATION.equals(key)) {
-           path = "icons/testGeneration.png";
-        }
-        else if (STARTER_WIZARD.equals(key)) {
-           path = "icons/start_wizard.png";
-        }
-        else if (INTERACTIVE_WIZARD.equals(key)) {
-           path = "icons/interactive_wizard.png";
-        }
-        else if (NEW_KEY_JAVA_PROJECT_WIZARD.equals(key)) {
-           path = "icons/new_key_java_wizard.png";
-        }
+        String path = getPath(key);
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -162,6 +173,40 @@ public final class KeYImages {
     }
     
     /**
+     * Returns the path to the given key.
+     * @param key The key.
+     * @return The path.
+     */
+    protected static String getPath(String key) {
+       String path = null;
+       if (KEY_LOGO.equals(key)) {
+          path = "icons/logo16.gif";
+       }
+       else if (TEST_GENERATION.equals(key)) {
+          path = "icons/testGeneration.png";
+       }
+       else if (STARTER_WIZARD.equals(key)) {
+          path = "icons/start_wizard.png";
+       }
+       else if (INTERACTIVE_WIZARD.equals(key)) {
+          path = "icons/interactive_wizard.png";
+       }
+       else if (NEW_KEY_JAVA_PROJECT_WIZARD.equals(key)) {
+          path = "icons/new_key_java_wizard.png";
+       }
+       else if (STOP_AT_BREAKPOINTS.equals(key)) {
+          path = "icons/stopAtBreakpoints.gif";
+       }
+       else if (KEY_FILE_WIZARD.equals(key)) {
+          path = "icons/key_file_wizard.png";
+       }
+       else if (KEY_FILE_EXPORT_WIZARD.equals(key)) {
+          path = "icons/key_file_export_wizard.png";
+       }
+       return path;
+    }
+    
+    /**
      * Disposes all contained images. This method is automatically called
      * when the plug-in is unloaded from the {@link Activator}.
      * There is no need to call it from any other place!
@@ -173,10 +218,13 @@ public final class KeYImages {
             @Override
             public void run() {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
-               registry.remove(KEY_LOGO);
                registry.remove(INTERACTIVE_WIZARD);
+               registry.remove(KEY_FILE_EXPORT_WIZARD);
+               registry.remove(KEY_FILE_WIZARD);
+               registry.remove(KEY_LOGO);
                registry.remove(NEW_KEY_JAVA_PROJECT_WIZARD);
                registry.remove(STARTER_WIZARD);
+               registry.remove(STOP_AT_BREAKPOINTS);
                registry.remove(TEST_GENERATION);
             }
          });

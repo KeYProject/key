@@ -3,6 +3,7 @@ package org.key_project.ui;
 import java.io.File;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.key_project.ui.util.EclipseKeYDesktop;
 import org.key_project.ui.util.KeYExampleUtil;
 import org.osgi.framework.BundleContext;
 
@@ -37,6 +38,7 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 	   // Make sure that the system is not exited when the KeY main window is closed.
+      Main.setKeyDesktop(new EclipseKeYDesktop());
 	   ExitMainAction.exitSystem = false;
 	   Main.showExampleChooserIfExamplesDirIsDefined = false;
 	   // Change the KeY config path to store configuration files inside the workspace.
@@ -44,7 +46,7 @@ public class Activator extends AbstractUIPlugin {
 	   PathConfig.setKeyConfigDir(keyConfigDir + File.separator + PathConfig.KEY_DIRECTORY_NAME);
 	   // Check if a local example directory is available. This is true if the plug-in is used inside a development IDE
 	   String exampleDir = KeYExampleUtil.getLocalExampleDirectory();
-	   if (exampleDir == null || exampleDir.isEmpty()) {
+	   if (exampleDir == null || !new File(exampleDir).isDirectory()) {
          // Extract KeY examples into workspace, this is required to use them.
          exampleDir = keyConfigDir + File.separator + "examples";
          String keyExampleFile = keyConfigDir + File.separator + "examples.properties";

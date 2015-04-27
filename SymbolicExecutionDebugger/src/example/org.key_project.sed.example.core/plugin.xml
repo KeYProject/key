@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="org.key_project.sed.example.launch.ExampleSourceLookupDirector"
+            id="org.key_project.sed.example.launch.ExampleSourceLookupDirector"
+            name="SED Example Source Locator">
+      </sourceLocator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="org.key_project.sed.example.launch.ExampleSourcePathComputerDelegate"
+            id="org.key_project.sed.example.launch.ExampleSourcePathComputerDelegate">
+      </sourcePathComputer>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.key_project.sed.example.launch.ExampleLaunchConfigurationDelegate"
+            id="org.key_project.sed.example.core.exampleLaunchType"
+            modes="debug"
+            name="Symbolic Execution Debugger (SED) - Example"
+            sourceLocatorId="org.key_project.sed.example.launch.ExampleSourceLookupDirector"
+            sourcePathComputerId="org.key_project.sed.example.launch.ExampleSourcePathComputerDelegate">
+      </launchConfigurationType>
+   </extension>
+
+</plugin>

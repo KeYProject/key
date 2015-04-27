@@ -20,6 +20,7 @@ import java.awt.Font;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -52,7 +53,7 @@ public class ContractSelectionPanel extends JPanel {
      */
     private static final long serialVersionUID = 1681223715264203991L;
     private final Services services;
-    private final JList contractList;
+    private final JList<Contract> contractList;
     private final TitledBorder border;
 
 
@@ -78,7 +79,7 @@ public class ContractSelectionPanel extends JPanel {
         add(scrollPane);
 
         //create contract list
-        contractList = new JList();
+        contractList = new JList<Contract>();
         contractList.setSelectionMode(
                 multipleSelection
                 ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
@@ -98,7 +99,7 @@ public class ContractSelectionPanel extends JPanel {
             private static final long serialVersionUID = 9066658130231994408L;
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
 
-	    public Component getListCellRendererComponent(JList list,
+	    public Component getListCellRendererComponent(JList<?> list,
 	                                                  Object value,
 	                                                  int index,
 	                                                  boolean isSelected,
@@ -200,7 +201,7 @@ public class ContractSelectionPanel extends JPanel {
 
 
     public Contract getContract() {
-        final Object[] selection = contractList.getSelectedValues();
+        final List<Contract> selection = contractList.getSelectedValuesList();
         return computeContract(services, selection);
     }
     
@@ -215,16 +216,21 @@ public class ContractSelectionPanel extends JPanel {
      * @param selection The selected contracts.
      * @return The selected {@link Contract} or {@code null} if not available.
      */
-    public static Contract computeContract(Services services, Object[] selection) {
-       if(selection.length == 0) {
+    public static Contract computeContract(Services services, List<Contract> selection) {
+       if(selection.isEmpty()) {
           return null;
-      } else if(selection.length == 1) {
-          return (Contract) selection[0];
-      } else {
+      } else if(selection.size() == 1) {
+          return selection.get(0);
+      } else {         
           ImmutableSet<FunctionalOperationContract> contracts
              = DefaultImmutableSet.<FunctionalOperationContract>nil();
-          for(Object contract : selection) {
-       contracts = contracts.add((FunctionalOperationContract) contract);
+          for(Contract contract : selection) {
+              if (contract instanceof FunctionalOperationContract) {
+                  contracts = contracts.add((FunctionalOperationContract) contract);
+              } else {
+                  throw new IllegalStateException("Don't know how to combine contracts of kind " 
+                          + contract.getClass() + "\n" + "Contract:\n" + contract.getPlainText(services));
+              }
           }
           return services.getSpecificationRepository()
                          .combineOperationContracts(contracts);

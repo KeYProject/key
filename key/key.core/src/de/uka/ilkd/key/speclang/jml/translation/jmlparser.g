@@ -361,9 +361,11 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = continuesclause
     |   result = dependsclause
     |   result = ensuresclause
+    |   result = ensuresfreeclause
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
+    |   result = requiresfreeclause
     |   result = decreasesclause
     |   result = separatesclause  // old information flow syntax
     |   result = determinesclause // new information flow syntax
@@ -376,7 +378,6 @@ top returns [Object result = null] throws  SLTranslationException
     )
     (SEMI)? EOF
     ;
-
 
 accessibleclause returns [Term result = null] throws SLTranslationException
 :
@@ -424,10 +425,22 @@ requiresclause returns [Term result = null] throws SLTranslationException
             { result = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
+requiresfreeclause returns [Term result = null] throws SLTranslationException
+:
+    req:REQUIRES_FREE result=predornot
+            { result = translator.translate(req.getText(), Term.class, result, services); }
+    ;
+
 
 ensuresclause returns [Term result = null] throws SLTranslationException
 :
     ens:ENSURES result=predornot
+            { result = translator.translate(ens.getText(), Term.class, result, services); }
+    ;
+
+ensuresfreeclause returns [Term result = null] throws SLTranslationException
+:
+    ens:ENSURES_FREE result=predornot
             { result = translator.translate(ens.getText(), Term.class, result, services); }
     ;
 
@@ -797,7 +810,7 @@ equivalenceexpr returns [SLExpression result=null] throws SLTranslationException
     ;
 
 /*
- * Note: According to JML Manual §12.6.3 forward implication has to be parsed right-associatively
+ * Note: According to JML Manual 12.6.3 forward implication has to be parsed right-associatively
  * and backward implication left-associatively.
  */
 impliesexpr returns [SLExpression result=null] throws SLTranslationException
@@ -953,12 +966,15 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
     Function f = null;
     KeYJavaType type = null;
     SLExpression right = null;
+    SLExpression right2 = null;
     Token opToken = null;
 }
 :
 	result=shiftexpr
 	(
-	    lt:LT right=shiftexpr
+	    lt:LT right=shiftexpr 
+	    // allow range predicates of the shape 0 < x < 23 (JML extension)
+	    ( LT right2=shiftexpr )?
 	    {
 		f = intLDT.getLessThan();
 		opToken = lt;
@@ -971,6 +987,8 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 	    }
 	|
 	    leq:LEQ right=shiftexpr
+	    // allow range predicates of the shape 0 <= x < 23 (JML extension)
+	    ( LT right2=shiftexpr )?
 	    {
 		f = intLDT.getLessOrEquals();
 		opToken = leq;
@@ -1058,6 +1076,15 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 
 			    result = new SLExpression(
 				tb.func(f,result.getTerm(),right.getTerm()));
+			} 
+			if (right2 != null) { // range expressions like 0 <= x < 23
+			    if (right2.isType()) {
+			    raiseError("Cannot build relational expression from type " +
+				right2.getType().getName() + ".", opToken);
+			    }
+			    assert right2.isTerm();
+			    final Term upperBound = tb.func(intLDT.getLessThan(),right.getTerm(),right2.getTerm());
+			    result = new SLExpression(tb.and(result.getTerm(),upperBound));
 			}
 		} catch (TermCreationException e) {
 		    raiseError("Error in relational expression: " + e.getMessage());
@@ -1276,7 +1303,6 @@ postfixexpr returns [SLExpression result=null] throws SLTranslationException
 	    }
 	    result = expr; //.getTerm();
 	}
-
 ;
 
 primaryexpr returns [SLExpression result=null] throws SLTranslationException
@@ -1598,7 +1624,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	        selfVar, resultVar, paramVars, atPres == null ? null : atPres.get(getBaseHeap()));
 	}
 
-    |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
+    |   escape:DL_ESCAPE ( (LPAREN) => LPAREN ( list=expressionlist )? RPAREN )?
         {
             result = translator.translate("\\dl_", SLExpression.class, escape, list, services);
         }

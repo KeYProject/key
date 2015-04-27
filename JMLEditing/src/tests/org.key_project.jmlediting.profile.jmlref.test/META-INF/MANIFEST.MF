@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JML Editing JML Reference Profile Test
+Bundle-SymbolicName: org.key_project.jmlediting.profile.jmlref.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.jmlediting.profile.jmlref.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.junit;bundle-version="4.11.0",
+ org.key_project.jmlediting.core;bundle-version="1.0.0",
+ org.key_project.jmlediting.core.test;bundle-version="1.0.0",
+ org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Export-Package: org.key_project.jmlediting.profile.jmlref.test.parser,
+ org.key_project.jmlediting.profile.jmlref.test.suite
+Bundle-Vendor: KeY Project

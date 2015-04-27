@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Stubby UI Tests
+Bundle-SymbolicName: org.key_project.stubby.ui.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.stubby.ui.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.core.resources;bundle-version="3.9.1",
+ org.eclipse.jdt.core;bundle-version="3.10.0",
+ org.junit;bundle-version="4.11.0",
+ org.eclipse.swtbot.go;bundle-version="2.2.1",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.util.test;bundle-version="1.0.0",
+ org.key_project.stubby.core;bundle-version="1.0.0",
+ org.key_project.stubby.core.test;bundle-version="1.0.0",
+ org.key_project.stubby.ui;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.stubby.ui.test.suite.swtbot,
+ org.key_project.stubby.ui.test.testcase.swtbot
+Import-Package: org.key_project.stubby.core.test.testcase

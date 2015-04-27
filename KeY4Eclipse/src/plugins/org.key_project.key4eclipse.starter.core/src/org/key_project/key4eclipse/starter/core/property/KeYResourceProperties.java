@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -29,10 +30,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.JavaModelException;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.decorator.ClassPathFolderLightweightLabelDecorator;
+import org.key_project.key4eclipse.starter.core.decorator.ClassPathProjectLightweightLabelDecorator;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.xml.sax.Attributes;
@@ -63,6 +67,11 @@ public final class KeYResourceProperties {
      * Property for the class path entries.
      */
     public static final QualifiedName PROP_CLASS_PATH_ENTRIES = new QualifiedName("org.key_project.key4eclipse.starter", "classPathEntries");
+
+    /**
+     * Property for the include path entries.
+     */
+    public static final QualifiedName PROP_INCLUDE_PATH_ENTRIES = new QualifiedName("org.key_project.key4eclipse.starter", "includePathEntries");
     
     /**
      * Possible kinds of boot class paths.
@@ -107,18 +116,6 @@ public final class KeYResourceProperties {
     }
     
     /**
-     * Sets the use boot class path entry.
-     * @param project The {@link IProject} to configure.
-     * @param kind The value to save.
-     * @throws CoreException Occurred Exception.
-     */
-    public static void setUseBootClassPathKind(IProject project, UseBootClassPathKind kind) throws CoreException {
-        if (project != null && project.isOpen()) {
-            project.setPersistentProperty(PROP_USE_BOOT_CLASS_PATH, kind != null ? kind.toString() : null);
-        }
-    }
-    
-    /**
      * Returns the boot class path entry value.
      * @param project The {@link IProject} to read from.
      * @return The boot class path entry value.
@@ -136,13 +133,57 @@ public final class KeYResourceProperties {
     /**
      * Sets the boot class path entry.
      * @param project The {@link IProject} to configure.
+     * @param kind The {@link UseBootClassPathKind} of the path.
      * @param bootClassPath The value to save.
      * @throws CoreException Occurred Exception.
      */
-    public static void setBootClassPath(IProject project, String bootClassPath) throws CoreException {
+    public static void setBootClassPath(IProject project, UseBootClassPathKind kind, String bootClassPath) throws CoreException {
         if (project != null && project.isOpen()) {
-            project.setPersistentProperty(PROP_BOOT_CLASS_PATH, bootClassPath);
+           IResource oldResource = null;
+           if (UseBootClassPathKind.WORKSPACE.equals(getUseBootClassPathKind(project))) {
+              oldResource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(getBootClassPath(project)));
+           }
+           if (oldResource instanceof IFolder && oldResource.exists()) {
+              ClassPathFolderLightweightLabelDecorator.redecorateFolder((IFolder)oldResource);
+           }
+           else if (oldResource instanceof IProject && oldResource.exists()) {
+              ClassPathProjectLightweightLabelDecorator.redecorateFolder((IProject) oldResource);
+           }
+           project.setPersistentProperty(PROP_USE_BOOT_CLASS_PATH, kind != null ? kind.toString() : null);
+           project.setPersistentProperty(PROP_BOOT_CLASS_PATH, bootClassPath);
+           if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
+              oldResource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(bootClassPath));
+              if (oldResource instanceof IFolder && oldResource.exists()) {
+                 ClassPathFolderLightweightLabelDecorator.redecorateFolder((IFolder)oldResource);
+              }
+              else if (oldResource instanceof IProject && oldResource.exists()) {
+                 ClassPathProjectLightweightLabelDecorator.redecorateFolder((IProject) oldResource);
+              }
+           }
         }
+    }
+    
+    /**
+     * Searches the {@link KeYPathEntry} with the given properties.
+     * @param entries The available {@link KeYPathEntry}s.
+     * @param kind The expected {@link KeYPathEntryKind}.
+     * @param path The expected path.
+     * @return The found {@link KeYPathEntry} or {@code null} if not found.
+     */
+    public static KeYPathEntry searchClassPathEntry(final List<KeYPathEntry> entries, 
+                                                         final KeYPathEntryKind kind,
+                                                         final String path) {
+       return CollectionUtil.search(entries, new IFilter<KeYPathEntry>() {
+          @Override
+          public boolean select(KeYPathEntry element) {
+             if (kind.equals(element.getKind())) {
+                return path.equals(element.getPath());
+             }
+             else {
+                return false;
+             }
+          }
+       });
     }
     
     /**
@@ -151,41 +192,52 @@ public final class KeYResourceProperties {
      * @return The class path entries.
      * @throws CoreException Occurred Exception.
      */
-    public static List<KeYClassPathEntry> getClassPathEntries(IProject project) throws CoreException {
-        try {
-            if (project != null && project.isOpen()) {
-                String xml = project.getPersistentProperty(PROP_CLASS_PATH_ENTRIES);
-                final List<KeYClassPathEntry> result = new LinkedList<KeYClassPathEntry>();
-                if (!StringUtil.isEmpty(xml)) {
-                    SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-                    DefaultHandler handler = new DefaultHandler() {
-                        @Override
-                        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                            try {
-                                if ("entry".equals(qName)) {
-                                    String kind = attributes.getValue("kind");
-                                    String path = attributes.getValue("path");
-                                    if (!StringUtil.isEmpty(kind) && !StringUtil.isEmpty(path)) {
-                                        result.add(new KeYClassPathEntry(KeYClassPathEntryKind.valueOf(kind), path));
-                                    }
-                                }
-                            }
-                            catch (Exception e) {
-                                // Just ignore the entry, nothing to do.
-                            }
-                        }
-                    };
-                    parser.parse(new ByteArrayInputStream(xml.getBytes()), handler);
-                }
-                return result;
-            }
-            else {
-                return null;
-            }
-        }
-        catch (Exception e) {
-            return null;
-        }
+    public static List<KeYPathEntry> getClassPathEntries(IProject project) throws CoreException {
+        return doGetPathEntries(project, PROP_CLASS_PATH_ENTRIES);
+    }
+    
+    /**
+     * Returns the class path entries of the property with the given {@link QualifiedName}.
+     * @param project The {@link IProject} to read from.
+     * @param key The {@link QualifiedName} of the property.
+     * @return The class path entries.
+     * @throws CoreException Occurred Exception.
+     */
+    private static List<KeYPathEntry> doGetPathEntries(IProject project, QualifiedName key) throws CoreException {
+       try {
+          if (project != null && project.isOpen()) {
+              String xml = project.getPersistentProperty(key);
+              final List<KeYPathEntry> result = new LinkedList<KeYPathEntry>();
+              if (!StringUtil.isEmpty(xml)) {
+                  SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+                  DefaultHandler handler = new DefaultHandler() {
+                      @Override
+                      public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+                          try {
+                              if ("entry".equals(qName)) {
+                                  String kind = attributes.getValue("kind");
+                                  String path = attributes.getValue("path");
+                                  if (!StringUtil.isEmpty(kind) && !StringUtil.isEmpty(path)) {
+                                      result.add(new KeYPathEntry(KeYPathEntryKind.valueOf(kind), path));
+                                  }
+                              }
+                          }
+                          catch (Exception e) {
+                              // Just ignore the entry, nothing to do.
+                          }
+                      }
+                  };
+                  parser.parse(new ByteArrayInputStream(xml.getBytes()), handler);
+              }
+              return result;
+          }
+          else {
+              return null;
+          }
+      }
+      catch (Exception e) {
+          return null;
+      }
     }
     
     /**
@@ -194,26 +246,67 @@ public final class KeYResourceProperties {
      * @param entries The values to save.
      * @throws CoreException Occurred Exception.
      */
-    public static void setClassPathEntries(IProject project, List<KeYClassPathEntry> entries) throws CoreException {
-        if (project != null && project.isOpen()) {
-            StringBuffer sb = new StringBuffer();
-            sb.append("<?xml version=\"1.0\"?>");
-            sb.append("<classPathEntries>");
-            if (entries != null) {
-                for (KeYClassPathEntry entry : entries) {
-                    sb.append("<entry");
-                    if (entry.getKind() != null) {
-                        sb.append(" kind=\"" + entry.getKind().toString() + "\"");
-                    }
-                    if (!StringUtil.isEmpty(entry.getPath())) {
-                        sb.append(" path=\"" + entry.getPath() + "\"");
-                    }
-                    sb.append(" />");
+    public static void setClassPathEntries(IProject project, List<KeYPathEntry> entries) throws CoreException {
+       doSetPathEntries(project, entries, PROP_CLASS_PATH_ENTRIES);
+    }
+    
+    /**
+     * Sets the {@link KeYPathEntry} in the property with the given {@link QualifiedName}.
+     * @param project The {@link IProject} to configure.
+     * @param entries The values to save.
+     * @param key The {@link QualifiedName} of the property to modify.
+     * @throws CoreException Occurred Exception.
+     */
+    private static void doSetPathEntries(IProject project, List<KeYPathEntry> entries, QualifiedName key) throws CoreException {
+       if (project != null && project.isOpen()) {
+          List<IResource> resources = new LinkedList<IResource>();
+          // Get old content
+          List<KeYPathEntry> oldEntries = KeYResourceProperties.getClassPathEntries(project);
+          if (!CollectionUtil.isEmpty(oldEntries)) {
+             for (KeYPathEntry entry : oldEntries) {
+                if (KeYPathEntryKind.WORKSPACE.equals(entry.getKind())) {
+                   IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(entry.getPath()));
+                   if (resource != null && resource.exists()) {
+                      resources.add(resource);
+                   }
                 }
-            }
-            sb.append("</classPathEntries>");
-            project.setPersistentProperty(PROP_CLASS_PATH_ENTRIES, sb.toString());
-        }
+             }
+          }
+          // Create new content
+          StringBuffer sb = new StringBuffer();
+          sb.append("<?xml version=\"1.0\"?>");
+          sb.append("<classPathEntries>");
+          if (entries != null) {
+              for (KeYPathEntry entry : entries) {
+                  if (KeYPathEntryKind.WORKSPACE.equals(entry.getKind())) {
+                     IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(entry.getPath()));
+                     if (resource != null && resource.exists()) {
+                        resources.add(resource);
+                     }
+                  }
+                  sb.append("<entry");
+                  if (entry.getKind() != null) {
+                      sb.append(" kind=\"" + entry.getKind().toString() + "\"");
+                  }
+                  if (!StringUtil.isEmpty(entry.getPath())) {
+                      sb.append(" path=\"" + entry.getPath() + "\"");
+                  }
+                  sb.append(" />");
+              }
+          }
+          sb.append("</classPathEntries>");
+          // Change property
+          project.setPersistentProperty(key, sb.toString());
+          // Update decorations
+          for (IResource resource : resources) {
+             if (resource instanceof IFolder) {
+                ClassPathFolderLightweightLabelDecorator.redecorateFolder((IFolder) resource);
+             }
+             else if (resource instanceof IProject) {
+                ClassPathProjectLightweightLabelDecorator.redecorateFolder((IProject) resource);
+             }
+          }
+      }
     }
     
     /**
@@ -250,20 +343,60 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */
     public static List<File> getKeYClassPathEntries(IProject project) throws CoreException {
-        List<KeYClassPathEntry> entries = getClassPathEntries(project);
-        if (entries != null) {
-            List<File> result = new ArrayList<File>(entries.size());
-            for (KeYClassPathEntry entry : entries) {
-                File location = entry.getLocation();
-                if (location != null) {
-                    result.add(location);
-                }
-            }
-            return result;
-        }
-        else {
-            return null;
-        }
+        List<KeYPathEntry> entries = getClassPathEntries(project);
+        return pathEntriesToFile(entries);
+    }
+    
+    /**
+     * Converts the given {@link KeYPathEntry}s into local {@link File}s.
+     * @param entries The {@link KeYPathEntry}s to convert.
+     * @return The local {@link File}s.
+     */
+    private static List<File> pathEntriesToFile(List<KeYPathEntry> entries) {
+       if (entries != null) {
+          List<File> result = new ArrayList<File>(entries.size());
+          for (KeYPathEntry entry : entries) {
+              File location = entry.getLocation();
+              if (location != null) {
+                  result.add(location);
+              }
+          }
+          return result;
+      }
+      else {
+          return null;
+      }
+    }
+
+    /**
+     * Returns the include path entries.
+     * @param project The {@link IProject} to read from.
+     * @return The include path entries.
+     * @throws CoreException Occurred Exception.
+     */
+    public static List<KeYPathEntry> getIncludeEntries(IProject project) throws CoreException {
+       return doGetPathEntries(project, PROP_INCLUDE_PATH_ENTRIES);
+    }
+
+    /**
+     * Sets the include path entries.
+     * @param project The {@link IProject} to configure.
+     * @param entries The values to save.
+     * @throws CoreException Occurred Exception.
+     */
+    public static void setIncludeEntries(IProject project, List<KeYPathEntry> includeEntries) throws CoreException {
+       doSetPathEntries(project, includeEntries, PROP_INCLUDE_PATH_ENTRIES);
+    }
+
+    /**
+     * Returns the include path entries to use in KeY.
+     * @param project The given {@link IProject}.
+     * @return The include path entries to use in KeY.
+     * @throws CoreException Occurred Exception.
+     */
+    public static List<File> getKeYIncludes(IProject project) throws CoreException {
+       List<KeYPathEntry> entries = getIncludeEntries(project);
+       return pathEntriesToFile(entries);
     }
 
     /**

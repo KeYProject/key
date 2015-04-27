@@ -316,10 +316,37 @@ public final class WorkbenchUtil {
                                                    boolean allowMultipleSelection,
                                                    Object[] initialSelection,
                                                    Collection<? extends ViewerFilter> viewerFilters) {
+       return openFolderSelection(parent, 
+                                  title, 
+                                  message, 
+                                  allowMultipleSelection, 
+                                  initialSelection, 
+                                  viewerFilters, 
+                                  ResourcesPlugin.getWorkspace().getRoot());
+    }
+    
+    /**
+     * Opens a select folder dialog.
+     * @param parent The parent {@link Shell}.
+     * @param title The title.
+     * @param message The message. 
+     * @param allowMultipleSelection Allow multiple selections?
+     * @param initialSelection Optional initial selection.
+     * @param viewerFilters Optional viewer filters.
+     * @param input The input.
+     * @return The selected {@link IContainer}s or {@code null} if the dialog was canceled.
+     */
+    public static IContainer[] openFolderSelection(Shell parent,
+                                                   String title,
+                                                   String message,
+                                                   boolean allowMultipleSelection,
+                                                   Object[] initialSelection,
+                                                   Collection<? extends ViewerFilter> viewerFilters,
+                                                   Object input) {
         ILabelProvider labelProvider = new WorkbenchLabelProvider();
         ITreeContentProvider contentProvider = new WorkbenchContentProvider();
         FolderSelectionDialog dialog = new FolderSelectionDialog(parent, labelProvider, contentProvider);
-        dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
+        dialog.setInput(input);
         dialog.setTitle(title);
         dialog.setMessage(message);
         dialog.setAllowMultiple(allowMultipleSelection);
@@ -482,5 +509,24 @@ public final class WorkbenchUtil {
             return element.getShell() == shell;
          }
       });
+   }
+
+   /**
+    * Gets the current active {@link IProject} for a given {@link IEditorPart}
+    *
+    * @param editorPart
+    *           The {@link IEditorPart} for which the {@link IProject} is
+    *           requested.
+    * @return IProject The {@link IProject} for the given {@link IEditorPart}
+    */
+   public static IProject getProject(final IEditorPart editorPart) {
+      if (editorPart == null) {
+         return null;
+      }
+      final IResource resource = (IResource) editorPart.getEditorInput().getAdapter(IResource.class);
+      if (resource != null) {
+         return resource.getProject();
+      }
+      return null;
    }
 }

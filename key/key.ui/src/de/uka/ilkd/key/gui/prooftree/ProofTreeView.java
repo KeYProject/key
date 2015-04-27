@@ -321,7 +321,7 @@ public class ProofTreeView extends JPanel {
             delegateModel.removeTreeModelListener(proofTreeSearchPanel);
 	}
 
-	if (proof != null) {
+	if (proof != null && !proof.isDisposed()) {
 	   proof.removeRuleAppListener(proofListener);
 	}
 	proof = p;
@@ -684,7 +684,7 @@ public class ProofTreeView extends JPanel {
 	    if (value instanceof GUIBranchNode) {
 	        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 setBackgroundNonSelectionColor(BISQUE_COLOR);
-                if ( ((GUIBranchNode)value).getNode().isClosed() ) {
+                if ( ((GUIBranchNode)value).isClosed() ) {
                     // all goals below this node are closed
                     this.setIcon(IconFactory.provedFolderIcon());
                 }

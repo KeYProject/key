@@ -14,17 +14,18 @@
 package de.uka.ilkd.key.control;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -43,26 +44,87 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
  * @author Martin Hentschel
  */
 public abstract class AbstractUserInterfaceControl implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
-    protected boolean saveOnly = false;
-
-    private ProverTaskListener pml = null;
-
     private int numOfInvokedMacros = 0;
-
-    public void setSaveOnly(boolean s) {
-        this.saveOnly = s;
+    
+    /**
+     * The registered {@link ProverTaskListener}.
+     */
+    private final List<ProverTaskListener> proverTaskListener = new LinkedList<ProverTaskListener>();
+    
+    /**
+     * Constructor.
+     */
+    public AbstractUserInterfaceControl() {
+       addProverTaskListener(new ProofMacroListenerAdapter());
     }
     
-    public boolean isSaveOnly() {
-        return this.saveOnly;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addProverTaskListener(ProverTaskListener ptl) {
+       if (ptl != null) {
+          proverTaskListener.add(ptl);
+       }
     }
 
-    public final ProverTaskListener getListener() {
-        if (this.pml == null) {
-            this.pml = new ProofMacroListenerAdapter();
-        }
-        return new CompositePTListener(this, pml);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeProverTaskListener(ProverTaskListener ptl) {
+       if (ptl != null) {
+          proverTaskListener.remove(ptl);
+       }
     }
+
+    /**
+     * Fires the event {@link ProverTaskListener#taskStarted(String, int)} to all listener.
+     * @param info the {@link TaskStartedInfo} containing general information about the task that is just about to start
+     */
+    protected void fireTaskStarted(TaskStartedInfo info) {
+       ProverTaskListener[] listener = proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+       for (ProverTaskListener l : listener) {
+          l.taskStarted(info);
+       }
+    }
+
+    /**
+     * Fires the event {@link ProverTaskListener#taskProgress(int)} to all listener.
+     * @param position The current position.
+     */
+    protected void fireTaskProgress(int position) {
+       ProverTaskListener[] listener = proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+       for (ProverTaskListener l : listener) {
+          l.taskProgress(position);
+       }
+    }
+
+    /**
+     * Fires the event {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} to all listener.
+     * @param info The {@link TaskFinishedInfo}.
+     */
+    protected void fireTaskFinished(TaskFinishedInfo info) {
+       ProverTaskListener[] listener = proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+       for (ProverTaskListener l : listener) {
+          l.taskFinished(info);
+       }
+    }
+
+   @Override
+   public void taskStarted(TaskStartedInfo info) {
+      fireTaskStarted(info);
+   }
+
+   @Override
+   public void taskProgress(int position) {
+      fireTaskProgress(position);
+   }
+
+   @Override
+   public void taskFinished(TaskFinishedInfo info) {
+      fireTaskFinished(info);
+   }
 
    /**
      * {@inheritDoc}
@@ -97,11 +159,11 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
        return numOfInvokedMacros != 0;
     }
 
-    protected void macroStarted(String message, int size) {
+    protected void macroStarted(TaskStartedInfo info) {
         numOfInvokedMacros++;
     }
 
-    protected void macroFinished(ProofMacroFinishedInfo info) {
+    protected synchronized void macroFinished(final ProofMacroFinishedInfo info) {
         if (numOfInvokedMacros > 0) {
             numOfInvokedMacros--;
         }
@@ -113,9 +175,9 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
     private class ProofMacroListenerAdapter implements ProverTaskListener {
 
         @Override
-        public void taskStarted(String message, int size) {
-            if (!ApplyStrategy.PROCESSING_STRATEGY.equals(message)) {//TODO: have a source object that make clear I am not a macro
-                macroStarted(message, size);
+        public void taskStarted(TaskStartedInfo info) {
+            if (TaskStartedInfo.TaskKind.Macro.equals(info.getKind())) {
+                macroStarted(info);
             }
         }
 
@@ -140,11 +202,12 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
                                      File file,
                                      List<File> classPath,
                                      File bootClassPath,
+                                     List<File> includes,
                                      Properties poPropertiesToForce,
                                      boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
        AbstractProblemLoader loader = null;
        try {
-          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile, forceNewProfileOfNewProofs,
+          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes, profile, forceNewProfileOfNewProofs,
                                                  this, false, poPropertiesToForce);
           loader.load();
           return loader;

@@ -214,18 +214,18 @@ public class SemisequentTacletAppIndex {
      * @param antec iff true create an index for the antecedent of
      * <code>s</code>, otherwise for the succedent
      */
-    public SemisequentTacletAppIndex ( Sequent         s,
-                                       boolean         antec,
-                                       Services        services,
-                                       TacletIndex     tacletIndex,
-                                       NewRuleListener listener,
-                                       RuleFilter      ruleFilter,
-                                       TermTacletAppIndexCacheSet indexCaches) {
+    SemisequentTacletAppIndex ( Sequent         s,
+                                boolean         antec,
+                                Services        services,
+                                TacletIndex     tacletIndex,
+                                NewRuleListener listener,
+                                RuleFilter      ruleFilter,
+                                TermTacletAppIndexCacheSet indexCaches) {
         this.seq = s;
         this.antec = antec;
         this.ruleFilter = ruleFilter;
         this.indexCaches = indexCaches;
-        addTermIndices ( ( antec ? s.antecedent () : s.succedent () ).toList (),
+        addTermIndices ( ( antec ? s.antecedent () : s.succedent () ).asList (),
                          s, services, tacletIndex, listener );
     }
 
@@ -314,12 +314,8 @@ public class SemisequentTacletAppIndex {
      * Calls ruleAdded on the given NewRuleListener for
      * every cached taclet app.
      */
-    public void reportRuleApps ( NewRuleListener l ) {
-        final Iterator<ImmutableMapEntry<SequentFormula,TermTacletAppIndex>> it =
-            termIndices.entryIterator();
-        
-        while ( it.hasNext() ) {
-            final ImmutableMapEntry<SequentFormula,TermTacletAppIndex> entry = it.next();
+    void reportRuleApps ( NewRuleListener l ) {
+        for (final ImmutableMapEntry<SequentFormula,TermTacletAppIndex> entry : termIndices) {
             final SequentFormula cfma = entry.key (); 
             final TermTacletAppIndex index = entry.value ();
             final PosInOccurrence pio = 
@@ -329,7 +325,7 @@ public class SemisequentTacletAppIndex {
         }
     }
     
-    public void setIndexCache(TermTacletAppIndexCacheSet indexCaches) {
+    void setIndexCache(TermTacletAppIndexCacheSet indexCaches) {
         this.indexCaches = indexCaches;
     }
 }

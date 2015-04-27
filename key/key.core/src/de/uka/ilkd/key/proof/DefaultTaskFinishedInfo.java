@@ -25,7 +25,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     // can be Throwable or ApplyStrategyInfo
     private final Object result;
     private final Proof proof;
-    private final long time;
+    private final long timeInNano;
     private final int appliedRules;
     private final int closedGoals;
     
@@ -36,14 +36,14 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
         this.source = source;
         this.result = result;
         this.proof = proof;
-        this.time = time;
+        this.timeInNano = time;
         this.appliedRules = appliedRules;
         this.closedGoals = closedGoals;
     }
 
     @Override
     public long getTime() {
-        return time;
+        return timeInNano;
     }
 
     @Override
@@ -76,7 +76,8 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     public String toString() {
         if ( appliedRules != 0 ) {
             StringBuilder message = new StringBuilder();
-            String timeString = (time/1000) + "." + ((time%1000)/100);
+            long timeInMs = timeInNano/1000000;
+            String timeString = (timeInMs/1000) + "." + ((timeInMs%1000)/100);
 
             message.append("Strategy: Applied ").append(appliedRules).append(" rule");
             if ( appliedRules != 1 ) {

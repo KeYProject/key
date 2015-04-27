@@ -598,6 +598,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                final File location = KeYResourceProperties.getSourceClassPathLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+               final List<File> includes = KeYResourceProperties.getKeYIncludes(project);
                // Load location
                if (initConfig == null) {
                    IRunnableWithProgressAndResult<InitConfig> run = new AbstractRunnableWithProgressAndResult<InitConfig>() {
@@ -608,7 +609,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                               SWTUtil.checkCanceled(monitor);
                               monitor.beginTask("Receiving contracts.", IProgressMonitor.UNKNOWN);
                               SWTUtil.checkCanceled(monitor);
-                              environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+                              environment = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
                               SWTUtil.checkCanceled(monitor);
                               setResult(environment.getInitConfig());
                               monitor.done();

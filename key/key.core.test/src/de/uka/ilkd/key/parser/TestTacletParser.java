@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
@@ -274,7 +275,7 @@ public class TestTacletParser extends TestCase {
 	// contraposition rule
 	// find(b->b0) replacewith(-b0 -> -b)
 
-	RewriteTacletBuilder builder=new RewriteTacletBuilder();
+	RewriteTacletBuilder<RewriteTaclet> builder=new RewriteTacletBuilder<RewriteTaclet>();
 	builder.setFind(parseFma("b->b0"));
 	builder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -333,7 +334,7 @@ public class TestTacletParser extends TestCase {
 	//find(ex z . ( b & b0 )) varcond(z not free in b) 
 	//  replacewith( b & ex z.b0 )
 	
-	RewriteTacletBuilder builder=new RewriteTacletBuilder();
+	RewriteTacletBuilder<RewriteTaclet> builder=new RewriteTacletBuilder<RewriteTaclet>();
 	builder.setFind(parseFma("\\exists z; (b & b0)"));
 	builder.addVarsNotFreeIn((SchemaVariable)lookup_var("z"),
 				   (SchemaVariable)lookup_var("b"));
@@ -354,7 +355,7 @@ public class TestTacletParser extends TestCase {
  	// f-idempotent-rule
 	// find(f(f(x))) replacewith( f(x) )
 	
-	RewriteTacletBuilder builder=new RewriteTacletBuilder();
+	RewriteTacletBuilder<RewriteTaclet> builder=new RewriteTacletBuilder<RewriteTaclet>();
 
 	builder.setFind(parseTerm("f(f(x))"));
 	builder.addTacletGoalTemplate(new
@@ -372,7 +373,7 @@ public class TestTacletParser extends TestCase {
     public void testMakeInsertEq() {
 	// make-insert-eq rule
 	// find (x = x0 =>) addrules ( find (x) replacewith (x0) )
-	RewriteTacletBuilder insertbuilder=new RewriteTacletBuilder();
+	RewriteTacletBuilder<RewriteTaclet> insertbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	insertbuilder.setFind(parseTerm("x"));
 	insertbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,

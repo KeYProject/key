@@ -35,7 +35,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.WaitForObjectCondition;
 import org.hamcrest.Matcher;
 import org.key_project.swtbot.swing.bot.finder.finders.ChildrenComponentFinder;
-import org.key_project.swtbot.swing.bot.finder.finders.Finder;
+import org.key_project.swtbot.swing.bot.finder.finders.SwingFinder;
 import org.key_project.swtbot.swing.bot.finder.finders.MenuFinder;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.swtbot.swing.finder.matchers.ComponentMatcherFactory;
@@ -57,7 +57,7 @@ public class SwingBot extends SWTBot {
     * Constructs a bot.
     */
    public SwingBot() {
-      this(new Finder());
+      this(new SwingFinder());
    }
 
    /**
@@ -65,14 +65,14 @@ public class SwingBot extends SWTBot {
     * @param parent The given parent {@link Component}.
     */
    public SwingBot(Component parent) {
-      this(new Finder(new ChildrenComponentFinder(parent), new MenuFinder()));
+      this(new SwingFinder(new ChildrenComponentFinder(parent), new MenuFinder()));
    }
 
    /**
     * Constructs a bot with the given finder.
-    * @param finder The {@link Finder} to use.
+    * @param finder The {@link SwingFinder} to use.
     */
-   public SwingBot(Finder finder) {
+   public SwingBot(SwingFinder finder) {
       super(finder);
    }
 
@@ -80,8 +80,8 @@ public class SwingBot extends SWTBot {
     * {@inheritDoc}
     */
    @Override
-   public Finder getFinder() {
-      return (Finder)super.getFinder();
+   public SwingFinder getFinder() {
+      return (SwingFinder)super.getFinder();
    }
    
    /**
@@ -401,11 +401,11 @@ public class SwingBot extends SWTBot {
    /**
     * Creates the {@link AbstractSwingBotComponent} for the given {@link Component}
     * or returns {@code null} if it is not supported.
-    * @param finder The {@link Finder} to use.
+    * @param finder The {@link SwingFinder} to use.
     * @param c The {@link Component} to create the bot instance for.
     * @return The created {@link AbstractSwingBotComponent} or {@code null} if not supported.
     */
-   public static AbstractSwingBotComponent<? extends Component> createBotComponent(Finder finder, Component c) {
+   public static AbstractSwingBotComponent<? extends Component> createBotComponent(SwingFinder finder, Component c) {
       if (c instanceof JButton) {
          return new SwingBotJButton((JButton)c);
       }
@@ -415,8 +415,8 @@ public class SwingBot extends SWTBot {
       else if (c instanceof JFrame) {
          return new SwingBotJFrame((JFrame)c);
       }
-      else if (c instanceof JList) {
-         return new SwingBotJList((JList)c);
+      else if (c instanceof JList<?>) {
+         return new SwingBotJList((JList<?>)c);
       }
       else if (c instanceof JMenu) {
          return new SwingBotJMenu(finder, (JMenu)c);

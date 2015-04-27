@@ -37,7 +37,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 // TODO: Add test case class to test suite "TestKey" after fixing exceptions
 public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
-   /**
+   private static final int NUMBER_OF_THREADS = 54;
+
+/**
     * Tests parallel site proofs on a new instantiate proof after applying "resume" on it.
     */
    //Commented out for the moment as Hudson throws an OOM Exception
@@ -86,7 +88,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       // Create threads
       List<SiteProofThread<?>> threads = new LinkedList<SiteProofThread<?>>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
-      while (iter.hasNext() && threads.size() < 54) {
+      while (iter.hasNext() && threads.size() < NUMBER_OF_THREADS) {
          IExecutionNode<?> next = iter.next(); 
          if (next instanceof IExecutionNode) {
             threads.add(new ExecutionVariableSiteProofThread(next));
@@ -96,7 +98,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          }
       }
       // Make sure that the correct number of threads are available
-      assertEquals(54, threads.size());
+      assertEquals(NUMBER_OF_THREADS, threads.size());
       // Start threads
       for (SiteProofThread<?> thread : threads) {
          thread.start();

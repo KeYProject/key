@@ -33,14 +33,14 @@ public class KeYParserF extends KeYParser {
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
             ParserConfig schemaConfig, ParserConfig normalConfig,
-            HashMap<Taclet, TacletBuilder> taclet2Builder, ImmutableSet<Taclet> taclets) {
+            HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder, ImmutableSet<Taclet> taclets) {
         super(mode, new CommonTokenStream(keYLexerF), schemaConfig,
                 normalConfig, taclet2Builder, taclets);
     }
 
     public KeYParserF(ParserMode mode, TokenStream lexer,
             ParserConfig schemaConfig, ParserConfig normalConfig,
-            HashMap<Taclet, TacletBuilder> taclet2Builder, ImmutableSet<Taclet> taclets) {
+            HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder, ImmutableSet<Taclet> taclets) {
         super(mode, lexer, schemaConfig, normalConfig, taclet2Builder, taclets);
     }
 

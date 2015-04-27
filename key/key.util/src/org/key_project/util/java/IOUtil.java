@@ -21,13 +21,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -166,12 +170,29 @@ public final class IOUtil {
        if (file != null && file.exists()) {
            if (file.isDirectory()) {
                File[] children = file.listFiles();
-               for (File child : children) {
-                   delete(child);
+               if (children != null) {
+                  for (File child : children) {
+                     delete(child);
+                 }
                }
            }
            file.delete();
        }
+   }
+
+   /**
+    * Reads the complete content from the {@link URL}.
+    * @param file The {@link URL} to read from.
+    * @return The read content or {@code null} if the {@link URL} is {@code null}.
+    * @throws IOException Occurred Exception.
+    */
+   public static String readFrom(URL url) throws IOException {
+      if (url != null) {
+         return readFrom(url.openStream());
+      }
+      else {
+         return null;
+      }
    }
 
    /**
@@ -707,7 +728,29 @@ public final class IOUtil {
    }
    
    public static URI toURI(URL url) {
-      return url != null ? URI.create(url.toString()) : null;
+      try {
+         if (url != null) {
+            String protocol = url.getProtocol();
+            String userInfo = url.getUserInfo();
+            String host = url.getHost();
+            String path = URLDecoder.decode(url.getPath(), "UTF-8");
+            String query = url.getQuery();
+            String ref = url.getRef();
+            return new URI(!StringUtil.isEmpty(protocol) ? protocol : null, 
+                           !StringUtil.isEmpty(userInfo) ? userInfo : null, 
+                           !StringUtil.isEmpty(host) ? host : null, 
+                           url.getPort(), 
+                           !StringUtil.isEmpty(path) ? path : null, 
+                           !StringUtil.isEmpty(query) ? query : null, 
+                           !StringUtil.isEmpty(ref) ? ref : null);
+         }
+         else {
+            return null;
+         }
+      }
+      catch (URISyntaxException | UnsupportedEncodingException e) {
+         return null;
+      }
    }
 
    /**
@@ -724,5 +767,33 @@ public final class IOUtil {
     */
    public static File getTempDirectory() {
       return new File(System.getProperty("java.io.tmpdir"));
+   }
+   
+   /**
+    * Ensures that the segment is a valid OS independent path segment meaning
+    * that it is a valid file/folder name. Each invalid sign will be replaced
+    * by {@code '_'}.
+    * @param segment The segment to validate.
+    * @return The validated OS independent path segment in which each invalid sign is replaced.
+    */
+   public static String validateOSIndependentFileName(String name) {
+      if (name != null) {
+         char[] latinBig = StringUtil.LATIN_ALPHABET_BIG.toCharArray();
+         char[] latinSmall = StringUtil.LATIN_ALPHABET_SMALL.toCharArray();
+         char[] numerals = StringUtil.NUMERALS.toCharArray();
+         char[] content = name.toCharArray();
+         for (int i = 0; i < content.length; i++) {
+            if (Arrays.binarySearch(latinBig, content[i]) < 0 &&
+                Arrays.binarySearch(latinSmall, content[i]) < 0 &&
+                Arrays.binarySearch(numerals, content[i]) < 0 &&
+                Arrays.binarySearch(StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS, content[i]) < 0) {
+               content[i] = '_';
+            }
+         }
+         return new String(content);
+      }
+      else {
+         return name;
+      }
    }
 }

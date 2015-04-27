@@ -14,6 +14,7 @@
 package org.key_project.key4eclipse.common.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.key_project.key4eclipse.common.ui.breakpoints.MainFrameBreakpointManager;
 import org.key_project.key4eclipse.common.ui.util.EclipseEditFileActionHandler;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.osgi.framework.BundleContext;
@@ -44,6 +45,8 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
       // Exchange the handler that is responsible to edit files
       EclipseEditFileActionHandler.setInstance(new EclipseEditFileActionHandler());
+      // Enable Breakpoint-Support in the MainWindow
+      MainFrameBreakpointManager.start();
 	}
 
 	/*
@@ -51,6 +54,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+      MainFrameBreakpointManager.stop();
 	   KeYImages.disposeImages();
 		plugin = null;
 		super.stop(context);

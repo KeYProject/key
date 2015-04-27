@@ -182,7 +182,7 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
          IFile javaFile = project.getFile(new Path(javaFileInProject));
          assertTrue(javaFile.exists());
          // Create Proof
-         environment = KeYEnvironment.load(ResourceUtil.getLocation(javaFile), null, null);
+         environment = KeYEnvironment.load(ResourceUtil.getLocation(javaFile), null, null, null);
          // Search type
          KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
          assertNotNull(containerKJT);

@@ -13,6 +13,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -257,9 +258,10 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                   }
                }
             }
-            Term comboundPathCondition = getServices().getTermBuilder().or(conditions);
-            comboundPathCondition = SymbolicExecutionUtil.simplify(getProof(), comboundPathCondition);
-            comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, getServices());
+            final Services services = getServices();
+            Term comboundPathCondition = services.getTermBuilder().or(conditions);
+            comboundPathCondition = SymbolicExecutionUtil.simplify(getProof().getInitConfig(), getProof(), comboundPathCondition);
+            comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, services);
             ExtractedExecutionValue value = new ExtractedExecutionValue(executionNode, 
                                                                         node, 
                                                                         variable, 

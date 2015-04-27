@@ -15,18 +15,12 @@ package org.key_project.sed.core.all.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.key4eclipse.starter.core.test.suite.AllStarterCoreTests;
-import org.key_project.key4eclipse.test.suite.AllKeY4EclipseTests;
+import org.key_project.key4eclipse.all.test.suite.AllTests;
 import org.key_project.sed.core.test.suite.AllSEDCoreTests;
 import org.key_project.sed.key.core.test.suite.AllSEDKeYTests;
 import org.key_project.sed.key.ui.test.suite.AllSEDKeYUITests;
 import org.key_project.sed.ui.test.suite.AllSEDUITests;
 import org.key_project.sed.ui.visualization.test.suite.AllSEDUIVisualizationTests;
-import org.key_project.util.test.suite.AllUtilTests;
-
-import de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests;
-import de.uka.ilkd.key.suite.AllTestGenTests;
-import de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -34,14 +28,9 @@ import de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AllProofReferencesTests.class,
-    AllSymbolicExecutionTests.class,
-    //TestKeY.class,
-    AllTestGenTests.class,
-    
-    AllUtilTests.class,
+    AllTests.class,
+   
     AllSEDCoreTests.class,
-    AllStarterCoreTests.class,
     AllSEDUITests.class,
     AllSEDUIVisualizationTests.class,
     AllSEDKeYTests.class,

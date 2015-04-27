@@ -28,8 +28,8 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.sed.core.model.ISEDDebugElement;
@@ -61,13 +61,12 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             // Create boot folder
             IFolder bootFolder = TestUtilsUtil.createFolder(project, "boot");
             BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/sameNamesSourceLocationTest/boot", bootFolder);
-            KeYResourceProperties.setBootClassPath(project, bootFolder.getFullPath().toString());
-            KeYResourceProperties.setUseBootClassPathKind(project, UseBootClassPathKind.WORKSPACE);
+            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.WORKSPACE, bootFolder.getFullPath().toString());
             // Create specs folder
             IFolder specsFolder = TestUtilsUtil.createFolder(project, "specs");
             BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/sameNamesSourceLocationTest/specs", specsFolder);
-            List<KeYClassPathEntry> entries = new LinkedList<KeYClassPathEntry>();
-            entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, specsFolder.getFullPath().toString()));
+            List<KeYPathEntry> entries = new LinkedList<KeYPathEntry>();
+            entries.add(new KeYPathEntry(KeYPathEntryKind.WORKSPACE, specsFolder.getFullPath().toString()));
             KeYResourceProperties.setClassPathEntries(project, entries);
          }
       };
@@ -148,6 +147,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            Boolean.FALSE,
                            14, 
                            executor);

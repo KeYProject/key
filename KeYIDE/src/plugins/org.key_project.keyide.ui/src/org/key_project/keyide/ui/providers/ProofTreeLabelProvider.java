@@ -25,9 +25,13 @@ import org.eclipse.swt.graphics.Image;
 import org.key_project.keyide.ui.util.KeYImages;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 
@@ -41,6 +45,11 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * The {@link Viewer} in which this {@link LabelProvider} is used.
     */
    private final Viewer viewer;
+   
+   /**
+    * The {@link ProofControl} to use.
+    */
+   private final ProofControl proofControl;
    
    /**
     * The shown {@link Proof} as root of the proof tree.
@@ -125,17 +134,34 @@ public class ProofTreeLabelProvider extends LabelProvider {
       }
    };
    
-   
+   /**
+    * Listens for auto mode start and stop events.
+    */
+   private final AutoModeListener autoModeListener = new AutoModeListener() {
+      @Override
+      public void autoModeStarted(ProofEvent e) {
+         handleAutoModeStarted(e);
+      }
+      
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         handleAutoModeStopped(e);
+      }
+   };
+      
    /**
     * The Constructor
     * @param viewer The {@link Viewer} in which this {@link LabelProvider} is used.
+    * @param proofControl The {@link ProofControl} to use.
     * @param proof The shown {@link Proof} as root of the proof tree.
     */
-   public ProofTreeLabelProvider(Viewer viewer, Proof proof) {
+   public ProofTreeLabelProvider(Viewer viewer, ProofControl proofControl, Proof proof) {
       this.viewer = viewer;
+      this.proofControl = proofControl;
       this.proof = proof;
       if (proof != null) {
          proof.addProofTreeListener(proofTreeListener);
+         proofControl.addAutoModeListener(autoModeListener);
       }
    }
 
@@ -208,6 +234,23 @@ public class ProofTreeLabelProvider extends LabelProvider {
       else {
          return super.getImage(element); // Unknown element
       }
+   }
+
+   /**
+    * When the auto mode is started.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleAutoModeStopped(ProofEvent e) {
+      proof.addProofTreeListener(proofTreeListener);
+      fireAllNodesChanged();
+   }
+
+   /**
+    * When the auto mode has finished.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleAutoModeStarted(ProofEvent e) {
+      proof.removeProofTreeListener(proofTreeListener);
    }
 
    /**
@@ -311,6 +354,9 @@ public class ProofTreeLabelProvider extends LabelProvider {
    public void dispose() {
       if (proof != null) {
          proof.removeProofTreeListener(proofTreeListener);
+      }
+      if (proofControl != null) {
+         proofControl.removeAutoModeListener(autoModeListener);
       }
       super.dispose();
    }    

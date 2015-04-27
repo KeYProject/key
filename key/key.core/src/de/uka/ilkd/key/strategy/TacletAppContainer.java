@@ -16,6 +16,8 @@ package de.uka.ilkd.key.strategy;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -29,7 +31,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
@@ -224,9 +225,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final ImmutableSet<SchemaVariable> needed = app.uninstantiatedVars ();
         if ( needed.size () == 0 ) return true;
         for (SchemaVariable aNeeded : needed) {
-            final SchemaVariable sv = aNeeded;
-            if ( sv instanceof SkolemTermSV ) continue;
-            return false;
+            if ( app.isInstantiationRequired(aNeeded) ) {
+                return false;
+            }
         }
         return true;
     }
@@ -243,9 +244,28 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     /**
      * Create containers for NoFindTaclets.
      */
-    static ImmutableList<RuleAppContainer> createAppContainers
+    static RuleAppContainer createAppContainers
         ( NoPosTacletApp p_app, Goal p_goal, Strategy  p_strategy ) {
 	return createAppContainers ( p_app, null, p_goal, p_strategy );
+    }
+    
+    protected static ImmutableList<RuleAppContainer> createInitialAppContainers(ImmutableList<NoPosTacletApp> p_app, 
+            PosInOccurrence p_pio, Goal p_goal, Strategy p_strategy) {
+        
+        List<RuleAppCost> costs = new LinkedList<>();
+        
+        for (TacletApp app : p_app) {
+            costs.add(p_strategy.computeCost ( app, p_pio, p_goal ));
+        }
+        
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        for (RuleAppCost cost : costs) {
+            final TacletAppContainer container = 
+                    createContainer ( p_app.head(), p_pio, p_goal, cost, true );
+            if (container != null) { result = result.prepend(container); }
+            p_app = p_app.tail();
+        }
+        return result;    
     }
 
     /**
@@ -256,7 +276,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * @return list of containers for currently applicable TacletApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    static ImmutableList<RuleAppContainer> createAppContainers
+    static RuleAppContainer createAppContainers
         ( NoPosTacletApp  p_app,
           PosInOccurrence p_pio,
           Goal            p_goal,
@@ -269,12 +289,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         // Create an initial container for the given taclet; the if-formulas of
         // the taclet are only matched lazy (by <code>createFurtherApps()</code>
-        return ImmutableSLList.<RuleAppContainer>nil()
-                    .prepend ( createContainer ( p_app,
-                                                 p_pio,
-                                                 p_goal,
-                                                 p_strategy,
-                                                 true ) );
+        return createContainer ( p_app, p_pio, p_goal, p_strategy, true );
     }
 
     /**
@@ -572,10 +587,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             final ImmutableList<IfFormulaInstantiation> formulas =
                 getSequentFormulas ( antec,
                                      !lastIfFormula || p_alreadyMatchedNewFor );
-            final IfMatchResult mr = getTaclet ().matchIf ( formulas.iterator (),
-                                                            p_ifSeqTail.head ().formula (),
-                                                            p_matchCond,
-                                                            getServices () );
+            final IfMatchResult mr = getTaclet ().getMatcher().matchIf(formulas, p_ifSeqTail.head ().formula (), p_matchCond, getServices ());
 
             // For each matching formula call the method again to match
             // the remaining terms

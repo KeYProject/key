@@ -691,7 +691,7 @@ public class Recoder2KeYConverter {
     private Class<?> getKeYClass(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
         String className = getKeYName(recoderClass);
         try {
-            return Class.forName(className);
+            return Class.forName(className); // Classes are always in this component; ClassLoaderUtil#getClassforName(String) does not need to be used.
         } catch (ClassNotFoundException cnfe) {
             Debug.out("There is an AST class " +className + " missing at KeY.", cnfe);
             throw new ConvertException("Recoder2KeYConverter could not find a conversion from RecodeR "+recoderClass.getClass()+".\n"

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.control;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -42,7 +41,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     * Constructor.
     */
    public DefaultUserInterfaceControl() {
-      proofControl = new DefaultProofControl(getListener());
+      proofControl = new DefaultProofControl(this);
    }
 
    /**
@@ -50,7 +49,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     * @param customization An optional {@link RuleCompletionHandler}.
     */
    public DefaultUserInterfaceControl(RuleCompletionHandler customization) {
-      proofControl = new DefaultProofControl(getListener(), customization);
+      proofControl = new DefaultProofControl(this, customization);
    }
    
    /**
@@ -77,18 +76,6 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
    @Override
    public boolean selectProofObligation(InitConfig initConfig) {
       return false; // Not supported.
-   }
-
-   @Override
-   public void taskFinished(TaskFinishedInfo info) {
-      // Nothing to do
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void taskStarted(String message, int size) {
    }
 
    /**
@@ -136,14 +123,6 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     */
    @Override
    public void reportException(Object sender, ProofOblInput input, Exception e) {
-      // Nothing to do
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void taskProgress(int position) {
       // Nothing to do
    }
 

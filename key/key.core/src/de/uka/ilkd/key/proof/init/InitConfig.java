@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
@@ -73,8 +74,8 @@ public class InitConfig {
      * GoalTemplates whose options are activated and those who don't belong
      * to any specific option.
      */
-    private HashMap<Taclet, TacletBuilder> taclet2Builder =
-        new LinkedHashMap<Taclet, TacletBuilder>();
+    private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder =
+        new LinkedHashMap<Taclet, TacletBuilder<? extends Taclet>>();
 
     /**
      * Set of the rule options activated for the current proof. The rule options
@@ -156,7 +157,7 @@ public class InitConfig {
     }
 
 
-    public void setTaclet2Builder(HashMap<Taclet, TacletBuilder> taclet2Builder){
+    public void setTaclet2Builder(HashMap<Taclet, TacletBuilder<? extends  Taclet>> taclet2Builder){
         this.taclet2Builder = taclet2Builder;
     }
 
@@ -168,7 +169,7 @@ public class InitConfig {
      * creating all possible combinations in advance this is done by demand
      * @return the map from a taclet to its builder
      */
-    public HashMap<Taclet, TacletBuilder> getTaclet2Builder(){
+    public HashMap<Taclet, TacletBuilder<? extends Taclet>> getTaclet2Builder(){
         return taclet2Builder;
     }
 
@@ -252,7 +253,7 @@ public class InitConfig {
        }
        final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
        for (Taclet t : taclets) {
-          TacletBuilder b = taclet2Builder.get(t);
+          TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
           
           if(t.getChoices().subset(activatedChoices)){
              if (b != null && b.getGoal2Choices() != null){
@@ -328,7 +329,7 @@ public class InitConfig {
      * taclets contained in this initial configuration
      */
     public TacletIndex createTacletIndex() {
-        return new TacletIndex(activatedTaclets());
+        return TacletIndexKit.getKit().createTacletIndex(activatedTaclets());
     }
 
 
@@ -431,7 +432,7 @@ public class InitConfig {
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
-                (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
+                (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
         ic.justifInfo = justifInfo.copy();
@@ -448,4 +449,6 @@ public class InitConfig {
             "Taclets:" + getTaclets() +"\n"+
             "Built-In:" + builtInRules() +"\n";
     }
+
+
 }

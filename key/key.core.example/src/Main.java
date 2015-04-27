@@ -35,10 +35,11 @@ public class Main {
                       new File("example"); // Path to the source code folder/file or to a *.proof file
       List<File> classPaths = null; // Optionally: Additional specifications for API classes
       File bootClassPath = null; // Optionally: Different default specifications for Java API
+      List<File> includes = null; // Optionally: Additional includes to consider
       try {
          // Ensure that Taclets are parsed
          if (!ProofSettings.isChoiceSettingInitialised()) {
-            KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath);
+            KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
             env.dispose();
          }
          // Set Taclet options
@@ -48,7 +49,7 @@ public class Main {
          newSettings.putAll(MiscTools.getDefaultTacletOptions());
          choiceSettings.setDefaultChoices(newSettings);
          // Load source code
-         KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
+         KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath, includes); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
          try {
             // List all specifications of all types in the source location (not classPaths and bootClassPath)
             final List<Contract> proofContracts = new LinkedList<Contract>();

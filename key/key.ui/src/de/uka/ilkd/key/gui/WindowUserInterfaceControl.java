@@ -54,6 +54,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -74,6 +75,7 @@ import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow}
@@ -81,7 +83,6 @@ import de.uka.ilkd.key.util.Pair;
  * @author Mattias Ulbrich
  */
 public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
-
     private final MainWindow mainWindow;
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions =
@@ -107,7 +108,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
           }          
        };
     }
-
+    
     /**
      * loads the problem or proof from the given file
      *
@@ -115,15 +116,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
      */
-    public void loadProblem(File file, List<File> classPath,
-                            File bootClassPath) {
+    public void loadProblem(File file, 
+                            List<File> classPath,
+                            File bootClassPath,
+                            List<File> includes) {
         mainWindow.addRecentFile(file.getAbsolutePath());
-        getProblemLoader(file, classPath, bootClassPath, getMediator()).runAsynchronously();
+        getProblemLoader(file, classPath, bootClassPath, includes, getMediator()).runAsynchronously();
     }
 
     @Override
     public void loadProblem(File file) {
-        loadProblem(file, null, null);
+        loadProblem(file, null, null, null);
     }
 
     @Override
@@ -158,6 +161,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
+        super.taskFinished(info);
         if (info.getSource() instanceof ApplyStrategy) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
@@ -233,13 +237,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void taskProgress(int position) {
+        super.taskProgress(position);
         mainWindow.getStatusLine().setProgress(position);
 
     }
 
     @Override
-    public void taskStarted(String message, int size) {
-        mainWindow.setStatusLine(message, size);
+    public void taskStarted(TaskStartedInfo info) {
+        super.taskStarted(info);
+        mainWindow.setStatusLine(info.getMessage(), info.getSize());
     }
 
     @Override
@@ -315,6 +321,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                                     File file,
                                     List<File> classPath,
                                     File bootClassPath,
+                                    List<File> includes,
                                     Properties poPropertiesToForce,
                                     boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       if (file != null) {
@@ -322,7 +329,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
       try {
          getMediator().stopInterface(true);
-         return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs);
+         return super.load(profile, file, classPath, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs);
       }
       finally {
          getMediator().startInterface(true);
@@ -397,10 +404,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * {@inheritDoc}
     */
    @Override
-   public void proofDisposing(ProofDisposedEvent e) {
+   public void proofDisposing(final ProofDisposedEvent e) {
       super.proofDisposing(e);
       // Remove proof from user interface
-      mainWindow.getProofList().removeProof(e.getSource());
+      ThreadUtilities.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            mainWindow.getProofList().removeProof(e.getSource());
+         }
+      });
       // Run the garbage collector.
       Runtime r = Runtime.getRuntime();
       r.gc();
@@ -465,15 +477,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
-                                                                      List<File> classPaths,
-                                                                      File bootClassPath,
-                                                                      boolean makeMainWindowVisible) throws ProblemLoaderException {
-      return loadInMainWindow(null, location, classPaths, bootClassPath, false, makeMainWindowVisible);
+                                                                             List<File> classPaths,
+                                                                             File bootClassPath,
+                                                                             List<File> includes,
+                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
+      return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
    }
    
    /**
@@ -483,24 +497,26 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
-                                                                      File location,
-                                                                      List<File> classPaths,
-                                                                      File bootClassPath,
-                                                                      boolean forceNewProfileOfNewProofs,
-                                                                      boolean makeMainWindowVisible) throws ProblemLoaderException {
+                                                                             File location,
+                                                                             List<File> classPaths,
+                                                                             File bootClassPath,
+                                                                             List<File> includes,
+                                                                             boolean forceNewProfileOfNewProofs,
+                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
       MainWindow main = MainWindow.getInstance();
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
+      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof());
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
    }
 
    @Override

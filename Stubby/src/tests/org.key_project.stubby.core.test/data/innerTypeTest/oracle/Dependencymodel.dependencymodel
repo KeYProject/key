@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="InnerTypeTest" source="true" simpleName="InnerTypeTest">
+    <methods name="main" static="true">
+      <returnType type="int" genericFreeType="int"/>
+      <parameterTypes type="A.InnerA" genericFreeType="A.InnerA"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types visibility="DEFAULT" package="" name="A" source="true" simpleName="A">
+    <innerTypes visibility="DEFAULT" package="" name="A.InnerA" source="true" simpleName="InnerA">
+      <fields name="value">
+        <type type="int" genericFreeType="int"/>
+      </fields>
+      <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </innerTypes>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+</dependencymodel:DependencyModel>

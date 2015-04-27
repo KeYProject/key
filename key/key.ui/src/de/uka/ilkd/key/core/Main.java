@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.core;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
-import java.util.ServiceLoader;
 
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -63,6 +65,7 @@ public final class Main {
     private static final String DEBUG = "--debug";
     private static final String MACRO = "--macro";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
+    private static final String TACLET_DIR = "--tacletDir";
     public static final String JUSTIFY_RULES ="--justify-rules";
     private static final String PRINT_STATISTICS ="--print-statistics";
     private static final String SAVE_ALL_CONTRACTS = "--save-all";
@@ -79,6 +82,13 @@ public final class Main {
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
     private static final String VERBOSITY = "--verbose";
+    
+    /**
+     * The {@link KeYDesktop} used by KeY. The default implementation is
+     * replaced in Eclipse. For this reason the {@link Desktop} should never
+     * be used directly.
+     */
+    private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
 
     /**
      * The user interface modes KeY can operate in.
@@ -128,7 +138,10 @@ public final class Main {
      */
     private static boolean loadRecentFile=false;
     
-    public static List<File> fileArguments;
+    /**
+     * The file names provided on the command line
+     */
+    private static List<File> fileArguments;
 
     /** Lists all features currently marked as experimental.
      * Unless invoked with command line option --experimental ,
@@ -159,13 +172,14 @@ public final class Main {
      */
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // this property overrides the default
-        if (Boolean.getBoolean("key.verbose-ui")) verbosity = Verbosity.DEBUG;
+        if (Boolean.getBoolean("key.verbose-ui")) {
+            verbosity = Verbosity.DEBUG;
+        }
 
-        // does no harm on non macs
+        // does no harm on non macs        
         System.setProperty("apple.laf.useScreenMenuBar","true");
-
 
         try {
             cl = createCommandLine();
@@ -221,6 +235,7 @@ public final class Main {
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addSection("Batchmode options:");
+        cl.addOption(TACLET_DIR, "<dir>", "load base taclets from a directory, not from internal structures");
         cl.addOption(DEBUG, null, "start KeY in debug mode");
         cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
@@ -315,13 +330,15 @@ public final class Main {
         }
 
         if(cl.isSet(TIMEOUT)){
-            if (verbosity >= Verbosity.HIGH)
+            if (verbosity >= Verbosity.HIGH) {
             System.out.println("Timeout is set");
+            }
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
-                if (verbosity >= Verbosity.HIGH)
+                if (verbosity >= Verbosity.HIGH) {
                 System.out.println("Timeout is: "+ timeout+" ms");
+                }
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
@@ -353,8 +370,9 @@ public final class Main {
         }
 
         if(cl.isSet(EXPERIMENTAL)){
-            if (verbosity > Verbosity.SILENT)
+            if (verbosity > Verbosity.SILENT) {
             System.out.println("Running in experimental mode ...");
+            }
         } else {
             deactivateExperimentalFeatures();
         }
@@ -373,7 +391,7 @@ public final class Main {
 
         if (cl.isSet(MACRO)) {
             String macro = cl.getString(MACRO, "");
-            for (ProofMacro m: ServiceLoader.load(ProofMacro.class)) {
+            for (ProofMacro m: ClassLoaderUtil.loadServices(ProofMacro.class)) {
                 if (macro.equals(m.getClass().getSimpleName())) {
                     // memorize macro for later
                     try {
@@ -397,12 +415,18 @@ public final class Main {
             saveAllContracts = true;
         }
 
+        if(cl.isSet(TACLET_DIR)) {
+            System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY,
+                    cl.getString(TACLET_DIR, ""));
+        }
+
     }
 
     /** Deactivate experimental features. */
     private static void deactivateExperimentalFeatures () {
-        for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES)
+        for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
             feature.deactivate();
+    }
     }
 
 
@@ -432,21 +456,26 @@ public final class Main {
                     if (verbosity > Verbosity.SILENT) {
                         System.out.println("Auto mode was terminated by an exception:"
                                             + e.getClass().toString().substring(5));
-                        if (verbosity >= Verbosity.DEBUG) e.printStackTrace();
+                        if (verbosity >= Verbosity.DEBUG) {
+                            e.printStackTrace();
+                        }
                         final String msg = e.getMessage();
-                        if (msg!=null) System.out.println(msg);
+                        if (msg!=null) {
+                            System.out.println(msg);
+                        }
                     }
                     System.exit(-1);
                 }
             });
-            if (fileArguments.isEmpty())
+            if (fileArguments.isEmpty()) {
                 printUsageAndExit(true, "Error: No file to load from.", -4);
+            }
 
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();
-
+            
             if (loadRecentFile) {
                 RecentFileEntry mostRecent =
                         mainWindow.getRecentFiles().getMostRecent();
@@ -478,9 +507,12 @@ public final class Main {
     private static void updateSplashScreen() {
         try {
             final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
-            if (sp == null) return;
+            if (sp == null)
+             {
+                return;
             // insert customization code here
             // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
+            }
         } catch (Exception e) {}
     }
 
@@ -557,5 +589,23 @@ public final class Main {
      */
     public static String getStatisticsFile() {
         return statisticsFile;
+    }
+
+    /**
+     * Returns the {@link KeYDesktop} to use. Never use {@link Desktop}
+     * directly because the {@link KeYDesktop} is different in Eclipse.
+     * @return The {@link KeYDesktop} to use.
+     */
+    public static KeYDesktop getKeyDesktop() {
+        return keyDesktop;
+    }
+
+    /**
+     * Sets the {@link KeYDesktop} to use.
+     * @param keyDesktop The new {@link KeYDesktop} to use.
+     */
+    public static void setKeyDesktop(KeYDesktop keyDesktop) {
+        assert keyDesktop != null;
+        Main.keyDesktop = keyDesktop;
     }
 }

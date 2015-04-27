@@ -92,6 +92,17 @@ public class TacletGenerator {
         return instance;
     }
 
+    
+    private TacletGoalTemplate createAxiomGoalTemplate(Term goalTerm) {
+        final SequentFormula axiomSf = new SequentFormula(goalTerm);
+        final Semisequent axiomSemiSeq =
+                Semisequent.EMPTY_SEMISEQUENT.insertFirst(axiomSf).semisequent();
+        final Sequent axiomSeq = Sequent.createAnteSequent(axiomSemiSeq);
+        final TacletGoalTemplate axiomTemplate =
+                new TacletGoalTemplate(axiomSeq, ImmutableSLList.<Taclet>nil());
+        return axiomTemplate;
+    }
+
 
     /**
      * Returns a no-find taclet to the passed axiom.
@@ -113,7 +124,7 @@ public class TacletGenerator {
         //create taclet
         NoFindTacletBuilder tacletBuilder = new NoFindTacletBuilder();
         tacletBuilder.setName(tacletName);
-        tacletBuilder.addGoalTerm(schemaAxiom.term);
+        tacletBuilder.addTacletGoalTemplate(createAxiomGoalTemplate(schemaAxiom.term));
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, schemaVars);
         tacletBuilder.addRuleSet(ruleSet);
         return tacletBuilder.getTaclet();
@@ -137,7 +148,7 @@ public class TacletGenerator {
                 schemaFind.boundVars.union(schemaAxiom.boundVars);
 
         //create taclet
-        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind.term);
         tacletBuilder.addGoalTerm(schemaAxiom.term);
@@ -157,7 +168,7 @@ public class TacletGenerator {
                                                      Map<LocationVariable,ProgramVariable> atPreVars,
                                                      boolean satisfiabilityGuard,
                                                      TermServices services) {
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         
         TermBuilder tb = services.getTermBuilder();
         originalAxiom = tb.convertToFormula(originalAxiom);
@@ -354,7 +365,7 @@ public class TacletGenerator {
         }
 
         //create taclet
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setFind(schemaLhs);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -405,7 +416,7 @@ public class TacletGenerator {
             IObserverFunction target, TermServices services,
             List<SchemaVariable> heapSVs, final SchemaVariable selfSV, ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
-            final RewriteTacletBuilder tacletBuilder) {
+            final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
         final Term axiomSatisfiable = functionalRepresentsSatisfiability(
               target, services, heapSVs, selfSV, paramSVs, schemaRepresents,
               tacletBuilder);
@@ -440,7 +451,7 @@ public class TacletGenerator {
             final SchemaVariable selfSV,
             ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
-            final RewriteTacletBuilder tacletBuilder) {
+            final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
     	ImmutableList<Term> vars = ImmutableSLList.<Term>nil();
       TermBuilder TB = services.getTermBuilder();
     	for(SchemaVariable heapSV : heapSVs) {
@@ -533,7 +544,7 @@ public class TacletGenerator {
         }
 //        final SchemaVariable resultSV = SchemaVariableFactory.createTermSV(new Name("sv_r"), target.getType().getSort(), false, false);
 
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
 
         Term wfFormula = null;
         Term createdFormula = null;
@@ -676,7 +687,7 @@ public class TacletGenerator {
                               TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
                               TB.tf().createTerm(modalitySV, new Term[]{TB.var(postSV)}, null, replaceBlock));
 
-        final RewriteTacletBuilder replaceTacletBuilder = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> replaceTacletBuilder = new RewriteTacletBuilder<>();
 
         replaceTacletBuilder.setFind(findTerm);
         replaceTacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
@@ -1000,7 +1011,7 @@ public class TacletGenerator {
                                          List<SchemaVariable> heapSVs,
                                          ImmutableList<SchemaVariable> paramSVs,
                                          final Term schemaAxiom,
-                                         final RewriteTacletBuilder tacletBuilder,
+                                         final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder,
                                          boolean addGuard) {
         final TermBuilder TB = services.getTermBuilder();
         final Term exactInstance =
@@ -1022,7 +1033,7 @@ public class TacletGenerator {
                                             final SchemaVariable selfSV,
                                             ImmutableList<SchemaVariable> paramSVs,
                                             final Term schemaAxiom,
-                                            final RewriteTacletBuilder tacletBuilder,
+                                            final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder,
                                             TermServices services) {
 
       final TermBuilder TB = services.getTermBuilder();

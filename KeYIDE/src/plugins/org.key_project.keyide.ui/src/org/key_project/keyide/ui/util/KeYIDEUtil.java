@@ -89,14 +89,14 @@ public final class KeYIDEUtil {
                final File location = KeYResourceProperties.getSourceClassPathLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-                 
+               final List<File> includes = KeYResourceProperties.getKeYIncludes(project);
                new Job("Loading Proof") { // A Job to load the proof in KeY
                   @Override
                     protected IStatus run(IProgressMonitor monitor) {
                        try {
                           SWTUtil.checkCanceled(monitor);
                           monitor.beginTask("Loading Proof Environment", IProgressMonitor.UNKNOWN);
-                          final KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, classPaths, bootClassPath, EclipseUserInterfaceCustomization.getInstance());
+                          final KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, classPaths, bootClassPath, includes, EclipseUserInterfaceCustomization.getInstance());
                           if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
                              final IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());

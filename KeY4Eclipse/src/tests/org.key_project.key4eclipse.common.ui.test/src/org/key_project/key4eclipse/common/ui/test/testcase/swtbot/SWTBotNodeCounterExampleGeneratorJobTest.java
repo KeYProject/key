@@ -55,7 +55,7 @@ public class SWTBotNodeCounterExampleGeneratorJobTest extends TestCase {
          IFile proofFile = src.getFile("CounterExample.proof");
          assertTrue(proofFile.exists());
          // Open proof
-         env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null);
+         env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null, null);
          Goal goal = env.getLoadedProof().openGoals().head();
          // Generate test cases
          NodeCounterExampleGeneratorJob job = new NodeCounterExampleGeneratorJob(env.getUi(), goal.node());

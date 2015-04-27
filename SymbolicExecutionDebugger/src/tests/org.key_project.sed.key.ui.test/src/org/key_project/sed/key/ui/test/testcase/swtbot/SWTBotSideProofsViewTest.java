@@ -9,6 +9,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -21,6 +22,7 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.sed.key.ui.view.SideProofsView;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -76,6 +78,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.TRUE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(false, false, 0, -1, new int[][] {}));
          // Test with collecting side proofs
@@ -95,6 +98,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.TRUE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(true, true, 4, 0, new int[][] {{1}, {0, 2}, {0}}));
          // Test without collecting side proofs again
@@ -113,6 +117,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(true, false, 0, -1, new int[][] {}));
@@ -268,8 +273,10 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
          Entry[] entries = SideProofStore.DEFAULT_INSTANCE.getEntries();
          assertTrue(entries.length >= expectedSideProofsCount);
          for (int i = 0; i < entries.length; i++) {
-            Object data = TestUtilsUtil.getTableItemData(table.getTableItem(i));
-            assertTrue(data instanceof Entry);
+            table.select(i);
+            SWTBotTableItem item = table.getTableItem(i);
+            Object data = TestUtilsUtil.getTableItemData(item);
+            assertTrue("Expected Entry, but is " + ObjectUtil.getClass(data) + ".", data instanceof Entry);
             assertSame(entries[i], data);
          }
       }

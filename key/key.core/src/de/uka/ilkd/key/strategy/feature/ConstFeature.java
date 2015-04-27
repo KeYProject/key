@@ -34,5 +34,9 @@ public class ConstFeature implements Feature {
         return new ConstFeature(p_val);
     }
 
+    public final RuleAppCost getValue() {
+        return val;
+    }
+    
     private final RuleAppCost val;
 }

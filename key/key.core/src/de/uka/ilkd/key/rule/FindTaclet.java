@@ -13,30 +13,17 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.tacletbuilder.FindTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.util.Pair;
 
 
 /** 
@@ -60,7 +47,7 @@ public abstract class FindTaclet extends Taclet {
      * SuccTaclet but not for a RewriteTaclet
      * @return true if top level updates shall be ignored 
      */
-    protected abstract boolean ignoreTopLevelUpdates();
+    public abstract boolean ignoreTopLevelUpdates();
 
     
     /** creates a FindTaclet 
@@ -79,7 +66,7 @@ public abstract class FindTaclet extends Taclet {
      * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
      */
-    public FindTaclet(Name name,
+    protected FindTaclet(Name name,
                       TacletApplPart applPart,
                       ImmutableList<TacletGoalTemplate> goalTemplates,
                       ImmutableList<RuleSet> ruleSets,
@@ -109,7 +96,7 @@ public abstract class FindTaclet extends Taclet {
      * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
      */
-    public FindTaclet(Name name, TacletApplPart applPart,  
+    protected FindTaclet(Name name, TacletApplPart applPart,  
 		      ImmutableList<TacletGoalTemplate> goalTemplates, 
 		      ImmutableList<RuleSet> ruleSets,
 		      TacletAttributes attrs, Term find,
@@ -124,183 +111,8 @@ public abstract class FindTaclet extends Taclet {
 	return find;
     }
     
-    /**
-     * ignores a possible update prefix
-     * @param term the term to be matched
-     * @param template the pattern term
-     * @param matchCond the accumulated match conditions for a successful match
-     * @param services the Services
-     * @return a pair of updated match conditions and the unwrapped term without the ignored updates (Which have been added to the update context in the match conditions)
-     */
-    private Pair<Term,MatchConditions> matchAndIgnoreUpdatePrefix(final Term term,
-            final Term template, MatchConditions matchCond, final TermServices services) {
-
-        final Operator sourceOp   = term.op ();
-        final Operator templateOp = template.op ();
-
-        if ( sourceOp instanceof UpdateApplication
-                && !(templateOp instanceof UpdateApplication) ) {
-            // updates can be ignored
-            Term update = UpdateApplication.getUpdate(term);
-            matchCond = matchCond
-                    .setInstantiations ( matchCond.getInstantiations ().
-                            addUpdate (update, term.getLabels()) );
-            return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), 
-                    template, matchCond, services);       
-        } else {
-            return new Pair<Term, MatchConditions>(term, matchCond);
-        }
-    }
-
-
-    /** 
-     * matches the given term against the taclet's find term and
-     * @param term the Term to be matched against the find expression 
-     * of the taclet
-     * @param matchCond the MatchConditions with side conditions to be 
-     * satisfied, eg. partial instantiations of schema variables; before
-     * calling this method the constraint contained in the match conditions
-     * must be ensured to be satisfiable, i.e.
-     *       <tt> matchCond.getConstraint ().isSatisfiable () </tt>
-     * must return true
-     * @param services the Services 
-     * @return the found schema variable mapping or <tt>null</tt> if 
-     * the matching failed
-     */
-    public MatchConditions matchFind(Term term,
-            MatchConditions matchCond,
-            Services services) {
-        
-        if (ignoreTopLevelUpdates()) {
-        	Pair</* term below updates */Term, MatchConditions> resultUpdateMatch = 
-                    matchAndIgnoreUpdatePrefix(term, find(), matchCond, services);
-            term = resultUpdateMatch.first;
-            matchCond = resultUpdateMatch.second;
-        }
-        
-        return match(term, find(), matchCond, services);
-    }
-
-    /** CONSTRAINT NOT USED 
-     * applies the replacewith part of Taclets
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param gt TacletGoalTemplate used to get the replaceexpression 
-     * in the Taclet
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence belonging to the find expression
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
-     */
-    protected abstract void applyReplacewith(Goal goal, TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
-					     PosInOccurrence posOfFind,
-					     Services services,
-					     MatchConditions matchCond,
-					     TacletApp tacletApp);
-
-
-    /**
-     * adds the sequent of the add part of the Taclet to the goal sequent
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param add the Sequent to be added
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence describes the place where to add
-     * the semisequent 
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
-     */
-    protected abstract void applyAdd(TermLabelState termLabelState, Sequent add, SequentChangeInfo sequentChangeInfo,
-				     PosInOccurrence posOfFind,
-				     Services services,
-				     MatchConditions matchCond,
-				     Goal goal,
-				     TacletApp tacletApp);
-
-
-    /**  
-     * the rule is applied on the given goal using the
-     * information of rule application. 
-     * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
-     * @param ruleApp the taclet application that is executed.
-     */
-    public ImmutableList<Goal> apply(Goal     goal,
-			    Services services,
-			    RuleApp  ruleApp) {
-   final TermLabelState termLabelState = new TermLabelState();
-	// Number without the if-goal eventually needed
-	int                          numberOfNewGoals = goalTemplates().size();
-
-	TacletApp                    tacletApp        = (TacletApp) ruleApp;
-	MatchConditions              mc               = tacletApp.matchConditions ();
-
-	ImmutableList<SequentChangeInfo>                   newSequentsForGoals         =
-	    checkIfGoals ( goal,
-			   tacletApp.ifFormulaInstantiations (),
-			   mc,
-			   numberOfNewGoals );
-	
-	ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
-	
-	Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();	
-	Iterator<Goal>               goalIt           = newGoals.iterator();
-   Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
-
-	while (it.hasNext()) {
-	    TacletGoalTemplate gt          = it    .next();
-	    Goal               currentGoal = goalIt.next();
-       SequentChangeInfo  currentSequent = newSequentsIt.next();
-
-	    // add first because we want to use pos information that
-	    // is lost applying replacewith
-	    
-	    applyAdd(termLabelState, gt.sequent(),
-			      currentSequent,
-			      tacletApp.posInOccurrence(),
-			      services,
-			      mc,
-			      goal,
-			      (TacletApp) ruleApp);
-
-	    applyReplacewith(currentGoal, 
-	             termLabelState, gt,
-	             currentSequent,
-	             tacletApp.posInOccurrence(),
-	             services,
-	             mc,
-	             (TacletApp) ruleApp);
-
-	    applyAddrule( gt.rules(),
-			      currentGoal,
-			      services,
-			      mc );
-
-	    
-	    applyAddProgVars( gt.addedProgVars(),
-	            currentSequent,
-			      currentGoal,
-               tacletApp.posInOccurrence(),
-               services,
-			      mc);
-                               
-       currentGoal.setSequent(currentSequent);      	    
-	    
-       currentGoal.setBranchLabel(gt.name());
-	}
-	
-	// in case the assumes sequent of the taclet did not
-	// already occur in the goal sequent, we had to perform a cut
-	// in this loop we make sure to assign the cut goal its correct
-	// sequent
-	while (newSequentsIt.hasNext()) {
-	   goalIt.next().setSequent(newSequentsIt.next());
-	}
-	
-	assert !goalIt.hasNext();
-
-	return newGoals;
-    }
-
-    StringBuffer toStringFind(StringBuffer sb) {
+ 
+    protected StringBuffer toStringFind(StringBuffer sb) {
 	return sb.append("\\find(").
 	    append(find().toString()).append(")\n");
     }
@@ -343,11 +155,6 @@ public abstract class FindTaclet extends Taclet {
 	}
 
 	return ifFindVariables;
-    }
-
-
-    protected Taclet setName(String s, FindTacletBuilder b) {
-       return super.setName(s, b); 
     }
 
     @Override

@@ -8,26 +8,21 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.informationflow.macros.AbstractFinishAuxiliaryComputationMacro;
-import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryBlockComputationMacro;
-import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryLoopComputationMacro;
-import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryMethodComputationMacro;
-import de.uka.ilkd.key.informationflow.po.InfFlowPO;
-import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
-import de.uka.ilkd.key.macros.IFProofMacroConstants;
+import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -37,6 +32,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for 
@@ -44,6 +40,8 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Martin Hentschel
  */
 public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserInterfaceControl implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
+   protected boolean saveOnly = false;
+
    private final MediatorProofControl proofControl = createProofControl();
 
    private ProofMacro autoMacro = new SkipMacro();
@@ -57,6 +55,13 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
       return new MediatorProofControl(this);
    }
 
+   public void setSaveOnly(boolean s) {
+       this.saveOnly = s;
+   }
+   
+   public boolean isSaveOnly() {
+       return this.saveOnly;
+   }
 
    public void setMacro(ProofMacro macro) {
        assert macro != null;
@@ -89,9 +94,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
    public abstract void loadProblem(File file);
 
    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-                                            File bootClassPath, KeYMediator mediator) {
+                                            File bootClassPath, List<File> includes,KeYMediator mediator) {
        final ProblemLoader pl =
-               new ProblemLoader(file, classPath, bootClassPath,
+               new ProblemLoader(file, classPath, bootClassPath, includes,
                                  AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
        return pl;
    }
@@ -103,18 +108,21 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
           Debug.out("[ APPLY " + getMacro().getClass().getSimpleName() + " ]");
           Proof proof = getMediator().getSelectedProof();
           ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-          ProverTaskListener ptl = getListener();
+          ProverTaskListener ptl = this;
           try {
               getMediator().stopInterface(true);
               getMediator().setInteractive(false);
-              ptl.taskStarted(macro.getName(), 0);
+              ptl.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
               synchronized(macro) {
                   // wait for macro to terminate
-                  info = macro.applyTo(getMediator().getSelectedNode(), null, ptl);
+                  info = macro.applyTo(this, getMediator().getSelectedNode(), null, ptl);
               }
           } catch(InterruptedException ex) {
               Debug.out("Proof macro has been interrupted:");
               Debug.out(ex);
+          } catch (Exception e) {
+              Debug.out("Exception occurred during macro application:");
+              Debug.out(e);
           } finally {
               ptl.taskFinished(info);
               getMediator().setInteractive(true);
@@ -128,53 +136,51 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
   }
    
    @Override
-   protected void macroFinished(ProofMacroFinishedInfo info) {
+   protected void macroFinished(final ProofMacroFinishedInfo info) {
       super.macroFinished(info);
-      
-      /*
-       * This solution is only a hack. TODO: Someone with deeper knowledge of the macros for information flow should
-       * solve the whole issue by not at all registering side proofs in the GUI, but instead using the proof starter.
-       * And maybe extend the proof starter by an option save after completion, so that the proofs get saved
-       */
-      if (info.getMacro() instanceof AbstractFinishAuxiliaryComputationMacro) {
-    	 InfFlowProof initiatingProof = (InfFlowProof) info.getProof();
-         Object sideProofObject = info.getValueFor(IFProofMacroConstants.SIDE_PROOF);
-         if (sideProofObject instanceof InfFlowProof) { 
-             final InfFlowProof sideProof = (InfFlowProof) sideProofObject;
-             saveSideProof(sideProof);
-             initiatingProof.addSideProof(sideProof);
-             // make everyone listen to the proof remove
-             getMediator().startInterface(true);
-             sideProof.dispose();
-             getMediator().getSelectionModel().setSelectedGoal(info.getGoals().head());
-             // go into automode again
-             getMediator().stopInterface(true);
-         }
-      } else if (info.getMacro() instanceof StartAuxiliaryBlockComputationMacro ||
-              info.getMacro() instanceof StartAuxiliaryMethodComputationMacro ||
-              info.getMacro() instanceof StartAuxiliaryLoopComputationMacro) {
-          final InfFlowProof proof = (InfFlowProof) info.getProof();
-          final Object poObject = info.getValueFor(IFProofMacroConstants.PO_FOR_NEW_SIDE_PROOF);
-
-          if (poObject instanceof InfFlowPO) {
-        	  InfFlowPO po = (InfFlowPO) poObject;
-              final InfFlowProof p;
-              synchronized (po) {
-                  try {
-                    p = (InfFlowProof) createProof(proof.getEnv().getInitConfigForEnvironment(), po);
-                } catch (ProofInputException e) {
-                    getMediator().notify(new ExceptionFailureEvent("PO generation for side proof failed.", e));
-                    return;
-                } 
-              }
-              p.unionIFSymbols(proof.getIFSymbols());
-              // stop interface again, because it is activated by the proof
-              // change through startProver; the ProofMacroWorker will activate
-              // it again at the right time
-              getMediator().stopInterface(true);
-              getMediator().setInteractive(false);
-          }
+      if (info.getMacro() instanceof StartSideProofMacro) {
+         final Proof initiatingProof = (Proof) info.getValueFor(StartSideProofMacro.PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF);
+         info.getProof().addProofDisposedListener(new ProofDisposedListener() {
+            @Override
+            public void proofDisposing(final ProofDisposedEvent e) {
+               e.getSource().removeProofDisposedListener(this);
+               macroSideProofDisposing(info, initiatingProof, e.getSource());
+            }
+            
+            @Override
+            public void proofDisposed(ProofDisposedEvent e) {
+               // Nothing to do
+            }
+         });
+         // stop interface again, because it is activated by the proof
+         // change through startProver; the ProofMacroWorker will activate
+         // it again at the right time
+         ThreadUtilities.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+               getMediator().stopInterface(true);
+               getMediator().setInteractive(false);
+            }
+         });
       }
+   }
+   
+   protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo, final Proof initiatingProof, final Proof sideProof) {
+      ThreadUtilities.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            saveSideProof(sideProof);
+            // make everyone listen to the proof remove
+            getMediator().startInterface(true);
+            if (initiatingProof.closed()) {
+                getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
+            } else {
+                getMediator().getSelectionModel().setSelectedGoal(initiatingProof.openGoals().head());            
+            }
+            // go into automode again
+            getMediator().stopInterface(true);
+         }
+      });
    }
 
    /**
@@ -190,7 +196,13 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
            proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
        }
        final String filename = MiscTools.toValidFileName(proofName) + ".proof";
-       final File toSave = new File(proof.getProofFile().getParentFile(), filename);
+       final File proofFolder;
+       if (proof.getProofFile() != null) {
+          proofFolder = proof.getProofFile().getParentFile();
+       } else { // happens when a Java file is loaded
+          proofFolder = Main.getWorkingDir();
+       }
+       final File toSave = new File(proofFolder, filename);
        final KeYResourceManager krm = KeYResourceManager.getManager();
        final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
        try {

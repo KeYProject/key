@@ -132,7 +132,7 @@ public abstract class TestCommons extends TestCase {
 	
 
 	protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
-	   return KeYEnvironment.load(new File(filepath), null, null);
+	   return KeYEnvironment.load(new File(filepath), null, null, null);
     }
 
 	/**

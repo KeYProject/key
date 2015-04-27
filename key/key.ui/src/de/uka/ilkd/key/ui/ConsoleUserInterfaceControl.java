@@ -23,6 +23,7 @@ import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -32,6 +33,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -40,7 +43,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -101,8 +103,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                final Statistics stat = info.getProof().statistics();
                System.out.println("Proof steps: "+stat.nodes);
                System.out.println("Branches: "+stat.branches);
-               System.out.println("Automode Time: "+stat.autoModeTime+"ms");
-               System.out.println("Time per step: "+stat.timePerStep+"ms");
+               System.out.println("Automode Time: "+(stat.autoModeTimeInNano/1000000)+"ms");
+               System.out.println("Time per step: "+(stat.timePerStepInNano/1000000)+"ms");
            }
            System.out.println("Number of goals remaining open: " + openGoals);
            System.out.flush();
@@ -132,6 +134,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
    public void taskFinished(TaskFinishedInfo info) {
+       super.taskFinished(info);
        progressMax = 0; // reset progress bar marker
        final Proof proof = info.getProof();
        if (proof==null) {
@@ -177,13 +180,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    }
 
     @Override
-    public void taskStarted(String message, int size) {
-        progressMax = size;
+    public void taskStarted(TaskStartedInfo info) {
+        super.taskStarted(info);
+        progressMax = info.getSize();
         if (verbosity >= Verbosity.HIGH) {
-            if (ApplyStrategy.PROCESSING_STRATEGY.equals(message)) {
-                System.out.print(message+" ["); // start progress bar
+            if (TaskKind.Strategy.equals(info.getKind())) {
+                System.out.print(info.getMessage()+" ["); // start progress bar
             } else {
-                System.out.println(message);
+                System.out.println(info.getMessage());
             }
         }
     }
@@ -196,7 +200,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          * in which proofs will be written.
          */
         keyProblemFile = file;
-        getProblemLoader(file, null, null, mediator).runSynchronously();
+        getProblemLoader(file, null, null, null, mediator).runSynchronously();
     }
 
     @Override
@@ -266,6 +270,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     final public void taskProgress(int position) {
+        super.taskProgress(position);
         if (verbosity >= Verbosity.HIGH && progressMax > 0) {
             if ((position*PROGRESS_BAR_STEPS) % progressMax == 0) {
                 System.out.print(PROGRESS_MARK);

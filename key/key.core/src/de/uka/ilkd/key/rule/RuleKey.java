@@ -8,8 +8,12 @@ import de.uka.ilkd.key.logic.Name;
 
 
 /**
- * Taclets are required to be assigned a unique name. An exception is that two taclets may have the same name if they belong to different taclet options (choices)
- * This class is intended to be used a key for 
+ * Provides a unique key for taclets based on a taclet's name and its taclet options.
+ * This class is e.g. used by the parser which might encounter more than one taclet of
+ * the same name (but with different taclet options). 
+ * 
+ * One does not need to use this implementation (but can rely on a taclet's own 
+ * {@link Taclet#equals(Object)} and {@link Taclet#hashCode()} method.
  */
 public class RuleKey {
    public final Name name;

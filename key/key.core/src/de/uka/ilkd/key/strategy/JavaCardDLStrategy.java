@@ -82,6 +82,7 @@ import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
+import de.uka.ilkd.key.strategy.feature.SVNeedsInstantiation;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
 import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
@@ -119,6 +120,7 @@ import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
@@ -174,22 +176,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         costComputationF = setupGlobalF ( costComputationDispatcher);
         instantiationF = setupGlobalF ( instantiationDispatcher);
         approvalF = add ( setupApprovalF (), approvalDispatcher );
+        
     }    
-    
     
     protected Feature setupGlobalF(Feature dispatcher) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
-        
-//        final Feature splitF =
-//            ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, 50);
-
-//        final Feature strengthenConstraints =
-//            ifHeuristics ( new String[] { "concrete", "closure" },
-//                           longConst ( 0 ),
-//                           ifZero ( ConstraintStrengthenFeatureUC.create ( p_proof ),
-//                                    inftyConst () ) );
-        
+           
         final Feature methodSpecF;
         final String methProp 
         	= strategyProperties.getProperty(
@@ -218,8 +211,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         } else {
                 queryF = null;
                 assert false;
-        }
-        
+        }    
 
         final Feature depSpecF;
         final String depProp
@@ -484,30 +476,44 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final String methProp
         	= strategyProperties.getProperty(
         			StrategyProperties.METHOD_OPTIONS_KEY);
-        if (methProp.equals(StrategyProperties.METHOD_CONTRACT)) {
-        	/* If method treatment by contracts is chosen, this does not mean 
-        	 * that method expansion is disabled. The original cost was 200 
-        	 * and is now increased to 2000 in order to repress method expansion 
-        	 * stronger when method treatment by contracts is chosen. 
-        	 */
+        
+        switch (methProp) {
+        case StrategyProperties.METHOD_CONTRACT:
+            /* If method treatment by contracts is chosen, this does not mean 
+             * that method expansion is disabled. The original cost was 200 
+             * and is now increased to 2000 in order to repress method expansion 
+             * stronger when method treatment by contracts is chosen. 
+             */
             bindRuleSet(d, "method_expand", longConst(2000));   	
-        	//bindRuleSet(d, "method_expand", inftyConst()); //This seems to be more correct, but the then some proofs from the example directory do not work.
-        } else if (methProp.equals(StrategyProperties.METHOD_EXPAND)) {
-            bindRuleSet(d, "method_expand", longConst(100));	   
-        } else if (methProp.equals(StrategyProperties.METHOD_NONE)) {
-            bindRuleSet(d, "method_expand", inftyConst());	  
-        } else throw new RuntimeException("Unexpected strategy property "+
-                                          methProp);
+            break;
+        case StrategyProperties.METHOD_EXPAND:
+            bindRuleSet(d, "method_expand", longConst(100));
+            break;
+        case StrategyProperties.METHOD_NONE:
+            bindRuleSet(d, "method_expand", inftyConst());
+            break;
+        default:
+            throw new RuntimeException("Unexpected strategy property "+ methProp);
+        }
 
         
         final String queryAxProp = strategyProperties.
                            getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
-        if (queryAxProp.equals(StrategyProperties.QUERYAXIOM_ON)) {
-            bindRuleSet ( d, "query_axiom", longConst(-3000) ); //Originally the QueryAxiom rule was assigned the strategy "simplify". Hence, the cost should be probably low.
-        } else if (queryAxProp.equals(StrategyProperties.QUERYAXIOM_OFF)) {
+        switch (queryAxProp) {
+        case StrategyProperties.QUERYAXIOM_ON:
+            bindRuleSet ( d, "query_axiom", longConst(-3000) ); 
+            break;
+        case StrategyProperties.QUERYAXIOM_OFF:
             bindRuleSet ( d, "query_axiom", inftyConst());
+            break;
+        default:
+            throw new RuntimeException("Unexpected strategy property "+ queryAxProp);
+        }
+
+        if (classAxiomApplicationEnabled()) {
+            bindRuleSet ( d, "classAxiom", longConst(-250) );
         } else {
-                assert false;
+            bindRuleSet(d, "classAxiom", inftyConst());
         }
         
         bindRuleSet ( d, "loop_expand",
@@ -537,18 +543,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
                             longConst ( 100 ) ) );
         
-        //class axioms
-        final String classAxiomPrio = strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
-        final Feature classAxiomDefaultCost = longConst(-250);
-        if (StrategyProperties.CLASS_AXIOM_FREE.equals(classAxiomPrio))
-            // default as before
-            bindRuleSet ( d, "classAxiom", classAxiomDefaultCost );
-        else if (StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomPrio))
-            bindRuleSet(d, "classAxiom", add (sequentContainsNoPrograms(), classAxiomDefaultCost ));
-        else if (StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomPrio))
-            bindRuleSet(d, "classAxiom", inftyConst());
-        else assert false : "Unknown strategy property "+classAxiomPrio;
-                
         //limit observer (must have better priority than "classAxiom")
         bindRuleSet ( d, "limitObserver",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
@@ -856,8 +850,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		ifZero ( MatchedIfFeature.INSTANCE,
                 DiffFindAndIfFeature.INSTANCE ) );
 
-	bindRuleSet ( d, "stringsExpandDefNormalOp", 
-        	SumFeature.createSum ( new Feature[] { longConst(500) } ));
+	bindRuleSet ( d, "stringsExpandDefNormalOp", longConst(500) );
 	
 	bindRuleSet ( d, "stringsContainsDefInline", 
         	SumFeature.createSum ( new Feature[] {
@@ -963,6 +956,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return !StrategyProperties.QUANTIFIERS_NONE.equals (
                  strategyProperties.getProperty
                  ( StrategyProperties.QUANTIFIERS_OPTIONS_KEY ) );
+    }
+    
+    private boolean classAxiomDelayedApplication() {
+        String classAxiomSetting = (String) strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+        return StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomSetting);
+    }
+
+    private boolean classAxiomApplicationEnabled() {
+        String classAxiomSetting = (String) strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+        return !StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomSetting);
     }
 
     private boolean autoInductionEnabled () { //chrisg
@@ -1440,7 +1443,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inEqSimp_propagation", -2400 );
         bindRuleSet ( d, "inEqSimp_pullOutGcd", -2150);
         bindRuleSet ( d, "inEqSimp_saturate", -1900 );
-        bindRuleSet ( d, "inEqSimp_forNormalisation", -1000);
+        bindRuleSet ( d, "inEqSimp_forNormalisation", -1100);
         bindRuleSet ( d, "inEqSimp_special_nonLin", -1400);
         
         if ( arithNonLinInferences () )
@@ -2436,8 +2439,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             setupMultiplyInequations ( d, inftyConst () );
 
         // these taclets are not supposed to be applied with metavariable
-        // instantiations
-        bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
+        // instantiations 
+        // I'll keep it here for the moment as documentation, but comment it out
+        // as meta variables are no longer part of KeY 2.x
+        /* bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
         bindRuleSet ( d, "polySimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
 
         bindRuleSet ( d, "inEqSimp_nonNegSquares", isInstantiated ( "squareFac" ) );
@@ -2446,6 +2451,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inEqSimp_nonLin_neg", isInstantiated ( "divY" ) );
 
         bindRuleSet ( d, "inEqSimp_signCases", isInstantiated ( "signCasesLeft" ) );
+        */
 
         setupNewSymApproval ( d, numbers );
 
@@ -2463,8 +2469,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         bindRuleSet ( d, "partialInvAxiom",
     	      NonDuplicateAppModPositionFeature.INSTANCE );         
+                
+        setupClassAxiomApproval(d);
         
         setupQuantifierInstantiationApproval ( d );
+        
         setupSplittingApproval ( d );
 
         bindRuleSet ( d, "apply_select_eq",
@@ -2473,6 +2482,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                    or( applyTF( "s", rec( any(), SimplifiedSelectTermFeature.create(heapLDT) ) ),
                        add( NoSelfApplicationFeature.INSTANCE ,
                             applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE) ) ) ) );
+        
         bindRuleSet ( d, "apply_auxiliary_eq",
               add( NoSelfApplicationFeature.INSTANCE ,
                    isInstantiated("s"),
@@ -2483,6 +2493,46 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                     instOf("t1") ) ) ) );
 
         return d;
+    }
+
+    private void setupClassAxiomApproval(final RuleSetDispatchFeature d) {
+        // isInstantiated approves also when sv_heap does not occur
+        if (classAxiomApplicationEnabled()) {        
+            TermBuffer tb = new TermBuffer();
+            final Feature needsInstantiation = SVNeedsInstantiation.create("sv_heap");
+            /* if 'sv_heap' is present and instantiated, 
+             * allow application only if the heap used to 
+             * instantiate 'sv_heap' still occurs in the sequent. 
+             * Otherwise this was a rather short lived heap term
+             * which has been rewritten since. Hence, we discard 
+             * it to avoid too many most likely useless
+             * applications. 
+             */
+            final Feature approveInst =
+                    ifZero (isInstantiated ("sv_heap"),  
+                    /* the sum expression is 0 if the heap does not occur and
+                       infinite if it does occur, 
+                       the outer 'not' then ensures that the costs are infinite
+                       in the first and 0 in the latter case */
+                    not ( sum(tb, HeapGenerator.INSTANCE, 
+                            not ( eq(instOf("sv_heap"), tb) ) ) ) );            
+            
+            if (classAxiomDelayedApplication()) {
+                bindRuleSet (d, "classAxiom", add(sequentContainsNoPrograms(), 
+                        /* can be applied if sv_heap is instantiated or not present */
+                        not ( needsInstantiation ), 
+                        approveInst, 
+                        NonDuplicateAppFeature.INSTANCE ) );
+            } else {
+                bindRuleSet (d, "classAxiom", add( 
+                        /* can be applied if sv_heap is instantiated or not present */
+                        not ( needsInstantiation ), 
+                        approveInst,
+                        NonDuplicateAppFeature.INSTANCE ) );                
+            }
+        } else {
+            bindRuleSet(d, "classAxiom", inftyConst());
+        }
     }
     
     
@@ -2495,7 +2545,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     //
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-
 
     private RuleSetDispatchFeature setupInstantiationF() {
         enableInstantiate ();
@@ -2511,8 +2560,25 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupInEqSimpInstantiation ( d );
         
+        setClassAxiomInstantiation(d);       
+
         disableInstantiate ();
         return d;
+    }
+
+    private void setClassAxiomInstantiation(final RuleSetDispatchFeature d) {
+        //class axioms
+        final TermBuffer heapVar = new TermBuffer();
+        final Feature needsInstantiation = SVNeedsInstantiation.create("sv_heap");
+
+        final Feature heapInstantiator = ifZero(needsInstantiation, 
+                forEach ( heapVar, HeapGenerator.INSTANCE_EXCLUDE_UPDATES, 
+                        add ( instantiate ( "sv_heap", heapVar ), 
+                        // prefer simpler heap terms before more complicated ones
+                        applyTF( heapVar, rec(not(tf.atom), longTermConst(10) ) ) ) ), 
+                        longConst(0));
+
+        bindRuleSet(d, "classAxiom", heapInstantiator);
     }
 
 
@@ -2551,11 +2617,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public final RuleAppCost computeCost (RuleApp app,
                                           PosInOccurrence pio,
                                           Goal goal) {
-//	if(app.rule()==UseDependencyContractRule.INSTANCE/* && (goal.node().serialNr() == 433 || goal.node().serialNr() == 421)*/) {
-//	    RuleAppCost result = costComputationF.compute ( app, pio, goal );
-//	    System.out.println("Cost for node " + goal.node().serialNr() + ": " + result);
-//	    return result;
-//	}
         return costComputationF.compute ( app, pio, goal );
     }
 

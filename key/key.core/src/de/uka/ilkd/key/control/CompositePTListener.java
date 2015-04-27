@@ -2,6 +2,7 @@ package de.uka.ilkd.key.control;
 
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 
 /**
  * A composite structure for prover task listeners.
@@ -23,10 +24,10 @@ public class CompositePTListener implements ProverTaskListener {
     }
 
     @Override
-    public void taskStarted(String message, int size) {
+    public void taskStarted(TaskStartedInfo info) {
         for (ProverTaskListener l: listeners) {
             if (l != null) {
-                l.taskStarted(message, size);
+                l.taskStarted(info);
             }
         }
     }

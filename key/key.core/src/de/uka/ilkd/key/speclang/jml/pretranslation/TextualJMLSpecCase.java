@@ -66,7 +66,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
       requires = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     private Map<String, ImmutableList<PositionedString>>
+      requiresFree = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
       ensures = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
+      ensuresFree = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     private Map<String, ImmutableList<PositionedString>>
       axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
@@ -79,7 +85,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
           assignables.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           requires.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          requiresFree.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          ensuresFree.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           accessibles.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           accessibles.put(hName.toString()+"AtPre", ImmutableSLList.<PositionedString>nil());
           axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
@@ -108,7 +116,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public TextualJMLSpecCase merge(TextualJMLSpecCase tsc) {
         TextualJMLSpecCase res = clone();
         res.addRequires(tsc.getRequires());
+        res.addRequiresFree(tsc.getRequiresFree());
         res.addEnsures(tsc.getEnsures());
+        res.addEnsuresFree(tsc.getEnsuresFree());
         res.addSignals(tsc.getSignals());
         res.addSignalsOnly(tsc.getSignalsOnly());
         res.addAssignable(tsc.getAssignable());
@@ -124,7 +134,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public TextualJMLSpecCase clone() {
         TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
         res.requires = new LinkedHashMap(requires);
+        res.requiresFree = new LinkedHashMap(requiresFree);
         res.ensures = new LinkedHashMap(ensures);
+        res.ensuresFree = new LinkedHashMap(ensuresFree);
         res.signals = signals;
         res.signalsOnly = signalsOnly;
         res.assignables = new LinkedHashMap(assignables);
@@ -153,10 +165,20 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addGeneric(requires, ps);
     }
 
-
     public void addRequires(ImmutableList<PositionedString> l) {
         for(PositionedString ps : l) {
            addRequires(ps);
+        }
+    }
+
+
+    public void addRequiresFree(PositionedString ps) {
+        addGeneric(requiresFree, ps);
+    }
+
+    public void addRequiresFree(ImmutableList<PositionedString> l) {
+        for(PositionedString ps : l) {
+           addRequiresFree(ps);
         }
     }
 
@@ -195,10 +217,20 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addGeneric(ensures, ps);
     }
 
-
     public void addEnsures(ImmutableList<PositionedString> l) {
         for(PositionedString ps : l) {
            addEnsures(ps);
+        }
+    }
+
+
+    public void addEnsuresFree(PositionedString ps) {
+        addGeneric(ensuresFree, ps);
+    }
+
+    public void addEnsuresFree(ImmutableList<PositionedString> l) {
+        for(PositionedString ps : l) {
+           addEnsuresFree(ps);
         }
     }
 
@@ -319,6 +351,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return requires.get(hName);
     }
 
+    public ImmutableList<PositionedString> getRequiresFree() {
+        return requiresFree.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+
+    public ImmutableList<PositionedString> getRequiresFree(String hName) {
+        return requiresFree.get(hName);
+    }
+
     public ImmutableList<PositionedString> getMeasuredBy() {
         return measuredBy;
     }
@@ -346,6 +386,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public ImmutableList<PositionedString> getEnsures(String hName) {
         return ensures.get(hName);
+    }
+
+    public ImmutableList<PositionedString> getEnsuresFree() {
+        return ensuresFree.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+
+    public ImmutableList<PositionedString> getEnsuresFree(String hName) {
+        return ensuresFree.get(hName);
     }
 
     public ImmutableList<PositionedString> getAxioms() {
@@ -434,6 +482,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           }
         }
         for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = requiresFree.get(h.toString()).iterator();
+            while(it.hasNext()) {
+              sb.append("requires_free<"+h+">: " + it.next() + "\n");
+            }
+          }
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
           it = assignables.get(h.toString()).iterator();
           while(it.hasNext()) {
             sb.append("assignable<"+h+">: " + it.next() + "\n");
@@ -455,6 +509,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             sb.append("ensures<"+h+">: " + it.next() + "\n");
           }
         }
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = ensuresFree.get(h.toString()).iterator();
+            while(it.hasNext()) {
+              sb.append("ensures_free<"+h+">: " + it.next() + "\n");
+            }
+          }
         for(Name h : HeapLDT.VALID_HEAP_NAMES) {
           it = axioms.get(h.toString()).iterator();
           while(it.hasNext()) {
@@ -507,10 +567,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && behavior.equals(sc.behavior)
                && abbreviations.equals(sc.abbreviations)
                && requires.equals(sc.requires)
+               && requiresFree.equals(sc.requiresFree)
                && assignables.equals(sc.assignables)
                && accessibles.equals(sc.accessibles)
                && axioms.equals(sc.axioms)
                && ensures.equals(sc.ensures)
+               && ensuresFree.equals(sc.ensuresFree)
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
                && diverges.equals(sc.diverges)
@@ -528,10 +590,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + behavior.hashCode()
                + abbreviations.hashCode()
                + requires.hashCode()
+               + requiresFree.hashCode()
                + assignables.hashCode()
                + accessibles.hashCode()
                + axioms.hashCode()
                + ensures.hashCode()
+               + ensuresFree.hashCode()
                + signals.hashCode()
                + signalsOnly.hashCode()
                + diverges.hashCode()

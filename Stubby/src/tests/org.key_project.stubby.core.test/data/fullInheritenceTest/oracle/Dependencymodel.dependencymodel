@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.awt.image" name="java.awt.image.ImageObserver" simpleName="ImageObserver"/>
+  <types kind="INTERFACE" package="java.awt" name="java.awt.MenuContainer" simpleName="MenuContainer"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types abstract="true" package="java.awt" name="java.awt.Component" simpleName="Component">
+    <implements type="java.awt.image.ImageObserver" genericFreeType="java.awt.image.ImageObserver"/>
+    <implements type="java.awt.MenuContainer" genericFreeType="java.awt.MenuContainer"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types package="java.awt" name="java.awt.Container" simpleName="Container">
+    <extends type="java.awt.Component" genericFreeType="java.awt.Component"/>
+  </types>
+  <types kind="INTERFACE" package="javax.accessibility" name="javax.accessibility.Accessible" simpleName="Accessible"/>
+  <types package="java.awt" name="java.awt.Window" simpleName="Window">
+    <implements type="javax.accessibility.Accessible" genericFreeType="javax.accessibility.Accessible"/>
+    <extends type="java.awt.Container" genericFreeType="java.awt.Container"/>
+  </types>
+  <types package="java.awt" name="java.awt.Frame" simpleName="Frame">
+    <implements type="java.awt.MenuContainer" genericFreeType="java.awt.MenuContainer"/>
+    <extends type="java.awt.Window" genericFreeType="java.awt.Window"/>
+  </types>
+  <types kind="INTERFACE" package="javax.swing" name="javax.swing.WindowConstants" simpleName="WindowConstants"/>
+  <types kind="INTERFACE" package="javax.swing" name="javax.swing.RootPaneContainer" simpleName="RootPaneContainer"/>
+  <types package="javax.swing" name="javax.swing.TransferHandler" simpleName="TransferHandler">
+    <innerTypes kind="INTERFACE" visibility="DEFAULT" static="true" package="javax.swing" name="javax.swing.TransferHandler.HasGetTransferHandler" simpleName="HasGetTransferHandler"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types package="javax.swing" name="javax.swing.JFrame" simpleName="JFrame">
+    <implements type="javax.swing.WindowConstants" genericFreeType="javax.swing.WindowConstants"/>
+    <implements type="javax.accessibility.Accessible" genericFreeType="javax.accessibility.Accessible"/>
+    <implements type="javax.swing.RootPaneContainer" genericFreeType="javax.swing.RootPaneContainer"/>
+    <implements type="javax.swing.TransferHandler.HasGetTransferHandler" genericFreeType="javax.swing.TransferHandler.HasGetTransferHandler"/>
+    <extends type="java.awt.Frame" genericFreeType="java.awt.Frame"/>
+  </types>
+  <types package="" name="FullInheritenceTest" source="true" simpleName="FullInheritenceTest">
+    <methods name="main" static="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="javax.swing.JFrame" genericFreeType="javax.swing.JFrame"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+</dependencymodel:DependencyModel>

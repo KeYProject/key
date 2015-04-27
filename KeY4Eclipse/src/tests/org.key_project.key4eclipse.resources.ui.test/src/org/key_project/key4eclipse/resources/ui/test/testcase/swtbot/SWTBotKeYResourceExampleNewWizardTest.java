@@ -34,6 +34,7 @@ public class SWTBotKeYResourceExampleNewWizardTest extends TestCase {
    @Test
    public void testCreatedProject() throws Exception {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      TestUtilsUtil.closeWelcomeView(bot);
       // Open Java perspective
       TestUtilsUtil.openJavaPerspective();
       // Open new example wizard

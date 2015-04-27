@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="OuterClass" source="true" simpleName="OuterClass">
+    <innerTypes package="" name="OuterClass.InnerClass" source="true" simpleName="InnerClass">
+      <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </innerTypes>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+</dependencymodel:DependencyModel>

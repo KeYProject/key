@@ -15,11 +15,8 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Schema variable matching modal operators.
@@ -41,38 +38,7 @@ public final class ModalOperatorSV extends AbstractSV  {
         super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA, false, false);
         this.modalities = modalities;
     }
-    
 
-    @Override
-    public MatchConditions match(SVSubstitute subst, 
-	    			 MatchConditions mc,
-	    			 Services services) {        
-        if (!(subst instanceof Modality)) {
-            Debug.out("FAILED. ModalOperatorSV matches only modalities " +
-                        "(template, orig)",
-                      this, subst);
-            return null;
-        }                
-        
-        final Modality m = (Modality) subst;
-        if(modalities.contains(m)) {
-            Operator o = (Operator) mc.getInstantiations().getInstantiation(this);
-            if(o == null) {
-                return mc.setInstantiations(mc.getInstantiations().add(this, m, services));
-            } else if(o != m) {
-        	Debug.out("FAILED. Already instantiated with a different operator.");
-        	return null;
-            } else {
-        	return mc;
-            }
-        }
-        
-        Debug.out("FAILED. template is a schema operator,"
-                +" term is an operator, but not a matching one");
-        return null; 
-    }
-    
-     
     /**
      * returns an unmodifiable set of operators this schemavariable can match
      */

@@ -13,24 +13,16 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
-import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
@@ -54,106 +46,19 @@ public class NoFindTaclet extends Taclet {
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,  
-		      ImmutableList<TacletGoalTemplate> goalTemplates, 
-		      ImmutableList<RuleSet> ruleSets, 
-		      TacletAttributes attrs,
-		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-		      ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, 
-	      choices);
-	cacheMatchInfo();
+            ImmutableList<TacletGoalTemplate> goalTemplates, 
+            ImmutableList<RuleSet> ruleSets, 
+            TacletAttributes attrs,
+            ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
+            ImmutableSet<Choice> choices){
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, 
+                choices);
+        createTacletServices();
     } 
 
-   /**
-    * adds the sequent of the add part of the Taclet to the goal sequent
-    * 
-    * @param termLabelState The {@link TermLabelState} of the current rule application.
-    * @param add
-    *           the Sequent to be added
-    * @param currentSequent
-    *           the Sequent which is the current (intermediate) result of
-    *           applying the taclet
-    * @param services
-    *           the Services encapsulating all java information
-    * @param matchCond
-    *           the MatchConditions with all required instantiations
-    */   
-   protected void applyAdd(TermLabelState termLabelState, Sequent add,
-         SequentChangeInfo currentSequent, Services services,
-         MatchConditions matchCond, Goal goal, TacletApp tacletApp) {
-      addToAntec(termLabelState, add.antecedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
-      addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
-   }    
-
-    /**
-     * the rule is applied on the given goal using the
-     * information of rule application. 
-     * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
-     * @param ruleApp the taclet application that is executed
-     */
-    public ImmutableList<Goal> apply(Goal     goal,
-			    Services services, 
-			    RuleApp  ruleApp) {
-   final TermLabelState termLabelState = new TermLabelState();
-
-	// Number without the if-goal eventually needed
-	int                          numberOfNewGoals = goalTemplates().size();
-
-	TacletApp                    tacletApp        = (TacletApp) ruleApp;
-	MatchConditions              mc               = tacletApp.matchConditions ();
-
-	ImmutableList<SequentChangeInfo> newSequentsForGoals         =
-	    checkIfGoals ( goal,
-			   tacletApp.ifFormulaInstantiations (),
-			   mc,
-			   numberOfNewGoals );
-	
-	ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
-   
-   Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();
-   Iterator<Goal>               goalIt           = newGoals.iterator();
-   Iterator<SequentChangeInfo> newSequentsIt     = newSequentsForGoals.iterator();	
-
-	while (it.hasNext()) {
-	    TacletGoalTemplate gt          = it    .next();
-	    Goal               currentGoal = goalIt.next();
-	    // add first because we want to use pos information that
-	    // is lost applying replacewith
-	    
-	    SequentChangeInfo currentSequent = newSequentsIt.next();
-	    
-	    applyAdd(   termLabelState,
-	                gt.sequent(),
-	                currentSequent,
-	                services,
-	                mc,
-	                goal,
-	                (TacletApp) ruleApp);
-	    
-	    applyAddrule(     gt.rules(),
-			      currentGoal,
-			      services,
-			      mc);
-
-	    applyAddProgVars( gt.addedProgVars(),
-	          currentSequent,  
-	          currentGoal,
-	          tacletApp.posInOccurrence(),
-	          services,
-			      mc);
-
-       currentGoal.setSequent(currentSequent);
-
-	    currentGoal.setBranchLabel(gt.name());
-	}
-
-	return newGoals;
-    }
-
-    protected Taclet setName(String s) {
-	NoFindTacletBuilder b=new NoFindTacletBuilder();
-	return super.setName(s, b);
+    @Override
+    protected void createAndInitializeExecutor() {
+        executor = new NoFindTacletExecutor(this);
     }
 
     /**
@@ -161,7 +66,7 @@ public class NoFindTaclet extends Taclet {
      * find part
      */
     public ImmutableSet<SchemaVariable> getIfFindVariables () {
-	return getIfVariables ();
+        return getIfVariables ();
     }
 
     /**
@@ -173,4 +78,17 @@ public class NoFindTaclet extends Taclet {
         return DefaultImmutableSet.<QuantifiableVariable>nil();
     }
 
+    @Override
+    public NoFindTaclet setName(String s) {        
+        final TacletApplPart applPart = 
+                new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(), 
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes();
+        attrs.setDisplayName(displayName());
+        
+        return new NoFindTaclet(new Name(s), 
+                applPart, goalTemplates(), getRuleSets(), attrs, prefixMap, choices);
+    }
+
+    
 }

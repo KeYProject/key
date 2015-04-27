@@ -64,8 +64,8 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.XMLUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -323,7 +323,7 @@ public class KeYResourcesUtil {
             Object target = proofRef.getTarget();
             if (IProofReference.USE_CONTRACT.equals(proofRef.getKind()) && target instanceof Contract){
                Contract contract = (Contract) target;
-               ImmutableSet<Contract> contracts = pe.getSpecificationRepository().splitContract(contract);
+               ImmutableSet<Contract> contracts = proofRef.getSource().getServices().getSpecificationRepository().splitContract(contract);
                for (Contract atomicContract : contracts) {
                   for(ProofElement proofElement : proofElements){
                      if(atomicContract.getName().equals(proofElement.getContract().getName())){
@@ -653,7 +653,7 @@ public class KeYResourcesUtil {
     */
    public static IFile getProofFile(String name, IPath path) {
       if (path != null && name != null) {
-         name = ResourceUtil.validateWorkspaceFileName(name);
+         name = IOUtil.validateOSIndependentFileName(name);
          name = name + "." + KeYResourcesUtil.PROOF_FILE_EXTENSION;
          path = path.append(name);
          IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);

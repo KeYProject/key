@@ -13,12 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
 
 
 /** 
@@ -31,18 +27,6 @@ public final class UpdateSV extends AbstractSV {
         super(name, Sort.UPDATE, false, true);
     }
     
-    
-    @Override
-    public MatchConditions match(SVSubstitute subst, 
-	    			 MatchConditions mc,
-	    			 Services services) {
-        if (subst instanceof Term) {
-            return addInstantiation((Term) subst, mc, services);
-        }
-        Debug.out("FAILED. Schemavariable of this kind only match terms.");
-        return null;
-    }
-	
     
     @Override
     public String toString() {
