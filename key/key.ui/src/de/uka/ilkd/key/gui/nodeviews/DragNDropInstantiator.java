@@ -490,15 +490,17 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             } else {
                 missingSV = app.uninstantiatedVars().iterator().next();
             }
-            try {
-                app = (PosTacletApp) app.addCheckedInstantiation(missingSV,
-                        missingSVPIO.subTerm(), services, true);
-            } catch (IllegalInstantiationException ie) {
-                app = null;
-            }
+            if ( app.isInstantiationRequired(missingSV) ) {
+                try {
+                    app = (PosTacletApp) app.addCheckedInstantiation(missingSV,
+                            missingSVPIO.subTerm(), services, true);
+                } catch (IllegalInstantiationException ie) {
+                    app = null;
+                }
 
-            if (app != null && app.complete()) {
-                result = result.prepend(app);
+                if (app != null && app.complete()) {
+                    result = result.prepend(app);
+                }
             }
         }
         return result;
