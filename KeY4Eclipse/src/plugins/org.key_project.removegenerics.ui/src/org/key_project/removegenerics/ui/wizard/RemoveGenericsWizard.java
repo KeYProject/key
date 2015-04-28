@@ -5,6 +5,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +32,7 @@ import org.key_project.removegenerics.ui.util.LogUtil;
 import org.key_project.removegenerics.ui.wizard.page.RemoveGenericsPreviewWizardPage;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.util.removegenerics.PreviewGenericRemover;
@@ -100,7 +102,7 @@ public class RemoveGenericsWizard extends Wizard {
                   throw new InterruptedException("Remove Generics Cancelled");
                }
                catch (Exception e) {
-                  throw new InvocationTargetException(e);
+                  throw new InvocationTargetException(e, e.getMessage());
                }
             }
          });
@@ -131,11 +133,14 @@ public class RemoveGenericsWizard extends Wizard {
       Set<IProject> alreadyHandledProjects = new HashSet<IProject>();
       IClasspathEntry[] entries = javaProject.getRawClasspath();
       monitor.beginTask("Listing libraries", entries.length);
+      List<String> libraryLocation = new LinkedList<String>();
       for (IClasspathEntry entry : entries) {
          SWTUtil.checkCanceled(monitor);
          List<File> locations = JDTUtil.getLocationFor(javaProject, entry, IPackageFragmentRoot.K_BINARY, alreadyHandledProjects);
          for (File location : locations) {
-            remover.addSearchPath(location.getAbsolutePath());
+            String path = location.getAbsolutePath();
+            remover.addSearchPath(path);
+            libraryLocation.add(path);
          }
          monitor.worked(1);
       }
@@ -157,7 +162,15 @@ public class RemoveGenericsWizard extends Wizard {
          }
       });
       // Remove generics and store result in a temporary directory.
-      remover.removeGenerics();
+      try {
+         remover.removeGenerics();
+      }
+      catch (Exception e) {
+         // Throw a more meaningful exception
+         throw new IllegalStateException("Unable to remove generics caused by: " + e.getMessage() + " \n\n" + 
+                                         "The considered libraries are: \n" +
+                                         CollectionUtil.toString(libraryLocation, File.pathSeparator + "\n"), e);
+      }
       // Map new content back to resources
       monitor.beginTask("Assigning new content to resources", remover.getResultMap().size());
       Map<IFile, String> contentMap = new HashMap<IFile, String>();
