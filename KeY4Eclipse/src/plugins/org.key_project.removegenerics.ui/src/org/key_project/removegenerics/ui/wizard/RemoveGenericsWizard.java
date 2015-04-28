@@ -166,10 +166,13 @@ public class RemoveGenericsWizard extends Wizard {
          remover.removeGenerics();
       }
       catch (Exception e) {
+         List<String> container = JDTUtil.getJavaContainerDescriptions(javaProject);
          // Throw a more meaningful exception
          throw new IllegalStateException("Unable to remove generics caused by: " + e.getMessage() + " \n\n" + 
                                          "The considered libraries are: \n" +
-                                         CollectionUtil.toString(libraryLocation, File.pathSeparator + "\n"), e);
+                                         CollectionUtil.toString(libraryLocation, File.pathSeparator + "\n") +
+                                         "\n\nPlease ensure that libraries and source code are compatible with Java 7." + 
+                                         "\n(current JRE of project '" + javaProject.getProject().getName() + "' is " + CollectionUtil.toString(container) + ").", e);
       }
       // Map new content back to resources
       monitor.beginTask("Assigning new content to resources", remover.getResultMap().size());
