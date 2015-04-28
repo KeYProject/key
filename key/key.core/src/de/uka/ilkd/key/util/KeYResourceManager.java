@@ -118,9 +118,9 @@ public class KeYResourceManager {
 
     public boolean visibleBranch() {
         final String b = getBranch();
-        return b.equals("")
-                || !INVISIBLE_BRANCHES.contains(b)
-                || b.startsWith("KeY" + getVersion());
+        return !b.equals("")
+                && !INVISIBLE_BRANCHES.contains(b)
+                && !b.startsWith("KeY" + getVersion());
     }
 
     /**
