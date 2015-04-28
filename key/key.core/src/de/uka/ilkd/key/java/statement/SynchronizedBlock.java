@@ -88,7 +88,7 @@ public class SynchronizedBlock extends JavaStatement
 
     private ImmutableArray<ProgramPrefix> computePrefix(StatementBlock b) {
         return StatementBlock.
-           computePrefixElements(b.getBody(), 0, this);                
+           computePrefixElements(b.getBody(), 0, this);
 }
 
     public int getPrefixLength() {        
@@ -105,7 +105,7 @@ public class SynchronizedBlock extends JavaStatement
     
     
     public PosInProgram getFirstActiveChildPos() {
-        return getStatementCount() == 0 ? PosInProgram.TOP : PosInProgram.ONE;
+        return getStatementCount() == 0 ? PosInProgram.TOP : PosInProgram.TOP.down(getChildCount()-1).down(0);
     }
     
     /**
