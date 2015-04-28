@@ -566,6 +566,17 @@ public abstract class TacletApp implements RuleApp {
 	return calculateNonInstantiatedSV();
     }
 
+    
+    /**
+     * returns true if the given {@link SchemaVariable} must be explicitly instantiated
+     * it does not check whether sv is already instantiated or not
+     * @param sv the SchemaVariable
+     * @return true if sv must be instantiated
+     */
+    public boolean isInstantiationRequired(SchemaVariable sv) {
+        return !(sv instanceof SkolemTermSV || sv instanceof VariableSV);
+    }
+    
     /**
      * @return A TacletApp with this.sufficientlyComplete() or null
      */

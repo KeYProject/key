@@ -22,7 +22,7 @@ import javax.swing.JMenuItem;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.hamcrest.Matcher;
-import org.key_project.swtbot.swing.bot.finder.finders.Finder;
+import org.key_project.swtbot.swing.bot.finder.finders.SwingFinder;
 import org.key_project.swtbot.swing.finder.matchers.ComponentMatcherFactory;
 
 
@@ -38,16 +38,16 @@ import org.key_project.swtbot.swing.finder.matchers.ComponentMatcherFactory;
  */
 public class SwingBotJMenu extends AbstractSwingBotComponent<JMenu> {
    /**
-    * The {@link Finder} that is used to find child menus and menu items.
+    * The {@link SwingFinder} that is used to find child menus and menu items.
     */
-   private final Finder finder;
+   private final SwingFinder finder;
    
    /**
     * Constructs an instance of this object with the given {@link JMenu}.
     * @param component The given {@link JMenu}.
     * @throws WidgetNotFoundException Is thrown when the given {@link Component} is {@code null}.
     */      
-   public SwingBotJMenu(Finder finder, JMenu component) throws WidgetNotFoundException {
+   public SwingBotJMenu(SwingFinder finder, JMenu component) throws WidgetNotFoundException {
       super(component);
       this.finder = finder;
    }

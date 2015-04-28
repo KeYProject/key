@@ -84,6 +84,13 @@
 	</target>
 
 	<!-- The following tasks are for KeY's Tests -->
+	<!-- The target "runAllTests" runs the tests on the compiled
+	     class-files as found in the bin/ directories;
+	     the target "test-deploy-all" runs the test on the packaged jar-files
+	     Rule of thumb: use "runAllTests" when developing and use
+	     "test-deploy-all" when deploying (jenkins/hudson use test-deploy-all)	     
+	-->
+
 	<target name="runAllTests" depends="compileAllTests">
 		<ant antfile="${key.dir}/key.util.test/build.xml" target="runTests" dir="${key.dir}/key.util.test" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.test/build.xml" target="runTests" dir="${key.dir}/key.core.test" inheritall="false"/>

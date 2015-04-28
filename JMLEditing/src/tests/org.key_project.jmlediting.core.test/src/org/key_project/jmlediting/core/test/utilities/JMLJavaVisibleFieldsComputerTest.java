@@ -8,8 +8,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.junit.After;
@@ -46,15 +44,8 @@ public class JMLJavaVisibleFieldsComputerTest {
    }
 
    public static ITypeBinding getTypeBinding(final String file, final int num) {
-      final ICompilationUnit cu = (ICompilationUnit) JavaCore.create(project
-            .getProject().getFile(file + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-
-      final ASTParser parser = ASTParser.newParser(AST.JLS8);
-      parser.setKind(ASTParser.K_COMPILATION_UNIT);
-      parser.setSource(cu);
-      parser.setResolveBindings(true);
-      final org.eclipse.jdt.core.dom.CompilationUnit ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser
-            .createAST(null);
+      final ICompilationUnit cu = (ICompilationUnit) JavaCore.create(project.getProject().getFile(file + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+      final org.eclipse.jdt.core.dom.CompilationUnit ast = (org.eclipse.jdt.core.dom.CompilationUnit) JDTUtil.parse(cu);
       final TypeDeclarationFinder finder = new TypeDeclarationFinder();
       ast.accept(finder);
       final List<TypeDeclaration> decls = finder.getDecls();

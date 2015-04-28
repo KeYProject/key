@@ -513,7 +513,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Tells whether the passed formula can be simplified
      */
-    private boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal) {
+    private synchronized boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal) {
         final Boolean b = applicabilityCache.get(cf);
         if(b != null) {
             return b.booleanValue();

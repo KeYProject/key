@@ -33,7 +33,7 @@ import org.hamcrest.Matcher;
  * </p>
  * @author Martin Hentschel
  */
-public class Finder extends org.eclipse.swtbot.swt.finder.finders.Finder {
+public class SwingFinder extends org.eclipse.swtbot.swt.finder.finders.Finder {
    /**
     * The {@link ComponentFinder} to use.
     */
@@ -47,7 +47,7 @@ public class Finder extends org.eclipse.swtbot.swt.finder.finders.Finder {
    /**
     * Constructs a default instance.
     */
-   public Finder() {
+   public SwingFinder() {
       this(new ComponentFinder(), new MenuFinder());
    }
    
@@ -56,7 +56,7 @@ public class Finder extends org.eclipse.swtbot.swt.finder.finders.Finder {
     * @param controlFinder The finder that finds controls.
     * @param menuFinder The finder that finds menus.
     */
-   public Finder(org.eclipse.swtbot.swt.finder.finders.ControlFinder controlFinder, org.eclipse.swtbot.swt.finder.finders.MenuFinder menuFinder) {
+   public SwingFinder(org.eclipse.swtbot.swt.finder.finders.ControlFinder controlFinder, org.eclipse.swtbot.swt.finder.finders.MenuFinder menuFinder) {
       super(controlFinder, menuFinder);
       this.swingComponentFinder = new ComponentFinder();
       this.swingMenuFinder = new MenuFinder();
@@ -67,7 +67,7 @@ public class Finder extends org.eclipse.swtbot.swt.finder.finders.Finder {
     * @param finder The finder
     * @param menuFinder The finder that finds menus.
     */
-   public Finder(org.eclipse.swtbot.swt.finder.finders.Finder finder, org.eclipse.swtbot.swt.finder.finders.MenuFinder menuFinder) {
+   public SwingFinder(org.eclipse.swtbot.swt.finder.finders.Finder finder, org.eclipse.swtbot.swt.finder.finders.MenuFinder menuFinder) {
       super(finder, menuFinder);
       this.swingComponentFinder = new ComponentFinder();
       this.swingMenuFinder = new MenuFinder();
@@ -78,7 +78,7 @@ public class Finder extends org.eclipse.swtbot.swt.finder.finders.Finder {
     * @param swingComponentFinder The {@link ComponentFinder} that finds {@link Component}s.
     * @param swingMenuFinder The {@link MenuFinder} that finds {@link JMenu}s and {@link JMenuItem}s.
     */
-   public Finder(ComponentFinder swingComponentFinder, MenuFinder swingMenuFinder) {
+   public SwingFinder(ComponentFinder swingComponentFinder, MenuFinder swingMenuFinder) {
       super(new org.eclipse.swtbot.swt.finder.finders.ControlFinder(), new org.eclipse.swtbot.swt.finder.finders.MenuFinder());
       this.swingComponentFinder = swingComponentFinder;
       this.swingMenuFinder = swingMenuFinder;

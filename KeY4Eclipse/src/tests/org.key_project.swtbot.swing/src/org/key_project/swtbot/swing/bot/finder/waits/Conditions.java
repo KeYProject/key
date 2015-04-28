@@ -103,6 +103,6 @@ public abstract class Conditions {
     * @return The created {@link ICondition}.
     */   
    public static ICondition hasSelection(SwingBotJList list) {
-      return new HasSelectionCondition<JList>(list);
+      return new HasSelectionCondition<JList<?>>(list);
    }
 }
