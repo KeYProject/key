@@ -24,9 +24,11 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.reference.MetaClassReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  *  Synchronized block.
@@ -103,14 +105,24 @@ public class SynchronizedBlock extends JavaStatement
         return prefixElementArray;
     }
 
-    private boolean expressionIsStatement() {
-        return expression instanceof Statement;
+    /**
+     * The method checks whether the expression in the synchronized
+     * prefix is either a local variable or a meta class reference
+     * (as local variables of this type are not supported by KeY,
+     * see return value for
+     * {@link MetaClassReference#getKeYJavaType(Services, ExecutionContext)}.
+     * @return true iff the above stated condition holds.
+     */
+    private boolean expressionWithoutSideffects() {
+        return (expression instanceof ProgramVariable
+                    && !((ProgramVariable)expression).isMember())
+                || (expression instanceof MetaClassReference);
     }
 
     public PosInProgram getFirstActiveChildPos() {
         return getStatementCount() == 0 ?
-                PosInProgram.TOP : (expressionIsStatement() ?
-                        PosInProgram.ONE : PosInProgram.TOP.down(getChildCount()-1).down(0));
+                PosInProgram.TOP : (expressionWithoutSideffects() ?
+                        PosInProgram.TOP.down(getChildCount()-1).down(0) : PosInProgram.ONE);
     }
     
     /**
