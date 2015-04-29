@@ -111,6 +111,8 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort EXPRESSION
 	= new ExpressionSort();
 
+    public static final ProgramSVSort NONSTATEMENTEXPRESSION
+    = new NonStatementExpressionSort();
 
     //----------- Initialisation and Creation expressions -------------------
     
@@ -781,6 +783,20 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     }
 
+    private static class NonStatementExpressionSort extends ProgramSVSort{
+
+        public NonStatementExpressionSort() {
+            super(new Name("NonStatementExpression"));
+        }
+
+        protected boolean canStandFor(ProgramElement pe, Services services) {
+            if (!( pe instanceof Expression )) {
+                return false;
+            }
+            return !STATEMENT.canStandFor(pe,services);
+        }
+    }
+
     /**
      * This sort represents a type of program schema variables that
      * match only on catch branches of try-catch-finally blocks
@@ -917,7 +933,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    return (check instanceof TypeReference);
 	}
     }
-    
+
 
     /**
      * This sort represents a type of program schema variables that

@@ -102,10 +102,15 @@ public class SynchronizedBlock extends JavaStatement
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
         return prefixElementArray;
     }
-    
-    
+
+    private boolean expressionIsStatement() {
+        return expression instanceof Statement;
+    }
+
     public PosInProgram getFirstActiveChildPos() {
-        return getStatementCount() == 0 ? PosInProgram.TOP : PosInProgram.TOP.down(getChildCount()-1).down(0);
+        return getStatementCount() == 0 ?
+                PosInProgram.TOP : (expressionIsStatement() ?
+                        PosInProgram.ONE : PosInProgram.TOP.down(getChildCount()-1).down(0));
     }
     
     /**
