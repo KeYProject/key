@@ -64,21 +64,25 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     /** 
      * a new term is created by replacing variables of term whose replacement is
      * found in the given SVInstantiations 
+     * @param term the {@link Term} the syntactical replacement is performed on
      * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param term the Term the syntactical replacement is performed on
-     * @param services the Services
+     * @param labelHint the hint used to maintain {@link TermLabel}s.
+     * @param applicationPosInOccurrence the {@link PosInOccurrence} of the find term 
+     * in the sequent this taclet is applied to
      * @param mc the {@link MatchConditions} with all instantiations and
      * the constraint 
-     * @param labelHint The hint used to maintain {@link TermLabel}s.
+     * @param goal the {@link Goal} on which this taclet is applied
+     * @param ruleApp the {@link RuleApp} with application information
+     * @param services the {@link Services} with the Java model information
      * @return the (partially) instantiated term  
      */
-    protected Term syntacticalReplace(TermLabelState termLabelState, Term term,
-            Services services,
-            MatchConditions mc,
-            PosInOccurrence applicationPosInOccurrence,
+    protected Term syntacticalReplace(Term term, TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            Goal goal, 
-            RuleApp tacletApp) {
+            PosInOccurrence applicationPosInOccurrence,
+            MatchConditions mc,
+            Goal goal,
+            RuleApp ruleApp, 
+            Services services) {
         final SyntacticalReplaceVisitor srVisitor =
                 new SyntacticalReplaceVisitor(termLabelState, 
                         services,
@@ -95,9 +99,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * adds SequentFormula to antecedent or succedent depending on
      * position information or the boolean antec 
      * contrary to "addToPos" frm will not be modified
-     * @param frm the formula that should be added
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param pos the PosInOccurrence describing the place in the sequent
+     * @param frm the {@link SequentFormula} that should be added
+     * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate) result of applying the taclet
+     * @param pos the {@link PosInOccurrence} describing the place in the sequent
      * @param antec boolean true(false) if elements have to be added to the
      * antecedent(succedent) (only looked at if pos == null)
      */
@@ -138,9 +142,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         final SVInstantiations svInst = matchCond.getInstantiations ();
 
-        Term instantiatedFormula = syntacticalReplace(termLabelState, schemaFormula.formula(), 
-                services, matchCond, applicationPosInOccurrence, 
-                new TacletLabelHint(labelHint, schemaFormula), goal, tacletApp);
+        Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), termLabelState, 
+                new TacletLabelHint(labelHint, schemaFormula), applicationPosInOccurrence, matchCond, 
+                goal, tacletApp, services);
 
         if (!svInst.getUpdateContext().isEmpty()) {
             instantiatedFormula = services.getTermBuilder().applyUpdatePairsSequential(svInst.getUpdateContext(), 
@@ -498,10 +502,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 seq = itNewGoalSequents.next ();
             }
 
-            addToPosWithoutInst ( new SequentFormula ( ifObl ),
-                    seq,
-                    null,
-                    false );
+            addToPosWithoutInst ( new SequentFormula ( ifObl ), seq, null, false );
         }
 
         return res;

@@ -31,55 +31,49 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     /**
      * does the work for applyReplacewith (wraps recursion) 
      */
-    private Term replace(TermLabelState termLabelState,
-                         Term term,
-                         Term with,
-                         PosInOccurrence posOfFind,
-                         IntIterator it,
-                         Services services,
-                         MatchConditions mc,
-                         Sort maxSort,
-                         TacletLabelHint labelHint,
-                         Goal goal,
-                         RuleApp ruleApp) {
-    if (it.hasNext()) {
-        int sub = it.next();
+    private Term replace(Term term,
+            Term with,
+            TermLabelState termLabelState,
+            TacletLabelHint labelHint,
+            PosInOccurrence posOfFind,
+            IntIterator it,
+            MatchConditions mc,
+            Sort maxSort,
+            Goal goal,
+            Services services,
+            RuleApp ruleApp) {
+        if (it.hasNext()) {
+            final int indexOfNextSubTerm = it.next();
 
-        final Term[] subs = new Term[term.arity()];
+            final Term[] subs = new Term[term.arity()];
+            term.subs().arraycopy(0, subs, 0, term.arity());
 
-        for (int i=0, arity = term.arity(); i<arity; i++) {
+            final Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm, services);
+            subs[indexOfNextSubTerm] = replace(term.sub(indexOfNextSubTerm), with,
+                    termLabelState,
+                    labelHint,
+                    posOfFind,
+                    it,
+                    mc,
+                    newMaxSort,
+                    goal,
+                    services, 
+                    ruleApp);            
 
-                if (i!=sub) {
-            subs[i] = term.sub(i);
-        } else {
-                    final Sort newMaxSort = TermHelper.getMaxSort(term, i, services);
-            subs[i] = replace(termLabelState, term.sub(i),
-                      with,
-                          posOfFind,
-                      it,
-                      services,
-                      mc,
-                          newMaxSort,
-                         labelHint,
-                         goal, 
-                         ruleApp);
+            return services.getTermFactory().createTerm(term.op(),
+                    subs,
+                    term.boundVars(),
+                    term.javaBlock(),
+                    term.getLabels());
         }
+
+        with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp, services);
+
+        if(!with.sort().extendsTrans(maxSort)) {
+            with = services.getTermBuilder().cast(maxSort, with);
         }
 
-        return services.getTermFactory().createTerm(term.op(),
-                                                  subs,
-                                                  term.boundVars(),
-                                                  term.javaBlock(),
-                                  term.getLabels());
-    }
-
-    with = syntacticalReplace(termLabelState, with, services, mc, posOfFind, labelHint, goal, ruleApp);
-
-    if(!with.sort().extendsTrans(maxSort)) {
-        with = services.getTermBuilder().cast(maxSort, with);
-    }
-
-    return with;
+        return with;
     }
 
 
@@ -94,16 +88,16 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     IntIterator it = posOfFind.posInTerm().iterator();
     Term rwTemplate=gt.replaceWith();
 
-    Term formula = replace(termLabelState,
-                           term,
+    Term formula = replace(term,
                            rwTemplate,
+                           termLabelState,
+                           new TacletLabelHint(rwTemplate),
                            posOfFind,
                            it,
-                           services,
                            matchCond,
                            term.sort(),
-                           new TacletLabelHint(rwTemplate),
                            goal,
+                           services,
                            ruleApp);
     formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula, posOfFind, taclet, goal, null, rwTemplate);
     if(term == formula) {

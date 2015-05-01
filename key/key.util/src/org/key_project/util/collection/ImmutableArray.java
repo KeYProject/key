@@ -99,11 +99,11 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     public <T> T[] toArray(T[] array) {
 	T[] result;
 	if (array.length < size()) {
-	    result = (T[]) Array.newInstance(array.getClass().getComponentType(), size());
+	    result = (T[]) Array.newInstance(array.getClass().getComponentType(), content.length);
 	} else {
 	    result = array;
 	}
-	System.arraycopy(content, 0, result, 0, size());
+	System.arraycopy(content, 0, result, 0, content.length);
 	return result;
     }    
 
