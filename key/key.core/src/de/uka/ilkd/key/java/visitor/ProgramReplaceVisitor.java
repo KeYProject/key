@@ -57,15 +57,17 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     }
     
     /** starts the walker*/
-    public void start() {	
+    public void start() {
+    assert result == null : "ProgramReplaceVisitor is not designed for multiple walks";
 	stack.push(new ExtList());		
 	walk(root());
-	final ExtList el = stack.peek();
-	int i = 0;
-	while (!(el.get(i) instanceof ProgramElement)) {
-	    i++;
+	final ExtList astList = stack.pop();
+	for (int i = 0, sz = astList.size(); result == null && i<sz; i++) {	
+	   final Object element = astList.get(i);
+	   if (element instanceof ProgramElement) {
+	       result = (ProgramElement) element;
+	   }
 	}
-	result = (ProgramElement) (stack.peek()).get(i);
     }
 
     public ProgramElement result() { 	
@@ -115,8 +117,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     }
 
     public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
-	result = x.getConcreteProgramElement(services);
-	addChild(result);
+	addChild(x.getConcreteProgramElement(services));
 	changed();
     }
 }
