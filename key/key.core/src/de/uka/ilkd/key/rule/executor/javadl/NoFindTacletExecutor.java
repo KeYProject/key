@@ -40,8 +40,8 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
             SequentChangeInfo currentSequent, Services services,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp) {
-        addToAntec(termLabelState, add.antecedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, ruleApp);
-        addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, ruleApp);
+        addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, null, matchCond, goal, ruleApp, services);
+        addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, null, matchCond, goal, ruleApp, services);
     }    
 
     /**

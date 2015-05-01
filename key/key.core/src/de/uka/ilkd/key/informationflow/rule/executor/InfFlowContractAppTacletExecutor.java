@@ -40,23 +40,23 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
 
 
     @Override
-    protected void addToAntec(TermLabelState termLabelState,
-            Semisequent semi,
+    protected void addToAntec(Semisequent semi,
+            TermLabelState termLabelState,
+            TacletLabelHint labelHint,
             SequentChangeInfo currentSequent,
             PosInOccurrence pos,
-            Services services,
-            MatchConditions matchCond,
             PosInOccurrence applicationPosInOccurrence,
-            TacletLabelHint labelHint,
+            MatchConditions matchCond,
             Goal goal,
-            RuleApp tacletApp) {
+            RuleApp tacletApp,
+            Services services) {
         final ImmutableList<SequentFormula> replacements =
-                instantiateSemisequent(termLabelState, semi, services, matchCond, pos, labelHint, goal, tacletApp);
+                instantiateSemisequent(semi, termLabelState, labelHint, pos, matchCond, goal, tacletApp, services);
         assert replacements.size() == 1 : "information flow taclets must have " +
                 "exactly one add!";
         updateStrategyInfo(services.getProof().openEnabledGoals().head(),
                 replacements.iterator().next().formula());
-        super.addToAntec(termLabelState, semi, currentSequent, pos, services, matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp);
+        super.addToAntec(semi, termLabelState, labelHint, currentSequent, pos, applicationPosInOccurrence, matchCond, goal, tacletApp, services);
     }
 
     /**
