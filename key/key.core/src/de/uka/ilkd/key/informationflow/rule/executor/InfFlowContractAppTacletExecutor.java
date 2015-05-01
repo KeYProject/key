@@ -14,9 +14,9 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.properties.Properties;
 
 public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfFlowContractAppTaclet> {
@@ -49,7 +49,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
             PosInOccurrence applicationPosInOccurrence,
             TacletLabelHint labelHint,
             Goal goal,
-            TacletApp tacletApp) {
+            RuleApp tacletApp) {
         final ImmutableList<SequentFormula> replacements =
                 instantiateSemisequent(termLabelState, semi, services, matchCond, pos, labelHint, goal, tacletApp);
         assert replacements.size() == 1 : "information flow taclets must have " +

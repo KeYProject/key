@@ -57,7 +57,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                      Services services,
                      MatchConditions matchCond,
                      Goal goal,
-                     TacletApp tacletApp);
+                     RuleApp ruleApp);
 
 
     

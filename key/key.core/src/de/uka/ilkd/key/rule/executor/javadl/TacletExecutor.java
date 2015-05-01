@@ -55,6 +55,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         this.taclet = taclet;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public abstract ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp);
 
@@ -76,7 +79,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence,
             TacletLabelHint labelHint,
             Goal goal, 
-            TacletApp tacletApp) {
+            RuleApp tacletApp) {
         final SyntacticalReplaceVisitor srVisitor =
                 new SyntacticalReplaceVisitor(termLabelState, 
                         services,
@@ -132,7 +135,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence,
             TacletLabelHint labelHint,
             Goal goal,
-            TacletApp tacletApp) { 
+            RuleApp tacletApp) { 
 
         final SVInstantiations svInst = matchCond.getInstantiations ();
 
@@ -161,7 +164,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @return the instanted formulas of the semisquent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(TermLabelState termLabelState, Semisequent semi, Services services,
-            MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint, Goal goal, TacletApp tacletApp) {       
+            MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint, Goal goal, RuleApp tacletApp) {       
 
         ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
 
@@ -228,7 +231,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence,
             TacletLabelHint labelHint,
             Goal goal,
-            TacletApp tacletApp) {
+            RuleApp tacletApp) {
 
         final ImmutableList<SequentFormula> replacements = 
                 instantiateSemisequent(termLabelState, semi, services, matchCond, 
@@ -266,7 +269,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence,
             TacletLabelHint labelHint,
             Goal goal,
-            TacletApp tacletApp) { 
+            RuleApp tacletApp) { 
         addToPos(termLabelState, semi, currentSequent, pos, true, services, 
                 matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp);
     }
@@ -297,8 +300,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence,
             TacletLabelHint labelHint,
             Goal goal,
-            TacletApp tacletApp) {
-        addToPos(termLabelState, semi, currentSequent, pos, false, services, matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp);
+            RuleApp ruleApp) {
+        addToPos(termLabelState, semi, currentSequent, pos, false, services, matchCond, applicationPosInOccurrence, labelHint, goal, ruleApp);
     }
 
 
