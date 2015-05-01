@@ -37,10 +37,14 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet> extends FindTacle
             MatchConditions matchCond,
             TacletApp tacletApp) {
         if (gt instanceof AntecSuccTacletGoalTemplate) {
-            Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
+            final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
 
             replaceAtPos(termLabelState, replWith.succedent(), currentSequent, posOfFind, services, matchCond, new TacletLabelHint(TacletOperation.REPLACE_AT_SUCCEDENT, replWith), goal, tacletApp);
-            addToAntec(termLabelState, replWith.antecedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.REPLACE_TO_ANTECEDENT, replWith), goal, tacletApp);                   
+            if (!replWith.antecedent().isEmpty()) {
+                addToAntec(termLabelState, replWith.antecedent(), currentSequent, null, services, matchCond, posOfFind, 
+                        new TacletLabelHint(TacletOperation.REPLACE_TO_ANTECEDENT, replWith), 
+                        goal, tacletApp);
+            }
         } 
     }
 

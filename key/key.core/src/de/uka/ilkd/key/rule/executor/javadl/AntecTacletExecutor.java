@@ -41,9 +41,12 @@ extends FindTacletExecutor<TacletKind> {
             TacletApp tacletApp) {
         if (gt instanceof AntecSuccTacletGoalTemplate) {
             final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
-
             replaceAtPos(termLabelState, replWith.antecedent(), currentSequent, posOfFind, services, matchCond, new TacletLabelHint(TacletOperation.REPLACE_AT_ANTECEDENT, replWith), goal, tacletApp);
-            addToSucc(termLabelState, replWith.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.REPLACE_TO_SUCCEDENT, replWith), goal, tacletApp);                  
+            if (!replWith.succedent().isEmpty()) {
+                addToSucc(termLabelState, replWith.succedent(), currentSequent, null, services, 
+                        matchCond, posOfFind, new TacletLabelHint(TacletOperation.REPLACE_TO_SUCCEDENT, replWith), 
+                        goal, tacletApp);                  
+            }
         } else {
             // Then there was no replacewith...
         }
