@@ -25,7 +25,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
-import de.uka.ilkd.key.util.Debug;
 
 /** 
  * Walks through a java AST in depth-left-fist-order. 
@@ -88,8 +87,6 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     public void performActionOnSchemaVariable(SchemaVariable sv) {
 	final Object inst = svinsts.getInstantiation(sv);
 	if (inst instanceof ProgramElement) {
-	    Debug.out("ProgramReplace SV:", sv);
-	    Debug.out("ProgramReplace:", inst);
 	    addChild((ProgramElement)inst);
 	} else if (inst instanceof ImmutableArray/*<ProgramElement>*/) {
 	    @SuppressWarnings("unchecked")
@@ -108,11 +105,18 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     }
 
     public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
-	ProgramReplaceVisitor trans = new ProgramReplaceVisitor(x.body(), services, svinsts);
-	trans.start();
-	ProgramElement localresult = trans.result();
-	localresult = x.transform(localresult, services, svinsts);
-	addChild(localresult);
+	final ExtList changeList = stack.peek();
+	
+	ProgramElement body = null;
+	for (Object element : changeList) {
+	    if (element instanceof SourceElement) {
+	        body = (ProgramElement) element;
+	    }
+	}
+
+	assert body != null : "A program transformer without program to transform?";
+
+	addChild(x.transform(body, services, svinsts));
 	changed();
     }
 
