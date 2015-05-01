@@ -85,12 +85,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             Services services) {
         final SyntacticalReplaceVisitor srVisitor =
                 new SyntacticalReplaceVisitor(termLabelState, 
-                        services,
-                        mc.getInstantiations(),
-                        applicationPosInOccurrence,
-                        taclet,
                         labelHint,
-                        goal);
+                        applicationPosInOccurrence,
+                        mc.getInstantiations(),
+                        goal,
+                        taclet,
+                        services);
         term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
