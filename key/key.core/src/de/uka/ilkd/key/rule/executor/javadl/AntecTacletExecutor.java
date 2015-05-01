@@ -24,13 +24,13 @@ extends FindTacletExecutor<TacletKind> {
     }
 
 
-    /** CONSTRAINT NOT USED 
-     * applies the replacewith part of Taclets
-     * @param gt TacletGoalTemplate used to get the replaceexpression in the Taclet
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence belonging to the find expression
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
+    /**  
+     * responsible for the application of {@code replacewith}-expression 
+     * @param gt TacletGoalTemplate used to get the {@code replacewith}-expression in the Taclet
+     * @param currentSequent the {@link Sequent} which is the current (intermediate) result of applying the taclet
+     * @param posOfFind the {@link PosInOccurrence} belonging to the find expression
+     * @param services the {@link Services} encapsulating all java information
+     * @param matchCond the {@link MatchConditions} with all required instantiations 
      * @return 
      */
     @Override
