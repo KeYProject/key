@@ -101,13 +101,14 @@ public class LabeledStatement extends JavaStatement
      *      @param statement a statement.
      */
 
-    public LabeledStatement(Label id, Statement statement) {
+    public LabeledStatement(Label id, Statement statement, PositionInfo pos) {
+        super(pos);
         this.name=id;
         body=statement;
         prefixElementArray = computePrefix(body);
         firstActiveChildPos = body instanceof StatementBlock ? 
                 (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
-                    PosInProgram.ONE_ZERO) : PosInProgram.ONE;
+                    PosInProgram.ONE_ZERO) : PosInProgram.ONE;       
     }
 
 

@@ -35,7 +35,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
     private ProgramElement result = null;
 
-    private SVInstantiations svinsts;
+    private final SVInstantiations svinsts;
     
     /** 
      * create the  ProgramReplaceVisitor

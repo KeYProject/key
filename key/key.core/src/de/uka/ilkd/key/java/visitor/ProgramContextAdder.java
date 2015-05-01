@@ -206,7 +206,7 @@ public class ProgramContextAdder {
 	return new MethodFrame(old.getProgramVariable(),
 			       old.getExecutionContext(),
 			       body,
-                               PositionInfo.UNDEFINED);
+                   old.getPositionInfo());
     }
 
     protected LabeledStatement createLabeledStatementWrapper
@@ -217,7 +217,8 @@ public class ProgramContextAdder {
 				    !(body.getChildAt(0) 
 				      instanceof LocalVariableDeclaration) ? 
 				    (Statement)body.getChildAt(0) : 
-				    (Statement)body);
+				    (Statement)body,
+				    old.getPositionInfo());
     }
 
     protected SynchronizedBlock createSynchronizedBlockWrapper

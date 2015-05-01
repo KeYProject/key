@@ -2518,8 +2518,8 @@ public abstract class KeYJavaASTFactory {
      *         <code>statement</code>
      */
     public static LabeledStatement labeledStatement(final Label label,
-	    final Statement statement) {
-	final LabeledStatement labeled = new LabeledStatement(label, statement);
+	    final Statement statement, PositionInfo pos) {
+	final LabeledStatement labeled = new LabeledStatement(label, statement, pos);
 
 	return labeled;
     }
@@ -2541,10 +2541,10 @@ public abstract class KeYJavaASTFactory {
      *         <code>statements</code>
      */
     public static Statement labeledStatement(final Label label,
-	    final Statement[] statements) {
+	    final Statement[] statements, PositionInfo pos) {
 	final StatementBlock block = KeYJavaASTFactory.block(statements);
 	final LabeledStatement labeled = KeYJavaASTFactory.labeledStatement(
-		label, block);
+		label, block, pos);
 
 	return labeled;
     }
