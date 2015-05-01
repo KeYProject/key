@@ -105,7 +105,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                   tacletApp.posInOccurrence(),
                   mc,
                   goal,
-                  (TacletApp) ruleApp,
+                  ruleApp,
                   services);
 
         applyReplacewith(gt, 
@@ -113,7 +113,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                  tacletApp.posInOccurrence(),
                  mc,
                  currentGoal,
-                 (TacletApp) ruleApp,
+                 ruleApp,
                  services);
 
         applyAddrule( gt.rules(),
