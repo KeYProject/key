@@ -139,7 +139,7 @@ public class ProofRunnable implements Runnable {
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(strategyProperties);
          
          ProofStarter ps = new ProofStarter(false);
-         ps.init(new SingleProof(proof, pe.getProofObl().name()));
+         ps.init(proof);
          ps.start();
          
          OneStepSimplifier.refreshOSS(proof);
