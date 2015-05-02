@@ -52,10 +52,22 @@ public class If extends BranchStatement implements ExpressionContainer {
      * May contain: Comments, a Then, an Else, an Expression (as condition of If)
      */ 
     public If(ExtList children) {
-	super(children);
-	thenBranch=children.get(Then.class);
-	elseBranch=children.get(Else.class);
-	expression=children.get(Expression.class);
+        super(children);
+        thenBranch = children.get(Then.class);
+        elseBranch = children.get(Else.class);
+        expression = children.get(Expression.class);
+        checkValidity();
+    }
+
+    /**
+     * throws an exception if the if-statement guard or then-branch are null
+     */
+    private void checkValidity() {
+        if (expression == null) {
+            throw new NullPointerException("Guard of if-statement cannot be null.");
+        } else if (thenBranch == null) {
+            throw new NullPointerException("Then-branch of if-statement cannot be null.");            
+        }
     }
 
     /**
@@ -74,16 +86,17 @@ public class If extends BranchStatement implements ExpressionContainer {
      *      @param thenBranch a then.
      *      @param elseBranch an else.
      */
-
     public If(Expression e, Then thenBranch, Else elseBranch) {
-        if (e == null) {
-            throw new NullPointerException();
-        }
-        expression = e;
+        this.expression = e;
         this.thenBranch=thenBranch;
         this.elseBranch=elseBranch;
+        checkValidity();
     }
 
+    /**
+     * 
+     * @return
+     */
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }
@@ -100,11 +113,10 @@ public class If extends BranchStatement implements ExpressionContainer {
     */
 
     public int getChildCount() {
-        int result = 0;
-        if (expression != null) result++;
-        if (thenBranch != null) result++;
-        if (elseBranch != null) result++;
-        return result;
+        if (elseBranch != null) {
+            return 3;
+        }
+        return 2;
     }
 
     /**
@@ -135,7 +147,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      *      @return the number of expressions.
      */
     public int getExpressionCount() {
-        return (expression != null) ? 1 : 0;
+        return 1;
     }
 
     /*
@@ -147,7 +159,7 @@ public class If extends BranchStatement implements ExpressionContainer {
       of bounds.
     */
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) {
+        if (index == 0) {
             return expression;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -183,8 +195,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      *      @return the number of branches.
      */
     public int getBranchCount() {
-        int result = 0;
-        if (thenBranch != null) result += 1;
+        int result = 1;
         if (elseBranch != null) result += 1;
         return result;
     }
@@ -198,29 +209,14 @@ public class If extends BranchStatement implements ExpressionContainer {
       of bounds.
     */
     public Branch getBranchAt(int index) {
-        if (thenBranch != null) {
-            if (index == 0) {
-                return thenBranch;
-            }
-            index -= 1;
+        if (index == 0) {
+            return thenBranch;
         }
-        if (elseBranch != null) {
-            if (index == 0) {
-                return elseBranch;
-            }
+        if (elseBranch != null && index == 1) {
+            return elseBranch;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
-
-    /**
-     *      Add (or replace) an else-branch
-     *      @author vladimir
-     */
-    public void addBranch(Else el) {
-       this.elseBranch = el;
-
-    }
-
 
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
