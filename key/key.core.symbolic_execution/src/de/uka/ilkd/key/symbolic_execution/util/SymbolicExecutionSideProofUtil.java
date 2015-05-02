@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -46,6 +47,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
@@ -737,7 +739,8 @@ public final class SymbolicExecutionSideProofUtil {
     * @param sourceInitConfig The {@link InitConfig} to copy its {@link ProofEnvironment}.
     * @return The created {@link ProofEnvironment} which is a copy of the environment of the given {@link Proof} but with its own {@link OneStepSimplifier} instance.
     */
-   public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final InitConfig sourceInitConfig, final boolean useSimplifyTermProfile) {
+   @SuppressWarnings("unchecked")
+public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final InitConfig sourceInitConfig, final boolean useSimplifyTermProfile) {
       // Get required source instances
       final RuleJustificationInfo sourceJustiInfo = sourceInitConfig.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
@@ -777,14 +780,14 @@ public final class SymbolicExecutionSideProofUtil {
       // Create new InitConfig
       final InitConfig initConfig = new InitConfig(sourceInitConfig.getServices().copy(profile, false));
       // Set modified taclet options in which runtime exceptions are banned.
-      ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
-      choices = choices.remove(new Choice("allow", "runtimeExceptions"));
-      choices = choices.add(new Choice("ban", "runtimeExceptions"));
+      Choice runtimeExceptionTreatment = new Choice("ban", "runtimeExceptions");
+      ImmutableSet<Choice> choices = SideProofUtil.activateChoice(sourceInitConfig.getActivatedChoices(), 
+              runtimeExceptionTreatment);
       initConfig.setActivatedChoices(choices);
       // Initialize InitConfig with settings from the original InitConfig.
       final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
       initConfig.setSettings(clonedSettings);
-      initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
+      initConfig.setTaclet2Builder((HashMap<Taclet, TacletBuilder<? extends Taclet>>) sourceInitConfig.getTaclet2Builder().clone());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       ProofEnvironment env = new ProofEnvironment(initConfig);
