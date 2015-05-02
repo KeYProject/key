@@ -16,7 +16,6 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
@@ -348,18 +347,21 @@ public class ContextStatementBlock extends StatementBlock {
     private PosInProgram matchPrefixEnd(final ProgramPrefix prefix, int pos, PosInProgram relPos) {
         PosInProgram prefixEnd = PosInProgram.TOP;
         if (prefix != null) {            
-            final IntIterator[] iterators = new IntIterator[pos + 1];
-            iterators[pos] = relPos.iterator();
-            
-            final ImmutableArray<ProgramPrefix> prefixElements = prefix.getPrefixElements();
-            for (int i = pos - 1; i>=0; i--) {
-                final ProgramPrefix prefixEl = prefixElements.get(i);                          
-                iterators[i] = prefixEl.getFirstActiveChildPos().iterator();               
-            }
-
-            for (final IntIterator it : iterators) {
-                while (it.hasNext()) {
+            ProgramPrefix currentPrefix = prefix;
+            int i = 0;
+            while (i<=pos) {
+                final IntIterator it = currentPrefix.getFirstActiveChildPos().iterator(); 
+                while ( it.hasNext() ) {
                     prefixEnd = prefixEnd.down(it.next());
+                }
+                i++;
+                if (i<=pos) { 
+                        // as fail-fast measure I do not test here using 
+                        // {@link ProgramPrefix#hasNextPrefixElement()}  
+                        // It must be guaranteed that there are at least pos + 1
+                        // prefix elements (incl. prefix) otherwise there 
+                        // is a bug already at an earlier point
+                    currentPrefix = currentPrefix.getNextPrefixElement();
                 }
             }
         } else {
