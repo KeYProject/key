@@ -18,6 +18,7 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -48,9 +49,13 @@ public class MethodFrame extends JavaStatement implements
     
     private final IExecutionContext execContext;
     
-    private final ImmutableArray<ProgramPrefix> prefixElementArray;
-    
     private final PosInProgram firstActiveChildPos;
+
+    private final int prefixLength;
+
+    private final MethodFrame innerMostMethodFrame;
+    
+    
     
     /**
      *      Labeled statement.
@@ -64,9 +69,7 @@ public class MethodFrame extends JavaStatement implements
         this.resultVar   = resultVar;
         this.body        = body;
         this.execContext = execContext;
-               
-        prefixElementArray = computePrefix(body);
-        
+                       
         firstActiveChildPos = 
                 body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.
                 down(getChildCount()-1).down(0);
@@ -75,6 +78,11 @@ public class MethodFrame extends JavaStatement implements
 			 "methodframe: executioncontext missing");
 	Debug.assertTrue(body != null, 
 			 "methodframe: body missing");
+	
+    ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+    prefixLength = info.getLength();
+    innerMostMethodFrame = info.getInnerMostMethodFrame();
+
     }
     
     /**
@@ -91,9 +99,7 @@ public class MethodFrame extends JavaStatement implements
         this.resultVar   = resultVar;
         this.body        = body;
         this.execContext = execContext;
-     
-        prefixElementArray = computePrefix(body);
-        
+             
         firstActiveChildPos = 
                 body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.
                 down(getChildCount()-1).down(0);
@@ -103,30 +109,54 @@ public class MethodFrame extends JavaStatement implements
 			 "methodframe: executioncontext missing");
 	Debug.assertTrue(body != null, 
 			 "methodframe: body missing");
-    }
-   
+	
+    ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+    prefixLength = info.getLength();
+    innerMostMethodFrame = info.getInnerMostMethodFrame();
 
-    private ImmutableArray<ProgramPrefix> computePrefix(StatementBlock b) {
-            return StatementBlock.
-            computePrefixElements(b.getBody(), 0, this);                
+    }
+
+    @Override
+    public int hashCode() {
+        return 17*super.hashCode() + 13*execContext.hashCode() + body.hashCode();
     }
     
-    public int getPrefixLength() {        
-        return prefixElementArray.size();
+    @Override
+    public boolean hasNextPrefixElement() {
+        return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
     }
 
-    public ProgramPrefix getPrefixElementAt(int i) {       
-        return prefixElementArray.get(i);
+    @Override
+    public ProgramPrefix getNextPrefixElement() {
+        if (hasNextPrefixElement()) {
+            return (ProgramPrefix) body.getStatementAt(0);
+        } else {
+            throw new IndexOutOfBoundsException("No next prefix element " + this);
+        }
+    }
+    
+    @Override
+    public ProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : 
+            this;
+    }
+    
+    @Override
+    public int getPrefixLength() {
+        return prefixLength;
     }
 
+    @Override
+    public MethodFrame getInnerMostMethodFrame() {
+        return innerMostMethodFrame;
+    }
+
+    @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return prefixElementArray;
-    }
+        return StatementBlock.computePrefixElements(body.getBody(), this);
+    }    
     
     public PosInProgram getFirstActiveChildPos() {        
-        if (firstActiveChildPos == null) {
-            
-        }
         return firstActiveChildPos;
     }
     

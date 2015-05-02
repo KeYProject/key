@@ -18,6 +18,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -45,7 +46,9 @@ public class Try extends BranchStatement
 
     private final ImmutableArray<Branch> branches;
 
-    private final ImmutableArray<ProgramPrefix> prefixElementArray;
+    private final MethodFrame innerMostMethodFrame;
+
+    private final int prefixLength;
     
     /**
  *      Try.
@@ -55,7 +58,9 @@ public class Try extends BranchStatement
     public Try(StatementBlock body) {
         this.body           = body;
         this.branches       = null;
-        prefixElementArray  = computePrefix(body);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     /**
@@ -67,7 +72,10 @@ public class Try extends BranchStatement
     public Try(StatementBlock body, Branch[] branches) {
         this.body           = body;
         this.branches       = new ImmutableArray<Branch>(branches);
-        prefixElementArray  = computePrefix(body);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+
     }
 
     /**
@@ -79,7 +87,10 @@ public class Try extends BranchStatement
     public Try(StatementBlock body, ImmutableArray<Branch> branches) {
         this.body=body;
         this.branches = branches;
-        prefixElementArray = computePrefix(body);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+
     }
 
     /**
@@ -89,29 +100,57 @@ public class Try extends BranchStatement
 
     public Try(ExtList children) {
         super(children);
-	this.body = children.get(StatementBlock.class);
-	this.branches=new
-	    ImmutableArray<Branch>(children.collect(Branch.class));
-        prefixElementArray = computePrefix(body);
+        this.body = children.get(StatementBlock.class);
+        this.branches=new
+                ImmutableArray<Branch>(children.collect(Branch.class));
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+
+    }
+    
+    
+    @Override
+    public int hashCode() {
+        return 17*super.hashCode() + 13*body.hashCode() + branches.hashCode();
     }
 
 
-    private ImmutableArray<ProgramPrefix> computePrefix(StatementBlock b) {
-        return StatementBlock.
-        computePrefixElements(b.getBody(), 0, this);                
+    @Override
+    public boolean hasNextPrefixElement() {
+        return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
     }
 
-    public int getPrefixLength() {        
-        return prefixElementArray.size();
+    @Override
+    public ProgramPrefix getNextPrefixElement() {
+        if (hasNextPrefixElement()) {
+            return (ProgramPrefix) body.getStatementAt(0);
+        } else {
+            throw new IndexOutOfBoundsException("No next prefix element " + this);
+        }
+    }
+    
+    @Override
+    public ProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : 
+            this;
+    }
+    
+    @Override
+    public int getPrefixLength() {
+        return prefixLength;
     }
 
-    public ProgramPrefix getPrefixElementAt(int i) {       
-        return prefixElementArray.get(i);
+    @Override
+    public MethodFrame getInnerMostMethodFrame() {
+        return innerMostMethodFrame;
     }
 
+    @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return prefixElementArray;
-    }
+        return StatementBlock.computePrefixElements(body.getBody(), this);
+    }    
+
     
     public SourceElement getFirstElement() {
         return body.getFirstElement();

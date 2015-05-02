@@ -106,10 +106,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
         final ProgramElement fstActive;
 
         if (jb instanceof ProgramPrefix) {
-            final ProgramPrefix pp = ((ProgramPrefix) jb)
-                    .getPrefixElementAt(((ProgramPrefix) jb).getPrefixLength() - 1);
-            fstActive = PosInProgram.getProgramAt(pp
-                    .getFirstActiveChildPos(), pp);
+            final ProgramPrefix pp = ((ProgramPrefix) jb).getLastPrefixElement();
+            fstActive = PosInProgram.getProgramAt(pp.getFirstActiveChildPos(), pp);
         } else {
             fstActive = jb;
         }

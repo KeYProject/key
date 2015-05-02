@@ -87,6 +87,12 @@ public class If extends BranchStatement implements ExpressionContainer {
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }
+    
+    @Override
+    public int hashCode() {
+        return 17*super.hashCode() + expression.hashCode() + 
+                13*thenBranch.hashCode() + 7*(elseBranch == null ? 0 : elseBranch.hashCode());
+    }
 
     /**
      *      Returns the number of children of this node.

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
@@ -45,12 +46,18 @@ public class ContextStatementBlock extends StatementBlock {
      */
     private final IExecutionContext executionContext;
 
+    /** 
+     * length of this progran prefix
+     */
+    private final int patternPrefixLength;
+    
     /** creates a ContextStatementBlock 
      * @param children the body of the context term
      */
     public ContextStatementBlock(ExtList children) {
-	super(children);
-	executionContext = null;
+        super(children);
+        executionContext = null;
+        patternPrefixLength = this.getPrefixLength();
     }
 
     /** creates a ContextStatementBlock 
@@ -61,18 +68,22 @@ public class ContextStatementBlock extends StatementBlock {
 		       IExecutionContext executionContext) {
 	super(children);
 	this.executionContext = executionContext;
+    patternPrefixLength = this.getPrefixLength();
+
     }
 
     public ContextStatementBlock(Statement s, 
                IExecutionContext executionContext) {
         super(s);
         this.executionContext = executionContext;
+        patternPrefixLength = this.getPrefixLength();
     }
     
     public ContextStatementBlock(Statement[] body, 
                IExecutionContext executionContext) {
         super(body);
         this.executionContext = executionContext;
+        patternPrefixLength = this.getPrefixLength();
     }
 
     public boolean requiresExplicitExecutionContextMatch() {
@@ -156,7 +167,6 @@ public class ContextStatementBlock extends StatementBlock {
         return true;
     }        
     
-    
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         SourceData newSource = source;
         
@@ -179,7 +189,6 @@ public class ContextStatementBlock extends StatementBlock {
         if (src instanceof ProgramPrefix) {
             prefix = (ProgramPrefix)src;            
             final int srcPrefixLength     = prefix.getPrefixLength();
-            final int patternPrefixLength = getPrefixLength();
                         
             if (patternPrefixLength > srcPrefixLength) {
                 Debug.out("Program match FAILED. Source has not enough prefix elements.", 
@@ -189,7 +198,7 @@ public class ContextStatementBlock extends StatementBlock {
      
             pos = srcPrefixLength - patternPrefixLength;
             
-            ProgramPrefix firstActiveStatement = prefix.getPrefixElementAt(pos);                                                                                            
+            ProgramPrefix firstActiveStatement = getPrefixElementAt(prefix, pos);                                                                                            
             
             relPos = firstActiveStatement.getFirstActiveChildPos();
             
@@ -299,17 +308,11 @@ public class ContextStatementBlock extends StatementBlock {
         
         ExecutionContext innerContext = lastExecutionContext;
         
-        if (innerContext == null) {
-            innerContext = services.getJavaInfo().getDefaultExecutionContext();
-            if (prefix != null) {            
-                for (int i = pos - 1; i>=0; i--) {
-                    final ProgramPrefix prefixEl = prefix.getPrefixElementAt(i);                                   
-                    if (prefixEl instanceof MethodFrame) {
-                        innerContext = (ExecutionContext) 
-                        ((MethodFrame)prefixEl).getExecutionContext();
-                        break;
-                    } 
-                }                
+        if (innerContext == null) {            
+            if (prefix != null && prefix.getInnerMostMethodFrame() != null) {
+                innerContext = (ExecutionContext) prefix.getInnerMostMethodFrame().getExecutionContext();
+            } else {
+                innerContext = services.getJavaInfo().getDefaultExecutionContext();
             }
         }
         
@@ -348,8 +351,9 @@ public class ContextStatementBlock extends StatementBlock {
             final IntIterator[] iterators = new IntIterator[pos + 1];
             iterators[pos] = relPos.iterator();
             
+            final ImmutableArray<ProgramPrefix> prefixElements = prefix.getPrefixElements();
             for (int i = pos - 1; i>=0; i--) {
-                final ProgramPrefix prefixEl = prefix.getPrefixElementAt(i);                          
+                final ProgramPrefix prefixEl = prefixElements.get(i);                          
                 iterators[i] = prefixEl.getFirstActiveChildPos().iterator();               
             }
 
@@ -362,5 +366,13 @@ public class ContextStatementBlock extends StatementBlock {
             prefixEnd = relPos;
         }
         return prefixEnd;
+    }
+
+    private static ProgramPrefix getPrefixElementAt(ProgramPrefix prefix, int i) {
+        ProgramPrefix current = prefix;
+        for (int pos = 0; pos < i; pos++) {
+            current = current.getNextPrefixElement();
+        }
+        return current;
     }
 }
