@@ -31,7 +31,7 @@ parserEntryPoint returns [ProofCollection proofCollection]
           * in a list first and process them when parsing is finished.
           */ 
          ProofCollectionSettings globalSettings =
-         ProofCollectionSettingsFactory.createSettings(getTokenStream().getSourceName(), settingsEntries);
+         new ProofCollectionSettings(getTokenStream().getSourceName(), settingsEntries);
          $proofCollection = new ProofCollection(proofCollectionUnits, globalSettings);
       }
 ;

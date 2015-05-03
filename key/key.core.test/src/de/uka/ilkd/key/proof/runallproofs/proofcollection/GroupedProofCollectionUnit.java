@@ -30,8 +30,8 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
    public RunAllProofsTestUnit createRunAllProofsTestUnit(
          final ProofCollectionSettings parentSettings) {
 
-      final ProofCollectionSettings settings = ProofCollectionSettingsFactory
-            .createSettings(parentSettings, settingsEntries);
+      final ProofCollectionSettings settings = new ProofCollectionSettings(
+            parentSettings, settingsEntries);
 
       return new RunAllProofsTestUnit(groupName) {
 
