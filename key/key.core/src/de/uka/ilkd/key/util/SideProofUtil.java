@@ -33,10 +33,12 @@ public final class SideProofUtil {
     * required for instance during parallel usage of site proofs because
     * {@link OneStepSimplifier} has an internal state.
     * @param source The {@link Proof} to copy its {@link ProofEnvironment}.
+    * @param enableChoices The {@link Choice}s that should be changed w.r.t. those derived from {@link Proof#getInitConfig()} 
     * @return The created {@link ProofEnvironment} which is a copy of the environment of the given {@link Proof} but with its own {@link OneStepSimplifier} instance.
     */
    @SuppressWarnings("unchecked")
-public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source) {
+public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source, 
+        final Choice... enableChoices) {
       assert source != null;
       assert !source.isDisposed();
       // Get required source instances
@@ -46,9 +48,12 @@ public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(fin
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig
       final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
-      // Set modified taclet options in which runtime exceptions are banned.
-      Choice runtimeExceptionTreatment = new Choice("ban", "runtimeExceptions");
-      initConfig.setActivatedChoices(activateChoice(sourceInitConfig.getActivatedChoices(), runtimeExceptionTreatment));
+      // Set modified taclet options in which runtime exceptions are banned.      
+      ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
+      for (Choice enabled : enableChoices) {
+          choices = activateChoice(choices, enabled);
+      }
+      initConfig.setActivatedChoices(choices);
       // Initialize InitConfig with settings from the original InitConfig.
       final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
       initConfig.setSettings(clonedSettings);
