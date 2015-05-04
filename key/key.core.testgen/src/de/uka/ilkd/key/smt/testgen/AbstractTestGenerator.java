@@ -114,12 +114,17 @@ public abstract class AbstractTestGenerator {
              if (stopRequest != null && stopRequest.shouldStop()) {
                 return;
              }
+             
+            // System.out.println("Proof before:"+proof.toString());
+             
              selectProof(ui, proof);
 
              ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
              synchronized(macro) {
                           info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
              }
+             
+           //  System.out.println("Proof after:"+proof.toString());
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {
              Debug.out("Semantics blasting interrupted");
@@ -174,7 +179,7 @@ public abstract class AbstractTestGenerator {
     }
     if (Thread.interrupted()) {
        return;
-    }
+    }    
     launcher.launch(solvers, problems, proof.getServices());
     //    ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
     //    mg.launch();
@@ -334,7 +339,7 @@ public abstract class AbstractTestGenerator {
 
 
    protected void handleLauncherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes, SolverLauncher launcher, TestGenerationLog log) {
-      log.writeln("Test data generation: solving SMT problems... \n please wait...");
+      log.writeln("Test data generation: solving "+problems.size()+" SMT problems... \n please wait...");
    }
 
    protected void handleLauncherStopped(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
@@ -383,6 +388,9 @@ public abstract class AbstractTestGenerator {
                     .getFinalResult().isValid();
             if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
                unknown++;
+               if(solver.getException() != null){
+            	   solver.getException().printStackTrace();
+               }               
             } else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
                solvedPaths++;
                if (solver.getSocket().getQuery() != null) {

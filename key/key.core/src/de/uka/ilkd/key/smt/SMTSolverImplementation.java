@@ -352,10 +352,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         	   
         	   Proof originalProof = null;
         	   for(Proof pr : specrep.getAllProofs()){
-        		   if(proof.name().toString().equals("Semantics Blasting: "+pr.name().toString())){
+        		   if(proof.name().toString().endsWith(pr.name().toString())){
         			   originalProof = pr;
         			   break;
         		   }
+        		   
+        		   
         	   }
         	   //System.out.println(originalProof.name());
         	   
