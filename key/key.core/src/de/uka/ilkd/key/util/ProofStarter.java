@@ -282,10 +282,6 @@ public class ProofStarter {
        this.setStrategy(proof.getActiveStrategy());
     }
     
-    public void init(ProofAggregate proofAggregate) {
-    	init(proofAggregate.getFirstProof());
-    }
-
     /**
      * Returns the managed side {@link Proof}.
      * @return The managed side {@link Proof}.

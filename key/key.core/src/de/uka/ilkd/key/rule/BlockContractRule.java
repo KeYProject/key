@@ -40,6 +40,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -1346,14 +1347,14 @@ public class BlockContractRule implements BuiltInRule {
             final Statement labeledAlmostSafeBlock = label(almostSafeBlock, labels);
             final Statement safeStatement = wrapInTryCatch(labeledAlmostSafeBlock,
                                                            exceptionParameter);
-            statements.add(new LabeledStatement(breakOutLabel, safeStatement));
+            statements.add(new LabeledStatement(breakOutLabel, safeStatement, PositionInfo.UNDEFINED));
         }
 
         private Statement label(final StatementBlock block, Iterable<Label> labels)
         {
             Statement result = block;
             for (Label label : labels) {
-                result = new LabeledStatement(label, result);
+                result = new LabeledStatement(label, result, PositionInfo.UNDEFINED);
             }
             return result;
         }

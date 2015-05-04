@@ -17,12 +17,11 @@ import org.eclipse.jdt.core.compiler.CompilationParticipant;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.compiler.ReconcileContext;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
-import org.eclipse.jdt.internal.corext.dom.GenericVisitor;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserError;
@@ -36,6 +35,7 @@ import org.key_project.jmlediting.core.utilities.JMLError;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLValidationEngine;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * This class takes part in the compilation process of the JDT to validate the
@@ -155,14 +155,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
          // Start Preparation for Validation
          // Setup JDT Parser and Create JDT AST
-         final org.eclipse.jdt.core.dom.CompilationUnit ast;
-         final ASTParser parser = ASTParser
-               .newParser(ASTParser.K_COMPILATION_UNIT);
-         parser.setKind(ASTParser.K_COMPILATION_UNIT);
-         parser.setSource(source.toCharArray());
-         parser.setResolveBindings(true);
-         ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser
-               .createAST(null);
+         final org.eclipse.jdt.core.dom.CompilationUnit ast = (org.eclipse.jdt.core.dom.CompilationUnit) JDTUtil.parse(source);
          // Setup jmlParser
          final IJMLParser jmlParser = JMLPreferencesHelper
                .getProjectActiveJMLProfile(res.getProject()).createParser();
@@ -220,9 +213,9 @@ public class JMLCompilationParticipant extends CompilationParticipant {
 
       }
       final Map<Comment, ASTNode> inverse = new HashMap<Comment, ASTNode>();
-      jdtAST.accept(new GenericVisitor() {
+      jdtAST.accept(new ASTVisitor() {
          @Override
-         protected boolean visitNode(final ASTNode node) {
+         public boolean preVisit2(final ASTNode node) {
             // Maps All Leading Comments to its node
             // Also Maps JML comments to Comments, which are mapped to nodes
             final int start = jdtAST.firstLeadingCommentIndex(node);
@@ -238,7 +231,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                }
 
             }
-            return super.visitNode(node);
+            return super.preVisit2(node);
          }
       });
       final JMLValidationContext jmlContext = new JMLValidationContext(inverse,

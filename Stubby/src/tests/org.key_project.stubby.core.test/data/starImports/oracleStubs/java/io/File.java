@@ -7,7 +7,7 @@ public class File extends java.lang.Object implements java.io.Serializable, java
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;

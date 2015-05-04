@@ -140,7 +140,7 @@ public abstract class ComponentMatcherFactory {
     * @param matchers he {@link Matcher} to use as children.
     * @return a matcher.
     */
-   public static <T extends Component> Matcher<T> allOf(Matcher<? extends T>... matchers) {
+   public static <T extends Component> Matcher<T> allOf(@SuppressWarnings("unchecked") Matcher<? extends T>... matchers) {
       return AllOf.allOf(matchers);
    }
 

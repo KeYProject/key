@@ -3,6 +3,7 @@ package org.key_project.stubby.ui.test.testcase.swtbot;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Test;
@@ -29,12 +30,25 @@ public class SWTBotGenerateStubsHandlerTest extends AbstractSWTBotGenerateStubsT
                           public void initProject(IJavaProject javaProject) throws Exception {
                              assertEquals(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH, StubGeneratorUtil.getStubFolderPath(javaProject));
                              StubGeneratorUtil.setStubFolderPath(javaProject, "myStubFolder");
+                             
                           }
                           
                           @Override
                           public void testAndSetSettings(SWTBotShell shell, SWTBotText stubFolderText) throws Exception {
                              assertEquals("myStubFolder", stubFolderText.getText());
                              stubFolderText.setText("new/stub folder");
+                             // Ensure that not part of KeY
+                             long originalTimeout = SWTBotPreferences.TIMEOUT;
+                             try {
+                                SWTBotPreferences.TIMEOUT = 500;
+                                shell.bot().radio("Not considered").click();
+                             }
+                             catch (Exception e) {
+                                // Nothing to do
+                             }
+                             finally {
+                                SWTBotPreferences.TIMEOUT = originalTimeout;
+                             }
                           }
 
                           @Override

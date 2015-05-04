@@ -64,6 +64,16 @@ public final class KeYImages {
      * The key for suspend at breakpoints icon.
      */
     public static final String STOP_AT_BREAKPOINTS = "org.key_project.key4eclipse.common.ui.suspendAtbreakpoints";
+
+    /**
+     * The key for a key file wizard.
+     */
+    public static final String KEY_FILE_WIZARD = "org.key_project.key4eclipse.common.ui.keyFileWizard";
+
+    /**
+     * The key for a key file export wizard.
+     */
+    public static final String KEY_FILE_EXPORT_WIZARD = "org.key_project.key4eclipse.common.ui.keyFileExportWizard";
     
     /**
      * Forbid instances.
@@ -187,6 +197,12 @@ public final class KeYImages {
        else if (STOP_AT_BREAKPOINTS.equals(key)) {
           path = "icons/stopAtBreakpoints.gif";
        }
+       else if (KEY_FILE_WIZARD.equals(key)) {
+          path = "icons/key_file_wizard.png";
+       }
+       else if (KEY_FILE_EXPORT_WIZARD.equals(key)) {
+          path = "icons/key_file_export_wizard.png";
+       }
        return path;
     }
     
@@ -202,8 +218,10 @@ public final class KeYImages {
             @Override
             public void run() {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
-               registry.remove(KEY_LOGO);
                registry.remove(INTERACTIVE_WIZARD);
+               registry.remove(KEY_FILE_EXPORT_WIZARD);
+               registry.remove(KEY_FILE_WIZARD);
+               registry.remove(KEY_LOGO);
                registry.remove(NEW_KEY_JAVA_PROJECT_WIZARD);
                registry.remove(STARTER_WIZARD);
                registry.remove(STOP_AT_BREAKPOINTS);

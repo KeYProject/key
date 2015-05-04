@@ -182,12 +182,9 @@ public final class GenericSortInstantiations {
     public ImmutableList<GenericSortCondition> toConditions () {
 	ImmutableList<GenericSortCondition>          res  =
 	    ImmutableSLList.<GenericSortCondition>nil();
-	Iterator<ImmutableMapEntry<GenericSort,Sort>> it   =
-	    insts.entryIterator ();
-	ImmutableMapEntry<GenericSort,Sort>           entry;
 	
-	while ( it.hasNext () ) {
-	    entry = it.next ();
+	
+	for (final ImmutableMapEntry<GenericSort,Sort> entry : insts) {
 	    res   = res.prepend ( GenericSortCondition.createIdentityCondition
 				  ( entry.key (), entry.value () ) );
 	}
@@ -433,9 +430,7 @@ public final class GenericSortInstantiations {
     private static ImmutableList<Sort> addChosenInstantiations (ImmutableMap<GenericSort,Sort> p_curRes,
                                                        GenericSort p_gs,
                                                        ImmutableList<Sort> p_subsorts) {
-        final Iterator<ImmutableMapEntry<GenericSort,Sort>> it = p_curRes.entryIterator ();
-        while ( it.hasNext () ) {
-            final ImmutableMapEntry<GenericSort,Sort> entry = it.next ();
+        for (final ImmutableMapEntry<GenericSort,Sort> entry :  p_curRes) {
             if ( entry.key ().extendsTrans ( p_gs ) )
                 p_subsorts = p_subsorts.prepend ( entry.value () );
         }
@@ -719,9 +714,7 @@ public final class GenericSortInstantiations {
 
 	// check whether the new instantiation is consistent with the
 	// already chosen instantiations
-	final Iterator<ImmutableMapEntry<GenericSort,Sort>> itEntry = p_curRes.entryIterator ();
-	while ( itEntry.hasNext () ) {
-	    final ImmutableMapEntry<GenericSort,Sort> entry = itEntry.next ();
+	for ( final ImmutableMapEntry<GenericSort,Sort> entry : p_curRes ) {
 
             if ( entry .key   ().extendsTrans ( p_gs ) &&
 		 !entry.value ().extendsTrans ( p_s  ) ||
@@ -735,14 +728,12 @@ public final class GenericSortInstantiations {
 
     @Override
     public String toString () {
-	Iterator<ImmutableMapEntry<GenericSort,Sort>> it  = insts.entryIterator ();
-	ImmutableMapEntry<GenericSort,Sort>           entry;
 	String                              res = "";
 
-	while ( it.hasNext () ) {
+	for (final ImmutableMapEntry<GenericSort,Sort> entry : insts) {
 	    if ( !"".equals ( res ) )
 		res += ", ";
-	    entry  = it.next ();
+	    
 	    res   += entry.key () + "=" + entry.value ();
 	}
 

@@ -4,14 +4,13 @@ import java.util.ArrayList;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -21,8 +20,8 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
+import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
 /**
@@ -112,8 +111,7 @@ public class TacletMatchProgram {
             program.add(Instruction.matchAndBindVariables(boundVars));
         }
 
-        if (pattern.javaBlock() != JavaBlock.EMPTY_JAVABLOCK
-                || patternPrg instanceof ContextStatementBlock) {
+        if (pattern.op() instanceof Modality || pattern.op() instanceof ModalOperatorSV) {
             program.add(Instruction.matchProgram(patternPrg));
         }
 

@@ -88,13 +88,10 @@ class MultiTrigger implements Trigger {
      * substituition, otherwise return null
      */
     private Substitution unifySubstitution(Substitution sub0, Substitution sub1) {
-	Iterator<ImmutableMapEntry<QuantifiableVariable, Term>> it0 = sub0.getVarMap()
-		.entryIterator();
 	final ImmutableMap<QuantifiableVariable, Term> varMap1 = sub1.getVarMap();
 	ImmutableMap<QuantifiableVariable, Term> resMap = varMap1;
 
-	while (it0.hasNext()) {
-	    ImmutableMapEntry<QuantifiableVariable, Term> en = it0.next();
+	for (final ImmutableMapEntry<QuantifiableVariable, Term> en : sub0.getVarMap()) {
 	    QuantifiableVariable key = en.key();
 	    Term value = en.value();
 	    if (varMap1.containsKey(key)) {

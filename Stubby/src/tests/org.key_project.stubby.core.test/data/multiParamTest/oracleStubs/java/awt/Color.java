@@ -7,7 +7,7 @@ public class Color extends java.lang.Object implements java.awt.Paint, java.io.S
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
@@ -17,7 +17,7 @@ public class Color extends java.lang.Object implements java.awt.Paint, java.io.S
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
@@ -27,7 +27,7 @@ public class Color extends java.lang.Object implements java.awt.Paint, java.io.S
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
@@ -37,7 +37,7 @@ public class Color extends java.lang.Object implements java.awt.Paint, java.io.S
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;

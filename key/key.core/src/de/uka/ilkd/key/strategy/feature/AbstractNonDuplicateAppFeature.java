@@ -125,7 +125,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry<?>> insts0,
                            ImmutableMap<SchemaVariable,InstantiationEntry<?>> insts1) {
         final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
-            insts0.entryIterator ();
+            insts0.iterator ();
 
         while ( it.hasNext () ) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry0 = it.next ();

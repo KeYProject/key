@@ -192,7 +192,7 @@ public final class SpecificationRepository {
         final Term unlimitedTerm = tb.func(unlimited, subs);
 
         // create taclet
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setFind(limitedTerm);
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
                 Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet> nil(),
@@ -218,7 +218,7 @@ public final class SpecificationRepository {
         final Term unlimitedTerm = tb.func(unlimited, subs);
 
         // create taclet
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setFind(tb.func(unlimited, subs));
         final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm,
                 unlimitedTerm));

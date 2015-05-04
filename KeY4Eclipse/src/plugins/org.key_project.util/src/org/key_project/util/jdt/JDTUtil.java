@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClassFile;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -1152,11 +1153,20 @@ public class JDTUtil {
     * Parses the given {@link ICompilationUnit}.
     * @param content The {@link String} to parse.
     * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
-    * @throws IOException Occurred Exception
     */
-   public static ASTNode parse(String content) throws IOException {
+   public static ASTNode parse(String content) {
+      return parse(content, ASTParser.K_COMPILATION_UNIT);
+   }
+   
+   /**
+    * Parses the given {@link ICompilationUnit}.
+    * @param content The {@link String} to parse.
+    * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
+    */
+   public static ASTNode parse(String content, int kind) {
       if (content != null) {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
+         parser.setKind(kind);
          parser.setResolveBindings(true);
          parser.setSource(content.toCharArray());
          Map<?, ?> options = JavaCore.getOptions();
@@ -1168,5 +1178,25 @@ public class JDTUtil {
       else {
          return null;
       }
+   }
+
+   /**
+    * Lists all Java container (JRE) of the given {@link IJavaProject}s.
+    * @param javaProject The {@link IJavaProject}.
+    * @return The descriptions of the avilable Java container.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static List<String> getJavaContainerDescriptions(IJavaProject javaProject) throws JavaModelException {
+      List<String> result = new LinkedList<String>();
+      if (javaProject != null && javaProject.isOpen()) {
+         IClasspathEntry[] cps = javaProject.getRawClasspath();
+         for (IClasspathEntry entry : cps) {
+            if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+               IClasspathContainer container= JavaCore.getClasspathContainer(entry.getPath(), javaProject);
+               result.add(container.getDescription());
+            }
+         }
+      }
+      return result;
    }
 }

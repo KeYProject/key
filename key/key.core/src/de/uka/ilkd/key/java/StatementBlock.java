@@ -13,12 +13,15 @@
 
 package de.uka.ilkd.key.java;
 
+import java.util.ArrayList;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.statement.JavaStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -32,23 +35,23 @@ import de.uka.ilkd.key.util.Debug;
 public class StatementBlock extends JavaStatement
     implements StatementContainer, TypeDeclarationContainer,
                VariableScope, TypeScope, ProgramPrefix {
-
+ 
     /**
      *      Body.
      */
     private final ImmutableArray<? extends Statement> body;
-
-
-    /**
-     * contains all program prefix elements below and including itself
-     */
-    private final ImmutableArray<ProgramPrefix> prefixElementArray;
-
-
+    
+    private final int prefixLength; 
+    
+    private final MethodFrame innerMostMethodFrame; 
+    
+    
     public StatementBlock() {
-	body = new ImmutableArray<Statement>();
-        prefixElementArray = new ImmutableArray<ProgramPrefix>(this);
+        body = new ImmutableArray<Statement>();
+        prefixLength = 1;
+        innerMostMethodFrame = null;
     }
+    
 
     /**
      *      Statement block.
@@ -60,21 +63,23 @@ public class StatementBlock extends JavaStatement
         body = new
             ImmutableArray<Statement>(children.collect(Statement.class));
 
-        prefixElementArray = computePrefixElements(body);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);        
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     public StatementBlock(ImmutableArray<? extends Statement> as) {
-
-	// check for non-null elements (bug fix)
-	Debug.assertDeepNonNull(as, "statement block contructor");
-
-	body = as;
-        prefixElementArray = computePrefixElements(body);
+        // check for non-null elements (bug fix)
+        Debug.assertDeepNonNull(as, "statement block contructor");
+        body = as;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
 
     public StatementBlock(Statement as) {
-	this(new ImmutableArray<Statement>(as));
+        this(new ImmutableArray<Statement>(as));
     }
 
     public StatementBlock(Statement... body) {
@@ -82,44 +87,30 @@ public class StatementBlock extends JavaStatement
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || !(o instanceof StatementBlock)) {
-            return false;
-        }
-        StatementBlock block = (StatementBlock)o;
-
-        return super.equals(block)
-                && (this.getStartPosition().equals(Position.UNDEFINED) ||
-                        block.getStartPosition().equals(Position.UNDEFINED) ||
-                        this.getStartPosition().getLine() == block.getStartPosition().getLine());
+    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
+       return super.equalsModRenaming(se, nat)
+                && (this.getStartPosition().equals(Position.UNDEFINED) ||  // why do we care here about position info and nowhere else?
+                        se.getStartPosition().equals(Position.UNDEFINED) ||
+                        this.getStartPosition().getLine() == se.getStartPosition().getLine());
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
-    }
-
-    private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b) {
-        return computePrefixElements(b,0,this);
+        return 17*super.hashCode() + body.hashCode();
     }
 
     /** computes the prefix elements for the given array of statment block */
     public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b,
-            int offset, ProgramPrefix current) {
-        final ProgramPrefix[] pp;
-
-        if (b.size()>0 && b.get(0) instanceof ProgramPrefix) {
-            final ProgramPrefix prefixElement = (ProgramPrefix) b.get(0);
-
-            final int prefixLength =
-                ((ProgramPrefix)b.get(0)).getPrefixLength();
-            pp = new ProgramPrefix[prefixLength + 1];
-            prefixElement.getPrefixElements().arraycopy(offset, pp, 1, prefixLength);
-        } else {
-            pp = new ProgramPrefix[1];
+            ProgramPrefix current) {
+        final ArrayList<ProgramPrefix> prefix = new ArrayList<>();
+        prefix.add(current);
+        
+        while (current.hasNextPrefixElement()) {
+            current = current.getNextPrefixElement();
+            prefix.add(current);
         }
-        pp[0] = current;
-        return new ImmutableArray<ProgramPrefix>(pp);
+        
+        return new ImmutableArray<ProgramPrefix>(prefix);
     }
 
 
@@ -255,18 +246,42 @@ public class StatementBlock extends JavaStatement
        else return getBody().get(0);
     }
 
+    
+    @Override
+    public boolean hasNextPrefixElement() {
+        return body.size() != 0 && (body.get(0) instanceof ProgramPrefix);
+    }
+
+    @Override
+    public ProgramPrefix getNextPrefixElement() {
+        if (hasNextPrefixElement()) {
+            return (ProgramPrefix) body.get(0);
+        } else {
+            throw new IndexOutOfBoundsException("No next prefix element " + this);
+        }
+    }
+    
+    @Override
+    public ProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? ((ProgramPrefix)body.get(0)).getLastPrefixElement() : this;
+    }
+    
+    @Override
     public int getPrefixLength() {
-        return prefixElementArray.size();
+        return prefixLength;
     }
 
-    public ProgramPrefix getPrefixElementAt(int i) {
-        return prefixElementArray.get(i);
+    @Override
+    public MethodFrame getInnerMostMethodFrame() {
+        return innerMostMethodFrame;
     }
-
+    
+    @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return prefixElementArray;
+        return computePrefixElements(body,this);
     }
 
+    @Override
     public PosInProgram getFirstActiveChildPos() {
         return isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO;
     }

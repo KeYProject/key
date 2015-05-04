@@ -630,6 +630,23 @@
             class="org.key_project.key4eclipse.common.ui.stubby.KeYStubGenerationCustomization">
       </customization>
    </extension>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="org.key_project.key4eclipse.common.ui.key.export.category"
+            name="KeY">
+      </category>
+      <wizard
+            category="org.key_project.key4eclipse.common.ui.key.export.category"
+            class="org.key_project.key4eclipse.common.ui.wizard.ExportProjectFileWizard"
+            icon="icons/prooffile_export16.gif"
+            id="org.key_project.key4eclipse.common.ui.wizard.ExportProjectFileWizard"
+            name="Project.key File">
+         <description>
+            Export KeY&apos;s project settings as &apos;project.key&apos; file.
+         </description>
+      </wizard>
+   </extension>
    <!--
    <extension
          point="org.eclipse.core.contenttype.contentTypes">

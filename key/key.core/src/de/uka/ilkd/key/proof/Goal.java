@@ -583,8 +583,7 @@ public final class Goal  {
 
         final Node n = node;
 
-        final ImmutableList<Goal> goalList = ruleApp.execute(this,
-                proof.getServices());
+        final ImmutableList<Goal> goalList = ruleApp.execute(this, proof.getServices());
 
         proof.getServices().saveNameRecorder(n);
 

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,7 +28,9 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
@@ -39,9 +42,18 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.SideProofUtil;
 
 /**
  * Defines the basic functionality for slicing algorithms.
@@ -54,7 +66,7 @@ public abstract class AbstractSlicer {
     * @param term The seed {@link Term}.
     * @return The computed slice.
     */
-   public ImmutableArray<Node> slice(Node seedNode, Term term) {
+   public ImmutableArray<Node> slice(Node seedNode, Term term) throws ProofInputException {
       return slice(seedNode, toLocation(seedNode.proof().getServices(), term));
    }
 
@@ -64,7 +76,7 @@ public abstract class AbstractSlicer {
     * @param seedLocation The seed {@link ReferencePrefix}.
     * @return The computed slice.
     */
-   public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation) {
+   public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation) throws ProofInputException {
       // Solve this reference
       PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
       Term topLevel = pio.constrainedFormula().formula();
@@ -82,7 +94,7 @@ public abstract class AbstractSlicer {
     * @param seedLocation The seed {@link ReferencePrefix}.
     * @return The computed slice.
     */
-   public ImmutableArray<Node> slice(Node seedNode, Location seedLocation) {
+   public ImmutableArray<Node> slice(Node seedNode, Location seedLocation) throws ProofInputException {
       // Ensure that seed node is valid
       if (seedNode.getAppliedRuleApp() == null) {
          throw new IllegalStateException("No rule applied on seed Node '" + seedNode.serialNr() + "'.");
@@ -105,7 +117,7 @@ public abstract class AbstractSlicer {
     * @param seedLocation The seed {@link Location}.
     * @return The computed slice.
     */
-   protected abstract ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation);
+   protected abstract ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation) throws ProofInputException;
    
    /**
     * The result returned by {@link AbstractSlicer#analyzeSequent(Node)}.
@@ -326,7 +338,7 @@ public abstract class AbstractSlicer {
     * @param services The {@link Services} to use.
     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
     * @param listToFill The result {@link List} with {@link Location}s to fill.
-    * @param ec The currrent {@link ExecutionContext}.
+    * @param ec The current {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
    protected void listModifiedLocations(Term term, 
@@ -334,17 +346,19 @@ public abstract class AbstractSlicer {
                                         HeapLDT heapLDT, 
                                         List<Location> listToFill,
                                         ExecutionContext ec,
-                                        ReferencePrefix thisReference) {
+                                        ReferencePrefix thisReference,
+                                        Set<Location> relevantLocations,
+                                        Node node) throws ProofInputException {
       if (term.op() == UpdateJunctor.PARALLEL_UPDATE || 
           term.op() == UpdateApplication.UPDATE_APPLICATION) {
          for (int i = 0 ; i < term.arity(); i++) {
-            listModifiedLocations(term.sub(i), services, heapLDT, listToFill, ec, thisReference);
+            listModifiedLocations(term.sub(i), services, heapLDT, listToFill, ec, thisReference, relevantLocations, node);
          }
       }
       else if (term.op() instanceof ElementaryUpdate) {
          UpdateableOperator target = ((ElementaryUpdate) term.op()).lhs();
          if (SymbolicExecutionUtil.isHeap(target, heapLDT)) {
-            listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference);
+            listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference, relevantLocations, node);
          }
          else {
             if (target instanceof ProgramVariable) {
@@ -369,10 +383,12 @@ public abstract class AbstractSlicer {
                                             Services services, 
                                             HeapLDT heapLDT, 
                                             List<Location> listToFill,
-                                            ReferencePrefix thisReference) {
+                                            ReferencePrefix thisReference,
+                                            Set<Location> relevantLocations,
+                                            Node node) throws ProofInputException {
       if (term.op() == heapLDT.getStore()) {
          // Analyze parent heap
-         listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference);
+         listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference, relevantLocations, node);
          // Check for alias in current store
          if (SymbolicExecutionUtil.hasReferenceSort(services, term.sub(3))) {
             Location source = toLocation(services, term.sub(3));
@@ -384,20 +400,68 @@ public abstract class AbstractSlicer {
       }
       else if (term.op() == heapLDT.getCreate()) {
          // Analyze parent heap
-         listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference);
-      }
-      else if (term.op() == heapLDT.getAnon()) {
-         // Analyze anonymized locations
-         listModifiedHeapLocations(term.sub(1), services, heapLDT, listToFill, thisReference);
+         listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference, relevantLocations, node);
       }
       else if (term.op() instanceof IProgramVariable) {
          // Nothing to do, root of heap reached.
       }
-      else if (term.op() == services.getTypeConverter().getLocSetLDT().getEmpty()) {
-         // Nothing to do, root of heap reached.
+      else if (term.op() == heapLDT.getAnon()) {
+         if (!relevantLocations.isEmpty()) { // Nothing to do if relevant locations are empty
+            Term anonHeap = term.sub(2);
+            // Idea: Compute all values of relevant locations in a side proof. Modified locations are anonymized.
+            ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+            ApplyStrategyInfo info = null;
+            try {
+               // Create location terms
+               List<Location> resultLocations = new ArrayList<Location>(relevantLocations.size());
+               List<Term> resultTerms = new ArrayList<Term>(relevantLocations.size());
+               List<Sort> resultSorts = new ArrayList<Sort>(relevantLocations.size());
+               for (Location location : relevantLocations) {
+                  Term locationTerm = location.toTerm(sideProofEnv.getServicesForEnvironment());
+                  if (!(locationTerm.op() instanceof IProgramVariable)) { // Ignore local variables.
+                     resultLocations.add(location);
+                     resultTerms.add(locationTerm);
+                     resultSorts.add(locationTerm.sort());
+                  }
+               }
+               if (!resultTerms.isEmpty()) {
+                  // Create predicate which will be used in formulas to store the value interested in.
+                  Function newPredicate = new Function(new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, new ImmutableArray<Sort>(resultSorts));
+                  // Create formula which contains the value interested in.
+                  Term newTerm = sideProofEnv.getServicesForEnvironment().getTermBuilder().func(newPredicate, resultTerms.toArray(new Term[resultTerms.size()]));
+
+                  Sequent sequentToProve = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), newTerm);
+                  ProofStarter starter = SideProofUtil.createSideProof(sideProofEnv, sequentToProve, "Analyze Anon Update");
+                  info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(), 
+                                                                       starter, 
+                                                                       StrategyProperties.METHOD_CONTRACT,
+                                                                       StrategyProperties.LOOP_INVARIANT,
+                                                                       StrategyProperties.QUERY_ON,
+                                                                       StrategyProperties.SPLITTING_NORMAL);
+                  // Check for anonymized values in the side proof goals
+                  assert !info.getProof().closed();
+                  for (Goal goal : info.getProof().openGoals()) {
+                     Term operatorTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, newPredicate);
+                     assert operatorTerm != null;
+                     for (int i = 0; i < operatorTerm.arity(); i++) {
+                        Term valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), operatorTerm.sub(i), services);
+                        if (valueTerm.arity() >= 1) {
+                           Term heap = valueTerm.sub(0);
+                           if (anonHeap.equals(heap)) {
+                              listToFill.add(resultLocations.get(i));
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+            finally {
+               SymbolicExecutionSideProofUtil.disposeOrStore("Analyze Anon Update", info);
+            }
+         }
       }
       else {
-         throw new IllegalStateException("Can not analyze heap update '" + term + "'.");
+         throw new IllegalStateException("Can not analyze update '" + term + "'.");
       }
    }
 

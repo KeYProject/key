@@ -452,11 +452,8 @@ public class ProofSaver {
    public String getInteresting(SVInstantiations inst) {
 //System.err.println(inst);   
       String s = "";
-      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> pairIt =
-         inst.interesting().entryIterator();
 
-      while (pairIt.hasNext()) {
-         ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair = pairIt.next();
+      for (final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair : inst.interesting()) {
          SchemaVariable var = pair.key();
 	 
          final Object value = pair.value().getInstantiation();

@@ -7,7 +7,7 @@ public class Container extends java.awt.Component {
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;

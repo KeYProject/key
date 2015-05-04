@@ -17,7 +17,7 @@ public class Font extends java.lang.Object implements java.io.Serializable {
   /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
  * Provides a basic implementation of backward slicing algorithms.
@@ -30,7 +31,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     * {@inheritDoc}
     */
    @Override
-   public ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation) {
+   public ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation) throws ProofInputException {
       final Services services = seedNode.proof().getServices();
       Set<Location> relevantLocations = null;
       List<Node> result = new LinkedList<Node>();
@@ -88,7 +89,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                                      Services services,
                                      Set<Location> relevantLocations, 
                                      SequentInfo info,
-                                     SourceElement activeStatement);
+                                     SourceElement activeStatement) throws ProofInputException;
 
    /**
     * Updates the relevant locations.

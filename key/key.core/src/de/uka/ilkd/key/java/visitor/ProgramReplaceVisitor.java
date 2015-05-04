@@ -25,7 +25,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
-import de.uka.ilkd.key.util.Debug;
 
 /** 
  * Walks through a java AST in depth-left-fist-order. 
@@ -34,24 +33,19 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
-
     private ProgramElement result = null;
 
-    private SVInstantiations svinsts;
-
-    private boolean allowPartialReplacement;
-
+    private final SVInstantiations svinsts;
+    
     /** 
      * create the  ProgramReplaceVisitor
      * @param root the ProgramElement where to begin
      */
     public ProgramReplaceVisitor(ProgramElement root,
 				 Services services, 
-				 SVInstantiations svi,
-				 boolean allowPartialReplacement) {
+				 SVInstantiations svi) {
 	super(root, false, services);
 	svinsts = svi;
-	this.allowPartialReplacement=allowPartialReplacement;
     }
 
     /** the action that is performed just before leaving the node the
@@ -62,15 +56,17 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     }
     
     /** starts the walker*/
-    public void start() {	
+    public void start() {
+    assert result == null : "ProgramReplaceVisitor is not designed for multiple walks";
 	stack.push(new ExtList());		
 	walk(root());
-	final ExtList el = stack.peek();
-	int i = 0;
-	while (!(el.get(i) instanceof ProgramElement)) {
-	    i++;
+	final ExtList astList = stack.pop();
+	for (int i = 0, sz = astList.size(); result == null && i<sz; i++) {	
+	   final Object element = astList.get(i);
+	   if (element instanceof ProgramElement) {
+	       result = (ProgramElement) element;
+	   }
 	}
-	result = (ProgramElement) (stack.peek()).get(i);
     }
 
     public ProgramElement result() { 	
@@ -91,8 +87,6 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     public void performActionOnSchemaVariable(SchemaVariable sv) {
 	final Object inst = svinsts.getInstantiation(sv);
 	if (inst instanceof ProgramElement) {
-	    Debug.out("ProgramReplace SV:", sv);
-	    Debug.out("ProgramReplace:", inst);
 	    addChild((ProgramElement)inst);
 	} else if (inst instanceof ImmutableArray/*<ProgramElement>*/) {
 	    @SuppressWarnings("unchecked")
@@ -104,31 +98,30 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 		   && ((Term)inst).op() instanceof ProgramInLogic) {
 	    addChild(services.getTypeConverter().convertToProgramElement((Term)inst));
 	} else {
-	    if ( inst == null && allowPartialReplacement &&
-		 sv instanceof SourceElement ) {
-		doDefaultAction ( (SourceElement)sv );
-		return;
-	    }
-	    Debug.fail("programreplacevisitor: Instantiation missing " + 
-		       "for schema variable ", sv);
+	    throw new IllegalStateException("programreplacevisitor: Instantiation missing " + 
+		       "for schema variable " + sv);
 	}
 	changed();
     }
 
     public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
-	ProgramReplaceVisitor trans = new ProgramReplaceVisitor(x.body(), services,
-								svinsts,
-								allowPartialReplacement);
-	trans.start();
-	ProgramElement localresult = trans.result();
-	localresult = x.transform(localresult, services, svinsts);
-	addChild(localresult);
+	final ExtList changeList = stack.peek();
+	
+	ProgramElement body = null;
+	for (Object element : changeList) {
+	    if (element instanceof SourceElement) {
+	        body = (ProgramElement) element;
+	    }
+	}
+
+	assert body != null : "A program transformer without program to transform?";
+
+	addChild(x.transform(body, services, svinsts));
 	changed();
     }
 
     public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
-	result = x.getConcreteProgramElement(services);
-	addChild(result);
+	addChild(x.getConcreteProgramElement(services));
 	changed();
     }
 }

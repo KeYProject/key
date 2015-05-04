@@ -45,12 +45,18 @@ public class ContextStatementBlock extends StatementBlock {
      */
     private final IExecutionContext executionContext;
 
+    /** 
+     * length of this progran prefix
+     */
+    private final int patternPrefixLength;
+    
     /** creates a ContextStatementBlock 
      * @param children the body of the context term
      */
     public ContextStatementBlock(ExtList children) {
-	super(children);
-	executionContext = null;
+        super(children);
+        executionContext = null;
+        patternPrefixLength = this.getPrefixLength();
     }
 
     /** creates a ContextStatementBlock 
@@ -61,18 +67,22 @@ public class ContextStatementBlock extends StatementBlock {
 		       IExecutionContext executionContext) {
 	super(children);
 	this.executionContext = executionContext;
+    patternPrefixLength = this.getPrefixLength();
+
     }
 
     public ContextStatementBlock(Statement s, 
                IExecutionContext executionContext) {
         super(s);
         this.executionContext = executionContext;
+        patternPrefixLength = this.getPrefixLength();
     }
     
     public ContextStatementBlock(Statement[] body, 
                IExecutionContext executionContext) {
         super(body);
         this.executionContext = executionContext;
+        patternPrefixLength = this.getPrefixLength();
     }
 
     public boolean requiresExplicitExecutionContextMatch() {
@@ -156,7 +166,6 @@ public class ContextStatementBlock extends StatementBlock {
         return true;
     }        
     
-    
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         SourceData newSource = source;
         
@@ -179,7 +188,6 @@ public class ContextStatementBlock extends StatementBlock {
         if (src instanceof ProgramPrefix) {
             prefix = (ProgramPrefix)src;            
             final int srcPrefixLength     = prefix.getPrefixLength();
-            final int patternPrefixLength = getPrefixLength();
                         
             if (patternPrefixLength > srcPrefixLength) {
                 Debug.out("Program match FAILED. Source has not enough prefix elements.", 
@@ -189,7 +197,7 @@ public class ContextStatementBlock extends StatementBlock {
      
             pos = srcPrefixLength - patternPrefixLength;
             
-            ProgramPrefix firstActiveStatement = prefix.getPrefixElementAt(pos);                                                                                            
+            ProgramPrefix firstActiveStatement = getPrefixElementAt(prefix, pos);                                                                                            
             
             relPos = firstActiveStatement.getFirstActiveChildPos();
             
@@ -299,17 +307,11 @@ public class ContextStatementBlock extends StatementBlock {
         
         ExecutionContext innerContext = lastExecutionContext;
         
-        if (innerContext == null) {
-            innerContext = services.getJavaInfo().getDefaultExecutionContext();
-            if (prefix != null) {            
-                for (int i = pos - 1; i>=0; i--) {
-                    final ProgramPrefix prefixEl = prefix.getPrefixElementAt(i);                                   
-                    if (prefixEl instanceof MethodFrame) {
-                        innerContext = (ExecutionContext) 
-                        ((MethodFrame)prefixEl).getExecutionContext();
-                        break;
-                    } 
-                }                
+        if (innerContext == null) {            
+            if (prefix != null && prefix.getInnerMostMethodFrame() != null) {
+                innerContext = (ExecutionContext) prefix.getInnerMostMethodFrame().getExecutionContext();
+            } else {
+                innerContext = services.getJavaInfo().getDefaultExecutionContext();
             }
         }
         
@@ -345,22 +347,34 @@ public class ContextStatementBlock extends StatementBlock {
     private PosInProgram matchPrefixEnd(final ProgramPrefix prefix, int pos, PosInProgram relPos) {
         PosInProgram prefixEnd = PosInProgram.TOP;
         if (prefix != null) {            
-            final IntIterator[] iterators = new IntIterator[pos + 1];
-            iterators[pos] = relPos.iterator();
-            
-            for (int i = pos - 1; i>=0; i--) {
-                final ProgramPrefix prefixEl = prefix.getPrefixElementAt(i);                          
-                iterators[i] = prefixEl.getFirstActiveChildPos().iterator();               
-            }
-
-            for (final IntIterator it : iterators) {
-                while (it.hasNext()) {
+            ProgramPrefix currentPrefix = prefix;
+            int i = 0;
+            while (i<=pos) {
+                final IntIterator it = currentPrefix.getFirstActiveChildPos().iterator(); 
+                while ( it.hasNext() ) {
                     prefixEnd = prefixEnd.down(it.next());
+                }
+                i++;
+                if (i<=pos) { 
+                        // as fail-fast measure I do not test here using 
+                        // {@link ProgramPrefix#hasNextPrefixElement()}  
+                        // It must be guaranteed that there are at least pos + 1
+                        // prefix elements (incl. prefix) otherwise there 
+                        // is a bug already at an earlier point
+                    currentPrefix = currentPrefix.getNextPrefixElement();
                 }
             }
         } else {
             prefixEnd = relPos;
         }
         return prefixEnd;
+    }
+
+    private static ProgramPrefix getPrefixElementAt(ProgramPrefix prefix, int i) {
+        ProgramPrefix current = prefix;
+        for (int pos = 0; pos < i; pos++) {
+            current = current.getNextPrefixElement();
+        }
+        return current;
     }
 }

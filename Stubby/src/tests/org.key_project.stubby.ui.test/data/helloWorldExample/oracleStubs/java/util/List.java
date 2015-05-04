@@ -7,7 +7,7 @@ public interface List<E extends java.lang.Object> extends java.util.Collection<E
    /**
     * @generated
     */
-   /*@ normal_behavior
+   /*@ public behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;

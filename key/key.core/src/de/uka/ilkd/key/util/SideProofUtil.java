@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util;
 
+import java.util.HashMap;
+
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Choice;
@@ -15,6 +17,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 public final class SideProofUtil {
@@ -30,9 +33,12 @@ public final class SideProofUtil {
     * required for instance during parallel usage of site proofs because
     * {@link OneStepSimplifier} has an internal state.
     * @param source The {@link Proof} to copy its {@link ProofEnvironment}.
+    * @param enableChoices The {@link Choice}s that should be changed w.r.t. those derived from {@link Proof#getInitConfig()} 
     * @return The created {@link ProofEnvironment} which is a copy of the environment of the given {@link Proof} but with its own {@link OneStepSimplifier} instance.
     */
-   public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source) {
+   @SuppressWarnings("unchecked")
+public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source, 
+        final Choice... enableChoices) {
       assert source != null;
       assert !source.isDisposed();
       // Get required source instances
@@ -42,15 +48,17 @@ public final class SideProofUtil {
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig
       final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
-      // Set modified taclet options in which runtime exceptions are banned.
+      // Set modified taclet options in which runtime exceptions are banned.      
       ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
-      choices = choices.remove(new Choice("allow", "runtimeExceptions"));
-      choices = choices.add(new Choice("ban", "runtimeExceptions"));
+      for (Choice enabled : enableChoices) {
+          choices = activateChoice(choices, enabled);
+      }
       initConfig.setActivatedChoices(choices);
       // Initialize InitConfig with settings from the original InitConfig.
       final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
       initConfig.setSettings(clonedSettings);
-      initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
+      initConfig.setTaclet2Builder((HashMap<Taclet, TacletBuilder<? extends Taclet>>) 
+              sourceInitConfig.getTaclet2Builder().clone());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       ProofEnvironment env = new ProofEnvironment(initConfig);
@@ -66,6 +74,31 @@ public final class SideProofUtil {
          initConfig.getJustifInfo().addJustification(rule, origJusti);
       }
       return env;
+   }
+   
+   /**
+    * removes all choices with the same category as {@code choiceToActivate} from
+    * {@code choices} and adds {@link choiceToActivate} to the set
+    * @param choices the currently active choices
+    * @param choiceToActivate the {@link Choice} to activate
+    * @return the set of choices with {@code choiceToActivate} added (i.e., 
+    * {@code choices.contains(choiceToActivate)} will return true) and all
+    * other choices of the same category removed 
+    */
+   public static ImmutableSet<Choice> activateChoice(
+           ImmutableSet<Choice> choices, Choice choiceToActivate) {
+       boolean alreadySet = false;
+       for (Choice choice : choices) {
+           if (choiceToActivate.equals(choice)) {
+               alreadySet = true;
+           } else if (choice.category().equals(choiceToActivate.category())) {
+               choices = choices.remove(choice);
+           }          
+       }
+       if (!alreadySet) {
+           choices = choices.add(choiceToActivate);
+       }
+       return choices;
    }
 
    /**

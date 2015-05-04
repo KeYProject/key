@@ -243,7 +243,7 @@ public class BasicDerivedProfileTest {
       this.parentProfile.derive(null, "a");
    }
 
-   private static <T> Set<T> set(final T... keywords) {
+   private static <T> Set<T> set(@SuppressWarnings("unchecked") final T... keywords) {
       return new HashSet<T>(Arrays.asList(keywords));
    }
 

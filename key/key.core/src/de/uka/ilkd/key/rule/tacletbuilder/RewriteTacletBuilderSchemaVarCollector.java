@@ -4,7 +4,6 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
 
@@ -22,10 +22,10 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 public class RewriteTacletBuilderSchemaVarCollector {
 
-    private final RewriteTacletBuilder rtb;
+    private final RewriteTacletBuilder<? extends RewriteTaclet> rtb;
 
 
-    public RewriteTacletBuilderSchemaVarCollector(RewriteTacletBuilder rtb) {
+    public RewriteTacletBuilderSchemaVarCollector(RewriteTacletBuilder<? extends RewriteTaclet>  rtb) {
         this.rtb = rtb;
     }
 
@@ -36,22 +36,13 @@ public class RewriteTacletBuilderSchemaVarCollector {
         result.addAll(collectSchemaVariables(rtb.ifSequent()));
 
         if (rtb instanceof FindTacletBuilder) {
-            result.addAll(collectSchemaVariables(((FindTacletBuilder) rtb).getFind()));
+            result.addAll(collectSchemaVariables(rtb.getFind()));
         }
 
-        Iterator<TacletGoalTemplate> itGoalTempl =
-                rtb.goalTemplates().iterator();
-
-        while (itGoalTempl.hasNext()) {
-            result.addAll(collectSchemaVariables(itGoalTempl.next()));
-        }
-
-        itGoalTempl = rtb.goalTemplates().iterator();
-        while (itGoalTempl.hasNext()) {
-            final Iterator<Taclet> addRules =
-                    itGoalTempl.next().rules().iterator();
-            while (addRules.hasNext()) {
-                result.addAll(addRules.next().collectSchemaVars());
+        for (TacletGoalTemplate tgt : rtb.goalTemplates()) {
+            result.addAll(collectSchemaVariables(tgt));
+            for (Taclet tacletInAddrules : tgt.rules()) {
+                result.addAll(tacletInAddrules.collectSchemaVars());
             }
         }
 

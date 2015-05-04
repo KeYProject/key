@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.waits.WaitForObjectCondition;
 import org.hamcrest.Matcher;
-import org.key_project.swtbot.swing.bot.finder.finders.Finder;
+import org.key_project.swtbot.swing.bot.finder.finders.SwingFinder;
 
 
 /**
@@ -55,8 +55,8 @@ public class WaitForComponent<T extends Component> extends WaitForObjectConditio
     */
    @Override
    protected List<T> findMatches() {
-      Assert.isTrue(bot.getFinder() instanceof Finder);
-      Finder finder = (Finder)bot.getFinder();
+      Assert.isTrue(bot.getFinder() instanceof SwingFinder);
+      SwingFinder finder = (SwingFinder)bot.getFinder();
       return finder.findComponents(matcher);
    }
 }

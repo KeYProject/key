@@ -353,8 +353,6 @@ public abstract class AbstractPO implements IPersistablePO {
         Proof proof = new Proof(proofName,
                                 poTerm,
                                 proofHeader,
-                                proofConfig.createTacletIndex(),
-                                proofConfig.createBuiltInRuleIndex(),
                                 proofConfig);
         return proof;
     }

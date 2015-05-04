@@ -43,8 +43,14 @@
 		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
 			<arg value="rev-parse"/>
 			<arg value="HEAD"/>
-		</exec>		
+		</exec>
+		<exec executable="git" outputproperty="git.branch" failifexecutionfails="false">
+			<arg value="rev-parse"/>
+			<arg value="--abbrev-ref"/>
+			<arg value="HEAD"/>
+		</exec>
 		<echo file="${build.dir}/de/uka/ilkd/key/util/sha1">${git.revision}</echo> 
+		<echo file="${build.dir}/de/uka/ilkd/key/util/branch">${git.branch}</echo>
 		<echo file="${build.dir}/de/uka/ilkd/key/util/version">${key.version}</echo> 
 	</target>
 

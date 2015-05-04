@@ -188,21 +188,22 @@ public class ManageKeYClassPathComposite extends BeanComposite {
     * Moves the selected entries one up if possible.
     */
    public void moveSelectedClassPathEntriesDown() {
+       List<KeYPathEntry> newEntries = new LinkedList<KeYPathEntry>(classPathEntries);
        ISelection selection = classPathTableViewer.getSelection();
        if (selection instanceof IStructuredSelection) {
            Object[] elements = ((IStructuredSelection)selection).toArray();
            for (int i = elements.length - 1; i >= 0; i--) {
                if (elements[i] instanceof KeYPathEntry) {
                    KeYPathEntry entry = (KeYPathEntry)elements[i];
-                   int index = classPathEntries.indexOf(entry);
-                   if (index < classPathEntries.size() - 1) {
-                       classPathEntries.remove(index);
-                       classPathEntries.add(index + 1, entry);
+                   int index = newEntries.indexOf(entry);
+                   if (index < newEntries.size() - 1) {
+                       newEntries.remove(index);
+                       newEntries.add(index + 1, entry);
                    }
                }
            }
        }
-       setClassPathEntries(classPathEntries);
+       setClassPathEntries(newEntries);
        classPathTableViewer.setSelection(selection);
    }
 
@@ -210,21 +211,22 @@ public class ManageKeYClassPathComposite extends BeanComposite {
     * Moves the selected entries one down if possible.
     */
    public void moveSelectedClassPathEntriesUp() {
+       List<KeYPathEntry> newEntries = new LinkedList<KeYPathEntry>(classPathEntries);
        ISelection selection = classPathTableViewer.getSelection();
        if (selection instanceof IStructuredSelection) {
            Object[] elements = ((IStructuredSelection)selection).toArray();
            for (Object element : elements) {
                if (element instanceof KeYPathEntry) {
                    KeYPathEntry entry = (KeYPathEntry)element;
-                   int index = classPathEntries.indexOf(entry);
+                   int index = newEntries.indexOf(entry);
                    if (index >= 1) {
-                       classPathEntries.remove(index);
-                       classPathEntries.add(index - 1, entry);
+                      newEntries.remove(index);
+                      newEntries.add(index - 1, entry);
                    }
                }
            }
        }
-       setClassPathEntries(classPathEntries);
+       setClassPathEntries(newEntries);
        classPathTableViewer.setSelection(selection);
    }
 
@@ -234,8 +236,9 @@ public class ManageKeYClassPathComposite extends BeanComposite {
    public void removeSelectedClassPathEntries() {
        ISelection selection = classPathTableViewer.getSelection();
        if (selection instanceof IStructuredSelection) {
-           classPathEntries.removeAll(((IStructuredSelection)selection).toList());
-           setClassPathEntries(classPathEntries);
+           List<KeYPathEntry> newEntries = new LinkedList<KeYPathEntry>(classPathEntries);
+           newEntries.removeAll(((IStructuredSelection)selection).toList());
+           setClassPathEntries(newEntries);
        }
    }
    
@@ -264,12 +267,12 @@ public class ManageKeYClassPathComposite extends BeanComposite {
        if (directory != null) {
            KeYPathEntry newEntry = new KeYPathEntry(KeYPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, directory);
            if (!classPathEntries.contains(newEntry)) {
-               classPathEntries.add(newEntry);
-               setClassPathEntries(classPathEntries);
+               List<KeYPathEntry> newEntries = new LinkedList<KeYPathEntry>(classPathEntries);
+               newEntries.add(newEntry);
+               setClassPathEntries(newEntries);
            }
            selectClassPathEntry(newEntry);
        }
-       setClassPathEntries(classPathEntries);
    }
 
    /**
@@ -292,13 +295,13 @@ public class ManageKeYClassPathComposite extends BeanComposite {
            for (String file : files) {
                KeYPathEntry newEntry = new KeYPathEntry(KeYPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, path + File.separator + file);
                if (!classPathEntries.contains(newEntry)) {
-                   classPathEntries.add(newEntry);
-                   setClassPathEntries(classPathEntries);
+                   List<KeYPathEntry> newEntries = new LinkedList<KeYPathEntry>(classPathEntries);
+                   newEntries.add(newEntry);
+                   setClassPathEntries(newEntries);
                }
                selectClassPathEntry(newEntry);
            }
        }
-       setClassPathEntries(classPathEntries);
    }
 
    /**
@@ -317,13 +320,13 @@ public class ManageKeYClassPathComposite extends BeanComposite {
                KeYPathEntry newEntry = new KeYPathEntry(KeYPathEntryKind.WORKSPACE, container.getFullPath().toString());
                toSelect.add(newEntry);
                if (!classPathEntries.contains(newEntry)) {
-                   classPathEntries.add(newEntry);
-                   setClassPathEntries(classPathEntries);
+                   List<KeYPathEntry> newEntries = new LinkedList<KeYPathEntry>(classPathEntries);
+                   newEntries.add(newEntry);
+                   setClassPathEntries(newEntries);
                }
            }
            selectClassPathEntries(toSelect);
        }
-       setClassPathEntries(classPathEntries);
    }
 
    /**
@@ -343,8 +346,9 @@ public class ManageKeYClassPathComposite extends BeanComposite {
                KeYPathEntry newEntry = new KeYPathEntry(KeYPathEntryKind.WORKSPACE, file.getFullPath().toString());
                toSelect.add(newEntry);
                if (!classPathEntries.contains(newEntry)) {
-                   classPathEntries.add(newEntry);
-                   setClassPathEntries(classPathEntries);
+                   List<KeYPathEntry> newEntries = new LinkedList<KeYPathEntry>(classPathEntries);
+                   newEntries.add(newEntry);
+                   setClassPathEntries(newEntries);
                }
            }
            selectClassPathEntries(toSelect);

@@ -23,6 +23,15 @@ import de.uka.ilkd.key.java.StatementBlock;
 
 public class JavaBlock {
     
+    /**
+     * Attention using the JavaBlock below means no program not the empty program.
+     * It is used as a realization of the sentinel design pattern to mark terms with operators
+     * that are incapable of containing a program like predicate symbols.
+     * 
+     * If you want to have an empty program, create a new JavaBlock instance with an 
+     * empty statement block.  
+     * 
+     */
     public static final JavaBlock EMPTY_JAVABLOCK
     	= new JavaBlock(new StatementBlock());
     private final JavaProgramElement prg;

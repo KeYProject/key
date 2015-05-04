@@ -194,12 +194,19 @@ public class TypeTemplate {
       sb.append(INDENT + "/**" + NL);
       sb.append(INDENT + " * @generated" + NL);
       sb.append(INDENT + " */" + NL);
-      sb.append(INDENT + "/*@ normal_behavior" + NL);
+      sb.append(INDENT + "/*@ ");
+      if (!Visibility.DEFAULT.equals(method.getVisibility())) {
+         sb.append(method.getVisibility().toJavaKeyword() + " ");         
+      }
+      sb.append("behavior" + NL);
       sb.append(INDENT + "  @ requires true;" + NL);
       sb.append(INDENT + "  @ ensures true;" + NL);
       sb.append(INDENT + "  @ assignable \\everything;" + NL);
       sb.append(INDENT + "  @*/" + NL);
-      sb.append(INDENT + method.getVisibility().toJavaKeyword() + " ");
+      sb.append(INDENT);
+      if (!Visibility.DEFAULT.equals(method.getVisibility())) {
+         sb.append(method.getVisibility().toJavaKeyword() + " ");         
+      }
       if (method.isStatic()) {
          sb.append("static ");
       }
@@ -256,7 +263,10 @@ public class TypeTemplate {
       sb.append(INDENT + "/**" + NL);
       sb.append(INDENT + " * @generated" + NL);
       sb.append(INDENT + " */" + NL);
-      sb.append(INDENT + field.getVisibility().toJavaKeyword() + " ");
+      sb.append(INDENT);
+      if (!Visibility.DEFAULT.equals(field.getVisibility())) {
+         sb.append(field.getVisibility().toJavaKeyword() + " ");
+      }
       if (field.isStatic()) {
          sb.append( "static ");
       }
