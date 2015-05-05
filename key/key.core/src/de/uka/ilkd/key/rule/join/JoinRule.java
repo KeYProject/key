@@ -520,16 +520,14 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       // and U \<{ ... }\> phi, where U must be an update
       // in normal form, i.e. a parallel update of elementary
       // updates.
-      
-       //TODO: How to find out whether we are in auto mode (or not)?
-       //      Is "goal.isAutomatic()" the right thing?
-      // At first, we allow only manual application of this rule,
-      // since in early stages of experimenting, it was possible
-      // to perform an infinite chain of applications, which was
-      // done by the automatic strategy.
-//      if (checkAutomatic && mediator().isInAutoMode()) {
-//         return false;
-//      }
+       
+       //TODO: How can we find out whether this rule is applied by an automatic strategy?
+       //      Did this using the mediator previously, but no longer possible after
+       //      refactoring. The below "solution" only allows merging for interactive
+       //      goals if checkAutomatic is true.
+      if (checkAutomatic && goal.isAutomatic()) {
+          return false;
+      }
       
       if (pio != null) {
          
