@@ -128,22 +128,4 @@ public final class KeYSEDExampleImages {
            return null;
         }
     }
-    
-    /**
-     * Disposes all contained images. This method is automatically called
-     * when the plug-in is unloaded from the {@link Activator}.
-     * There is no need to call it from any other place!
-     */
-    public static void disposeImages() {
-       Display display = Display.getDefault();
-       if (!display.isDisposed()) {
-          display.syncExec(new Runnable() {
-            @Override
-            public void run() {
-               ImageRegistry registry = Activator.getDefault().getImageRegistry();
-               registry.remove(NEW_KEY_SED_JAVA_PROJECT_WIZARD);
-            }
-         });
-       }
-    }
 }
