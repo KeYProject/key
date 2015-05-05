@@ -15,10 +15,10 @@ package de.uka.ilkd.key.rule.join;
 
 import java.util.HashSet;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+//import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -90,12 +90,16 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
    @Override
    public final ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
+       
+       //TODO: Remove source code related to signaling progress to UI
+       //      (has been commented out) if there is no alternative to
+       //      using the (now no longer accessible) mediator.
       
-      boolean stoppedInterface = false;
-      if (!mediator().isInAutoMode()) {
-         mediator().stopInterface(true);
-         stoppedInterface = true;
-      }
+//      boolean stoppedInterface = false;
+//      if (!mediator().isInAutoMode()) {
+//         mediator().stopInterface(true);
+//         stoppedInterface = true;
+//      }
       
       final TermBuilder tb = services.getTermBuilder();
       final PosInOccurrence pio = ruleApp.posInOccurrence();
@@ -112,14 +116,14 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(newGoal, pio);
       
       // Signal this task to UI
-      mediator().getUI().taskStarted(
-            "Joining " + (joinPartners.size() + 1) + " goals",
-            joinPartners.size());
+//      mediator().getUI().taskStarted(
+//            "Joining " + (joinPartners.size() + 1) + " goals",
+//            joinPartners.size());
       //TODO: Progress information is so far not properly displayed in the
       //      UI. Obviously, the progress bar does only receive the updates
       //      *after* the task terminated, since the EDT is blocked.
       //      See MainStatusLine#setProgress(final int value).
-      long startTime = System.currentTimeMillis();
+//      long startTime = System.currentTimeMillis();
       
       // Convert sequents to SE states
       ImmutableList<SymbolicExecutionState> joinPartnerStates = ImmutableSLList.nil();      
@@ -149,7 +153,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
          joinedState.setCorrespondingNode(goal.node());
          
          // Signal progress to UI
-         mediator().getUI().taskProgress(++progress);
+//         mediator().getUI().taskProgress(++progress);
       }
       
       Term resultPathCondition = joinedState.second;
@@ -182,19 +186,19 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
                thisSEState.third);
       }
 
-      long endTime = System.currentTimeMillis();
-      long duration = endTime - startTime;
-      mediator().getUI().taskFinished(new DefaultTaskFinishedInfo(
-            this,                          // source
-            joinedState,                   // result
-            mediator().getSelectedProof(), // proof
-            duration,                      // time
-            1 + joinPartners.size(),       // applied rules
-            0));                           // closed goals
-      
-      if (stoppedInterface) {
-         mediator().startInterface(true);
-      }
+//      long endTime = System.currentTimeMillis();
+//      long duration = endTime - startTime;
+//      mediator().getUI().taskFinished(new DefaultTaskFinishedInfo(
+//            this,                          // source
+//            joinedState,                   // result
+//            mediator().getSelectedProof(), // proof
+//            duration,                      // time
+//            1 + joinPartners.size(),       // applied rules
+//            0));                           // closed goals
+//      
+//      if (stoppedInterface) {
+//         mediator().startInterface(true);
+//      }
       
       return newGoals;
    }
@@ -231,7 +235,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
             new HashSet<LocationVariable>();
       
       // Collect program variables in Java block
-      progVars.addAll(getLocationVariables(programCounter));
+      progVars.addAll(getLocationVariables(programCounter, services));
       // Collect program variables in update
       progVars.addAll(getUpdateLeftSideLocations(state1.first));
       progVars.addAll(getUpdateLeftSideLocations(state2.first));
@@ -517,13 +521,15 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       // in normal form, i.e. a parallel update of elementary
       // updates.
       
+       //TODO: How to find out whether we are in auto mode (or not)?
+       //      Is "goal.isAutomatic()" the right thing?
       // At first, we allow only manual application of this rule,
       // since in early stages of experimenting, it was possible
       // to perform an infinite chain of applications, which was
       // done by the automatic strategy.
-      if (checkAutomatic && mediator().isInAutoMode()) {
-         return false;
-      }
+//      if (checkAutomatic && mediator().isInAutoMode()) {
+//         return false;
+//      }
       
       if (pio != null) {
          
@@ -561,6 +567,12 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
          return false;
          
       }
+   }
+   
+   @Override
+   public boolean isApplicableOnSubTerms() {
+       // TODO: Check if this has to be changed. This is a stub!
+       return false;
    }
    
    @Override
@@ -648,15 +660,19 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
    private ImmutableList<Pair<Goal,PosInOccurrence>> findJoinPartners(
          Goal goal, PosInOccurrence pio) {
       
-      Services services = goal.proof().getServices();
+//      Services services = goal.proof().getServices();
       
       ImmutableList<Pair<Goal,PosInOccurrence>> potentialPartners =
             findPotentialJoinPartners(goal, pio);
       
-      JoinPartnerSelectionDialog selectionDialog =
-            new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
-      selectionDialog.setVisible(true);
+      //TODO: How to require feedback about choice of partner goals from user?
       
-      return selectionDialog.getChosen();
+      return potentialPartners;
+      
+//      JoinPartnerSelectionDialog selectionDialog =
+//            new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
+//      selectionDialog.setVisible(true);
+//      
+//      return selectionDialog.getChosen();
    }
 }

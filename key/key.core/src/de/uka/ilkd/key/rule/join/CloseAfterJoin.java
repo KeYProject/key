@@ -20,8 +20,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -198,8 +199,8 @@ public class CloseAfterJoin implements BuiltInRule {
             new LinkedHashSet<LocationVariable>();
       allLocs.addAll(getUpdateLeftSideLocations(thisSEState.getSymbolicState()));
       allLocs.addAll(getUpdateLeftSideLocations(joinState.getSymbolicState()));
-      allLocs.addAll(getLocationVariables(thisSEState.getPathCondition()));
-      allLocs.addAll(getLocationVariables(joinState.getPathCondition()));
+      allLocs.addAll(getLocationVariables(thisSEState.getPathCondition(), services));
+      allLocs.addAll(getLocationVariables(joinState.getPathCondition(), services));
       
       final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
       
@@ -271,6 +272,12 @@ public class CloseAfterJoin implements BuiltInRule {
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
       return joinNode != null && joinState != null &&  pc != null;
    }
+   
+   @Override
+   public boolean isApplicableOnSubTerms() {
+       // TODO: Check if something has to be changed here. This is a stub!
+       return false;
+   }
 
    @Override
    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
@@ -323,4 +330,5 @@ public class CloseAfterJoin implements BuiltInRule {
          }
       }
    }
+
 }

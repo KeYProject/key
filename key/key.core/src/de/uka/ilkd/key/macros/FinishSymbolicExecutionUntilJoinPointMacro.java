@@ -16,9 +16,10 @@ package de.uka.ilkd.key.macros;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.core.TaskFinishedInfo;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -52,9 +53,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues
@@ -73,6 +76,8 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
    
    private HashSet<ProgramElement> blockElems = new HashSet<ProgramElement>();
    private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
+   
+   private UserInterfaceControl uic = null;
 
    public FinishSymbolicExecutionUntilJoinPointMacro() {}
    
@@ -135,6 +140,14 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
 
       return false;
    }
+   
+    @Override
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+            Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+        this.uic = uic;
+        return super.applyTo(uic, proof, goals, posInOcc, listener);
+    }
 
    @Override
    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
@@ -166,8 +179,9 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
             try {
                // Do single proof step
                new OneStepProofMacro().applyTo(
-                     JoinRuleUtils.mediator(), goal.node(), null, DUMMY_PROVER_TASK_LISTENER);
+                     uic, goal.node(), null, DUMMY_PROVER_TASK_LISTENER); //TODO Change
             } catch (InterruptedException e) {}
+              catch (Exception e) {}
             
             // We want no splits, but the proof must have changed
             if (lastNode.childrenCount() == 1) {
@@ -186,17 +200,22 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
       }
    }
    
-   /**
-    * Dummy ProverTaskListener.
-    */
-   private static final ProverTaskListener DUMMY_PROVER_TASK_LISTENER = new ProverTaskListener() {                        
-      @Override
-      public void taskStarted(String message, int size) {}                        
-      @Override
-      public void taskProgress(int position) {}                        
-      @Override
-      public void taskFinished(TaskFinishedInfo info) {}
-   };
+    /**
+     * Dummy ProverTaskListener.
+     */
+    private static final ProverTaskListener DUMMY_PROVER_TASK_LISTENER = new ProverTaskListener() {
+        @Override
+        public void taskProgress(int position) {
+        }
+
+        @Override
+        public void taskStarted(TaskStartedInfo info) {
+        }
+
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+        }
+    };
    
    
    /**
@@ -205,7 +224,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
     *   a break point statement.
     */
    private boolean hasBreakPoint(Semisequent succedent) {
-      for (SequentFormula formula : succedent.toList()) {
+      for (SequentFormula formula : succedent.asList()) {
          if (blockElems.contains(
                JavaTools.getActiveStatement(
                      getJavaBlockRecursive(formula.formula())))) {
@@ -284,7 +303,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
             }
             
             // Find break points
-            blockElems.addAll(findJoinPoints((StatementBlock) theJavaBlock.program()));
+            blockElems.addAll(findJoinPoints((StatementBlock) theJavaBlock.program(), goal.proof().getServices()));
             
             if (app.rule().name().toString().equals("One Step Simplification")) {
                
@@ -311,7 +330,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param toSearch The statement block to search for join points.
        * @return A set of join points for the given statement block.
        */
-      private HashSet<ProgramElement> findJoinPoints(StatementBlock toSearch) {
+      private HashSet<ProgramElement> findJoinPoints(StatementBlock toSearch, Services services) {
          HashSet<ProgramElement> result = new HashSet<ProgramElement>();
          ImmutableArray<? extends Statement> stmts = toSearch.getBody();
          
@@ -324,7 +343,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
             SourceElement stmt = stmts.get(0);
             while (!stmt.getFirstElement().equals(stmt)) {
                for (StatementBlock body : getBodies(stmt)) {
-                  result.addAll(findJoinPoints(body));
+                  result.addAll(findJoinPoints(body, services));
                }
                stmt = stmt.getFirstElement();
             }
@@ -350,7 +369,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
                // an early stop in this case.
                
                FindBreakVisitor visitor = new FindBreakVisitor(
-                     getBodies(stmt).element(), JoinRuleUtils.mediator().getServices());
+                     getBodies(stmt).element(), services);
                visitor.start();
                if (visitor.containsBreak()) {
                   result.add(stmts.get(i+1));
@@ -641,6 +660,12 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
          
          return result;
       }
+
+    @Override
+    public boolean isStopAtFirstNonCloseableGoal() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
    }
 

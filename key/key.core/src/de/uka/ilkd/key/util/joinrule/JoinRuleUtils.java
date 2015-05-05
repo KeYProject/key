@@ -24,8 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
+
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -60,14 +60,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.CloseAfterJoin;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.SideProofUtil;
 
 /**
  * This class encapsulates static methods used in the JoinRule
@@ -98,13 +96,6 @@ public class JoinRuleUtils {
    ///////////////////////////////////////////////////
    /////////////// SIMPLE  AUXILIARIES ///////////////
    ///////////////////////////////////////////////////
-   
-   /**
-    * @return The current KeYMediator.
-    */
-   public static KeYMediator mediator() {
-      return MainWindow.getInstance().getMediator();
-   }
    
    /**
     * For Strings "xxx_i", this method returns "xxx". For
@@ -160,18 +151,18 @@ public class JoinRuleUtils {
     * @param term The term to extract program variables from.
     * @return All program variables of the given term.
     */
-   public static HashSet<LocationVariable> getLocationVariables(Term term) {
+   public static HashSet<LocationVariable> getLocationVariables(Term term, Services services) {
       HashSet<LocationVariable> result = new HashSet<LocationVariable>();
       
       if (term.op() instanceof LocationVariable) {
          result.add((LocationVariable) term.op());
       } else {
          if (!term.javaBlock().isEmpty()) {
-            result.addAll(getProgramLocations(term, mediator().getServices()));
+            result.addAll(getProgramLocations(term, services));
          }
          
          for (Term sub : term.subs()) {
-            result.addAll(getLocationVariables(sub));
+            result.addAll(getLocationVariables(sub, services));
          }
       }
       
@@ -505,6 +496,8 @@ public class JoinRuleUtils {
    public static LocationVariable getBranchUniqueLocVar(
          LocationVariable var,
          Node startLeaf) {
+       
+       Services services = startLeaf.proof().getServices();
       
       // Find the node where the variable was introduced
       Node intrNode = getIntroducingNodeforLocVar(var, startLeaf);
@@ -514,13 +507,13 @@ public class JoinRuleUtils {
       int newCounter = 0;
       String branchUniqueName = base;
       while (!isUniqueInGlobals(branchUniqueName.toString(), intrNode.getGlobalProgVars()) ||
-            (lookupVarInNS(branchUniqueName) != null &&
-               !lookupVarInNS(branchUniqueName).sort().equals(var.sort()))) {
+            (lookupVarInNS(branchUniqueName, services) != null &&
+               !lookupVarInNS(branchUniqueName, services).sort().equals(var.sort()))) {
          newCounter += 1;
          branchUniqueName = base + "_" + newCounter;
       }
       
-      LocationVariable branchUniqueVar = lookupVarInNS(branchUniqueName);
+      LocationVariable branchUniqueVar = lookupVarInNS(branchUniqueName, services);
       
       return branchUniqueVar == null ? var : branchUniqueVar;
    }
@@ -923,7 +916,7 @@ public class JoinRuleUtils {
       TermBuilder tb = services.getTermBuilder();
       
       ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
-      pathConditionSet = pathConditionSet.prepend(goal.sequent().antecedent().toList());
+      pathConditionSet = pathConditionSet.prepend(goal.sequent().antecedent().asList());
       
       Term selected = pio.subTerm();
       
@@ -961,7 +954,7 @@ public class JoinRuleUtils {
       //       unprovable.
       
       LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
-            goal.node(), getLocationVariables(postCondition));
+            goal.node(), getLocationVariables(postCondition, services));
       
       // Replace location variables in program counter by their
       // branch-unique versions
@@ -1026,7 +1019,7 @@ public class JoinRuleUtils {
       ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
       ImmutableList<Term> elementaries = ImmutableSLList.nil();
       
-      for (LocationVariable loc : getLocationVariables(term)) {
+      for (LocationVariable loc : getLocationVariables(term, services)) {
          final String newName = tb.newName(stripIndex(loc.name().toString()));
          final LogicVariable newVar =
                new LogicVariable(new Name(newName), loc.sort());
@@ -1138,20 +1131,28 @@ public class JoinRuleUtils {
       return result;
    }
    
-   /**
-    * Disposes the side proof. The stored information string is
-    * assembled form the supplied term; this is expected to be
-    * the original proof input for the side proof.
-    * 
-    * @param previousInput The original input for the side proof.
-    * @param proofResult The result of the side proof.
-    * @param services The services object.
-    */
-   private static void disposeSideProof(
-         Term previousInput, ApplyStrategyInfo proofResult, Services services) {
-      SideProofUtil.disposeOrStore(
-            "Finished proof of " + ProofSaver.printTerm(previousInput, services), proofResult);
-   }
+//    // TODO: Do we need to dispose / store side proofs explicitely?
+//    // Method previously used is no longer accessible after
+//    // refactoring.
+//    /**
+//     * Disposes the side proof. The stored information string is assembled form
+//     * the supplied term; this is expected to be the original proof input for
+//     * the side proof.
+//     * 
+//     * @param previousInput
+//     *            The original input for the side proof.
+//     * @param proofResult
+//     *            The result of the side proof.
+//     * @param services
+//     *            The services object.
+//     */
+//    private static void disposeSideProof(Term previousInput,
+//            ApplyStrategyInfo proofResult, Services services) {
+//        SideProofUtil.disposeOrStore(
+//                "Finished proof of "
+//                        + ProofSaver.printTerm(previousInput, services),
+//                proofResult);
+//    }
    
    /**
     * Tries to prove the given formula and returns the result.
@@ -1168,21 +1169,19 @@ public class JoinRuleUtils {
       final ProofEnvironment sideProofEnv =
             SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
                   services.getProof(),                            // Parent Proof
-                  false);                                         // useSimplifyTermProfile
+                  new Choice[] {});                               // useSimplifyTermProfile
       
       ApplyStrategyInfo proofResult = null;
       try {
-         proofResult = SideProofUtil.startSideProof(
-               services.getProof(),                                  // Parent proof
-               sideProofEnv,                                         // Proof environment
-               Sequent.createSequent(                                // Sequent to prove
-                     Semisequent.EMPTY_SEMISEQUENT,
-                     new Semisequent(new SequentFormula(toProve))),
-               StrategyProperties.METHOD_NONE,                       // Method Treatment
-               StrategyProperties.LOOP_NONE,                         // Loop Treatment
-               StrategyProperties.QUERY_OFF,                         // Query Treatment
-               doSplit ? StrategyProperties.SPLITTING_NORMAL:        // Splitting Option
-                  StrategyProperties.SPLITTING_OFF);
+          //TODO: Find a sensible name for the side proof
+          ProofStarter proofStarter = SideProofUtil.createSideProof(
+                  sideProofEnv,                                          // Proof environment
+                  Sequent.createSequent(                                 // Sequent to prove
+                          Semisequent.EMPTY_SEMISEQUENT,                 
+                          new Semisequent(new SequentFormula(toProve))), 
+                  "Side proof for join");                                // Proof name
+          
+          proofResult = proofStarter.start();
       } catch (ProofInputException e) {}
       
       return proofResult;
@@ -1205,7 +1204,10 @@ public class JoinRuleUtils {
       ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit);
       boolean result = proofResult.getProof().closed();
       
-      disposeSideProof(toProve, proofResult, services);
+      //TODO: Do we need to dispose / store side proofs explicitely?
+      //      Method previously used is no longer accessible after
+      //      refactoring.
+//      disposeSideProof(toProve, proofResult, services);
       
       return result;
       
@@ -1248,10 +1250,13 @@ public class JoinRuleUtils {
          }
       }
       finally {
-         SideProofUtil.disposeOrStore(
-               "Simplification of "
-                     + ProofSaver.printAnything(term,
-                           parentProof.getServices()), info);
+//         SideProofUtil.disposeOrStore(
+//               "Simplification of "
+//                     + ProofSaver.printAnything(term,
+//                           parentProof.getServices()), info);
+          //TODO: Do we need to dispose / store side proofs explicitely?
+          //      Method previously used is no longer accessible after
+          //      refactoring.
       }
    }
    
@@ -1273,12 +1278,12 @@ public class JoinRuleUtils {
       ImmutableList<Term> succedentForms     = ImmutableSLList.nil();
       
       // Shift antecedent formulae to the succedent by negation
-      for (SequentFormula sf : sequent.antecedent().toList()) {
+      for (SequentFormula sf : sequent.antecedent().asList()) {
          negAntecedentForms = negAntecedentForms.prepend(
                tb.not(sf.formula()));
       }
       
-      for (SequentFormula sf : sequent.succedent().toList()) {
+      for (SequentFormula sf : sequent.succedent().asList()) {
          succedentForms = succedentForms.prepend(sf.formula());
       }
       
@@ -1310,8 +1315,8 @@ public class JoinRuleUtils {
     * @return The PV with the given name in the global namespace,
     *    or null if there is none.
     */
-   private static LocationVariable lookupVarInNS(String name) {
-      return (LocationVariable) mediator().progVar_ns().lookup(new Name(name));
+   private static LocationVariable lookupVarInNS(String name, Services services) {
+      return (LocationVariable) services.getNamespaces().programVariables().lookup(new Name(name));
    }
 
    /**
