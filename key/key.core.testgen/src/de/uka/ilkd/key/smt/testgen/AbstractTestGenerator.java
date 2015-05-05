@@ -87,7 +87,7 @@ public abstract class AbstractTestGenerator {
     }
     log
     .writeln("Extracting test data constraints (path conditions).");
-    proofs = createProofsForTesting(settings.removeDuplicates());
+    proofs = createProofsForTesting(settings.removeDuplicates(), settings.removePostCondition());
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;
     }
@@ -215,7 +215,7 @@ public abstract class AbstractTestGenerator {
     *            - if true no identical proofs will be created
     * @return
     */
-   private List<Proof> createProofsForTesting(boolean removeDuplicatePathConditions) {
+   private List<Proof> createProofsForTesting(boolean removeDuplicatePathConditions, boolean removePostCondition) {
       final List<Proof> res = new LinkedList<Proof>();
       final List<Node> nodes = new LinkedList<Node>();
       final ImmutableList<Goal> oldGoals = originalProof.openGoals();
