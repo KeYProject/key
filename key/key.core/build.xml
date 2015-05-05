@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<project name="key.core" default="deploy" basedir=".">
+	<property name="src.dir"   value="${basedir}/src" />
+	<property name="gen.dir"  value="${basedir}/genSrc" />
+	<property name="build.dir" value="${basedir}/bin" />
+	<property name="dist.dir"  value="${basedir}/../deployment" />
+	<property name="ext.dir" value="${basedir}/lib" />
+
+	<property environment="env"/>
+	 <condition property="key.version" value="${env.KEY_VERSION}" else="2.5">
+	 	<isset property="env.KEY_VERSION"/>
+	 </condition>
+
+	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/components"/>
+		<mkdir dir="${dist.dir}/libs"/>
+		<copy todir="${dist.dir}/libs">
+			<fileset file="${ext.dir}/antlr.jar"/>
+			<fileset file="${ext.dir}/Antlr.License.txt"/>
+			<fileset file="${ext.dir}/recoderKey.jar"/>
+			<fileset file="${ext.dir}/LGPL.txt"/>
+		</copy>
+		<jar destfile="${dist.dir}/components/key.core.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+
+	<target name="compile" depends="copyAndGenerate" description="Compile all source files into the build directory.">
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir= "${src.dir}:${gen.dir}" 
+		       destdir="${build.dir}" 
+		       includeantruntime="false" 
+		       source="1.7" 
+		       deprecation="off" 
+		       debug="on" 
+		       depend="${build.depend}" 
+		       optimize="off">
+			<classpath>
+				<pathelement location="${ext.dir}/antlr.jar"/>
+				<pathelement location="${ext.dir}/recoderKey.jar"/>
+				<pathelement location="${basedir}/../key.util/bin/"/>
+			</classpath>
+		</javac>
+		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+			<arg value="rev-parse"/>
+			<arg value="HEAD"/>
+		</exec>
+		<exec executable="git" outputproperty="git.branch" failifexecutionfails="false">
+			<arg value="rev-parse"/>
+			<arg value="--abbrev-ref"/>
+			<arg value="HEAD"/>
+		</exec>
+		<echo file="${build.dir}/de/uka/ilkd/key/util/sha1">${git.revision}</echo> 
+		<echo file="${build.dir}/de/uka/ilkd/key/util/branch">${git.branch}</echo>
+		<echo file="${build.dir}/de/uka/ilkd/key/util/version">${key.version}</echo> 
+	</target>
+
+  <target name="prepare">
+   <echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
+
+   <mkdir dir="${gen.dir}/de/uka/ilkd/key/parser"/>
+   <mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
+   <mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
+   <mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
+   <mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation"/>
+   <property name="lib.dir" value="${basedir}/../key.core/lib"/>
+
+   <mkdir dir="${build.dir}"/>
+
+   <uptodate property="keylexer.notRequired"
+        targetFile="${gen.dir}/de/uka/ilkd/key/parser/KeYLexer.java"
+        srcFile="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g"/>
+
+   <uptodate property="keyparser.notRequired"
+        targetFile="${gen.dir}/de/uka/ilkd/key/parser/KeYParser.java">
+     <srcfiles dir="${src.dir}/de/uka/ilkd/key/parser">
+       <include name="KeYParser.g"/>
+       <include name="KeYLexer.g"/>
+     </srcfiles>
+   </uptodate>
+
+   <uptodate property="jmlprelexer.notRequired"
+        targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.java"
+        srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g"/>
+
+   <uptodate property="jmlpreparser.notRequired"
+        targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.java">
+     <srcfiles dir="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/">
+       <include name="KeYJMLPreParser.g"/>
+       <include name="KeYJMLPreLexer.g"/>
+     </srcfiles>
+   </uptodate>
+   
+   <uptodate property="jmllexer.notRequired"
+        targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.java"
+        srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"/>
+        
+   <uptodate property="jmlparser.notRequired"
+        targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.java">
+     <srcfiles dir="${src.dir}/de/uka/ilkd/key/speclang/jml/translation">
+       <include name="jmllexer.g"/>
+       <include name="jmlparser.g"/>
+     </srcfiles>
+   </uptodate>
+
+   <!-- no uptodate checks are needed for the javacc/antlr tasks, it is built-in there -->
+  </target>
+
+
+  <target name="copy" depends="prepare"
+     description="Copy all resources into the binary directory.">
+   <copy todir="${build.dir}">
+     <fileset dir="${basedir}/resources/"/>
+   </copy>
+   <copy todir="${build.dir}/META-INF">
+     <fileset dir="${basedir}/META-INF/"/>
+   </copy>
+  </target>
+
+
+  <target name="copyAndGenerate" depends="prepare, keyparser, proofjavaparser, schemajavaparser, jmlparser, jmlpreparser, copy" description="Copies resources into the bin folder and generates the parser code.">
+  </target>
+
+  <target name="clean" description="Deletes all generated files and folders.">
+   <delete failonerror="false" includeemptydirs="true"> 
+      <fileset dir="${build.dir}" includes="**/*" />
+      <fileset dir="${gen.dir}" includes="**/*" excludes="**/readme.txt" />
+      <fileset file="${dist.dir}/components/key.core.jar" />
+      <fileset file="${dist.dir}/libs/antlr.jar" />
+      <fileset file="${dist.dir}/libs/Antlr.License.txt" />
+      <fileset file="${dist.dir}/libs/recoderKey.jar" />
+      <fileset file="${dist.dir}/libs/LGPL.txt" />
+   </delete>
+  </target>
+   
+    <target name="keylexer" unless="keylexer.notRequired">
+   <echo message="Running antlr ..."/>
+        <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
+        <arg value="-o" />
+        <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
+        <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g" />
+     </java>
+  </target>
+
+    <target name="keyparser"  depends="keylexer" unless="keyparser.notRequired">
+   <echo message="Running antlr ..."/>
+     <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
+        <arg value="-o" />
+        <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
+        <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYParser.g" />
+     </java>
+  </target>
+
+    <target name="jmlprelexer" unless="jmlprelexer.notRequired">
+   <echo message="Running antlr ..."/>
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
+      <arg value="-o" />
+      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g" />
+    </java>
+  </target>
+
+    <target name="jmlpreparser" depends="jmlprelexer" unless="jmlpreparser.notRequired">
+   <echo message="Running antlr ..."/>
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
+      <arg value="-o" />
+      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g" />
+    </java>
+  </target>
+  
+    <target name="jmllexer" unless="jmllexer.notRequired">
+        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+            <arg value="-o" />
+            <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g" />
+        </java>
+    </target>
+
+    <target name="jmlparser"  depends="jmllexer" unless="jmlparser.notRequired">
+        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+            <arg value="-o" />
+            <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g" />
+        </java>
+    </target>
+
+
+  <target name="schemajavaparser"> 
+      <copy tofile="${gen.dir}/de/uka/ilkd/key/parser/schemajava/Token.java">
+            <fileset file="${src.dir}/de/uka/ilkd/key/parser/schemajava/Token.java.source"/>
+      </copy>
+
+     <javacc
+         target="${src.dir}/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj"
+         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/schemajava"        
+         javacchome="${ext.dir}" />
+  </target>
+
+  <target name="proofjavaparser"> 
+      <copy tofile="${gen.dir}/de/uka/ilkd/key/parser/proofjava/Token.java">
+            <fileset file="${src.dir}/de/uka/ilkd/key/parser/proofjava/Token.java.source"/>
+      </copy>
+   <javacc
+       target="${src.dir}/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
+       outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/proofjava"
+       javacchome="${ext.dir}" 
+   />
+  </target>
+   
+  <target name="build.dir" depends="prepare">
+       <mkdir dir="${build.dir}"/>
+  </target>
+</project>

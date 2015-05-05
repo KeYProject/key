@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="ImplicitFieldCallTest" source="true" simpleName="ImplicitFieldCallTest">
+    <methods name="callStringField">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <fields name="intField" visibility="DEFAULT">
+      <type type="int" genericFreeType="int"/>
+    </fields>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+</dependencymodel:DependencyModel>

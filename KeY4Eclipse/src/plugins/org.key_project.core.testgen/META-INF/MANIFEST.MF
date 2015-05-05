@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY Project Core Testgeneration
+Bundle-SymbolicName: org.key_project.core.testgen;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.core.testgen.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.core;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: KeY Project
+Export-Package: de.uka.ilkd.key.macros,
+ de.uka.ilkd.key.smt.counterexample,
+ de.uka.ilkd.key.smt.testgen,
+ de.uka.ilkd.key.testgen,
+ de.uka.ilkd.key.testgen.oracle

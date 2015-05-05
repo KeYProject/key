@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Stubby Core
+Bundle-SymbolicName: org.key_project.stubby.core
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.stubby.core.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.9.1",
+ org.eclipse.jdt.core;bundle-version="3.10.0",
+ org.eclipse.jdt.ui;bundle-version="3.10.1",
+ org.eclipse.emf.codegen;bundle-version="2.10.0",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.stubby.model;bundle-version="0.1.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.stubby.core.customization,
+ org.key_project.stubby.core.jdt,
+ org.key_project.stubby.core.util

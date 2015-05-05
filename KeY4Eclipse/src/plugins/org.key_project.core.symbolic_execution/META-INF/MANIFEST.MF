@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY Symbolic Execution Engine
+Bundle-SymbolicName: org.key_project.core.symbolic_execution;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.core.symbolic_execution.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.core;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: KeY Project
+Export-Package: de.uka.ilkd.key.proof,
+ de.uka.ilkd.key.rule.label,
+ de.uka.ilkd.key.strategy,
+ de.uka.ilkd.key.symbolic_execution,
+ de.uka.ilkd.key.symbolic_execution.model,
+ de.uka.ilkd.key.symbolic_execution.model.impl,
+ de.uka.ilkd.key.symbolic_execution.object_model,
+ de.uka.ilkd.key.symbolic_execution.object_model.impl,
+ de.uka.ilkd.key.symbolic_execution.po,
+ de.uka.ilkd.key.symbolic_execution.profile,
+ de.uka.ilkd.key.symbolic_execution.rule,
+ de.uka.ilkd.key.symbolic_execution.slicing,
+ de.uka.ilkd.key.symbolic_execution.strategy,
+ de.uka.ilkd.key.symbolic_execution.strategy.breakpoint,
+ de.uka.ilkd.key.symbolic_execution.util,
+ de.uka.ilkd.key.symbolic_execution.util.event

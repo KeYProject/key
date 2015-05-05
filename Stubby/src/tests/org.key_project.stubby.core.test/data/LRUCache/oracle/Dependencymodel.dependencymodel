@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Map" simpleName="Map">
+    <typeVariables name="K">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <innerTypes kind="INTERFACE" static="true" package="java.util" name="java.util.Map.Entry" simpleName="Entry">
+      <typeVariables name="K">
+        <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+      </typeVariables>
+      <typeVariables name="V">
+        <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+      </typeVariables>
+    </innerTypes>
+  </types>
+  <types abstract="true" package="java.util" name="java.util.AbstractMap" simpleName="AbstractMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.Map&lt;K,V>" genericFreeType="java.util.Map"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.util" name="java.util.HashMap" simpleName="HashMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <methods name="size">
+      <returnType type="int" genericFreeType="int"/>
+    </methods>
+    <implements type="java.util.Map&lt;K,V>" genericFreeType="java.util.Map"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.util.AbstractMap&lt;K,V>" genericFreeType="java.util.AbstractMap"/>
+  </types>
+  <types package="java.util" name="java.util.LinkedHashMap" simpleName="LinkedHashMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <methods name="LinkedHashMap" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="int" genericFreeType="int"/>
+      <parameterTypes type="float" genericFreeType="float"/>
+      <parameterTypes type="boolean" genericFreeType="boolean"/>
+    </methods>
+    <implements type="java.util.Map&lt;K,V>" genericFreeType="java.util.Map"/>
+    <extends type="java.util.HashMap&lt;K,V>" genericFreeType="java.util.HashMap"/>
+  </types>
+  <types package="org.key_project.util" name="org.key_project.util.LRUCache" source="true" simpleName="LRUCache">
+    <typeVariables name="K">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <methods name="LRUCache" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="int" genericFreeType="int"/>
+    </methods>
+    <methods name="removeEldestEntry" visibility="PROTECTED">
+      <returnType type="boolean" genericFreeType="boolean"/>
+      <parameterTypes type="java.util.Map.Entry&lt;K,V>" genericFreeType="java.util.Map.Entry"/>
+    </methods>
+    <fields name="serialVersionUID" visibility="PRIVATE" final="true" static="true" constantValue="4962274836567079680">
+      <type type="long" genericFreeType="long"/>
+    </fields>
+    <fields name="maxEntries" visibility="PRIVATE" final="true">
+      <type type="int" genericFreeType="int"/>
+    </fields>
+    <extends type="java.util.LinkedHashMap&lt;K,V>" genericFreeType="java.util.LinkedHashMap"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang.annotation" name="java.lang.annotation.Annotation" simpleName="Annotation"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Override" simpleName="Override">
+    <extends type="java.lang.annotation.Annotation" genericFreeType="java.lang.annotation.Annotation"/>
+  </types>
+</dependencymodel:DependencyModel>

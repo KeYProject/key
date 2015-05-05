@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="superMethodA" source="true" simpleName="superMethodA">
+    <methods name="testMethodSuper">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types visibility="DEFAULT" package="" name="SuperMethodB" source="true" simpleName="SuperMethodB">
+    <methods name="testMethod">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <extends type="superMethodA" genericFreeType="superMethodA"/>
+  </types>
+</dependencymodel:DependencyModel>

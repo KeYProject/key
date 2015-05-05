@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.key_project.jmlediting.core.profiles">
+      <profile
+            class="org.key_project.jmlediting.core.test.profile.JMLProfileManagementTest$DummyJMLProfile1">
+      </profile>
+      <profile
+            class="org.key_project.jmlediting.core.test.profile.JMLProfileManagementTest$DummyJMLProfile2">
+      </profile>
+      <profile
+            class="org.key_project.jmlediting.core.test.utilities.profile.PersistenceParentProfile">
+      </profile>
+   </extension>
+
+</plugin>

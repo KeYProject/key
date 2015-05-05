@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types package="" name="StarImports" source="true" simpleName="StarImports">
+    <methods name="main" static="true">
+      <returnType type="void" genericFreeType="void"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types package="java.io" name="java.io.File" simpleName="File">
+    <methods name="listRoots" static="true">
+      <returnType type="java.io.File[]" genericFreeType="java.io.File[]"/>
+    </methods>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.io.File>" genericFreeType="java.lang.Comparable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types package="java.util" name="java.util.Date" simpleName="Date">
+    <methods name="Date" constructor="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="long" genericFreeType="long"/>
+    </methods>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.lang.Comparable&lt;java.util.Date>" genericFreeType="java.lang.Comparable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+</dependencymodel:DependencyModel>

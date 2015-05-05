@@ -1,0 +1,2 @@
+How is JUnit licensed?
+JUnit is Open Source Software, released under the Eclipse Public License Version 1.0 and hosted on SourceForge.

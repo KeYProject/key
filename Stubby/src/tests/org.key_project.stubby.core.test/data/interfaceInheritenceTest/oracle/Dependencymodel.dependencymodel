@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Iterable" simpleName="Iterable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types kind="INTERFACE" package="java.util" name="java.util.Collection" simpleName="Collection">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.lang.Iterable&lt;E>" genericFreeType="java.lang.Iterable"/>
+  </types>
+  <types abstract="true" package="java.util" name="java.util.AbstractCollection" simpleName="AbstractCollection">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.Collection&lt;E>" genericFreeType="java.util.Collection"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+  <types kind="INTERFACE" package="java.util" name="java.util.List" simpleName="List">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.util.Collection&lt;E>" genericFreeType="java.util.Collection"/>
+  </types>
+  <types abstract="true" package="java.util" name="java.util.AbstractList" simpleName="AbstractList">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.List&lt;E>" genericFreeType="java.util.List"/>
+    <extends type="java.util.AbstractCollection&lt;E>" genericFreeType="java.util.AbstractCollection"/>
+  </types>
+  <types abstract="true" package="java.util" name="java.util.AbstractSequentialList" simpleName="AbstractSequentialList">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.util.AbstractList&lt;E>" genericFreeType="java.util.AbstractList"/>
+  </types>
+  <types kind="INTERFACE" package="java.util" name="java.util.Queue" simpleName="Queue">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.util.Collection&lt;E>" genericFreeType="java.util.Collection"/>
+  </types>
+  <types kind="INTERFACE" package="java.util" name="java.util.Deque" simpleName="Deque">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <extends type="java.util.Queue&lt;E>" genericFreeType="java.util.Queue"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.util" name="java.util.LinkedList" simpleName="LinkedList">
+    <typeVariables name="E">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.List&lt;E>" genericFreeType="java.util.List"/>
+    <implements type="java.util.Deque&lt;E>" genericFreeType="java.util.Deque"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.util.AbstractSequentialList&lt;E>" genericFreeType="java.util.AbstractSequentialList"/>
+  </types>
+  <types package="" name="InterfaceInheritenceTest" source="true" simpleName="InterfaceInheritenceTest">
+    <methods name="main" static="true">
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="java.util.LinkedList&lt;?>" genericFreeType="java.util.LinkedList"/>
+    </methods>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
+  </types>
+</dependencymodel:DependencyModel>

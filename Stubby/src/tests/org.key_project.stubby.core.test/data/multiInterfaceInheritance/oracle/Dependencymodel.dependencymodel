@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types kind="INTERFACE" package="" name="MultiInterfaceInheritance" source="true" simpleName="MultiInterfaceInheritance">
+    <extends type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Comparable" genericFreeType="java.lang.Comparable"/>
+  </types>
+</dependencymodel:DependencyModel>
