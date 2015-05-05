@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="SED Evaluation"
+            id="org.key_project.sed.key.evaluation.commands.category">
+      </category>
+      <command
+            name="Understanding Proof Attempts"
+            categoryId="org.key_project.sed.key.evaluation.commands.category"
+            id="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
+            icon="icons/sample.gif">
+      </image>
+   </extension>   
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
+            class="org.key_project.sed.key.evaluation.handlers.UnderstandingProofAttemptsHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+M2+9"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?before=help">
+         <menu
+               label="Evaluation"
+               mnemonic="v"
+               id="org.key_project.sed.key.evaluation.menus.evaluationMenu">
+            <command
+                  commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
+                  mnemonic="U"
+                  id="org.key_project.sed.key.evaluation.menus.sampleCommand">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.key_project.sed.key.evaluation.toolbars.evaluationToolbar">
+            <command
+                  commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
+                  icon="icons/sample.gif"
+                  tooltip="Understanding Proof Attempts"
+                  id="org.key_project.sed.key.evaluation.toolbars.sampleCommand">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+</plugin>
