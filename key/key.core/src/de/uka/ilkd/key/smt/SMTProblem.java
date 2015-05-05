@@ -50,7 +50,6 @@ public class SMTProblem {
         public static Collection<SMTProblem> createSMTProblems(Proof proof) {
                 LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
                 for (Goal goal : proof.openGoals()) {
-                		System.out.println("Goal:"+goal.toString());
                         problems.add(new SMTProblem(goal));
                 }
                 return problems;
