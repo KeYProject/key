@@ -15,7 +15,6 @@ package org.key_project.sed.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.sed.ui.util.LaunchViewManager;
-import org.key_project.sed.ui.util.SEDImages;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -50,8 +49,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-      LaunchViewManager.getInstance().stop();
-	   SEDImages.disposeImages();
+        LaunchViewManager.getInstance().stop();
 		plugin = null;
 		super.stop(context);
 	}

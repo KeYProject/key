@@ -17,7 +17,6 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.sed.ui.visualization.util.SETFileLaunchUtil;
-import org.key_project.sed.ui.visualization.util.VisualizationImages;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -53,7 +52,6 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-	   VisualizationImages.disposeImages();
 		plugin = null;
 		super.stop(context);
 	}
