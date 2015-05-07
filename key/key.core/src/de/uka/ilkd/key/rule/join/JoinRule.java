@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -113,7 +112,8 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       final Goal newGoal = newGoals.head();
       
       // Find join partner
-      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(newGoal, pio);
+//      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(newGoal, pio);
+      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = ((JoinRuleBuiltInRuleApp) ruleApp).getJoinPartners();
       
       // Signal this task to UI
 //      mediator().getUI().taskStarted(
@@ -494,6 +494,8 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       // Note: If the join rule is applicable for automatic
       //       rule application, the symbolic execution strategy
       //       does not seem to work as usual!
+       
+       
 
       return isApplicable(goal, pio,
             true,  // Only allow application of rule for manual calls
@@ -574,8 +576,8 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
    }
    
    @Override
-   public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-      return new DefaultBuiltInRuleApp(this, pos);
+   public IBuiltInRuleApp createApp(PosInOccurrence pio, TermServices services) {
+      return new JoinRuleBuiltInRuleApp(this, pio);
    }
    
    /**
@@ -586,8 +588,8 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
     * @param services The services object.
     * @return A list of suitable join partners. May be empty if none exist.
     */
-   private ImmutableList<Pair<Goal,PosInOccurrence>> findPotentialJoinPartners(
-         Goal goal, PosInOccurrence pio/*, Services services*/) {
+   public ImmutableList<Pair<Goal,PosInOccurrence>> findPotentialJoinPartners(
+         Goal goal, PosInOccurrence pio) {
       
       Services services = goal.proof().getServices();
       
@@ -645,32 +647,5 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       }
       
       return potentialPartners;
-   }
-   
-   /**
-    * Selects among suitable join partners using GUI input.
-    * 
-    * @param goal Current goal to join.
-    * @param pio Position of update-program counter formula in goal.
-    * @param services The services object.
-    * @return A list of suitable join partners. May be empty if none exist / selected.
-    */
-   private ImmutableList<Pair<Goal,PosInOccurrence>> findJoinPartners(
-         Goal goal, PosInOccurrence pio) {
-      
-//      Services services = goal.proof().getServices();
-      
-      ImmutableList<Pair<Goal,PosInOccurrence>> potentialPartners =
-            findPotentialJoinPartners(goal, pio);
-      
-      //TODO: How to require feedback about choice of partner goals from user?
-      
-      return potentialPartners;
-      
-//      JoinPartnerSelectionDialog selectionDialog =
-//            new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
-//      selectionDialog.setVisible(true);
-//      
-//      return selectionDialog.getChosen();
    }
 }

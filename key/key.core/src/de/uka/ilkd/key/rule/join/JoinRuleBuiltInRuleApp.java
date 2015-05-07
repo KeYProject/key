@@ -18,15 +18,13 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     private ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = null;
 
-    protected JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
+    public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
-        // TODO Auto-generated constructor stub
         super(builtInRule, pio);
     }
 
     protected JoinRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts) {
-        // TODO Auto-generated constructor stub
         super(rule, pio, ifInsts);
     }
 
@@ -52,9 +50,18 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public boolean complete() {
         return joinPartners != null;
     }
+
+    public ImmutableList<Pair<Goal, PosInOccurrence>> getJoinPartners() {
+        return joinPartners;
+    }
     
     public void setJoinPartners(ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners) {
         this.joinPartners = joinPartners;
+    }
+    
+    @Override
+    public JoinRule rule() {
+        return (JoinRule) super.rule();
     }
 
 }

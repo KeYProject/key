@@ -45,6 +45,7 @@ import javax.swing.text.html.HTMLDocument;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -90,7 +91,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
    
    private JEditorPane txtPartner1 = null;
    private JEditorPane txtPartner2 = null;
-   private JComboBox cmbCandidates = null;
+   private JComboBox<String> cmbCandidates = null;
    private JCheckBox cbSelectCandidate = null;
    
    private JScrollPane scrpPartner1 = null;
@@ -121,7 +122,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
       scrpPartner2 = new JScrollPane(txtPartner2);
       
       // Goal selection dropdown field and checkbox
-      cmbCandidates = new JComboBox();
+      cmbCandidates = new JComboBox<String>();
       cmbCandidates.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
       cmbCandidates.addItemListener(new ItemListener() {
          @Override
@@ -209,6 +210,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
          @Override
          public void actionPerformed(ActionEvent e) {
             setVisible(false);
+            dispose();
          }
       });
       
@@ -251,14 +253,14 @@ public class JoinPartnerSelectionDialog extends JDialog {
    /**
     * Creates a new join partner selection dialog.
     * 
-    * @param joinNode The first (already chosen) join partner.
+    * @param joinGoal The first (already chosen) join partner.
     * @param pio Position of Update-Modality-Postcondition formula in
     *    the joinNode.
     * @param candidates Potential join candidates.
     * @param services The services object.
     */
    public JoinPartnerSelectionDialog(
-         Goal joinNode,
+         Goal joinGoal,
          PosInOccurrence pio,
          ImmutableList<Pair<Goal,PosInOccurrence>> candidates,
          Services services) {
@@ -276,7 +278,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
          this.candidates.add(insPos, candidate);
       }
       
-      setHighlightedSequentForArea(joinNode, pio, txtPartner1);
+      setHighlightedSequentForArea(joinGoal, pio, txtPartner1);
       loadCandidates();
       
    }
