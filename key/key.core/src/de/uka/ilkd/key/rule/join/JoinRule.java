@@ -89,16 +89,6 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
    @Override
    public final ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
-       
-       //TODO: Remove source code related to signaling progress to UI
-       //      (has been commented out) if there is no alternative to
-       //      using the (now no longer accessible) mediator.
-      
-//      boolean stoppedInterface = false;
-//      if (!mediator().isInAutoMode()) {
-//         mediator().stopInterface(true);
-//         stoppedInterface = true;
-//      }
       
       final TermBuilder tb = services.getTermBuilder();
       final PosInOccurrence pio = ruleApp.posInOccurrence();
@@ -111,19 +101,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       
       final Goal newGoal = newGoals.head();
       
-      // Find join partner
-//      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(newGoal, pio);
       ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = ((JoinRuleBuiltInRuleApp) ruleApp).getJoinPartners();
-      
-      // Signal this task to UI
-//      mediator().getUI().taskStarted(
-//            "Joining " + (joinPartners.size() + 1) + " goals",
-//            joinPartners.size());
-      //TODO: Progress information is so far not properly displayed in the
-      //      UI. Obviously, the progress bar does only receive the updates
-      //      *after* the task terminated, since the EDT is blocked.
-      //      See MainStatusLine#setProgress(final int value).
-//      long startTime = System.currentTimeMillis();
       
       // Convert sequents to SE states
       ImmutableList<SymbolicExecutionState> joinPartnerStates = ImmutableSLList.nil();      
@@ -151,9 +129,6 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
          
          joinedState = joinStates(joinedState, state, thisSEState.third, services);
          joinedState.setCorrespondingNode(goal.node());
-         
-         // Signal progress to UI
-//         mediator().getUI().taskProgress(++progress);
       }
       
       Term resultPathCondition = joinedState.second;
@@ -185,20 +160,6 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
                sequentToSEPair(joinPartner.first, joinPartner.second, services),
                thisSEState.third);
       }
-
-//      long endTime = System.currentTimeMillis();
-//      long duration = endTime - startTime;
-//      mediator().getUI().taskFinished(new DefaultTaskFinishedInfo(
-//            this,                          // source
-//            joinedState,                   // result
-//            mediator().getSelectedProof(), // proof
-//            duration,                      // time
-//            1 + joinPartners.size(),       // applied rules
-//            0));                           // closed goals
-//      
-//      if (stoppedInterface) {
-//         mediator().startInterface(true);
-//      }
       
       return newGoals;
    }
@@ -494,8 +455,6 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       // Note: If the join rule is applicable for automatic
       //       rule application, the symbolic execution strategy
       //       does not seem to work as usual!
-       
-       
 
       return isApplicable(goal, pio,
             true,  // Only allow application of rule for manual calls

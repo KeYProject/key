@@ -10,7 +10,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * TODO: Document.
+ * Rule application class for join rule applications. Is complete iff
+ * the joinPartners field has been set by the corresponding setter function.
  * 
  * @author Dominic Scheurer
  */
@@ -30,7 +31,6 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -42,8 +42,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
-        // TODO Auto-generated method stub
-        return null;
+        return this;
     }
     
     @Override
