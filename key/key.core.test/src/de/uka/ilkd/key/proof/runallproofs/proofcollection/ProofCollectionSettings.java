@@ -21,6 +21,17 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  */
 public class ProofCollectionSettings implements Serializable {
 
+   /*
+    * Known constants for entries that may occur in field settingsMap.
+    */
+   private static final String BASE_DIRECTORY_KEY = "baseDirectory";
+   private static final String KEY_SETTINGS_KEY = "keySettings";
+   private static final String FORK_MODE = "forkMode";
+
+   public enum ForkMode {
+      PERFILE, PERGROUP, NOFORK
+   }
+
    /**
     * {@link List} of default entries that will be available in every
     * {@link ProofCollectionSettings} object.
@@ -77,12 +88,6 @@ public class ProofCollectionSettings implements Serializable {
             .unmodifiableMap(mutableMap);
       return unmodifiableMap;
    }
-
-   /*
-    * Known constants for entries that may occur in field settingsMap.
-    */
-   private static final String BASE_DIRECTORY_KEY = "baseDirectory";
-   private static final String KEY_SETTINGS_KEY = "keySettings";
 
    /**
     * File in which the present {@link ProofCollectionSettings} were declared.
@@ -179,6 +184,16 @@ public class ProofCollectionSettings implements Serializable {
     */
    public String get(String key) {
       return immutableSettingsMap.get(key);
+   }
+
+   public ForkMode getForkMode() {
+      String forkMode = get(FORK_MODE);
+      for (ForkMode mode : ForkMode.values()) {
+         if (forkMode.toLowerCase().equals(mode.toString().toLowerCase())) {
+            return mode;
+         }
+      }
+      return ForkMode.NOFORK;
    }
 
    /**

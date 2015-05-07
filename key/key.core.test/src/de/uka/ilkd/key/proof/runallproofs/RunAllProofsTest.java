@@ -125,12 +125,7 @@ public class RunAllProofsTest implements Serializable {
     */
    @Test
    public void testWithKeYAutoMode() throws Exception {
-      // ProofCollectionSubProcess.executeRunAllProofsTest(this);
       TestResult report = unit.runTest();
-      // System.out.println(report.message);
-      // System.gc(); System.out.println("Memory " +
-      // Runtime.getRuntime().totalMemory());
-      // System.out.println("Time " + System.currentTimeMillis());
        assertTrue(report.message, report.success);
    }
 

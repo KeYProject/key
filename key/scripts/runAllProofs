@@ -50,6 +50,10 @@ shift
 done
 fi
 
+#
+# Determine JAVA_HOME
+#
+
 UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
 ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
 
@@ -72,7 +76,7 @@ else
 fi
 
 #
-# Determining $KEY_HOME environment variable.
+# Determining KEY_HOME
 #
 
 if [ -z "$KEY_HOME" ] ; then
