@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -88,7 +89,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
 		body = KeYJavaASTFactory.labeledStatement(
-			breakInnerLabel.getLabel(), body);
+			breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
             }
 
             final int updateSize = (updates == null ? 0 : updates.size());
@@ -121,7 +122,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
 		outerBlock = KeYJavaASTFactory.labeledStatement(
-			breakOuterLabel.getLabel(), outerBlock);
+			breakOuterLabel.getLabel(), outerBlock, PositionInfo.UNDEFINED);
             }
             
             // copy loop invariant to the created while loop

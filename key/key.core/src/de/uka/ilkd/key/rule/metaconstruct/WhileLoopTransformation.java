@@ -552,7 +552,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
 		body = KeYJavaASTFactory.labeledStatement(
-			breakInnerLabel.getLabel(), body);
+			breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
 	    }
 	    
 	    final int updateSize = updates == null ? 0 : updates.size();
@@ -583,7 +583,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    
 	    if (outerLabelNeeded() && breakOuterLabel!=null) {
 		addChild(KeYJavaASTFactory.labeledStatement(
-			breakOuterLabel.getLabel(), outerBlockStatements));
+			breakOuterLabel.getLabel(), outerBlockStatements, PositionInfo.UNDEFINED));
 	    } else {
 		addChild(KeYJavaASTFactory.block(outerBlockStatements));
 	    }
@@ -669,7 +669,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    if (innerLabelNeeded() && breakInnerLabel != null) {
 		// an unlabeled continue needs to be handled with (replaced)
 		body = KeYJavaASTFactory.labeledStatement(
-			breakInnerLabel.getLabel(), body);
+			breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
 	    }
 	    Then then = null;
 	    StatementBlock block = KeYJavaASTFactory.block(body,
@@ -678,7 +678,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		// an unlabeled break occurs in the
 		// while loop therefore we need a labeled statement
 		then = KeYJavaASTFactory.thenBlock(KeYJavaASTFactory
-			.labeledStatement(breakOuterLabel.getLabel(), block));
+			.labeledStatement(breakOuterLabel.getLabel(), block, PositionInfo.UNDEFINED));
 
 	    } else {
 		then = KeYJavaASTFactory.thenBlock(block);
@@ -719,7 +719,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (innerLabelNeeded() && breakInnerLabel != null) {
 		// an unlabeled continue needs to be handled with (replaced)
 		unwindedBody = KeYJavaASTFactory.labeledStatement(
-			breakInnerLabel.getLabel(), body);
+			breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
 	    } else {
                 unwindedBody = body;
             }
@@ -734,7 +734,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		// an unlabeled break occurs in the
 		// body therefore we need a labeled statement
 		resultStatement = KeYJavaASTFactory.labeledStatement(
-			breakOuterLabel.getLabel(), block);
+			breakOuterLabel.getLabel(), block, PositionInfo.UNDEFINED);
 	    } else {
 		resultStatement = block;
 	    }

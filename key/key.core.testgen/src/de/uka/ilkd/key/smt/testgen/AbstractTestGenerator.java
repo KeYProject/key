@@ -10,6 +10,7 @@ import java.util.Vector;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -86,7 +87,7 @@ public abstract class AbstractTestGenerator {
     }
     log
     .writeln("Extracting test data constraints (path conditions).");
-    proofs = createProofsForTesting(settings.removeDuplicates());
+    proofs = createProofsForTesting(settings.removeDuplicates(), settings.removePostCondition());
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;
     }
@@ -113,12 +114,17 @@ public abstract class AbstractTestGenerator {
              if (stopRequest != null && stopRequest.shouldStop()) {
                 return;
              }
+             
+            // System.out.println("Proof before:"+proof.toString());
+             
              selectProof(ui, proof);
 
              ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
              synchronized(macro) {
                           info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
              }
+             
+           //  System.out.println("Proof after:"+proof.toString());
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {
              Debug.out("Semantics blasting interrupted");
@@ -173,7 +179,7 @@ public abstract class AbstractTestGenerator {
     }
     if (Thread.interrupted()) {
        return;
-    }
+    }    
     launcher.launch(solvers, problems, proof.getServices());
     //    ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
     //    mg.launch();
@@ -209,7 +215,7 @@ public abstract class AbstractTestGenerator {
     *            - if true no identical proofs will be created
     * @return
     */
-   private List<Proof> createProofsForTesting(boolean removeDuplicatePathConditions) {
+   private List<Proof> createProofsForTesting(boolean removeDuplicatePathConditions, boolean removePostCondition) {
       final List<Proof> res = new LinkedList<Proof>();
       final List<Node> nodes = new LinkedList<Node>();
       final ImmutableList<Goal> oldGoals = originalProof.openGoals();
@@ -305,7 +311,8 @@ public abstract class AbstractTestGenerator {
    }
    
    protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
-      ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof);
+      ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof,
+              new Choice("ban", "runtimeExceptions"));
       ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
       Proof proof = starter.getProof();
       proof.getServices().getSpecificationRepository().registerProof(proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);
@@ -332,7 +339,7 @@ public abstract class AbstractTestGenerator {
 
 
    protected void handleLauncherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes, SolverLauncher launcher, TestGenerationLog log) {
-      log.writeln("Test data generation: solving SMT problems... \n please wait...");
+      log.writeln("Test data generation: solving "+problems.size()+" SMT problems... \n please wait...");
    }
 
    protected void handleLauncherStopped(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
@@ -381,6 +388,9 @@ public abstract class AbstractTestGenerator {
                     .getFinalResult().isValid();
             if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
                unknown++;
+               if(solver.getException() != null){
+            	   solver.getException().printStackTrace();
+               }               
             } else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
                solvedPaths++;
                if (solver.getSocket().getQuery() != null) {

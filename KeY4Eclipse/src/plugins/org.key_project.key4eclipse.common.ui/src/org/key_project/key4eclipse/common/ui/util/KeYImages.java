@@ -205,29 +205,4 @@ public final class KeYImages {
        }
        return path;
     }
-    
-    /**
-     * Disposes all contained images. This method is automatically called
-     * when the plug-in is unloaded from the {@link Activator}.
-     * There is no need to call it from any other place!
-     */
-    public static void disposeImages() {
-       Display display = Display.getDefault();
-       if (!display.isDisposed()) {
-          display.syncExec(new Runnable() {
-            @Override
-            public void run() {
-               ImageRegistry registry = Activator.getDefault().getImageRegistry();
-               registry.remove(INTERACTIVE_WIZARD);
-               registry.remove(KEY_FILE_EXPORT_WIZARD);
-               registry.remove(KEY_FILE_WIZARD);
-               registry.remove(KEY_LOGO);
-               registry.remove(NEW_KEY_JAVA_PROJECT_WIZARD);
-               registry.remove(STARTER_WIZARD);
-               registry.remove(STOP_AT_BREAKPOINTS);
-               registry.remove(TEST_GENERATION);
-            }
-         });
-       }
-    }
 }

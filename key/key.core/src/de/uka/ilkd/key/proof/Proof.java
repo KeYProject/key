@@ -154,11 +154,11 @@ public class Proof implements Named {
             initConfig.setSettings( new ProofSettings(ProofSettings.DEFAULT_SETTINGS) );
         }
 
-        this.initConfig.getServices().setProof(this);
-        this.proofFile = initConfig.getServices().getJavaModel() != null ? initConfig.getServices().getJavaModel().getInitialFile() : null;
+        final Services services = this.initConfig.getServices();
+        services.setProof(this);
+        this.proofFile = services.getJavaModel() != null ? services.getJavaModel().getInitialFile() : null;
 
-        settingsListener =
-                        new SettingsListener () {
+        settingsListener = new SettingsListener () {
             @Override
             public void settingsChanged ( EventObject config ) {
                 updateStrategyOnGoals();
@@ -219,12 +219,13 @@ public class Proof implements Named {
             fireProofClosed();
     }
 
-    public Proof(String name, Term problem, String header, TacletIndex rules,
-                    BuiltInRuleIndex builtInRules, InitConfig initConfig ) {
+    public Proof(String name, Term problem, String header, InitConfig initConfig ) {
         this ( name, Sequent.createSuccSequent
                         (Semisequent.EMPTY_SEMISEQUENT.insert(0,
                                         new SequentFormula(problem)).semisequent()),
-                                        rules, builtInRules, initConfig );
+                                        initConfig.createTacletIndex(), 
+                                        initConfig.createBuiltInRuleIndex(), 
+                                        initConfig );
         problemHeader = header;
     }
 

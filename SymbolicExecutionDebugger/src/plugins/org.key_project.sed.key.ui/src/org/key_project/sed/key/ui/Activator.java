@@ -14,10 +14,8 @@
 package org.key_project.sed.key.ui;
 
 import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.sed.key.core.util.KeySEDUtil;
-import org.key_project.sed.key.ui.util.KeYSEDImages;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.osgi.framework.BundleContext;
 
@@ -54,12 +52,6 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-	    Display.getDefault().syncExec(new Runnable() {
-	            @Override
-	            public void run() {
-	                KeYSEDImages.disposeImages();
-	            }
-	    });
             plugin = null;
             super.stop(context);
 	}

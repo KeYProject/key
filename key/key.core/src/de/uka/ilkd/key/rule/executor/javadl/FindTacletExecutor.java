@@ -24,40 +24,42 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
     }
 
 
-    /** CONSTRAINT NOT USED 
-     * applies the replacewith part of Taclets
+    /**  
+     * applies the {@code replacewith}-expression of taclet goal descriptions
+     * @param gt the {@link TacletGoalTemplate} used to get the taclet's {@code replacewith}-expression 
      * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param gt TacletGoalTemplate used to get the replaceexpression 
-     * in the Taclet
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence belonging to the find expression
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
+     * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate) result of applying the taclet
+     * @param posOfFind the {@link PosInOccurrence} belonging to the find expression
+     * @param matchCond the {@link MatchConditions} with all required instantiations 
+     * @param goal the {@link Goal} on which the taclet is applied 
+     * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
+     * @param services the {@link Services} encapsulating all Java model information
      */
-    protected abstract void applyReplacewith(Goal goal, TermLabelState termLabelState, 
-                         TacletGoalTemplate gt, SequentChangeInfo currentSequent,
-                         PosInOccurrence posOfFind,
-                         Services services,
+    protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
+                         SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
                          MatchConditions matchCond,
-                         TacletApp tacletApp);
+                         Goal goal,
+                         RuleApp ruleApp,
+                         Services services);
 
 
     /**
-     * adds the sequent of the add part of the Taclet to the goal sequent
+     * applies the {@code add}-expressions of taclet goal descriptions
+     * @param add the {@link Sequent} with the uninstantiated {@link SequentFormula}'s to be added to the goal's sequent
      * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param add the Sequent to be added
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
-     * @param posOfFind the PosInOccurrence describes the place where to add
-     * the semisequent 
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
+     * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate) result of applying the taclet
+     * @param posOfFind the {@link PosInOccurrence} providing the position information where the match took place 
+     * (it will be tried to add the new formulas close to that position)
+     * @param matchCond the {@link MatchConditions} with all required instantiations 
+     * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
+     * @param services the {@link Services} encapsulating all Java model information
      */
-    protected abstract void applyAdd(TermLabelState termLabelState, Sequent add, SequentChangeInfo sequentChangeInfo,
+    protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, SequentChangeInfo currentSequent,
                      PosInOccurrence posOfFind,
-                     Services services,
                      MatchConditions matchCond,
                      Goal goal,
-                     TacletApp tacletApp);
+                     RuleApp ruleApp,
+                     Services services);
 
 
     
@@ -98,21 +100,21 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
         // add first because we want to use pos information that
         // is lost applying replacewith
         
-        applyAdd(termLabelState, gt.sequent(),
+        applyAdd(gt.sequent(), termLabelState,
                   currentSequent,
                   tacletApp.posInOccurrence(),
-                  services,
                   mc,
                   goal,
-                  (TacletApp) ruleApp);
+                  ruleApp,
+                  services);
 
-        applyReplacewith(currentGoal, 
-                 termLabelState, gt,
-                 currentSequent,
+        applyReplacewith(gt, 
+                 termLabelState, currentSequent,
                  tacletApp.posInOccurrence(),
-                 services,
                  mc,
-                 (TacletApp) ruleApp);
+                 currentGoal,
+                 ruleApp,
+                 services);
 
         applyAddrule( gt.rules(),
                   currentGoal,

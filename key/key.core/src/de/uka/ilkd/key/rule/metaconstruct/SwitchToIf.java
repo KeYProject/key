@@ -18,6 +18,7 @@ import org.key_project.util.ExtList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -126,7 +127,7 @@ public class SwitchToIf extends ProgramTransformer {
 	if(noNewBreak){
 	    return result;
 	}else{
-	    return KeYJavaASTFactory.labeledStatement(l, result);
+	    return KeYJavaASTFactory.labeledStatement(l, result, PositionInfo.UNDEFINED);
 	}
     }
 

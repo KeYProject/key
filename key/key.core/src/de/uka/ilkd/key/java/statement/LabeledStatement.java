@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.NamedProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -54,11 +55,11 @@ public class LabeledStatement extends JavaStatement
     protected final Statement body;
 
     
-    private final ImmutableArray<ProgramPrefix> prefixElementArray;
-    
     private final PosInProgram firstActiveChildPos;
 
-
+    private final int prefixLength;
+    private final MethodFrame innerMostMethodFrame;
+    
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      * @param children the children of this AST element as KeY classes.
@@ -71,7 +72,6 @@ public class LabeledStatement extends JavaStatement
 	name=label;	        
 
 	body=children.get(Statement.class);
-        prefixElementArray = computePrefix(body);
         firstActiveChildPos = body instanceof StatementBlock ? 
                     ((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
                         PosInProgram.ONE_ZERO : PosInProgram.ONE;
@@ -79,6 +79,10 @@ public class LabeledStatement extends JavaStatement
         // otherwise it will crash later
         assert body != null;
         assert name != null;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+
     }
 
     /**
@@ -89,10 +93,12 @@ public class LabeledStatement extends JavaStatement
     public LabeledStatement(Label name) {
 	this.name=name;
 	body=new EmptyStatement();
-        prefixElementArray = new ImmutableArray<ProgramPrefix>();
         firstActiveChildPos = body instanceof StatementBlock ? 
                 (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
                     PosInProgram.ONE_ZERO) : PosInProgram.ONE;
+                ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+                prefixLength = info.getLength();
+                innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     /**
@@ -101,38 +107,57 @@ public class LabeledStatement extends JavaStatement
      *      @param statement a statement.
      */
 
-    public LabeledStatement(Label id, Statement statement) {
+    public LabeledStatement(Label id, Statement statement, PositionInfo pos) {
+        super(pos);
         this.name=id;
         body=statement;
-        prefixElementArray = computePrefix(body);
         firstActiveChildPos = body instanceof StatementBlock ? 
                 (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
-                    PosInProgram.ONE_ZERO) : PosInProgram.ONE;
+                    PosInProgram.ONE_ZERO) : PosInProgram.ONE;       
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
+    @Override
+    public boolean hasNextPrefixElement() {
+        if (body instanceof ProgramPrefix) {
+            if (body instanceof StatementBlock) {
+                return !((StatementBlock) body).isEmpty() &&
+                    ((StatementBlock)body).getStatementAt(0) instanceof ProgramPrefix;
+            }
+            return true;
+        }
+        return false;
+    }
 
-    private ImmutableArray<ProgramPrefix> computePrefix(Statement b) {
-        if (b instanceof StatementBlock) {
-            return StatementBlock.computePrefixElements
-            (((StatementBlock)b).getBody(), 0, this);
-        } else if (b instanceof ProgramPrefix) {
-            return StatementBlock.
-                computePrefixElements(new ImmutableArray<Statement>(b), 
-                        0, this);
-        }        
-        return new ImmutableArray<ProgramPrefix>(this);
+    @Override
+    public ProgramPrefix getNextPrefixElement() {
+        if (hasNextPrefixElement()) {
+            return (ProgramPrefix) 
+                    (body instanceof StatementBlock ? ((StatementBlock) body).getStatementAt(0) : body);
+        } else {
+            throw new IndexOutOfBoundsException("No next prefix element " + this);
+        }
     }
     
-    public int getPrefixLength() {        
-        return prefixElementArray.size();
+    @Override
+    public ProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : 
+            this;
     }
-
-    public ProgramPrefix getPrefixElementAt(int i) {       
-        return prefixElementArray.get(i);
-    }
-
+    
+    @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return prefixElementArray;
+        if (body instanceof StatementBlock) {
+            return StatementBlock.computePrefixElements
+            (((StatementBlock)body).getBody(), this);
+        } else if (body instanceof ProgramPrefix) {
+            return StatementBlock.
+                computePrefixElements(new ImmutableArray<Statement>(body), 
+                        this);
+        }        
+        return new ImmutableArray<ProgramPrefix>(this);
     }
 
 
@@ -280,30 +305,33 @@ public class LabeledStatement extends JavaStatement
      */
     public boolean equalsModRenaming(SourceElement se, 
 				     NameAbstractionTable nat) {
-	if (!(se instanceof LabeledStatement)) {
+	if (se == null || this.getClass() != se.getClass()) {
 	    return false;
 	}
+		
 	final LabeledStatement lSt = (LabeledStatement)se;	
-	nat.add(getLabel(), lSt.getLabel());
+	
+	nat.add(name, lSt.name);
 	return super.equalsModRenaming(lSt, nat);
     }
     
+    @Override
     public int hashCode(){
-    	int result = 17;
-    	result = 37 * result + getChildCount();
-    	for (int i = 0; i<getChildCount(); i++) {
-    		result = 37 * result + getChildAt(i).hashCode();
-    	}
-    	return result;
+    	return 17 * super.hashCode() + 13 * body.hashCode() + name.hashCode();
     }
-    
-    public boolean equals(Object o){
-    	return super.equals(o);
-    }
-    
-    
+        
     public PosInProgram getFirstActiveChildPos() {
         return firstActiveChildPos;
+    }
+
+    @Override
+    public int getPrefixLength() {
+        return prefixLength;
+    }
+
+    @Override
+    public MethodFrame getInnerMostMethodFrame() {
+        return innerMostMethodFrame;
     }
     
 }

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
@@ -346,7 +347,24 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         	if(getType() == SolverType.Z3_CE_SOLVER){
         	   Proof proof = problem.getGoal().proof();
-        	   KeYJavaType typeOfClassUnderTest = proof.getServices().getSpecificationRepository().getProofOblInput(proof).getContainerType();
+        	   SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
+        	   
+        	   
+        	   Proof originalProof = null;
+        	   for(Proof pr : specrep.getAllProofs()){
+        		   if(proof.name().toString().endsWith(pr.name().toString())){
+        			   originalProof = pr;
+        			   break;
+        		   }
+        		   
+        		   
+        	   }
+        	   //System.out.println(originalProof.name());
+        	   
+        	   
+        	   
+        	   KeYJavaType typeOfClassUnderTest = specrep.getProofOblInput(originalProof).getContainerType();
+        	   
         		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
         		problemTypeInformation = objTrans.getTypes();

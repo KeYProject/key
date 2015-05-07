@@ -72,11 +72,14 @@ public abstract class JavaNonTerminalProgramElement
      */
     public boolean equalsModRenaming(SourceElement se, 
 				     NameAbstractionTable nat) {
-	if (this.getClass() != se.getClass()) {
+
+    if (se == this) {
+        return true;
+    } else if (se == null || this.getClass() != se.getClass()) {
 	    return false;
 	}
-	final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement)se;
-	
+        
+	final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement)se;	
 	if (jnte.getChildCount()!=getChildCount()) {
 	    return false;
 	}	
@@ -88,17 +91,15 @@ public abstract class JavaNonTerminalProgramElement
 	}
 	return true;
     }
-
     
     @Override    
     public boolean equals(Object o) {
         return super.equals(o);
     }
     
-    
     @Override    
     public int hashCode(){
-	return super.hashCode();
+        return 17*super.hashCode() + getChildCount() * 7;
     }
     
   

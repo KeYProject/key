@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 
@@ -34,19 +33,15 @@ public class PosInProgram {
     public static final PosInProgram ONE_ONE  = ONE.down(1);
 
 
-    private final PosInProgram prev;
-    
     /** 
      * the position number
      */
-    private final int pos;
-
-    /** 
-     * the depth
+    private final int[] pos;
+    
+    /**
+     * pointer to the (last element + 1) in pos valid for this position
      */
     private final int depth;
-
-    private final int hashCode;
 
     /** 
      * returns the ProgramElement at the given position 
@@ -59,29 +54,27 @@ public class PosInProgram {
     public static ProgramElement getProgramAt(PosInProgram pos,
 					      ProgramElement prg)
     {
-	ProgramElement result = prg;
-	final IntIterator it = pos.iterator();	
-	while (it.hasNext()) {	
+        ProgramElement result = prg;
+        for (int i = 0; i<pos.depth; i++) {
             if(!(result instanceof NonTerminalProgramElement)) {
                 throw new IndexOutOfBoundsException("PosInProgram is invalid.");
             }
             // getchild at throws an array index out of bound if 
             // it.next refers to a non-existing child
-	    result = 
-                ((JavaNonTerminalProgramElement)result).getChildAt(it.next());
-	}
+            result = ((NonTerminalProgramElement)result).getChildAt(pos.pos[i]);
+        }
 
-	return result;
+        return result;
     }
 
     /** 
      * creates a new program position
      */
     private PosInProgram(PosInProgram pip, int posNr) {
-	prev = pip;
-	pos = posNr;
-	depth = pip.depth + 1;
-	hashCode = prev.hashCode * 31 + pos;
+        pos = new int[pip.depth + 1]; 
+        System.arraycopy(pip.pos, 0, pos, 0, pip.depth);
+        pos[pos.length - 1] = posNr;
+        depth = pos.length;
     }   
 
     /**
@@ -89,11 +82,14 @@ public class PosInProgram {
      * position. 
      */
     private PosInProgram() {
-	pos = -1;
-	prev = null;
+	pos = new int[0];
 	depth = 0;
-	hashCode = 17;
     }   
+
+    private PosInProgram(int[] pos, int depth) {
+        this.pos = pos;
+        this.depth = depth; 
+    }
 
     /** size of the position list */
     public int depth() {
@@ -113,7 +109,13 @@ public class PosInProgram {
      *
      */
     public PosInProgram up() {
-	return this == TOP ? this : prev;
+        final PosInProgram up;
+        if (this != TOP) {
+            up = new PosInProgram(this.pos, depth - 1); 
+        } else {
+            up = TOP;
+        }
+        return up;
     }
 
     public PosInProgram append(PosInProgram pp) {
@@ -146,25 +148,23 @@ public class PosInProgram {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        
-	if (!(obj instanceof PosInProgram)) {
-	    return false;
-	} 
-        
-	final PosInProgram cmp = (PosInProgram) obj;
 
-	if (depth != cmp.depth) {
-	    return false;
-	}
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        } 
 
-	final IntIterator it = reverseIterator();
-	final IntIterator cmpIt = cmp.reverseIterator();
-	while (it.hasNext()) {
-	    if (it.next() != cmpIt.next()) {
-		return false;
-	    }
-	}
-	return true;
+        final PosInProgram cmp = (PosInProgram) obj;
+
+        if (depth != cmp.depth) {
+            return false;
+        }
+
+        for (int i = 0; i<depth; i++) {
+            if (cmp.pos[i] != pos[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     
@@ -181,36 +181,18 @@ public class PosInProgram {
 	return true;
     }
 
-    /**
-     * returns an Iterator<Integer> that iterates through the subterms
-     * of a sequent in the reverse order as the PosInProgram has been defined.
-     * @return Iterator<Integer> that iterates through the subterms
-     * of a sequent in the reverse order as the PosInProgram has been defined.
-     */ 
-    public IntIterator reverseIterator() {
-	return new PosIntIterator(this);
-    }
-
-
     public int get(int i) {
         if (i >= depth || i < 0) {
             throw new ArrayIndexOutOfBoundsException();
         }
-
-        PosInProgram previous = this;        
-        while ((depth - 1) - i > 0) {
-            previous = previous.prev;  
-            i++;
-        }
-        
-        return previous.pos;
+        return pos[i];
     }
 
     /**
      * return the last index (or -1 if this == TOP)
      */
     public int last() {
-	return pos;
+	return pos[depth-1];
     }
 
     public ProgramElement getProgram(ProgramElement pe) {
@@ -243,55 +225,30 @@ public class PosInProgram {
     
 
 
-    static class PosIntIterator implements IntIterator {
-	private PosInProgram p;
-	
-	public PosIntIterator(PosInProgram p) {
-	    this.p = p;
-	}
-
-	public boolean hasNext() {
-	    return p != null && p != TOP;
-	}
-
-	public int next() {
-	    int result = p.pos; 
-	    p = p.prev;
-	    return result;
-	}
-		
-    }
-
     static class PosArrayIntIterator implements IntIterator {
-	private final int[] pos;
+	private final PosInProgram pip;
 	private int next;
 
 	public PosArrayIntIterator(PosInProgram pip) {
-        pos = new int[pip.depth];
-	    fillCache(pip);
+        this.pip = pip;
 	    next = 0;
-	    
-	}
-
-	private void fillCache(PosInProgram pip) {
-	    for (int at = pip.depth - 1; at >= 0; at--) {
-	        pos[at] = pip.pos;
-	        pip = pip.prev;
-	    }
 	}
 
 	public boolean hasNext() {
-	    return next < pos.length;
+	    return next < pip.depth;
 	}
 
 	public int next() {
-	    next++;
-	    return pos[next-1];
+	    return pip.pos[next++];
 	}
 		
     }
 
     public int hashCode () {
+        int hashCode = 0;
+        for (int i : pos) {
+          hashCode = 31*hashCode + i;
+        }
         return hashCode;
     }
 }

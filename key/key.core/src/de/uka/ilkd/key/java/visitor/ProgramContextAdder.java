@@ -16,7 +16,6 @@ package de.uka.ilkd.key.java.visitor;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -206,7 +205,7 @@ public class ProgramContextAdder {
 	return new MethodFrame(old.getProgramVariable(),
 			       old.getExecutionContext(),
 			       body,
-                               PositionInfo.UNDEFINED);
+                   old.getPositionInfo());
     }
 
     protected LabeledStatement createLabeledStatementWrapper
@@ -217,7 +216,8 @@ public class ProgramContextAdder {
 				    !(body.getChildAt(0) 
 				      instanceof LocalVariableDeclaration) ? 
 				    (Statement)body.getChildAt(0) : 
-				    (Statement)body);
+				    (Statement)body,
+				    old.getPositionInfo());
     }
 
     protected SynchronizedBlock createSynchronizedBlockWrapper

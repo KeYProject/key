@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -33,7 +34,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                             Services services,
                             Set<Location> relevantLocations, 
                             SequentInfo info,
-                            SourceElement activeStatement) {
+                            SourceElement activeStatement) throws ProofInputException {
       try {
          boolean accept = false;
          if (activeStatement instanceof CopyAssignment) {
@@ -70,7 +71,14 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             }
             Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
             while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
-               listModifiedLocations(UpdateApplication.getUpdate(updateTerm), services, services.getTypeConverter().getHeapLDT(), modifiedLocations, info.getExecutionContext(), info.getThisReference());
+               listModifiedLocations(UpdateApplication.getUpdate(updateTerm), 
+                                     services, 
+                                     services.getTypeConverter().getHeapLDT(), 
+                                     modifiedLocations, 
+                                     info.getExecutionContext(), 
+                                     info.getThisReference(), 
+                                     relevantLocations,
+                                     previousChild);
                updateTerm = UpdateApplication.getTarget(updateTerm);
             }
             // Check modified locations
