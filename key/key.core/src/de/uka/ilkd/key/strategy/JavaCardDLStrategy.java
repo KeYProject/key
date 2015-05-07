@@ -44,7 +44,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.join.JoinIfThenElse;
+import de.uka.ilkd.key.rule.join.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.JoinWeaken;
+import de.uka.ilkd.key.rule.join.JoinWithSignLattice;
 import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
@@ -249,7 +252,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-11000));
-      //  final Feature smtF = smtFeature(inftyConst());
+      
+
+        setupJoinRule();
+        
+        //  final Feature smtF = smtFeature(inftyConst());
         
         return SumFeature.createSum (AutomatedRuleFeature.INSTANCE,
               NonDuplicateAppFeature.INSTANCE,
@@ -297,7 +304,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	return ConditionalFeature.createConditional(filter, cost);
     }
 
+    private Feature setupJoinRule() {
+    	SetRuleFilter filter = new SetRuleFilter();
+    	filter.addRuleToSet(JoinIfThenElse.INSTANCE);
+    	filter.addRuleToSet(JoinIfThenElseAntecedent.INSTANCE);
+    	filter.addRuleToSet(JoinWeaken.INSTANCE);
+       	filter.addRuleToSet(JoinWithSignLattice.INSTANCE);
 
+    	return ConditionalFeature.createConditional(filter, inftyConst());
+    }
+    
     //private Feature smtFeature(Feature cost) {
 	//ClassRuleFilter filter = new ClassRuleFilter(SMTRule.class);
         //return ConditionalFeature.createConditional(filter, cost);        

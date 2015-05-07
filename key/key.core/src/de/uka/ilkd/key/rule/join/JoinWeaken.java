@@ -24,6 +24,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
+
 /**
  * Rule that joins two sequents based on "total" weakening:
  * Replacement of symbolic state by an update setting every

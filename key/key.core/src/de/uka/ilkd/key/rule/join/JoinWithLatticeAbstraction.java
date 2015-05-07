@@ -27,6 +27,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
+
 /**
  * Rule that joins two sequents based on a specified set of
  * abstract domain lattices. If no lattice is specified for

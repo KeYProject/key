@@ -18,7 +18,6 @@ import java.util.HashSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-//import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -46,6 +45,7 @@ import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
  * Base for implementing join rules. Extend this class,
@@ -65,7 +65,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
  * @see JoinWithLatticeAbstraction
  * @see JoinWithSignLattice
  */
-public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
+public abstract class JoinRule implements BuiltInRule {
 
    /**
     * If set to true, join rules are expected to check the equivalence
@@ -489,6 +489,12 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       if (checkAutomatic && goal.isAutomatic()) {
           return false;
       }
+
+//      if (checkAutomatic &&
+//    		  ProofUserManager.getInstance().getEnvironment(goal.proof())
+//    		  	.getProofControl().isInAutoMode()) {
+//          return false;
+//      }
       
       if (pio != null) {
          
@@ -565,7 +571,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
                SequentFormula f = succedent.get(i);
                
                PosInTerm pit = PosInTerm.getTopLevel();
-               pit.down(i);
+               pit.down(i); //FIXME: Does not change anything!!! Immutable.
 
                PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                if (isApplicable(g, gPio, false, false)) {

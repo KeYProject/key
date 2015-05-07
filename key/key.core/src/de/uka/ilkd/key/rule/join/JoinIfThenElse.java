@@ -24,6 +24,8 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
+
 /**
  * Rule that joins two sequents based on the if-then-else
  * construction: If two locations are assigned different
