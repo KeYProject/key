@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+<extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.key_project.sed.key.evaluation.server.SEDEvaluationServer" 
+            name="SED Evaluation Server">
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+         <property
+               name="appName"
+               value="SED Evaluation Server">
+         </property>
+         <property
+               name="welcomePerspective"
+               value="org.eclipse.jdt.ui.JavaPerspective">
+         </property>
+         <property
+               name="introTitle"
+               value="SED Evaluation Server">
+         </property>
+         <property
+               name="introBrandingImage"
+               value="product:icons/IntroLogo.gif">
+         </property>
+         <property
+               name="introBrandingImageText"
+               value="KeY Project">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/logo16.gif,icons/logo32.gif,icons/logo48.gif,icons/logo64.gif,icons/logo128.gif">
+         </property>
+         <property
+               name="aboutText"
+               value="SED Evaluation Server&#x0A;&#x0A;Version: 1.0.0&#x0A;&#x0A;Developed as part of the KeY project.">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/About.gif">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="3F3F3F">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="30,252,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="30,275,445,15">
+         </property>
+      </product>
+   </extension>
+   <extension
+         id="SEDEvaluationServer"
+         name="SED Evaluation Server"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="*"
+            icon="icons/logo16.gif"
+            thread="main"
+            visible="true">
+         <run
+               class="org.key_project.sed.key.evaluation.server.application.SEDEvaluationServerApplication">
+         </run>
+      </application>
+   </extension>
+</plugin>

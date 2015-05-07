@@ -1,10 +1,10 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.key_project.sed.key.evaluation.feature"
-      label="SED Evaluation Feature"
+      id="org.key_project.sed.key.evaluation.server.feature"
+      label="SED Evaluation Server Feature"
       version="1.0.0.qualifier"
       provider-name="KeY Project"
-      plugin="org.key_project.sed.key.evaluation.ui">
+      plugin="org.key_project.sed.key.evaluation.server">
 
    <description>
       Functionality to participate in an evaluation of the SED which helps us to improve the tool.
@@ -118,11 +118,6 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
       <update label="KeY Luna Updates" url="http://www.key-project.org/download/releases/eclipse/luna"/>
    </url>
 
-   <requires>
-      <import feature="org.key_project.sed.feature" version="1.0.0.qualifier"/>
-      <import feature="org.key_project.key4eclipse.feature" version="1.0.0.qualifier"/>
-   </requires>
-
    <plugin
          id="org.key_project.sed.key.evaluation.model"
          download-size="0"
@@ -131,7 +126,14 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
          unpack="false"/>
 
    <plugin
-         id="org.key_project.sed.key.evaluation.ui"
+         id="org.key_project.sed.key.evaluation.server"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.key_project.util"
          download-size="0"
          install-size="0"
          version="0.0.0"
