@@ -185,15 +185,52 @@ public class ProofCollectionSettings implements Serializable {
    public String get(String key) {
       return immutableSettingsMap.get(key);
    }
+   
+   /**
+    * A warning will be printed out in case unknown value for forkMode is used.
+    * This helper variable ensures the warning is printed at most once.
+    */
+   private ForkMode forkMode = null;
 
    public ForkMode getForkMode() {
-      String forkMode = get(FORK_MODE);
-      for (ForkMode mode : ForkMode.values()) {
-         if (forkMode.toLowerCase().equals(mode.toString().toLowerCase())) {
-            return mode;
+      
+      /*
+       * Since proof collection settings are immutable, fork mode needs to be
+       * computed only once and can be reused later. Warning in case of unknown
+       * value for fork mode will also be printed only once this way.
+       */
+      if (forkMode == null) {
+         String forkModeString = get(FORK_MODE);
+
+         if (forkModeString == null) {
+            // Return default value in case no particular fork mode is specified.
+            forkMode = ForkMode.NOFORK;
          }
+         else if (forkModeString.toLowerCase().equals("nofork")) {
+            forkMode = ForkMode.NOFORK;
+         }
+         else if (forkModeString.toLowerCase().equals("pergroup")) {
+            forkMode = ForkMode.PERGROUP;
+         }
+         else if (forkModeString.toLowerCase().equals("perfile")) {
+            forkMode = ForkMode.PERFILE;
+         }
+
+         /*
+          * Unknown value used for fork mode. Printing out warning to the user.
+          */
+         System.out
+               .println("Warning: Unknown value used for runAllProofs fork mode: "
+                     + forkModeString);
+         System.out
+               .println("Use either of the following: noFork (default), perGroup, perFile");
+         System.out.println("Using default fork mode: noFork");
+         System.out
+               .println("If you want to inspect source code, look up the following location:");
+         System.out.println(new Throwable().getStackTrace()[0]);
+         forkMode = ForkMode.NOFORK;
       }
-      return ForkMode.NOFORK;
+      return forkMode;
    }
 
    /**

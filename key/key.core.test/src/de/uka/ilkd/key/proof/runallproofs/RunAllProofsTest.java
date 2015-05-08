@@ -126,7 +126,7 @@ public class RunAllProofsTest implements Serializable {
    @Test
    public void testWithKeYAutoMode() throws Exception {
       TestResult report = unit.runTest();
-       assertTrue(report.message, report.success);
+      assertTrue(report.message, report.success);
    }
 
    /**
