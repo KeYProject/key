@@ -54,7 +54,10 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * 
  * The rule is applicable if the chosen subterm has the
  * form { x := v || ... } PHI and there are potential join
- * candidates.
+ * candidates.<p>
+ * 
+ * Any rule application returned will be incomplete; completion
+ * is handled by de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion. 
  * 
  * @author Dominic Scheurer
  * 
@@ -64,6 +67,8 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * @see JoinIfThenElseAntecedent
  * @see JoinWithLatticeAbstraction
  * @see JoinWithSignLattice
+ * @see de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion
+ * @see de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog
  */
 public abstract class JoinRule implements BuiltInRule {
 
