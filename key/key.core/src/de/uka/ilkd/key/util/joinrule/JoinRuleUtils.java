@@ -1131,29 +1131,6 @@ public class JoinRuleUtils {
       return result;
    }
    
-//    // TODO: Do we need to dispose / store side proofs explicitely?
-//    // Method previously used is no longer accessible after
-//    // refactoring.
-//    /**
-//     * Disposes the side proof. The stored information string is assembled form
-//     * the supplied term; this is expected to be the original proof input for
-//     * the side proof.
-//     * 
-//     * @param previousInput
-//     *            The original input for the side proof.
-//     * @param proofResult
-//     *            The result of the side proof.
-//     * @param services
-//     *            The services object.
-//     */
-//    private static void disposeSideProof(Term previousInput,
-//            ApplyStrategyInfo proofResult, Services services) {
-//        SideProofUtil.disposeOrStore(
-//                "Finished proof of "
-//                        + ProofSaver.printTerm(previousInput, services),
-//                proofResult);
-//    }
-   
    /**
     * Tries to prove the given formula and returns the result.
     * 
@@ -1179,7 +1156,7 @@ public class JoinRuleUtils {
                   Sequent.createSequent(                                 // Sequent to prove
                           Semisequent.EMPTY_SEMISEQUENT,                 
                           new Semisequent(new SequentFormula(toProve))), 
-                  "Side proof for join");                                // Proof name
+                  "Side proof");                                         // Proof name
           
           proofResult = proofStarter.start();
       } catch (ProofInputException e) {}
@@ -1204,61 +1181,48 @@ public class JoinRuleUtils {
       ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit);
       boolean result = proofResult.getProof().closed();
       
-      //TODO: Do we need to dispose / store side proofs explicitely?
-      //      Method previously used is no longer accessible after
-      //      refactoring.
-//      disposeSideProof(toProve, proofResult, services);
-      
       return result;
       
    }
    
-   /**
-    * Simplifies the given {@link Term} in a side proof with splits.
-    * This code has been copied from {@link SymbolicExecutionUtil}
-    * and only been slightly modified (to allow for splitting the proof). 
-    * 
-    * @param parentProof The parent {@link Proof}.
-    * @param term The {@link Term} to simplify.
-    * @return The simplified {@link Term}.
-    * @throws ProofInputException Occurred Exception.
-    * 
-    * @see SymbolicExecutionUtil#simplify(Proof, Term)
-    */
-   private static Term simplify(Proof parentProof, Term term)
-         throws ProofInputException {
-      
-      final Services services = parentProof.getServices();
-      
-      final ApplyStrategyInfo info = tryToProve(term, services, true);
-      
-      try {
-         // The simplified formula is the conjunction of all open goals
-         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
-         final TermBuilder tb = services.getTermBuilder();
-         if (openGoals.isEmpty()) {
-            return tb.tt();
-         }
-         else {
-            ImmutableList<Term> goalImplications = ImmutableSLList.nil();
-            for (Goal goal : openGoals) {
-               Term goalImplication = sequentToFormula(goal.sequent(), services);
-               goalImplications = goalImplications.append(goalImplication);
-            }
-            
-            return tb.and(goalImplications);
-         }
-      }
-      finally {
-//         SideProofUtil.disposeOrStore(
-//               "Simplification of "
-//                     + ProofSaver.printAnything(term,
-//                           parentProof.getServices()), info);
-          //TODO: Do we need to dispose / store side proofs explicitely?
-          //      Method previously used is no longer accessible after
-          //      refactoring.
-      }
-   }
+	/**
+	 * Simplifies the given {@link Term} in a side proof with splits. This code
+	 * has been copied from {@link SymbolicExecutionUtil} and only been slightly
+	 * modified (to allow for splitting the proof).
+	 * 
+	 * @param parentProof
+	 *            The parent {@link Proof}.
+	 * @param term
+	 *            The {@link Term} to simplify.
+	 * @return The simplified {@link Term}.
+	 * @throws ProofInputException
+	 *             Occurred Exception.
+	 * 
+	 * @see SymbolicExecutionUtil#simplify(Proof, Term)
+	 */
+	private static Term simplify(Proof parentProof, Term term)
+			throws ProofInputException {
+
+		final Services services = parentProof.getServices();
+
+		final ApplyStrategyInfo info = tryToProve(term, services, true);
+
+		// The simplified formula is the conjunction of all open goals
+		ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
+		final TermBuilder tb = services.getTermBuilder();
+		if (openGoals.isEmpty()) {
+			return tb.tt();
+		} else {
+			ImmutableList<Term> goalImplications = ImmutableSLList.nil();
+			for (Goal goal : openGoals) {
+				Term goalImplication = sequentToFormula(goal.sequent(),
+						services);
+				goalImplications = goalImplications.append(goalImplication);
+			}
+
+			return tb.and(goalImplications);
+		}
+	}
    
    /**
     * Converts a Sequent "Gamma ==> Delta" into a single formula

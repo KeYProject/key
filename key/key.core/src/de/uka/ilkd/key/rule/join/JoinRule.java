@@ -475,62 +475,57 @@ public abstract class JoinRule implements BuiltInRule {
     * @param doJoinPartnerCheck Checks for available join partners iff this flag is set to true.
     * @return true iff a suitable top level formula for joining.
     */
-   public boolean isApplicable(
-         Goal goal, PosInOccurrence pio, boolean checkAutomatic, boolean doJoinPartnerCheck) {
-      // We admit top level formulas of the form \<{ ... }\> phi
-      // and U \<{ ... }\> phi, where U must be an update
-      // in normal form, i.e. a parallel update of elementary
-      // updates.
-       
-       //TODO: How can we find out whether this rule is applied by an automatic strategy?
-       //      Did this using the mediator previously, but no longer possible after
-       //      refactoring. The below "solution" only allows merging for interactive
-       //      goals if checkAutomatic is true.
-//      if (checkAutomatic && goal.isAutomatic()) {
-//          return false;
-//      }
-      
-      if (pio != null) {
-         
-         if (!pio.isTopLevel()) {
-            return false;
-         }
-         
-         Term selected = pio.subTerm();
-         
-         Term termAfterUpdate = selected;
-         
-         if (selected.op() instanceof UpdateApplication) {
-            Term update = selected.sub(0);
-            
-            if (isUpdateNormalForm(update) && selected.subs().size() > 1) {
-               termAfterUpdate = selected.sub(1);
-            } else {
-               return false;
-            }
-         }
-         
-         // Term after update must have the form "phi" or "\<{...}\> phi" or
-         // "\[{...}\]", where phi must not contain a Java block.
-         if (termAfterUpdate.op() instanceof Modality &&
-               !termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
-            return false;
-         } else if (termAfterUpdate.op() instanceof UpdateApplication) {
-            return false;
-         }
-         
-         return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio).size() > 0;
-         
-      } else {
-         
-         return false;
-         
-      }
-   }
+	public boolean isApplicable(Goal goal, PosInOccurrence pio,
+			boolean checkAutomatic, boolean doJoinPartnerCheck) {
+		// We admit top level formulas of the form \<{ ... }\> phi
+		// and U \<{ ... }\> phi, where U must be an update
+		// in normal form, i.e. a parallel update of elementary
+		// updates.
+
+		if (pio == null || !pio.isTopLevel()) {
+			return false;
+		}
+
+		Term selected = pio.subTerm();
+
+		Term termAfterUpdate = selected;
+
+		if (selected.op() instanceof UpdateApplication) {
+			Term update = selected.sub(0);
+
+			if (isUpdateNormalForm(update) && selected.subs().size() > 1) {
+				termAfterUpdate = selected.sub(1);
+			} else {
+				return false;
+			}
+		} else {
+			//NOTE: This disallows joins for formulae without updates
+			//      in front. In principle, joins are possible for
+			//      arbitrary formulae, but this significantly slows
+			//      down the JavaCardDLStrategy since for every formula,
+			//      all goals in the tree are searched. For the intended
+			//      applications, it suffices to allow joins just for
+			//      formulae of the form {U}\phi.
+			return false;
+		}
+		
+		// Term after update must have the form "phi" or "\<{...}\> phi" or
+		// "\[{...}\]", where phi must not contain a Java block.
+		if (termAfterUpdate.op() instanceof Modality
+				&& !termAfterUpdate.sub(0).javaBlock()
+						.equals(JavaBlock.EMPTY_JAVABLOCK)) {
+			return false;
+		} else if (termAfterUpdate.op() instanceof UpdateApplication) {
+			return false;
+		}
+
+		return !doJoinPartnerCheck
+				|| findPotentialJoinPartners(goal, pio).size() > 0;
+
+	}
    
    @Override
    public boolean isApplicableOnSubTerms() {
-       // TODO: Check if this has to be changed. This is a stub!
        return false;
    }
    
@@ -565,7 +560,6 @@ public abstract class JoinRule implements BuiltInRule {
                SequentFormula f = succedent.get(i);
                
                PosInTerm pit = PosInTerm.getTopLevel();
-               pit.down(i); //FIXME: Does not change anything!!! Immutable.
 
                PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                if (isApplicable(g, gPio, false, false)) {
