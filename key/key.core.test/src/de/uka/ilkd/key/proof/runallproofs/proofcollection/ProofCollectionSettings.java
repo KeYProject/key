@@ -277,6 +277,26 @@ public class ProofCollectionSettings implements Serializable {
       }
    }
 
+   private Set<String> enabledTestCaseNames = null;
+
+   public Set<String> getEnabledTestCaseNames() {
+      String testCases = get("testCases");
+      if (testCases == null || testCases.length() == 0) {
+         return null;
+      }
+
+      if (enabledTestCaseNames == null) {
+         enabledTestCaseNames = new LinkedHashSet<>();
+         String[] testCaseList = testCases.split(" ");
+         for (String testCaseName : testCaseList) {
+            enabledTestCaseNames.add(testCaseName);
+         }
+         enabledTestCaseNames = Collections
+               .unmodifiableSet(enabledTestCaseNames);
+      }
+      return enabledTestCaseNames;
+   }
+
    /**
     * Static class for {@link ProofCollectionSettings} entries.
     */
