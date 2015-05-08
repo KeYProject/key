@@ -486,13 +486,7 @@ public abstract class JoinRule implements BuiltInRule {
        //      Did this using the mediator previously, but no longer possible after
        //      refactoring. The below "solution" only allows merging for interactive
        //      goals if checkAutomatic is true.
-      if (checkAutomatic && goal.isAutomatic()) {
-          return false;
-      }
-
-//      if (checkAutomatic &&
-//    		  ProofUserManager.getInstance().getEnvironment(goal.proof())
-//    		  	.getProofControl().isInAutoMode()) {
+//      if (checkAutomatic && goal.isAutomatic()) {
 //          return false;
 //      }
       
