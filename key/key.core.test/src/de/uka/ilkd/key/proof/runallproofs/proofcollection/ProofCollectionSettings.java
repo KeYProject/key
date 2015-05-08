@@ -198,7 +198,7 @@ public class ProofCollectionSettings implements Serializable {
       if (forkMode == null) {
          String forkModeString = get(FORK_MODE);
 
-         if (forkModeString == null) {
+         if (forkModeString == null || forkModeString.length() == 0) {
             // Return default value in case no particular fork mode is
             // specified.
             forkMode = ForkMode.NOFORK;
