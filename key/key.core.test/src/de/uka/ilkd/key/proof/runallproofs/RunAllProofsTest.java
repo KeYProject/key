@@ -32,7 +32,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit.TestResult;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
@@ -105,7 +104,7 @@ public class RunAllProofsTest implements Serializable {
       }
    }
 
-   final RunAllProofsTestUnit unit;
+   private final RunAllProofsTestUnit unit;
 
    /**
     * Constructor.

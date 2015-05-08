@@ -661,5 +661,3 @@ provable: ./heap/permissions/threads/Sampler_workingPermissions_accessible.key
 # provable: ./heap/permissions/threads/Plotter_staticPermissions_accessible.key
 # Is provable, but very heavy (~400000 steps)
 # provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
-
-# End -- please do not remove this line.
