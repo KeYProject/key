@@ -23,7 +23,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 /**
- * Executes KeY on a list of {@link TestFile}s in a separate process.
+ * Executes KeY prover for a list of {@link TestFile}s in a separate process.
  * 
  * @author Kai Wallisch
  *

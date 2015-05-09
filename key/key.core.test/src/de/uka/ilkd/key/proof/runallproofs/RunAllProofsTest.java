@@ -88,7 +88,7 @@ public class RunAllProofsTest implements Serializable {
    static {
       String keyHome = System.getProperty("key.home");
       if (keyHome == null) {
-         throw new RuntimeException("Environment variable KEY_HOME not set. "
+         throw new RuntimeException("System property key.home not set. "
                + "Cannot test proofs.");
       }
 

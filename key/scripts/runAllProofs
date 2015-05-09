@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 list_help() {
     echo "Usage: runAllProofs [[--fork-mode=<perFile|perGroup|noFork>] <groupNames>] | [--list-tests]"
@@ -137,11 +137,11 @@ case $1 in
     ;;
 esac
 
-if [[ $# > 0 ]]
+if [ "$#" -ne 0 ]
     then
     TESTCASES=$1
     shift
-    while [[ $# > 0 ]]
+    while [ "$#" -ne 0 ]
         do
         TESTCASES="$TESTCASES $1"
         shift
@@ -152,3 +152,4 @@ call_java \
 -Dkey.runallproofs.forkMode=$FORKMODE \
 -Dkey.runallproofs.testCases="$TESTCASES" \
 org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
+
