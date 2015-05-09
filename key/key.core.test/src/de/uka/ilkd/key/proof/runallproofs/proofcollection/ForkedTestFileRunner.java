@@ -86,20 +86,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
    }
 
    public static TestResult processTestFile(TestFile testFile,
-         ProofCollectionSettings settings) throws Exception {
-      /*
-       * Passing argument testFile and using null as temp directory prefix. null
-       * as temp directory prefix causes Java to create a temporary directory
-       * with random name.
-       */
-      return processTestFile(testFile, settings, null);
-   }
-
-   public static TestResult processTestFile(TestFile testFile,
-         ProofCollectionSettings settings, String tempDirectoryPrefix)
-         throws Exception {
-      return processTestFiles(Arrays.asList(testFile), settings,
-            tempDirectoryPrefix).get(0);
+         ProofCollectionSettings settings, String testName) throws Exception {
+      return processTestFiles(Arrays.asList(testFile), settings, testName).get(
+            0);
    }
 
    /**
@@ -107,18 +96,15 @@ public abstract class ForkedTestFileRunner implements Serializable {
     * {@link RunAllProofsTest} object in a separate process.
     */
    public static List<TestResult> processTestFiles(List<TestFile> testFiles,
-         ProofCollectionSettings settings, String tempDirectoryPrefix)
-         throws Exception {
+         ProofCollectionSettings settings, String testName) throws Exception {
       File runAllProofsFolder = new File(KEY_CORE_TEST, "testresults"
             + File.separator + "runallproofs");
       if (!runAllProofsFolder.exists()) {
-         System.out.println("Creating directory for temporary files: "
-               + runAllProofsFolder);
          Files.createDirectories(runAllProofsFolder.toPath());
       }
 
       Path tempDirectory = Files.createTempDirectory(
-            runAllProofsFolder.toPath(), tempDirectoryPrefix);
+            runAllProofsFolder.toPath(), testName + "-");
 
       writeObject(getLocationOfSerializedTestFiles(tempDirectory),
             (Serializable) testFiles);

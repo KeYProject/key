@@ -23,7 +23,7 @@ public class ListRunAllProofsTestCases {
       List<RunAllProofsTestUnit> units = proofCollection
             .createRunAllProofsTestUnits();
       for (RunAllProofsTestUnit unit : units) {
-         System.out.println(unit.name);
+         System.out.println(unit.testName);
       }
    }
 

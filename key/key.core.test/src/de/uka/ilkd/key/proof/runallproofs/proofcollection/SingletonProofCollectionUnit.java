@@ -32,7 +32,7 @@ public class SingletonProofCollectionUnit implements ProofCollectionUnit {
             }
             else if (forkMode == ForkMode.PERGROUP
                   || forkMode == ForkMode.PERFILE) {
-               return ForkedTestFileRunner.processTestFile(file, settings);
+               return ForkedTestFileRunner.processTestFile(file, settings, testName);
             }
             else {
                throw new RuntimeException("Unexpected value for fork mode: "

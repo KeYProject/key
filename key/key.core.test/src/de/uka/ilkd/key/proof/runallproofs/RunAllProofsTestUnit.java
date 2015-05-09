@@ -15,7 +15,7 @@ public abstract class RunAllProofsTestUnit implements Serializable {
    /**
     * The name of this test. 
     */
-   public String name;
+   public String testName;
 
    /**
     * This method is used by class {@link RunAllProofsTest} to determine the
@@ -24,11 +24,11 @@ public abstract class RunAllProofsTestUnit implements Serializable {
     */
    @Override
    public String toString() {
-      return name;
+      return testName;
    }
 
    public RunAllProofsTestUnit(String name) {
-      this.name = name;
+      this.testName = name;
    }
 
    /**

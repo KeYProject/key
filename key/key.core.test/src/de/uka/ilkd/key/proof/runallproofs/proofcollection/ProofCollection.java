@@ -51,7 +51,7 @@ public class ProofCollection {
 
          RunAllProofsTestUnit testUnit = proofCollectionUnit
                .createRunAllProofsTestUnit(settings);
-         String testUnitOriginalName = testUnit.name;
+         String testUnitOriginalName = testUnit.testName;
 
          /**
           * Assign a new name to testUnit in case one of the previous
@@ -63,7 +63,7 @@ public class ProofCollection {
             counter++;
             testUnitName = testUnitOriginalName + "#" + counter;
          }
-         testUnit.name = testUnitName;
+         testUnit.testName = testUnitName;
          testUnitNames.add(testUnitName);
 
          ret.add(testUnit);
@@ -77,7 +77,7 @@ public class ProofCollection {
          Iterator<RunAllProofsTestUnit> iterator = ret.iterator();
          while (iterator.hasNext()) {
             RunAllProofsTestUnit unit = iterator.next();
-            if (!enabledTestCaseNames.contains(unit.name)) {
+            if (!enabledTestCaseNames.contains(unit.testName)) {
                iterator.remove();
             }
          }

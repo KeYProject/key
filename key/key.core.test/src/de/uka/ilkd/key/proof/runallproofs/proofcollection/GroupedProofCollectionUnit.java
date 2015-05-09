@@ -3,7 +3,6 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
@@ -19,23 +18,12 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
    private final List<TestFile> testFiles;
    private final List<ProofCollectionSettings.Entry> settingsEntries;
 
-   /**
-    * A temp directory prefix is created for each group so that directories for
-    * groups can easily be recognized in the {@link RunAllProofsTest} temp
-    * directory.
-    * 
-    * @see de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit#getTempDirectoryPrefix()
-    * @see de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner
-    */
-   private final String tempDirectoryPrefix;
-
    public GroupedProofCollectionUnit(String groupName,
          List<ProofCollectionSettings.Entry> settingsEntries,
          List<TestFile> files) {
       this.groupName = groupName;
       this.settingsEntries = settingsEntries;
       this.testFiles = files;
-      this.tempDirectoryPrefix = groupName + "-";
    }
 
    @Override
@@ -59,7 +47,7 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
             ForkMode forkMode = settings.getForkMode();
             if (forkMode == ForkMode.PERGROUP) {
                testResults = ForkedTestFileRunner.processTestFiles(testFiles,
-                     settings, tempDirectoryPrefix);
+                     settings, testName);
             }
             else if (forkMode == ForkMode.NOFORK
                   || forkMode == ForkMode.PERFILE) {
@@ -68,7 +56,7 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
                   TestResult testResult = forkMode == ForkMode.NOFORK ? testFile
                         .runKey(settings) : ForkedTestFileRunner
                         .processTestFile(testFile, settings,
-                              tempDirectoryPrefix);
+                              testName);
                   testResults.add(testResult);
                }
             }
