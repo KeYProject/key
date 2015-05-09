@@ -16,7 +16,7 @@ public enum ForkMode {
     * Default fork mode, in which {@link RunAllProofsTest} does not create any
     * subprocesses.
     */
-   NOFORK,
+   NOFORK("noFork"),
    /**
     * Causes {@link RunAllProofsTest} to create a new subprocess for each group
     * of files. All files from the same group will be proven together in the
@@ -26,10 +26,23 @@ public enum ForkMode {
     * this essentially means that each test case from {@link RunAllProofsTest}
     * is executed in a separate thread.
     */
-   PERGROUP,
+   PERGROUP("perGroup"),
    /**
     * In this mode, a new subprocess will be created for each KeY file that is
     * proven during test run of {@link RunAllProofsTest}.
     */
-   PERFILE
+   PERFILE("perFile");
+
+   /**
+    * Name of every fork mode that can be used in
+    * {@link ProofCollectionSettings} to activate that specific fork mode.
+    * 
+    * @see {@link ProofCollectionSettings#getForkMode()}
+    */
+   public final String settingName;
+
+   ForkMode(String settingName) {
+      this.settingName = settingName;
+   }
+
 }

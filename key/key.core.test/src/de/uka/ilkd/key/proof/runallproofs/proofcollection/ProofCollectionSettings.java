@@ -203,16 +203,21 @@ public class ProofCollectionSettings implements Serializable {
             // specified.
             forkMode = ForkMode.NOFORK;
          }
-         else if (forkModeString.toLowerCase().equals("nofork")) {
-            forkMode = ForkMode.NOFORK;
-         }
-         else if (forkModeString.toLowerCase().equals("pergroup")) {
-            forkMode = ForkMode.PERGROUP;
-         }
-         else if (forkModeString.toLowerCase().equals("perfile")) {
-            forkMode = ForkMode.PERFILE;
-         }
          else {
+            for (ForkMode mode : ForkMode.values()) {
+               if (mode.settingName.toLowerCase().equals(
+                     forkModeString.toLowerCase())) {
+                  forkMode = mode;
+                  break;
+               }
+            }
+         }
+
+         /*
+          * Warn user that specified fork mode was not recognized but use
+          * default fork mode rather than throwing an Exception.
+          */
+         if (forkMode == null) {
             /*
              * Unknown value used for fork mode. Printing out warning to the
              * user.
