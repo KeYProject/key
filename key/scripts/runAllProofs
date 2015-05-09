@@ -1,7 +1,12 @@
 #!/bin/bash
 
-resolve_symlink  ()
-{
+list_help() {
+    echo "Usage: runAllProofs [[--fork-mode=<perFile|perGroup|noFork>] <groupNames>] | [--list-tests]"
+    echo "Examples: runAllProofs --fork-mode=perFile newBook comprehensions"
+    echo "          runAllProofs --list-tests"
+}
+
+resolve_symlink() {
    TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
 
    if [ -n "$TARGET" ] ; then
@@ -17,38 +22,10 @@ resolve_symlink  ()
    echo "$RESULT"
 }
 
-list_help(){
-    echo "Usage: runAllProofs [--forkMode=<perFile|perGroup|noFork>] <groupNames>"
-    echo "Example: runAllProofs --forkMode=perFile newBook comprehensions"
-}
-
 #
-# Parse command line arguments
+# Method for initialisation of environment variables.
 #
-
-case $1 in
-    --forkMode=*)
-    FORKMODE=$(echo $1 | cut -d'=' -f 2)
-    shift
-    ;;
-    -h|--help|-?)
-    list_help
-    exit
-    ;;
-esac
-
-if [[ $# > 0 ]]
-then
-
-TESTCASES=$1
-shift
-
-while [[ $# > 0 ]]
-do
-TESTCASES="$TESTCASES $1"
-shift
-done
-fi
+init_env() {
 
 #
 # Determine JAVA_HOME
@@ -68,7 +45,7 @@ else
     if [ "$UNAME" = "darwin" ] ; then
 	JRE=$JAVA_HOME/Home
 	JAVA=$JRE/bin/java
-# other OS
+    # other OS
     else
 	JRE=$JAVA_HOME/jre
 	JAVA=$JRE/bin/java
@@ -127,10 +104,51 @@ for i in $key_junit_jars ; do
     fi
 done
 
-$JAVA $keysysprops \
--ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
+}
+
+call_java(){
+init_env
+
+$JAVA -ea:de.uka.ilkd.key...\
+-noverify\
+-Djvm.dir=$JVM_DIR\
+-Xms64m -Xmx2048m \
 -Dkey.home="$KEY_HOME" \
--Djava.awt.headless=true \
+-classpath "$keyclasspath" \
+$@
+}
+
+#
+# Parse command line arguments
+#
+
+case $1 in
+    --fork-mode=*)
+    FORKMODE=$(echo $1 | cut -d'=' -f 2)
+    shift
+    ;;
+    --list-tests)
+    call_java de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
+    exit
+    ;;
+    -h|--help|-?)
+    list_help
+    exit
+    ;;
+esac
+
+if [[ $# > 0 ]]
+    then
+    TESTCASES=$1
+    shift
+    while [[ $# > 0 ]]
+        do
+        TESTCASES="$TESTCASES $1"
+        shift
+        done
+fi
+
+call_java \
 -Dkey.runallproofs.forkMode=$FORKMODE \
 -Dkey.runallproofs.testCases="$TESTCASES" \
--classpath "$keyclasspath" org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
+org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest

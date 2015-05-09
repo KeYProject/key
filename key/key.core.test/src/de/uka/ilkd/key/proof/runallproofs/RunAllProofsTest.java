@@ -86,7 +86,7 @@ public class RunAllProofsTest implements Serializable {
     * Computes the constant values.
     */
    static {
-      String keyHome = System.getenv("KEY_HOME");
+      String keyHome = System.getProperty("key.home");
       if (keyHome == null) {
          throw new RuntimeException("Environment variable KEY_HOME not set. "
                + "Cannot test proofs.");
@@ -148,10 +148,10 @@ public class RunAllProofsTest implements Serializable {
       assertDirectoryExists(EXAMPLE_DIR);
 
       /*
-       * Parse index file containing declarations for proof obligations.
+       * Parse index file containing declarations for KeY files that will be
+       * verified.
        */
-      File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL.txt");
-      ProofCollection proofCollection = parseFile(automaticJAVADL);
+      ProofCollection proofCollection = parseIndexFile();
 
       /*
        * Create list of constructor parameters that will be returned by this
@@ -170,9 +170,11 @@ public class RunAllProofsTest implements Serializable {
     * Uses {@link ProofCollectionParser} to parse the given file and returns a
     * parse result that is received from main parser entry point.
     */
-   private static ProofCollection parseFile(File file) throws IOException,
+   public static ProofCollection parseIndexFile() throws IOException,
          RecognitionException {
-      CharStream charStream = new ANTLRFileStream(file.getAbsolutePath());
+      File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL.txt");
+      CharStream charStream = new ANTLRFileStream(
+            automaticJAVADL.getAbsolutePath());
       ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
       TokenStream tokenStream = new CommonTokenStream(lexer);
       ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
