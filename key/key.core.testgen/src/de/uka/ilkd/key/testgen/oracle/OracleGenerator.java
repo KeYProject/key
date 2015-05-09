@@ -222,7 +222,7 @@ public class OracleGenerator {
 	
 	private void findConstants(Set<Term> constants, Term term){	
 		//System.out.println("FindConstants: "+term+ " cls "+term.getClass().getName());
-		if(term.op() instanceof Function && term.subs().size() == 0){
+		if(term.op() instanceof Function && term.arity() == 0){
 			constants.add(term);
 		}
 		if(term.op() instanceof ProgramVariable){
@@ -372,7 +372,7 @@ public class OracleGenerator {
 	    else if(falsePredicates.contains(name)){
 	    	return OracleConstant.FALSE;
 	    }
-	    else if(term.subs().size() == 0){
+	    else if(term.arity() == 0){
 	    	return new OracleConstant(name, term.sort());
 	    }
 	    else if(name.endsWith("select")){
