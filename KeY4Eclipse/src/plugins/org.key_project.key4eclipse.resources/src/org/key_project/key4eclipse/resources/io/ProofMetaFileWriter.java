@@ -319,6 +319,7 @@ public class ProofMetaFileWriter {
                XMLUtil.appendEmptyTag(level + 1, TAG_CONTRACT_REFERENCE, attributeValues, sb);
             }
          }
+         XMLUtil.appendEndTag(level, TAG_CONTRACT_REFERENCES, sb);
       }
    }
 }
