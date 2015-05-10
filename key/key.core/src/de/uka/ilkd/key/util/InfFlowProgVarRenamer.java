@@ -207,7 +207,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
     private Term[] applyProgramRenamingsToSubs(Term term,
                                                Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
-        Term[] appliedSubs = new Term[term.subs().size()];
+        Term[] appliedSubs = new Term[term.arity()];
         for (int i = 0; i < appliedSubs.length; i++) {
             appliedSubs[i] = applyRenamingsToPrograms(term.sub(i),
                     progVarReplaceMap);
