@@ -17,10 +17,30 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    public static UnderstandingProofAttemptsEvaluation INSTANCE = new UnderstandingProofAttemptsEvaluation();
    
    /**
+    * The name of the {@link Tool} representing 'KeY'.
+    */
+   public static final String KEY_TOOL_NAME = "KeY";
+
+   /**
+    * The name of the {@link Tool} representing 'SED'.
+    */
+   public static final String SED_TOOL_NAME = "SED";
+
+   /**
     * Forbid additional instances.
     */
    private UnderstandingProofAttemptsEvaluation() {
       super("Understanding Proof Attempts");
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected List<Tool> computeTools() {
+      Tool key = new Tool(KEY_TOOL_NAME);
+      Tool sed = new Tool(SED_TOOL_NAME);
+      return CollectionUtil.toList(key, sed);
    }
    
    /**

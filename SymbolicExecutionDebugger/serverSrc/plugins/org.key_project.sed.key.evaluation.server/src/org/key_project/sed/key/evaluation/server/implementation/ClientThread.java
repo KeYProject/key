@@ -10,7 +10,7 @@ import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
-import org.key_project.sed.key.evaluation.model.random.IRandomFormOrderComputer;
+import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.util.java.ObjectUtil;
 
@@ -50,9 +50,9 @@ public class ClientThread extends Thread {
             EvaluationInput evaluationInput = EvaluationInputReader.parse(message);
             AbstractFormInput<?> formInput = evaluationInput.getCurrentFormInput();
             // Compute random orders
-            IRandomFormOrderComputer computer = formInput.getForm().getRandomOrderComputer();
+            IRandomCompletion computer = formInput.getForm().getRandomOrderComputer();
             List<RandomFormInput> updatedOrders = computer != null ? 
-                                                  computer.updateRandomOrder(evaluationInput, formInput) : 
+                                                  computer.computeRandomValues(evaluationInput, formInput) : 
                                                   null;
             // Store evaluation
             FileStorage.store(formInput, updatedOrders);

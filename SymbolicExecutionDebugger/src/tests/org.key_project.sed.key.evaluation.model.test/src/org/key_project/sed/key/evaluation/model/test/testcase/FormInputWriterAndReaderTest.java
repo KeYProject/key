@@ -10,6 +10,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.FixedForm;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
 import org.key_project.sed.key.evaluation.model.definition.TestEvaluation;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
@@ -20,7 +21,7 @@ import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
-import org.key_project.sed.key.evaluation.model.random.IRandomFormOrderComputer;
+import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -40,11 +41,11 @@ public class FormInputWriterAndReaderTest extends TestCase {
    /**
     * Performs the test steps to test parsing of {@link EvaluationInputWriter#toFormAnswerXML(AbstractFormInput, List)}.
     * @param changer The {@link IFormInputChanger} to use.
-    * @param computer The {@link IRandomFormOrderComputer} to use.
+    * @param computer The {@link IRandomCompletion} to use.
     * @throws Exception Occurred Exception.
     */
    protected void doAnswersAndRandomOrder(IFormInputChanger changer,
-                                          IRandomFormOrderComputer computer) throws Exception {
+                                          IRandomCompletion computer) throws Exception {
       // Create example form
       AbstractEvaluation evaluation = TestEvaluation.INSTANCE;
       FixedForm fixedForm = (FixedForm) evaluation.getForms()[0];
@@ -60,7 +61,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
       AbstractFormInput<?> randomFormInput = evaluationInput.getFormInput(randomForm);
       // Convert to xml
       List<RandomFormInput> updatedOrders = computer != null ? 
-                                            computer.updateRandomOrder(evaluationInput, randomFormInput) : 
+                                            computer.computeRandomValues(evaluationInput, randomFormInput) : 
                                             null;
       String xml = EvaluationInputWriter.toFormAnswerXML(fixedFormInput, updatedOrders);
       // Parse xml
@@ -81,19 +82,21 @@ public class FormInputWriterAndReaderTest extends TestCase {
    }
    
    /**
-    * Creates a {@link IRandomFormOrderComputer} which returns a fixed order.
-    * @return The created {@link IRandomFormOrderComputer}.
+    * Creates a {@link IRandomCompletion} which returns a fixed order.
+    * @return The created {@link IRandomCompletion}.
     */
-   protected IRandomFormOrderComputer createFixedOrderComputer() {
-      return new IRandomFormOrderComputer() {
+   protected IRandomCompletion createFixedOrderComputer() {
+      return new IRandomCompletion() {
          @SuppressWarnings("unchecked")
          @Override
-         public List<RandomFormInput> updateRandomOrder(EvaluationInput evaluationInput, AbstractFormInput<?> currentForm) {
+         public List<RandomFormInput> computeRandomValues(EvaluationInput evaluationInput, AbstractFormInput<?> currentForm) {
             RandomFormInput formInput = (RandomFormInput)evaluationInput.getFormInputs()[1];
             AbstractPageInput<?> page1 = formInput.getPageInputs()[0];
             AbstractPageInput<?> page2 = formInput.getPageInputs()[1];
             AbstractPageInput<?> page3 = formInput.getPageInputs()[2];
             formInput.setPageOrder(CollectionUtil.toList(page3, page1, page2));
+            formInput.setTool(page1, currentForm.getEvaluationInput().getEvaluation().getTools()[0]);
+            formInput.setTool(page2, currentForm.getEvaluationInput().getEvaluation().getTools()[1]);
             return CollectionUtil.toList(formInput);
          }
       };
@@ -110,10 +113,10 @@ public class FormInputWriterAndReaderTest extends TestCase {
    
    /**
     * Performs the test steps to test parsing of {@link EvaluationInputWriter#toRandomOrderXML(EvaluationInput, List)}.
-    * @param computer The {@link IRandomFormOrderComputer} to use.
+    * @param computer The {@link IRandomCompletion} to use.
     * @throws Exception Occurred Exception.
     */
-   protected void doRandomOrderTest(IRandomFormOrderComputer computer) throws Exception {
+   protected void doRandomOrderTest(IRandomCompletion computer) throws Exception {
       // Create example form
       AbstractEvaluation evaluation = TestEvaluation.INSTANCE;
       RandomForm randomForm = (RandomForm) evaluation.getForms()[1];
@@ -123,9 +126,10 @@ public class FormInputWriterAndReaderTest extends TestCase {
       AbstractFormInput<?> randomFormInput = evaluationInput.getFormInput(randomForm);
       // Convert to xml
       List<RandomFormInput> updatedOrders = computer != null ? 
-                                            computer.updateRandomOrder(evaluationInput, randomFormInput) : 
+                                            computer.computeRandomValues(evaluationInput, randomFormInput) : 
                                             null;
       String xml = EvaluationInputWriter.toRandomOrderXML(evaluationInput, updatedOrders);
+System.out.println(xml);
       // Parse xml
       EvaluationInput parsedInput = EvaluationInputReader.parse(xml);
       // Compare inputs
@@ -253,6 +257,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
          if (expected instanceof RandomFormInput) {
             assertTrue(actual instanceof RandomFormInput);
             assertPageInputs(((RandomFormInput) expected).getPageOrder(), ((RandomFormInput) actual).getPageOrder());
+            assertTools((RandomFormInput) expected, (RandomFormInput) actual);
          }
          else if (expected instanceof FixedFormInput) {
             assertTrue(actual instanceof FixedFormInput);
@@ -260,6 +265,39 @@ public class FormInputWriterAndReaderTest extends TestCase {
          else {
             fail("Unsupported form input: " + expected);
          }
+      }
+      else {
+         assertNull(actual);
+      }
+   }
+
+   /**
+    * Ensures that the given {@link Tool}s are equal.
+    * @param expected The expected {@link Tool}s.
+    * @param actual The actual {@link Tool}s.
+    */
+   protected void assertTools(RandomFormInput expected, RandomFormInput actual) {
+      assertNotNull(expected);
+      assertNotNull(actual);
+      for (AbstractPageInput<?> expectedPageInput : expected.getPageInputs()) {
+         AbstractPageInput<?> actualPageInput = actual.getPageInput(expectedPageInput.getPage());
+         assertTool(expected.getTool(expectedPageInput), actual.getTool(actualPageInput));
+      }
+      for (AbstractPageInput<?> actualPageInput : actual.getPageInputs()) {
+         AbstractPageInput<?> expectedPageInput = expected.getPageInput(actualPageInput.getPage());
+         assertTool(expected.getTool(expectedPageInput), actual.getTool(actualPageInput));
+      }
+   }
+
+   /**
+    * Ensures that the given {@link Tool}s are equal.
+    * @param expected The expected {@link Tool}s.
+    * @param actual The actual {@link Tool}s.
+    */
+   private void assertTool(Tool expected, Tool actual) {
+      if (expected != null) {
+         assertNotNull(actual);
+         assertEquals(expected.getName(), actual.getName());
       }
       else {
          assertNull(actual);

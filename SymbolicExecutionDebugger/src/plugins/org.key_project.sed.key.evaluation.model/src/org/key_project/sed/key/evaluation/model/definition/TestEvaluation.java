@@ -38,4 +38,11 @@ public class TestEvaluation extends AbstractEvaluation {
          throw new IllegalArgumentException(e);
       }
    }
+
+   @Override
+   protected List<Tool> computeTools() {
+      Tool t1 = new Tool("tool1");
+      Tool t2 = new Tool("tool2");
+      return CollectionUtil.toList(t1, t2);
+   }
 }

@@ -9,20 +9,29 @@ import org.key_project.util.java.ObjectUtil;
 public abstract class AbstractEvaluation {
    private final String name;
    
+   private final List<Tool> tools;
+   
    private final List<AbstractForm> forms;
 
    public AbstractEvaluation(String name) {
       this.name = name;
+      this.tools = computeTools();
       this.forms = (List<AbstractForm>)computeForms();
       for (AbstractForm form : forms) {
          form.setEvaluation(this);
       }
    }
 
+   protected abstract List<Tool> computeTools();
+
    protected abstract List<AbstractForm> computeForms();
 
    public String getName() {
       return name;
+   }
+   
+   public Tool[] getTools() {
+      return tools.toArray(new Tool[tools.size()]);
    }
    
    public AbstractForm[] getForms() {
@@ -50,6 +59,15 @@ public abstract class AbstractEvaluation {
          @Override
          public boolean select(AbstractForm element) {
             return ObjectUtil.equals(formName, element.getName());
+         }
+      });
+   }
+
+   public Tool getTool(final String toolName) {
+      return CollectionUtil.search(tools, new IFilter<Tool>() {
+         @Override
+         public boolean select(Tool element) {
+            return ObjectUtil.equals(toolName, element.getName());
          }
       });
    }

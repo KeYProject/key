@@ -12,6 +12,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
@@ -19,6 +20,7 @@ import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.StringUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -158,6 +160,14 @@ public class EvaluationInputReader {
                CollectionUtil.addAll(newPageOrder, randomFormInput.getPageOrder());
                newPageOrder.add(pageInput);
                randomFormInput.setPageOrder(newPageOrder);
+               String toolName = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_TOOL_NAME);
+               if (!StringUtil.isTrimmedEmpty(toolName)) {
+                  Tool tool = evaluationInput.getEvaluation().getTool(toolName);
+                  if (tool == null) {
+                     throw new SAXException("Tool '" + toolName + "' is not part of evaluation '" + evaluationInput.getEvaluation().getName() + "'.");
+                  }
+                  randomFormInput.setTool(pageInput, tool);
+               }
             }
             else {
                currentPageInput = pageInput;

@@ -2,7 +2,7 @@ package org.key_project.sed.key.evaluation.model.definition;
 
 import java.util.List;
 
-import org.key_project.sed.key.evaluation.model.random.IRandomFormOrderComputer;
+import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
 import org.key_project.util.java.CollectionUtil;
 
 public abstract class AbstractForm {
@@ -10,7 +10,7 @@ public abstract class AbstractForm {
    
    private final List<AbstractPage> pages;
    
-   private final IRandomFormOrderComputer randomOrderComputer;
+   private final IRandomCompletion randomOrderComputer;
    
    private AbstractEvaluation evaluation;
 
@@ -22,11 +22,11 @@ public abstract class AbstractForm {
       this(name, null, pages);
    }
 
-   public AbstractForm(String name, IRandomFormOrderComputer randomOrderComputer, AbstractPage... pages) {
+   public AbstractForm(String name, IRandomCompletion randomOrderComputer, AbstractPage... pages) {
       this(name, randomOrderComputer, CollectionUtil.toList(pages));
    }
 
-   public AbstractForm(String name, IRandomFormOrderComputer randomOrderComputer, List<AbstractPage> pages) {
+   public AbstractForm(String name, IRandomCompletion randomOrderComputer, List<AbstractPage> pages) {
       this.name = name;
       this.randomOrderComputer = randomOrderComputer;
       this.pages = pages;
@@ -56,7 +56,7 @@ public abstract class AbstractForm {
       this.evaluation = evaluation;
    }
 
-   public IRandomFormOrderComputer getRandomOrderComputer() {
+   public IRandomCompletion getRandomOrderComputer() {
       return randomOrderComputer;
    }
 }

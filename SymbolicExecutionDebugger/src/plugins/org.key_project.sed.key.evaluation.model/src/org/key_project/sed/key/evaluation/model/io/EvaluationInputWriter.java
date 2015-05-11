@@ -8,6 +8,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
@@ -80,6 +81,11 @@ public class EvaluationInputWriter {
     * Tag name to store {@link RandomFormInput#getPageOrder()}.
     */
    public static final String TAG_RANDOM_PAGE_ORDER = "pageOrder";
+
+   /**
+    * Attribute name to store {@link RandomFormInput#getTool(AbstractPageInput)} entries.
+    */
+   public static final String ATTRIBUTE_TOOL_NAME = "tool";
 
    /**
     * Converts the orders of the given {@link RandomFormInput}s into XML.
@@ -155,12 +161,17 @@ public class EvaluationInputWriter {
          // Nothing to do
       }
       else if (formInput instanceof RandomFormInput) {
-         List<AbstractPageInput<?>> pageOrder = ((RandomFormInput) formInput).getPageOrder();
+         RandomFormInput rfi = (RandomFormInput) formInput;
+         List<AbstractPageInput<?>> pageOrder = rfi.getPageOrder();
          if (!CollectionUtil.isEmpty(pageOrder)) {
             XMLUtil.appendStartTag(level + 1, TAG_RANDOM_PAGE_ORDER, null, sb);
             for (AbstractPageInput<?> pageInput : pageOrder) {
                Map<String, String> pageAttributes = new LinkedHashMap<String, String>();
                pageAttributes.put(ATTRIBUTE_PAGE_NAME, XMLUtil.encodeText(pageInput.getPage().getName()));
+               Tool tool = rfi.getTool(pageInput);
+               if (tool != null) {
+                  pageAttributes.put(ATTRIBUTE_TOOL_NAME, XMLUtil.encodeText(tool.getName()));
+               }
                XMLUtil.appendEmptyTag(level + 2, TAG_PAGE, pageAttributes, sb);
             }
             XMLUtil.appendEndTag(level + 1, TAG_RANDOM_PAGE_ORDER, sb);
