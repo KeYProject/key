@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.ConcreteJoinRule;
+import de.uka.ilkd.key.rule.join.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.Pair;
@@ -19,6 +20,8 @@ import de.uka.ilkd.key.util.Pair;
  * @author Dominic Scheurer
  */
 public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion {
+	
+	private static final ConcreteJoinRule STD_CONCRETE_JOIN_RULE = JoinIfThenElse.INSTANCE; 
 
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
@@ -35,6 +38,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
         
         if (forced) {
             chosenCandidates = candidates;
+            chosenRule = STD_CONCRETE_JOIN_RULE;
         } else {
             JoinPartnerSelectionDialog dialog =
                     new JoinPartnerSelectionDialog(goal, pio, candidates, goal.proof().getServices());
