@@ -522,9 +522,11 @@ public abstract class JoinRule implements BuiltInRule {
 		} else if (termAfterUpdate.op() instanceof UpdateApplication) {
 			return false;
 		}
+		
+		return true;
 
-		return !doJoinPartnerCheck
-				|| findPotentialJoinPartners(goal, pio).size() > 0;
+//		return !doJoinPartnerCheck
+//				|| findPotentialJoinPartners(goal, pio).size() > 0;
 
 	}
    
@@ -566,7 +568,7 @@ public abstract class JoinRule implements BuiltInRule {
                PosInTerm pit = PosInTerm.getTopLevel();
 
                PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
-               if (isApplicable(g, gPio, false, false)) {
+               if (isApplicable(g, gPio, false)) {
                   Triple<Term, Term, Term> ownSEState = sequentToSETriple(
                         goal, pio, services);
                   Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
