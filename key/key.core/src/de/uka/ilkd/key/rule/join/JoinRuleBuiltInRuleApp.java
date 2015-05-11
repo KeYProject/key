@@ -11,15 +11,17 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * Rule application class for join rule applications. Is complete iff
- * the joinPartners field has been set by the corresponding setter function.
+ * the joinPartners field as well as the concrete join rule to be used
+ * have been set by the corresponding setter function.
  * 
  * @author Dominic Scheurer
  */
 public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     private ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = null;
+    private ConcreteJoinRule concreteRule = null;
 
-    public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
+	public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
         super(builtInRule, pio);
     }
@@ -47,7 +49,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     @Override
     public boolean complete() {
-        return joinPartners != null;
+        return joinPartners != null && concreteRule != null;
     }
 
     public ImmutableList<Pair<Goal, PosInOccurrence>> getJoinPartners() {
@@ -57,10 +59,13 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public void setJoinPartners(ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners) {
         this.joinPartners = joinPartners;
     }
-    
-    @Override
-    public JoinRule rule() {
-        return (JoinRule) super.rule();
-    }
+
+    public ConcreteJoinRule getConcreteRule() {
+		return concreteRule;
+	}
+
+	public void setConcreteRule(ConcreteJoinRule concreteRule) {
+		this.concreteRule = concreteRule;
+	}
 
 }

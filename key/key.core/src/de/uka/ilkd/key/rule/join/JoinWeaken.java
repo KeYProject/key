@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
@@ -36,14 +35,14 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * 
  * @author Dominic Scheurer
  */
-public class JoinWeaken extends JoinRule {
+public class JoinWeaken extends JoinRule implements ConcreteJoinRule {
    
    public static final JoinWeaken INSTANCE = new JoinWeaken();
-   private static final String DISPLAY_NAME = "JoinByWeakening";
+   private static final String DISPLAY_NAME = "JoinByFullAnonymization";
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
    
    @Override
-   protected Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Pair<HashSet<Term>, Term> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,

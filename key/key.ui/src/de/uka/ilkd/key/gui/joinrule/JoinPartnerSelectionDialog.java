@@ -24,21 +24,25 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.html.HTMLDocument;
@@ -47,10 +51,16 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.utilities.WrapLayout;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.join.ConcreteJoinRule;
+import de.uka.ilkd.key.rule.join.JoinIfThenElse;
+import de.uka.ilkd.key.rule.join.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.JoinWeaken;
+import de.uka.ilkd.key.rule.join.JoinWithSignLattice;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -65,13 +75,16 @@ public class JoinPartnerSelectionDialog extends JDialog {
    /** The tooltip hint for the checkbox. */
    private static final String CB_SELECT_CANDIDATE_HINT =
          "Select to add shown state as a join partner.";
+   
    /** The initial size of this dialog. */
    private static final Dimension INITIAL_SIZE =
-         new Dimension(750, 450);
+         new Dimension(850, 450);
+   
    /** The font for the JEditorPanes. Should
     *  resemble the standard font of KeY for proofs etc. */
    private static final Font TXT_AREA_FONT =
          new Font(Font.MONOSPACED, Font.PLAIN, 14);
+   
    /** Comparator for goals; sorts by serial nr. of the node */
    private static Comparator<Pair<Goal, PosInOccurrence>> GOAL_COMPARATOR =
       new Comparator<Pair<Goal, PosInOccurrence>>() {
@@ -81,18 +94,30 @@ public class JoinPartnerSelectionDialog extends JDialog {
             return o1.first.node().serialNr() - o2.first.node().serialNr();
          }
       };
+      
+   /** Concrete join rules to consider. */
+   private static final ImmutableList<ConcreteJoinRule> CONCRETE_RULES =
+		   ImmutableSLList.<ConcreteJoinRule>nil()
+			   .append(JoinIfThenElse.INSTANCE)
+			   .append(JoinIfThenElseAntecedent.INSTANCE)
+			   .append(JoinWithSignLattice.INSTANCE)
+			   .append(JoinWeaken.INSTANCE);
    
    private LinkedList<Pair<Goal, PosInOccurrence>> candidates = null;
    private Services services = null;
    
    /** The chosen goals. */
-   private SortedSet<Pair<Goal, PosInOccurrence>> chosen =
+   private SortedSet<Pair<Goal, PosInOccurrence>> chosenGoals =
          new TreeSet<Pair<Goal,PosInOccurrence>>(GOAL_COMPARATOR);
+   
+   /** The chosen join method. */
+   private ConcreteJoinRule chosenRule = CONCRETE_RULES.head();
    
    private JEditorPane txtPartner1 = null;
    private JEditorPane txtPartner2 = null;
    private JComboBox<String> cmbCandidates = null;
    private JCheckBox cbSelectCandidate = null;
+   private ButtonGroup bgJoinMethods = null;
    
    private JScrollPane scrpPartner1 = null;
    private JScrollPane scrpPartner2 = null;
@@ -133,7 +158,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
             setHighlightedSequentForArea(
                   selectedCandidate.first, selectedCandidate.second, txtPartner2);
             
-            if (chosen.contains(selectedCandidate)) {
+            if (chosenGoals.contains(selectedCandidate)) {
                cbSelectCandidate.setSelected(true);
             } else {
                cbSelectCandidate.setSelected(false);
@@ -157,12 +182,26 @@ public class JoinPartnerSelectionDialog extends JDialog {
          @Override
          public void actionPerformed(ActionEvent e) {
             if (cbSelectCandidate.isSelected()) {
-               chosen.add(getSelectedCandidate());
+               chosenGoals.add(getSelectedCandidate());
             } else {
-               chosen.remove(getSelectedCandidate());
+               chosenGoals.remove(getSelectedCandidate());
             }
          }
       });
+      
+      bgJoinMethods = new ButtonGroup();
+      for (final ConcreteJoinRule rule : CONCRETE_RULES) {
+    	  JRadioButton rb = new JRadioButton(rule.toString());
+    	  rb.setSelected(true);
+    	  
+    	  rb.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+					chosenRule = rule;
+				}
+    	  	});
+    	  bgJoinMethods.add(rb);
+      }
       
       // Join state container
       JPanel joinStateContainer = new JPanel();
@@ -197,7 +236,22 @@ public class JoinPartnerSelectionDialog extends JDialog {
       upperContainer.add(joinStateContainer);
       upperContainer.add(partnerContainer);
       
-      // Lower container: OK / Cancel
+      // Join rules container
+      JPanel joinRulesContainer = new JPanel();
+      joinRulesContainer.setLayout(new WrapLayout());
+      
+      for (Enumeration<AbstractButton> e = bgJoinMethods.getElements(); e.hasMoreElements();) {
+    	  JRadioButton rb = (JRadioButton) e.nextElement();
+    	  joinRulesContainer.add(rb);
+      }
+      
+      TitledBorder joinRulesContainerTitle =
+              BorderFactory.createTitledBorder("Concrete join rule to apply");
+      joinRulesContainerTitle.setTitleJustification(TitledBorder.LEFT);
+      joinRulesContainerTitle.setBorder(joinStateContainerTitle);
+      joinRulesContainer.setBorder(joinRulesContainerTitle);
+      
+      // Control buttons container: OK / Cancel
       JButton okButton = new JButton("OK");
       JButton chooseAllButton = new JButton("Choose All");
       JButton cancelButton = new JButton("Cancel");
@@ -218,7 +272,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
          @Override
          public void actionPerformed(ActionEvent e) {
             for (Pair<Goal, PosInOccurrence> candidate : candidates) {
-               chosen.add(candidate);
+               chosenGoals.add(candidate);
             }
             setVisible(false);
          }
@@ -227,21 +281,26 @@ public class JoinPartnerSelectionDialog extends JDialog {
       cancelButton.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent e) {
-            chosen = null;
+            chosenGoals = null;
             setVisible(false);
          }
       });
       
-      JPanel lowerContainer = new JPanel();
-      lowerContainer.setLayout(new BoxLayout(lowerContainer, BoxLayout.X_AXIS));
-      lowerContainer.add(Box.createHorizontalGlue());
-      lowerContainer.add(okButton);
+      JPanel ctrlBtnsContainer = new JPanel();
+      ctrlBtnsContainer.setLayout(new BoxLayout(ctrlBtnsContainer, BoxLayout.X_AXIS));
+      ctrlBtnsContainer.add(Box.createHorizontalGlue());
+      ctrlBtnsContainer.add(okButton);
       Dimension fillerDim = new Dimension(30, 40);
-      lowerContainer.add(new Box.Filler(fillerDim, fillerDim, fillerDim));
-      lowerContainer.add(chooseAllButton);
-      lowerContainer.add(new Box.Filler(fillerDim, fillerDim, fillerDim));
-      lowerContainer.add(cancelButton);
-      lowerContainer.add(Box.createHorizontalGlue());
+      ctrlBtnsContainer.add(new Box.Filler(fillerDim, fillerDim, fillerDim));
+      ctrlBtnsContainer.add(chooseAllButton);
+      ctrlBtnsContainer.add(new Box.Filler(fillerDim, fillerDim, fillerDim));
+      ctrlBtnsContainer.add(cancelButton);
+      ctrlBtnsContainer.add(Box.createHorizontalGlue());
+      
+      JPanel lowerContainer = new JPanel();
+      lowerContainer.setLayout(new BoxLayout(lowerContainer, BoxLayout.Y_AXIS));
+      lowerContainer.add(joinRulesContainer);
+      lowerContainer.add(ctrlBtnsContainer);
       
       // Add components to content pane
       getContentPane().add(upperContainer, BorderLayout.CENTER);
@@ -286,14 +345,21 @@ public class JoinPartnerSelectionDialog extends JDialog {
    /**
     * @return All chosen join partners.
     */
-   public ImmutableList<Pair<Goal, PosInOccurrence>> getChosen() {
+   public ImmutableList<Pair<Goal, PosInOccurrence>> getChosenCandidates() {
       ImmutableSLList<Pair<Goal, PosInOccurrence>> result = ImmutableSLList.nil();
       
-      if (chosen != null) {
-         return result.append(chosen);
+      if (chosenGoals != null) {
+         return result.append(chosenGoals);
       } else {
          return result;
       }
+   }
+   
+   /**
+    * @return The chosen join rule.
+    */
+   public ConcreteJoinRule getChosenJoinRule() {
+      return chosenRule;
    }
    
    /**

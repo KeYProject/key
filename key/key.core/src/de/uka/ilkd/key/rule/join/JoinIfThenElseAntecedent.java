@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * @see JoinIfThenElse
  * @see JoinRule
  */
-public class JoinIfThenElseAntecedent extends JoinRule {
+public class JoinIfThenElseAntecedent extends JoinRule implements ConcreteJoinRule {
    
    public static final JoinIfThenElseAntecedent INSTANCE = new JoinIfThenElseAntecedent();
    
@@ -49,7 +49,7 @@ public class JoinIfThenElseAntecedent extends JoinRule {
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
    @Override
-   protected Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Pair<HashSet<Term>, Term> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,

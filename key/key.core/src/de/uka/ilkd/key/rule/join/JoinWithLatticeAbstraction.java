@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.join;
 
 import java.util.HashSet;
 import java.util.Iterator;
+
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
@@ -26,7 +27,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
@@ -38,7 +38,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * 
  * @author Dominic Scheurer
  */
-public abstract class JoinWithLatticeAbstraction extends JoinRule {
+public abstract class JoinWithLatticeAbstraction extends JoinRule implements ConcreteJoinRule {
 
    /**
     * Returns the abstract domain lattice for the given sort or
@@ -51,7 +51,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
    protected abstract AbstractDomainLattice<?> getAbstractDomainForSort(Sort s, Services services);
    
    @Override
-   protected Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Pair<HashSet<Term>, Term> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,

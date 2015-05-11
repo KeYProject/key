@@ -41,7 +41,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * @see JoinIfThenElseAntecedent
  * @see JoinRule
  */
-public class JoinIfThenElse extends JoinRule {
+public class JoinIfThenElse extends JoinRule implements ConcreteJoinRule {
    
    public static final JoinIfThenElse INSTANCE = new JoinIfThenElse();
    
@@ -50,7 +50,7 @@ public class JoinIfThenElse extends JoinRule {
    static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
    
    @Override
-   protected Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Pair<HashSet<Term>, Term> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,

@@ -33,10 +33,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinIfThenElse;
-import de.uka.ilkd.key.rule.join.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.rule.join.JoinWeaken;
-import de.uka.ilkd.key.rule.join.JoinWithSignLattice;
+import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -126,11 +123,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
-        			   .prepend(QueryExpand.INSTANCE)
-                                   .prepend(JoinWeaken.INSTANCE)
-                                   .prepend(JoinIfThenElse.INSTANCE)
-                                   .prepend(JoinIfThenElseAntecedent.INSTANCE)
-                                   .prepend(JoinWithSignLattice.INSTANCE);
+                                   .prepend(QueryExpand.INSTANCE)
+                                   .prepend(JoinRule.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!

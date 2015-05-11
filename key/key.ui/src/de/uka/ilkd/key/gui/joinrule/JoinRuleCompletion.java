@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.gui.joinrule;
 
 import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.ConcreteJoinRule;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.Pair;
@@ -23,13 +25,13 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
             boolean forced) {
 
         JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) app;
-        JoinRule joinRule = joinApp.rule();
         PosInOccurrence pio = joinApp.posInOccurrence();
         
         ImmutableList<Pair<Goal,PosInOccurrence>> candidates =
-                joinRule.findPotentialJoinPartners(goal, pio);
+                JoinRule.findPotentialJoinPartners(goal, pio);
         
         ImmutableList<Pair<Goal,PosInOccurrence>> chosenCandidates = null;
+        ConcreteJoinRule chosenRule = null;
         
         if (forced) {
             chosenCandidates = candidates;
@@ -37,15 +39,17 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
             JoinPartnerSelectionDialog dialog =
                     new JoinPartnerSelectionDialog(goal, pio, candidates, goal.proof().getServices());
             dialog.setVisible(true);
-            chosenCandidates = dialog.getChosen();
+            chosenCandidates = dialog.getChosenCandidates();
+            chosenRule = dialog.getChosenJoinRule();
         }
         
         if (chosenCandidates == null || chosenCandidates.size() < 1) {
         	return null;
         }
         
-        JoinRuleBuiltInRuleApp result = new JoinRuleBuiltInRuleApp(joinApp.rule(), pio);
+        JoinRuleBuiltInRuleApp result = new JoinRuleBuiltInRuleApp(app.rule(), pio);
         result.setJoinPartners(chosenCandidates);
+        result.setConcreteRule(chosenRule);
         
         return result;
     }

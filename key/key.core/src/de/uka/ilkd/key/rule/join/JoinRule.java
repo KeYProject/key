@@ -70,7 +70,12 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * @see de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion
  * @see de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog
  */
-public abstract class JoinRule implements BuiltInRule {
+public class JoinRule implements BuiltInRule {
+	
+	public static final JoinRule INSTANCE = new JoinRule();
+	
+	private static final String DISPLAY_NAME = "JoinRule";
+	private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
    /**
     * If set to true, join rules are expected to check the equivalence
@@ -91,12 +96,32 @@ public abstract class JoinRule implements BuiltInRule {
     */
    private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
    
+   /** JoinRule is a Singleton class, therefore constructor
+    *  only package-wide visible. */
+   JoinRule() {}
+   
+   @Override
+   public Name name() {
+	   return RULE_NAME;
+   }
+
+   @Override
+   public String displayName() {
+	   return DISPLAY_NAME;
+   }
+   
+   @Override
+   public String toString() {
+	   return displayName();
+   }
+   
    @Override
    public final ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
       
       final TermBuilder tb = services.getTermBuilder();
       final PosInOccurrence pio = ruleApp.posInOccurrence();
+      final ConcreteJoinRule joinRule = ((JoinRuleBuiltInRuleApp) ruleApp).getConcreteRule();
       
       if (findPotentialJoinPartners(goal, pio) == null) {
          return null;
@@ -132,7 +157,7 @@ public abstract class JoinRule implements BuiltInRule {
          System.out.print(" of ");
          System.out.println(joinPartners.size());
          
-         joinedState = joinStates(joinedState, state, thisSEState.third, services);
+         joinedState = joinStates(joinRule, joinedState, state, thisSEState.third, services);
          joinedState.setCorrespondingNode(goal.node());
       }
       
@@ -184,8 +209,9 @@ public abstract class JoinRule implements BuiltInRule {
     * @return A new joined SE state (U*,C*) which is a weakening
     *    of the original states.
     */
-   @SuppressWarnings("unused")
+   @SuppressWarnings("unused") // For deactivated equivalence check
    protected SymbolicExecutionState joinStates(
+		 ConcreteJoinRule joinRule,
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
          Term programCounter,
@@ -265,14 +291,14 @@ public abstract class JoinRule implements BuiltInRule {
             
             if (v.sort().equals(heapSort)) {
                
-               Pair<HashSet<Term>, Term> joinedHeaps = joinHeaps(v, rightSide1, rightSide2, state1, state2, services);
+               Pair<HashSet<Term>, Term> joinedHeaps = joinHeaps(joinRule, v, rightSide1, rightSide2, state1, state2, services);
                newElementaryUpdates = newElementaryUpdates.prepend(tb.elementary(v, joinedHeaps.second));
                newPathCondition = tb.and(newPathCondition, tb.and(joinedHeaps.first));
                
             } else {
                
                Pair<HashSet<Term>, Term> joinedVal =
-                     joinValuesInStates(v, state1, rightSide1, state2, rightSide2, services);
+                     joinRule.joinValuesInStates(v, state1, rightSide1, state2, rightSide2, services);
                
                newElementaryUpdates = newElementaryUpdates.prepend(
                      tb.elementary(
@@ -313,6 +339,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @return A joined heap term.
     */
    protected Pair<HashSet<Term>, Term> joinHeaps(
+		 ConcreteJoinRule joinRule,
          LocationVariable heapVar,
          Term heap1,
          Term heap2,
@@ -360,7 +387,7 @@ public abstract class JoinRule implements BuiltInRule {
          if (pointer1.equals(pointer2) && field1.equals(field2)) {
             // Potential for deep merge: Access of same object / field.
             
-            Pair<HashSet<Term>, Term> joinedSubHeap = joinHeaps(heapVar, subHeap1, subHeap2, state1, state2, services);
+            Pair<HashSet<Term>, Term> joinedSubHeap = joinHeaps(joinRule, heapVar, subHeap1, subHeap2, state1, state2, services);
             newConstraints.addAll(joinedSubHeap.first);
             
             Term joinedVal = null;
@@ -372,7 +399,7 @@ public abstract class JoinRule implements BuiltInRule {
             } else {
                
                Pair<HashSet<Term>, Term> joinedValAndConstr =
-                     joinValuesInStates(
+                     joinRule.joinValuesInStates(
                            new LocationVariable(
                                  new ProgramElementName(field1.name().toString()),
                                  value1.sort()),
@@ -405,7 +432,7 @@ public abstract class JoinRule implements BuiltInRule {
             // Same objects are created: Join.
             
             Pair<HashSet<Term>, Term> joinedSubHeap =
-                  joinHeaps(heapVar, subHeap1, subHeap2, state1, state2, services);
+                  joinHeaps(joinRule, heapVar, subHeap1, subHeap2, state1, state2, services);
             newConstraints.addAll(joinedSubHeap.first);
             
             return new Pair<HashSet<Term>, Term>(
@@ -423,27 +450,6 @@ public abstract class JoinRule implements BuiltInRule {
             JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services));
       
    }
-         
-   
-   /**
-    * Joins two values valueInState1 and valueInState2 of corresponding
-    * SE states state1 and state2 to a new value of a join state.
-    * 
-    * @param v The variable for which the values should be joined
-    * @param state1 First SE state.
-    * @param valueInState1 Value in state1.
-    * @param state2 Second SE state.
-    * @param valueInState2 Value in state2.
-    * @param services The services object.
-    * @return A joined value for valueInState1 and valueInState2.
-    */
-   protected abstract Pair<HashSet<Term>, Term> joinValuesInStates(
-         LocationVariable v,
-         SymbolicExecutionState state1,
-         Term valueInState1,
-         SymbolicExecutionState state2,
-         Term valueInState2,
-         Services services);
 
    /**
     * We admit top level formulas of the form \&lt;{ ... }\&gt; phi
@@ -463,8 +469,7 @@ public abstract class JoinRule implements BuiltInRule {
 	   //       formula of suitable form, but then with empty
 	   //       list of candidates.
 	   
-      return isApplicable(goal, pio,
-            false); // Do the check for partner existence
+      return isOfAdmissibleForm(goal, pio, false); // Do the check for partner existence
    }
    
    /**
@@ -472,16 +477,13 @@ public abstract class JoinRule implements BuiltInRule {
     * and U \&lt;{ ... }\&gt; phi, where U must be an update
     * in normal form, i.e. a parallel update of elementary
     * updates. We require that phi does not contain a Java block.
-    * When checkAutomatic is set to true, only interactive goals
-    * are admitted.
     * 
     * @param goal Current goal.
     * @param pio Position of selected sequent formula.
-    * @param checkAutomatic If true, only interactive goals are applicable.
     * @param doJoinPartnerCheck Checks for available join partners iff this flag is set to true.
     * @return true iff a suitable top level formula for joining.
     */
-	public boolean isApplicable(Goal goal, PosInOccurrence pio,
+	public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence pio,
 			boolean doJoinPartnerCheck) {
 		// We admit top level formulas of the form \<{ ... }\> phi
 		// and U \<{ ... }\> phi, where U must be an update
@@ -548,7 +550,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param services The services object.
     * @return A list of suitable join partners. May be empty if none exist.
     */
-   public ImmutableList<Pair<Goal,PosInOccurrence>> findPotentialJoinPartners(
+   public static ImmutableList<Pair<Goal,PosInOccurrence>> findPotentialJoinPartners(
          Goal goal, PosInOccurrence pio) {
       
       Services services = goal.proof().getServices();
@@ -568,7 +570,7 @@ public abstract class JoinRule implements BuiltInRule {
                PosInTerm pit = PosInTerm.getTopLevel();
 
                PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
-               if (isApplicable(g, gPio, false)) {
+               if (isOfAdmissibleForm(g, gPio, false)) {
                   Triple<Term, Term, Term> ownSEState = sequentToSETriple(
                         goal, pio, services);
                   Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
@@ -607,4 +609,5 @@ public abstract class JoinRule implements BuiltInRule {
       
       return potentialPartners;
    }
+
 }
