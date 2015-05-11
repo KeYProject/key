@@ -457,12 +457,14 @@ public abstract class JoinRule implements BuiltInRule {
     */
    @Override
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-      // Note: If the join rule is applicable for automatic
-      //       rule application, the symbolic execution strategy
-      //       does not seem to work as usual!
-
+	   // Note: We do not check for join partner existence
+	   //       to save time during automatic execution.
+	   //       As a result, the rule is applicable for any
+	   //       formula of suitable form, but then with empty
+	   //       list of candidates.
+	   
       return isApplicable(goal, pio,
-            true); // Do the check for partner existence
+            false); // Do the check for partner existence
    }
    
    /**
@@ -522,11 +524,9 @@ public abstract class JoinRule implements BuiltInRule {
 		} else if (termAfterUpdate.op() instanceof UpdateApplication) {
 			return false;
 		}
-		
-		return true;
 
-//		return !doJoinPartnerCheck
-//				|| findPotentialJoinPartners(goal, pio).size() > 0;
+		return !doJoinPartnerCheck
+				|| findPotentialJoinPartners(goal, pio).size() > 0;
 
 	}
    
