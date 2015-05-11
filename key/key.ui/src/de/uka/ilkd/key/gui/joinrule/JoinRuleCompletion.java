@@ -40,6 +40,10 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
             chosenCandidates = dialog.getChosen();
         }
         
+        if (chosenCandidates == null || chosenCandidates.size() < 1) {
+        	return null;
+        }
+        
         JoinRuleBuiltInRuleApp result = new JoinRuleBuiltInRuleApp(joinApp.rule(), pio);
         result.setJoinPartners(chosenCandidates);
         
