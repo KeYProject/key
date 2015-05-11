@@ -79,13 +79,22 @@ public final class WorkbenchUtil {
     public static IPerspectiveDescriptor openPerspective(String perspectiveId) {
        IWorkbenchPage page = getActivePage();
        if (page != null) {
-          IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+          IPerspectiveDescriptor perspective = getPerspectiveDescriptor(perspectiveId);
           page.setPerspective(perspective);
           return perspective;
        }
        else {
           return null;
        }
+    }
+    
+    /**
+     * Returns the {@link IPerspectiveDescriptor} with the given ID.
+     * @param perspectiveId The perspective ID.
+     * @return The found {@link IPerspectiveDescriptor} or {@code null} if not available.
+     */
+    public static IPerspectiveDescriptor getPerspectiveDescriptor(String perspectiveId) {
+       return PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
     }
 
     /**

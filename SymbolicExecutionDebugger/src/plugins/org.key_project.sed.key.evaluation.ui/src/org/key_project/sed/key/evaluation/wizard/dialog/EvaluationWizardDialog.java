@@ -2,21 +2,31 @@ package org.key_project.sed.key.evaluation.wizard.dialog;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
+import org.eclipse.jface.dialogs.DialogTray;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
+import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
+import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
+import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.SendFormWizardPage;
 
 public class EvaluationWizardDialog extends WizardDialog {
+   private static final Map<EvaluationInput, WeakHashMap<EvaluationWizardDialog, Void>> dialogInstances = new HashMap<EvaluationInput, WeakHashMap<EvaluationWizardDialog, Void>>();
+
    private final EvaluationInput evaluationInput;
    
    private final PropertyChangeListener currentPageListener = new PropertyChangeListener() {
@@ -38,6 +48,10 @@ public class EvaluationWizardDialog extends WizardDialog {
       this.evaluationInput = evaluationInput;
       evaluationInput.getCurrentFormInput().addPropertyChangeListener(AbstractFormInput.PROP_CURRENT_PAGE_INPUT, currentPageListener);
       setHelpAvailable(false);
+   }
+
+   public EvaluationInput getEvaluationInput() {
+      return evaluationInput;
    }
 
    @Override
@@ -111,10 +125,37 @@ public class EvaluationWizardDialog extends WizardDialog {
    }
 
    @Override
+   public void openTray(DialogTray tray) throws IllegalStateException,UnsupportedOperationException {
+      registerDialog(this);
+      super.openTray(tray);
+   }
+
+   @Override
+   public int open() {
+      registerDialog(this);
+      return super.open();
+   }
+
+   @Override
    public boolean close() {
       boolean closed = super.close();
       if (closed) {
+         unregisterDialog(this);
          removeListener();
+         try {
+            if (!hasDialogs(evaluationInput)) {
+               AbstractPage currentPage = getCurrentPage().getPageInput().getPage();
+               if (currentPage instanceof QuestionPage) {
+                  IWorkbenchModifier modifier = ((QuestionPage) currentPage).getWorkbenchModifier();
+                  if (modifier != null) {
+                     modifier.cleanWorkbench();
+                  }
+               }
+            }
+         }
+         catch (Exception e) {
+            LogUtil.getLogger().logError(e);
+         }
       }
       return closed;
    }
@@ -124,5 +165,39 @@ public class EvaluationWizardDialog extends WizardDialog {
          ((SendFormWizardPage) getCurrentPage()).getPageInput().removePropertyChangeListener(SendFormPageInput.PROP_SENDING_IN_PROGRESS, sendingListener);
       }
       evaluationInput.getCurrentFormInput().removePropertyChangeListener(AbstractFormInput.PROP_CURRENT_PAGE_INPUT, currentPageListener);
+   }
+
+   public static void registerDialog(EvaluationWizardDialog dialog) {
+      synchronized (dialogInstances) {
+         WeakHashMap<EvaluationWizardDialog, Void> evaluationMap = dialogInstances.get(dialog.getEvaluationInput());
+         if (evaluationMap == null) {
+            evaluationMap = new WeakHashMap<EvaluationWizardDialog, Void>();
+            dialogInstances.put(dialog.getEvaluationInput(), evaluationMap);
+         }
+         evaluationMap.put(dialog, null);
+      }
+   }
+
+   public static void unregisterDialog(EvaluationWizardDialog dialog) {
+      synchronized (dialogInstances) {
+         WeakHashMap<EvaluationWizardDialog, Void> evaluationMap = dialogInstances.get(dialog.getEvaluationInput());
+         if (evaluationMap == null) {
+            evaluationMap = new WeakHashMap<EvaluationWizardDialog, Void>();
+            dialogInstances.put(dialog.getEvaluationInput(), evaluationMap);
+         }
+         evaluationMap.remove(dialog);
+      }
+   }
+   
+   public static boolean hasDialogs(EvaluationInput evaluationInput) {
+      synchronized (dialogInstances) {
+         WeakHashMap<EvaluationWizardDialog, Void> evaluationMap = dialogInstances.get(evaluationInput);
+         if (evaluationMap != null) {
+            return !evaluationMap.isEmpty();
+         }
+         else {
+            return false;
+         }
+      }
    }
 }

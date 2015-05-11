@@ -3,25 +3,34 @@ package org.key_project.sed.key.evaluation.wizard.page;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.sed.key.evaluation.model.definition.BrowserQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
+import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
+import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
+import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.manager.RadioButtonsManager;
+import org.key_project.util.eclipse.WorkbenchUtil;
 
 public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPageInput> {
    private final List<IDisposable> controls = new LinkedList<IDisposable>();
@@ -32,6 +41,8 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
          handleValueChange(evt);
       }
    };
+   
+   private String workbenchModifierFailure;
 
    public QuestionWizardPage(QuestionPageInput pageInput) {
       super(pageInput);
@@ -89,15 +100,61 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    
    @Override
    protected void updatePageCompleted() {
-      String errorMessage = null;
-      QuestionInput[] inputs = getPageInput().getQuestionInputs();
-      int i = 0;
-      while (errorMessage == null && i < inputs.length) {
-         errorMessage = inputs[i].validate();
-         i++;
+      String errorMessage = workbenchModifierFailure;
+      // Validate questions
+      if (errorMessage == null) {
+         QuestionInput[] inputs = getPageInput().getQuestionInputs();
+         int i = 0;
+         while (errorMessage == null && i < inputs.length) {
+            errorMessage = inputs[i].validate();
+            i++;
+         }
       }
+      // Update page completed state
       setPageComplete(errorMessage == null);
       setErrorMessage(errorMessage);
+   }
+
+   @Override
+   public void setVisible(final boolean visible) {
+      super.setVisible(visible);
+      try {
+         final IWorkbenchModifier modifier = getPageInput().getPage().getWorkbenchModifier();
+         final Tool tool = getPageInput().getFormInput() instanceof RandomFormInput ?
+                           ((RandomFormInput) getPageInput().getFormInput()).getTool(getPageInput()) :
+                           null;
+         if (modifier != null) {
+            final IWorkbenchPage activePage = WorkbenchUtil.getActivePage(); 
+            getContainer().run(true, false, new IRunnableWithProgress() {
+               @Override
+               public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                  try {
+                     if (visible) {
+                        monitor.beginTask("Modifying Workbench", IProgressMonitor.UNKNOWN);
+                        modifier.init(activePage, getShell(), getPageInput(), tool);
+                        modifier.modifyWorkbench();
+                        monitor.done();
+                     }
+                     else {
+                        monitor.beginTask("Cleaning Workbench", IProgressMonitor.UNKNOWN);
+                        modifier.cleanWorkbench();
+                        monitor.done();
+                     }
+                  }
+                  catch (Exception e) {
+                     throw new InvocationTargetException(e, e.getMessage());
+                  }
+               }
+            });
+         }
+      }
+      catch (Exception e) {
+         workbenchModifierFailure = e.getMessage();
+         LogUtil.getLogger().logError(e);
+      }
+      finally {
+         updatePageCompleted();
+      }
    }
 
    @Override

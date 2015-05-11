@@ -6,6 +6,9 @@ import java.util.List;
 import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion.Choice;
 import org.key_project.sed.key.evaluation.model.random.UnderstandingProofAttemptsRandomFormOrderComputer;
+import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier;
+import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier.FileDefinition;
+import org.key_project.sed.key.evaluation.model.tooling.ProofAttemptJavaProjectModifier;
 import org.key_project.sed.key.evaluation.model.validation.FixedValueValidator;
 import org.key_project.sed.key.evaluation.model.validation.NotUndefinedValueValidator;
 import org.key_project.util.java.CollectionUtil;
@@ -53,6 +56,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       QuestionPage conditionsPage = new QuestionPage("conditionsPage", 
                                                      "Introduction", 
                                                      "Please read the information and conditions of the evaluation carefully.",
+                                                     null,
                                                      new BrowserQuestion("conditions", conditionsURL),
                                                      new RadioButtonsQuestion("acceptConditions",
                                                                               null, 
@@ -63,6 +67,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       QuestionPage backgroundPage = new QuestionPage("backgroundPage", 
                                                      "Background", 
                                                      "Please fill out the form with your background knowledge.",
+                                                     null,
                                                      new RadioButtonsQuestion("experienceWithJava",
                                                                               "Experience with Java: ", 
                                                                               null, 
@@ -94,17 +99,25 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                  backgroundPage,
                                                  sendConditionsPage);
       // Create evaluation form
-      QuestionPage proof1Page = new QuestionPage("proof1", "Proof Attempt 1", "Please answer the question to the best of your knowledge.");
-      QuestionPage proof2Page = new QuestionPage("proof2", "Proof Attempt 2", "Please answer the question to the best of your knowledge.");
-      QuestionPage proof3Page = new QuestionPage("proof3", "Proof Attempt 3", "Please answer the question to the best of your knowledge.");
-      QuestionPage proof4Page = new QuestionPage("proof4", "Proof Attempt 4", "Please answer the question to the best of your knowledge.");
+      QuestionPage proof1Page = new QuestionPage("proof1", "Proof Attempt 1", "Please answer the question to the best of your knowledge.", null);
+      QuestionPage proof2Page = new QuestionPage("proof2", 
+                                                 "Proof Attempt 2", 
+                                                 "Please answer the question to the best of your knowledge.", 
+                                                 new ProofAttemptJavaProjectModifier(new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
+                                                                                     new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
+      QuestionPage proof3Page = new QuestionPage("proof3", "Proof Attempt 3", "Please answer the question to the best of your knowledge.", null);
+      QuestionPage proof4Page = new QuestionPage("proof4", 
+                                                 "Proof Attempt 4", 
+                                                 "Please answer the question to the best of your knowledge.", 
+                                                 new ProofAttemptJavaProjectModifier(new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
+                                                                                     new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
       SendFormPage sendEvaluationPage = new SendFormPage("sendEvaluation", 
                                                          "Confirm Sending Content", 
                                                          "Inspect the content to be send.", 
                                                          "Current date and time (nothing else!)");
       RandomForm evaluationForm = new RandomForm("evaluationForm", proof1Page, proof2Page, proof3Page, proof4Page, sendEvaluationPage);
       // Create thanks form
-      QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.");
+      QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.", null);
       FixedForm thanksForm = new FixedForm("thanksForm", thanksPage);
       // Create forms
       return CollectionUtil.toList(introductionForm, evaluationForm, thanksForm);

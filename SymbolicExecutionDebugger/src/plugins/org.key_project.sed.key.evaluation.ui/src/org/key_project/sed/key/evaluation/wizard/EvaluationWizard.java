@@ -10,6 +10,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.key.evaluation.io.SendThread;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
@@ -307,6 +308,10 @@ public class EvaluationWizard extends Wizard {
                            if (!CollectionUtil.isEmpty(randomAnswer.getPageOrder())) {
                               RandomFormInput form = (RandomFormInput) evaluationInput.getFormInput(randomAnswer.getForm());
                               form.setPageOrder(randomAnswer.getPageOrder());
+                              for (AbstractPageInput<?> pageInput : form.getPageInputs()) {
+                                 Tool tool = randomAnswer.getTool(randomAnswer.getPageInput(pageInput.getPage()));
+                                 form.setTool(pageInput, tool);
+                              }
                            }
                         }
                      }
