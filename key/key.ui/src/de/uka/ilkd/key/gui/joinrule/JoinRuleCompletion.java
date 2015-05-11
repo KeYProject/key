@@ -14,8 +14,9 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * This class completes the instantiation for a join rule application.
- * The user is queried for partner goals to choose. If in forced mode,
- * all potential partners are chosen (no query is shown to the user).
+ * The user is queried for partner goals and concrete join rule to
+ * choose. If in forced mode, all potential partners and the if-then-else
+ * join method are chosen (no query is shown to the user).
  * 
  * @author Dominic Scheurer
  */
