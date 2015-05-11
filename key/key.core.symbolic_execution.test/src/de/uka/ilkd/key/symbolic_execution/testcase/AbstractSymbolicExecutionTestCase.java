@@ -1358,9 +1358,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Sequent sequent = node.sequent();
       assertEquals(1, sequent.succedent().size());
       Term succedent = sequent.succedent().get(0).formula();
-      assertEquals(2, succedent.subs().size());
+      assertEquals(2, succedent.arity());
       Term updateApplication = succedent.subs().get(1);
-      assertEquals(2, updateApplication.subs().size());
+      assertEquals(2, updateApplication.arity());
       JavaProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
       assertTrue(updateContent instanceof StatementBlock);
       ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();

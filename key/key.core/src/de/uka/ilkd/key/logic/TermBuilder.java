@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic;
 
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -916,7 +917,7 @@ public class TermBuilder {
         } else if (a.sort() == booleanLDT.targetSort()) {
             // special case where a is the result of convertToBoolean
             if (a.op() == IfThenElse.IF_THEN_ELSE) {
-                assert a.subs().size() == 3;
+                assert a.arity() == 3;
                 assert a.sub(0).sort() == Sort.FORMULA;
                 if (a.sub(1).op() == booleanLDT.getTrueConst() && a.sub(2).op() == booleanLDT.getFalseConst())
                     return a.sub(0);
@@ -1708,25 +1709,18 @@ public class TermBuilder {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
         } else {
-            ImmutableList<TermLabel> newLabelList = ImmutableSLList.<TermLabel>nil();
+            ArrayList<TermLabel> newLabelList = new ArrayList<TermLabel>();           
+            for (TermLabel l: term.getLabels()) {
+                newLabelList.add(l);                
+            }
             for (TermLabel l: labels) {
-                if (!term.getLabels().contains(l)) {
-                    newLabelList = newLabelList.append(l);
+                if (!newLabelList.contains(l)) {
+                    newLabelList.add(l);
                 }
             }
-            TermLabel[] newLabelArr = new TermLabel[newLabelList.size()];
-            Iterator<TermLabel> it = newLabelList.iterator();
-            for (int i = 0; i < newLabelArr.length; i++) {
-                assert it.hasNext();
-                newLabelArr[i] = it.next();
-            }
-            TermLabel[] newLabels = new TermLabel[labels.size() + newLabelArr.length];
-            labels.arraycopy(0, newLabels, 0, labels.size());
-            new ImmutableArray<TermLabel>(newLabelArr).arraycopy(0, newLabels, labels.size(),
-                                                                  newLabelArr.length);
             return tf.createTerm(term.op(), term.subs(),
-                                                  term.boundVars(), term.javaBlock(),
-                                                  new ImmutableArray<TermLabel>(newLabels));
+                    term.boundVars(), term.javaBlock(),
+                    new ImmutableArray<TermLabel>(newLabelList));
         }
     }
 
@@ -1776,7 +1770,7 @@ public class TermBuilder {
     }
 
     public Term unlabelRecursive(Term term) {
-        Term[] subs = new Term[term.subs().size()];
+        Term[] subs = new Term[term.arity()];
         for (int i = 0; i < subs.length; i++) {
             subs[i] = unlabelRecursive(term.sub(i));
         }
