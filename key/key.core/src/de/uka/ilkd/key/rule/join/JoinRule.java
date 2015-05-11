@@ -462,7 +462,6 @@ public abstract class JoinRule implements BuiltInRule {
       //       does not seem to work as usual!
 
       return isApplicable(goal, pio,
-            true,  // Only allow application of rule for manual calls
             true); // Do the check for partner existence
    }
    
@@ -481,7 +480,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @return true iff a suitable top level formula for joining.
     */
 	public boolean isApplicable(Goal goal, PosInOccurrence pio,
-			boolean checkAutomatic, boolean doJoinPartnerCheck) {
+			boolean doJoinPartnerCheck) {
 		// We admit top level formulas of the form \<{ ... }\> phi
 		// and U \<{ ... }\> phi, where U must be an update
 		// in normal form, i.e. a parallel update of elementary
