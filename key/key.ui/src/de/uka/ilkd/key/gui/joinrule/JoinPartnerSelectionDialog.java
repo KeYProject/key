@@ -326,6 +326,10 @@ public class JoinPartnerSelectionDialog extends JDialog {
     * the partner editor pane with the text of the first candidate.
     */
    private void loadCandidates() {
+	   if (candidates.size() < 1) {
+		   return;
+	   }
+	   
       for (Pair<Goal, PosInOccurrence> candidate : candidates) {
          cmbCandidates.addItem("Node " + candidate.first.node().serialNr());
       }
