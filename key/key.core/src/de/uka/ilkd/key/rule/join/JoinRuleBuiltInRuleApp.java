@@ -4,6 +4,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -17,7 +18,8 @@ import de.uka.ilkd.key.util.Pair;
  * @author Dominic Scheurer
  */
 public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
-    
+
+    private Node joinNode = null;
     private ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = null;
     private JoinProcedure concreteRule = null;
 
@@ -66,6 +68,14 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
 	public void setConcreteRule(JoinProcedure concreteRule) {
 		this.concreteRule = concreteRule;
+	}
+
+	public Node getJoinNode() {
+		return joinNode;
+	}
+
+	public void setJoinNode(Node joinNode) {
+		this.joinNode = joinNode;
 	}
 
 }

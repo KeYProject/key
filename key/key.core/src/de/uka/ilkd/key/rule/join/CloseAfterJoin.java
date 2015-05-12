@@ -41,7 +41,6 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -281,7 +280,7 @@ public class CloseAfterJoin implements BuiltInRule {
 
    @Override
    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-      return new DefaultBuiltInRuleApp(this, pos);
+      return new CloseAfterJoinRuleBuiltInRuleApp(this, pos, thisSEState.getCorrespondingNode(), joinNode);
    }
    
    /**
