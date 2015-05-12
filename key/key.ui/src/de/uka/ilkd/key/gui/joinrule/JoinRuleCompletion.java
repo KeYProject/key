@@ -55,6 +55,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
         JoinRuleBuiltInRuleApp result = new JoinRuleBuiltInRuleApp(app.rule(), pio);
         result.setJoinPartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
+        result.setJoinNode(goal.node());
         
         return result;
     }

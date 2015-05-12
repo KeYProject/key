@@ -80,6 +80,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.util.Debug;
 
@@ -688,9 +689,40 @@ public class ProofTreeView extends JPanel {
                 if ( ((GUIBranchNode)value).isClosed() ) {
                     // all goals below this node are closed
                     this.setIcon(IconFactory.provedFolderIcon());
-                } else if ( ((GUIBranchNode)value).getNode().isLinked() ) {
-                   this.setIcon(IconFactory.linkedFolderIcon());
+                } else {
+                	
+                	// Find leaf goal for node and check whether this is a linked goal.
+                	
+                	// TODO (DS): This marks all "folder" nodes as linked that have
+                	//            at least one linked child. Check whether this is
+                	//            an acceptable behavior.
+                	
+                	class FindGoalVisitor implements ProofVisitor {
+                		private boolean isLinked = false;
+                		
+                		public boolean isLinked() {
+                			return this.isLinked;
+                		}
+                		
+                		@Override
+						public void visit(Proof proof, Node visitedNode) {
+							Goal g;
+							if ((g = proof.getGoal(visitedNode)) != null &&
+									g.isLinked()) {
+								this.isLinked = true;
+							}
+						}
+                	}
+                	
+                	FindGoalVisitor v = new FindGoalVisitor();
+					
+                	proof.breadthFirstSearch(((GUIBranchNode)value).getNode(), v);
+                	if (v.isLinked()) {
+                		this.setIcon(IconFactory.linkedFolderIcon());
+                	}
+                   
                 }
+                
                 return this;
             }
 
@@ -729,7 +761,7 @@ public class ProofTreeView extends JPanel {
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
-		   if ( node.isLinked() ) {
+		   if ( goal.isLinked() ) {
             tree_cell.setForeground(PINK_COLOR);
             tree_cell.setIcon(IconFactory.keyHoleLinked(20, 20));
             ProofTreeView.this.setToolTipText("Linked Goal");

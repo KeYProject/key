@@ -829,7 +829,7 @@ public class GoalList extends JList<Goal> {
 	        final Sequent seq = ((Goal)value).sequent();
 	        valueStr = seqToString (seq);
 	        
-		statusIcon = ((Goal)value).node().isLinked() ? linkedGoalIcon :
+		statusIcon = ((Goal)value).isLinked() ? linkedGoalIcon :
 		   ((Goal)value).isAutomatic() ? keyIcon : disabledGoalIcon;
 	    } else {
 		valueStr   = ""+value;

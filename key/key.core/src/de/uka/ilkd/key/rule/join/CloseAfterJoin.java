@@ -41,7 +41,6 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -141,7 +140,7 @@ public class CloseAfterJoin implements BuiltInRule {
       linkedGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
       // Workaround: Disable linked goal to prevent strategies
       // from automatically working further on it.
-      linkedGoal.node().setLinkedNode(joinNode);
+      linkedGoal.setLinkedGoal(goal);
       linkedGoal.setEnabled(false);
       
       // Add a listener to close this node if the associated join
@@ -162,7 +161,7 @@ public class CloseAfterJoin implements BuiltInRule {
             if (!proofContainsNode(e.getSource(), joinNodeF)) {
                // The joined node has been pruned; now mark this node
                // as not linked and set it to automatic again.
-               linkedGoal.node().setLinkedNode(null);
+               linkedGoal.setLinkedGoal(null);
                linkedGoal.setEnabled(true);
             }
          }
@@ -281,7 +280,7 @@ public class CloseAfterJoin implements BuiltInRule {
 
    @Override
    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-      return new DefaultBuiltInRuleApp(this, pos);
+      return new CloseAfterJoinRuleBuiltInRuleApp(this, pos, thisSEState.getCorrespondingNode(), joinNode);
    }
    
    /**
