@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.join;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -35,11 +34,10 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * 
  * @author Dominic Scheurer
  */
-public class JoinWeaken extends JoinRule implements ConcreteJoinRule {
+public class JoinWeaken implements JoinProcedure {
    
    public static final JoinWeaken INSTANCE = new JoinWeaken();
    private static final String DISPLAY_NAME = "JoinByFullAnonymization";
-   private static final Name RULE_NAME = new Name(DISPLAY_NAME);
    
    @Override
    public Pair<HashSet<Term>, Term> joinValuesInStates(
@@ -59,16 +57,6 @@ public class JoinWeaken extends JoinRule implements ConcreteJoinRule {
             new HashSet<Term>(),
             tb.func(skolemConstant));
       
-   }
-
-   @Override
-   public Name name() {
-      return RULE_NAME;
-   }
-
-   @Override
-   public String displayName() {
-      return DISPLAY_NAME;
    }
    
    @Override

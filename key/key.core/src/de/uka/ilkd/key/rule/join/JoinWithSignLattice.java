@@ -36,7 +36,6 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
    
    public static final JoinWithSignLattice INSTANCE = new JoinWithSignLattice();
    private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
-   private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
    @Override
    protected AbstractDomainLattice<?> getAbstractDomainForSort(Sort s, Services services) {
@@ -52,16 +51,6 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
       } else {
          return null;
       }
-   }
-
-   @Override
-   public Name name() {
-      return RULE_NAME;
-   }
-
-   @Override
-   public String displayName() {
-      return DISPLAY_NAME;
    }
    
    @Override

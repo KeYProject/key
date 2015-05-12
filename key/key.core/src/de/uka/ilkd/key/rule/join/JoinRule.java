@@ -121,7 +121,7 @@ public class JoinRule implements BuiltInRule {
       
       final TermBuilder tb = services.getTermBuilder();
       final PosInOccurrence pio = ruleApp.posInOccurrence();
-      final ConcreteJoinRule joinRule = ((JoinRuleBuiltInRuleApp) ruleApp).getConcreteRule();
+      final JoinProcedure joinRule = ((JoinRuleBuiltInRuleApp) ruleApp).getConcreteRule();
       
       if (findPotentialJoinPartners(goal, pio) == null) {
          return null;
@@ -211,7 +211,7 @@ public class JoinRule implements BuiltInRule {
     */
    @SuppressWarnings("unused") // For deactivated equivalence check
    protected SymbolicExecutionState joinStates(
-		 ConcreteJoinRule joinRule,
+		 JoinProcedure joinRule,
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
          Term programCounter,
@@ -339,7 +339,7 @@ public class JoinRule implements BuiltInRule {
     * @return A joined heap term.
     */
    protected Pair<HashSet<Term>, Term> joinHeaps(
-		 ConcreteJoinRule joinRule,
+		 JoinProcedure joinRule,
          LocationVariable heapVar,
          Term heap1,
          Term heap2,

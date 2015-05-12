@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -41,12 +40,11 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * @see JoinIfThenElse
  * @see JoinRule
  */
-public class JoinIfThenElseAntecedent extends JoinRule implements ConcreteJoinRule {
+public class JoinIfThenElseAntecedent implements JoinProcedure {
    
    public static final JoinIfThenElseAntecedent INSTANCE = new JoinIfThenElseAntecedent();
    
    private static final String DISPLAY_NAME = "JoinByIfThenElseAntecedent";
-   private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
    @Override
    public Pair<HashSet<Term>, Term> joinValuesInStates(
@@ -123,16 +121,6 @@ public class JoinIfThenElseAntecedent extends JoinRule implements ConcreteJoinRu
       
       return result;
       
-   }
-
-   @Override
-   public Name name() {
-      return RULE_NAME;
-   }
-
-   @Override
-   public String displayName() {
-      return DISPLAY_NAME;
    }
    
    @Override

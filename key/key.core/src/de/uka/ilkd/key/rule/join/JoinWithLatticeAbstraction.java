@@ -38,7 +38,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * 
  * @author Dominic Scheurer
  */
-public abstract class JoinWithLatticeAbstraction extends JoinRule implements ConcreteJoinRule {
+public abstract class JoinWithLatticeAbstraction implements JoinProcedure {
 
    /**
     * Returns the abstract domain lattice for the given sort or

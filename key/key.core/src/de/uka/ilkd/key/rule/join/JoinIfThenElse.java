@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.join;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -41,12 +40,11 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * @see JoinIfThenElseAntecedent
  * @see JoinRule
  */
-public class JoinIfThenElse extends JoinRule implements ConcreteJoinRule {
+public class JoinIfThenElse implements JoinProcedure {
    
    public static final JoinIfThenElse INSTANCE = new JoinIfThenElse();
    
    private static final String DISPLAY_NAME = "JoinByIfThenElse";
-   private static final Name RULE_NAME = new Name(DISPLAY_NAME);
    static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
    
    @Override
@@ -232,16 +230,6 @@ public class JoinIfThenElse extends JoinRule implements ConcreteJoinRule {
             commuteSides ? ifTerm : elseTerm,
             commuteSides);
       
-   }
-
-   @Override
-   public Name name() {
-      return RULE_NAME;
-   }
-
-   @Override
-   public String displayName() {
-      return DISPLAY_NAME;
    }
    
    @Override

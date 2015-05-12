@@ -19,7 +19,7 @@ import de.uka.ilkd.key.util.Pair;
 public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     private ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = null;
-    private ConcreteJoinRule concreteRule = null;
+    private JoinProcedure concreteRule = null;
 
 	public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
@@ -60,11 +60,11 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.joinPartners = joinPartners;
     }
 
-    public ConcreteJoinRule getConcreteRule() {
+    public JoinProcedure getConcreteRule() {
 		return concreteRule;
 	}
 
-	public void setConcreteRule(ConcreteJoinRule concreteRule) {
+	public void setConcreteRule(JoinProcedure concreteRule) {
 		this.concreteRule = concreteRule;
 	}
 

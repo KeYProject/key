@@ -6,7 +6,7 @@ import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.ConcreteJoinRule;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
@@ -22,7 +22,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion {
 	
-	private static final ConcreteJoinRule STD_CONCRETE_JOIN_RULE = JoinIfThenElse.INSTANCE; 
+	private static final JoinProcedure STD_CONCRETE_JOIN_RULE = JoinIfThenElse.INSTANCE; 
 
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
@@ -35,7 +35,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
                 JoinRule.findPotentialJoinPartners(goal, pio);
         
         ImmutableList<Pair<Goal,PosInOccurrence>> chosenCandidates = null;
-        ConcreteJoinRule chosenRule = null;
+        JoinProcedure chosenRule = null;
         
         if (forced) {
             chosenCandidates = candidates;

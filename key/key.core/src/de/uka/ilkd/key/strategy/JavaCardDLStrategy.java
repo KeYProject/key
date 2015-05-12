@@ -308,10 +308,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private Feature setupJoinRule() {
     	SetRuleFilter filter = new SetRuleFilter();
-    	filter.addRuleToSet(JoinIfThenElse.INSTANCE);
-    	filter.addRuleToSet(JoinIfThenElseAntecedent.INSTANCE);
-    	filter.addRuleToSet(JoinWeaken.INSTANCE);
-       	filter.addRuleToSet(JoinWithSignLattice.INSTANCE);
        	filter.addRuleToSet(JoinRule.INSTANCE);
 
     	return ConditionalFeature.createConditional(filter, inftyConst());
