@@ -63,9 +63,6 @@ public class Node  {
     private ImmutableSet<ProgramVariable> globalProgVars      = DefaultImmutableSet.<ProgramVariable>nil();
 
     private boolean              closed              = false;
-    
-    /** Marks this node as linked (-> join rules) */
-    private Node                 linkedNode          = null;
 
     /** contains non-logical content, used for user feedback */
     private final NodeInfo             nodeInfo;
@@ -501,7 +498,7 @@ public class Node  {
                 Goal goal = proof().getGoal(this);
                 if ( goal == null || this.isClosed() )
                     return CLOSED_GOAL; // don't cache this
-                else if(isLinked())
+                else if(goal.isLinked())
                    cachedName = LINKED_GOAL;
                 else if(goal.isAutomatic())
                     cachedName = OPEN_GOAL;
@@ -580,45 +577,6 @@ public class Node  {
 
     public boolean isClosed() {
 	return closed;
-    }
-
-    /**
-     * Checks if is this node is linked to another
-     * node (for example due to a join operation).
-     *
-     * @return true iff this node is linked to another node.
-     */
-    public boolean isLinked() {
-        return this.linkedNode != null;
-    }
-
-    /**
-     * Returns the node that this goal is linked to.
-     *
-     * @return The node that this goal is linked to (or null if there is no such one).
-     */
-    public Node getLinkedNode() {
-        return this.linkedNode;
-    }
-
-    /**
-     * Sets the node that this goal is linked to; also sets this for
-     * all parents.
-     * 
-     * TODO: Check whether it is problematic when multiple child nodes
-     * of a node are linked; in this case, the linkedNode field would
-     * be overwritten.
-     * 
-     * @param linkedNode The node that this goal is linked to.
-     */
-    public void setLinkedNode(final Node linkedNode) {
-        this.linkedNode = linkedNode;
-        
-        Node current = parent();
-        while (current != null && current.childrenCount() == 1) {
-           current.linkedNode = linkedNode;
-           current = current.parent();
-        }
     }
 
     /**
