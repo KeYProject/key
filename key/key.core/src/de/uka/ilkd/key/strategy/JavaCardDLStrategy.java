@@ -46,6 +46,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.join.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinWeaken;
 import de.uka.ilkd.key.rule.join.JoinWithSignLattice;
 import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
@@ -311,6 +312,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     	filter.addRuleToSet(JoinIfThenElseAntecedent.INSTANCE);
     	filter.addRuleToSet(JoinWeaken.INSTANCE);
        	filter.addRuleToSet(JoinWithSignLattice.INSTANCE);
+       	filter.addRuleToSet(JoinRule.INSTANCE);
 
     	return ConditionalFeature.createConditional(filter, inftyConst());
     }
