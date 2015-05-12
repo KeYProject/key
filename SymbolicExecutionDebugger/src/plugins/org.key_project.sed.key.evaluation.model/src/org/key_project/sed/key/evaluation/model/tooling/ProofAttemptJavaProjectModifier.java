@@ -6,11 +6,13 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
-import org.key_project.sed.key.ui.launch.KeYLaunchShortcut;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -24,8 +26,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 
 
+@SuppressWarnings("restriction")
 public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
    private final FileDefinition proofFileDefinition;
+   
+   private final String typeName;
+   
+   private final String methodName;
+   
+   private final String[] methodParameters;
    
    private IPerspectiveDescriptor originalPerspective;
    
@@ -33,8 +42,15 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
    
    private ILaunchConfiguration launchConfiguration;
    
-   public ProofAttemptJavaProjectModifier(FileDefinition proofFileDefinition, FileDefinition... files) {
+   public ProofAttemptJavaProjectModifier(String typeName, 
+                                          String methodName, 
+                                          String[] methodParameters, 
+                                          FileDefinition proofFileDefinition, 
+                                          FileDefinition... files) {
       super(ArrayUtil.add(files, proofFileDefinition));
+      this.typeName = typeName;
+      this.methodName = methodName;
+      this.methodParameters = methodParameters;
       this.proofFileDefinition = proofFileDefinition;
    }
 
@@ -61,7 +77,13 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
                   @Override
                   public void run() {
                      try {
-                        launchConfiguration = KeYLaunchShortcut.launch(projectFile, null, KeySEDUtil.MODE);
+                        IType type = getJavaProject().findType(typeName);
+                        IMethod method = type != null ?
+                                         type.getMethod(methodName, methodParameters) : 
+                                         null;
+                        launchConfiguration = KeySEDUtil.createConfiguration(projectFile, method);
+                        launchConfiguration = KeySEDUtil.updateLaunchConfiguration(launchConfiguration, null, null, true, true, false, false, false, true, true, true, true);
+                        DebugUIPlugin.launchInForeground(launchConfiguration, KeySEDUtil.MODE);
                      }
                      catch (CoreException e) {
                         setException(e);
@@ -82,6 +104,7 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
       super.doAdditinalCleanup();
       if (proof != null) {
          proof.dispose();
+         MainWindow.getInstance().setVisible(false);
          proof = null;
       }
       if (launchConfiguration != null) {
@@ -91,6 +114,7 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
                launch.terminate();
             }
          }
+         launchConfiguration.delete();
          launchConfiguration = null;
       }
       if (originalPerspective != null) {

@@ -752,4 +752,81 @@ public final class KeySEDUtil {
       Display.getDefault().syncExec(run);
       return run.getResult();
    }
+   
+   /**
+    * Updates the given {@link ILaunchConfiguration}.
+    * @param config The {@link ILaunchConfiguration} to update.
+    * @param useExistingContract The new value to set.
+    * @param preconditionOrExistingContract The new value to set.
+    * @param showMethodReturnValues The new value to set.
+    * @param showVariablesOfSelectedDebugNode The new value to set.
+    * @param showKeYMainWindow The new value to set.
+    * @param mergeBranchConditions The new value to set.
+    * @param useUnicode The new value to set.
+    * @param usePrettyPrinting The new value to set.
+    * @param showSignatureOnMethodReturnNodes The new value to set.
+    * @param higlightReachedSourceCode The new value to set.
+    * @param truthValueEvaluationEnabled The new value to set.
+    * @return The updated {@link ILaunchConfiguration}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static ILaunchConfiguration updateLaunchConfiguration(ILaunchConfiguration config,
+                                                                Boolean useExistingContract,
+                                                                String preconditionOrExistingContract,
+                                                                Boolean showMethodReturnValues,
+                                                                Boolean showVariablesOfSelectedDebugNode,
+                                                                Boolean showKeYMainWindow,
+                                                                Boolean mergeBranchConditions,
+                                                                Boolean useUnicode,
+                                                                Boolean usePrettyPrinting,
+                                                                Boolean showSignatureOnMethodReturnNodes,
+                                                                Boolean higlightReachedSourceCode,
+                                                                Boolean truthValueEvaluationEnabled) throws CoreException {
+      ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+      if (useExistingContract != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
+         if (preconditionOrExistingContract != null) {
+            if (useExistingContract) {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
+            }
+            else {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+            }
+         }
+      }
+      else {
+         if (preconditionOrExistingContract != null) {
+            wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+         }
+      }
+      if (showMethodReturnValues != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+      }
+      if (showVariablesOfSelectedDebugNode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+      }
+      if (showKeYMainWindow != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+      }
+      if (mergeBranchConditions != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+      }
+      if (useUnicode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
+      }
+      if (usePrettyPrinting != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
+      }
+      if (showSignatureOnMethodReturnNodes != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
+      }
+      if (higlightReachedSourceCode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
+      }
+      if (truthValueEvaluationEnabled != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
+      }
+      config = wc.doSave();
+      return config;
+   }
 }

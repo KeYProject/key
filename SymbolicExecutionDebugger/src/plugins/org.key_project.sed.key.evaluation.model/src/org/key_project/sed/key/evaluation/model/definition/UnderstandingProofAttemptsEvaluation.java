@@ -132,13 +132,19 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       QuestionPage proof2Page = new QuestionPage(PROOF_2_PAGE_NAME, 
                                                  "Proof Attempt 2", 
                                                  "Please answer the question to the best of your knowledge.", 
-                                                 new ProofAttemptJavaProjectModifier(new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
+                                                 new ProofAttemptJavaProjectModifier("MyInteger",
+                                                                                     "add",
+                                                                                     new String[] {"QMyInteger;"},
+                                                                                     new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
                                                                                      new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
       QuestionPage proof3Page = new QuestionPage(PROOF_3_PAGE_NAME, "Proof Attempt 3", "Please answer the question to the best of your knowledge.", null);
       QuestionPage proof4Page = new QuestionPage(PROOF_4_PAGE_NAME, 
                                                  "Proof Attempt 4", 
                                                  "Please answer the question to the best of your knowledge.", 
-                                                 new ProofAttemptJavaProjectModifier(new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
+                                                 new ProofAttemptJavaProjectModifier("MyInteger",
+                                                                                     "add",
+                                                                                     new String[] {"QMyInteger;"},
+                                                                                     new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
                                                                                      new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
       SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
                                                          "Confirm Sending Content", 

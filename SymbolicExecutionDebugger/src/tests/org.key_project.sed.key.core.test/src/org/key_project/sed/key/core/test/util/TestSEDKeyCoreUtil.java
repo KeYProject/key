@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -193,52 +192,18 @@ public final class TestSEDKeyCoreUtil {
                                                                    Boolean showSignatureOnMethodReturnNodes,
                                                                    Boolean higlightReachedSourceCode,
                                                                    Boolean truthValueEvaluationEnabled) throws CoreException {
-      ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-      if (useExistingContract != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
-         if (preconditionOrExistingContract != null) {
-            if (useExistingContract) {
-               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
-            }
-            else {
-               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
-            }
-         }
-      }
-      else {
-         if (preconditionOrExistingContract != null) {
-            wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
-         }
-      }
-      if (showMethodReturnValues != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
-      }
-      if (showVariablesOfSelectedDebugNode != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
-      }
-      if (showKeYMainWindow != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
-      }
-      if (mergeBranchConditions != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
-      }
-      if (useUnicode != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
-      }
-      if (usePrettyPrinting != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
-      }
-      if (showSignatureOnMethodReturnNodes != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
-      }
-      if (higlightReachedSourceCode != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
-      }
-      if (truthValueEvaluationEnabled != null) {
-         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
-      }
-      config = wc.doSave();
-      return config;
+      return KeySEDUtil.updateLaunchConfiguration(config, 
+                                                  useExistingContract, 
+                                                  preconditionOrExistingContract, 
+                                                  showMethodReturnValues, 
+                                                  showVariablesOfSelectedDebugNode, 
+                                                  showKeYMainWindow, 
+                                                  mergeBranchConditions, 
+                                                  useUnicode, 
+                                                  usePrettyPrinting, 
+                                                  showSignatureOnMethodReturnNodes, 
+                                                  higlightReachedSourceCode, 
+                                                  truthValueEvaluationEnabled);
    }
    
    /**
