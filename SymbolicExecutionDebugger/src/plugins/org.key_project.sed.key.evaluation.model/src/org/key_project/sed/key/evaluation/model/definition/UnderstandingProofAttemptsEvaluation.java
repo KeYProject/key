@@ -129,23 +129,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
       ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME));
       QuestionPage proof1Page = new QuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt 1", "Please answer the question to the best of your knowledge.", null);
-      QuestionPage proof2Page = new QuestionPage(PROOF_2_PAGE_NAME, 
-                                                 "Proof Attempt 2", 
-                                                 "Please answer the question to the best of your knowledge.", 
-                                                 new ProofAttemptJavaProjectModifier("MyInteger",
-                                                                                     "add",
-                                                                                     new String[] {"QMyInteger;"},
-                                                                                     new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
-                                                                                     new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
+      QuestionPage proof2Page = createMyIntegerQuestionPage(PROOF_2_PAGE_NAME, "Proof Attempt 2");
       QuestionPage proof3Page = new QuestionPage(PROOF_3_PAGE_NAME, "Proof Attempt 3", "Please answer the question to the best of your knowledge.", null);
-      QuestionPage proof4Page = new QuestionPage(PROOF_4_PAGE_NAME, 
-                                                 "Proof Attempt 4", 
-                                                 "Please answer the question to the best of your knowledge.", 
-                                                 new ProofAttemptJavaProjectModifier("MyInteger",
-                                                                                     "add",
-                                                                                     new String[] {"QMyInteger;"},
-                                                                                     new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
-                                                                                     new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
+      QuestionPage proof4Page = createMyIntegerQuestionPage(PROOF_4_PAGE_NAME, "Proof Attempt 4");
       SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
                                                          "Confirm Sending Content", 
                                                          "Inspect the content to be send.", 
@@ -156,6 +142,22 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       FixedForm thanksForm = new FixedForm("thanksForm", thanksPage);
       // Create forms
       return CollectionUtil.toList(introductionForm, evaluationForm, thanksForm);
+   }
+   
+   protected QuestionPage createMyIntegerQuestionPage(String pageName, String title) {
+      return new QuestionPage(pageName, 
+                              title, 
+                              "Please answer the question to the best of your knowledge.", 
+                               new ProofAttemptJavaProjectModifier("MyInteger",
+                                                                   "add",
+                                                                   new String[] {"QMyInteger;"},
+                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
+                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
+      // Why is proof open (Rule application stopped to early, proof is closeable | 
+      //                    normal_behavior 
+      // Under which condition is the proof open
+      // Which execution paths are feasible using specification?
+      // Why is no null pointer exception possible?
    }
    
    public RandomForm getEvaluationForm() {
