@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 public abstract class AbstractForm {
    private final String name;
@@ -41,6 +43,15 @@ public abstract class AbstractForm {
 
    public AbstractPage[] getPages() {
       return pages.toArray(new AbstractPage[pages.size()]);
+   }
+
+   public AbstractPage getPage(final String pageName) {
+      return CollectionUtil.search(pages, new IFilter<AbstractPage>() {
+         @Override
+         public boolean select(AbstractPage element) {
+            return ObjectUtil.equals(pageName, element.getName());
+         }
+      });
    }
 
    public int countPages() {

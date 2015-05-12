@@ -16,16 +16,24 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
    @Override
    // TODO: Compute a real random order!
    public List<RandomFormInput> computeRandomValues(EvaluationInput evaluationInput, AbstractFormInput<?> currentForm) {
+      // Get needed objects
       RandomForm evaluationForm = ((UnderstandingProofAttemptsEvaluation) evaluationInput.getEvaluation()).getEvaluationForm();
       RandomFormInput evaluationFormInput = (RandomFormInput) evaluationInput.getFormInput(evaluationForm);
-      AbstractPageInput<?>[] pageInputs = evaluationFormInput.getPageInputs();
-      evaluationFormInput.setPageOrder(CollectionUtil.toList(pageInputs[1], pageInputs[0], pageInputs[3], pageInputs[2], pageInputs[4]));
+      AbstractPageInput<?> keyPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
+      AbstractPageInput<?> sedPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
+      AbstractPageInput<?> proof1Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME);
+      AbstractPageInput<?> proof2Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME);
+      AbstractPageInput<?> proof3Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME);
+      AbstractPageInput<?> proof4Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME);
+      AbstractPageInput<?> sendPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SEND_EVALUATION_PAGE_NAME);
+      // Set order and tools
+      evaluationFormInput.setPageOrder(CollectionUtil.toList(keyPage, proof2Page, proof1Page, sedPage, proof4Page, proof3Page, sendPage));
       Tool keyTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
       Tool sedTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
-      evaluationFormInput.setTool(pageInputs[1], keyTool);
-      evaluationFormInput.setTool(pageInputs[0], keyTool);
-      evaluationFormInput.setTool(pageInputs[3], sedTool);
-      evaluationFormInput.setTool(pageInputs[2], sedTool);
+      evaluationFormInput.setTool(proof2Page, keyTool);
+      evaluationFormInput.setTool(proof1Page, keyTool);
+      evaluationFormInput.setTool(proof4Page, sedTool);
+      evaluationFormInput.setTool(proof3Page, sedTool);
       return CollectionUtil.toList(evaluationFormInput);
    }
 

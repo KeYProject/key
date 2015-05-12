@@ -28,6 +28,31 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     * The name of the {@link Tool} representing 'SED'.
     */
    public static final String SED_TOOL_NAME = "SED";
+   
+   /**
+    * Page name of proof 1.
+    */
+   public static final String PROOF_1_PAGE_NAME = "proof1";
+
+   /**
+    * Page name of proof 2.
+    */
+   public static final String PROOF_2_PAGE_NAME = "proof2";
+
+   /**
+    * Page name of proof 3.
+    */
+   public static final String PROOF_3_PAGE_NAME = "proof3";
+
+   /**
+    * Page name of proof 4.
+    */
+   public static final String PROOF_4_PAGE_NAME = "proof4";
+
+   /**
+    * Page name of the send evaluation page.
+    */
+   public static final String SEND_EVALUATION_PAGE_NAME = "sendEvaluation";
 
    /**
     * Forbid additional instances.
@@ -41,8 +66,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     */
    @Override
    protected List<Tool> computeTools() {
-      Tool key = new Tool(KEY_TOOL_NAME);
-      Tool sed = new Tool(SED_TOOL_NAME);
+      URL keyURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/KeY.html");
+      URL sedURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/SED.html");
+      Tool key = new Tool(KEY_TOOL_NAME, keyURL);
+      Tool sed = new Tool(SED_TOOL_NAME, sedURL);
       return CollectionUtil.toList(key, sed);
    }
    
@@ -99,23 +126,25 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                  backgroundPage,
                                                  sendConditionsPage);
       // Create evaluation form
-      QuestionPage proof1Page = new QuestionPage("proof1", "Proof Attempt 1", "Please answer the question to the best of your knowledge.", null);
-      QuestionPage proof2Page = new QuestionPage("proof2", 
+      ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
+      ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME));
+      QuestionPage proof1Page = new QuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt 1", "Please answer the question to the best of your knowledge.", null);
+      QuestionPage proof2Page = new QuestionPage(PROOF_2_PAGE_NAME, 
                                                  "Proof Attempt 2", 
                                                  "Please answer the question to the best of your knowledge.", 
                                                  new ProofAttemptJavaProjectModifier(new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
                                                                                      new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
-      QuestionPage proof3Page = new QuestionPage("proof3", "Proof Attempt 3", "Please answer the question to the best of your knowledge.", null);
-      QuestionPage proof4Page = new QuestionPage("proof4", 
+      QuestionPage proof3Page = new QuestionPage(PROOF_3_PAGE_NAME, "Proof Attempt 3", "Please answer the question to the best of your knowledge.", null);
+      QuestionPage proof4Page = new QuestionPage(PROOF_4_PAGE_NAME, 
                                                  "Proof Attempt 4", 
                                                  "Please answer the question to the best of your knowledge.", 
                                                  new ProofAttemptJavaProjectModifier(new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
                                                                                      new FileDefinition("data/understandingProofAttempts/proof2/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
-      SendFormPage sendEvaluationPage = new SendFormPage("sendEvaluation", 
+      SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
                                                          "Confirm Sending Content", 
                                                          "Inspect the content to be send.", 
                                                          "Current date and time (nothing else!)");
-      RandomForm evaluationForm = new RandomForm("evaluationForm", proof1Page, proof2Page, proof3Page, proof4Page, sendEvaluationPage);
+      RandomForm evaluationForm = new RandomForm("evaluationForm", keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, sendEvaluationPage);
       // Create thanks form
       QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.", null);
       FixedForm thanksForm = new FixedForm("thanksForm", thanksPage);

@@ -7,6 +7,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.SendFormPage;
+import org.key_project.sed.key.evaluation.model.definition.ToolPage;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -35,6 +36,9 @@ public abstract class AbstractFormInput<F extends AbstractForm> extends Bean {
          }
          else if (page instanceof SendFormPage) {
             this.pageInputs.add(new SendFormPageInput(this, (SendFormPage) page));
+         }
+         else if (page instanceof ToolPage) {
+            this.pageInputs.add(new ToolPageInput(this, (ToolPage) page));
          }
          else {
             throw new IllegalStateException("Unsupported page: " + page);

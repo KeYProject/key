@@ -19,6 +19,7 @@ import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
+import org.key_project.sed.key.evaluation.model.input.ToolPageInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
@@ -357,6 +358,10 @@ System.out.println(xml);
          else if (expected instanceof SendFormPageInput) {
             assertTrue(actual instanceof SendFormPageInput);
             // Nothing else to do as accept state is not stored
+         }
+         else if (expected instanceof ToolPageInput) {
+            assertTrue(actual instanceof ToolPageInput);
+            // Nothing else to do as nothing is stored
          }
          else {
             fail("Unsupported page input '" + expected.getClass() + "'.");

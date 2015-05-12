@@ -76,17 +76,22 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    }
 
    protected void createBrowser(FormToolkit toolkit, Composite parent, BrowserQuestion question) {
+      createBrowser(toolkit, parent, question.getUrl());
+   }
+   
+   public static Browser createBrowser(FormToolkit toolkit, Composite parent, URL url) {
       Browser browser = new Browser(parent, SWT.BORDER);
       toolkit.adapt(browser);
       browser.setLayoutData(new GridData(GridData.FILL_BOTH));
       browser.setMenu(new MenuManager().createContextMenu(browser)); // Disable context menu
       try {
-         URL fileUrl = FileLocator.toFileURL(question.getUrl()); 
+         URL fileUrl = FileLocator.toFileURL(url); 
          browser.setUrl(fileUrl.toString());
       }
       catch (IOException e) {
          browser.setText(e.getMessage());
       }
+      return browser;
    }
 
    protected void createRadioButtons(FormToolkit toolkit, Composite parent, QuestionInput questionInput, RadioButtonsQuestion question) {
