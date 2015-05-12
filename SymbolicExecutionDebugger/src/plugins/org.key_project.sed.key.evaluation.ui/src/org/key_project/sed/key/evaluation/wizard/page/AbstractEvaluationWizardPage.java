@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
+import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 
 public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?>> extends WizardPage {
    private final P pageInput;
@@ -15,6 +16,7 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
       this.pageInput = pageInput;
       setTitle(pageInput.getPage().getTitle());
       setMessage(pageInput.getPage().getMessage());
+      setImageDescriptor(SEDEvaluationImages.getImageDescriptor(SEDEvaluationImages.EVALUATION_WIZARD));
    }
 
    @Override
