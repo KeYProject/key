@@ -1,5 +1,6 @@
 package org.key_project.sed.key.evaluation.wizard.page;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -35,5 +36,15 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
 
    public P getPageInput() {
       return pageInput;
+   }
+
+   @Override
+   public IWizardPage getPreviousPage() {
+      return getWizard().getPreviousPage(this); // Avoid that the previously shown page is returned
+   }
+
+   @Override
+   public IWizardPage getNextPage() {
+      return getWizard().getNextPage(this);
    }
 }

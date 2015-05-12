@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.layout.GridData;
@@ -160,15 +159,5 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       finally {
          updatePageCompleted();
       }
-   }
-
-   @Override
-   public IWizardPage getPreviousPage() {
-      return getWizard().getPreviousPage(this); // Avoid that the previously shown page is returned
-   }
-
-   @Override
-   public IWizardPage getNextPage() {
-      return getWizard().getNextPage(this);
    }
 }
