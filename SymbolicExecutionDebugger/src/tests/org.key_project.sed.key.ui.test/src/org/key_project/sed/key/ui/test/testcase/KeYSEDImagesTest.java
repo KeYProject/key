@@ -42,27 +42,4 @@ public class KeYSEDImagesTest extends AbstractSetupTestCase {
         assertFalse(imageAgain.isDisposed());
         assertSame(image, imageAgain);
     }
-    
-    /**
-     * Tests {@link KeYSEDImages#disposeImages()}
-     */
-    @Test
-    public void testDisposeImages() {
-        // Test null image to make sure that they are not cached.
-        assertNull(KeYSEDImages.getImage(null));
-        // Test invalid image to make sure that they are not cached.
-        assertNull(KeYSEDImages.getImage("INVALID"));
-        // Get valid image
-        Image image = KeYSEDImages.getImage(KeYSEDImages.LAUNCH_MAIN_TAB_GROUP);
-        assertNotNull(image);
-        assertFalse(image.isDisposed());
-        // Dispose images
-        KeYSEDImages.disposeImages();
-        assertTrue(image.isDisposed());
-        // Get valid image again
-        Image imageAgain = KeYSEDImages.getImage(KeYSEDImages.LAUNCH_MAIN_TAB_GROUP);
-        assertNotNull(imageAgain);
-        assertFalse(imageAgain.isDisposed());
-        assertNotSame(image, imageAgain);
-    }
 }

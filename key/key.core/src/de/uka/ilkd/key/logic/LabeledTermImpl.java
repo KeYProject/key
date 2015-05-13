@@ -120,8 +120,13 @@ class LabeledTermImpl extends TermImpl {
 	/**
 	 * {@inheritDoc}
 	 */
-	public int hashCode() {
-		return super.hashCode() * 17 + labels.hashCode();
+	@Override
+	public int computeHashCode() {
+	    int hash = super.computeHashCode();
+	    for (int i = 0, sz=labels.size(); i<sz; i++) {
+	        hash += 7*labels.get(i).hashCode(); 
+	    }
+	    return hash;
 	}
 
 	/**

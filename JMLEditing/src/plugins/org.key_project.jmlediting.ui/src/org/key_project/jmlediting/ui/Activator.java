@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.key_project.jmlediting.ui.util.JMLEditingImages;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -43,7 +42,6 @@ public class Activator extends AbstractUIPlugin {
     */
    @Override
    public void stop(final BundleContext context) throws Exception {
-      JMLEditingImages.disposeImages();
       plugin = null;
       super.stop(context);
    }

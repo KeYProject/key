@@ -429,59 +429,6 @@ public final class SEDImages {
     }
     
     /**
-     * Disposes all contained images. This method is automatically called
-     * when the plug-in is unloaded from the {@link Activator}.
-     * There is no need to call it from any other place!
-     */
-    public static void disposeImages() {
-       Display display = Display.getDefault();
-       if (!display.isDisposed()) {
-          display.syncExec(new Runnable() {
-            @Override
-            public void run() {
-               ImageRegistry registry = Activator.getDefault().getImageRegistry();
-               registry.remove(ANNOTATION_DELETE);
-               registry.remove(ANNOTATION_EDIT);
-               registry.remove(ANNOTATION_EDIT_WIZARD);
-               registry.remove(ANNOTATION_GO_TO);
-               registry.remove(ANNOTATION_LINKS);
-               registry.remove(ANNOTATION_LINKS_WIZARD);
-               registry.remove(ANNOTATION_MOVE_DOWN);
-               registry.remove(ANNOTATION_MOVE_UP);
-               registry.remove(BRANCH_CONDITION);
-               registry.remove(BRANCH_STATEMENT);
-               registry.remove(COMMENT);
-               registry.remove(COMMENT_WIZARD);
-               registry.remove(EXCEPTIONAL_METHOD_RETURN);
-               registry.remove(EXCEPTIONAL_TERMINATION);
-               registry.remove(EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
-               registry.remove(KEY_WATCHPOINT);
-               registry.remove(LOOP_BODY_TERMINATION);
-               registry.remove(LOOP_BODY_TERMINATION_NOT_VERIFIED);
-               registry.remove(LOOP_CONDITION);
-               registry.remove(LOOP_INVARIANT);
-               registry.remove(LOOP_INVARIANT_INITIALLY_INVALID);
-               registry.remove(LOOP_STATEMENT);
-               registry.remove(METHOD_CALL);
-               registry.remove(METHOD_CONTRACT);
-               registry.remove(METHOD_CONTRACT_NOT_NPC);
-               registry.remove(METHOD_CONTRACT_NOT_PRE);
-               registry.remove(METHOD_CONTRACT_NOT_PRE_NOT_NPC);
-               registry.remove(METHOD_RETURN);
-               registry.remove(SHOW_ALL_CONSTRAINTS);
-               registry.remove(SEARCH);
-               registry.remove(SEARCH_WIZARD);
-               registry.remove(SLICE);
-               registry.remove(SLICE_WIZARD);
-               registry.remove(TERMINATION);
-               registry.remove(TERMINATION_NOT_VERIFIED);
-               registry.remove(SYMBOLIC_DEBUG);
-            }
-         });
-       }
-    }
-    
-    /**
      * Returns the type icon of the given {@link ISEDDebugNode}.
      * @param element The {@link ISEDDebugNode} to get type icon for.
      * @return The type icon.

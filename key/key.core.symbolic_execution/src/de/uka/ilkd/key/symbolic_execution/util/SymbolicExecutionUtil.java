@@ -908,7 +908,7 @@ public final class SymbolicExecutionUtil {
       try {
          if (term.op() == heapLDT.getStore()) {
             ImmutableArray<Term> subs = term.subs();
-            if (subs.size() == 4) {
+            if (term.arity() == 4) {
                Term innerMostSelect = findInnerMostSelect(subs.get(1), services);
                Term locationTerm = innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
                ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
@@ -972,7 +972,7 @@ public final class SymbolicExecutionUtil {
     */
    public static Term getArrayIndex(Services services, HeapLDT heapLDT, Term arrayIndexTerm) {
       // Make sure that the term is an array index
-      if (arrayIndexTerm.op() == heapLDT.getArr() && arrayIndexTerm.subs().size() == 1) {
+      if (arrayIndexTerm.op() == heapLDT.getArr() && arrayIndexTerm.arity() == 1) {
          return arrayIndexTerm.sub(0);
       }
       else {
@@ -2198,7 +2198,7 @@ public final class SymbolicExecutionUtil {
          // Check if first condition is the exceptional definition
          boolean isExceptionCondition = false;
          Term toCheck = root.sub(1);
-         while (!isExceptionCondition && !toCheck.subs().isEmpty()) {
+         while (!isExceptionCondition && toCheck.arity() > 0) {
             // Assumption: Implications implies first that exception is not null 
             if (toCheck == exceptionDefinition) {
                isExceptionCondition = true;
