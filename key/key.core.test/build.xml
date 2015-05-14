@@ -6,7 +6,6 @@
 	<property name="dist.dir"  value="${basedir}/../deployment/components" />
 	<property name="lib.dir"  value="${basedir}/../key.core/lib/" />
 	<property name="test.reports"   value="${basedir}/testresults/" />
-	<property name="key.home"   value="${basedir}/../" />
 
 	<target name="test-deploy" depends="compile">
 	  	<mkdir dir="${test.reports}" />
@@ -20,7 +19,6 @@
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
-			<jvmarg value="-Dkey.home=${key.home}"/>
 			<classpath>
 				<pathelement location="${dist.dir}/key.core.jar"/>
 				<pathelement location="${dist.dir}/key.util.jar"/>
@@ -83,7 +81,6 @@
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
-			<jvmarg value="-Dkey.home=${key.home}"/>
 			<classpath>
 				<pathelement path="${basedir}/../key.core/bin"/>
 				<pathelement path="${basedir}/../key.util/bin"/>

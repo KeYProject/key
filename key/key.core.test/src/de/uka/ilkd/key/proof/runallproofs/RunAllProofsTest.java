@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
@@ -86,13 +87,7 @@ public class RunAllProofsTest implements Serializable {
     * Computes the constant values.
     */
    static {
-      String keyHome = System.getProperty("key.home");
-      if (keyHome == null) {
-         throw new RuntimeException("System property key.home not set. "
-               + "Cannot test proofs.");
-      }
-
-      KEY_HOME = new File(keyHome);
+      KEY_HOME = IOUtil.getProjectRoot(RunAllProofsTest.class).getParentFile();
       EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
       KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
    }
