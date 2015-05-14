@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import static de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest.KEY_CORE_TEST;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 /**
@@ -48,43 +46,56 @@ public abstract class ForkedTestFileRunner implements Serializable {
             "ProofCollectionSettings.serialized");
    }
 
+   /*
+    * Converts a {@link Serializable} object into a byte array and stores it in
+    * a file at given location.
+    */
    private static void writeObject(Path path, Serializable s)
          throws IOException {
-      Files.write(path, convertToByteArray(s));
-   }
-
-   @SuppressWarnings("unchecked")
-   private static <G> G readObject(Path path) throws IOException,
-         ClassNotFoundException {
-      return (G) convertToObject(Files.readAllBytes(path));
-   }
-
-   /**
-    * This method is used to convert a {@link Serializable} object into a byte
-    * array.
-    */
-   private static byte[] convertToByteArray(Serializable o) throws IOException {
+      /*
+       * Convert given object into a byte array.
+       */
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       ObjectOutputStream objectOutputStream = new ObjectOutputStream(
             byteArrayOutputStream);
-      objectOutputStream.writeObject(o);
+      objectOutputStream.writeObject(s);
       objectOutputStream.flush();
-      return byteArrayOutputStream.toByteArray();
+      byte[] bytes = byteArrayOutputStream.toByteArray();
+
+      /*
+       * Write byte array to a file.
+       */
+      Files.write(path, bytes);
    }
 
    /**
-    * This method is used to convert a byte array back into a
-    * {@link Serializable}
+    * Converts contents of a file back into an object.
     */
-   private static Object convertToObject(byte[] bytes) throws IOException,
+   @SuppressWarnings("unchecked")
+   private static <S> S readObject(Path path) throws IOException,
          ClassNotFoundException {
+      /*
+       * Convert content of given path (which points to a file) into a byte
+       * array.
+       */
+      byte[] bytes = Files.readAllBytes(path);
+
+      /*
+       * Convert byte array back into an object.
+       */
       ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
             bytes);
       ObjectInputStream objectInputStream = new ObjectInputStream(
             byteArrayInputStream);
-      return objectInputStream.readObject();
+      return (S) objectInputStream.readObject();
    }
 
+   /**
+    * Process a single {@link TestFile} in a separate subprocess.
+    * 
+    * @param testName
+    *           Name of the test used as prefix for test folder.
+    */
    public static TestResult processTestFile(TestFile testFile,
          ProofCollectionSettings settings, String testName) throws Exception {
       return processTestFiles(Arrays.asList(testFile), settings, testName).get(
@@ -92,8 +103,10 @@ public abstract class ForkedTestFileRunner implements Serializable {
    }
 
    /**
-    * Runs the {@link RunAllProofsTestUnit} belonging to a
-    * {@link RunAllProofsTest} object in a separate process.
+    * Process a list of {@link TestFile}s in a separate subprocess.
+    * 
+    * @param testName
+    *           Name of the test used as prefix for test folder.
     */
    public static List<TestResult> processTestFiles(List<TestFile> testFiles,
          ProofCollectionSettings settings, String testName) throws Exception {
