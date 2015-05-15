@@ -58,7 +58,7 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
       Text additionalText = toolkit.createText(form.getBody(), getPageInput().getPage().getAdditionalDataCollectedByServer(), SWT.READ_ONLY | SWT.MULTI);
       additionalText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       
-      acceptManager = new RadioButtonsManager(toolkit, form.getBody(), getPageInput().getAcceptInput(), (RadioButtonsQuestion) getPageInput().getAcceptInput().getQuestion());
+      acceptManager = new RadioButtonsManager(toolkit, form.getBody(), getPageInput().getAcceptInput(), (RadioButtonsQuestion) getPageInput().getAcceptInput().getQuestion(), null);
       GridData managerData = new GridData();
       managerData.horizontalSpan = 2;
       acceptManager.getComposite().setLayoutData(managerData);

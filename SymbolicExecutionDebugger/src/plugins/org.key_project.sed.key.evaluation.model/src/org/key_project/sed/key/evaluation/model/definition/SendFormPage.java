@@ -1,6 +1,5 @@
 package org.key_project.sed.key.evaluation.model.definition;
 
-import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion.Choice;
 import org.key_project.sed.key.evaluation.model.validation.FixedValueValidator;
 
 public class SendFormPage extends AbstractPage {
@@ -8,6 +7,7 @@ public class SendFormPage extends AbstractPage {
    
    private final RadioButtonsQuestion acceptQuestion = new RadioButtonsQuestion("acceptSending", 
                                                                                 null, 
+                                                                                false,
                                                                                 "no", 
                                                                                 new FixedValueValidator("yes", "Conditions of sending are not accepted."),
                                                                                 new Choice("I &accept that the content will be send and that the additional data will be stored.", "yes"),

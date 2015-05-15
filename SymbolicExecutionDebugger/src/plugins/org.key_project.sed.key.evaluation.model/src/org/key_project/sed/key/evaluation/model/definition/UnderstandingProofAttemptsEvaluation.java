@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.List;
 
 import org.key_project.sed.key.evaluation.model.Activator;
-import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion.Choice;
 import org.key_project.sed.key.evaluation.model.random.UnderstandingProofAttemptsRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier;
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier.FileDefinition;
@@ -87,6 +86,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                      new BrowserQuestion("conditions", conditionsURL),
                                                      new RadioButtonsQuestion("acceptConditions",
                                                                               null, 
+                                                                              true,
                                                                               "no", 
                                                                               new FixedValueValidator("yes", "Conditions are not accepted."), 
                                                                               new Choice("I &accept the conditions", "yes"), 
@@ -97,6 +97,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                      null,
                                                      new RadioButtonsQuestion("experienceWithJava",
                                                                               "Experience with Java: ", 
+                                                                              true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with Java not defined."), 
                                                                               new Choice("None", "None"), 
@@ -104,6 +105,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               new Choice(">= 2 years", "More than 2 years")),
                                                      new RadioButtonsQuestion("experienceWithKeY",
                                                                               "Experience with KeY: ", 
+                                                                              true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with KeY not defined."), 
                                                                               new Choice("None", "None"), 
@@ -111,6 +113,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               new Choice(">= 2 years", "More than 2 years")),
                                                      new RadioButtonsQuestion("experienceWithSED",
                                                                               "Experience with SED: ", 
+                                                                              true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with SED not defined."), 
                                                                               new Choice("None", "None"), 
@@ -145,6 +148,25 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    }
    
    protected QuestionPage createMyIntegerQuestionPage(String pageName, String title) {
+      String whyOpenTitle = "Why is the proof still open?";
+      RadioButtonsQuestion whyOpenQuestion = new RadioButtonsQuestion("whyOpen", 
+                                                                      whyOpenTitle, 
+                                                                      true,
+                                                                      null, 
+                                                                      new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
+                                                                      new Choice("Rule application stopped to early, proof is closeable", "Stopped to early"), 
+                                                                      new Choice("Precondition (true) is not established", "Precondition not established"),
+                                                                      new Choice("Postcondition does not hold", "Postcondition does not hold"),
+                                                                      new Choice("Assignable clause does not hold", "Assignable clause does not hold"),
+                                                                      new Choice("Exception might be thorwn (normal_behavior violated)", "Exception might be thrown"));
+      String openQuestionTitle = "Is the proof closed?";
+      RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
+                                                                   openQuestionTitle, 
+                                                                   true,
+                                                                   null, 
+                                                                   new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
+                                                                   new Choice("Yes", "Yes"), 
+                                                                   new Choice("No", "No", whyOpenQuestion));
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
@@ -152,9 +174,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    "add",
                                                                    new String[] {"QMyInteger;"},
                                                                    new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
-                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)));
-      // Why is proof open (Rule application stopped to early, proof is closeable | 
-      //                    normal_behavior 
+                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)),
+                              openQuestion);
       // Under which condition is the proof open
       // Which execution paths are feasible using specification?
       // Why is no null pointer exception possible?

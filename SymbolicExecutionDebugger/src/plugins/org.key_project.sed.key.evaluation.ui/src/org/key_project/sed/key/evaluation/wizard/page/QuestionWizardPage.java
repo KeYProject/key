@@ -2,19 +2,12 @@ package org.key_project.sed.key.evaluation.wizard.page;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -28,6 +21,8 @@ import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.util.LogUtil;
+import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
+import org.key_project.sed.key.evaluation.wizard.manager.IQuestionInputManager;
 import org.key_project.sed.key.evaluation.wizard.manager.RadioButtonsManager;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -60,42 +55,51 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
 
    @Override
    protected void createContent(FormToolkit toolkit, ScrolledForm form) {
-      for (QuestionInput questionInput : getPageInput().getQuestionInputs()) {
-         questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, valueListener);
+      ICreateControlCallback callBack = new ICreateControlCallback() {
+         @Override
+         public void handleQuestionInput(QuestionInput questionInput) {
+            questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, valueListener);
+         }
+      };
+      List<IQuestionInputManager> managers = createQuestionControls(toolkit, 
+                                                                    form.getBody(), 
+                                                                    getPageInput().getQuestionInputs(),
+                                                                    callBack);
+      controls.addAll(managers);
+   }
+   
+   public static List<IQuestionInputManager> createQuestionControls(FormToolkit toolkit, 
+                                                                    Composite parent, 
+                                                                    QuestionInput[] questionInputs,
+                                                                    ICreateControlCallback callback) {
+      List<IQuestionInputManager> managers = new LinkedList<IQuestionInputManager>();
+      for (QuestionInput questionInput : questionInputs) {
+         callback.handleQuestionInput(questionInput);
          if (questionInput.getQuestion() instanceof BrowserQuestion) {
-            createBrowser(toolkit, form.getBody(), (BrowserQuestion) questionInput.getQuestion());
+            IQuestionInputManager manager = createBrowser(toolkit, parent, (BrowserQuestion) questionInput.getQuestion());
+            managers.add(manager);
          }
          else if (questionInput.getQuestion() instanceof RadioButtonsQuestion) {
-            createRadioButtons(toolkit, form.getBody(), questionInput, (RadioButtonsQuestion) questionInput.getQuestion());
+            IQuestionInputManager manager = createRadioButtons(toolkit, parent, questionInput, (RadioButtonsQuestion) questionInput.getQuestion(), callback);
+            managers.add(manager);
          }
          else {
             throw new IllegalStateException("Unsupported question: " + questionInput.getQuestion());
          }
       }
+      return managers;
    }
 
-   protected void createBrowser(FormToolkit toolkit, Composite parent, BrowserQuestion question) {
-      createBrowser(toolkit, parent, question.getUrl());
+   public static BrowserManager createBrowser(FormToolkit toolkit, Composite parent, BrowserQuestion question) {
+      return new BrowserManager(toolkit, parent, question);
+   }
+
+   public static RadioButtonsManager createRadioButtons(FormToolkit toolkit, Composite parent, QuestionInput questionInput, RadioButtonsQuestion question, ICreateControlCallback callback) {
+      return new RadioButtonsManager(toolkit, parent, questionInput, question, callback);
    }
    
-   public static Browser createBrowser(FormToolkit toolkit, Composite parent, URL url) {
-      Browser browser = new Browser(parent, SWT.BORDER);
-      toolkit.adapt(browser);
-      browser.setLayoutData(new GridData(GridData.FILL_BOTH));
-      browser.setMenu(new MenuManager().createContextMenu(browser)); // Disable context menu
-      try {
-         URL fileUrl = FileLocator.toFileURL(url); 
-         browser.setUrl(fileUrl.toString());
-      }
-      catch (IOException e) {
-         browser.setText(e.getMessage());
-      }
-      return browser;
-   }
-
-   protected void createRadioButtons(FormToolkit toolkit, Composite parent, QuestionInput questionInput, RadioButtonsQuestion question) {
-      RadioButtonsManager manager = new RadioButtonsManager(toolkit, parent, questionInput, question);
-      controls.add(manager);
+   public static interface ICreateControlCallback {
+      public void handleQuestionInput(QuestionInput questionInput);
    }
 
    protected void handleValueChange(PropertyChangeEvent evt) {

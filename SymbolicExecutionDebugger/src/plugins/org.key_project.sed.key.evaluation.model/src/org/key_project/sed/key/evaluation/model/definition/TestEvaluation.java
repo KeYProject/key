@@ -29,13 +29,14 @@ public class TestEvaluation extends AbstractEvaluation {
 
    @Override
    protected List<AbstractForm> computeForms() {
-      try {         
+      try {
+         RadioButtonsQuestion yesSubQuestion = new RadioButtonsQuestion("yesSubQuestions", "yesSubQuestionsLabel", true, "one", new FixedValueValidator("one", "errorMessage"), new Choice("one", "one"), new Choice("two", "two"), new Choice("three", "three"));
          QuestionPage questionPage = new QuestionPage("questionPage", 
                                                       "questionPageTitle", 
                                                       "questionPageMessage",
                                                       null,
                                                       new BrowserQuestion("browserQuestion", new URL("http://key-project.org/")),
-                                                      new RadioButtonsQuestion("radioQuestions", "radioQuestionsLabel", "no", new FixedValueValidator("yes", "errorMessage"), new RadioButtonsQuestion.Choice("Yes", "yes"), new RadioButtonsQuestion.Choice("No", "no")));
+                                                      new RadioButtonsQuestion("radioQuestions", "radioQuestionsLabel", false, "no", new FixedValueValidator("yes", "errorMessage"), new Choice("Yes", "yes", yesSubQuestion), new Choice("No", "no")));
          SendFormPage sendFixedPage = new SendFormPage("sendFixedPage", "sendFixedPageTitle", "sendFixedPageMessage", "additionalDataCollectedByServer");
          FixedForm fixedForm = new FixedForm("fixedForm", questionPage, sendFixedPage);
          ToolPage tool1Page = new ToolPage(getTool(TOOL_1_NAME));

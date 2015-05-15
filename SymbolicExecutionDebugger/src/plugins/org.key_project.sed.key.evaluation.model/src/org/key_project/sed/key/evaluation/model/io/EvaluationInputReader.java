@@ -3,6 +3,7 @@ package org.key_project.sed.key.evaluation.model.io;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
+import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
@@ -19,7 +21,10 @@ import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -89,6 +94,16 @@ public class EvaluationInputReader {
        * Is currently defining page order?
        */
       private boolean parsingPageOrder = false;
+      
+      /**
+       * Stack to store {@link QuestionInput}s.
+       */
+      private final Deque<QuestionInput> questionInputStack = new LinkedList<QuestionInput>();
+      
+      /**
+       * Stack to store {@link Choice}s.
+       */
+      private final Deque<Choice> choiceStack = new LinkedList<Choice>();
       
       /**
        * {@inheritDoc}
@@ -180,16 +195,44 @@ public class EvaluationInputReader {
             if (!(currentPageInput instanceof QuestionPageInput)) {
                throw new SAXException("Page does not support questions.");
             }
-            String questionName = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_NAME);
-            QuestionInput questionInput = ((QuestionPageInput) currentPageInput).getQuestionInput(questionName);
+            final String questionName = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_NAME);
+            QuestionInput questionInput;
+            if (choiceStack.isEmpty()) {
+               questionInput = ((QuestionPageInput) currentPageInput).getQuestionInput(questionName);
+            }
+            else {
+               QuestionInput[] choiceInputs = questionInputStack.getFirst().getChoiceInputs(choiceStack.getFirst());
+               if (choiceInputs == null) {
+                  throw new SAXException("Question Inputs of '" + choiceStack.getFirst() + "' are not available.");
+               }
+               questionInput = ArrayUtil.search(choiceInputs, new IFilter<QuestionInput>() {
+                  @Override
+                  public boolean select(QuestionInput element) {
+                     return ObjectUtil.equals(element.getQuestion().getName(), questionName);
+                  }
+               });
+            }
             if (questionInput == null) {
                throw new SAXException("Question '" + questionInput + "' is not part of page '" + currentPageInput.getPage().getName() + "'.");
             }
+            questionInputStack.addFirst(questionInput);
             String questionValue = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_VALUE);
             questionInput.setValue(questionValue);
          }
          else if (EvaluationInputWriter.TAG_RANDOM_PAGE_ORDER.equals(qName)) {
             parsingPageOrder = true;
+         }
+         else if (EvaluationInputWriter.TAG_CHOICE.equals(qName)) {
+            if (questionInputStack.isEmpty()) {
+               throw new SAXException("Choice is not a child of a question input.");
+            }
+            String choiceText = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_CHOICE_TEXT);
+            QuestionInput parentInput = questionInputStack.getFirst();
+            Choice choice = parentInput.getChoice(choiceText);
+            if (choice == null) {
+               throw new SAXException("Choice '" + choiceText + "' is not part of question '" + parentInput.getQuestion().getName() + "'.");
+            }
+            choiceStack.addFirst(choice);
          }
          else {
             throw new SAXException("Unsupported tag '" + qName + "'.");
@@ -203,6 +246,12 @@ public class EvaluationInputReader {
       public void endElement(String uri, String localName, String qName) throws SAXException {
          if (EvaluationInputWriter.TAG_RANDOM_PAGE_ORDER.equals(qName)) {
             parsingPageOrder = false;
+         }
+         else if (EvaluationInputWriter.TAG_QUESTION.equals(qName)) {
+            questionInputStack.removeFirst();
+         }
+         else if (EvaluationInputWriter.TAG_CHOICE.equals(qName)) {
+            choiceStack.removeFirst();
          }
       }
 

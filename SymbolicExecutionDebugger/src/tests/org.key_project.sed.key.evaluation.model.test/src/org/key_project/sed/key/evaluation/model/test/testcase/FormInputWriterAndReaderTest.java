@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
+import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.FixedForm;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
 import org.key_project.sed.key.evaluation.model.definition.TestEvaluation;
@@ -130,7 +131,6 @@ public class FormInputWriterAndReaderTest extends TestCase {
                                             computer.computeRandomValues(evaluationInput, randomFormInput) : 
                                             null;
       String xml = EvaluationInputWriter.toRandomOrderXML(evaluationInput, updatedOrders);
-System.out.println(xml);
       // Parse xml
       EvaluationInput parsedInput = EvaluationInputReader.parse(xml);
       // Compare inputs
@@ -159,7 +159,12 @@ System.out.println(xml);
             QuestionPageInput pageInput = (QuestionPageInput)formInput.getPageInputs()[0];
             assertFalse(pageInput.getQuestionInputs()[0].getQuestion().isEditable()); // Browser
             assertTrue(pageInput.getQuestionInputs()[1].getQuestion().isEditable()); // RadioButtons
-            pageInput.getQuestionInputs()[1].setValue("This is not a valid radio button value!");
+            // Change question 1
+            QuestionInput radioInput = pageInput.getQuestionInputs()[1];
+            radioInput.setValue("This is not a valid radio button value!");
+            // Change yes sub question
+            QuestionInput childInput = radioInput.getChoiceInputs(radioInput.getChoices()[0])[0];
+            childInput.setValue("two");
          }         
       };
    }
@@ -397,6 +402,12 @@ System.out.println(xml);
          assertNotSame(expected, actual);
          assertEquals(expected.getQuestion(), actual.getQuestion());
          assertEquals(expected.getValue(), actual.getValue());
+         assertEquals(expected.hasChoiceInputs(), actual.hasChoiceInputs());
+         if (expected.hasChoiceInputs()) {
+            for (Choice choice : expected.getChoices()) {
+               assertQuestionInputs(expected.getChoiceInputs(choice), actual.getChoiceInputs(choice));
+            }
+         }
       }
       else {
          assertNull(actual);

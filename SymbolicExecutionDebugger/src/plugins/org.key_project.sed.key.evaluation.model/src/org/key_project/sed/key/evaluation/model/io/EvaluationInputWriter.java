@@ -8,6 +8,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
@@ -86,6 +87,16 @@ public class EvaluationInputWriter {
     * Attribute name to store {@link RandomFormInput#getTool(AbstractPageInput)} entries.
     */
    public static final String ATTRIBUTE_TOOL_NAME = "tool";
+
+   /**
+    * Tag name to store {@link Choice}s.
+    */
+   public static final String TAG_CHOICE = "choice";
+
+   /**
+    * Attribute name to store {@link Choice#getText()} entries.
+    */
+   public static final String ATTRIBUTE_CHOICE_TEXT = "text";
 
    /**
     * Converts the orders of the given {@link RandomFormInput}s into XML.
@@ -242,7 +253,22 @@ public class EvaluationInputWriter {
          Map<String, String> questionAttributes = new LinkedHashMap<String, String>();
          questionAttributes.put(ATTRIBUTE_QUESTION_NAME, XMLUtil.encodeText(questionInput.getQuestion().getName()));
          questionAttributes.put(ATTRIBUTE_QUESTION_VALUE, XMLUtil.encodeText(questionInput.getValue()));
-         XMLUtil.appendEmptyTag(level, TAG_QUESTION, questionAttributes, sb);
+         if (questionInput.hasChoiceInputs()) {
+            XMLUtil.appendStartTag(level, TAG_QUESTION, questionAttributes, sb);
+            for (Choice choice : questionInput.getChoices()) {
+               Map<String, String> choiceAttributes = new LinkedHashMap<String, String>();
+               choiceAttributes.put(ATTRIBUTE_CHOICE_TEXT, XMLUtil.encodeText(choice.getText()));
+               XMLUtil.appendStartTag(level + 1, TAG_CHOICE, choiceAttributes, sb);
+               for (QuestionInput childQuestionInput : questionInput.getChoiceInputs(choice)) {
+                  appendQuestionInput(level + 2, childQuestionInput, sb);
+               }
+               XMLUtil.appendEndTag(level + 1, TAG_CHOICE, sb);
+            }
+            XMLUtil.appendEndTag(level, TAG_QUESTION, sb);
+         }
+         else {
+            XMLUtil.appendEmptyTag(level, TAG_QUESTION, questionAttributes, sb);
+         }
       }
    }
 }

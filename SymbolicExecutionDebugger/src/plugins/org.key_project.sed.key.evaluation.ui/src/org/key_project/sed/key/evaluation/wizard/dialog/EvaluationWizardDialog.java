@@ -14,9 +14,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
+import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
-import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.util.LogUtil;
@@ -128,6 +128,15 @@ public class EvaluationWizardDialog extends WizardDialog {
    public void openTray(DialogTray tray) throws IllegalStateException,UnsupportedOperationException {
       registerDialog(this);
       super.openTray(tray);
+   }
+
+   @Override
+   public void create() {
+      super.create();
+      // Ensure that a button is selected, otherwise radio buttons might change values
+      if (!getButton(IDialogConstants.NEXT_ID).isEnabled()) {
+         getButton(IDialogConstants.CANCEL_ID).forceFocus();
+      }
    }
 
    @Override
