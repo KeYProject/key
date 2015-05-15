@@ -28,6 +28,23 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: /set/truthValueMyInteger
+    */
+   public void testMyInteger() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal131 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE));
+      ExpectedBranchResult goal133 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.FALSE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.FALSE), new ExpectedTruthValueResult("6.0", TruthValue.FALSE));
+      ExpectedBranchResult goal150 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal131, goal133, goal150);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueMyInteger/test/MyInteger.proof", 
+                                 "/set/truthValueMyInteger/oracle/MyInteger.xml",
+                                 false,
+                                 false,
+                                 result);
+   }
+   
+   /**
     * Tests example: /set/truthValueEquivExample
     */
    public void testEquivExample_NoOneStepSimplification() throws Exception {

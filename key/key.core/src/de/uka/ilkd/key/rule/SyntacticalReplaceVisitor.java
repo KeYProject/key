@@ -19,6 +19,8 @@
  */
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Stack;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -50,9 +52,11 @@ import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
 public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
@@ -75,6 +79,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      */
     private final Stack<Object> subStack; //of Term (and Boolean)
     private final Boolean newMarker = new Boolean(true);
+    private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
 
     /**
      */
@@ -93,6 +98,9 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         this.labelHint = labelHint;
         this.goal = goal;
         subStack = new Stack<Object>(); // of Term
+        if (labelHint instanceof TacletLabelHint) {
+           ((TacletLabelHint) labelHint).setTacletTermStack(tacletTermStack);
+        }
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
@@ -265,7 +273,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         return vBoundVars;
     }
 
-    /**
+   /**
      * performs the syntactic replacement of schemavariables with their
      * instantiations
      */
@@ -354,9 +362,14 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
     private Term resolveSubst(Term t) {
-        if (t.op() instanceof SubstOp)
-            return ((SubstOp)t.op ()).apply ( t, services );
-        return t;
+        if (t.op() instanceof SubstOp) {
+           Term resolved = ((SubstOp)t.op ()).apply ( t, services );
+           resolved = services.getTermBuilder().label(resolved, t.sub(1).getLabels());
+           return resolved;
+        }
+        else {
+           return t;
+        }
     }
 
     /**
@@ -383,7 +396,15 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         return svInst;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subtreeEntered(Term subtreeRoot) {
+       tacletTermStack.push(subtreeRoot);
+       super.subtreeEntered(subtreeRoot);
+    }
+    
     /**
      * this method is called in execPreOrder and execPostOrder in class Term
      * when leaving the subtree rooted in the term subtreeRoot.
@@ -393,6 +414,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     public void subtreeLeft(Term subtreeRoot){
+        tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
             final Term newTerm = mop.transform((Term)subStack.pop(),svInst, services);
