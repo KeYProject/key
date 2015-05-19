@@ -385,7 +385,7 @@ public class ProofSaver {
         	tree.append(joinApp.getConcreteRule().toString());
             tree.append("\")");
         	
-        	tree.append(" (nr-partners \"");
+        	tree.append(" (nrpartners \"");
         	tree.append(joinApp.getJoinPartners().size());
             tree.append("\")");
         	
