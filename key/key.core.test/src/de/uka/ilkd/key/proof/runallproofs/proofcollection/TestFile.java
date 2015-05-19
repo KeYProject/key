@@ -142,8 +142,7 @@ public class TestFile extends ForkedTestFileRunner {
       File keyFile = getKeYFile(settings);
 
       // File that the created proof will be saved to.
-      File proofFile = new File(pathToTempDir.toFile(), keyFile.getName()
-            + ".proof");
+      File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
 
       KeYEnvironment<DefaultUserInterfaceControl> env = null;
       Proof loadedProof = null;
@@ -220,7 +219,7 @@ public class TestFile extends ForkedTestFileRunner {
       }
       catch (Throwable t) {
          throw new Exception(
-               "Exception while saving/loading proof (see cause for details): "
+               "Exception while loading proof (see cause for details): "
                      + proofFile, t);
       }
       finally {
