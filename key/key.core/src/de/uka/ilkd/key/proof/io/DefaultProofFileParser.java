@@ -70,6 +70,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
 
 /**
  * Default implementation of {@link IProofFileParser}.
+ * 
  * @author Martin Hentschel
  */
 public class DefaultProofFileParser implements IProofFileParser {
@@ -78,600 +79,609 @@ public class DefaultProofFileParser implements IProofFileParser {
     private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
 
     private final AbstractProblemLoader loader;
-   private Proof proof = null;
-   private Iterator<Node> children = null;
+    private Proof proof = null;
+    private Iterator<Node> children = null;
 
-   private Node currNode = null;
-   private Goal currGoal = null;
-   private String currTacletName = null;
-   private int currFormula = 0;
-   private PosInTerm currPosInTerm = PosInTerm.getTopLevel();
-   private Contract currContract = null;
-   private Stack<Iterator<Node>> stack = new Stack<Iterator<Node>>();
-   private LinkedList<String> loadedInsts = null;
-   private ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList.<IfFormulaInstantiation>nil();
-   private ImmutableList<PosInOccurrence> builtinIfInsts;
-   private int currIfInstFormula;
-   private PosInTerm currIfInstPosInTerm;
-   private String status = "";
-   
-   
-   /** a value == 1 means the current branch is ignored; a value > 1 means that the "skipBranch - 1" parent branch of the
-    *  current branch is ignored.
-    *  a value == 0 means that no branch is ignored 
-    */
-   private int skipBranch;
+    private Node currNode = null;
+    private Goal currGoal = null;
+    private String currTacletName = null;
+    private int currFormula = 0;
+    private PosInTerm currPosInTerm = PosInTerm.getTopLevel();
+    private Contract currContract = null;
+    private Stack<Iterator<Node>> stack = new Stack<Iterator<Node>>();
+    private LinkedList<String> loadedInsts = null;
+    private ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList
+            .<IfFormulaInstantiation> nil();
+    private ImmutableList<PosInOccurrence> builtinIfInsts;
+    private int currIfInstFormula;
+    private PosInTerm currIfInstPosInTerm;
+    private String status = "";
 
-   private List<Throwable> errors = new LinkedList<Throwable>();
+    /**
+     * a value == 1 means the current branch is ignored; a value > 1 means that
+     * the "skipBranch - 1" parent branch of the current branch is ignored. a
+     * value == 0 means that no branch is ignored
+     */
+    private int skipBranch;
 
+    private List<Throwable> errors = new LinkedList<Throwable>();
 
-   public DefaultProofFileParser(AbstractProblemLoader loader, Proof proof) {
-      super();
-      this.proof = proof;
-      this.loader = loader;
-      currNode = proof.root(); // initialize loader
-      children = currNode.childrenIterator(); // --"--
-   }
+    public DefaultProofFileParser(AbstractProblemLoader loader, Proof proof) {
+        super();
+        this.proof = proof;
+        this.loader = loader;
+        currNode = proof.root(); // initialize loader
+        children = currNode.childrenIterator(); // --"--
+    }
 
-   public DefaultProofFileParser(Proof proof) {
-       this(null, proof);
-   }
+    public DefaultProofFileParser(Proof proof) {
+        this(null, proof);
+    }
 
-   /**
-    * Communicates a non-fatal condition to the caller. Empty string
-    * means everything is OK. The message will be displayed to the user
-    * in the GUI after the proof has been parsed.
-    */
-   public String getStatus() {
-       return status;
-   }
+    /**
+     * Communicates a non-fatal condition to the caller. Empty string means
+     * everything is OK. The message will be displayed to the user in the GUI
+     * after the proof has been parsed.
+     */
+    public String getStatus() {
+        return status;
+    }
 
-   /**
-    * returns the most recent selected goal 
-    */
-   public Goal getLastSelectedGoal() {
-	   return currGoal;
-   }
-   
+    /**
+     * returns the most recent selected goal
+     */
+    public Goal getLastSelectedGoal() {
+        return currGoal;
+    }
 
-// note: Expressions without parameters only emit the endExpr signal
-   @Override
-   public void beginExpr(char id, String s) {
+    // note: Expressions without parameters only emit the endExpr signal
+    @Override
+    public void beginExpr(char id, String s) {
 
-       //start no new commands until the ignored branch closes
-       //count sub-branches though
-       if (skipBranch > 0 && id != 'b') return;
-       
-       switch (id) {
-       case 'b' :
-           stack.push(children);
-           if (children.hasNext()) currNode = children.next();
-           if (skipBranch > 0) {
-               skipBranch ++;
-           }
-           break;
-  case 'r' :
-           if (currNode == null) currNode = children.next();
-           // otherwise we already fetched the node at branch point
-           currGoal      = proof.getGoal(currNode);
-           currTacletName= s;
-           // set default state
-           currFormula   = 0;
-           currPosInTerm = PosInTerm.getTopLevel();
-           loadedInsts   = null;
-           ifFormulaList = ImmutableSLList.<IfFormulaInstantiation>nil();
-           break;
+        // start no new commands until the ignored branch closes
+        // count sub-branches though
+        if (skipBranch > 0 && id != 'b')
+            return;
 
-       case 'f' : //formula
-           final int formula = Integer.parseInt(s);
-           if(builtinIfInsts != null) {
-        currIfInstFormula = formula;
-           } else {
-        currFormula = formula;
-           }
-           break;
+        switch (id) {
+        case 'b':
+            stack.push(children);
+            if (children.hasNext())
+                currNode = children.next();
+            if (skipBranch > 0) {
+                skipBranch++;
+            }
+            break;
+        case 'r':
+            if (currNode == null)
+                currNode = children.next();
+            // otherwise we already fetched the node at branch point
+            currGoal = proof.getGoal(currNode);
+            currTacletName = s;
+            // set default state
+            currFormula = 0;
+            currPosInTerm = PosInTerm.getTopLevel();
+            loadedInsts = null;
+            ifFormulaList = ImmutableSLList.<IfFormulaInstantiation> nil();
+            break;
 
-       case 't' : //term
-           final PosInTerm pos = PosInTerm.parseReverseString(s);
-           if(builtinIfInsts != null) {
-        currIfInstPosInTerm = pos;
-           } else {
-        currPosInTerm = pos;
-           }
-           break;
+        case 'f': // formula
+            final int formula = Integer.parseInt(s);
+            if (builtinIfInsts != null) {
+                currIfInstFormula = formula;
+            }
+            else {
+                currFormula = formula;
+            }
+            break;
 
-       case 'i' :
-           if (loadedInsts == null) loadedInsts = new LinkedList<String>();
-           loadedInsts.add(s);
-           break;
+        case 't': // term
+            final PosInTerm pos = PosInTerm.parseReverseString(s);
+            if (builtinIfInsts != null) {
+                currIfInstPosInTerm = pos;
+            }
+            else {
+                currPosInTerm = pos;
+            }
+            break;
 
-  case 'h' :
-      //             Debug.fail("Detected use of heuristics!");
-      break;
-  case 'q' : // ifseqformula
-           Sequent seq = currGoal.sequent();
-           ifFormulaList = ifFormulaList.append(
-                   new IfFormulaInstSeq(seq, Integer.parseInt(s)));
-           break;
-       case 'd' : // ifdirectformula
-           ifFormulaList = ifFormulaList.append(
-               new IfFormulaInstDirect(
-                   new SequentFormula(parseTerm(s, proof))));
-           break;
-       case 'u' : //UserLog
-           if(proof.userLog==null)
-               proof.userLog = new Vector<String>();
-           proof.userLog.add(s);
-           break;
-       case 'v' : //Version log
-           if(proof.keyVersionLog==null)
-               proof.keyVersionLog = new Vector<String>();
-           proof.keyVersionLog.add(s);
-           break;
-       case 's' : //ProofSettings
-           //System.out.println("---------------\n" + s + "------------\n");
-           //necessary for downward compatibility of the proof format
-           loadPreferences(s);
-           break;
-       case 'n' : //BuiltIn rules
-    	   if (currNode == null) currNode = children.next();
-    	   currGoal      = proof.getGoal(currNode);
-    	   currTacletName = s;
-    	   // set default state
-    	   currFormula   = 0;
-    	   currPosInTerm = PosInTerm.getTopLevel();
-    	   builtinIfInsts = null;
-           break;
-       case 'c' : //contract
-           currContract = proof.getServices().getSpecificationRepository().getContractByName(s);
-           if(currContract == null) {
-               // XXX: changed from throwing this exception
-               final ProblemLoaderException e = new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");
-               reportError(ERROR_LOADING_PROOF_LINE+
-                               ", goal "+currGoal.node().serialNr()+
-                               ", rule "+currTacletName+NOT_APPLICABLE,e);
-           }
-           break;
-       case 'x' : //ifInst (for built in rules)
-           if(builtinIfInsts == null) {
-        	   builtinIfInsts = ImmutableSLList.<PosInOccurrence>nil();
-           }
-           currIfInstFormula = 0;
-           currIfInstPosInTerm = PosInTerm.getTopLevel();
-           break;
-       case 'w' : //newnames
-           final String[] newNames = s.split(",");
-           ImmutableList<Name> l = ImmutableSLList.<Name>nil();
-           for (int in = 0; in < newNames.length; in++) {
-               l = l.append(new Name(newNames[in]));
-           }
-           proof.getServices().getNameRecorder().setProposals(l);
-           break;
-       case 'e': //autoModeTime
-           try {
-               proof.addAutoModeTime(Long.parseLong(s));
-           } catch (NumberFormatException e) {
-               // ignore
-           }
-           break;
-       }
-   }
+        case 'i':
+            if (loadedInsts == null)
+                loadedInsts = new LinkedList<String>();
+            loadedInsts.add(s);
+            break;
 
+        case 'h':
+            // Debug.fail("Detected use of heuristics!");
+            break;
+        case 'q': // ifseqformula
+            Sequent seq = currGoal.sequent();
+            ifFormulaList = ifFormulaList.append(new IfFormulaInstSeq(seq,
+                    Integer.parseInt(s)));
+            break;
+        case 'd': // ifdirectformula
+            ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
+                    new SequentFormula(parseTerm(s, proof))));
+            break;
+        case 'u': // UserLog
+            if (proof.userLog == null)
+                proof.userLog = new Vector<String>();
+            proof.userLog.add(s);
+            break;
+        case 'v': // Version log
+            if (proof.keyVersionLog == null)
+                proof.keyVersionLog = new Vector<String>();
+            proof.keyVersionLog.add(s);
+            break;
+        case 's': // ProofSettings
+            // System.out.println("---------------\n" + s + "------------\n");
+            // necessary for downward compatibility of the proof format
+            loadPreferences(s);
+            break;
+        case 'n': // BuiltIn rules
+            if (currNode == null)
+                currNode = children.next();
+            currGoal = proof.getGoal(currNode);
+            currTacletName = s;
+            // set default state
+            currFormula = 0;
+            currPosInTerm = PosInTerm.getTopLevel();
+            builtinIfInsts = null;
+            break;
+        case 'c': // contract
+            currContract = proof.getServices().getSpecificationRepository()
+                    .getContractByName(s);
+            if (currContract == null) {
+                // XXX: changed from throwing this exception
+                final ProblemLoaderException e = new ProblemLoaderException(
+                        loader, "Error loading proof: contract \"" + s
+                                + "\" not found.");
+                reportError(ERROR_LOADING_PROOF_LINE + ", goal "
+                        + currGoal.node().serialNr() + ", rule "
+                        + currTacletName + NOT_APPLICABLE, e);
+            }
+            break;
+        case 'x': // ifInst (for built in rules)
+            if (builtinIfInsts == null) {
+                builtinIfInsts = ImmutableSLList.<PosInOccurrence> nil();
+            }
+            currIfInstFormula = 0;
+            currIfInstPosInTerm = PosInTerm.getTopLevel();
+            break;
+        case 'w': // newnames
+            final String[] newNames = s.split(",");
+            ImmutableList<Name> l = ImmutableSLList.<Name> nil();
+            for (int in = 0; in < newNames.length; in++) {
+                l = l.append(new Name(newNames[in]));
+            }
+            proof.getServices().getNameRecorder().setProposals(l);
+            break;
+        case 'e': // autoModeTime
+            try {
+                proof.addAutoModeTime(Long.parseLong(s));
+            }
+            catch (NumberFormatException e) {
+                // ignore
+            }
+            break;
+        }
+    }
 
-   @Override
-   public void endExpr(char id, int linenr) {
-       //System.out.println("end "+id);
+    @Override
+    public void endExpr(char id, int linenr) {
+        // System.out.println("end "+id);
 
-       //read no new commands until ignored branch closes
-       if (skipBranch > 0 && id != 'b') return;
+        // read no new commands until ignored branch closes
+        if (skipBranch > 0 && id != 'b')
+            return;
 
-       switch (id) {
-       case 'b' :
-           children = stack.pop();
-           if (skipBranch > 0) {
-               skipBranch--;
-           }
-           break;
-       case 'a' :
-           if (currNode != null) {
-               currNode.getNodeInfo().setInteractiveRuleApplication(true);
-           }
-           break;
-       case 'r' :
-           try{
-              currGoal.apply(constructApp());
-              children = currNode.childrenIterator();
-              currNode = null;
-           } catch(Exception e) {
-               skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
-                   ", goal "+currGoal.node().serialNr()+
-                   ", rule "+currTacletName+NOT_APPLICABLE,e);
-           } catch (AssertionError e) {
-               skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
-                   ", goal "+currGoal.node().serialNr()+
-                   ", rule "+currTacletName+NOT_APPLICABLE,e);
-           }
-           break;
-       case 'n' :
-           try {
-               IBuiltInRuleApp app = constructBuiltinApp();
-              if (!app.complete()) {
-                 app = app.tryToInstantiate(currGoal);
-              }
-               currGoal.apply(app);
-               children = currNode.childrenIterator();
-               currNode = null;
-           } catch (SkipSMTRuleException e) {
-               // silently continue; status will be reported via polling
-           } catch (BuiltInConstructionException e) {
-               skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
-                   ", goal "+currGoal.node().serialNr()+
-                   ", rule "+currTacletName+NOT_APPLICABLE,e);
-           } catch (RuntimeException e) {
-               skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
-                   ", goal "+currGoal.node().serialNr()+
-                   ", rule "+currTacletName+NOT_APPLICABLE,e);
-           } catch (AssertionError e) {
-               skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
-                   ", goal "+currGoal.node().serialNr()+
-                   ", rule "+currTacletName+NOT_APPLICABLE,e);
-           }
-           break;
-       case 'x' : //ifInst (for built in rules)
-           try {
-        final PosInOccurrence ifInst
-           = PosInOccurrence.findInSequent(currGoal.sequent(),
-                                                     currIfInstFormula,
-                                                     currIfInstPosInTerm);
-        builtinIfInsts = builtinIfInsts.append(ifInst);
-           } catch(RuntimeException e) {
-//        System.out.println("formula: " + currIfInstFormula);
-//        System.out.println("term: " + currIfInstPosInTerm);
-               skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
-                   ", goal "+currGoal.node().serialNr()+
-                   ", rule "+currTacletName+NOT_APPLICABLE,e);
-           } catch (AssertionError e) {
-               skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
-                   ", goal "+currGoal.node().serialNr()+
-                   ", rule "+currTacletName+NOT_APPLICABLE,e);
-           }
-           break;
-       }
-
-   }
-
-
-   
-   private void reportError(String string, Throwable e) {       
-       status = "Errors while reading the proof. Not all branches could be load successfully.";
-       errors.add(new ProblemLoaderException(loader, string, e));
-   }
-
-   /** 
-    * returns list of errors that have been reported during parsing
-    * @return list of errors
-    */
-   @Override
-   public List<Throwable> getErrors() {
-       return errors;
-   }
-   
-   public void loadPreferences(String preferences) {
-       final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
-       proofSettings.loadSettingsFromString(preferences);
-   }
-
-   /**
-    * Constructs rule application for UpdateSimplification from
-    * current parser information
-    *
-    * @return current rule application for updateSimplification
-    */
-   private IBuiltInRuleApp constructBuiltinApp()
-                              throws SkipSMTRuleException,
-                                     BuiltInConstructionException {
-
-        if (RuleAppSMT.rule.name().toString().equals(currTacletName)) {
-           boolean error = false;
-           final SMTProblem smtProblem = new SMTProblem(currGoal);
-           try {
-        	   SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-                       ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
-               SolverLauncher launcher = new SolverLauncher(settings);
-               //launcher.addListener(new SolverListener(settings, proof));
-               SolverTypeCollection active = ProofIndependentSettings
-       		        .DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
-               ArrayList<SMTProblem> problems = new ArrayList<SMTProblem>();
-               problems.add(smtProblem);
-               launcher.launch(active.getTypes(),                       
-            		   problems,
-                       proof.getServices()); 
-           } catch (Exception e) {
-        	   error = true;
-           }
-        	if (error || smtProblem.getFinalResult().isValid() != ThreeValuedTruth.VALID)
-        	{        	
-        	   status = "Your proof has been loaded, but SMT solvers have not been run";
-        	   throw new SkipSMTRuleException();
-           } else {
-        	   return RuleAppSMT.rule.createApp(null, proof.getServices());
-           }
+        switch (id) {
+        case 'b':
+            children = stack.pop();
+            if (skipBranch > 0) {
+                skipBranch--;
+            }
+            break;
+        case 'a':
+            if (currNode != null) {
+                currNode.getNodeInfo().setInteractiveRuleApplication(true);
+            }
+            break;
+        case 'r':
+            try {
+                currGoal.apply(constructApp());
+                children = currNode.childrenIterator();
+                currNode = null;
+            }
+            catch (Exception e) {
+                skipBranch = 1;
+                reportError(ERROR_LOADING_PROOF_LINE + "Line " + linenr
+                        + ", goal " + currGoal.node().serialNr() + ", rule "
+                        + currTacletName + NOT_APPLICABLE, e);
+            }
+            catch (AssertionError e) {
+                skipBranch = 1;
+                reportError(ERROR_LOADING_PROOF_LINE + "Line " + linenr
+                        + ", goal " + currGoal.node().serialNr() + ", rule "
+                        + currTacletName + NOT_APPLICABLE, e);
+            }
+            break;
+        case 'n':
+            try {
+                IBuiltInRuleApp app = constructBuiltinApp();
+                if (!app.complete()) {
+                    app = app.tryToInstantiate(currGoal);
+                }
+                currGoal.apply(app);
+                children = currNode.childrenIterator();
+                currNode = null;
+            }
+            catch (SkipSMTRuleException e) {
+                // silently continue; status will be reported via polling
+            }
+            catch (BuiltInConstructionException e) {
+                skipBranch = 1;
+                reportError(ERROR_LOADING_PROOF_LINE + "Line " + linenr
+                        + ", goal " + currGoal.node().serialNr() + ", rule "
+                        + currTacletName + NOT_APPLICABLE, e);
+            }
+            catch (RuntimeException e) {
+                skipBranch = 1;
+                reportError(ERROR_LOADING_PROOF_LINE + "Line " + linenr
+                        + ", goal " + currGoal.node().serialNr() + ", rule "
+                        + currTacletName + NOT_APPLICABLE, e);
+            }
+            catch (AssertionError e) {
+                skipBranch = 1;
+                reportError(ERROR_LOADING_PROOF_LINE + "Line " + linenr
+                        + ", goal " + currGoal.node().serialNr() + ", rule "
+                        + currTacletName + NOT_APPLICABLE, e);
+            }
+            break;
+        case 'x': // ifInst (for built in rules)
+            try {
+                final PosInOccurrence ifInst = PosInOccurrence.findInSequent(
+                        currGoal.sequent(), currIfInstFormula,
+                        currIfInstPosInTerm);
+                builtinIfInsts = builtinIfInsts.append(ifInst);
+            }
+            catch (RuntimeException e) {
+                // System.out.println("formula: " + currIfInstFormula);
+                // System.out.println("term: " + currIfInstPosInTerm);
+                skipBranch = 1;
+                reportError(ERROR_LOADING_PROOF_LINE + "Line " + linenr
+                        + ", goal " + currGoal.node().serialNr() + ", rule "
+                        + currTacletName + NOT_APPLICABLE, e);
+            }
+            catch (AssertionError e) {
+                skipBranch = 1;
+                reportError(ERROR_LOADING_PROOF_LINE + "Line " + linenr
+                        + ", goal " + currGoal.node().serialNr() + ", rule "
+                        + currTacletName + NOT_APPLICABLE, e);
+            }
+            break;
         }
 
+    }
 
-     IBuiltInRuleApp ourApp = null;
-       PosInOccurrence pos = null;
+    private void reportError(String string, Throwable e) {
+        status = "Errors while reading the proof. Not all branches could be load successfully.";
+        errors.add(new ProblemLoaderException(loader, string, e));
+    }
 
-       if (currFormula != 0) { // otherwise we have no pos
-           try {
-        pos = PosInOccurrence.findInSequent(currGoal.sequent(),
-                                                   currFormula,
-                                                   currPosInTerm);
-           } catch(RuntimeException e) {
-        throw new BuiltInConstructionException(e);
-           }
-       }
-       
-       if (currContract != null) {
-    	   AbstractContractRuleApp contractApp = null;
+    /**
+     * returns list of errors that have been reported during parsing
+     * 
+     * @return list of errors
+     */
+    @Override
+    public List<Throwable> getErrors() {
+        return errors;
+    }
 
-    	   BuiltInRule useContractRule;
-    	   if (currContract instanceof OperationContract) {
-    		   useContractRule = UseOperationContractRule.INSTANCE;
-    		   contractApp = (((UseOperationContractRule)useContractRule).createApp(pos)).setContract(currContract);
-    	   }
-    	   else {
-    		   useContractRule = UseDependencyContractRule.INSTANCE;
-    		   contractApp = (((UseDependencyContractRule)useContractRule).createApp(pos)).setContract(currContract);
-    	   }
+    public void loadPreferences(String preferences) {
+        final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
+        proofSettings.loadSettingsFromString(preferences);
+    }
 
-    	   if (contractApp.check(currGoal.proof().getServices()) == null) {
-    		   throw new BuiltInConstructionException
-    		   ("Cannot apply contract: " + currContract);
-    	   } else {
-    		   ourApp = contractApp;
-    	   }
+    /**
+     * Constructs rule application for UpdateSimplification from current parser
+     * information
+     *
+     * @return current rule application for updateSimplification
+     */
+    private IBuiltInRuleApp constructBuiltinApp() throws SkipSMTRuleException,
+            BuiltInConstructionException {
 
-    	   currContract = null;
-    	   if(builtinIfInsts != null) {
-    		   ourApp = ourApp.setIfInsts(builtinIfInsts);
-    		   builtinIfInsts = null;
-    	   }
-    	   return ourApp;
-       }
+        if (RuleAppSMT.rule.name().toString().equals(currTacletName)) {
+            boolean error = false;
+            final SMTProblem smtProblem = new SMTProblem(currGoal);
+            try {
+                SMTSettings settings = new SMTSettings(proof.getSettings()
+                        .getSMTSettings(),
+                        ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getSMTSettings(), proof);
+                SolverLauncher launcher = new SolverLauncher(settings);
+                // launcher.addListener(new SolverListener(settings, proof));
+                SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getSMTSettings().computeActiveSolverUnion();
+                ArrayList<SMTProblem> problems = new ArrayList<SMTProblem>();
+                problems.add(smtProblem);
+                launcher.launch(active.getTypes(), problems,
+                        proof.getServices());
+            }
+            catch (Exception e) {
+                error = true;
+            }
+            if (error
+                    || smtProblem.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
+                status = "Your proof has been loaded, but SMT solvers have not been run";
+                throw new SkipSMTRuleException();
+            }
+            else {
+                return RuleAppSMT.rule.createApp(null, proof.getServices());
+            }
+        }
 
-       final ImmutableSet<IBuiltInRuleApp> ruleApps = collectAppsForRule(currTacletName, currGoal, pos) ;
-       if (ruleApps.size() != 1) {
-           if (ruleApps.size() < 1) {
-               throw new BuiltInConstructionException
-               (currTacletName +
-                   " is missing. Most probably the binary "+
-                   "for this built-in rule is not in your path or " +
-                   "you do not have the permission to execute it.");
-           } else {
-               throw new BuiltInConstructionException
-               (currTacletName + ": found " + ruleApps.size() +
-                   " applications. Don't know what to do !\n" +
-                   "@ " + pos);
-           }
-       }
-       ourApp = ruleApps.iterator().next();
-       builtinIfInsts = null;
-       return ourApp;
-   }
-   
-   private ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g, PosInOccurrence pos) {
-	   ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
+        IBuiltInRuleApp ourApp = null;
+        PosInOccurrence pos = null;
 
-       for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g, pos)) {
-           if (app.rule().name().toString().equals(ruleName)) {
-               result = result.add(app);
-           }
-       }
-	   
-	   return result;
-   }
+        if (currFormula != 0) { // otherwise we have no pos
+            try {
+                pos = PosInOccurrence.findInSequent(currGoal.sequent(),
+                        currFormula, currPosInTerm);
+            }
+            catch (RuntimeException e) {
+                throw new BuiltInConstructionException(e);
+            }
+        }
 
-   private TacletApp constructApp() throws AppConstructionException {
-       TacletApp ourApp = null;
-       PosInOccurrence pos = null;
+        if (currContract != null) {
+            AbstractContractRuleApp contractApp = null;
 
-       Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(currTacletName));
-       if (t==null) {
-           ourApp = currGoal.indexOfTaclets().lookup(currTacletName);
-       } else {
-           ourApp = NoPosTacletApp.createNoPosTacletApp(t);
-       }
-       Services services = proof.getServices();
+            BuiltInRule useContractRule;
+            if (currContract instanceof OperationContract) {
+                useContractRule = UseOperationContractRule.INSTANCE;
+                contractApp = (((UseOperationContractRule) useContractRule)
+                        .createApp(pos)).setContract(currContract);
+            }
+            else {
+                useContractRule = UseDependencyContractRule.INSTANCE;
+                contractApp = (((UseDependencyContractRule) useContractRule)
+                        .createApp(pos)).setContract(currContract);
+            }
 
+            if (contractApp.check(currGoal.proof().getServices()) == null) {
+                throw new BuiltInConstructionException(
+                        "Cannot apply contract: " + currContract);
+            }
+            else {
+                ourApp = contractApp;
+            }
 
-       if (currFormula != 0) { // otherwise we have no pos
-           pos = PosInOccurrence.findInSequent(currGoal.sequent(),
-                                               currFormula,
-                                               currPosInTerm);
-//System.err.print("Want to apply "+currTacletName+" at "+currGoal);
-            //this is copied from TermTacletAppIndex :-/
+            currContract = null;
+            if (builtinIfInsts != null) {
+                ourApp = ourApp.setIfInsts(builtinIfInsts);
+                builtinIfInsts = null;
+            }
+            return ourApp;
+        }
 
-           ourApp = ((NoPosTacletApp)ourApp).matchFind(pos, services);
-           ourApp = ourApp.setPosInOccurrence(pos, services);
-       }
+        final ImmutableSet<IBuiltInRuleApp> ruleApps = collectAppsForRule(
+                currTacletName, currGoal, pos);
+        if (ruleApps.size() != 1) {
+            if (ruleApps.size() < 1) {
+                throw new BuiltInConstructionException(currTacletName
+                        + " is missing. Most probably the binary "
+                        + "for this built-in rule is not in your path or "
+                        + "you do not have the permission to execute it.");
+            }
+            else {
+                throw new BuiltInConstructionException(currTacletName
+                        + ": found " + ruleApps.size()
+                        + " applications. Don't know what to do !\n" + "@ "
+                        + pos);
+            }
+        }
+        ourApp = ruleApps.iterator().next();
+        builtinIfInsts = null;
+        return ourApp;
+    }
 
+    private ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName,
+            Goal g, PosInOccurrence pos) {
+        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet
+                .<IBuiltInRuleApp> nil();
 
-       ourApp = constructInsts(ourApp, services);
+        for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g,
+                pos)) {
+            if (app.rule().name().toString().equals(ruleName)) {
+                result = result.add(app);
+            }
+        }
 
-       ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList,
-                                                  services);
+        return result;
+    }
 
-       if (!ourApp.complete()) {
-           ourApp = ourApp.tryToInstantiate(proof.getServices());
-       }
+    private TacletApp constructApp() throws AppConstructionException {
+        TacletApp ourApp = null;
+        PosInOccurrence pos = null;
 
-       return ourApp;
-   }
+        Taclet t = proof.getInitConfig().lookupActiveTaclet(
+                new Name(currTacletName));
+        if (t == null) {
+            ourApp = currGoal.indexOfTaclets().lookup(currTacletName);
+        }
+        else {
+            ourApp = NoPosTacletApp.createNoPosTacletApp(t);
+        }
+        Services services = proof.getServices();
 
+        if (currFormula != 0) { // otherwise we have no pos
+            pos = PosInOccurrence.findInSequent(currGoal.sequent(),
+                    currFormula, currPosInTerm);
+            // System.err.print("Want to apply "+currTacletName+" at "+currGoal);
+            // this is copied from TermTacletAppIndex :-/
 
+            ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
+            ourApp = ourApp.setPosInOccurrence(pos, services);
+        }
 
-   /** 1st pass: only VariableSV */
-   public static TacletApp parseSV1(TacletApp app, SchemaVariable sv,
-                                    String value, Services services) {
-       LogicVariable lv = new LogicVariable(new Name(value),
-                                          app.getRealSort(sv, services));
-       Term instance = services.getTermFactory().createTerm(lv);
-       return app.addCheckedInstantiation(sv, instance, services,true);
-   }
+        ourApp = constructInsts(ourApp, services);
 
+        ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
 
-   /** 2nd pass: all other SV */
-   public static TacletApp parseSV2(TacletApp app,
-                   SchemaVariable sv,
-                                    String value,
-                                    Goal targetGoal) {
-       final Proof p = targetGoal.proof();
-       final Services services = p.getServices();
-       TacletApp result;
-       if(sv instanceof VariableSV) {
-           // ignore -- already done
-           result = app;
-       } else if(sv instanceof ProgramSV) {
-      final ProgramElement pe =
-          app.getProgramElement(value, sv, services);
-      result = app.addCheckedInstantiation(sv, pe, services, true);
-       } else if(sv instanceof SkolemTermSV) {
-      result = app.createSkolemConstant ( value, sv, true, services );
-       } else {
-           Namespace varNS = p.getNamespaces().variables();
-      varNS = app.extendVarNamespaceForSV(varNS, sv);
-      Term instance = parseTerm(value, p, varNS,
-              targetGoal.getVariableNamespace(varNS));
-      result = app.addCheckedInstantiation(sv, instance, services, true);
-       }
-       return result;
-   }
+        if (!ourApp.complete()) {
+            ourApp = ourApp.tryToInstantiate(proof.getServices());
+        }
 
+        return ourApp;
+    }
 
-   private TacletApp constructInsts(TacletApp app, Services services) {
-       if (loadedInsts == null) return app;
-       ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
+    /** 1st pass: only VariableSV */
+    public static TacletApp parseSV1(TacletApp app, SchemaVariable sv,
+            String value, Services services) {
+        LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(
+                sv, services));
+        Term instance = services.getTermFactory().createTerm(lv);
+        return app.addCheckedInstantiation(sv, instance, services, true);
+    }
 
-       // first pass: add variables
-       Iterator<String> it = loadedInsts.iterator();
-       while (it.hasNext()) {
-           String s = it.next();
-           int eq = s.indexOf('=');
-           String varname = s.substring(0, eq);
-           String value = s.substring(eq+1, s.length());
+    /** 2nd pass: all other SV */
+    public static TacletApp parseSV2(TacletApp app, SchemaVariable sv,
+            String value, Goal targetGoal) {
+        final Proof p = targetGoal.proof();
+        final Services services = p.getServices();
+        TacletApp result;
+        if (sv instanceof VariableSV) {
+            // ignore -- already done
+            result = app;
+        }
+        else if (sv instanceof ProgramSV) {
+            final ProgramElement pe = app
+                    .getProgramElement(value, sv, services);
+            result = app.addCheckedInstantiation(sv, pe, services, true);
+        }
+        else if (sv instanceof SkolemTermSV) {
+            result = app.createSkolemConstant(value, sv, true, services);
+        }
+        else {
+            Namespace varNS = p.getNamespaces().variables();
+            varNS = app.extendVarNamespaceForSV(varNS, sv);
+            Term instance = parseTerm(value, p, varNS,
+                    targetGoal.getVariableNamespace(varNS));
+            result = app.addCheckedInstantiation(sv, instance, services, true);
+        }
+        return result;
+    }
 
-           SchemaVariable sv = lookupName(uninsts, varname);
-           if (sv==null) {
-//               throw new IllegalStateException(
-//                   varname+" from \n"+loadedInsts+"\n is not in\n"+uninsts);
-               System.err.println(varname+" from "+app.rule().name()+" is not in uninsts");
-               continue;
-           }
+    private TacletApp constructInsts(TacletApp app, Services services) {
+        if (loadedInsts == null)
+            return app;
+        ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
-           if (sv instanceof VariableSV) {
-               app = parseSV1(app, sv, value, services);
-           }
-       }
+        // first pass: add variables
+        Iterator<String> it = loadedInsts.iterator();
+        while (it.hasNext()) {
+            String s = it.next();
+            int eq = s.indexOf('=');
+            String varname = s.substring(0, eq);
+            String value = s.substring(eq + 1, s.length());
 
-       // second pass: add everything else
-       uninsts = app.uninstantiatedVars();
-       it = loadedInsts.iterator();
-       while (it.hasNext()) {
-           String s = it.next();
-           int eq = s.indexOf('=');
-           String varname = s.substring(0, eq);
-           String value = s.substring(eq + 1, s.length());
-           SchemaVariable sv = lookupName(uninsts, varname);
-           if(sv == null) {
-        continue;
-           }
-           app = parseSV2(app, sv, value, currGoal);
-       }
+            SchemaVariable sv = lookupName(uninsts, varname);
+            if (sv == null) {
+                // throw new IllegalStateException(
+                // varname+" from \n"+loadedInsts+"\n is not in\n"+uninsts);
+                System.err.println(varname + " from " + app.rule().name()
+                        + " is not in uninsts");
+                continue;
+            }
 
-       return app;
-   }
+            if (sv instanceof VariableSV) {
+                app = parseSV1(app, sv, value, services);
+            }
+        }
 
+        // second pass: add everything else
+        uninsts = app.uninstantiatedVars();
+        it = loadedInsts.iterator();
+        while (it.hasNext()) {
+            String s = it.next();
+            int eq = s.indexOf('=');
+            String varname = s.substring(0, eq);
+            String value = s.substring(eq + 1, s.length());
+            SchemaVariable sv = lookupName(uninsts, varname);
+            if (sv == null) {
+                continue;
+            }
+            app = parseSV2(app, sv, value, currGoal);
+        }
 
-   public static Term parseTerm(String value, Proof proof,
-           Namespace varNS, Namespace progVar_ns) {
-       try {
-           return new DefaultTermParser().
-               parse(new StringReader(value), null,
-                     proof.getServices(),
-                     varNS,
-                     proof.getNamespaces().functions(),
-                     proof.getNamespaces().sorts(),
-                     progVar_ns,
-                     new AbbrevMap());
-       } catch(ParserException e) {
-           throw new RuntimeException("Error while parsing value "+value+
-                                      "\nVar namespace is: "+varNS+"\n", e);
-       }
-   }
-   public static Term parseTerm(String value, Services services,
-           Namespace varNS, Namespace progVar_ns) {
-       try {
-           return new DefaultTermParser().
-               parse(new StringReader(value), null,
-                     services,
-                     varNS,
-                     services.getNamespaces().functions(),
-                     services.getNamespaces().sorts(),
-                     progVar_ns,
-                     new AbbrevMap());
-       } catch(ParserException e) {
-           throw new RuntimeException("Error while parsing value "+value+
-                                      "\nVar namespace is: "+varNS+"\n", e);
-       }
-   }
+        return app;
+    }
 
-   public static Term parseTerm(String value, Proof proof) {
-       return parseTerm(value, proof, proof.getNamespaces().variables(),
-               proof.getNamespaces().programVariables());
-   }
+    public static Term parseTerm(String value, Proof proof, Namespace varNS,
+            Namespace progVar_ns) {
+        try {
+            return new DefaultTermParser().parse(new StringReader(value), null,
+                    proof.getServices(), varNS, proof.getNamespaces()
+                            .functions(), proof.getNamespaces().sorts(),
+                    progVar_ns, new AbbrevMap());
+        }
+        catch (ParserException e) {
+            throw new RuntimeException("Error while parsing value " + value
+                    + "\nVar namespace is: " + varNS + "\n", e);
+        }
+    }
 
+    public static Term parseTerm(String value, Services services,
+            Namespace varNS, Namespace progVar_ns) {
+        try {
+            return new DefaultTermParser().parse(new StringReader(value), null,
+                    services, varNS, services.getNamespaces().functions(),
+                    services.getNamespaces().sorts(), progVar_ns,
+                    new AbbrevMap());
+        }
+        catch (ParserException e) {
+            throw new RuntimeException("Error while parsing value " + value
+                    + "\nVar namespace is: " + varNS + "\n", e);
+        }
+    }
 
-   private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
-       Iterator<SchemaVariable> it = set.iterator();
-       while (it.hasNext()) {
-           SchemaVariable v = it.next();
-           if (v.name().toString().equals(name)) return v;
-       }
-       return null; // handle this better!
-   }
+    public static Term parseTerm(String value, Proof proof) {
+        return parseTerm(value, proof, proof.getNamespaces().variables(), proof
+                .getNamespaces().programVariables());
+    }
 
-   private static class AppConstructionException extends Exception {
+    private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set,
+            String name) {
+        Iterator<SchemaVariable> it = set.iterator();
+        while (it.hasNext()) {
+            SchemaVariable v = it.next();
+            if (v.name().toString().equals(name))
+                return v;
+        }
+        return null; // handle this better!
+    }
 
-       /**
-        *
-        */
-       private static final long serialVersionUID = -6534063595443883709L; }
+    static class AppConstructionException extends Exception {
+        private static final long serialVersionUID = -6534063595443883709L;
+    }
 
-   private static class BuiltInConstructionException extends Exception {
-       /**
-        *
-        */
-       private static final long serialVersionUID = -735474220502290816L;
-       BuiltInConstructionException(String s) {
-           super(s);
-       }
-       BuiltInConstructionException(Throwable cause) {
-           super(cause);
-       }
-   }
+    static class BuiltInConstructionException extends Exception {
+        private static final long serialVersionUID = -735474220502290816L;
 
-    private static class SkipSMTRuleException extends Exception {
+        BuiltInConstructionException(String s) {
+            super(s);
+        }
 
+        BuiltInConstructionException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    static class SkipSMTRuleException extends Exception {
         private static final long serialVersionUID = -2932282883810135168L;
-
     }
 
 }
