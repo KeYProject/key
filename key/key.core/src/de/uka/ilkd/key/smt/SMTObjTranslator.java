@@ -2079,7 +2079,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		}
 
 		public void countConstants(Term t) {
-			if (t.subs().size() == 0) {
+			if (t.arity() == 0) {
 				Sort s = t.sort();
 				String str = t.toString();
 				if (s.equals(heapSort)) {

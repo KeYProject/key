@@ -509,19 +509,27 @@ class TermImpl implements Term {
 
 
     @Override
-    public int hashCode(){
+    public final int hashCode(){
         if(hashcode == -1) {
             // compute into local variable first to be thread-safe.
-            int hashcode = 5;
-            hashcode = hashcode*17 + op().hashCode();
-            hashcode = hashcode*17 + subs().hashCode();
-            hashcode = hashcode*17 + boundVars().hashCode();            
-            hashcode = hashcode*17 + javaBlock().hashCode();
-            
-            if(hashcode == -1) {
-        	hashcode = 0;
-            }
-            this.hashcode = hashcode;
+            this.hashcode = computeHashCode();
+        }
+        return hashcode;
+    }
+
+
+    /** 
+     * performs teh actual computation of the hashcode and can be overwritten by subclasses if necessary 
+     */
+    protected int computeHashCode() {
+        int hashcode = 5;
+        hashcode = hashcode*17 + op().hashCode();
+        hashcode = hashcode*17 + subs().hashCode();
+        hashcode = hashcode*17 + boundVars().hashCode();            
+        hashcode = hashcode*17 + javaBlock().hashCode();
+        
+        if(hashcode == -1) {
+            hashcode = 0;
         }
         return hashcode;
     }
