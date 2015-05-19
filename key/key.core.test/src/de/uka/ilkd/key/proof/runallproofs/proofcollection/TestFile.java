@@ -41,7 +41,7 @@ public class TestFile extends ForkedTestFileRunner {
     * @return {@link File} object pointing to given path name relative to given
     *         base directory.
     */
-   public static File getAbsoluteFile(File baseDirectory, String pathName) {
+   private static File getAbsoluteFile(File baseDirectory, String pathName) {
 
       /*
        * Caller of this method must provide an absolute path as initial
@@ -73,7 +73,9 @@ public class TestFile extends ForkedTestFileRunner {
 
    /**
     * Uses a {@link ProofCollectionSettings} object and the given
-    * {@link #pathToFile} string to create a {@link File} object.
+    * {@link #pathToFile} string to create a {@link File} object that
+    * (presumable) points to a KeY file. Settings are necessary for name
+    * resolution of the file name.
     * 
     * @param settings
     *           {@link ProofCollectionSettings} object that specifies the base
@@ -85,7 +87,7 @@ public class TestFile extends ForkedTestFileRunner {
     *            Is thrown in case given .key-file is not a directory or does
     *            not exist.
     */
-   public File getFile(ProofCollectionSettings settings) throws IOException {
+   public File getKeYFile(ProofCollectionSettings settings) throws IOException {
       File baseDirectory = settings.getBaseDirectory();
       File keyFile = getAbsoluteFile(baseDirectory, pathToFile);
 
@@ -100,6 +102,7 @@ public class TestFile extends ForkedTestFileRunner {
                + keyFile.getAbsolutePath();
          throw new IOException(exceptionMessage);
       }
+
       return keyFile;
    }
 
@@ -108,13 +111,13 @@ public class TestFile extends ForkedTestFileRunner {
       String message = (success ? "pass: " : "FAIL: ")
             + "Verifying property \"" + testProperty.toString().toLowerCase()
             + "\"" + (success ? " was successful " : " failed ") + "for file: "
-            + getFile(settings).toString();
+            + getKeYFile(settings).toString();
       return new TestResult(message, success);
    }
 
    /**
-    * Use given to verify that {@link #testProperty} holds for given .key-file
-    * specified by {@link #pathToFile} string..
+    * Use KeY to verify that given {@link #testProperty} holds for KeY file that
+    * is at file system location specified by {@link #pathToFile} string.
     * 
     * @param settings
     *           {@link ProofCollectionSettings} object that specifies settings
@@ -130,20 +133,31 @@ public class TestFile extends ForkedTestFileRunner {
     */
    public TestResult runKey(ProofCollectionSettings settings, Path pathToTempDir)
          throws Exception {
+
+      // Initialize KeY settings.
       String gks = settings.getGlobalKeYSettings();
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
 
-      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
-            getFile(settings), null, null, null);
-      Proof loadedProof = env.getLoadedProof();
+      // Name resolution for the available KeY file.
+      File keyFile = getKeYFile(settings);
 
-      if (testProperty == TestProperty.LOADABLE) {
-         loadedProof.dispose();
-         getRunAllProofsTestResult(true, settings);
-      }
+      // File that the created proof will be saved to.
+      File proofFile = new File(pathToTempDir.toFile(), keyFile.getName()
+            + ".proof");
 
+      KeYEnvironment<DefaultUserInterfaceControl> env = null;
+      Proof loadedProof = null;
       boolean success;
       try {
+         // Initialize KeY environment and load proof.
+         env = KeYEnvironment.load(keyFile, null, null, null);
+         loadedProof = env.getLoadedProof();
+
+         // For a reload test we are done at this point. Loading was successful.
+         if (testProperty == TestProperty.LOADABLE) {
+            return getRunAllProofsTestResult(true, settings);
+         }
+
          // Run KeY prover.
          env.getProofControl().startAndWaitForAutoMode(loadedProof);
          success = (testProperty == TestProperty.PROVABLE) == loadedProof
@@ -152,41 +166,59 @@ public class TestFile extends ForkedTestFileRunner {
          // Write statistics.
          File statisticsFile = settings.getStatisticsFile();
          if (statisticsFile != null) {
-            Statistics.appendStatisticsToFile(statisticsFile, loadedProof, false,
-                  getFile(settings));
+            Statistics.appendStatisticsToFile(statisticsFile, loadedProof,
+                  false, keyFile);
+         }
+
+         /*
+          * Reload available proof if it was tested whether available KeY file
+          * is provable and the previous proof attempt was successful.
+          */
+         if ((testProperty == TestProperty.PROVABLE) && success) {
+            // Save the available proof to a temporary file.
+            loadedProof.saveToFile(proofFile);
+            reloadProof(proofFile);
          }
       }
       catch (Throwable t) {
-         loadedProof.dispose();
          throw new Exception(
                "Exception while attempting to prove file (see cause for details): "
-                     + getFile(settings), t);
+                     + keyFile, t);
+      }
+      finally {
+         if (loadedProof != null) {
+            loadedProof.dispose();
+         }
+         if (env != null) {
+            env.dispose();
+         }
       }
 
+      return getRunAllProofsTestResult(success, settings);
+   }
+
+   /**
+    * 
+    * Reload proof that was previously saved at the location corresponding to
+    * the given {@link File} object.
+    * 
+    * @param proofFile
+    *           File that contains the proof that will be (re-)loaded.
+    */
+   private void reloadProof(File proofFile) throws Exception {
       /*
-       * Save and reload proof.
+       * Reload proof and dispose corresponding KeY environment immediately
+       * afterwards. If no exception is thrown it is assumed that loading works
+       * properly.
        */
-      File proofFile = new File(pathToTempDir.toFile(), getFile(settings)
-            .getName() + ".proof");
       KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
       Proof savedProof = null;
       try {
-         /*
-          * Save the proof to a temporary file.
-          */
-         loadedProof.saveToFile(proofFile);
-
-         /*
-          * Reload proof and dispose corresponding KeY environment immediately
-          * afterwards. If no exceptions are thrown we assume loading works
-          * fine.
-          */
          proofLoadEnvironment = KeYEnvironment
                .load(proofFile, null, null, null);
          savedProof = proofLoadEnvironment.getLoadedProof();
       }
       catch (Throwable t) {
-         loadedProof.dispose();
          throw new Exception(
                "Exception while saving/loading proof (see cause for details): "
                      + proofFile, t);
@@ -199,9 +231,6 @@ public class TestFile extends ForkedTestFileRunner {
             proofLoadEnvironment.dispose();
          }
       }
-
-      return getRunAllProofsTestResult(success, settings);
-
    }
 
 }

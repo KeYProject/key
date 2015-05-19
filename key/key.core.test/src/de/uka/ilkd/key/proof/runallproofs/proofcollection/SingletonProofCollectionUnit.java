@@ -23,7 +23,7 @@ public class SingletonProofCollectionUnit extends ProofCollectionUnit {
    @Override
    public RunAllProofsTestUnit createRunAllProofsTestUnit(
          final ProofCollectionSettings settings) throws IOException {
-      final String fileName = file.getFile(settings).getName();
+      final String fileName = file.getKeYFile(settings).getName();
       final Path pathToTempDir = getRunAllProofsTempDirectory(fileName);
       return new RunAllProofsTestUnit(fileName) {
 

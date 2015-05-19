@@ -26,6 +26,11 @@ baseDirectory = ../
  */
 statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
 
+/*
+ * Fork mode setting, can be declared to create subprocesses while running tests declared in this file.
+ */
+forkMode = noFork
+
 keySettings = "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
