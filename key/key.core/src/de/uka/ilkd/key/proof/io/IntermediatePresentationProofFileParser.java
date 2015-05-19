@@ -19,7 +19,9 @@ import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * TODO.
+ * TODO: Document.
+ * 
+ * TODO (IMPORTANT): Special properties for join-related rules.
  * 
  * @author Dominic Scheurer
  */
