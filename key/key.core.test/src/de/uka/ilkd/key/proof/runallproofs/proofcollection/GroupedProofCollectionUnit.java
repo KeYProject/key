@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,7 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class GroupedProofCollectionUnit implements ProofCollectionUnit {
+public class GroupedProofCollectionUnit extends ProofCollectionUnit {
 
    private final String groupName;
    private final List<TestFile> testFiles;
@@ -28,8 +30,9 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
 
    @Override
    public RunAllProofsTestUnit createRunAllProofsTestUnit(
-         final ProofCollectionSettings parentSettings) {
+         final ProofCollectionSettings parentSettings) throws IOException {
 
+      final Path pathToTempDir = getRunAllProofsTempDirectory(groupName);
       final ProofCollectionSettings settings = new ProofCollectionSettings(
             parentSettings, settingsEntries);
 
@@ -47,16 +50,15 @@ public class GroupedProofCollectionUnit implements ProofCollectionUnit {
             ForkMode forkMode = settings.getForkMode();
             if (forkMode == ForkMode.PERGROUP) {
                testResults = ForkedTestFileRunner.processTestFiles(testFiles,
-                     settings, testName);
+                     settings, pathToTempDir);
             }
             else if (forkMode == ForkMode.NOFORK
                   || forkMode == ForkMode.PERFILE) {
                testResults = new ArrayList<>();
                for (TestFile testFile : testFiles) {
                   TestResult testResult = forkMode == ForkMode.NOFORK ? testFile
-                        .runKey(settings) : ForkedTestFileRunner
-                        .processTestFile(testFile, settings,
-                              testName);
+                        .runKey(settings, pathToTempDir) : ForkedTestFileRunner
+                        .processTestFile(testFile, settings, pathToTempDir);
                   testResults.add(testResult);
                }
             }

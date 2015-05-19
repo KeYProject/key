@@ -2,6 +2,8 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.antlr.runtime.Token;
 
@@ -15,7 +17,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 /**
  * Data structure for .key-files that will be tested during
  * {@link RunAllProofsTest} execution. It consists of a {@link #testProperty}
- * and a {@link #path} String for the file location. Method
+ * and a {@link #pathToFile} String for the file location. Method
  * {@link #runKey(ProofCollectionSettings)} will verify {@link #testProperty}
  * for the given file.
  * 
@@ -24,7 +26,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 public class TestFile extends ForkedTestFileRunner {
 
    final TestProperty testProperty;
-   private final String path;
+   private final String pathToFile;
 
    /**
     * In order to ensure that the implementation is independent of working
@@ -65,18 +67,18 @@ public class TestFile extends ForkedTestFileRunner {
    }
 
    public TestFile(TestProperty testProperty, Token pathToken) {
-      this.path = pathToken.getText();
+      this.pathToFile = pathToken.getText();
       this.testProperty = testProperty;
    }
 
    /**
-    * Uses a {@link ProofCollectionSettings} object and the given {@link #path}
-    * string to create a {@link File} object.
+    * Uses a {@link ProofCollectionSettings} object and the given
+    * {@link #pathToFile} string to create a {@link File} object.
     * 
     * @param settings
     *           {@link ProofCollectionSettings} object that specifies the base
-    *           directory that will be used in case {@link #path} specifies a
-    *           relative path.
+    *           directory that will be used in case {@link #pathToFile}
+    *           specifies a relative path.
     * @return A {@link File} object that points to the target .key-file that
     *         will be tested.
     * @throws IOException
@@ -85,7 +87,7 @@ public class TestFile extends ForkedTestFileRunner {
     */
    public File getFile(ProofCollectionSettings settings) throws IOException {
       File baseDirectory = settings.getBaseDirectory();
-      File keyFile = getAbsoluteFile(baseDirectory, path);
+      File keyFile = getAbsoluteFile(baseDirectory, pathToFile);
 
       if (keyFile.isDirectory()) {
          String exceptionMessage = "Expecting a file, but found a directory: "
@@ -112,7 +114,7 @@ public class TestFile extends ForkedTestFileRunner {
 
    /**
     * Use given to verify that {@link #testProperty} holds for given .key-file
-    * specified by {@link #path} string..
+    * specified by {@link #pathToFile} string..
     * 
     * @param settings
     *           {@link ProofCollectionSettings} object that specifies settings
@@ -126,37 +128,81 @@ public class TestFile extends ForkedTestFileRunner {
     *            converted into an {@link Exception} object with original
     *            exception as cause.
     */
-   public TestResult runKey(ProofCollectionSettings settings) throws Exception {
+   public TestResult runKey(ProofCollectionSettings settings, Path pathToTempDir)
+         throws Exception {
+      String gks = settings.getGlobalKeYSettings();
+      ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
+
+      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
+            getFile(settings), null, null, null);
+      Proof loadedProof = env.getLoadedProof();
+
+      if (testProperty == TestProperty.LOADABLE) {
+         loadedProof.dispose();
+         getRunAllProofsTestResult(true, settings);
+      }
+
+      boolean success;
       try {
-         String gks = settings.getGlobalKeYSettings();
-         ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
-
-         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
-               getFile(settings), null, null, null);
-         Proof loadedProof = env.getLoadedProof();
-
-         if (testProperty == TestProperty.LOADABLE) {
-            loadedProof.dispose();
-            getRunAllProofsTestResult(true, settings);
-         }
-
-         boolean success;
-         try {
-            env.getProofControl().startAndWaitForAutoMode(loadedProof);
-            success = (testProperty == TestProperty.PROVABLE) == loadedProof
-                  .closed();
-         }
-         finally {
-            loadedProof.dispose();
-         }
-
-         return getRunAllProofsTestResult(success, settings);
+         env.getProofControl().startAndWaitForAutoMode(loadedProof);
+         success = (testProperty == TestProperty.PROVABLE) == loadedProof
+               .closed();
       }
       catch (Throwable t) {
+         loadedProof.dispose();
          throw new Exception(
                "Exception while attempting to prove file (see cause for details): "
                      + getFile(settings), t);
       }
+
+      /*
+       * Save and reload proof.
+       */
+      File proofFile = new File(pathToTempDir.toFile(), getFile(settings)
+            .getName() + ".proof");
+      KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
+      Proof savedProof = null;
+      try {
+         /*
+          * Save the proof to a temporary file.
+          */
+         loadedProof.saveToFile(proofFile);
+
+         /*
+          * Reload proof and dispose corresponding KeY environment immediately
+          * afterwards. If no exceptions are thrown we assume loading works
+          * fine.
+          */
+         proofLoadEnvironment = KeYEnvironment
+               .load(proofFile, null, null, null);
+         savedProof = proofLoadEnvironment.getLoadedProof();
+      }
+      catch (Throwable t) {
+         loadedProof.dispose();
+         throw new Exception(
+               "Exception while saving/loading proof (see cause for details): "
+                     + proofFile, t);
+      }
+      finally {
+         if (savedProof != null) {
+            savedProof.dispose();
+         }
+         if (proofLoadEnvironment != null) {
+            proofLoadEnvironment.dispose();
+         }
+      }
+
+      /*
+       * Write statistics.
+       */
+      File statisticsFile = new File(pathToTempDir.toFile(), getFile(settings)
+            .getName() + ".statistics");
+      Files.write(statisticsFile.toPath(), loadedProof.statistics().toString()
+            .getBytes());
+      loadedProof.dispose();
+
+      return getRunAllProofsTestResult(success, settings);
+
    }
 
 }

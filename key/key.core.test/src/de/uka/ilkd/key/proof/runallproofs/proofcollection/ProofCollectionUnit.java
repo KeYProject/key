@@ -2,7 +2,10 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 /**
@@ -14,7 +17,16 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public interface ProofCollectionUnit extends Serializable {
+public abstract class ProofCollectionUnit implements Serializable {
+
+   public static Path getRunAllProofsTempDirectory(String name)
+         throws IOException {
+      if (!RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.exists()) {
+         RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.mkdirs();
+      }
+      return Files.createTempDirectory(RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.toPath(),
+            name + "-");
+   }
 
    /**
     * 

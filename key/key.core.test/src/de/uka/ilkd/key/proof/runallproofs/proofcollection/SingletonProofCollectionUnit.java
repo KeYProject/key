@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
@@ -11,7 +12,7 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class SingletonProofCollectionUnit implements ProofCollectionUnit {
+public class SingletonProofCollectionUnit extends ProofCollectionUnit {
 
    private final TestFile file;
 
@@ -22,17 +23,20 @@ public class SingletonProofCollectionUnit implements ProofCollectionUnit {
    @Override
    public RunAllProofsTestUnit createRunAllProofsTestUnit(
          final ProofCollectionSettings settings) throws IOException {
-      return new RunAllProofsTestUnit(file.getFile(settings).getName()) {
+      final String fileName = file.getFile(settings).getName();
+      final Path pathToTempDir = getRunAllProofsTempDirectory(fileName);
+      return new RunAllProofsTestUnit(fileName) {
 
          @Override
          public TestResult runTest() throws Exception {
             ForkMode forkMode = settings.getForkMode();
             if (forkMode == ForkMode.NOFORK) {
-               return file.runKey(settings);
+               return file.runKey(settings, pathToTempDir);
             }
             else if (forkMode == ForkMode.PERGROUP
                   || forkMode == ForkMode.PERFILE) {
-               return ForkedTestFileRunner.processTestFile(file, settings, testName);
+               return ForkedTestFileRunner.processTestFile(file, settings,
+                     pathToTempDir);
             }
             else {
                throw new RuntimeException("Unexpected value for fork mode: "

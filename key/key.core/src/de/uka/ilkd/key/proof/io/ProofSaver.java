@@ -67,6 +67,7 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -92,6 +93,10 @@ public class ProofSaver {
     * </p>.
     */
    private static final List<ProofSaverListener> listeners = new LinkedList<ProofSaverListener>();
+   
+   public ProofSaver(Proof proof, String filename) {
+      this(proof, filename, KeYConstants.INTERNAL_VERSION);
+   }
    
    public ProofSaver(Proof proof, String filename, String internalVersion) {
       this.filename = filename;

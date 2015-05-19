@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import static de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest.KEY_CORE_TEST;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -97,9 +95,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
     *           Name of the test used as prefix for test folder.
     */
    public static TestResult processTestFile(TestFile testFile,
-         ProofCollectionSettings settings, String testName) throws Exception {
-      return processTestFiles(Arrays.asList(testFile), settings, testName).get(
-            0);
+         ProofCollectionSettings settings, Path pathToTempDir) throws Exception {
+      return processTestFiles(Arrays.asList(testFile), settings, pathToTempDir)
+            .get(0);
    }
 
    /**
@@ -109,25 +107,17 @@ public abstract class ForkedTestFileRunner implements Serializable {
     *           Name of the test used as prefix for test folder.
     */
    public static List<TestResult> processTestFiles(List<TestFile> testFiles,
-         ProofCollectionSettings settings, String testName) throws Exception {
-      File runAllProofsFolder = new File(KEY_CORE_TEST, "testresults"
-            + File.separator + "runallproofs");
-      if (!runAllProofsFolder.exists()) {
-         Files.createDirectories(runAllProofsFolder.toPath());
-      }
+         ProofCollectionSettings settings, Path pathToTempDir) throws Exception {
 
-      Path tempDirectory = Files.createTempDirectory(
-            runAllProofsFolder.toPath(), testName + "-");
-
-      writeObject(getLocationOfSerializedTestFiles(tempDirectory),
+      writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
             (Serializable) testFiles);
       writeObject(
-            getLocationOfSerializedProofCollectionSettings(tempDirectory),
+            getLocationOfSerializedProofCollectionSettings(pathToTempDir),
             (Serializable) settings);
 
       ProcessBuilder pb = new ProcessBuilder("java", "-classpath",
             System.getProperty("java.class.path"),
-            ForkedTestFileRunner.class.getName(), tempDirectory.toString());
+            ForkedTestFileRunner.class.getName(), pathToTempDir.toString());
       Process process = pb.inheritIO().start();
       process.waitFor();
       assertEquals("Executed process terminated with non-zero exit value.",
@@ -136,7 +126,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
       /*
        * Check if an exception occured and rethrow it if one occured.
        */
-      Path exceptionFile = getLocationOfSerializedException(tempDirectory);
+      Path exceptionFile = getLocationOfSerializedException(pathToTempDir);
       if (exceptionFile.toFile().exists()) {
          Throwable t = ForkedTestFileRunner
                .<Throwable> readObject((exceptionFile));
@@ -148,7 +138,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
       /*
        * Read serialized list of test results and return.
        */
-      Path testResultsFile = getLocationOfSerializedTestResults(tempDirectory);
+      Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
       assertTrue("File containing serialized test results not presend.",
             testResultsFile.toFile().exists());
       return ForkedTestFileRunner
@@ -175,7 +165,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
          ArrayList<TestResult> testResults = new ArrayList<>();
          for (TestFile testFile : testFiles) {
-            testResults.add(testFile.runKey(settings));
+            testResults.add(testFile.runKey(settings, tempDirectory));
          }
          writeObject(getLocationOfSerializedTestResults(tempDirectory),
                testResults);

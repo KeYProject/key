@@ -22,7 +22,6 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.util.KeYConstants;
 
 public class BatchMode {
 
@@ -125,7 +124,7 @@ public class BatchMode {
     }
 
     private static void saveProof(Proof proof, String filename) throws IOException {
-        ProofSaver saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+        ProofSaver saver = new ProofSaver(proof, filename);
         saver.save();
     }
 
