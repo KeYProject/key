@@ -19,13 +19,17 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  */
 public abstract class ProofCollectionUnit implements Serializable {
 
-   public static Path getRunAllProofsTempDirectory(String name)
-         throws IOException {
-      if (!RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.exists()) {
-         RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.mkdirs();
+   private Path pathToTempDir = null;
+
+   public Path getTempDirectory(String name) throws IOException {
+      if (pathToTempDir == null) {
+         if (!RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.exists()) {
+            RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.mkdirs();
+         }
+         pathToTempDir = Files.createTempDirectory(
+               RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.toPath(), name + "-");
       }
-      return Files.createTempDirectory(RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.toPath(),
-            name + "-");
+      return pathToTempDir;
    }
 
    /**

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
@@ -24,19 +23,18 @@ public class SingletonProofCollectionUnit extends ProofCollectionUnit {
    public RunAllProofsTestUnit createRunAllProofsTestUnit(
          final ProofCollectionSettings settings) throws IOException {
       final String fileName = file.getKeYFile(settings).getName();
-      final Path pathToTempDir = getRunAllProofsTempDirectory(fileName);
       return new RunAllProofsTestUnit(fileName) {
 
          @Override
          public TestResult runTest() throws Exception {
             ForkMode forkMode = settings.getForkMode();
             if (forkMode == ForkMode.NOFORK) {
-               return file.runKey(settings, pathToTempDir);
+               return file.runKey(settings);
             }
             else if (forkMode == ForkMode.PERGROUP
                   || forkMode == ForkMode.PERFILE) {
                return ForkedTestFileRunner.processTestFile(file, settings,
-                     pathToTempDir);
+                     getTempDirectory(fileName));
             }
             else {
                throw new RuntimeException("Unexpected value for fork mode: "

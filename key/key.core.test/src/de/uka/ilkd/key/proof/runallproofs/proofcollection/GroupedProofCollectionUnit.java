@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,6 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
    public RunAllProofsTestUnit createRunAllProofsTestUnit(
          final ProofCollectionSettings parentSettings) throws IOException {
 
-      final Path pathToTempDir = getRunAllProofsTempDirectory(groupName);
       final ProofCollectionSettings settings = new ProofCollectionSettings(
             parentSettings, settingsEntries);
 
@@ -50,15 +48,16 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
             ForkMode forkMode = settings.getForkMode();
             if (forkMode == ForkMode.PERGROUP) {
                testResults = ForkedTestFileRunner.processTestFiles(testFiles,
-                     settings, pathToTempDir);
+                     settings, getTempDirectory(groupName));
             }
             else if (forkMode == ForkMode.NOFORK
                   || forkMode == ForkMode.PERFILE) {
                testResults = new ArrayList<>();
                for (TestFile testFile : testFiles) {
                   TestResult testResult = forkMode == ForkMode.NOFORK ? testFile
-                        .runKey(settings, pathToTempDir) : ForkedTestFileRunner
-                        .processTestFile(testFile, settings, pathToTempDir);
+                        .runKey(settings) : ForkedTestFileRunner
+                        .processTestFile(testFile, settings,
+                              getTempDirectory(groupName));
                   testResults.add(testResult);
                }
             }

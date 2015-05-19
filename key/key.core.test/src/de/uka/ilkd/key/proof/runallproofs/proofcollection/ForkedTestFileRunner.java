@@ -165,7 +165,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
          ArrayList<TestResult> testResults = new ArrayList<>();
          for (TestFile testFile : testFiles) {
-            testResults.add(testFile.runKey(settings, tempDirectory));
+            testResults.add(testFile.runKey(settings));
          }
          writeObject(getLocationOfSerializedTestResults(tempDirectory),
                testResults);

@@ -2,7 +2,6 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.antlr.runtime.Token;
 
@@ -131,7 +130,7 @@ public class TestFile extends ForkedTestFileRunner {
     *            converted into an {@link Exception} object with original
     *            exception as cause.
     */
-   public TestResult runKey(ProofCollectionSettings settings, Path pathToTempDir)
+   public TestResult runKey(ProofCollectionSettings settings)
          throws Exception {
 
       // Initialize KeY settings.
