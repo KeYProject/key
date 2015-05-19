@@ -270,13 +270,13 @@ public class Statistics {
       Runtime.getRuntime().gc();
       final long memory = (Runtime.getRuntime().totalMemory() - Runtime
             .getRuntime().freeMemory()) / 1024;
-
+      boolean printColumnNames = !statisticsFile.exists();
       try {
          final FileWriter statisticsFileWriter = new FileWriter(statisticsFile,
                true);
          final PrintWriter statPrinter = new PrintWriter(statisticsFileWriter);
 
-         if (!statisticsFile.exists()) {
+         if (printColumnNames) {
             statPrinter.println("Name | Total rule apps | Nodes | "
                   + "Branches | Overall time | Automode time | "
                   + "Closed | Time per step | Memory");
