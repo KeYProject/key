@@ -108,7 +108,7 @@ public final class Main {
     /** Level of verbosity for command line outputs. */
     private static byte verbosity = Verbosity.NORMAL;
 
-    private static String statisticsFile = null;
+    private static File statisticsFile = null;
 
     private static String examplesDir = null;
 
@@ -325,8 +325,10 @@ public final class Main {
             GeneralSettings.disableSpecs = true;
         }
 
-        if(cl.isSet(PRINT_STATISTICS)){
-            statisticsFile = cl.getString(PRINT_STATISTICS, null);
+        if (cl.isSet(PRINT_STATISTICS)) {
+           String statisticsFileName = cl.getString(PRINT_STATISTICS, null);
+           statisticsFile = statisticsFileName == null ? null : new File(
+                 statisticsFileName);
         }
 
         if(cl.isSet(TIMEOUT)){
@@ -587,7 +589,7 @@ public final class Main {
     /**
      * @return the statisticsFile
      */
-    public static String getStatisticsFile() {
+    public static File getStatisticsFile() {
         return statisticsFile;
     }
 

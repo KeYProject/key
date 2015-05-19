@@ -2,7 +2,6 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.antlr.runtime.Token;
@@ -10,6 +9,7 @@ import org.antlr.runtime.Token;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -144,9 +144,17 @@ public class TestFile extends ForkedTestFileRunner {
 
       boolean success;
       try {
+         // Run KeY prover.
          env.getProofControl().startAndWaitForAutoMode(loadedProof);
          success = (testProperty == TestProperty.PROVABLE) == loadedProof
                .closed();
+
+         // Write statistics.
+         File statisticsFile = settings.getStatisticsFile();
+         if (statisticsFile != null) {
+            Statistics.appendStatisticsToFile(statisticsFile, loadedProof, false,
+                  getFile(settings));
+         }
       }
       catch (Throwable t) {
          loadedProof.dispose();
@@ -191,15 +199,6 @@ public class TestFile extends ForkedTestFileRunner {
             proofLoadEnvironment.dispose();
          }
       }
-
-      /*
-       * Write statistics.
-       */
-      File statisticsFile = new File(pathToTempDir.toFile(), getFile(settings)
-            .getName() + ".statistics");
-      Files.write(statisticsFile.toPath(), loadedProof.statistics().toString()
-            .getBytes());
-      loadedProof.dispose();
 
       return getRunAllProofsTestResult(success, settings);
 

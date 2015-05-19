@@ -27,6 +27,7 @@ public class ProofCollectionSettings implements Serializable {
    private static final String BASE_DIRECTORY_KEY = "baseDirectory";
    private static final String KEY_SETTINGS_KEY = "keySettings";
    private static final String FORK_MODE = "forkMode";
+   private static final String STATISTICS_FILE = "statisticsFile";
 
    /**
     * {@link List} of default entries that will be available in every
@@ -300,6 +301,11 @@ public class ProofCollectionSettings implements Serializable {
                .unmodifiableSet(enabledTestCaseNames);
       }
       return enabledTestCaseNames;
+   }
+
+   public File getStatisticsFile() {
+      String statisticsFileName = get(STATISTICS_FILE);
+      return statisticsFileName == null ? null : new File(getBaseDirectory(), statisticsFileName);
    }
 
    /**

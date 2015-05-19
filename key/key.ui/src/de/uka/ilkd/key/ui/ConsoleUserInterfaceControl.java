@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -119,7 +120,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
        assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
                + " save a proof but no corresponding key problem file is "
                + "available.";
-       allProofsSuccessful &= BatchMode.saveProof(result2, info.getProof(), keyProblemFile);
+       allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
        /*
         * We "delete" the value of keyProblemFile at this point by assigning
         * null to it. That way we prevent KeY from saving another proof (that
@@ -367,4 +368,55 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
       // Nothing to do
    }
+
+   public static boolean saveProof(Object result, Proof proof,
+         File keyProblemFile) {
+
+      if (Main.getStatisticsFile() != null) {
+         Statistics.appendStatisticsToFile(Main.getStatisticsFile(), proof,
+               "Error".equals(result.toString()), keyProblemFile);
+      }
+
+      if (result instanceof Throwable) {
+         throw new Error("Error in batchmode.", (Throwable) result);
+      }
+
+      // Save the proof before exit.
+
+      String baseName = keyProblemFile.getAbsolutePath();
+      int idx = baseName.indexOf(".key");
+      if (idx == -1) {
+         idx = baseName.indexOf(".proof");
+      }
+      baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
+
+      File f;
+      int counter = 0;
+      do {
+
+         f = new File(baseName + ".auto." + counter + ".proof");
+         counter++;
+      }
+      while (f.exists());
+
+      try {
+         // a copy with running number to compare different runs
+         proof.saveToFile(new File(f.getAbsolutePath()));
+         // save current proof under common name as well
+         proof.saveToFile(new File(baseName + ".auto.proof"));
+      }
+      catch (IOException e) {
+         e.printStackTrace();
+      }
+
+      if (proof.openGoals().size() == 0) {
+         // Says that all Proofs have succeeded
+         return true;
+      }
+      else {
+         // Says that there is at least one open Proof
+         return false;
+      }
+   }
+
 }

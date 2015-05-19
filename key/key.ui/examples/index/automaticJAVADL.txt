@@ -14,7 +14,17 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+/*
+ * Defines a base directory.
+ * All paths in this file are treated relative to base directory (except path for base directory itself).
+ */
 baseDirectory = ../
+
+/*
+ * Defines a statistics file.
+ * Path is relative to base directory.
+ */
+statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
 
 keySettings = "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009

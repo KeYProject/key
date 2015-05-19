@@ -964,6 +964,7 @@ public class Proof implements Named {
     }
 
     /** toString */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append("Proof -- ");
@@ -1069,7 +1070,7 @@ public class Proof implements Named {
     }
     
     public void saveToFile(File file) throws IOException{
-       ProofSaver saver = new ProofSaver(this, file.getAbsolutePath());
+       ProofSaver saver = new ProofSaver(this, file);
        saver.save();
     }
 }
