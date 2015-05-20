@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleStaticContractTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="return magic(x);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_0 = magic(x) catch(exc_0)
+pre: x &gt;= 10
+post: result_0 = 10 &amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleStaticContractTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </branchCondition>
+         </operationContract>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+</start>
