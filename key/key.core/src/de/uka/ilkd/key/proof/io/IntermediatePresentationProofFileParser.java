@@ -110,6 +110,7 @@ public class IntermediatePresentationProofFileParser implements
             currPosInTerm = PosInTerm.getTopLevel();
             loadedInsts = null;
             ifSeqFormulaList = ImmutableSLList.<String> nil();
+            ifDirectFormulaList = ImmutableSLList.<String> nil();
             break;
 
         case 'f': // formula
