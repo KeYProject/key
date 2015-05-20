@@ -172,11 +172,13 @@ public class TestFile extends ForkedTestFileRunner {
           * Reload available proof if it was tested whether available KeY file
           * is provable and the previous proof attempt was successful.
           */
+         /*
          if ((testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
             loadedProof.saveToFile(proofFile);
             reloadProof(proofFile);
          }
+         */
       }
       catch (Throwable t) {
          throw new Exception(
