@@ -486,21 +486,27 @@ public abstract class AbstractProblemLoader {
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
 
-        DefaultProofFileParser parser = null;
+//        DefaultProofFileParser parser = null;
+        
+        //////////(DS: Experimental code)
+        IntermediatePresentationProofFileParser parser = null;
+        IntermediateProofReplayer replayer = null;
+        //////////(END DS: Experimental code)
+        
         try {
         	if (envInput instanceof KeYUserProblemFile) {
-        		parser = new DefaultProofFileParser(this, proof);
+//        		parser = new DefaultProofFileParser(this, proof);
+//        	    problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
                 
                 //////////     (DS: Experimental code)
-                
-                IntermediatePresentationProofFileParser intermParser = new IntermediatePresentationProofFileParser(proof);
-                problemInitializer.tryReadProof(intermParser, (KeYUserProblemFile) envInput);
-                
+        	    parser = new IntermediatePresentationProofFileParser(proof);
+                problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+                replayer = new IntermediateProofReplayer(this, proof, parser.getParsedResult());
+                replayer.replay();
+                lastTouchedNode = replayer.getLastSelectedGoal() != null ? replayer.getLastSelectedGoal().node() : proof.root();
                 ////////// (END DS: Experimental code)
                 
-        		problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-
-        		lastTouchedNode = parser.getLastSelectedGoal() != null ? parser.getLastSelectedGoal().node() : proof.root();       
+//        		lastTouchedNode = parser.getLastSelectedGoal() != null ? parser.getLastSelectedGoal().node() : proof.root();       
         	}
         } catch (Exception e) {
         	if (parser == null || parser.getErrors() == null || parser.getErrors().isEmpty()) {
