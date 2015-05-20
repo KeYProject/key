@@ -19,7 +19,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
     private int id = 0;
     private String joinProc = null;
     private int nrPartners = 0;
-    
+
     /**
      * TODO: Document.
      *
@@ -29,11 +29,11 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      * @param builtInIfInsts
      * @param newNames
      */
-    public JoinAppIntermediate(String ruleName,
-            Pair<Integer, PosInTerm> pos, String contract,
-            ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
-            String[] newNames, int id, String joinProc, int nrPartners) {
-        super(ruleName, pos, contract, builtInIfInsts, newNames);
+    public JoinAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
+            String contract,
+            ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts, int id,
+            String joinProc, int nrPartners) {
+        super(ruleName, pos, contract, builtInIfInsts);
         this.id = id;
         this.joinProc = joinProc;
         this.nrPartners = nrPartners;

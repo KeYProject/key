@@ -31,20 +31,14 @@ public class TacletAppIntermediate implements AppIntermediate {
     private Pair<Integer, PosInTerm> posInfo = null;
     private LinkedList<String> insts = null;
     private ImmutableList<String> ifFormulaList = null;
-    private String[] newNames = null;
 
     public TacletAppIntermediate(String tacletName,
             Pair<Integer, PosInTerm> posInfo, LinkedList<String> insts,
-            ImmutableList<String> ifFormulaList, String[] newNames) {
+            ImmutableList<String> ifFormulaList) {
         this.tacletName = tacletName;
         this.posInfo = posInfo;
         this.insts = insts;
         this.ifFormulaList = ifFormulaList;
-        this.newNames = newNames;
-    }
-
-    public String[] getNewNames() {
-        return newNames;
     }
 
     public String getTacletName() {

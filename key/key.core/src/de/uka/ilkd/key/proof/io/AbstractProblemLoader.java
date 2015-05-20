@@ -514,8 +514,14 @@ public abstract class AbstractProblemLoader {
         		errors.add(e);
         	}
         } finally {
-    		status = parser.getStatus();
-    		errors.addAll(parser.getErrors());
+            //////////  (DS: Experimental code)
+            status = parser.getStatus() + "\n\n" + replayer.getStatus();
+            errors.addAll(parser.getErrors());
+            errors.addAll(replayer.getErrors());
+            ////////// (END DS: Experimental code)
+            
+//    		status = parser.getStatus();
+//    		errors.addAll(parser.getErrors());
         }
         	
         ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);

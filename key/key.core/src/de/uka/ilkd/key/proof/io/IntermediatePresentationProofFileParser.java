@@ -21,6 +21,7 @@ import java.util.Vector;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
@@ -56,12 +57,11 @@ public class IntermediatePresentationProofFileParser implements
     private int currNrPartners = 0;
     private int currCorrespondingJoinNodeId = 0;
     private int currJoinNodeId = 0;
-    private String[] newNames = null;
 
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
 
-    private Stack<BranchNodeIntermediate> stack = new Stack<BranchNodeIntermediate>();
+    private Stack<NodeIntermediate> stack = new Stack<NodeIntermediate>();
 
     /**
      * TODO: Document.
@@ -84,13 +84,15 @@ public class IntermediatePresentationProofFileParser implements
             if (root == null) {
                 root = newNode;
                 currNode = newNode;
+                stack.push(newNode);
             } else {
+                stack.push(currNode);
                 currNode.addChild(newNode);
                 currNode = newNode;
             }
         }
 
-            stack.push((BranchNodeIntermediate) currNode);
+//            stack.push((BranchNodeIntermediate) currNode);
             break;
 
         case 'r': // rule (taclet)
@@ -142,6 +144,7 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case 'd': // ifdirectformula
+            //TODO: Needs to be treated special from ifseqformula!
             ifFormulaList = ifFormulaList.append(str);
             break;
 
@@ -191,7 +194,12 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case 'w': // newnames
-            newNames = str.split(",");
+            final String[] newNames = str.split(",");
+            ImmutableList<Name> l = ImmutableSLList.<Name> nil();
+            for (int in = 0; in < newNames.length; in++) {
+                l = l.append(new Name(newNames[in]));
+            }
+            proof.getServices().getNameRecorder().setProposals(l);
             break;
 
         case 'e': // autoModeTime
@@ -285,7 +293,7 @@ public class IntermediatePresentationProofFileParser implements
     private TacletAppIntermediate constructTacletApp() {
         return new TacletAppIntermediate(currRuleName,
                 new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                loadedInsts, ifFormulaList, newNames);
+                loadedInsts, ifFormulaList);
     }
 
     /**
@@ -299,18 +307,18 @@ public class IntermediatePresentationProofFileParser implements
         if (currRuleName.equals("JoinRule")) {
             result = new JoinAppIntermediate(currRuleName,
                     new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                    currContract, builtinIfInsts, newNames, currJoinNodeId,
+                    currContract, builtinIfInsts, currJoinNodeId,
                     currJoinProc, currNrPartners);
         }
         else if (currRuleName.equals("CloseAfterJoin")) {
             result = new JoinPartnerAppIntermediate(currRuleName,
                     new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                    currContract, builtinIfInsts, newNames, currCorrespondingJoinNodeId);
+                    currContract, builtinIfInsts, currCorrespondingJoinNodeId);
         }
         else {
             result = new BuiltInAppIntermediate(currRuleName,
                     new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                    currContract, builtinIfInsts, newNames);
+                    currContract, builtinIfInsts);
         }
 
         currContract = null;

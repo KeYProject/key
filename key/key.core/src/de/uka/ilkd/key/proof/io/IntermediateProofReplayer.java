@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -49,6 +51,7 @@ import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -141,7 +144,7 @@ public class IntermediateProofReplayer {
                         
                         int i = 0;
                         Iterator<Node> children = currNode.childrenIterator();
-                        while (children.hasNext()) {
+                        while (!currGoal.node().isClosed() && children.hasNext()) {
                             Node child = children.next();
                             queue.addLast(new Pair<Node, NodeIntermediate>(child, currInterm.getChildren().get(i++)));
                         }
@@ -224,6 +227,15 @@ public class IntermediateProofReplayer {
      * TODO: Document.
      *
      * @return
+     */
+    public Collection<Throwable> getErrors() {
+        return errors;
+    }
+
+    /**
+     * TODO: Document.
+     *
+     * @return
      * @throws AppConstructionException
      */
     private TacletApp constructApp(TacletAppIntermediate currInterm, Goal currGoal) throws AppConstructionException {
@@ -259,8 +271,9 @@ public class IntermediateProofReplayer {
 
         ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
         for (String ifFormulaStr : currInterm.getIfFormulaList()) {
-            ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
-                    new SequentFormula(DefaultProofFileParser.parseTerm(ifFormulaStr, proof))));
+            Sequent seq = currGoal.sequent();
+            ifFormulaList = ifFormulaList.append(new IfFormulaInstSeq(seq,
+                    Integer.parseInt(ifFormulaStr)));
         }
         
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);

@@ -16,7 +16,7 @@ import de.uka.ilkd.key.util.Pair;
 public class JoinPartnerAppIntermediate extends BuiltInAppIntermediate {
 
     private int joinNodeId = 0;
-    
+
     /**
      * TODO: Document.
      *
@@ -29,8 +29,8 @@ public class JoinPartnerAppIntermediate extends BuiltInAppIntermediate {
     public JoinPartnerAppIntermediate(String ruleName,
             Pair<Integer, PosInTerm> pos, String contract,
             ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
-            String[] newNames, int joinNodeId) {
-        super(ruleName, pos, contract, builtInIfInsts, newNames);
+            int joinNodeId) {
+        super(ruleName, pos, contract, builtInIfInsts);
         this.joinNodeId = joinNodeId;
     }
 
@@ -40,5 +40,5 @@ public class JoinPartnerAppIntermediate extends BuiltInAppIntermediate {
     public int getJoinNodeId() {
         return joinNodeId;
     }
-    
+
 }

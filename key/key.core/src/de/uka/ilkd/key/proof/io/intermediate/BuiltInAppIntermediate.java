@@ -20,21 +20,14 @@ public class BuiltInAppIntermediate implements AppIntermediate {
     private Pair<Integer, PosInTerm> posInfo = null;
     private String contract = null;
     private ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
-    private String[] newNames = null;
 
     public BuiltInAppIntermediate(String ruleName,
             Pair<Integer, PosInTerm> pos, String contract,
-            ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
-            String[] newNames) {
+            ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts) {
         this.ruleName = ruleName;
         this.posInfo = pos;
         this.contract = contract;
         this.builtInIfInsts = builtInIfInsts;
-        this.newNames = newNames;
-    }
-
-    public String[] getNewNames() {
-        return newNames;
     }
 
     public String getRuleName() {
