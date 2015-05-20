@@ -1,7 +1,9 @@
 #!/bin/sh
 
 list_help() {
-    echo "Usage: runAllProofs [[--fork-mode=<perFile|perGroup|noFork>] <groupNames>] | [--list-tests]"
+    echo "Usage: runAllProofs [--list-tests] | [ [--enable-reload=<true|false>]"
+    echo "                                       [--fork-mode=<perFile|perGroup|noFork>]"
+    echo "                                       <groupNames> ]"
     echo "Examples: runAllProofs --fork-mode=perFile newBook comprehensions"
     echo "          runAllProofs --list-tests"
 }
@@ -115,7 +117,7 @@ $JAVA -ea:de.uka.ilkd.key...\
 -Xms64m -Xmx2048m \
 -Dkey.home="$KEY_HOME" \
 -classpath "$keyclasspath" \
-$@
+"$@"
 }
 
 #
@@ -125,6 +127,10 @@ $@
 case $1 in
     --fork-mode=*)
     FORKMODE=$(echo $1 | cut -d'=' -f 2)
+    shift
+    ;;
+    --reload-enabled=*)
+    RELOADENABLED=$(echo $1 | cut -d'=' -f 2)
     shift
     ;;
     --list-tests)
@@ -154,6 +160,7 @@ fi
 
 call_java \
 -Dkey.runallproofs.forkMode=$FORKMODE \
+-Dkey.runallproofs.reloadEnabled=$RELOADENABLED \
 -Dkey.runallproofs.testCases="$TESTCASES" \
 org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
 
