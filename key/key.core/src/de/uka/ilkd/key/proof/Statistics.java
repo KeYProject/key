@@ -279,7 +279,7 @@ public class Statistics {
          if (printColumnNames) {
             statPrinter.println("Name | Total rule apps | Nodes | "
                   + "Branches | Overall time | Automode time | "
-                  + "Closed | Time per step | Memory");
+                  + "Closed | Time per step | Total Runtime Memory");
          }
 
          String name = keyProblemFile.getAbsolutePath();

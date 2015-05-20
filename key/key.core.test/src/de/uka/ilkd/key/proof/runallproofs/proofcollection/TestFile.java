@@ -217,11 +217,11 @@ public class TestFile extends ForkedTestFileRunner {
        * properly.
        */
       KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
-      Proof savedProof = null;
+      Proof reloadedProof = null;
       try {
          proofLoadEnvironment = KeYEnvironment
                .load(proofFile, null, null, null);
-         savedProof = proofLoadEnvironment.getLoadedProof();
+         reloadedProof = proofLoadEnvironment.getLoadedProof();
       }
       catch (Throwable t) {
          throw new Exception(
@@ -229,8 +229,8 @@ public class TestFile extends ForkedTestFileRunner {
                      + proofFile, t);
       }
       finally {
-         if (savedProof != null) {
-            savedProof.dispose();
+         if (reloadedProof != null) {
+            reloadedProof.dispose();
          }
          if (proofLoadEnvironment != null) {
             proofLoadEnvironment.dispose();
