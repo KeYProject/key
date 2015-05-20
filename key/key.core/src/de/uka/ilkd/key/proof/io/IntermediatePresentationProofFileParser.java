@@ -40,6 +40,10 @@ public class IntermediatePresentationProofFileParser implements
     private int currFormula = 0;
     private PosInTerm currPosInTerm = PosInTerm.getTopLevel();
     private String currContract = null;
+    private String currJoinProc = null;
+    private int currNrPartners = 0;
+    private int currCurrespondingJoinNodeId = 0;
+    private int currJoinNodeId = 0;
     private String[] newNames = null;
 
     private RootNodeIntermediate root = null;
@@ -181,7 +185,20 @@ public class IntermediatePresentationProofFileParser implements
                 /* ignore */
             }
             break;
+
+        case 'o': // join procedure
+            break;
+
+        case 'p': // number of join partners
+            break;
+
+        case 'j': // corresponding join node id
+            break;
+
+        case 'I': // join node id
+            break;
         }
+        
     }
 
     @Override

@@ -132,6 +132,7 @@ options {
       prooflabel2tag.put("joinproc", new Character('o'));
       prooflabel2tag.put("nrpartners", new Character('p'));
       prooflabel2tag.put("joinnode", new Character('j'));
+      prooflabel2tag.put("id", new Character('I'));
    }
 
    private NamespaceSet nss;
