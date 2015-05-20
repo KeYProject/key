@@ -3,24 +3,21 @@ package de.uka.ilkd.key.proof.runallproofs;
 import java.io.Serializable;
 
 /**
- * A single unit that will be tested during {@link RunAllProofsTest} run. In
- * case {@link RunAllProofsTest} is configured to run in dedicated-process
- * fallback mode, each {@link RunAllProofsTestUnit} is executed in a separate
- * process.
+ * A single unit that will be tested during {@link RunAllProofsTest} run.
  * 
  * @author Kai Wallisch
  */
 public abstract class RunAllProofsTestUnit implements Serializable {
 
    /**
-    * The name of this test. 
+    * The name of this test.
     */
    public String testName;
 
    /**
-    * This method is used by class {@link RunAllProofsTest} to determine the
-    * name of a test case. It is overridden in order to assign a meaningful name
-    * to each test case.
+    * Method {@link Object#toString()} is used by class {@link RunAllProofsTest}
+    * to determine the name of a test case. It is overridden here so that test
+    * cases can be easily recognized by their name.
     */
    @Override
    public String toString() {

@@ -10,9 +10,9 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 /**
  * Parser {@link ProofCollectionParser} splits a file into several
- * {@link ProofCollectionUnit}s during parsing. The only constraint on objects
- * of this type is that a {@link RunAllProofsTestUnit} can be created from them.
- * See implementations {@link GroupedProofCollectionUnit} and
+ * {@link ProofCollectionUnit}s during parsing. The created
+ * {@link ProofCollectionUnit}s are combined into a {@link ProofCollection} by
+ * the parser. See implementations {@link GroupedProofCollectionUnit} and
  * {@link SingletonProofCollectionUnit} for further details.
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>

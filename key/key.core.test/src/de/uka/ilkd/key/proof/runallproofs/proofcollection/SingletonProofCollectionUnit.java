@@ -6,8 +6,8 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 /**
- * A {@link ProofCollectionUnit} that is created from a separate
- * {@link TestFile} that is not declared as part of a group.
+ * A {@link ProofCollectionUnit} that is created from a single {@link TestFile}
+ * that is not declared as part of a group.
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */

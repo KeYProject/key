@@ -15,8 +15,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * Data structure for .key-files that will be tested during
- * {@link RunAllProofsTest} execution. It consists of a {@link #testProperty}
- * and a {@link #pathToFile} String for the file location. Method
+ * {@link RunAllProofsTest} run. It consists of a {@link #testProperty} and a
+ * {@link #pathToFile} String for the file location. Method
  * {@link #runKey(ProofCollectionSettings)} will verify {@link #testProperty}
  * for the given file.
  * 

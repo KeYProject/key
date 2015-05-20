@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 /**
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s
- * grouped together.
+ * that are grouped together.
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
