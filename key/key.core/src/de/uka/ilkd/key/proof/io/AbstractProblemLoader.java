@@ -490,6 +490,14 @@ public abstract class AbstractProblemLoader {
         try {
         	if (envInput instanceof KeYUserProblemFile) {
         		parser = new DefaultProofFileParser(this, proof);
+                
+                //////////     (DS: Experimental code)
+                
+                IntermediatePresentationProofFileParser intermParser = new IntermediatePresentationProofFileParser(proof);
+                problemInitializer.tryReadProof(intermParser, (KeYUserProblemFile) envInput);
+                
+                ////////// (END DS: Experimental code)
+                
         		problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
 
         		lastTouchedNode = parser.getLastSelectedGoal() != null ? parser.getLastSelectedGoal().node() : proof.root();       

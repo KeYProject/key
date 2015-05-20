@@ -16,7 +16,6 @@ import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.RootNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.util.Pair;
 
@@ -46,7 +45,7 @@ public class IntermediatePresentationProofFileParser implements
     private int currJoinNodeId = 0;
     private String[] newNames = null;
 
-    private RootNodeIntermediate root = null;
+    private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
 
     private Stack<BranchNodeIntermediate> stack = new Stack<BranchNodeIntermediate>();
@@ -58,7 +57,6 @@ public class IntermediatePresentationProofFileParser implements
      */
     public IntermediatePresentationProofFileParser(Proof proof) {
         this.proof = proof;
-        this.root = new RootNodeIntermediate();
         this.currNode = this.root;
     }
 
@@ -69,8 +67,14 @@ public class IntermediatePresentationProofFileParser implements
         {
             final BranchNodeIntermediate newNode = new BranchNodeIntermediate(
                     str);
-            currNode.addChild(newNode);
-            currNode = newNode;
+            
+            if (root == null) {
+                root = newNode;
+                currNode = newNode;
+            } else {
+                currNode.addChild(newNode);
+                currNode = newNode;
+            }
         }
 
             stack.push((BranchNodeIntermediate) currNode);
@@ -249,6 +253,15 @@ public class IntermediatePresentationProofFileParser implements
     @Override
     public List<Throwable> getErrors() {
         return new LinkedList<Throwable>();
+    }
+    
+    /**
+     * TODO: Document.
+     *
+     * @return
+     */
+    public BranchNodeIntermediate getParsedResult() {
+       return root; 
     }
 
     /**
