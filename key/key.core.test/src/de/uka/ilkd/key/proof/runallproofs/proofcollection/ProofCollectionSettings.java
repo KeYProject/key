@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -246,41 +247,24 @@ public class ProofCollectionSettings implements Serializable {
    }
 
    /**
-    * Settings must specify a base directory. Relative paths can be treated as
-    * relative to directory returned by this method.
+    * Settings must specify a base directory. Relative
+    * {@link ProofCollectionSettings} paths will be treated as relative to
+    * directory returned by this method.
     */
    public File getBaseDirectory() {
-      /*
-       * Get base directory as specified in the settings.
-       */
-      String baseDirectory = get(BASE_DIRECTORY_KEY);
+      String baseDirectoryName = get(BASE_DIRECTORY_KEY);
+      return baseDirectoryName == null ? null : getAbsoluteFile(
+            sourceProofCollectionFile, baseDirectoryName);
+   }
 
-      if (baseDirectory == null) {
-         /*
-          * In case no base directory is specified, return location of source
-          * file.
-          */
-         return sourceProofCollectionFile;
-      }
-      else {
-         File baseDirectoryFile = new File(baseDirectory);
-         if (baseDirectoryFile.isAbsolute()) {
-            /*
-             * In case specified base directory is given as absolute location,
-             * it will be returned without modification.
-             */
-            return baseDirectoryFile;
-         }
-         else {
-            /*
-             * In case specified base directory is given as relative location,
-             * it will be treated as relative to source file location.
-             */
-            File ret = new File(sourceProofCollectionFile, baseDirectory);
-            assert ret.isAbsolute() : "Computed File object is not absolute, which is not expected.";
-            return ret;
-         }
-      }
+   /**
+    * Returns location of statistics file. Can be null. In this case no
+    * statistics are saved.
+    */
+   public File getStatisticsFile() {
+      String statisticsFileName = get(STATISTICS_FILE);
+      return statisticsFileName == null ? null : getAbsoluteFile(
+            getBaseDirectory(), statisticsFileName);
    }
 
    private Set<String> enabledTestCaseNames = null;
@@ -301,11 +285,6 @@ public class ProofCollectionSettings implements Serializable {
                .unmodifiableSet(enabledTestCaseNames);
       }
       return enabledTestCaseNames;
-   }
-
-   public File getStatisticsFile() {
-      String statisticsFileName = get(STATISTICS_FILE);
-      return statisticsFileName == null ? null : new File(getBaseDirectory(), statisticsFileName);
    }
 
    /**

@@ -40,15 +40,20 @@ public class TestFile extends ForkedTestFileRunner {
     * @return {@link File} object pointing to given path name relative to given
     *         base directory.
     */
-   private static File getAbsoluteFile(File baseDirectory, String pathName) {
+   static File getAbsoluteFile(File baseDirectory, String pathName) {
 
       /*
-       * Caller of this method must provide an absolute path as initial
-       * directory.
+       * Caller of this method must provide an absolute path as base directory.
        */
       if (!baseDirectory.isAbsolute()) {
          throw new RuntimeException("Expecting an absolute path but found: "
                + baseDirectory);
+      }
+
+      if (!baseDirectory.isDirectory()) {
+         throw new RuntimeException(
+               "Given file system location is not a directory: "
+                     + baseDirectory);
       }
 
       /*
