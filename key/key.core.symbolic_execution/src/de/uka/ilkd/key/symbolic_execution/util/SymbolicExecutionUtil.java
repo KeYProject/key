@@ -1842,28 +1842,22 @@ public final class SymbolicExecutionUtil {
       else {
          // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
          // Find Term to extract implications from.
-
          ContractPostOrExcPostExceptionVariableResult search = searchContractPostOrExcPostExceptionVariable(node, node.proof().getServices());
-         // Collect all implications for normal or exceptional preconditions
+         
+         List<Term> normalConditions = new LinkedList<Term>();
+         List<Term> exceptinalConditions = new LinkedList<Term>();
+         collectContractPreconditions(services, search, normalConditions, exceptinalConditions);
+         List<Term> relevantConditions = childIndex == 1 ? // Exceptional case
+                                         exceptinalConditions :
+                                         normalConditions;
          Term result;
-         Term implications = search.getWorkingTerm().sub(1);
-         ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(),
-                                                                                             search.getExceptionDefinition(),
-                                                                                             childIndex == 1, 
-                                                                                             implications);
-         if (!implicationTerms.isEmpty()) {
-            // Implications find, return their conditions as branch condition
-            ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
-            for (Term implication : implicationTerms) {
-               condtionTerms = condtionTerms.append(implication.sub(0));
-            }
-            result = services.getTermBuilder().or(condtionTerms);
-            // Add updates
-            result = services.getTermBuilder().applyParallel(search.getUpdatesAndTerm().first, result);
+         if (relevantConditions.isEmpty()) {
+            result = services.getTermBuilder().tt();
          }
          else {
-            // No preconditions available, branch condition is true
-            result = services.getTermBuilder().tt();
+            result = services.getTermBuilder().or(relevantConditions);
+            // Add updates
+            result = services.getTermBuilder().applyParallel(search.getUpdatesAndTerm().first, result);
          }
          // Add caller not null to condition
          if (parent.childrenCount() == 4) {
@@ -1906,6 +1900,119 @@ public final class SymbolicExecutionUtil {
       }
    }
    
+   /**
+    * Collects the preconditions of an applied operation contract.
+    * @param services The {@link Services} to use.
+    * @param search The {@link ContractPostOrExcPostExceptionVariableResult}.
+    * @param normalConditions The {@link List} with the normal case conditions to fill.
+    * @param exceptinalConditions The {@link List} with the exceptional case conditions to fill.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static void collectContractPreconditions(Services services, 
+                                                    ContractPostOrExcPostExceptionVariableResult search,
+                                                    List<Term> normalConditions,
+                                                    List<Term> exceptinalConditions) throws ProofInputException {
+      // Treat general conditions
+      if (search.getWorkingTerm().op() != Junctor.AND) {
+         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      Term specificationCasesTerm = search.getWorkingTerm().sub(1);
+      Term excDefinition = search.getExceptionDefinition();
+      Term normalExcDefinition;
+      Term exceptionalExcDefinition;
+      if (excDefinition.op() == Junctor.NOT) {
+         exceptionalExcDefinition = excDefinition;
+         normalExcDefinition = search.getExceptionEquality();
+      }
+      else {
+         normalExcDefinition = excDefinition;
+         exceptionalExcDefinition = services.getTermBuilder().not(excDefinition);
+      }
+      collectSpecifcationCasesPreconditions(normalExcDefinition, exceptionalExcDefinition, specificationCasesTerm, normalConditions, exceptinalConditions);
+   }
+
+   /**
+    * Collects recursively the preconditions of specification cases.
+    * @param normalExcDefinition The normal exception equality.
+    * @param exceptionalExcDefinition The exceptional equality.
+    * @param term The current {@link Term}.
+    * @param normalConditions The {@link List} with the normal case conditions to fill.
+    * @param exceptinalConditions The {@link List} with the exceptional case conditions to fill.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static void collectSpecifcationCasesPreconditions(Term normalExcDefinition, 
+                                                             Term exceptionalExcDefinition, 
+                                                             Term term,
+                                                             List<Term> normalConditions,
+                                                             List<Term> exceptinalConditions) throws ProofInputException {
+      if (term.op() == Junctor.AND) {
+         Term lastChild = term.sub(term.arity() - 1);
+         if (lastChild.equals(normalExcDefinition) || lastChild.equals(exceptionalExcDefinition)) {
+            // Nothing to do, condition is just true
+         }
+         else {
+            Term firstChild = term.sub(0);
+            if (firstChild.equals(normalExcDefinition) || firstChild.equals(exceptionalExcDefinition)) {
+               // Nothing to do, condition is just true
+            }
+            else {
+               for (int i = 0; i < term.arity(); i++) {
+                  collectSpecifcationCasesPreconditions(normalExcDefinition, exceptionalExcDefinition, term.sub(i), normalConditions, exceptinalConditions);
+               }
+            }
+         }
+      }
+      else if (term.op() == Junctor.IMP) {
+         Term leftTerm = term.sub(0);
+         if (leftTerm.equals(normalExcDefinition) || leftTerm.equals(exceptionalExcDefinition)) {
+            // Nothing to do, condition is just true
+         }
+         else {
+            Term rightTerm = term.sub(1);
+            // Check if condition is used for normal and exceptional case
+            if (rightTerm.op() == Junctor.AND &&
+                rightTerm.sub(0).op() == Junctor.IMP &&
+                rightTerm.sub(0).sub(0).equals(normalExcDefinition) &&
+                rightTerm.sub(1).op() == Junctor.IMP &&
+                rightTerm.sub(1).sub(0).equals(exceptionalExcDefinition)) {
+               normalConditions.add(leftTerm);
+               exceptinalConditions.add(leftTerm);
+            }
+            else {
+               Term excCondition = rightTerm;
+               // Check if right child is exception definition
+               if (excCondition.op() == Junctor.AND) {
+                  excCondition = excCondition.sub(excCondition.arity() - 1);
+               }
+               if (excCondition.equals(normalExcDefinition)) {
+                  normalConditions.add(leftTerm);
+               }
+               else if (excCondition.equals(exceptionalExcDefinition)) {
+                  exceptinalConditions.add(leftTerm);
+               }
+               else {
+                  // Check if left child is exception definition
+                  if (rightTerm.op() == Junctor.AND) {
+                     excCondition = rightTerm.sub(0);
+                     if (excCondition.equals(normalExcDefinition)) {
+                        normalConditions.add(leftTerm);
+                     }
+                     else if (excCondition.equals(exceptionalExcDefinition)) {
+                        exceptinalConditions.add(leftTerm);
+                     }
+                     else {
+                        throw new ProofInputException("Exeptional condition expected, implementation of UseOperationContractRule might has changed!"); 
+                     }
+                  }
+                  else {
+                     throw new ProofInputException("Exeptional condition expected, implementation of UseOperationContractRule might has changed!"); 
+                  }
+               }
+            }
+         }
+      }
+   }
+
    /**
     * Searches the used exception variable in the post or exceptional post branch of an applied {@link ContractRuleApp} on the parent of the given {@link Node}. 
     * @param node The {@link Node} which is the post or exceptional post branch of an applied {@link ContractRuleApp}.
@@ -2179,53 +2286,6 @@ public final class SymbolicExecutionUtil {
       else {
          return null;
       }
-   }
-
-   /**
-    * Lists recursive implications filtered for post or exceptional post branch.
-    * @param toFill The result {@link ImmutableList} to fill.
-    * @param exceptionDefinition The exception definition {@code exc_0 = null}.
-    * @param exceptionalExecution {@code true} exceptional post branch, {@code false} post branch.
-    * @param root The root {@link Term} to start search in.
-    * @return The found implications.
-    */
-   private static ImmutableList<Term>
-                   collectPreconditionImpliesPostconditionTerms(ImmutableList<Term> toFill,
-                                                                Term exceptionDefinition,
-                                                                boolean exceptionalExecution,
-                                                                Term root) {
-      if (root.op() == Junctor.IMP) {
-         // Check if first condition is the exceptional definition
-         boolean isExceptionCondition = false;
-         Term toCheck = root.sub(1);
-         while (!isExceptionCondition && toCheck.arity() > 0) {
-            // Assumption: Implications implies first that exception is not null 
-            if (toCheck == exceptionDefinition) {
-               isExceptionCondition = true;
-            }
-            toCheck = toCheck.sub(0);
-         }
-         // Update result
-         if (exceptionalExecution) {
-            // Collect only exceptional terms
-            if (isExceptionCondition) {
-               toFill = toFill.append(root);
-            }
-         }
-         else {
-            // Collect only normal terms
-            if (!isExceptionCondition) {
-               toFill = toFill.append(root);
-            }
-         }
-      }
-      else {
-         for (Term sub : root.subs()) {
-            toFill = collectPreconditionImpliesPostconditionTerms(toFill, exceptionDefinition,
-                                                                  exceptionalExecution, sub);
-         }
-      }
-      return toFill;
    }
 
    /**

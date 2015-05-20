@@ -385,7 +385,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertNotNull(current);
       assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
       assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
-      assertTrue("Expected \"" + expected.getFormatedPathCondition() + "\" but is \"" + current.getFormatedPathCondition() + "\".", StringUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition()));
+      if (!StringUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition())) {
+         assertEquals(expected.getFormatedPathCondition(), current.getFormatedPathCondition());
+      }
       if (compareParent) {
          if (expected instanceof IExecutionBlockStartNode<?>) {
             assertTrue(current instanceof IExecutionBlockStartNode<?>);
