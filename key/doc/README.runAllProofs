@@ -1,0 +1,225 @@
+
+Usage of RunAllProofs JUnit implementation
+==========================================
+
+May 2015 Kai Wallisch
+
+RunAllProofs is a test routine in KeY, that verifies for certain .key files
+if they can be opened and proven by KeY prover without user interaction.
+Also, it verifies for some files that they can not be proven automatically
+and that proofs created during a test run can be reloaded by KeY after
+saving them to the file system.
+
+Previous version of RunAllProofs, which was realized as a Perl script, has
+now been replaced by a Java JUnit implementation. Main benefits of the new
+implementation are:
+
+ - Can be significantly faster, depending on fork mode settings (see
+   subitem "Fork Modes" for more information).
+ - Creates possibility for uncovering memory leaks by investigating RunAllProofs
+   statistics because intended usage scenario is now to execute all tests in a
+   single process (see "Fork Modes" and "Statistics" sections below).
+ - Better/easier Jenkins integration provided by JUnit.
+
+1. RunAllProofs Invocations
+---------------------------
+
+The following possibilities are currently available to start a
+RunAllProofs test run:
+
+ - Execute shell script "key/scripts/runAllProofs"
+ - Execute ant task "runAllProofs" in component key.core.test, for instance from
+   root of KeY git repository the following should work:
+        ant -buildfile key/key.core.test/build.xml runAllProofs
+ - Execute ant task "test-deploy" in component key.core.test. This task is mainly intended
+   for a Jenkins test run. It can be manually invoked with:
+        ant -buildfile key/key.core.test/build.xml test-deploy
+
+The recommended tool for a user to execute RunAllProofs locally is by executing shell
+script "key/scripts/runAllProofs". Invocation of this script without any arguments
+starts a RunAllProofs test run with standard settings. Check output of
+"key/scripts/runAllProofs --help" to see available command line parameters.
+
+Executing ant task "runAllProofs" should do the same as the command line script.
+It is recommended over ant task "test-deploy" for local test runs.
+
+2. Syntax of the Proof Collection/Index File
+--------------------------------------------
+
+There is an proof collection (or index) file containing declarations of
+.key files that will be tested during RunAllProofs test run. It is
+currently located in KeY gitrepository at: key/key.ui/examples/index/automaticJAVADL.txt
+
+A small antlr parser was written for this file. Corresponding antlr grammar is located at:
+key/key.core.test/src/de/uka/ilkd/key/proof/runallproofs/proofcollection/ProofCollection.g
+
+A proof collection file is composed of the following components:
+
+ - Comments
+ - Settings declarations
+ - Declarations of .key files
+
+The different components are explained below. It is recommended to look up
+automaticJAVADL.txt as an example.
+
+2.1 Comments
+------------
+
+The following comment styles are supported:
+
+# Single-line shell-style comment
+
+// Single-line C-style comment
+
+/*
+ * Multi-line C-style comment
+ */
+
+2.2 Settings Declarations
+-------------------------
+
+Proof collections settings entries are key-value pairs, which must occur before
+all .key file declarations. The following syntax is used for settings declarations:
+
+key = value
+
+A key is an arbitrary identifier composed of letters and digits, but it
+must start with a letter. Value can be either of the following:
+
+ - an identifier starting with a letter, followed by a combination of letters and digits
+ - a number
+ - a quoted string (a string literal)
+ - an unquoted path string
+
+Examples:
+    baseDirectory = ../
+    statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
+    forkMode = perGroup
+    reloadEnabled = true
+
+The following settings are currently supported:
+
+ - baseDirectory: Specifies a base directory, which works similar to working directory.
+                  All paths (except base directory path) in proof collection file are treated
+                  relative to base directory. Base directory itself can be specified by a
+                  relative path as well. It is treated relative to location of proof collection 
+                  file automaticJAVADL.txt. If not specified, default is parent folder of proof
+                  collection file.
+ - statisticsFile: If specified, statistics of a RunAllProofs run will be written to the given file.
+                   If not specified, code for writing statistics is skipped. See subitem
+                   "Test Statistics" for more information.
+ - forkMode: Specifies fork mode, that will be used for a test run. See subitem "Fork Modes" for 
+             explanation of different fork modes. If not specified, this setting will default to "noFork".
+ - reloadEnabled: Boolean value, which specifies whether closed proofs will be saved and reloaded
+                  after prover completes proof attempt. Default value is true. Files that are not 
+                  expected to be provable will never be reloaded, even if their corresponding proof
+                  obligations ends up in a closed proof after prover finishes.
+ - keySettings: String literal for default KeY settings, that will be loaded before each proof attempt.
+                Defaults to empty string.
+
+Proof collection settings can be specified in the following ways:
+
+    - at the beginning (before any .key file decleration) of proof collection index file automaticJAVADL.txt
+    - inside of a group in automaticJAVADL.txt
+    - as system properties - all system properties starting with "key.runallproofs." are assumed to
+      be settings assignments for RunAllProofs and can be set via JVM arguments in the following way:
+      java [...] -Dkey.runallproofs.forkMode=perFile -Dkey.runallproofs.reloadEnabled=false  [...]
+
+If a settings key is assigned mutltiple times at different places, the declaration with the
+highest priority takes precedence for that key. Priorities are determined according to the 
+following order:
+
+ - Highest: Declarations via system property "-Dkey.runallproofs.*"
+ - 2nd-highest: Declarations inside of a group.
+ - 2nd-lowest: Declarations in proof collection file outside of a group.
+ - lowest: Default values. (can be overridden by all other levels)
+
+Proof collection parser is forgiving in the sense that unknown settings are
+parsed without an error (unless they are syntactically incorrect) but will 
+not influence a test run.
+
+2.3 Declarations of .key Files
+------------------------------
+
+.key files can be declared in two different ways in a proof collection file.
+Either grouped or ungrouped. Files that are grouped together will be executed
+in the same subprocess when fork mode "perGroup" is activated. Each individual
+file gets its own subprocess in fork mode "perFile" (regardless of groups).
+The files are declared by a path name (which is treated relative to base
+directory) preceded by a test property that shall be verified.
+
+.key file declarations and settings declarations can not be mixed up. All settings declarations
+must precede .key file declarations. However, groups can have custom settings declarations, in
+which also settings must precede .key files (see example below).
+
+The following test properties are currently supported:
+
+ - provable: Test whether the corresponding .key file can be proven by KeY. In case proof
+             can be closed successfully and reload is enabled, it will be saved and reloaded
+             after prover has finished.
+ - notprovable: Verify that the corresponding .key file can not be proven automatically by 
+                KeY. Proofs are not reloaded for those files.
+ - loadable: With this option, it is only verified if the corresponding .key file can be
+             opened successfully by KeY. Proof attempt is skipped with this option.
+
+Example for a group declaration with custom/local settings:
+
+group newBook {
+    forkMode = perFile
+    reloadEnabled = false
+    provable ./newBook/09.list_modelfield/ArrayList.add.key
+    provable ./newBook/09.list_modelfield/ArrayList.remFirst.key
+    provable ./newBook/09.list_modelfield/ArrayList.empty.key
+    provable ./newBook/09.list_modelfield/ArrayList.size.key
+    provable ./newBook/09.list_modelfield/ArrayList.get.key
+}
+
+.key file declarations are also allowed outside of groups, for example:
+
+provable ./standard_key/java_dl/jml-information-flow.key
+notprovable ./standard_key/java_dl/jml-min/min-unprovable1.key
+notprovable ./standard_key/java_dl/jml-min/min-unprovable2.key
+provable ./standard_key/java_dl/methodCall.key
+
+3. Fork Modes
+-------------
+
+There are different fork mode settings available, which influence how often
+subprocesses are created during RunAllProofs test run. Default is value
+"noFork" as fork mode setting, which prevents RunAllProofs from creating subprocesses
+entirely (everything is executed in a single process). However, in case
+memory leaks occur and have a significant impact on test performance, it
+is recommended to use one of the other available fork mode settings.
+
+The following fork modes are available:
+
+ - noFork: RunAllProofs is executed in a single process.
+ - perGroup: A new subprocess is created for each group of test files.
+ - perFile: A new subprocess is created for each individual test file
+   (regardless of groupings).
+
+Example: Setting fork mode to "perFile" can be done with the following line in
+automaticJAVADL.txt:
+
+    forkMode = perFile
+
+4. Test Statistics
+------------------
+
+In case a path is specified via settings key "statisticsFile", RunAllProofs
+will save proof statistics to that file. It contains  information about
+runtime, memory consumption, rule applications and others.
+
+Example for declaration of a statistics file in automaticJAVADL.txt:
+
+    statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
+
+5. Proof Reloading
+------------------
+
+RunAllProofs will attempt to reload proofs that were retrieved during a
+successful proof attempt for files that are marked "provable". Proof reloading
+can be disabled via settings key "reloadEnabled" as follows:
+
+    reloadEnabled = true
+

@@ -249,7 +249,8 @@ public class ProofCollectionSettings implements Serializable {
     * Returns KeY settings that will be used as default settings.
     */
    public String getGlobalKeYSettings() {
-      return get(KEY_SETTINGS_KEY);
+      String gks = get(KEY_SETTINGS_KEY);
+      return gks == null ? "" : gks;
    }
 
    /**
@@ -259,8 +260,9 @@ public class ProofCollectionSettings implements Serializable {
     */
    public File getBaseDirectory() {
       String baseDirectoryName = get(BASE_DIRECTORY_KEY);
-      return baseDirectoryName == null ? null : getAbsoluteFile(
-            sourceProofCollectionFile, baseDirectoryName);
+      return baseDirectoryName == null ? sourceProofCollectionFile
+            .getParentFile() : getAbsoluteFile(sourceProofCollectionFile,
+            baseDirectoryName);
    }
 
    /**
@@ -283,7 +285,7 @@ public class ProofCollectionSettings implements Serializable {
 
       if (enabledTestCaseNames == null) {
          enabledTestCaseNames = new LinkedHashSet<>();
-         String[] testCaseList = testCases.split(" ");
+         String[] testCaseList = testCases.split(",");
          for (String testCaseName : testCaseList) {
             enabledTestCaseNames.add(testCaseName);
          }

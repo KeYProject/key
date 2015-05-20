@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# RunAllProofs documentation can be found at: key/doc/README.runAllProofs
+
 list_help() {
     echo "Usage: runAllProofs [--list-tests] | [ [--enable-reload=<true|false>]"
     echo "                                       [--fork-mode=<perFile|perGroup|noFork>]"
@@ -124,28 +126,40 @@ $JAVA -ea:de.uka.ilkd.key...\
 # Parse command line arguments
 #
 
-case $1 in
-    --fork-mode=*)
-    FORKMODE=$(echo $1 | cut -d'=' -f 2)
-    shift
-    ;;
-    --reload-enabled=*)
-    RELOADENABLED=$(echo $1 | cut -d'=' -f 2)
-    shift
-    ;;
-    --list-tests)
-    call_java de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
-    exit
-    ;;
-    -h|--help|-?)
-    list_help
-    exit
-    ;;
-    -*)
-    echo Unrecognised option: $1
-    exit
-    ;;
-esac
+JAVAARGS=""
+
+while [ "$#" -ne 0 ]
+    do
+    case $1 in
+        --fork-mode=*)
+        FORKMODE=$(echo $1 | cut -d'=' -f 2)
+        JAVAARGS="$JAVAARGS -Dkey.runallproofs.forkMode=$FORKMODE"
+        shift
+        continue
+        ;;
+        --reload-enabled=*)
+        RELOADENABLED=$(echo $1 | cut -d'=' -f 2)
+        JAVAARGS="$JAVAARGS -Dkey.runallproofs.reloadEnabled=$RELOADENABLED"
+        shift
+        continue
+        ;;
+        --list-tests)
+        call_java de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
+        exit
+        ;;
+        -h|--help|-?)
+        list_help
+        exit
+        ;;
+        -*)
+        echo Unrecognised option: $1
+        exit
+        ;;
+        *)
+        break
+        ;;
+    esac
+    done
 
 if [ "$#" -ne 0 ]
     then
@@ -153,14 +167,11 @@ if [ "$#" -ne 0 ]
     shift
     while [ "$#" -ne 0 ]
         do
-        TESTCASES="$TESTCASES $1"
+        TESTCASES="$TESTCASES,$1"
         shift
         done
+    JAVAARGS="$JAVAARGS -Dkey.runallproofs.testCases=$TESTCASES"
 fi
 
-call_java \
--Dkey.runallproofs.forkMode=$FORKMODE \
--Dkey.runallproofs.reloadEnabled=$RELOADENABLED \
--Dkey.runallproofs.testCases="$TESTCASES" \
-org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
+call_java $JAVAARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
 

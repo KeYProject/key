@@ -44,6 +44,11 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
  * </p>
  * 
  * <p>
+ * RunAllProofs documentation can be found at the following location in KeY git
+ * repository: key/doc/README.runAllProofs
+ * </p>
+ * 
+ * <p>
  * The files to test are listed in: <br />
  * $KEY_HOME/key.core.test/resources/testcase/runallproofs/automaticJAVADL.txt
  * </p>

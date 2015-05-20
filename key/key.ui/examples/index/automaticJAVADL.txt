@@ -11,7 +11,7 @@
 # Files marked as provable should be closed automatically.
 # Files marked as nonprovable should be not closable.
 #
-# It is used by bin/runAllProofs.pl.
+# Documentation on RunAllProofs can be found at: key/doc/README.runAllProofs
 #
 
 /*

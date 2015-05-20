@@ -74,6 +74,7 @@
 	</target>
 	
 	<target name="runAllProofs" depends="compile">
+	<!-- For documentation in runAllProofs see: key/doc/README.runAllProofs -->
 		<junit printsummary="withOutAndErr" haltonfailure="yes"
 		       fork="yes" forkMode="once" haltonerror="yes"
 		       enableTestListenerEvents="false"
