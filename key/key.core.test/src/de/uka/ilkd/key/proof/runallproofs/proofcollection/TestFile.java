@@ -135,8 +135,7 @@ public class TestFile extends ForkedTestFileRunner {
     *            converted into an {@link Exception} object with original
     *            exception as cause.
     */
-   public TestResult runKey(ProofCollectionSettings settings)
-         throws Exception {
+   public TestResult runKey(ProofCollectionSettings settings) throws Exception {
 
       // Initialize KeY settings.
       String gks = settings.getGlobalKeYSettings();
@@ -174,16 +173,16 @@ public class TestFile extends ForkedTestFileRunner {
          }
 
          /*
-          * Testing proof reloading now.
-          * Saving and reloading proof in case it was closed and test property is PROVABLE.
+          * Testing proof reloading now. Saving and reloading proof only in case
+          * it was closed and test property is PROVABLE.
           */
-         /*
-         if ((testProperty == TestProperty.PROVABLE) && success) {
+         if (settings.reloadEnabled()
+               && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
             loadedProof.saveToFile(proofFile);
             reloadProof(proofFile);
          }
-         */
+
       }
       catch (Throwable t) {
          throw new Exception(

@@ -29,6 +29,7 @@ public class ProofCollectionSettings implements Serializable {
    private static final String KEY_SETTINGS_KEY = "keySettings";
    private static final String FORK_MODE = "forkMode";
    private static final String STATISTICS_FILE = "statisticsFile";
+   private static final String RELOAD_ENABLED = "reloadEnabled";
 
    /**
     * {@link List} of settings entries that are created from system properties.
@@ -290,6 +291,27 @@ public class ProofCollectionSettings implements Serializable {
                .unmodifiableSet(enabledTestCaseNames);
       }
       return enabledTestCaseNames;
+   }
+
+   /**
+    * Check whether proof reloading is enabled or disabled. If enabled, closed
+    * proofs will be saved and reloaded after prover is finished.
+    */
+   public boolean reloadEnabled() {
+      String reloadEnabled = get(RELOAD_ENABLED);
+      if (reloadEnabled == null || reloadEnabled.equals("true")) {
+         return true;
+      }
+      else if (reloadEnabled.equals("false")) {
+         return false;
+      }
+      else {
+         System.out.println("Warning - unrecognized reload option: "
+               + reloadEnabled);
+         System.out.println("To check Java code for this message, see:");
+         System.out.println(new Throwable().getStackTrace()[0]);
+         return true;
+      }
    }
 
    /**

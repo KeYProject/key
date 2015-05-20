@@ -28,8 +28,17 @@ statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
 
 /*
  * Fork mode setting, can be declared to create subprocesses while running tests declared in this file.
+ * Possible modes: noFork - all files are proven within a single process
+ *                 perGroup - one subprocess is created for each group
+ *                 perFile - one subprocess is created for each file
  */
-forkMode = noFork
+forkMode = perGroup
+
+/*
+ * Enable or disable proof reloading.
+ * If enabled, closed proofs will be saved and reloaded after prover is finished.
+ */
+reloadEnabled = true
 
 keySettings = "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009
