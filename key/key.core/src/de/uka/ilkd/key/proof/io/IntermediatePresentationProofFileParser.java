@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.io.intermediate.JoinAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.JoinPartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -44,7 +45,9 @@ public class IntermediatePresentationProofFileParser implements
     private Proof proof = null;
 
     private LinkedList<String> loadedInsts = null;
-    private ImmutableList<String> ifFormulaList = ImmutableSLList
+    private ImmutableList<String> ifSeqFormulaList = ImmutableSLList
+            .<String> nil();
+    private ImmutableList<String> ifDirectFormulaList = ImmutableSLList
             .<String> nil();
     private ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
     private int currIfInstFormula;
@@ -106,7 +109,7 @@ public class IntermediatePresentationProofFileParser implements
             currFormula = 0;
             currPosInTerm = PosInTerm.getTopLevel();
             loadedInsts = null;
-            ifFormulaList = ImmutableSLList.<String> nil();
+            ifSeqFormulaList = ImmutableSLList.<String> nil();
             break;
 
         case 'f': // formula
@@ -140,12 +143,11 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case 'q': // ifseqformula
-            ifFormulaList = ifFormulaList.append(str);
+            ifSeqFormulaList = ifSeqFormulaList.append(str);
             break;
 
         case 'd': // ifdirectformula
-            //TODO: Needs to be treated special from ifseqformula!
-            ifFormulaList = ifFormulaList.append(str);
+            ifDirectFormulaList = ifDirectFormulaList.append(str);
             break;
 
         case 'u': // UserLog
@@ -163,7 +165,7 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case 's': // ProofSettings
-            // loadPreferences(str); //TODO
+            loadPreferences(str);
             break;
 
         case 'n': // BuiltIn rules
@@ -293,7 +295,7 @@ public class IntermediatePresentationProofFileParser implements
     private TacletAppIntermediate constructTacletApp() {
         return new TacletAppIntermediate(currRuleName,
                 new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                loadedInsts, ifFormulaList);
+                loadedInsts, ifSeqFormulaList, ifDirectFormulaList);
     }
 
     /**
@@ -325,6 +327,17 @@ public class IntermediatePresentationProofFileParser implements
         builtinIfInsts = null;
 
         return result;
+    }
+    
+    /**
+     * TODO: Document.
+     *
+     * @param preferences
+     */
+    private void loadPreferences(String preferences) {
+        //TODO: Does this have *any* effects? See DefaultProofFileParser.
+        final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
+        proofSettings.loadSettingsFromString(preferences);
     }
 
 }

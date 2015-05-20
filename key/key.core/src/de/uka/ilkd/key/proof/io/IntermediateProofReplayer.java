@@ -270,10 +270,14 @@ public class IntermediateProofReplayer {
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
         ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
-        for (String ifFormulaStr : currInterm.getIfFormulaList()) {
+        for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             Sequent seq = currGoal.sequent();
             ifFormulaList = ifFormulaList.append(new IfFormulaInstSeq(seq,
                     Integer.parseInt(ifFormulaStr)));
+        }
+        for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
+            ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
+                    new SequentFormula(DefaultProofFileParser.parseTerm(ifFormulaStr, proof))));
         }
         
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
@@ -309,7 +313,6 @@ public class IntermediateProofReplayer {
             currContract = proof.getServices().getSpecificationRepository()
                     .getContractByName(currInterm.getContract());
             if (currContract == null) {
-                // XXX: changed from throwing this exception
                 final ProblemLoaderException e = new ProblemLoaderException(
                         loader, "Error loading proof: contract \"" + currInterm.getContract()
                                 + "\" not found.");
@@ -332,8 +335,6 @@ public class IntermediateProofReplayer {
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 }
                 catch (RuntimeException e) {
-                    // System.out.println("formula: " + currIfInstFormula);
-                    // System.out.println("term: " + currIfInstPosInTerm);
                     skipBranch = 1;
                     reportError(ERROR_LOADING_PROOF_LINE + "Goal " + currGoal.node().serialNr() + ", rule "
                             + ruleName + NOT_APPLICABLE, e);

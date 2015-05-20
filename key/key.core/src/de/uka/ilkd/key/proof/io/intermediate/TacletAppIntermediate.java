@@ -30,15 +30,17 @@ public class TacletAppIntermediate implements AppIntermediate {
     private String tacletName = null;
     private Pair<Integer, PosInTerm> posInfo = null;
     private LinkedList<String> insts = null;
-    private ImmutableList<String> ifFormulaList = null;
+    private ImmutableList<String> ifSeqFormulaList = null;
+    private ImmutableList<String> ifDirectFormulaList = null;
 
     public TacletAppIntermediate(String tacletName,
             Pair<Integer, PosInTerm> posInfo, LinkedList<String> insts,
-            ImmutableList<String> ifFormulaList) {
+            ImmutableList<String> ifSeqFormulaList, ImmutableList<String> ifDirectFormulaList) {
         this.tacletName = tacletName;
         this.posInfo = posInfo;
         this.insts = insts;
-        this.ifFormulaList = ifFormulaList;
+        this.ifSeqFormulaList = ifSeqFormulaList;
+        this.ifDirectFormulaList = ifDirectFormulaList;
     }
 
     public String getTacletName() {
@@ -53,8 +55,12 @@ public class TacletAppIntermediate implements AppIntermediate {
         return insts;
     }
 
-    public ImmutableList<String> getIfFormulaList() {
-        return ifFormulaList;
+    public ImmutableList<String> getIfSeqFormulaList() {
+        return ifSeqFormulaList;
+    }
+
+    public ImmutableList<String> getIfDirectFormulaList() {
+        return ifDirectFormulaList;
     }
 
 }
