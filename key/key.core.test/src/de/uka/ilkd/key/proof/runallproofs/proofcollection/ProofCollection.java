@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -40,6 +41,15 @@ public class ProofCollection {
     */
    public List<RunAllProofsTestUnit> createRunAllProofsTestUnits()
          throws IOException {
+
+      /*
+       * Delete old statistics file, if present.
+       */
+      File statisticsFile = settings.getStatisticsFile();
+      if (statisticsFile.exists()) {
+         System.out.println("Deleting old RunAllProofs statistics file: " + statisticsFile);
+         statisticsFile.delete();
+      }
 
       /**
        * Create list of {@link RunAllProofsTestUnit}s from list of units. This
