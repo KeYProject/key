@@ -31,13 +31,18 @@ public class ProofCollectionSettings implements Serializable {
    private static final String STATISTICS_FILE = "statisticsFile";
 
    /**
-    * {@link List} of default entries that will be available in every
-    * {@link ProofCollectionSettings} object.
+    * {@link List} of settings entries that are created from system properties.
+    * Those entries are copied into every {@link ProofCollectionSettings}
+    * object. Every system property starting with "key.runallproofs." is
+    * considered a RunAllProofs setting. It overrides settings specified in the
+    * automaticJAVADL.txt index file. RunAllProofs settings can be specified via
+    * system properties by providing JVM arguments like:
+    * "-Dkey.runallproofs.forkMode=perFile"
     */
-   private static final List<Entry> DEFAULT_ENTRIES;
+   private static final List<Entry> SYSTEM_PROPERTIES_ENTRIES;
    static {
       /*
-       * Iterating over all system properties to get default entries. System
+       * Iterating over all system properties to get settings entries. System
        * properties starting with "key.runallproofs." are relevant for proof
        * collection settings.
        */
@@ -52,13 +57,13 @@ public class ProofCollectionSettings implements Serializable {
             tmp.add(new Entry(key, value));
          }
       }
-      DEFAULT_ENTRIES = Collections.unmodifiableList(tmp);
+      SYSTEM_PROPERTIES_ENTRIES = Collections.unmodifiableList(tmp);
    }
 
    /**
     * Converts a list of map entries to an unmodifiable map containing the
     * specified entries and additionally default entries specified in
-    * {@link #DEFAULT_ENTRIES}.
+    * {@link #SYSTEM_PROPERTIES_ENTRIES}.
     */
    private static Map<String, String> createUnmodifiableMapContainingDefaults(
          List<Entry> entries) {
@@ -66,16 +71,16 @@ public class ProofCollectionSettings implements Serializable {
       Map<String, String> mutableMap = new LinkedHashMap<>();
 
       /*
-       * Add default entries.
+       * Add specified entries.
        */
-      for (Entry entry : DEFAULT_ENTRIES) {
+      for (Entry entry : entries) {
          mutableMap.put(entry.key, entry.value);
       }
 
       /*
-       * Add specified entries.
+       * Add entries created from system properties.
        */
-      for (Entry entry : entries) {
+      for (Entry entry : SYSTEM_PROPERTIES_ENTRIES) {
          mutableMap.put(entry.key, entry.value);
       }
 

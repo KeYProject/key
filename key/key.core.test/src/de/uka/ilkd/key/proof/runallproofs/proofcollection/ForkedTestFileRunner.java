@@ -139,7 +139,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
        * Read serialized list of test results and return.
        */
       Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
-      assertTrue("File containing serialized test results not presend.",
+      assertTrue("File containing serialized test results not present.",
             testResultsFile.toFile().exists());
       return ForkedTestFileRunner
             .<List<TestResult>> readObject((testResultsFile));
@@ -162,7 +162,6 @@ public abstract class ForkedTestFileRunner implements Serializable {
                .<List<TestFile>> readObject(getLocationOfSerializedTestFiles(tempDirectory));
          ProofCollectionSettings settings = ForkedTestFileRunner
                .<ProofCollectionSettings> readObject(getLocationOfSerializedProofCollectionSettings(tempDirectory));
-
          ArrayList<TestResult> testResults = new ArrayList<>();
          for (TestFile testFile : testFiles) {
             testResults.add(testFile.runKey(settings));

@@ -174,8 +174,8 @@ public class TestFile extends ForkedTestFileRunner {
          }
 
          /*
-          * Reload available proof if it was tested whether available KeY file
-          * is provable and the previous proof attempt was successful.
+          * Testing proof reloading now.
+          * Saving and reloading proof in case it was closed and test property is PROVABLE.
           */
          /*
          if ((testProperty == TestProperty.PROVABLE) && success) {

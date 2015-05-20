@@ -135,6 +135,10 @@ case $1 in
     list_help
     exit
     ;;
+    -*)
+    echo Unrecognised option: $1
+    exit
+    ;;
 esac
 
 if [ "$#" -ne 0 ]
