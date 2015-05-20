@@ -130,10 +130,13 @@ public class IntermediateProofReplayer {
 
             
             if (currentP.second instanceof BranchNodeIntermediate) {
+                assert currentP.second.getChildren().size() == 1 : "Branch node should have exactly one child.";
                 queue.addFirst(new Pair<Node, NodeIntermediate>(currNode, currentP.second.getChildren().get(0)));
+                continue;
             }
             else if (currentP.second instanceof AppNodeIntermediate) {
                 AppNodeIntermediate currInterm = (AppNodeIntermediate) currentP.second;
+                currNode.getNodeInfo().setInteractiveRuleApplication(currInterm.isInteractiveRuleApplication());
 
                 if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
                     TacletAppIntermediate appInterm = (TacletAppIntermediate) currInterm
