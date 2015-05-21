@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.join.procedures;
 
 import java.util.HashSet;
 
@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;

@@ -8,6 +8,10 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
+import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithSignLattice;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 

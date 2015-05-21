@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.join.procedures;
 
 import java.util.HashSet;
 
@@ -19,10 +19,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
@@ -86,7 +87,7 @@ public class JoinIfThenElse extends JoinProcedure {
     * @return An if then else term like <code>\if (c1) \then (t1) \else (t2)</code>,
     *    where the cI are the path conditions of stateI.
     */
-   static Term createIfThenElseTerm (
+   public static Term createIfThenElseTerm (
          final SymbolicExecutionState state1,
          final SymbolicExecutionState state2,
          final Term ifTerm,
