@@ -486,27 +486,29 @@ public abstract class AbstractProblemLoader {
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
 
-//        DefaultProofFileParser parser = null;
+        final boolean useIntermediateParser = true;
         
         //////////(DS: Experimental code)
-        IntermediatePresentationProofFileParser parser = null;
+        IProofFileParser parser = null;
         IntermediateProofReplayer replayer = null;
         //////////(END DS: Experimental code)
         
         try {
         	if (envInput instanceof KeYUserProblemFile) {
-//        		parser = new DefaultProofFileParser(this, proof);
-//        	    problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-                
-                //////////     (DS: Experimental code)
-        	    parser = new IntermediatePresentationProofFileParser(proof);
-                problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-                replayer = new IntermediateProofReplayer(this, proof, parser.getParsedResult());
-                replayer.replay();
-                lastTouchedNode = replayer.getLastSelectedGoal() != null ? replayer.getLastSelectedGoal().node() : proof.root();
-                ////////// (END DS: Experimental code)
-                
-//        		lastTouchedNode = parser.getLastSelectedGoal() != null ? parser.getLastSelectedGoal().node() : proof.root();       
+        	    if (!useIntermediateParser) {
+                  parser = new DefaultProofFileParser(this, proof);
+                  problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+                  lastTouchedNode = ((DefaultProofFileParser) parser).getLastSelectedGoal() != null ? ((DefaultProofFileParser) parser).getLastSelectedGoal().node() : proof.root(); 
+        	    }
+        	    else {
+        	        //////////     (DS: Experimental code)
+                    parser = new IntermediatePresentationProofFileParser(proof);
+                    problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+                    replayer = new IntermediateProofReplayer(this, proof, (IntermediatePresentationProofFileParser) parser);
+                    replayer.replay();
+                    lastTouchedNode = replayer.getLastSelectedGoal() != null ? replayer.getLastSelectedGoal().node() : proof.root();
+                    ////////// (END DS: Experimental code)
+        	    }   
         	}
         } catch (Exception e) {
         	if (parser == null || parser.getErrors() == null || parser.getErrors().isEmpty()) {
@@ -514,14 +516,15 @@ public abstract class AbstractProblemLoader {
         		errors.add(e);
         	}
         } finally {
-            //////////  (DS: Experimental code)
-            status = parser.getStatus() + "\n\n" + replayer.getStatus();
+            status = parser.getStatus();
             errors.addAll(parser.getErrors());
-            errors.addAll(replayer.getErrors());
-            ////////// (END DS: Experimental code)
             
-//    		status = parser.getStatus();
-//    		errors.addAll(parser.getErrors());
+            if (useIntermediateParser) {
+                //////////  (DS: Experimental code)
+                status += "\n\n" + replayer.getStatus();
+                errors.addAll(replayer.getErrors());
+                ////////// (END DS: Experimental code)
+            }
         }
         	
         ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);

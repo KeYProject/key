@@ -94,8 +94,6 @@ public class IntermediatePresentationProofFileParser implements
                 currNode = newNode;
             }
         }
-
-//            stack.push((BranchNodeIntermediate) currNode);
             break;
 
         case 'r': // rule (taclet)
@@ -296,7 +294,8 @@ public class IntermediatePresentationProofFileParser implements
     private TacletAppIntermediate constructTacletApp() {
         return new TacletAppIntermediate(currRuleName,
                 new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                loadedInsts, ifSeqFormulaList, ifDirectFormulaList);
+                loadedInsts,
+                ifSeqFormulaList, ifDirectFormulaList);
     }
 
     /**

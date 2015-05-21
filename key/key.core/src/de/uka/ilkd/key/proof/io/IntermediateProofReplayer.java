@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.DefaultProofFileParser.AppConstructionException;
 import de.uka.ilkd.key.proof.io.DefaultProofFileParser.BuiltInConstructionException;
 import de.uka.ilkd.key.proof.io.DefaultProofFileParser.SkipSMTRuleException;
@@ -107,12 +108,12 @@ public class IntermediateProofReplayer {
      * @param intermediate
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
-            BranchNodeIntermediate intermediate) {
+            IntermediatePresentationProofFileParser parser) {
         this.proof = proof;
         this.loader = loader;
-
+        
         queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(),
-                intermediate));
+                parser.getParsedResult()));
     }
     
     /**
@@ -143,13 +144,15 @@ public class IntermediateProofReplayer {
                             .getIntermediateRuleApp();
                     
                     try {
-                        currGoal.apply(constructApp(appInterm, currGoal));
+                        currGoal.apply(constructTacletApp(appInterm, currGoal));
                         
+//                        int i = currInterm.getChildren().size() - 1;
                         int i = 0;
                         Iterator<Node> children = currNode.childrenIterator();
                         while (!currGoal.node().isClosed() && children.hasNext()) {
                             Node child = children.next();
                             queue.addLast(new Pair<Node, NodeIntermediate>(child, currInterm.getChildren().get(i++)));
+//                            queue.addLast(new Pair<Node, NodeIntermediate>(child, currInterm.getChildren().get(i--)));
                         }
                     }
                     catch (Exception e) {
@@ -241,7 +244,7 @@ public class IntermediateProofReplayer {
      * @return
      * @throws AppConstructionException
      */
-    private TacletApp constructApp(TacletAppIntermediate currInterm, Goal currGoal) throws AppConstructionException {
+    private TacletApp constructTacletApp(TacletAppIntermediate currInterm, Goal currGoal) throws AppConstructionException {
         
         final String tacletName = currInterm.getTacletName();
         final int currFormula = currInterm.getPosInfo().first;
@@ -263,9 +266,6 @@ public class IntermediateProofReplayer {
         if (currFormula != 0) { // otherwise we have no pos
             pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                     currFormula, currPosInTerm);
-            // System.err.print("Want to apply "+currTacletName+" at "+currGoal);
-            // this is copied from TermTacletAppIndex :-/
-
             ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
             ourApp = ourApp.setPosInOccurrence(pos, services);
         }
