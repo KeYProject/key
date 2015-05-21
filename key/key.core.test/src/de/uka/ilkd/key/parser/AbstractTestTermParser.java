@@ -29,11 +29,11 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
- * Scaffold for antlr {@link Parser} testing.
+ * Class providing methods for parser tests.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public abstract class AbstractTestTermParser extends TestCase {
+public class AbstractTestTermParser extends TestCase {
 
     protected final TermFactory tf;
     protected final TermBuilder tb;
