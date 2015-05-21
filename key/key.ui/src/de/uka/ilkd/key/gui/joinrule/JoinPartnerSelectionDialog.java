@@ -99,7 +99,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
          new TreeSet<Pair<Goal,PosInOccurrence>>(GOAL_COMPARATOR);
    
    /** The chosen join method. */
-   private JoinProcedure chosenRule = JoinProcedure.CONCRETE_RULES.head();
+   private JoinProcedure chosenRule = JoinProcedure.getJoinProcedures().head();
    
    private JEditorPane txtPartner1 = null;
    private JEditorPane txtPartner2 = null;
@@ -178,7 +178,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
       });
       
       bgJoinMethods = new ButtonGroup();
-      for (final JoinProcedure rule : JoinProcedure.CONCRETE_RULES) {
+      for (final JoinProcedure rule : JoinProcedure.getJoinProcedures()) {
     	  JRadioButton rb = new JRadioButton(rule.toString());
     	  rb.setSelected(true);
     	  

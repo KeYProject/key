@@ -42,7 +42,14 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  */
 public class JoinIfThenElse extends JoinProcedure {
    
-   public static final JoinIfThenElse INSTANCE = new JoinIfThenElse();
+   private static JoinIfThenElse INSTANCE = null;
+   
+   public static JoinIfThenElse instance() {
+       if (INSTANCE == null) {
+           INSTANCE = new JoinIfThenElse();
+       }
+       return INSTANCE;
+   }
    
    private static final String DISPLAY_NAME = "JoinByIfThenElse";
    static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;

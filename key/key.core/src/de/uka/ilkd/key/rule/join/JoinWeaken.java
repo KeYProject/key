@@ -36,7 +36,15 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  */
 public class JoinWeaken extends JoinProcedure {
    
-   public static final JoinWeaken INSTANCE = new JoinWeaken();
+    private static JoinWeaken INSTANCE = null;
+    
+    public static JoinWeaken instance() {
+        if (INSTANCE == null) {
+            INSTANCE = new JoinWeaken();
+        }
+        return INSTANCE;
+    }
+    
    private static final String DISPLAY_NAME = "JoinByFullAnonymization";
    
    @Override

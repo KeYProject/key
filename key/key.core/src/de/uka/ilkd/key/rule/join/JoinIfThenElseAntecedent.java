@@ -42,7 +42,14 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  */
 public class JoinIfThenElseAntecedent extends JoinProcedure {
    
-   public static final JoinIfThenElseAntecedent INSTANCE = new JoinIfThenElseAntecedent();
+   private static JoinIfThenElseAntecedent INSTANCE = null;
+   
+   public static JoinIfThenElseAntecedent instance() {
+       if (INSTANCE == null) {
+           INSTANCE = new JoinIfThenElseAntecedent();
+       }
+       return INSTANCE;
+   }
    
    private static final String DISPLAY_NAME = "JoinByIfThenElseAntecedent";
 

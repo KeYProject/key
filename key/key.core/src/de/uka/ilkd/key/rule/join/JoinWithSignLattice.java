@@ -34,7 +34,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
    
-   public static final JoinWithSignLattice INSTANCE = new JoinWithSignLattice();
+    private static JoinWithSignLattice INSTANCE = null;
+    
+    public static JoinWithSignLattice instance() {
+        if (INSTANCE == null) {
+            INSTANCE = new JoinWithSignLattice();
+        }
+        return INSTANCE;
+    }
+    
    private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
 
    @Override
