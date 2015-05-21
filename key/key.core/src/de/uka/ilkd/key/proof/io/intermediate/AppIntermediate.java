@@ -24,9 +24,12 @@ import de.uka.ilkd.key.logic.Name;
  */
 public interface AppIntermediate {
     /**
-     * TODO: Document.
-     *
-     * @return
+     * @return The new names registered in the course of this app.
      */
     ImmutableList<Name> getNewNames();
+    
+    /**
+     * @return The name of this taclet / built in rule.
+     */
+    String getRuleName();
 }

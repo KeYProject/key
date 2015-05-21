@@ -47,7 +47,7 @@ public class TacletAppIntermediate implements AppIntermediate {
         this.newNames = newNames;
     }
 
-    public String getTacletName() {
+    public String getRuleName() {
         return tacletName;
     }
 

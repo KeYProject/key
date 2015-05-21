@@ -173,13 +173,13 @@ public class IntermediateProofReplayer {
                         skipBranch = 1;
                         reportError(ERROR_LOADING_PROOF_LINE + "Goal "
                                 + currGoal.node().serialNr() + ", rule "
-                                + appInterm.getTacletName() + NOT_APPLICABLE, e);
+                                + appInterm.getRuleName() + NOT_APPLICABLE, e);
                     }
                     catch (AssertionError e) {
                         skipBranch = 1;
                         reportError(ERROR_LOADING_PROOF_LINE + "Goal "
                                 + currGoal.node().serialNr() + ", rule "
-                                + appInterm.getTacletName() + NOT_APPLICABLE, e);
+                                + appInterm.getRuleName() + NOT_APPLICABLE, e);
                     }
 
                 }
@@ -339,7 +339,7 @@ public class IntermediateProofReplayer {
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
             Goal currGoal) throws AppConstructionException {
 
-        final String tacletName = currInterm.getTacletName();
+        final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
 
