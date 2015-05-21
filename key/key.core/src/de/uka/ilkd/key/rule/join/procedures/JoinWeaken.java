@@ -11,16 +11,19 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.HashSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
@@ -34,13 +37,21 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * 
  * @author Dominic Scheurer
  */
-public class JoinWeaken implements JoinProcedure {
+public class JoinWeaken extends JoinProcedure {
    
-   public static final JoinWeaken INSTANCE = new JoinWeaken();
+    private static JoinWeaken INSTANCE = null;
+    
+    public static JoinWeaken instance() {
+        if (INSTANCE == null) {
+            INSTANCE = new JoinWeaken();
+        }
+        return INSTANCE;
+    }
+    
    private static final String DISPLAY_NAME = "JoinByFullAnonymization";
    
    @Override
-   public Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -50,12 +61,15 @@ public class JoinWeaken implements JoinProcedure {
       
       final TermBuilder tb = services.getTermBuilder();
       
-      final Function skolemConstant =
+      final Function newSkolemConstant =
             getNewSkolemConstantForPrefix(v.name().toString(), v.sort(), services);
+      ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
+      newNames = newNames.add(newSkolemConstant.name());
 
-      return new Pair<HashSet<Term>, Term>(
-            new HashSet<Term>(),
-            tb.func(skolemConstant));
+      return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+            DefaultImmutableSet.<Term>nil(),
+            tb.func(newSkolemConstant),
+            newNames);
       
    }
    

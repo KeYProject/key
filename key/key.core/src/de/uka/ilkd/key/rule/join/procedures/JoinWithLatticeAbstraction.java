@@ -11,21 +11,25 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.HashSet;
 import java.util.Iterator;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
@@ -38,7 +42,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * 
  * @author Dominic Scheurer
  */
-public abstract class JoinWithLatticeAbstraction implements JoinProcedure {
+public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
 
    /**
     * Returns the abstract domain lattice for the given sort or
@@ -51,7 +55,7 @@ public abstract class JoinWithLatticeAbstraction implements JoinProcedure {
    protected abstract AbstractDomainLattice<?> getAbstractDomainForSort(Sort s, Services services);
    
    @Override
-   public Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -61,7 +65,7 @@ public abstract class JoinWithLatticeAbstraction implements JoinProcedure {
       
       final TermBuilder tb = services.getTermBuilder();
       
-      HashSet<Term> newConstraints = new HashSet<Term>();
+      ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
       
       AbstractDomainLattice<?> lattice = getAbstractDomainForSort(valueInState1.sort(), services);
       
@@ -73,25 +77,28 @@ public abstract class JoinWithLatticeAbstraction implements JoinProcedure {
          
          AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
          
-         Function skolemConstant =
+         Function newSkolemConst =
                getNewSkolemConstantForPrefix(joinElem.toString(), valueInState1.sort(), services);
+         ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
+         newNames = newNames.add(newSkolemConst.name());
          
-         newConstraints.add(joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
+         newConstraints = newConstraints.add(joinElem.getDefiningAxiom(tb.func(newSkolemConst), services));
          //NOTE: We also remember the precise values by if-then-else construction. This
          //      preserves completeness and should also not be harmful to performance in
          //      cases where completeness is also preserved by the lattice. However, if
          //      there are lattices where this construction is bad, it may be safely
          //      removed (no harm to soundness!).
-         newConstraints.add(tb.equals(tb.func(skolemConstant),
+         newConstraints = newConstraints.add(tb.equals(tb.func(newSkolemConst),
                JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services)));
          
-         return new Pair<HashSet<Term>, Term>(newConstraints, tb.func(skolemConstant));
+         return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
          
       } else {
          
-         return new Pair<HashSet<Term>, Term>(
-               new HashSet<Term>(),
-               JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services));
+         return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+               DefaultImmutableSet.<Term>nil(),
+               JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services),
+               DefaultImmutableSet.<Name>nil());
          
       }
       

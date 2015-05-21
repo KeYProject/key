@@ -11,18 +11,22 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.join;
+package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.HashSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
+import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
@@ -40,15 +44,22 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * @see JoinIfThenElseAntecedent
  * @see JoinRule
  */
-public class JoinIfThenElse implements JoinProcedure {
+public class JoinIfThenElse extends JoinProcedure {
    
-   public static final JoinIfThenElse INSTANCE = new JoinIfThenElse();
+   private static JoinIfThenElse INSTANCE = null;
+   
+   public static JoinIfThenElse instance() {
+       if (INSTANCE == null) {
+           INSTANCE = new JoinIfThenElse();
+       }
+       return INSTANCE;
+   }
    
    private static final String DISPLAY_NAME = "JoinByIfThenElse";
    static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
    
    @Override
-   public Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -56,9 +67,10 @@ public class JoinIfThenElse implements JoinProcedure {
          Term valueInState2,
          Services services) {
 
-      return new Pair<HashSet<Term>, Term>(
-            new HashSet<Term>(),
-            createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services));
+      return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+            DefaultImmutableSet.<Term>nil(),
+            createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services),
+            DefaultImmutableSet.<Name>nil());
       
    }
    
@@ -79,7 +91,7 @@ public class JoinIfThenElse implements JoinProcedure {
     * @return An if then else term like <code>\if (c1) \then (t1) \else (t2)</code>,
     *    where the cI are the path conditions of stateI.
     */
-   static Term createIfThenElseTerm (
+   public static Term createIfThenElseTerm (
          final SymbolicExecutionState state1,
          final SymbolicExecutionState state2,
          final Term ifTerm,
