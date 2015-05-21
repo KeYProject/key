@@ -16,12 +16,13 @@ package de.uka.ilkd.key.rule.join.procedures;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
@@ -49,7 +50,7 @@ public class JoinWeaken extends JoinProcedure {
    private static final String DISPLAY_NAME = "JoinByFullAnonymization";
    
    @Override
-   public Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -59,12 +60,15 @@ public class JoinWeaken extends JoinProcedure {
       
       final TermBuilder tb = services.getTermBuilder();
       
-      final Function skolemConstant =
+      final Function newSkolemConstant =
             getNewSkolemConstantForPrefix(v.name().toString(), v.sort(), services);
+      HashSet<Name> newNames = new HashSet<Name>();
+      newNames.add(newSkolemConstant.name());
 
-      return new Pair<HashSet<Term>, Term>(
+      return new Triple<HashSet<Term>, Term, HashSet<Name>>(
             new HashSet<Term>(),
-            tb.func(skolemConstant));
+            tb.func(newSkolemConstant),
+            newNames);
       
    }
    

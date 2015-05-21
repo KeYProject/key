@@ -17,14 +17,15 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
+import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
@@ -56,7 +57,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
    private static final String DISPLAY_NAME = "JoinByIfThenElseAntecedent";
 
    @Override
-   public Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -68,6 +69,8 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
       
       Function newSkolemConst = JoinRuleUtils.getNewSkolemConstantForPrefix(
             v.name().toString(), v.sort(), services);
+      HashSet<Name> newNames = new HashSet<Name>();
+      newNames.add(newSkolemConst.name());
       
       HashSet<Term> newConstraints = new HashSet<Term>();
       newConstraints.addAll(getIfThenElseConstraints(
@@ -79,7 +82,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
             services
       ));
       
-      return new Pair<HashSet<Term>, Term>(newConstraints, tb.func(newSkolemConst));
+      return new Triple<HashSet<Term>, Term, HashSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
       
    }
    

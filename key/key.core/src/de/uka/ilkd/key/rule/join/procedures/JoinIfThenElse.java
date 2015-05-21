@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.join.procedures;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
+import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
@@ -56,7 +58,7 @@ public class JoinIfThenElse extends JoinProcedure {
    static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
    
    @Override
-   public Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -64,9 +66,10 @@ public class JoinIfThenElse extends JoinProcedure {
          Term valueInState2,
          Services services) {
 
-      return new Pair<HashSet<Term>, Term>(
+      return new Triple<HashSet<Term>, Term, HashSet<Name>>(
             new HashSet<Term>(),
-            createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services));
+            createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services),
+            new HashSet<Name>());
       
    }
    

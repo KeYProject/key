@@ -20,13 +20,14 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
@@ -52,7 +53,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
    protected abstract AbstractDomainLattice<?> getAbstractDomainForSort(Sort s, Services services);
    
    @Override
-   public Pair<HashSet<Term>, Term> joinValuesInStates(
+   public Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -74,25 +75,28 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
          
          AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
          
-         Function skolemConstant =
+         Function newSkolemConst =
                getNewSkolemConstantForPrefix(joinElem.toString(), valueInState1.sort(), services);
+         HashSet<Name> newNames = new HashSet<Name>();
+         newNames.add(newSkolemConst.name());
          
-         newConstraints.add(joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
+         newConstraints.add(joinElem.getDefiningAxiom(tb.func(newSkolemConst), services));
          //NOTE: We also remember the precise values by if-then-else construction. This
          //      preserves completeness and should also not be harmful to performance in
          //      cases where completeness is also preserved by the lattice. However, if
          //      there are lattices where this construction is bad, it may be safely
          //      removed (no harm to soundness!).
-         newConstraints.add(tb.equals(tb.func(skolemConstant),
+         newConstraints.add(tb.equals(tb.func(newSkolemConst),
                JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services)));
          
-         return new Pair<HashSet<Term>, Term>(newConstraints, tb.func(skolemConstant));
+         return new Triple<HashSet<Term>, Term, HashSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
          
       } else {
          
-         return new Pair<HashSet<Term>, Term>(
+         return new Triple<HashSet<Term>, Term, HashSet<Name>>(
                new HashSet<Term>(),
-               JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services));
+               JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services),
+               new HashSet<Name>());
          
       }
       
