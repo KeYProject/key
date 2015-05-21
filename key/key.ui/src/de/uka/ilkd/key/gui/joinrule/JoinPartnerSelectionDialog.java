@@ -57,10 +57,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.JoinIfThenElse;
-import de.uka.ilkd.key.rule.join.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.rule.join.JoinWeaken;
-import de.uka.ilkd.key.rule.join.JoinWithSignLattice;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -94,14 +90,6 @@ public class JoinPartnerSelectionDialog extends JDialog {
             return o1.first.node().serialNr() - o2.first.node().serialNr();
          }
       };
-      
-   /** Concrete join rules to consider. */
-   private static final ImmutableList<JoinProcedure> CONCRETE_RULES =
-		   ImmutableSLList.<JoinProcedure>nil()
-			   .append(JoinIfThenElse.INSTANCE)
-			   .append(JoinIfThenElseAntecedent.INSTANCE)
-			   .append(JoinWithSignLattice.INSTANCE)
-			   .append(JoinWeaken.INSTANCE);
    
    private LinkedList<Pair<Goal, PosInOccurrence>> candidates = null;
    private Services services = null;
@@ -111,7 +99,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
          new TreeSet<Pair<Goal,PosInOccurrence>>(GOAL_COMPARATOR);
    
    /** The chosen join method. */
-   private JoinProcedure chosenRule = CONCRETE_RULES.head();
+   private JoinProcedure chosenRule = JoinProcedure.CONCRETE_RULES.head();
    
    private JEditorPane txtPartner1 = null;
    private JEditorPane txtPartner2 = null;
@@ -190,7 +178,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
       });
       
       bgJoinMethods = new ButtonGroup();
-      for (final JoinProcedure rule : CONCRETE_RULES) {
+      for (final JoinProcedure rule : JoinProcedure.CONCRETE_RULES) {
     	  JRadioButton rb = new JRadioButton(rule.toString());
     	  rb.setSelected(true);
     	  

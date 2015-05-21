@@ -186,6 +186,7 @@ public class JoinRule implements BuiltInRule {
          closeJoinPartnerGoal(
                newGoal.node(),
                joinPartner.first,
+               joinPartner.second,
                joinedState,
                sequentToSEPair(joinPartner.first, joinPartner.second, services),
                thisSEState.third);

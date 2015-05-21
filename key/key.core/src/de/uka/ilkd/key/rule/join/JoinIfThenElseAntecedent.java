@@ -40,7 +40,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * @see JoinIfThenElse
  * @see JoinRule
  */
-public class JoinIfThenElseAntecedent implements JoinProcedure {
+public class JoinIfThenElseAntecedent extends JoinProcedure {
    
    public static final JoinIfThenElseAntecedent INSTANCE = new JoinIfThenElseAntecedent();
    

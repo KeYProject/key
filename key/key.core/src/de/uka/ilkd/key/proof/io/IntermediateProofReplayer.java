@@ -37,7 +37,6 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.DefaultProofFileParser.AppConstructionException;
 import de.uka.ilkd.key.proof.io.DefaultProofFileParser.BuiltInConstructionException;
 import de.uka.ilkd.key.proof.io.DefaultProofFileParser.SkipSMTRuleException;
@@ -59,6 +58,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
@@ -69,6 +70,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * TODO: Document.
@@ -83,21 +85,24 @@ public class IntermediateProofReplayer {
 
     private final AbstractProblemLoader loader;
     private Proof proof = null;
-    
+
     private List<Throwable> errors = new LinkedList<Throwable>();
     private String status = "";
 
     private LinkedList<Pair<Node, NodeIntermediate>> queue = new LinkedList<Pair<Node, NodeIntermediate>>();
 
-    private HashMap<Integer, HashSet<Pair<Node, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Pair<Node, NodeIntermediate>>>();
-    
+    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
+
     /**
      * a value == 1 means the current branch is ignored; a value > 1 means that
      * the "skipBranch - 1" parent branch of the current branch is ignored. a
      * value == 0 means that no branch is ignored
      */
-    private int skipBranch = 0; //TODO: Implement skipBranch feature
-    
+    private int skipBranch = 0;
+    // TODO: Implement skipBranch feature.
+    // TODO: Could be that this is not needed: If an exception occurs, the
+    // new nodes are not added to the queue, and the next branch is chosen...
+
     private Goal currGoal = null;
 
     /**
@@ -111,11 +116,11 @@ public class IntermediateProofReplayer {
             IntermediatePresentationProofFileParser parser) {
         this.proof = proof;
         this.loader = loader;
-        
-        queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(),
-                parser.getParsedResult()));
+
+        queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(), parser
+                .getParsedResult()));
     }
-    
+
     /**
      * @return the lastSelectedGoal
      */
@@ -127,70 +132,153 @@ public class IntermediateProofReplayer {
         while (!queue.isEmpty()) {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
+            final NodeIntermediate currNodeInterm = currentP.second;
             currGoal = proof.getGoal(currNode);
 
-            
-            if (currentP.second instanceof BranchNodeIntermediate) {
-                assert currentP.second.getChildren().size() == 1 : "Branch node should have exactly one child.";
-                queue.addFirst(new Pair<Node, NodeIntermediate>(currNode, currentP.second.getChildren().get(0)));
+            if (currNodeInterm instanceof BranchNodeIntermediate) {
+                assert currNodeInterm.getChildren().size() == 1 : "Branch node should have exactly one child.";
+                queue.addFirst(new Pair<Node, NodeIntermediate>(currNode,
+                        currNodeInterm.getChildren().get(0)));
                 continue;
             }
-            else if (currentP.second instanceof AppNodeIntermediate) {
-                AppNodeIntermediate currInterm = (AppNodeIntermediate) currentP.second;
-                currNode.getNodeInfo().setInteractiveRuleApplication(currInterm.isInteractiveRuleApplication());
+            else if (currNodeInterm instanceof AppNodeIntermediate) {
+                AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
+                currNode.getNodeInfo().setInteractiveRuleApplication(
+                        currInterm.isInteractiveRuleApplication());
 
                 // Register name proposals
-                proof.getServices().getNameRecorder().setProposals(currInterm.getIntermediateRuleApp().getNewNames());
-                
+                proof.getServices()
+                        .getNameRecorder()
+                        .setProposals(
+                                currInterm.getIntermediateRuleApp()
+                                        .getNewNames());
+
                 if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
                     TacletAppIntermediate appInterm = (TacletAppIntermediate) currInterm
                             .getIntermediateRuleApp();
-                    
+
                     try {
                         currGoal.apply(constructTacletApp(appInterm, currGoal));
-                        
+
                         int i = 0;
                         Iterator<Node> children = currNode.childrenIterator();
-                        while (!currGoal.node().isClosed() && children.hasNext()) {
+                        while (!currGoal.node().isClosed()
+                                && children.hasNext()) {
                             Node child = children.next();
-                            queue.addLast(new Pair<Node, NodeIntermediate>(child, currInterm.getChildren().get(i++)));
+                            queue.addLast(new Pair<Node, NodeIntermediate>(
+                                    child, currInterm.getChildren().get(i++)));
                         }
                     }
                     catch (Exception e) {
                         skipBranch = 1;
-                        reportError(ERROR_LOADING_PROOF_LINE + "Goal " + currGoal.node().serialNr() + ", rule "
+                        reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                                + currGoal.node().serialNr() + ", rule "
                                 + appInterm.getTacletName() + NOT_APPLICABLE, e);
                     }
                     catch (AssertionError e) {
                         skipBranch = 1;
-                        reportError(ERROR_LOADING_PROOF_LINE + "Goal " + currGoal.node().serialNr() + ", rule "
+                        reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                                + currGoal.node().serialNr() + ", rule "
                                 + appInterm.getTacletName() + NOT_APPLICABLE, e);
                     }
-                    
+
                 }
                 else if (currInterm.getIntermediateRuleApp() instanceof BuiltInAppIntermediate) {
                     BuiltInAppIntermediate appInterm = (BuiltInAppIntermediate) currInterm
                             .getIntermediateRuleApp();
-                    
+
                     if (appInterm instanceof JoinAppIntermediate) {
-                        // TODO
+                        JoinAppIntermediate joinAppInterm = (JoinAppIntermediate) appInterm;
+                        HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo = joinPartnerNodes
+                                .get(((JoinAppIntermediate) appInterm).getId());
+                        
+                        if (partnerNodesInfo == null || partnerNodesInfo.size() < joinAppInterm.getNrPartners()) {
+                            // Wait until all partners are found
+                            queue.addLast(new Pair<Node, NodeIntermediate>(currNode, currNodeInterm));
+                        } else {
+                            try {
+                                //TODO: Check if this works with the constructBuiltinApp method out-of-the-box
+                                JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) constructBuiltinApp(joinAppInterm, currGoal);
+                                joinApp.setConcreteRule(JoinProcedure.getProcedureByName(joinAppInterm.getJoinProc()));
+                                
+                                ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = ImmutableSLList.nil();
+                                for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    joinPartners = joinPartners.append(new Pair<Goal, PosInOccurrence>(proof.getGoal(partnerNodeInfo.first), partnerNodeInfo.second));
+                                }
+                                
+                                joinApp.setJoinPartners(joinPartners);
+                                
+                                assert joinApp.complete() : "Join app should be automatically completed in replay";
+                                
+                                currGoal.apply(joinApp);
+                                
+                                // Join node has exactly one child
+                                queue.addLast(new Pair<Node, NodeIntermediate>(currNode.childrenIterator().next(), currInterm.getChildren().get(0)));
+                                
+                                // Now add children of partner nodes
+                                for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    int i = 0;
+                                    Iterator<Node> children = partnerNodeInfo.first
+                                            .childrenIterator();
+                                    while (children.hasNext()) {
+                                        Node child = children.next();
+                                        if (!proof.getGoal(child).isLinked()) {
+                                            queue.addLast(new Pair<Node, NodeIntermediate>(
+                                                    child, partnerNodeInfo.third.getChildren()
+                                                            .get(i++)));
+                                        }
+                                    }
+                                }
+                            }
+                            catch (SkipSMTRuleException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            catch (BuiltInConstructionException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
                     }
                     else if (appInterm instanceof JoinPartnerAppIntermediate) {
-                        // TODO
+                        // Register this partner node
+                        JoinPartnerAppIntermediate joinPartnerApp = (JoinPartnerAppIntermediate) appInterm;
+                        HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo = joinPartnerNodes
+                                .get(joinPartnerApp.getJoinNodeId());
+
+                        if (partnerNodeInfo == null) {
+                            partnerNodeInfo = new HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>();
+                            joinPartnerNodes.put(
+                                    joinPartnerApp.getJoinNodeId(),
+                                    partnerNodeInfo);
+                        }
+
+                        partnerNodeInfo
+                                .add(new Triple<Node, PosInOccurrence, NodeIntermediate>(
+                                        currNode,
+                                        PosInOccurrence.findInSequent(
+                                                currGoal.sequent(),
+                                                appInterm.getPosInfo().first,
+                                                appInterm.getPosInfo().second),
+                                        currNodeInterm));
                     }
                     else {
                         try {
-                            IBuiltInRuleApp app = constructBuiltinApp(appInterm, currGoal);
+                            IBuiltInRuleApp app = constructBuiltinApp(
+                                    appInterm, currGoal);
                             if (!app.complete()) {
                                 app = app.tryToInstantiate(currGoal);
                             }
                             currGoal.apply(app);
-                            
+
                             int i = 0;
-                            Iterator<Node> children = currNode.childrenIterator();
+                            Iterator<Node> children = currNode
+                                    .childrenIterator();
                             while (children.hasNext()) {
                                 Node child = children.next();
-                                queue.addLast(new Pair<Node, NodeIntermediate>(child, currInterm.getChildren().get(i++)));
+                                queue.addLast(new Pair<Node, NodeIntermediate>(
+                                        child, currInterm.getChildren()
+                                                .get(i++)));
                             }
                         }
                         catch (SkipSMTRuleException e) {
@@ -199,20 +287,23 @@ public class IntermediateProofReplayer {
                         }
                         catch (BuiltInConstructionException e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Goal " + currGoal.node().serialNr()
-                                    + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE,
+                            reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                                    + currGoal.node().serialNr() + ", rule "
+                                    + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
                         catch (RuntimeException e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Goal " + currGoal.node().serialNr()
-                                    + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE,
+                            reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                                    + currGoal.node().serialNr() + ", rule "
+                                    + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
                         catch (AssertionError e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Goal " + currGoal.node().serialNr()
-                                    + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE,
+                            reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                                    + currGoal.node().serialNr() + ", rule "
+                                    + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
                     }
@@ -245,12 +336,13 @@ public class IntermediateProofReplayer {
      * @return
      * @throws AppConstructionException
      */
-    private TacletApp constructTacletApp(TacletAppIntermediate currInterm, Goal currGoal) throws AppConstructionException {
-        
+    private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
+            Goal currGoal) throws AppConstructionException {
+
         final String tacletName = currInterm.getTacletName();
         final int currFormula = currInterm.getPosInfo().first;
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
-        
+
         TacletApp ourApp = null;
         PosInOccurrence pos = null;
 
@@ -271,9 +363,11 @@ public class IntermediateProofReplayer {
             ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 
-        ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
+        ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(),
+                services);
 
-        ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
+        ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList
+                .nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             Sequent seq = currGoal.sequent();
             ifFormulaList = ifFormulaList.append(new IfFormulaInstSeq(seq,
@@ -281,9 +375,10 @@ public class IntermediateProofReplayer {
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
-                    new SequentFormula(DefaultProofFileParser.parseTerm(ifFormulaStr, proof))));
+                    new SequentFormula(DefaultProofFileParser.parseTerm(
+                            ifFormulaStr, proof))));
         }
-        
+
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
 
         if (!ourApp.complete()) {
@@ -292,7 +387,7 @@ public class IntermediateProofReplayer {
 
         return ourApp;
     }
-    
+
     /**
      * TODO: Document.
      *
@@ -302,56 +397,60 @@ public class IntermediateProofReplayer {
      * @throws SkipSMTRuleException
      * @throws BuiltInConstructionException
      */
-    private IBuiltInRuleApp constructBuiltinApp(BuiltInAppIntermediate currInterm, Goal currGoal) throws SkipSMTRuleException,
-            BuiltInConstructionException {
+    private IBuiltInRuleApp constructBuiltinApp(
+            BuiltInAppIntermediate currInterm, Goal currGoal)
+            throws SkipSMTRuleException, BuiltInConstructionException {
 
         final String ruleName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
-        
+
         Contract currContract = null;
         ImmutableList<PosInOccurrence> builtinIfInsts = null;
-        
+
         // Load contracts, if applicable
         if (currInterm.getContract() != null) {
             currContract = proof.getServices().getSpecificationRepository()
                     .getContractByName(currInterm.getContract());
             if (currContract == null) {
                 final ProblemLoaderException e = new ProblemLoaderException(
-                        loader, "Error loading proof: contract \"" + currInterm.getContract()
-                                + "\" not found.");
+                        loader, "Error loading proof: contract \""
+                                + currInterm.getContract() + "\" not found.");
                 reportError(ERROR_LOADING_PROOF_LINE + ", goal "
-                        + currGoal.node().serialNr() + ", rule "
-                        + ruleName + NOT_APPLICABLE, e);
+                        + currGoal.node().serialNr() + ", rule " + ruleName
+                        + NOT_APPLICABLE, e);
             }
         }
-        
+
         // Load ifInsts, if applicable
         if (currInterm.getBuiltInIfInsts() != null) {
             builtinIfInsts = ImmutableSLList.nil();
-            for (Pair<Integer, PosInTerm> ifInstP : currInterm.getBuiltInIfInsts()) {
+            for (Pair<Integer, PosInTerm> ifInstP : currInterm
+                    .getBuiltInIfInsts()) {
                 final int currIfInstFormula = ifInstP.first;
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
-                
+
                 try {
-                    final PosInOccurrence ifInst = PosInOccurrence.findInSequent(
-                            currGoal.sequent(), currIfInstFormula,
-                            currIfInstPosInTerm);
+                    final PosInOccurrence ifInst = PosInOccurrence
+                            .findInSequent(currGoal.sequent(),
+                                    currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 }
                 catch (RuntimeException e) {
                     skipBranch = 1;
-                    reportError(ERROR_LOADING_PROOF_LINE + "Goal " + currGoal.node().serialNr() + ", rule "
-                            + ruleName + NOT_APPLICABLE, e);
+                    reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                            + currGoal.node().serialNr() + ", rule " + ruleName
+                            + NOT_APPLICABLE, e);
                 }
                 catch (AssertionError e) {
                     skipBranch = 1;
-                    reportError(ERROR_LOADING_PROOF_LINE + "Goal " + currGoal.node().serialNr() + ", rule "
-                            + ruleName + NOT_APPLICABLE, e);
+                    reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                            + currGoal.node().serialNr() + ", rule " + ruleName
+                            + NOT_APPLICABLE, e);
                 }
             }
         }
-        
+
         if (RuleAppSMT.rule.name().toString().equals(ruleName)) {
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
@@ -436,8 +535,8 @@ public class IntermediateProofReplayer {
                         + "you do not have the permission to execute it.");
             }
             else {
-                throw new BuiltInConstructionException(ruleName
-                        + ": found " + ruleApps.size()
+                throw new BuiltInConstructionException(ruleName + ": found "
+                        + ruleApps.size()
                         + " applications. Don't know what to do !\n" + "@ "
                         + pos);
             }
@@ -488,7 +587,8 @@ public class IntermediateProofReplayer {
      * @param services
      * @return
      */
-    private TacletApp constructInsts(TacletApp app, Goal currGoal, LinkedList<String> loadedInsts, Services services) {
+    private TacletApp constructInsts(TacletApp app, Goal currGoal,
+            LinkedList<String> loadedInsts, Services services) {
         if (loadedInsts == null)
             return app;
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
@@ -532,7 +632,7 @@ public class IntermediateProofReplayer {
 
         return app;
     }
-    
+
     /**
      * TODO: Document.
      *

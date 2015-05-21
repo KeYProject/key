@@ -40,7 +40,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * @see JoinIfThenElseAntecedent
  * @see JoinRule
  */
-public class JoinIfThenElse implements JoinProcedure {
+public class JoinIfThenElse extends JoinProcedure {
    
    public static final JoinIfThenElse INSTANCE = new JoinIfThenElse();
    
