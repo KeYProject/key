@@ -136,9 +136,11 @@ public class IntermediateProofReplayer {
             currGoal = proof.getGoal(currNode);
 
             if (currNodeInterm instanceof BranchNodeIntermediate) {
-                assert currNodeInterm.getChildren().size() == 1 : "Branch node should have exactly one child.";
-                queue.addFirst(new Pair<Node, NodeIntermediate>(currNode,
+                assert currNodeInterm.getChildren().size() <= 1 : "Branch node should have exactly one child.";
+                if (currNodeInterm.getChildren().size() == 1) { 
+                    queue.addFirst(new Pair<Node, NodeIntermediate>(currNode,
                         currNodeInterm.getChildren().get(0)));
+                }
                 continue;
             }
             else if (currNodeInterm instanceof AppNodeIntermediate) {
