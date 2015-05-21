@@ -17,6 +17,7 @@ import java.util.LinkedList;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.util.Pair;
 
@@ -32,15 +33,18 @@ public class TacletAppIntermediate implements AppIntermediate {
     private LinkedList<String> insts = null;
     private ImmutableList<String> ifSeqFormulaList = null;
     private ImmutableList<String> ifDirectFormulaList = null;
+    private ImmutableList<Name> newNames = null;
 
     public TacletAppIntermediate(String tacletName,
             Pair<Integer, PosInTerm> posInfo, LinkedList<String> insts,
-            ImmutableList<String> ifSeqFormulaList, ImmutableList<String> ifDirectFormulaList) {
+            ImmutableList<String> ifSeqFormulaList, ImmutableList<String> ifDirectFormulaList,
+            ImmutableList<Name> newNames) {
         this.tacletName = tacletName;
         this.posInfo = posInfo;
         this.insts = insts;
         this.ifSeqFormulaList = ifSeqFormulaList;
         this.ifDirectFormulaList = ifDirectFormulaList;
+        this.newNames = newNames;
     }
 
     public String getTacletName() {
@@ -61,6 +65,14 @@ public class TacletAppIntermediate implements AppIntermediate {
 
     public ImmutableList<String> getIfDirectFormulaList() {
         return ifDirectFormulaList;
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
+     */
+    @Override
+    public ImmutableList<Name> getNewNames() {
+        return newNames;
     }
 
 }

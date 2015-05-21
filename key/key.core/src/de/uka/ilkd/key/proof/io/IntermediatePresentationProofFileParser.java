@@ -60,6 +60,7 @@ public class IntermediatePresentationProofFileParser implements
     private int currNrPartners = 0;
     private int currCorrespondingJoinNodeId = 0;
     private int currJoinNodeId = 0;
+    private ImmutableList<Name> currNewNames = null;
 
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
@@ -196,11 +197,11 @@ public class IntermediatePresentationProofFileParser implements
 
         case 'w': // newnames
             final String[] newNames = str.split(",");
-            ImmutableList<Name> l = ImmutableSLList.<Name> nil();
+            currNewNames = ImmutableSLList.<Name> nil();
             for (int in = 0; in < newNames.length; in++) {
-                l = l.append(new Name(newNames[in]));
+                currNewNames = currNewNames.append(new Name(newNames[in]));
             }
-            proof.getServices().getNameRecorder().setProposals(l);
+//            proof.getServices().getNameRecorder().setProposals(l);
             break;
 
         case 'e': // autoModeTime
@@ -295,7 +296,7 @@ public class IntermediatePresentationProofFileParser implements
         return new TacletAppIntermediate(currRuleName,
                 new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
                 loadedInsts,
-                ifSeqFormulaList, ifDirectFormulaList);
+                ifSeqFormulaList, ifDirectFormulaList, currNewNames);
     }
 
     /**
@@ -310,17 +311,17 @@ public class IntermediatePresentationProofFileParser implements
             result = new JoinAppIntermediate(currRuleName,
                     new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
                     currContract, builtinIfInsts, currJoinNodeId,
-                    currJoinProc, currNrPartners);
+                    currJoinProc, currNrPartners, currNewNames);
         }
         else if (currRuleName.equals("CloseAfterJoin")) {
             result = new JoinPartnerAppIntermediate(currRuleName,
                     new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                    currContract, builtinIfInsts, currCorrespondingJoinNodeId);
+                    currContract, builtinIfInsts, currCorrespondingJoinNodeId, currNewNames);
         }
         else {
             result = new BuiltInAppIntermediate(currRuleName,
                     new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                    currContract, builtinIfInsts);
+                    currContract, builtinIfInsts, currNewNames);
         }
 
         currContract = null;

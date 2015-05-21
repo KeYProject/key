@@ -139,6 +139,9 @@ public class IntermediateProofReplayer {
                 AppNodeIntermediate currInterm = (AppNodeIntermediate) currentP.second;
                 currNode.getNodeInfo().setInteractiveRuleApplication(currInterm.isInteractiveRuleApplication());
 
+                // Register name proposals
+                proof.getServices().getNameRecorder().setProposals(currInterm.getIntermediateRuleApp().getNewNames());
+                
                 if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
                     TacletAppIntermediate appInterm = (TacletAppIntermediate) currInterm
                             .getIntermediateRuleApp();
