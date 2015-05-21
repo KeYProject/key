@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.HashSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -50,7 +51,7 @@ public class JoinWeaken extends JoinProcedure {
    private static final String DISPLAY_NAME = "JoinByFullAnonymization";
    
    @Override
-   public Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
+   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -62,11 +63,11 @@ public class JoinWeaken extends JoinProcedure {
       
       final Function newSkolemConstant =
             getNewSkolemConstantForPrefix(v.name().toString(), v.sort(), services);
-      HashSet<Name> newNames = new HashSet<Name>();
-      newNames.add(newSkolemConstant.name());
+      ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
+      newNames = newNames.add(newSkolemConstant.name());
 
-      return new Triple<HashSet<Term>, Term, HashSet<Name>>(
-            new HashSet<Term>(),
+      return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+            DefaultImmutableSet.<Term>nil(),
             tb.func(newSkolemConstant),
             newNames);
       

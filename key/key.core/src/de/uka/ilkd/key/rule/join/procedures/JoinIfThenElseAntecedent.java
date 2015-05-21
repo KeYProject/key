@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.HashSet;
-import java.util.LinkedList;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -57,7 +57,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
    private static final String DISPLAY_NAME = "JoinByIfThenElseAntecedent";
 
    @Override
-   public Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
+   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -69,11 +69,11 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
       
       Function newSkolemConst = JoinRuleUtils.getNewSkolemConstantForPrefix(
             v.name().toString(), v.sort(), services);
-      HashSet<Name> newNames = new HashSet<Name>();
-      newNames.add(newSkolemConst.name());
+      ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
+      newNames = newNames.add(newSkolemConst.name());
       
-      HashSet<Term> newConstraints = new HashSet<Term>();
-      newConstraints.addAll(getIfThenElseConstraints(
+      ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
+      newConstraints = newConstraints.union(getIfThenElseConstraints(
             tb.func(newSkolemConst),
             valueInState1,
             valueInState2,
@@ -82,7 +82,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
             services
       ));
       
-      return new Triple<HashSet<Term>, Term, HashSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
+      return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
       
    }
    
@@ -99,7 +99,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
     * @return A list of if-then-else constraints for the given constrained
     *    term, states and if/else terms.
     */
-   private static LinkedList<Term> getIfThenElseConstraints(
+   private static ImmutableSet<Term> getIfThenElseConstraints(
          Term constrained,
          Term ifTerm,
          Term elseTerm,
@@ -108,7 +108,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
          Services services) {
       
       TermBuilder tb = services.getTermBuilder();
-      LinkedList<Term> result = new LinkedList<Term>();
+      ImmutableSet<Term> result = DefaultImmutableSet.nil();
       
       Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
             JoinIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
@@ -123,12 +123,12 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
       
       if (!(ifTerm.equals(constrained) && !isSwapped ||
             elseTerm.equals(constrained) && isSwapped)) {
-         result.add(tb.imp(cond, varEqualsIfForm));
+          result = result.add(tb.imp(cond, varEqualsIfForm));
       }
       
       if (!(elseTerm.equals(constrained) && !isSwapped ||
             ifTerm.equals(constrained) && isSwapped)) {
-         result.add(tb.or (cond, varEqualsElseForm));
+         result = result.add(tb.or (cond, varEqualsElseForm));
       }
       
       return result;

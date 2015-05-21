@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -123,18 +124,18 @@ public class JoinRuleUtils {
     * @param u The update (in normal form) to extract program locations from.
     * @return All program locations (left sides) in the given update.
     */
-   public static HashSet<LocationVariable> getUpdateLeftSideLocations(Term u) {
+   public static ImmutableSet<LocationVariable> getUpdateLeftSideLocations(Term u) {
       if (u.op() instanceof ElementaryUpdate) {
          
-         HashSet<LocationVariable> result = new HashSet<LocationVariable>();
-         result.add((LocationVariable) ((ElementaryUpdate) u.op()).lhs());
+         ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
+         result = result.add((LocationVariable) ((ElementaryUpdate) u.op()).lhs());
          return result;
          
       } else if (u.op() instanceof UpdateJunctor) {
          
-         HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+         ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
          for (Term sub : u.subs()) {
-            result.addAll(getUpdateLeftSideLocations(sub));
+            result = result.union(getUpdateLeftSideLocations(sub));
          }
          return result;
          
@@ -151,18 +152,18 @@ public class JoinRuleUtils {
     * @param term The term to extract program variables from.
     * @return All program variables of the given term.
     */
-   public static HashSet<LocationVariable> getLocationVariables(Term term, Services services) {
-      HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+   public static ImmutableSet<LocationVariable> getLocationVariables(Term term, Services services) {
+       ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
       
       if (term.op() instanceof LocationVariable) {
          result.add((LocationVariable) term.op());
       } else {
          if (!term.javaBlock().isEmpty()) {
-            result.addAll(getProgramLocations(term, services));
+             result = result.union(getProgramLocations(term, services));
          }
          
          for (Term sub : term.subs()) {
-            result.addAll(getLocationVariables(sub, services));
+             result = result.union(getLocationVariables(sub, services));
          }
       }
       
@@ -675,7 +676,7 @@ public class JoinRuleUtils {
          Services services) {
       
       LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
-            node, new HashSet<LocationVariable>());
+            node, DefaultImmutableSet.<LocationVariable>nil());
       
       ProgVarReplaceVisitor replVisitor1 =
             new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
@@ -1091,7 +1092,7 @@ public class JoinRuleUtils {
     * @param services The Services object.
     * @return The set of contained program locations.
     */
-   private static HashSet<LocationVariable> getProgramLocations(
+   private static ImmutableSet<LocationVariable> getProgramLocations(
          Term programCounterTerm, Services services) {
       CollectLocationVariablesVisitor visitor =
             new CollectLocationVariablesVisitor(
@@ -1099,12 +1100,11 @@ public class JoinRuleUtils {
                true,
                services);
       
-      HashSet<LocationVariable> progVars =
-            new HashSet<LocationVariable>();
+      ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
       
       // Collect program variables in Java block
       visitor.start();
-      progVars.addAll(visitor.getLocationVariables());
+      progVars = progVars.union(visitor.getLocationVariables());
       
       return progVars;
    }
@@ -1290,8 +1290,7 @@ public class JoinRuleUtils {
     * @author Dominic Scheurer
     */
    private static class CollectLocationVariablesVisitor extends CreatingASTVisitor {
-      private HashSet<LocationVariable> variables =
-            new HashSet<LocationVariable>();
+      private ImmutableSet<LocationVariable> variables = DefaultImmutableSet.nil();
 
       public CollectLocationVariablesVisitor(ProgramElement root,
             boolean preservesPos, Services services) {
@@ -1300,7 +1299,7 @@ public class JoinRuleUtils {
       
       @Override
       public void performActionOnLocationVariable(LocationVariable x) {
-         variables.add(x);
+         variables = variables.add(x);
       }
       
       /**
@@ -1308,7 +1307,7 @@ public class JoinRuleUtils {
        * 
        * @return All program locations in the given Java block.
        */
-      public HashSet<LocationVariable> getLocationVariables() {
+      public ImmutableSet<LocationVariable> getLocationVariables() {
          return variables;
       }
       
@@ -1329,9 +1328,9 @@ public class JoinRuleUtils {
       private static final long serialVersionUID = 2305410114265133879L;
       
       private Node node = null;
-      private HashSet<LocationVariable> doNotRename = null;
+      private ImmutableSet<LocationVariable> doNotRename = null;
       
-      public LocVarReplBranchUniqueMap(Node goal, HashSet<LocationVariable> doNotRename) {
+      public LocVarReplBranchUniqueMap(Node goal, ImmutableSet<LocationVariable> doNotRename) {
          this.node = goal;
          this.doNotRename = doNotRename;
       }

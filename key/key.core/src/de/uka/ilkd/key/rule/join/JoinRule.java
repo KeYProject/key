@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.rule.join;
 
-import java.util.HashSet;
-
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -156,7 +156,7 @@ public class JoinRule implements BuiltInRule {
       // The join loop
       SymbolicExecutionState joinedState =
             new SymbolicExecutionState(thisSEState.first, thisSEState.second, goal.node());    
-      HashSet<Name> newNames = new HashSet<Name>();
+      ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       
       int progress = 0;
       for (SymbolicExecutionState state : joinPartnerStates) {
@@ -165,8 +165,8 @@ public class JoinRule implements BuiltInRule {
          System.out.print(" of ");
          System.out.println(joinPartners.size());
          
-         Pair<SymbolicExecutionState, HashSet<Name>> joinResult = joinStates(joinRule, joinedState, state, thisSEState.third, services);
-         newNames.addAll(joinResult.second);
+         Pair<SymbolicExecutionState, ImmutableSet<Name>> joinResult = joinStates(joinRule, joinedState, state, thisSEState.third, services);
+         newNames = newNames.union(joinResult.second);
          
          joinedState = joinResult.first;         
          joinedState.setCorrespondingNode(goal.node());
@@ -191,6 +191,13 @@ public class JoinRule implements BuiltInRule {
       newGoal.addFormula(
             new SequentFormula(succedentFormula),
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
+      
+      // The following line has the only effect of emptying the
+      // name recorder -- the name recorder for currentNode will
+      // be filled after partner node closing. The purpose of this
+      // measure is to avoid new names of join nodes being added as
+      // new names of the partners.
+      services.saveNameRecorder(currentNode);
       
       // Close partner goals
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
@@ -227,7 +234,7 @@ public class JoinRule implements BuiltInRule {
     *    of the original states.
     */
    @SuppressWarnings("unused") // For deactivated equivalence check
-   protected Pair<SymbolicExecutionState, HashSet<Name>> joinStates(
+   protected Pair<SymbolicExecutionState, ImmutableSet<Name>> joinStates(
 		 JoinProcedure joinRule,
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
@@ -237,20 +244,19 @@ public class JoinRule implements BuiltInRule {
       final TermBuilder tb = services.getTermBuilder();
       
       // Newly introduced names
-      HashSet<Name> newNames = new HashSet<Name>();
+      ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       
       // Construct path condition as (optimized) disjunction
       Term newPathCondition =
             createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
                
-      HashSet<LocationVariable> progVars =
-            new HashSet<LocationVariable>();
+      ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
       
       // Collect program variables in Java block
-      progVars.addAll(getLocationVariables(programCounter, services));
+      progVars = progVars.union(getLocationVariables(programCounter, services));
       // Collect program variables in update
-      progVars.addAll(getUpdateLeftSideLocations(state1.first));
-      progVars.addAll(getUpdateLeftSideLocations(state2.first));
+      progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
+      progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
       
       ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
       
@@ -311,17 +317,17 @@ public class JoinRule implements BuiltInRule {
             
             if (v.sort().equals(heapSort)) {
                
-               Triple<HashSet<Term>, Term, HashSet<Name>> joinedHeaps = joinHeaps(joinRule, v, rightSide1, rightSide2, state1, state2, services);
+               Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedHeaps = joinHeaps(joinRule, v, rightSide1, rightSide2, state1, state2, services);
                newElementaryUpdates = newElementaryUpdates.prepend(tb.elementary(v, joinedHeaps.second));
                newPathCondition = tb.and(newPathCondition, tb.and(joinedHeaps.first));
-               newNames.addAll(joinedHeaps.third);
+               newNames = newNames.union(joinedHeaps.third);
                
             } else {
                
-               Triple<HashSet<Term>, Term, HashSet<Name>> joinedVal =
+               Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedVal =
                      joinRule.joinValuesInStates(v, state1, rightSide1, state2, rightSide2, services);
                
-               newNames.addAll(joinedVal.third);
+               newNames = newNames.union(joinedVal.third);
                
                newElementaryUpdates = newElementaryUpdates.prepend(
                      tb.elementary(
@@ -341,7 +347,7 @@ public class JoinRule implements BuiltInRule {
       // Construct weakened symbolic state
       Term newSymbolicState = tb.parallel(newElementaryUpdates);
       
-      return new Pair<SymbolicExecutionState, HashSet<Name>>(
+      return new Pair<SymbolicExecutionState, ImmutableSet<Name>>(
               new SymbolicExecutionState(newSymbolicState, newPathCondition), newNames);
       
    }
@@ -362,7 +368,7 @@ public class JoinRule implements BuiltInRule {
     * @param services The services object.
     * @return A joined heap term.
     */
-   protected Triple<HashSet<Term>, Term, HashSet<Name>> joinHeaps(
+   protected Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinHeaps(
 		 JoinProcedure joinRule,
          LocationVariable heapVar,
          Term heap1,
@@ -372,18 +378,18 @@ public class JoinRule implements BuiltInRule {
          Services services) {
       
       TermBuilder tb = services.getTermBuilder();
-      HashSet<Term> newConstraints = new HashSet<Term>();
-      HashSet<Name> newNames = new HashSet<Name>();
+      ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
+      ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       
       if (heap1.equals(heap2)) {
          // Keep equal heaps
-         return new Triple<HashSet<Term>, Term, HashSet<Name>>(newConstraints, heap1, newNames);
+         return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(newConstraints, heap1, newNames);
       }
       
       if (!(heap1.op() instanceof Function) ||
             !(heap2.op() instanceof Function)) {
          // Covers the case of two different symbolic heaps
-         return new Triple<HashSet<Term>, Term, HashSet<Name>>(
+         return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                newConstraints,
                JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services),
                newNames);
@@ -413,9 +419,9 @@ public class JoinRule implements BuiltInRule {
          if (pointer1.equals(pointer2) && field1.equals(field2)) {
             // Potential for deep merge: Access of same object / field.
             
-            Triple<HashSet<Term>, Term, HashSet<Name>> joinedSubHeap = joinHeaps(joinRule, heapVar, subHeap1, subHeap2, state1, state2, services);
-            newConstraints.addAll(joinedSubHeap.first);
-            newNames.addAll(joinedSubHeap.third);
+            Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedSubHeap = joinHeaps(joinRule, heapVar, subHeap1, subHeap2, state1, state2, services);
+            newConstraints = newConstraints.union(joinedSubHeap.first);
+            newNames = newNames.union(joinedSubHeap.third);
             
             Term joinedVal = null;
             
@@ -425,20 +431,20 @@ public class JoinRule implements BuiltInRule {
                
             } else {
                
-                Triple<HashSet<Term>, Term, HashSet<Name>> joinedValAndConstr =
+                Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedValAndConstr =
                      joinRule.joinValuesInStates(
                            new LocationVariable(
                                  new ProgramElementName(field1.name().toString()),
                                  value1.sort()),
                            state1, value1, state2, value2, services);
 
-               newConstraints.addAll(joinedValAndConstr.first);
-               newNames.addAll(joinedValAndConstr.third);
+               newConstraints = newConstraints.union(joinedValAndConstr.first);
+               newNames = newNames.union(joinedValAndConstr.third);
                joinedVal = joinedValAndConstr.second;
                
             }
             
-            return new Triple<HashSet<Term>, Term, HashSet<Name>>(
+            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                   newConstraints,
                   tb.func((Function) heap1.op(), joinedSubHeap.second, tb.var(pointer1), tb.func(field1), joinedVal),
                   newNames);
@@ -460,12 +466,12 @@ public class JoinRule implements BuiltInRule {
          if (pointer1.equals(pointer2)) {
             // Same objects are created: Join.
             
-             Triple<HashSet<Term>, Term, HashSet<Name>> joinedSubHeap =
+             Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedSubHeap =
                   joinHeaps(joinRule, heapVar, subHeap1, subHeap2, state1, state2, services);
-            newConstraints.addAll(joinedSubHeap.first);
-            newNames.addAll(joinedSubHeap.third);
+            newConstraints = newConstraints.union(joinedSubHeap.first);
+            newNames = newNames.union(joinedSubHeap.third);
             
-            return new Triple<HashSet<Term>, Term, HashSet<Name>>(
+            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                   newConstraints,
                   tb.func((Function) heap1.op(), joinedSubHeap.second, tb.var(pointer1)),
                   newNames);
@@ -476,7 +482,7 @@ public class JoinRule implements BuiltInRule {
          
       } // end else of else if (((Function) heap1.op()).equals(createFunc) && ((Function) heap2.op()).equals(createFunc))
 
-      return new Triple<HashSet<Term>, Term, HashSet<Name>>(
+      return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
             newConstraints,
             JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services),
             newNames);

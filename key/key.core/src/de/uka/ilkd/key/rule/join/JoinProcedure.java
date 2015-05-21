@@ -1,9 +1,8 @@
 package de.uka.ilkd.key.rule.join;
 
-import java.util.HashSet;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -13,7 +12,6 @@ import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithSignLattice;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
@@ -69,7 +67,7 @@ public abstract class JoinProcedure {
      * @return A joined value for valueInState1 and valueInState2, that is a triple
      *  consisting of new constraints, the actual value and new names introduced.
      */
-    public abstract Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
+    public abstract Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
             LocationVariable v, SymbolicExecutionState state1,
             Term valueInState1, SymbolicExecutionState state2,
             Term valueInState2, Services services);

@@ -17,11 +17,12 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -194,12 +195,11 @@ public class CloseAfterJoin implements BuiltInRule {
    private Term getSyntacticWeakeningFormula(Services services) {
       TermBuilder tb = services.getTermBuilder();
       
-      final LinkedHashSet<LocationVariable> allLocs =
-            new LinkedHashSet<LocationVariable>();
-      allLocs.addAll(getUpdateLeftSideLocations(thisSEState.getSymbolicState()));
-      allLocs.addAll(getUpdateLeftSideLocations(joinState.getSymbolicState()));
-      allLocs.addAll(getLocationVariables(thisSEState.getPathCondition(), services));
-      allLocs.addAll(getLocationVariables(joinState.getPathCondition(), services));
+      ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
+      allLocs = allLocs.union(getUpdateLeftSideLocations(thisSEState.getSymbolicState()));
+      allLocs = allLocs.union(getUpdateLeftSideLocations(joinState.getSymbolicState()));
+      allLocs = allLocs.union(getLocationVariables(thisSEState.getPathCondition(), services));
+      allLocs = allLocs.union(getLocationVariables(joinState.getPathCondition(), services));
       
       final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
       

@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.HashSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -58,7 +59,7 @@ public class JoinIfThenElse extends JoinProcedure {
    static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
    
    @Override
-   public Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
+   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -66,10 +67,10 @@ public class JoinIfThenElse extends JoinProcedure {
          Term valueInState2,
          Services services) {
 
-      return new Triple<HashSet<Term>, Term, HashSet<Name>>(
-            new HashSet<Term>(),
+      return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+            DefaultImmutableSet.<Term>nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services),
-            new HashSet<Name>());
+            DefaultImmutableSet.<Name>nil());
       
    }
    

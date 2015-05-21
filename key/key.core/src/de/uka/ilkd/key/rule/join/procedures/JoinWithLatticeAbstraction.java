@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.HashSet;
 import java.util.Iterator;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -53,7 +55,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
    protected abstract AbstractDomainLattice<?> getAbstractDomainForSort(Sort s, Services services);
    
    @Override
-   public Triple<HashSet<Term>, Term, HashSet<Name>> joinValuesInStates(
+   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
          LocationVariable v,
          SymbolicExecutionState state1,
          Term valueInState1,
@@ -63,7 +65,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
       
       final TermBuilder tb = services.getTermBuilder();
       
-      HashSet<Term> newConstraints = new HashSet<Term>();
+      ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
       
       AbstractDomainLattice<?> lattice = getAbstractDomainForSort(valueInState1.sort(), services);
       
@@ -77,26 +79,26 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
          
          Function newSkolemConst =
                getNewSkolemConstantForPrefix(joinElem.toString(), valueInState1.sort(), services);
-         HashSet<Name> newNames = new HashSet<Name>();
-         newNames.add(newSkolemConst.name());
+         ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
+         newNames = newNames.add(newSkolemConst.name());
          
-         newConstraints.add(joinElem.getDefiningAxiom(tb.func(newSkolemConst), services));
+         newConstraints = newConstraints.add(joinElem.getDefiningAxiom(tb.func(newSkolemConst), services));
          //NOTE: We also remember the precise values by if-then-else construction. This
          //      preserves completeness and should also not be harmful to performance in
          //      cases where completeness is also preserved by the lattice. However, if
          //      there are lattices where this construction is bad, it may be safely
          //      removed (no harm to soundness!).
-         newConstraints.add(tb.equals(tb.func(newSkolemConst),
+         newConstraints = newConstraints.add(tb.equals(tb.func(newSkolemConst),
                JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services)));
          
-         return new Triple<HashSet<Term>, Term, HashSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
+         return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(newConstraints, tb.func(newSkolemConst), newNames);
          
       } else {
          
-         return new Triple<HashSet<Term>, Term, HashSet<Name>>(
-               new HashSet<Term>(),
+         return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+               DefaultImmutableSet.<Term>nil(),
                JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services),
-               new HashSet<Name>());
+               DefaultImmutableSet.<Name>nil());
          
       }
       
