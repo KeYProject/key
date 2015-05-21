@@ -201,7 +201,6 @@ public class IntermediatePresentationProofFileParser implements
             for (int in = 0; in < newNames.length; in++) {
                 currNewNames = currNewNames.append(new Name(newNames[in]));
             }
-//            proof.getServices().getNameRecorder().setProposals(l);
             break;
 
         case 'e': // autoModeTime

@@ -149,13 +149,11 @@ public class IntermediateProofReplayer {
                     try {
                         currGoal.apply(constructTacletApp(appInterm, currGoal));
                         
-//                        int i = currInterm.getChildren().size() - 1;
                         int i = 0;
                         Iterator<Node> children = currNode.childrenIterator();
                         while (!currGoal.node().isClosed() && children.hasNext()) {
                             Node child = children.next();
                             queue.addLast(new Pair<Node, NodeIntermediate>(child, currInterm.getChildren().get(i++)));
-//                            queue.addLast(new Pair<Node, NodeIntermediate>(child, currInterm.getChildren().get(i--)));
                         }
                     }
                     catch (Exception e) {
@@ -330,6 +328,7 @@ public class IntermediateProofReplayer {
         
         // Load ifInsts, if applicable
         if (currInterm.getBuiltInIfInsts() != null) {
+            builtinIfInsts = ImmutableSLList.nil();
             for (Pair<Integer, PosInTerm> ifInstP : currInterm.getBuiltInIfInsts()) {
                 final int currIfInstFormula = ifInstP.first;
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
