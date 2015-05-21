@@ -44,28 +44,38 @@ public class IntermediatePresentationProofFileParser implements
 
     private Proof proof = null;
 
+    /* + General Information */
+    private String currRuleName = null;
+    private int currFormula = 0;
+    private PosInTerm currPosInTerm = PosInTerm.getTopLevel();
+    
+    /* + Taclet Information */
     private LinkedList<String> loadedInsts = null;
     private ImmutableList<String> ifSeqFormulaList = ImmutableSLList
             .<String> nil();
     private ImmutableList<String> ifDirectFormulaList = ImmutableSLList
             .<String> nil();
+    private ImmutableList<Name> currNewNames = null;
+    
+    /* + Built-In Formula Information */
     private ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
     private int currIfInstFormula;
     private PosInTerm currIfInstPosInTerm;
-    private String currRuleName = null;
-    private int currFormula = 0;
-    private PosInTerm currPosInTerm = PosInTerm.getTopLevel();
+    /*   > Method Contract */
     private String currContract = null;
+    /*   > Join Rule */
     private String currJoinProc = null;
     private int currNrPartners = 0;
     private int currCorrespondingJoinNodeId = 0;
     private int currJoinNodeId = 0;
-    private ImmutableList<Name> currNewNames = null;
-
+    
+    /* + Open Branches */
+    private Stack<NodeIntermediate> stack = new Stack<NodeIntermediate>();
+    
+    /* + State information that is returned after parsing */
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
 
-    private Stack<NodeIntermediate> stack = new Stack<NodeIntermediate>();
 
     /**
      * TODO: Document.
