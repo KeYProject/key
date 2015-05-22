@@ -18,7 +18,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * @author Kai Wallisch
  *
  */
-public class ProofCollection {
+public final class ProofCollection {
 
    private final List<ProofCollectionUnit> units;
    private final ProofCollectionSettings settings;
@@ -61,7 +61,7 @@ public class ProofCollection {
 
          RunAllProofsTestUnit testUnit = proofCollectionUnit
                .createRunAllProofsTestUnit(settings);
-         String testUnitOriginalName = testUnit.testName;
+         String testUnitOriginalName = testUnit.getTestName();
 
          /**
           * Assign a new name to testUnit in case one of the previous
@@ -73,7 +73,7 @@ public class ProofCollection {
             counter++;
             testUnitName = testUnitOriginalName + "#" + counter;
          }
-         testUnit.testName = testUnitName;
+         testUnit.setTestName(testUnitName);
          testUnitNames.add(testUnitName);
 
          ret.add(testUnit);
@@ -87,7 +87,7 @@ public class ProofCollection {
          Iterator<RunAllProofsTestUnit> iterator = ret.iterator();
          while (iterator.hasNext()) {
             RunAllProofsTestUnit unit = iterator.next();
-            if (!enabledTestCaseNames.contains(unit.testName)) {
+            if (!enabledTestCaseNames.contains(unit.getTestName())) {
                iterator.remove();
             }
          }

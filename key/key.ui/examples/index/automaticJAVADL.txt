@@ -49,6 +49,14 @@ reloadEnabled = true
 forkTimeout = 1000
 
 /*
+ * If the fork mode is not set to noFork, the launched subprocesses 
+ * get the specified amount of heap memory.
+ * 
+ * Heap memory for subprocesses (like 500m or 2G)
+ */
+# forkMemory = 1000m
+
+/*
  * Originally runAllProofs does not print a lot of information.
  * Set this to true to get more output.
  */

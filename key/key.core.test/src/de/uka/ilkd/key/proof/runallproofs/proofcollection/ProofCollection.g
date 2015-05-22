@@ -14,6 +14,32 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * Section for parser rules. Parser rules start with lowercase letters.
  */
 
+// see also: http://stackoverflow.com/questions/2445008/how-to-get-antlr-3-2-to-exit-upon-first-error
+@parser::members {
+  @Override
+  protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
+    throw new MismatchedTokenException(ttype, input);
+  }
+
+  @Override
+  public Object recoverFromMismatchedSet(IntStream input, RecognitionException e, BitSet follow) throws RecognitionException {
+    throw e;
+  }
+}
+
+@rulecatch {
+  catch (RecognitionException e) {
+    throw e;
+  }
+}
+
+@lexer::members {
+  @Override
+  public void reportError(RecognitionException e) {
+    throw new RuntimeException(e);
+  }
+}
+
 parserEntryPoint returns [ProofCollection proofCollection]
 @init {
     List<ProofCollectionUnit> proofCollectionUnits = new ArrayList<>();

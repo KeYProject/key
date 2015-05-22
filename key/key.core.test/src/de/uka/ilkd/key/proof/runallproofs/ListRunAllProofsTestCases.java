@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
  * Used by {@link RunAllProofsTest} command line interface to print out a list
  * of test cases. Command line interface can be found at git location:<br>
  * key/scripts/runAllProofs
- * 
+ *
  * @author Kai Wallisch
  *
  */
@@ -23,7 +23,7 @@ public class ListRunAllProofsTestCases {
       List<RunAllProofsTestUnit> units = proofCollection
             .createRunAllProofsTestUnits();
       for (RunAllProofsTestUnit unit : units) {
-         System.out.println(unit.testName);
+         System.out.println(unit.getTestName());
       }
    }
 

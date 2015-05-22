@@ -34,50 +34,7 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
       final ProofCollectionSettings settings = new ProofCollectionSettings(
             parentSettings, settingsEntries);
 
-      return new RunAllProofsTestUnit(groupName) {
+      return new RunAllProofsTestUnit(groupName, settings, getTempDirectory(groupName), testFiles, false);
 
-         @Override
-         public TestResult runTest() throws Exception {
-
-            /*
-             * List of test results containing one test result for each test
-             * file contained in this group.
-             */
-            List<TestResult> testResults;
-
-            ForkMode forkMode = settings.getForkMode();
-            if (forkMode == ForkMode.PERGROUP) {
-               testResults = ForkedTestFileRunner.processTestFiles(testFiles,
-                     settings, getTempDirectory(groupName));
-            }
-            else if (forkMode == ForkMode.NOFORK
-                  || forkMode == ForkMode.PERFILE) {
-               testResults = new ArrayList<>();
-               for (TestFile testFile : testFiles) {
-                  TestResult testResult = forkMode == ForkMode.NOFORK ? testFile
-                        .runKey(settings) : ForkedTestFileRunner
-                        .processTestFile(testFile, settings,
-                              getTempDirectory(groupName));
-                  testResults.add(testResult);
-               }
-            }
-            else {
-               throw new RuntimeException("Unexpected value for fork mode: "
-                     + forkMode);
-            }
-
-            /*
-             * Merge list of test results into one single test result.
-             */
-            boolean success = true;
-            String message = "group " + groupName + ":\n";
-            for (TestResult testResult : testResults) {
-               success &= testResult.success;
-               message += testResult.message + "\n";
-            }
-            return new TestResult(message, success);
-         }
-
-      };
    }
 }
