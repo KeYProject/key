@@ -35,7 +35,36 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * TODO: Document.
+ * Parses a KeY proof file into an intermediate representation. The parsed
+ * intermediate result can be processed by {@link IntermediateProofReplayer}.
+ * This approach is more flexible than direct parsing; for instance, it is
+ * capable of dealing with join rule applications.<p>
+ * 
+ * The returned intermediate proof closely resembles the structure of the
+ * parsed proof file. Specifically, branch nodes are explicitly stored and,
+ * as in the proof file, have exactly one child (or zero in the case of an
+ * empty proof). The first node, that is also the main returned result, is
+ * a branch node with the identifier "dummy ID" that is present in every proof.<p>
+ * 
+ * Example for parsed intermediate proof:<p>
+ * 
+ * <pre>
+ * BranchNodeIntermediate "dummy ID"
+ * - AppNodeIntermediate
+ * - AppNodeIntermediate
+ * - ...
+ * - AppNodeIntermediate
+ *   + BranchNodeIntermediate "x > 0"
+ *     > AppNodeIntermediate
+ *     > ...
+ *   + BranchNodeIntermediate "x <= 0"
+ *     > AppNodeIntermediate
+ *     > ...
+ * </pre>
+ * 
+ * Note that the last open goal in an unfinished proof is not represented
+ * by a node in the intermediate representation (since no rule has been
+ * applied on the goal yet).
  * 
  * @author Dominic Scheurer
  */
@@ -57,9 +86,7 @@ public class IntermediatePresentationProofFileParser implements
 
 
     /**
-     * TODO: Document.
-     *
-     * @param proof
+     * @param proof Proof object for storing meta information about the parsed proof.
      */
     public IntermediatePresentationProofFileParser(Proof proof) {
         this.proof = proof;
@@ -266,18 +293,16 @@ public class IntermediatePresentationProofFileParser implements
     }
     
     /**
-     * TODO: Document.
-     *
-     * @return
+     * @return The parsed intermediate representation in form of the top level
+     *  branch node (the "dummy ID" branch).
      */
     public BranchNodeIntermediate getParsedResult() {
        return root; 
     }
 
     /**
-     * TODO: Document.
-     *
-     * @return
+     * @return An intermediate taclet application generated from previously parsed
+     *   information.
      */
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
@@ -288,9 +313,8 @@ public class IntermediatePresentationProofFileParser implements
     }
 
     /**
-     * TODO: Document.
-     *
-     * @return
+     * @return An intermediate built-in rule application generated from previously
+     *   parsed information.
      */
     private BuiltInAppIntermediate constructBuiltInApp() {
         BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
@@ -317,9 +341,9 @@ public class IntermediatePresentationProofFileParser implements
     }
     
     /**
-     * TODO: Document.
+     * Loads proof settings.
      *
-     * @param preferences
+     * @param preferences The preferences to load.
      */
     private void loadPreferences(String preferences) {
         final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
@@ -327,19 +351,17 @@ public class IntermediatePresentationProofFileParser implements
     }
     
     /**
-     * TODO: Document.
-     *
-     * @return
+     * @return True iff we are currently parsing a built-in rule and are inside
+     *   an if-insts sub expression.
      */
     private boolean insideBuiltinIfInsts() {
         return ruleInfo.isBuiltinInfo() &&  ((BuiltinRuleInformation) ruleInfo).builtinIfInsts != null;
     }
     
     /**
-     * TODO: Document.
+     * General information about taclet and built-in rule applications.
      *
      * @author Dominic Scheurer
-     *
      */
     private static abstract class RuleInformation {
         /* + General Information */
@@ -358,10 +380,9 @@ public class IntermediatePresentationProofFileParser implements
     }
     
     /**
-     * TODO: Document.
+     * Information about taclet applications.
      *
      * @author Dominic Scheurer
-     *
      */
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
@@ -377,10 +398,9 @@ public class IntermediatePresentationProofFileParser implements
     }
     
     /**
-     * TODO: Document.
+     * Information about built-in rule applications.
      *
      * @author Dominic Scheurer
-     *
      */
     private static class BuiltinRuleInformation extends RuleInformation {
         /* + Built-In Formula Information */
