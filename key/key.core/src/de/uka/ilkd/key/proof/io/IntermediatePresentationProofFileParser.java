@@ -41,36 +41,15 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class IntermediatePresentationProofFileParser implements
         IProofFileParser {
-
+    
+    /* + The proof object for storing meta information */
     private Proof proof = null;
-
-    /* + General Information */
-    private String currRuleName = null;
-    private int currFormula = 0;
-    private PosInTerm currPosInTerm = PosInTerm.getTopLevel();
-    
-    /* + Taclet Information */
-    private LinkedList<String> loadedInsts = null;
-    private ImmutableList<String> ifSeqFormulaList = ImmutableSLList
-            .<String> nil();
-    private ImmutableList<String> ifDirectFormulaList = ImmutableSLList
-            .<String> nil();
-    private ImmutableList<Name> currNewNames = null;
-    
-    /* + Built-In Formula Information */
-    private ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
-    private int currIfInstFormula;
-    private PosInTerm currIfInstPosInTerm;
-    /*   > Method Contract */
-    private String currContract = null;
-    /*   > Join Rule */
-    private String currJoinProc = null;
-    private int currNrPartners = 0;
-    private int currCorrespondingJoinNodeId = 0;
-    private int currJoinNodeId = 0;
     
     /* + Open Branches */
     private Stack<NodeIntermediate> stack = new Stack<NodeIntermediate>();
+    
+    /* + State Information */
+    private RuleInformation ruleInfo = null;
     
     /* + State information that is returned after parsing */
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
@@ -113,51 +92,55 @@ public class IntermediatePresentationProofFileParser implements
             currNode.addChild(newNode);
             currNode = newNode;
         }
-
-            currRuleName = str;
-            currFormula = 0;
-            currPosInTerm = PosInTerm.getTopLevel();
-            loadedInsts = null;
-            ifSeqFormulaList = ImmutableSLList.<String> nil();
-            ifDirectFormulaList = ImmutableSLList.<String> nil();
+            
+            ruleInfo = new TacletInformation(str);
             break;
 
         case 'f': // formula
             final int formula = Integer.parseInt(str);
-            if (builtinIfInsts != null) {
-                currIfInstFormula = formula;
+            if (insideBuiltinIfInsts()) {
+                ((BuiltinRuleInformation) ruleInfo).currIfInstFormula = formula;
             }
             else {
-                currFormula = formula;
+                ruleInfo.currFormula = formula;
             }
             break;
 
         case 't': // term
             final PosInTerm pos = PosInTerm.parseReverseString(str);
-            if (builtinIfInsts != null) {
-                currIfInstPosInTerm = pos;
+            if (insideBuiltinIfInsts()) {
+                ((BuiltinRuleInformation) ruleInfo).currIfInstPosInTerm = pos;
             }
             else {
-                currPosInTerm = pos;
+                ruleInfo.currPosInTerm = pos;
             }
             break;
 
         case 'i': // inst
-            if (loadedInsts == null) {
-                loadedInsts = new LinkedList<String>();
+        {
+            TacletInformation tacletInfo = (TacletInformation) ruleInfo;
+            if (tacletInfo.loadedInsts == null) {
+                tacletInfo.loadedInsts = new LinkedList<String>();
             }
-            loadedInsts.add(str);
+            tacletInfo.loadedInsts.add(str);
+        }
             break;
 
         case 'h': // heuristics
             break;
 
         case 'q': // ifseqformula
-            ifSeqFormulaList = ifSeqFormulaList.append(str);
+        {
+            TacletInformation tacletInfo = (TacletInformation) ruleInfo;
+            tacletInfo.ifSeqFormulaList = tacletInfo.ifSeqFormulaList.append(str);
+        }
             break;
 
         case 'd': // ifdirectformula
-            ifDirectFormulaList = ifDirectFormulaList.append(str);
+        {
+            TacletInformation tacletInfo = (TacletInformation) ruleInfo;
+            tacletInfo.ifDirectFormulaList = tacletInfo.ifDirectFormulaList.append(str);
+        }
             break;
 
         case 'u': // UserLog
@@ -184,32 +167,30 @@ public class IntermediatePresentationProofFileParser implements
             currNode.addChild(newNode);
             currNode = newNode;
         }
-
-            currRuleName = str;
-            // set default state
-            currFormula = 0;
-            currPosInTerm = PosInTerm.getTopLevel();
-            builtinIfInsts = null;
+        
+            ruleInfo = new BuiltinRuleInformation(str);
             break;
 
         case 'c': // contract
-            currContract = str;
+            ((BuiltinRuleInformation) ruleInfo).currContract = str;
             break;
 
         case 'x': // ifInst (for built in rules)
-            if (builtinIfInsts == null) {
-                builtinIfInsts = ImmutableSLList
+            BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
+            
+            if (builtinInfo.builtinIfInsts == null) {
+                builtinInfo.builtinIfInsts = ImmutableSLList
                         .<Pair<Integer, PosInTerm>> nil();
             }
-            currIfInstFormula = 0;
-            currIfInstPosInTerm = PosInTerm.getTopLevel();
+            builtinInfo.currIfInstFormula = 0;
+            builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
             break;
 
         case 'w': // newnames
             final String[] newNames = str.split(",");
-            currNewNames = ImmutableSLList.<Name> nil();
+            ruleInfo.currNewNames = ImmutableSLList.<Name> nil();
             for (int in = 0; in < newNames.length; in++) {
-                currNewNames = currNewNames.append(new Name(newNames[in]));
+                ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newNames[in]));
             }
             break;
 
@@ -223,19 +204,19 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case 'o': // join procedure
-            currJoinProc = str;
+            ((BuiltinRuleInformation) ruleInfo).currJoinProc = str;
             break;
 
         case 'p': // number of join partners
-            currNrPartners = Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currNrPartners = Integer.parseInt(str);
             break;
 
         case 'j': // corresponding join node id
-            currCorrespondingJoinNodeId = Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currCorrespondingJoinNodeId = Integer.parseInt(str);
             break;
 
         case 'I': // join node id
-            currJoinNodeId = Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currJoinNodeId = Integer.parseInt(str);
             break;
         }
 
@@ -256,9 +237,6 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case 'r': // rule (taclet)
-            // DS: Only construct an intermediate application, do not
-            // actually apply it to the goal.
-            // TODO: Why do we need currGoal?
             ((AppNodeIntermediate) currNode)
                     .setIntermediateRuleApp(constructTacletApp());
             break;
@@ -269,17 +247,17 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case 'x': // ifInst (for built in rules)
-            builtinIfInsts = builtinIfInsts
-                    .append(new Pair<Integer, PosInTerm>(currIfInstFormula,
-                            currIfInstPosInTerm));
+            BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
+            builtinInfo.builtinIfInsts = builtinInfo.builtinIfInsts
+                    .append(new Pair<Integer, PosInTerm>(builtinInfo.currIfInstFormula,
+                            builtinInfo.currIfInstPosInTerm));
             break;
         }
     }
 
     @Override
     public String getStatus() {
-        // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
@@ -302,10 +280,11 @@ public class IntermediatePresentationProofFileParser implements
      * @return
      */
     private TacletAppIntermediate constructTacletApp() {
-        return new TacletAppIntermediate(currRuleName,
-                new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                loadedInsts,
-                ifSeqFormulaList, ifDirectFormulaList, currNewNames);
+        TacletInformation tacletInfo = (TacletInformation) ruleInfo;
+        return new TacletAppIntermediate(tacletInfo.currRuleName,
+                new Pair<Integer, PosInTerm>(tacletInfo.currFormula, tacletInfo.currPosInTerm),
+                tacletInfo.loadedInsts,
+                tacletInfo.ifSeqFormulaList, tacletInfo.ifDirectFormulaList, tacletInfo.currNewNames);
     }
 
     /**
@@ -314,27 +293,25 @@ public class IntermediatePresentationProofFileParser implements
      * @return
      */
     private BuiltInAppIntermediate constructBuiltInApp() {
+        BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         BuiltInAppIntermediate result = null;
 
-        if (currRuleName.equals("JoinRule")) {
-            result = new JoinAppIntermediate(currRuleName,
-                    new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                    currContract, builtinIfInsts, currJoinNodeId,
-                    currJoinProc, currNrPartners, currNewNames);
+        if (builtinInfo.currRuleName.equals("JoinRule")) {
+            result = new JoinAppIntermediate(builtinInfo.currRuleName,
+                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                    builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currJoinNodeId,
+                    builtinInfo.currJoinProc, builtinInfo.currNrPartners, builtinInfo.currNewNames);
         }
-        else if (currRuleName.equals("CloseAfterJoin")) {
-            result = new JoinPartnerAppIntermediate(currRuleName,
-                    new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                    currContract, builtinIfInsts, currCorrespondingJoinNodeId, currNewNames);
+        else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
+            result = new JoinPartnerAppIntermediate(builtinInfo.currRuleName,
+                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                    builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currCorrespondingJoinNodeId, builtinInfo.currNewNames);
         }
         else {
-            result = new BuiltInAppIntermediate(currRuleName,
-                    new Pair<Integer, PosInTerm>(currFormula, currPosInTerm),
-                    currContract, builtinIfInsts, currNewNames);
+            result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
+                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                    builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
         }
-
-        currContract = null;
-        builtinIfInsts = null;
 
         return result;
     }
@@ -345,9 +322,64 @@ public class IntermediatePresentationProofFileParser implements
      * @param preferences
      */
     private void loadPreferences(String preferences) {
-        //TODO: Does this have *any* effects? See DefaultProofFileParser.
         final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
         proofSettings.loadSettingsFromString(preferences);
+    }
+    
+    /**
+     * TODO: Document.
+     *
+     * @return
+     */
+    private boolean insideBuiltinIfInsts() {
+        return ruleInfo.isBuiltinInfo() &&  ((BuiltinRuleInformation) ruleInfo).builtinIfInsts != null;
+    }
+    
+    private static abstract class RuleInformation {
+        /* + General Information */
+        protected String currRuleName = null;
+        protected int currFormula = 0;
+        protected PosInTerm currPosInTerm = PosInTerm.getTopLevel();
+        protected ImmutableList<Name> currNewNames = null;
+        
+        public RuleInformation(String ruleName) {
+            this.currRuleName = ruleName;
+        }
+        
+        public boolean isBuiltinInfo() {
+            return this instanceof BuiltinRuleInformation;
+        }
+    }
+    
+    private static class TacletInformation extends RuleInformation {
+        /* + Taclet Information */
+        protected LinkedList<String> loadedInsts = null;
+        protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList
+                .<String> nil();
+        protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList
+                .<String> nil();
+        
+        public TacletInformation(String ruleName) {
+            super(ruleName);
+        }
+    }
+    
+    private static class BuiltinRuleInformation extends RuleInformation {
+        /* + Built-In Formula Information */
+        protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
+        protected int currIfInstFormula;
+        protected PosInTerm currIfInstPosInTerm;
+        /*   > Method Contract */
+        protected String currContract = null;
+        /*   > Join Rule */
+        protected String currJoinProc = null;
+        protected int currNrPartners = 0;
+        protected int currCorrespondingJoinNodeId = 0;
+        protected int currJoinNodeId = 0;
+        
+        public BuiltinRuleInformation(String ruleName) {
+            super(ruleName);
+        }
     }
 
 }
