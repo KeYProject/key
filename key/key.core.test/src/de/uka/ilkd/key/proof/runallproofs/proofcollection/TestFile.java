@@ -15,16 +15,16 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * Data structure for .key-files that will be tested during
- * {@link RunAllProofsTest} run. It consists of a {@link #testProperty} and a
- * {@link #pathToFile} String for the file location. Method
+ * {@link RunAllProofsTest} execution. It consists of a {@link #testProperty}
+ * and a {@link #pathToFile} String for the file location. Method
  * {@link #runKey(ProofCollectionSettings)} will verify {@link #testProperty}
  * for the given file.
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class TestFile extends ForkedTestFileRunner {
+public class TestFile {
 
-   final TestProperty testProperty;
+   private final TestProperty testProperty;
    private final String pathToFile;
 
    /**
@@ -135,7 +135,8 @@ public class TestFile extends ForkedTestFileRunner {
     *            converted into an {@link Exception} object with original
     *            exception as cause.
     */
-   public TestResult runKey(ProofCollectionSettings settings) throws Exception {
+   public TestResult runKey(ProofCollectionSettings settings)
+         throws Exception {
 
       // Initialize KeY settings.
       String gks = settings.getGlobalKeYSettings();
@@ -182,7 +183,6 @@ public class TestFile extends ForkedTestFileRunner {
             loadedProof.saveToFile(proofFile);
             reloadProof(proofFile);
          }
-
       }
       catch (Throwable t) {
          throw new Exception(

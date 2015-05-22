@@ -26,6 +26,8 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
  */
 public abstract class ForkedTestFileRunner implements Serializable {
 
+    private static final String FORK_TIMEOUT_KEY = "forkTimeout";
+
    private static Path getLocationOfSerializedTestFiles(Path tempDirectory) {
       return Paths.get(tempDirectory.toString(), "TestFiles.serialized");
    }
@@ -50,42 +52,23 @@ public abstract class ForkedTestFileRunner implements Serializable {
     */
    private static void writeObject(Path path, Serializable s)
          throws IOException {
-      /*
-       * Convert given object into a byte array.
-       */
-      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-      ObjectOutputStream objectOutputStream = new ObjectOutputStream(
-            byteArrayOutputStream);
-      objectOutputStream.writeObject(s);
-      objectOutputStream.flush();
-      byte[] bytes = byteArrayOutputStream.toByteArray();
 
-      /*
-       * Write byte array to a file.
-       */
-      Files.write(path, bytes);
+        try(ObjectOutputStream objectOutputStream =
+                new ObjectOutputStream(Files.newOutputStream(path))) {
+            objectOutputStream.writeObject(s);
+        }
    }
 
    /**
     * Converts contents of a file back into an object.
     */
-   @SuppressWarnings("unchecked")
-   private static <S> S readObject(Path path) throws IOException,
+    private static <S> S readObject(Path path, Class<S> type) throws IOException,
          ClassNotFoundException {
-      /*
-       * Convert content of given path (which points to a file) into a byte
-       * array.
-       */
-      byte[] bytes = Files.readAllBytes(path);
-
-      /*
-       * Convert byte array back into an object.
-       */
-      ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
-            bytes);
-      ObjectInputStream objectInputStream = new ObjectInputStream(
-            byteArrayInputStream);
-      return (S) objectInputStream.readObject();
+        try(ObjectInputStream objectInputStream =
+                new ObjectInputStream(Files.newInputStream(path))) {
+            Object result = objectInputStream.readObject();
+            return type.cast(result);
+        }
    }
 
    /**
@@ -95,9 +78,10 @@ public abstract class ForkedTestFileRunner implements Serializable {
     *           Name of the test used as prefix for test folder.
     */
    public static TestResult processTestFile(TestFile testFile,
-         ProofCollectionSettings settings, Path pathToTempDir) throws Exception {
-      return processTestFiles(Arrays.asList(testFile), settings, pathToTempDir)
-            .get(0);
+            ProofCollectionSettings settings, Path pathToTempDir)
+            throws Exception {
+        return processTestFiles(Arrays.asList(testFile), settings,
+                pathToTempDir).get(0);
    }
 
    /**
@@ -107,13 +91,14 @@ public abstract class ForkedTestFileRunner implements Serializable {
     *           Name of the test used as prefix for test folder.
     */
    public static List<TestResult> processTestFiles(List<TestFile> testFiles,
-         ProofCollectionSettings settings, Path pathToTempDir) throws Exception {
+            ProofCollectionSettings settings, Path pathToTempDir)
+            throws Exception {
 
       writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
-            (Serializable) testFiles);
+                testFiles.toArray(new TestFile[testFiles.size()]));
       writeObject(
             getLocationOfSerializedProofCollectionSettings(pathToTempDir),
-            (Serializable) settings);
+                settings);
 
       ProcessBuilder pb = new ProcessBuilder("java", "-classpath",
             System.getProperty("java.class.path"),
@@ -128,8 +113,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
        */
       Path exceptionFile = getLocationOfSerializedException(pathToTempDir);
       if (exceptionFile.toFile().exists()) {
-         Throwable t = ForkedTestFileRunner
-               .<Throwable> readObject((exceptionFile));
+            Throwable t = ForkedTestFileRunner.readObject(exceptionFile, Throwable.class);
          throw new Exception(
                "Subprocess returned exception (see cause for details):\n"
                      + t.getMessage(), t);
@@ -141,8 +125,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
       Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
       assertTrue("File containing serialized test results not present.",
             testResultsFile.toFile().exists());
-      return ForkedTestFileRunner
-            .<List<TestResult>> readObject((testResultsFile));
+        TestResult[] array = ForkedTestFileRunner.readObject(testResultsFile, TestResult[].class);
+
+        return Arrays.asList(array);
    }
 
    public static void main(String[] args) throws IOException {
@@ -158,20 +143,83 @@ public abstract class ForkedTestFileRunner implements Serializable {
       }
 
       try {
-         List<TestFile> testFiles = ForkedTestFileRunner
-               .<List<TestFile>> readObject(getLocationOfSerializedTestFiles(tempDirectory));
-         ProofCollectionSettings settings = ForkedTestFileRunner
-               .<ProofCollectionSettings> readObject(getLocationOfSerializedProofCollectionSettings(tempDirectory));
+            TestFile[] testFiles =
+                    ForkedTestFileRunner.readObject(
+                            getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
+            ProofCollectionSettings settings =
+                    ForkedTestFileRunner.
+                    readObject(getLocationOfSerializedProofCollectionSettings(tempDirectory),
+                            ProofCollectionSettings.class);
+            installTimeoutWatchdog(settings, tempDirectory);
+            Thread.sleep(4000);
          ArrayList<TestResult> testResults = new ArrayList<>();
          for (TestFile testFile : testFiles) {
             testResults.add(testFile.runKey(settings));
          }
          writeObject(getLocationOfSerializedTestResults(tempDirectory),
-               testResults);
-      }
-      catch (Throwable t) {
+                    testResults.toArray(new TestResult[testResults.size()]));
+        } catch (Throwable t) {
          writeObject(getLocationOfSerializedException(tempDirectory), t);
       }
    }
+
+    /**
+     * Launches a timeout-thread acting as a watchdog over this forked instance.
+     *
+     * If a time is specified in the settings, a fresh daemon thread is started
+     * which terminates this instance after the specified time has elapsed.
+     *
+     * If no timeout has been specified, no thread is launched.
+     *
+     * @param settings
+     *            the (non-null) settings to take the timeout from.
+     * @param tempDirectory
+     */
+    private static void installTimeoutWatchdog(ProofCollectionSettings settings, final Path tempDirectory) {
+
+        String timeoutString = settings.get(FORK_TIMEOUT_KEY);
+        if(timeoutString == null) {
+            return;
+        }
+
+        final boolean verbose = "true".equals(settings.get("verboseOutput"));
+
+        final int timeout;
+        try {
+            timeout = Integer.parseInt(timeoutString);
+        } catch(NumberFormatException ex) {
+            throw new RuntimeException("The setting forkTimeout requires an integer, not " +
+                        timeoutString, ex);
+        }
+
+        if(timeout <= 0) {
+            throw new RuntimeException("The setting forkTimeout requires a positive integer, not " +
+                    timeoutString);
+        }
+
+        Thread t = new Thread("Timeout watchdog") {
+            public void run() {
+                try {
+                    if(verbose) {
+                        System.err.println("Timeout watcher launched (" + timeout + " secs.)");
+                    }
+                    Thread.sleep(timeout * 1000);
+                    InterruptedException ex =
+                            new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
+                    writeObject(getLocationOfSerializedException(tempDirectory), ex);
+                    // TODO consider something other than 0 here
+                    if(verbose) {
+                        System.err.println("Process timed out");
+                    }
+                    System.exit(0);
+                } catch (Exception ex) {
+                    System.err.println("The watchdog has been interrupted or failed. Timeout cancelled.");
+                    ex.printStackTrace();
+                }
+            }
+        };
+        t.setDaemon(true);
+        t.start();
+    }
 
 }
