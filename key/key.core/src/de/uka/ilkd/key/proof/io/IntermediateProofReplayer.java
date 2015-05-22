@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof.io;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,20 +27,26 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.DefaultProofFileParser.AppConstructionException;
-import de.uka.ilkd.key.proof.io.DefaultProofFileParser.BuiltInConstructionException;
-import de.uka.ilkd.key.proof.io.DefaultProofFileParser.SkipSMTRuleException;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
@@ -165,7 +172,14 @@ public class IntermediateProofReplayer {
                         int i = 0;
                         Iterator<Node> children = currNode.childrenIterator();
                         while (!currGoal.node().isClosed()
-                                && children.hasNext()) {
+                                && children.hasNext()
+                                && currInterm.getChildren().size() > 0) {
+                            
+                            // NOTE: In the case of an unfinished proof, there is another node
+                            //       after the last application which is not represented by
+                            //       an intermediate application. Therefore, we have to add
+                            //       the last check in the above conjunction.
+                            
                             Node child = children.next();
                             queue.addLast(new Pair<Node, NodeIntermediate>(
                                     child, currInterm.getChildren().get(i++)));
@@ -377,7 +391,7 @@ public class IntermediateProofReplayer {
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
-                    new SequentFormula(DefaultProofFileParser.parseTerm(
+                    new SequentFormula(parseTerm(
                             ifFormulaStr, proof))));
         }
 
@@ -547,6 +561,8 @@ public class IntermediateProofReplayer {
         builtinIfInsts = null;
         return ourApp;
     }
+    
+    // ######## Below: Methods previously listed in DefaultProofFileParser ######## //
 
     /**
      * TODO: Document.
@@ -567,7 +583,7 @@ public class IntermediateProofReplayer {
      * @param pos
      * @return
      */
-    private ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName,
+    private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName,
             Goal g, PosInOccurrence pos) {
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet
                 .<IBuiltInRuleApp> nil();
@@ -589,7 +605,7 @@ public class IntermediateProofReplayer {
      * @param services
      * @return
      */
-    private TacletApp constructInsts(TacletApp app, Goal currGoal,
+    private static TacletApp constructInsts(TacletApp app, Goal currGoal,
             LinkedList<String> loadedInsts, Services services) {
         if (loadedInsts == null)
             return app;
@@ -613,7 +629,7 @@ public class IntermediateProofReplayer {
             }
 
             if (sv instanceof VariableSV) {
-                app = DefaultProofFileParser.parseSV1(app, sv, value, services);
+                app = parseSV1(app, sv, value, services);
             }
         }
 
@@ -629,7 +645,7 @@ public class IntermediateProofReplayer {
             if (sv == null) {
                 continue;
             }
-            app = DefaultProofFileParser.parseSV2(app, sv, value, currGoal);
+            app = parseSV2(app, sv, value, currGoal);
         }
 
         return app;
@@ -642,7 +658,7 @@ public class IntermediateProofReplayer {
      * @param name
      * @return
      */
-    private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set,
+    private static SchemaVariable lookupName(ImmutableSet<SchemaVariable> set,
             String name) {
         Iterator<SchemaVariable> it = set.iterator();
         while (it.hasNext()) {
@@ -651,5 +667,135 @@ public class IntermediateProofReplayer {
                 return v;
         }
         return null; // handle this better!
+    }
+
+    /**
+     * TODO: Document.
+     *
+     * @param value
+     * @param proof
+     * @param varNS
+     * @param progVar_ns
+     * @return
+     */
+    public static Term parseTerm(String value, Proof proof, Namespace varNS,
+            Namespace progVar_ns) {
+        try {
+            return new DefaultTermParser().parse(new StringReader(value), null,
+                    proof.getServices(), varNS, proof.getNamespaces()
+                            .functions(), proof.getNamespaces().sorts(),
+                    progVar_ns, new AbbrevMap());
+        }
+        catch (ParserException e) {
+            throw new RuntimeException("Error while parsing value " + value
+                    + "\nVar namespace is: " + varNS + "\n", e);
+        }
+    }
+
+    /**
+     * TODO: Document.
+     *
+     * @param value
+     * @param proof
+     * @return
+     */
+    public static Term parseTerm(String value, Proof proof) {
+        return parseTerm(value, proof, proof.getNamespaces().variables(), proof
+                .getNamespaces().programVariables());
+    }
+
+    /**
+     * 1st pass: only VariableSV.
+     * 
+     * TODO: Document.
+     *
+     * @param app
+     * @param sv
+     * @param value
+     * @param services
+     * @return
+     */
+    public static TacletApp parseSV1(TacletApp app, SchemaVariable sv,
+            String value, Services services) {
+        LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(
+                sv, services));
+        Term instance = services.getTermFactory().createTerm(lv);
+        return app.addCheckedInstantiation(sv, instance, services, true);
+    }
+
+    /**
+     * 2nd pass: all other SV.
+     * 
+     * TODO: Document.
+     *
+     * @param app
+     * @param sv
+     * @param value
+     * @param targetGoal
+     * @return
+     */
+    public static TacletApp parseSV2(TacletApp app, SchemaVariable sv,
+            String value, Goal targetGoal) {
+        final Proof p = targetGoal.proof();
+        final Services services = p.getServices();
+        TacletApp result;
+        if (sv instanceof VariableSV) {
+            // ignore -- already done
+            result = app;
+        }
+        else if (sv instanceof ProgramSV) {
+            final ProgramElement pe = app
+                    .getProgramElement(value, sv, services);
+            result = app.addCheckedInstantiation(sv, pe, services, true);
+        }
+        else if (sv instanceof SkolemTermSV) {
+            result = app.createSkolemConstant(value, sv, true, services);
+        }
+        else {
+            Namespace varNS = p.getNamespaces().variables();
+            varNS = app.extendVarNamespaceForSV(varNS, sv);
+            Term instance = parseTerm(value, p, varNS,
+                    targetGoal.getVariableNamespace(varNS));
+            result = app.addCheckedInstantiation(sv, instance, services, true);
+        }
+        return result;
+    }
+
+    /**
+     * TODO: Document.
+     *
+     * @author Dominic Scheurer
+     *
+     */
+    static class AppConstructionException extends Exception {
+        private static final long serialVersionUID = -6534063595443883709L;
+    }
+
+    /**
+     * TODO: Document.
+     *
+     * @author Dominic Scheurer
+     *
+     */
+    static class BuiltInConstructionException extends Exception {
+        private static final long serialVersionUID = -735474220502290816L;
+
+        BuiltInConstructionException(String s) {
+            super(s);
+        }
+
+        BuiltInConstructionException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    /**
+     * TODO: Document.
+     *
+     * @author Dominic Scheurer
+     *
+     */
+    static class SkipSMTRuleException extends Exception {
+        private static final long serialVersionUID = -2932282883810135168L;
     }
 }

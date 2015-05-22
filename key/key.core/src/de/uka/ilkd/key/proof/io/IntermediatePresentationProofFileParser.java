@@ -335,6 +335,12 @@ public class IntermediatePresentationProofFileParser implements
         return ruleInfo.isBuiltinInfo() &&  ((BuiltinRuleInformation) ruleInfo).builtinIfInsts != null;
     }
     
+    /**
+     * TODO: Document.
+     *
+     * @author Dominic Scheurer
+     *
+     */
     private static abstract class RuleInformation {
         /* + General Information */
         protected String currRuleName = null;
@@ -351,6 +357,12 @@ public class IntermediatePresentationProofFileParser implements
         }
     }
     
+    /**
+     * TODO: Document.
+     *
+     * @author Dominic Scheurer
+     *
+     */
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
         protected LinkedList<String> loadedInsts = null;
@@ -364,6 +376,12 @@ public class IntermediatePresentationProofFileParser implements
         }
     }
     
+    /**
+     * TODO: Document.
+     *
+     * @author Dominic Scheurer
+     *
+     */
     private static class BuiltinRuleInformation extends RuleInformation {
         /* + Built-In Formula Information */
         protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
