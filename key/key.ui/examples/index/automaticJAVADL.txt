@@ -92,6 +92,11 @@ group newBook {
    provable ./newBook/09.list_modelfield/ArrayList.get.key
 }
 
+group oldBook {
+   provable ./standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key
+   provable ./standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key
+}
+
 # Comprehension Tests
 group comprehensions {
    provable ./heap/comprehensions/general_sum.key
@@ -134,7 +139,6 @@ group applicationRestrictions {
    notprovable ./heap/polarity_tests/wellformed10.key
    notprovable ./heap/polarity_tests/wellformed11.key
 }
-
 
 # Tests for block contracts:
 group blockContracts {
@@ -263,6 +267,10 @@ group removeDups {
 
 provable ./heap/saddleback_search/Saddleback_search.key
 
+/*
+ * These are simpler regression tests that show a certain feature works
+ * fine.
+ */
 group simpleTests {
    provable ./heap/simple/anonymise_datagroup.key
    provable ./heap/simple/array_creation.key
@@ -276,7 +284,6 @@ group simpleTests {
    provable ./heap/simple/locsets.key
    provable ./heap/simple/loop1.key
    provable ./heap/simple/loop2.key
-provable: ./false.key
    provable ./heap/simple/modifies_datagroup.key
    provable ./heap/simple/modifies.key
    provable ./heap/simple/object_creation.key
@@ -441,14 +448,18 @@ group arithmetic {
    provable ./standard_key/polySimp/simplify9.key
 }
 
-group standard_key_JavaDL {
+group arrays {
    provable ./standard_key/arrays/arrayStoreException/array2DimPrim.key
    provable ./standard_key/arrays/arrayStoreException/arrayStoreKnownDynType.key
    provable ./standard_key/arrays/arrayStoreException/reverseArray.key
    provable ./standard_key/arrays/arrayStoreException/throwArrayStoreException.key
    provable ./standard_key/arrays/creation/arrayCreation1.key
-   provable ./standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key
-   provable ./standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key
+   notprovable ./standard_key/arrays/arrayStoreException/array2Dim.key
+   notprovable ./standard_key/arrays/arrayStoreException/array2DimClose.key
+   notprovable ./standard_key/arrays/arrayStoreException/throwASEForPrim.key
+}
+
+group javadl {
    provable ./standard_key/instanceCreation/instanceCreation1.key
    provable ./standard_key/instanceCreation/instanceCreation2.key
    provable ./standard_key/instanceCreation/interfacesAndAbstractClassesHaveNoInstances.key
@@ -479,10 +490,11 @@ group standard_key_JavaDL {
    provable ./standard_key/java_dl/exchange.key
    provable ./standard_key/java_dl/if.key
    provable ./standard_key/java_dl/incrementcounter.key
-# commented out - in the current handling of this references (from branch mostThisRef)
-# inner classes do not work. According to Richard, there is a bug in handling inner classes
-# that needs a non-trivial fix.
-# provable: ./standard_key/java_dl/innerClasses/inner.key
+   notprovable ./standard_key/java_dl/danglingElse.key
+   # commented out - in the current handling of this references (from branch mostThisRef)
+   # inner classes do not work. According to Richard, there is a bug in handling inner classes
+   # that needs a non-trivial fix.
+   # provable: ./standard_key/java_dl/innerClasses/inner.key
    provable ./standard_key/java_dl/iteratedAssignment.key
    notprovable ./standard_key/java_dl/assert/assert1.key
    provable ./standard_key/java_dl/assert/assert2.key
@@ -514,14 +526,28 @@ group standard_key_JavaDL {
    provable ./standard_key/java_dl/strassen/strassen.key
    provable ./standard_key/java_dl/symmArray.key
    provable ./standard_key/java_dl/testcontext.key
+   provable ./standard_key/staticInitialisation/cascadeStaticInitialisation.key
+   provable ./standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key
+   provable ./standard_key/staticInitialisation/initializedSubclassImpliesInitializedSuperclass.key
+   provable ./standard_key/staticInitialisation/localDeclared.key
+   provable ./standard_key/staticInitialisation/localDeclaredMethod.key
+   provable ./standard_key/staticInitialisation/objectOfErroneousClass.key
+   provable ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
+   provable ./standard_key/types/disjoint.key
+   provable ../../key.core.test/resources/testcase/classpath/classpath.key
+   notprovable ./heap/inconsistent_represents/MyClass_m.key
+   notprovable ./heap/inconsistent_represents/MyClass_n.key
+}
+
+group FOL {
    provable ./standard_key/pred_log/count.key
    provable ./standard_key/pred_log/count2.key
    provable ./standard_key/pred_log/count3.key
    provable ./standard_key/pred_log/equalities.key
    provable ./standard_key/pred_log/equalities2.key
    provable ./standard_key/pred_log/equalities3.key
-# cannot be proven automatically (see bug #1248)
-# provable: ./standard_key/pred_log/exist1.key
+   # cannot be proven automatically (see bug #1248)
+   # provable: ./standard_key/pred_log/exist1.key
    provable ./standard_key/pred_log/functions.key
    provable ./standard_key/pred_log/mv1.key
    provable ./standard_key/pred_log/mv2.key
@@ -533,16 +559,16 @@ group standard_key_JavaDL {
    provable ./standard_key/pred_log/tptp/PUZ/PUZ031p1.key
    provable ./standard_key/pred_log/tptp/SET/SET027p3.key
    provable ./standard_key/pred_log/tptp/SET/SET043p1.key
-# cannot be proven automatically (see bug #1248)
-# provable: ./standard_key/pred_log/tptp/SET/SET044p1.key
+   # cannot be proven automatically (see bug #1248)
+   # provable: ./standard_key/pred_log/tptp/SET/SET044p1.key
    provable ./standard_key/pred_log/tptp/SET/SET045p1.key
    provable ./standard_key/pred_log/tptp/SET/SET062p3.key
    provable ./standard_key/pred_log/tptp/SET/SET063p3.key
-# cannot be proven automatically (see bug #1248)
-# provable: ./standard_key/pred_log/tptp/SYN/SYN002m1.007.008.key
+   # cannot be proven automatically (see bug #1248)
+   # provable: ./standard_key/pred_log/tptp/SYN/SYN002m1.007.008.key
    provable ./standard_key/pred_log/tptp/SYN/SYN036p2.key
-# cannot be proven automatically (timeout, possibly due to bug #1248)
-# provable: ./standard_key/pred_log/tptp/SYN/SYN548p1.key
+   # cannot be proven automatically (timeout, possibly due to bug #1248)
+   # provable: ./standard_key/pred_log/tptp/SYN/SYN548p1.key
    provable ./standard_key/pred_log/tptp/SYN/SYN550p1.key
    notprovable ./standard_key/prop_log/reallySimple.key
    notprovable ./standard_key/pred_log/sameName1.key
@@ -570,18 +596,14 @@ group standard_key_JavaDL {
    provable ./standard_key/quantifiers/normalisation8.key
    provable ./standard_key/quantifiers/normalisation9.key
    provable ./standard_key/quantifiers/normalisation10.key
-#removed as long as we do not have a rule safely removing identical updates
-#provable: ./standard_key/quantifiers/normalisation11.key
+   #removed as long as we do not have a rule safely removing identical updates
+   #provable: ./standard_key/quantifiers/normalisation11.key
    provable ./standard_key/quantifiers/normalisation12.key
    provable ./standard_key/quantifiers/normalisation13.key
    provable ./standard_key/quantifiers/triggers0.key
-   provable ./standard_key/staticInitialisation/cascadeStaticInitialisation.key
-   provable ./standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key
-   provable ./standard_key/staticInitialisation/initializedSubclassImpliesInitializedSuperclass.key
-   provable ./standard_key/staticInitialisation/localDeclared.key
-   provable ./standard_key/staticInitialisation/localDeclaredMethod.key
-   provable ./standard_key/staticInitialisation/objectOfErroneousClass.key
-   provable ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
+}
+
+group strings {
    provable ./standard_key/strings/charAt0.key
    provable ./standard_key/strings/charAt1.key
    provable ./standard_key/strings/concat1.key
@@ -609,18 +631,12 @@ group standard_key_JavaDL {
    provable ./standard_key/strings/substring3.key
    provable ./standard_key/strings/substring4.key
    provable ./standard_key/strings/substring5.key
-   provable ./standard_key/types/disjoint.key
+}
 
-   provable ../../key.core.test/resources/testcase/classpath/classpath.key
-
-   notprovable ./heap/inconsistent_represents/MyClass_m.key
-   notprovable ./heap/inconsistent_represents/MyClass_n.key
+group simple_info_flow {
    notprovable ./heap/information_flow/UpdateAbstraction_ex7_1_insecure.key
    notprovable ./heap/information_flow/UpdateAbstraction_ex7_2_insecure.key
-   notprovable ./standard_key/arrays/arrayStoreException/array2Dim.key
-   notprovable ./standard_key/arrays/arrayStoreException/array2DimClose.key
-   notprovable ./standard_key/arrays/arrayStoreException/throwASEForPrim.key
-   notprovable ./standard_key/java_dl/danglingElse.key
+}
 
 # Model methods tests:
 # (Note: some of the problems are trivial, but they should be kept
@@ -726,17 +742,16 @@ group permissionHeap {
    provable ./heap/permissions/threads/Sampler_stateInv_accessible.key
    provable ./heap/permissions/threads/Sampler_staticPermissions_accessible.key
    provable ./heap/permissions/threads/Sampler_workingPermissions_accessible.key
+
+   # These need (a lot of) interaction at the moment:
+   # provable: ./heap/permissions/threads/AFilter_run.key
+   # provable: ./heap/permissions/threads/BFilter_run.key
+   # provable: ./heap/permissions/threads/Fib_run.key
+   #  provable: ./heap/permissions/threads/Plotter_run.key
+   # provable: ./heap/permissions/threads/Main_main.key
+
+   # Should be provable, but isn't at the moment:
+   # provable: ./heap/permissions/threads/Plotter_staticPermissions_accessible.key
+   # Is provable, but very heavy (~400000 steps)
+   # provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
 }
-
-# These need (a lot of) interaction at the moment:
-# provable: ./heap/permissions/threads/AFilter_run.key
-# provable: ./heap/permissions/threads/BFilter_run.key
-# provable: ./heap/permissions/threads/Fib_run.key
-# provable: ./heap/permissions/threads/Plotter_run.key
-# provable: ./heap/permissions/threads/Main_main.key
-
-# Should be provable, but isn't at the moment:
-# provable: ./heap/permissions/threads/Plotter_staticPermissions_accessible.key
-# Is provable, but very heavy (~400000 steps)
-# provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
-
