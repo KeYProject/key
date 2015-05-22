@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.Pair;
  * 
  * @author Dominic Scheurer
  */
-public class TacletAppIntermediate implements AppIntermediate {
+public class TacletAppIntermediate extends AppIntermediate {
 
     private String tacletName = null;
     private Pair<Integer, PosInTerm> posInfo = null;

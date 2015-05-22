@@ -250,7 +250,7 @@ public class IntermediatePresentationProofFileParser implements
     }
 
     @Override
-    public void endExpr(char eid, int stringLiteralLine) {
+    public void endExpr(char eid, int lineNr) {
         switch (eid) {
         case 'b': // branch
             currNode = stack.pop();
@@ -266,11 +266,13 @@ public class IntermediatePresentationProofFileParser implements
         case 'r': // rule (taclet)
             ((AppNodeIntermediate) currNode)
                     .setIntermediateRuleApp(constructTacletApp());
+            ((AppNodeIntermediate) currNode).getIntermediateRuleApp().setLineNr(lineNr);
             break;
 
         case 'n': // BuiltIn rules
             ((AppNodeIntermediate) currNode)
                     .setIntermediateRuleApp(constructBuiltInApp());
+            ((AppNodeIntermediate) currNode).getIntermediateRuleApp().setLineNr(lineNr);
             break;
 
         case 'x': // ifInst (for built in rules)

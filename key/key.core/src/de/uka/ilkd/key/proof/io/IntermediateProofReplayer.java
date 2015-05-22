@@ -214,14 +214,14 @@ public class IntermediateProofReplayer {
                     }
                     catch (Exception e) {
                         skipBranch = 1;
-                        reportError(ERROR_LOADING_PROOF_LINE + "Goal "
-                                + currGoal.node().serialNr() + ", rule "
+                        reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
+                                + ", goal " + currGoal.node().serialNr() + ", rule "
                                 + appInterm.getRuleName() + NOT_APPLICABLE, e);
                     }
                     catch (AssertionError e) {
                         skipBranch = 1;
-                        reportError(ERROR_LOADING_PROOF_LINE + "Goal "
-                                + currGoal.node().serialNr() + ", rule "
+                        reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
+                                + ", goal " + currGoal.node().serialNr() + ", rule "
                                 + appInterm.getRuleName() + NOT_APPLICABLE, e);
                     }
 
@@ -346,22 +346,22 @@ public class IntermediateProofReplayer {
                         }
                         catch (BuiltInConstructionException e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Goal "
-                                    + currGoal.node().serialNr() + ", rule "
+                            reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
+                                    + ", goal " + currGoal.node().serialNr() + ", rule "
                                     + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
                         catch (RuntimeException e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Goal "
-                                    + currGoal.node().serialNr() + ", rule "
+                            reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
+                                    + ", goal " + currGoal.node().serialNr() + ", rule "
                                     + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
                         catch (AssertionError e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Goal "
-                                    + currGoal.node().serialNr() + ", rule "
+                            reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
+                                    + ", goal " + currGoal.node().serialNr() + ", rule "
                                     + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
@@ -501,13 +501,15 @@ public class IntermediateProofReplayer {
                 }
                 catch (RuntimeException e) {
                     skipBranch = 1;
-                    reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                    reportError(ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr()
+                        + ", goal "
                             + currGoal.node().serialNr() + ", rule " + ruleName
                             + NOT_APPLICABLE, e);
                 }
                 catch (AssertionError e) {
                     skipBranch = 1;
-                    reportError(ERROR_LOADING_PROOF_LINE + "Goal "
+                    reportError(ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr()
+                        + ", goal "
                             + currGoal.node().serialNr() + ", rule " + ruleName
                             + NOT_APPLICABLE, e);
                 }

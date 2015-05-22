@@ -14,7 +14,7 @@ import de.uka.ilkd.key.util.Pair;
  *
  * @author Dominic Scheurer
  */
-public class BuiltInAppIntermediate implements AppIntermediate {
+public class BuiltInAppIntermediate extends AppIntermediate {
 
     private String ruleName = null;
     private Pair<Integer, PosInTerm> posInfo = null;

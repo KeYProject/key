@@ -24,14 +24,30 @@ import de.uka.ilkd.key.logic.Name;
  * @see TacletAppIntermediate
  * @see BuiltInAppIntermediate
  */
-public interface AppIntermediate {
+public abstract class AppIntermediate {
+    private int lineNr = -1;
+    
     /**
      * @return The new names registered in the course of this app.
      */
-    ImmutableList<Name> getNewNames();
+    public abstract ImmutableList<Name> getNewNames();
     
     /**
      * @return The name of this taclet / built in rule.
      */
-    String getRuleName();
+    public abstract String getRuleName();
+
+    /**
+     * @return The line number of this application in the loaded proof file.
+     */
+    public String getLineNr() {
+        return "" + lineNr;
+    }
+
+    /**
+     * @param lineNr The line number of this application in the loaded proof file.
+     */
+    public void setLineNr(int lineNr) {
+        this.lineNr = lineNr;
+    }
 }
