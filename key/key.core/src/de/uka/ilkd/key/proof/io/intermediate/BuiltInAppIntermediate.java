@@ -10,8 +10,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * 
- * TODO: Document.
+ * Encapsulates intermediate information for constructing a built-in rule application.
  *
  * @author Dominic Scheurer
  */

@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.proof.io.intermediate;
 
 /**
- * TODO.
+ * Node in an intermediate proof representation storing a rule application.
  * 
  * @author Dominic Scheurer
  */
 public class AppNodeIntermediate extends NodeIntermediate {
-    
+
     private AppIntermediate ruleApp = null;
     private boolean interactiveRuleApplication = false;
 

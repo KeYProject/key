@@ -87,6 +87,10 @@ import de.uka.ilkd.key.util.Triple;
  * Replay is started using {@link #replay()}. In the course of replaying, new
  * nodes are added to the supplied proof object. The last goal touched during
  * replay can be obtained by {@link #getLastSelectedGoal()}.
+ * 
+ * TODO: Check if joining with more than one partner works out of the box.
+ *   Potential problem: Different order may result in syntactically different
+ *   nodes.
  *
  * @see IntermediatePresentationProofFileParser
  *

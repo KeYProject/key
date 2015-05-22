@@ -16,7 +16,8 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import java.util.LinkedList;
 
 /**
- * TODO.
+ * Node in an intermediate proof representation. Responsible for
+ * storing information about children of nodes.
  * 
  * @author Dominic Scheurer
  */

@@ -323,13 +323,13 @@ public class IntermediatePresentationProofFileParser implements
         if (builtinInfo.currRuleName.equals("JoinRule")) {
             result = new JoinAppIntermediate(builtinInfo.currRuleName,
                     new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
-                    builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currJoinNodeId,
+                    builtinInfo.currJoinNodeId,
                     builtinInfo.currJoinProc, builtinInfo.currNrPartners, builtinInfo.currNewNames);
         }
         else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
             result = new JoinPartnerAppIntermediate(builtinInfo.currRuleName,
                     new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
-                    builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currCorrespondingJoinNodeId, builtinInfo.currNewNames);
+                    builtinInfo.currCorrespondingJoinNodeId, builtinInfo.currNewNames);
         }
         else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,

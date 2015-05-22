@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * TODO.
+ * Encapsulates intermediate information for constructing a taclet application.
  * 
  * @author Dominic Scheurer
  */
@@ -35,6 +35,17 @@ public class TacletAppIntermediate implements AppIntermediate {
     private ImmutableList<String> ifDirectFormulaList = null;
     private ImmutableList<Name> newNames = null;
 
+    /**
+     * Constructs a new intermediate taclet application.
+     *
+     * @param tacletName Name of the taclet.
+     * @param posInfo Position information (Integer representing position
+     *   of the target formula, PosInTerm for relevant term inside the formula).
+     * @param insts Schema variable instantiations.
+     * @param ifSeqFormulaList
+     * @param ifDirectFormulaList
+     * @param newNames New names registered during taclet application.
+     */
     public TacletAppIntermediate(String tacletName,
             Pair<Integer, PosInTerm> posInfo, LinkedList<String> insts,
             ImmutableList<String> ifSeqFormulaList, ImmutableList<String> ifDirectFormulaList,

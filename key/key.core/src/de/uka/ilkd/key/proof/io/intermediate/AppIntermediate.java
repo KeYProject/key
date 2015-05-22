@@ -18,9 +18,11 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Name;
 
 /**
- * TODO.
+ * Represents an intermediate rule / taclet application.
  * 
  * @author Dominic Scheurer
+ * @see TacletAppIntermediate
+ * @see BuiltInAppIntermediate
  */
 public interface AppIntermediate {
     /**
