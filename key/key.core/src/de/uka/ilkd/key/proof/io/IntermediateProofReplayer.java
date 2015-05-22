@@ -89,8 +89,8 @@ import de.uka.ilkd.key.util.Triple;
  * replay can be obtained by {@link #getLastSelectedGoal()}.
  * 
  * TODO: Check if joining with more than one partner works out of the box.
- *   Potential problem: Different order may result in syntactically different
- *   nodes.
+ * Potential problem: Different order may result in syntactically different
+ * nodes.
  *
  * @see IntermediatePresentationProofFileParser
  *
@@ -115,8 +115,7 @@ public class IntermediateProofReplayer {
     private LinkedList<Pair<Node, NodeIntermediate>> queue = new LinkedList<Pair<Node, NodeIntermediate>>();
 
     /** Maps join node IDs to previously seen join partners */
-    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
-            new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
+    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
 
     /**
      * a value == 1 means the current branch is ignored; a value > 1 means that
@@ -134,8 +133,10 @@ public class IntermediateProofReplayer {
     /**
      * Constructs a new {@link IntermediateProofReplayer}.
      *
-     * @param loader The problem loader, for reporting errors.
-     * @param proof The proof object into which to load the replayed proof.
+     * @param loader
+     *            The problem loader, for reporting errors.
+     * @param proof
+     *            The proof object into which to load the replayed proof.
      * @param intermediate
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
@@ -200,12 +201,10 @@ public class IntermediateProofReplayer {
                                 && currInterm.getChildren().size() > 0) {
 
                             // NOTE: In the case of an unfinished proof, there
-                            // is another node
-                            // after the last application which is not
-                            // represented by
-                            // an intermediate application. Therefore, we have
-                            // to add
-                            // the last check in the above conjunction.
+                            // is another node after the last application which
+                            // is not represented by an intermediate
+                            // application. Therefore, we have to add the last
+                            // check in the above conjunction.
 
                             Node child = children.next();
                             queue.addLast(new Pair<Node, NodeIntermediate>(
@@ -214,14 +213,16 @@ public class IntermediateProofReplayer {
                     }
                     catch (Exception e) {
                         skipBranch = 1;
-                        reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                + ", goal " + currGoal.node().serialNr() + ", rule "
+                        reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                + appInterm.getLineNr() + ", goal "
+                                + currGoal.node().serialNr() + ", rule "
                                 + appInterm.getRuleName() + NOT_APPLICABLE, e);
                     }
                     catch (AssertionError e) {
                         skipBranch = 1;
-                        reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                + ", goal " + currGoal.node().serialNr() + ", rule "
+                        reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                + appInterm.getLineNr() + ", goal "
+                                + currGoal.node().serialNr() + ", rule "
                                 + appInterm.getRuleName() + NOT_APPLICABLE, e);
                     }
 
@@ -346,22 +347,25 @@ public class IntermediateProofReplayer {
                         }
                         catch (BuiltInConstructionException e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                    + ", goal " + currGoal.node().serialNr() + ", rule "
+                            reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                    + appInterm.getLineNr() + ", goal "
+                                    + currGoal.node().serialNr() + ", rule "
                                     + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
                         catch (RuntimeException e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                    + ", goal " + currGoal.node().serialNr() + ", rule "
+                            reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                    + appInterm.getLineNr() + ", goal "
+                                    + currGoal.node().serialNr() + ", rule "
                                     + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
                         catch (AssertionError e) {
                             skipBranch = 1;
-                            reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                    + ", goal " + currGoal.node().serialNr() + ", rule "
+                            reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                    + appInterm.getLineNr() + ", goal "
+                                    + currGoal.node().serialNr() + ", rule "
                                     + appInterm.getRuleName() + NOT_APPLICABLE,
                                     e);
                         }
@@ -386,15 +390,17 @@ public class IntermediateProofReplayer {
     public Collection<Throwable> getErrors() {
         return errors;
     }
-    
+
     /**
      * Constructs a taclet application from an intermediate one.
      *
-     * @param currInterm The intermediate taclet application to create
-     *  a "real" application for.
-     * @param currGoal The goal on which to apply the taclet app.
-     * @return The taclet application corresponding to the supplied
-     *  intermediate representation.
+     * @param currInterm
+     *            The intermediate taclet application to create a "real"
+     *            application for.
+     * @param currGoal
+     *            The goal on which to apply the taclet app.
+     * @return The taclet application corresponding to the supplied intermediate
+     *         representation.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
             Goal currGoal) {
@@ -450,15 +456,18 @@ public class IntermediateProofReplayer {
     /**
      * Constructs a built-in rule application from an intermediate one.
      *
-     * @param currInterm The intermediate built-in application to create
-     *  a "real" application for.
-     * @param currGoal The goal on which to apply the built-in app.
+     * @param currInterm
+     *            The intermediate built-in application to create a "real"
+     *            application for.
+     * @param currGoal
+     *            The goal on which to apply the built-in app.
      * @return The built-in application corresponding to the supplied
-     *  intermediate representation.
-     * @throws SkipSMTRuleException If the proof has been loaded, but the
-     *  SMT solvers have not been run.
-     * @throws BuiltInConstructionException In case of an error during
-     *  construction.
+     *         intermediate representation.
+     * @throws SkipSMTRuleException
+     *             If the proof has been loaded, but the SMT solvers have not
+     *             been run.
+     * @throws BuiltInConstructionException
+     *             In case of an error during construction.
      */
     private IBuiltInRuleApp constructBuiltinApp(
             BuiltInAppIntermediate currInterm, Goal currGoal)
@@ -501,17 +510,19 @@ public class IntermediateProofReplayer {
                 }
                 catch (RuntimeException e) {
                     skipBranch = 1;
-                    reportError(ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr()
-                        + ", goal "
-                            + currGoal.node().serialNr() + ", rule " + ruleName
-                            + NOT_APPLICABLE, e);
+                    reportError(
+                            ERROR_LOADING_PROOF_LINE + "Line "
+                                    + currInterm.getLineNr() + ", goal "
+                                    + currGoal.node().serialNr() + ", rule "
+                                    + ruleName + NOT_APPLICABLE, e);
                 }
                 catch (AssertionError e) {
                     skipBranch = 1;
-                    reportError(ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr()
-                        + ", goal "
-                            + currGoal.node().serialNr() + ", rule " + ruleName
-                            + NOT_APPLICABLE, e);
+                    reportError(
+                            ERROR_LOADING_PROOF_LINE + "Line "
+                                    + currInterm.getLineNr() + ", goal "
+                                    + currGoal.node().serialNr() + ", rule "
+                                    + ruleName + NOT_APPLICABLE, e);
                 }
             }
         }
@@ -616,8 +627,10 @@ public class IntermediateProofReplayer {
     /**
      * Stores an error in the list.
      *
-     * @param string Description text.
-     * @param e Error encountered.
+     * @param string
+     *            Description text.
+     * @param e
+     *            Error encountered.
      */
     private void reportError(String string, Throwable e) {
         status = "Errors while reading the proof. Not all branches could be load successfully.";
@@ -625,12 +638,15 @@ public class IntermediateProofReplayer {
     }
 
     /**
-     * Retrieves all registered applications at the given goal and position
-     * for the rule corresponding to the given ruleName.
+     * Retrieves all registered applications at the given goal and position for
+     * the rule corresponding to the given ruleName.
      *
-     * @param ruleName Name of the rule to find applications for.
-     * @param g Goal to search.
-     * @param pos Position of interest in the given goal.
+     * @param ruleName
+     *            Name of the rule to find applications for.
+     * @param g
+     *            Goal to search.
+     * @param pos
+     *            Position of interest in the given goal.
      * @return All matching rule applications at pos in g.
      */
     private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(
@@ -647,14 +663,18 @@ public class IntermediateProofReplayer {
 
         return result;
     }
-    
+
     /**
      * Instantiates schema variables in the given taclet application.
      *
-     * @param app The taclet application to instantiate.
-     * @param currGoal The corresponding goal.
-     * @param loadedInsts Loaded schema variable instantiations.
-     * @param services The services object.
+     * @param app
+     *            The taclet application to instantiate.
+     * @param currGoal
+     *            The corresponding goal.
+     * @param loadedInsts
+     *            Loaded schema variable instantiations.
+     * @param services
+     *            The services object.
      * @return The instantiated taclet.
      */
     private static TacletApp constructInsts(TacletApp app, Goal currGoal,
@@ -706,9 +726,12 @@ public class IntermediateProofReplayer {
     /**
      * Finds a schema variable in the given set.
      *
-     * @param set The set to search.
-     * @param name The name to search for.
-     * @return The found schema variable, or null if it is not present in the set.
+     * @param set
+     *            The set to search.
+     * @param name
+     *            The name to search for.
+     * @return The found schema variable, or null if it is not present in the
+     *         set.
      */
     private static SchemaVariable lookupName(ImmutableSet<SchemaVariable> set,
             String name) {
@@ -724,12 +747,17 @@ public class IntermediateProofReplayer {
     /**
      * Parses a given term in String representation.
      *
-     * @param value String to parse.
-     * @param proof Proof object (for namespaces and Services object).
-     * @param varNS Variable namespace.
-     * @param progVar_ns Program variable namespace.
+     * @param value
+     *            String to parse.
+     * @param proof
+     *            Proof object (for namespaces and Services object).
+     * @param varNS
+     *            Variable namespace.
+     * @param progVar_ns
+     *            Program variable namespace.
      * @return The parsed term.
-     * @throws ParserException In case of an error.
+     * @throws ParserException
+     *             In case of an error.
      */
     public static Term parseTerm(String value, Proof proof, Namespace varNS,
             Namespace progVar_ns) {
@@ -748,8 +776,10 @@ public class IntermediateProofReplayer {
     /**
      * Parses a given term in String representation.
      *
-     * @param value String to parse.
-     * @param proof Proof object (for namespaces and Services object).
+     * @param value
+     *            String to parse.
+     * @param proof
+     *            Proof object (for namespaces and Services object).
      * @return The parsed term.
      */
     public static Term parseTerm(String value, Proof proof) {
@@ -758,15 +788,19 @@ public class IntermediateProofReplayer {
     }
 
     /**
-     * Instantiates a schema variable in the given taclet application.
-     * 1st pass: only VariableSV.
+     * Instantiates a schema variable in the given taclet application. 1st pass:
+     * only VariableSV.
      *
-     * @param app Application to instantiate.
-     * @param sv Schema variable (VariableSV) to instantiate.
-     * @param value Name for the instantiated logic variable.
-     * @param services The services object.
-     * @return An instantiated taclet application, where the schema variable
-     *  has been instantiated by a logic variable of the given name.
+     * @param app
+     *            Application to instantiate.
+     * @param sv
+     *            Schema variable (VariableSV) to instantiate.
+     * @param value
+     *            Name for the instantiated logic variable.
+     * @param services
+     *            The services object.
+     * @return An instantiated taclet application, where the schema variable has
+     *         been instantiated by a logic variable of the given name.
      */
     public static TacletApp parseSV1(TacletApp app, SchemaVariable sv,
             String value, Services services) {
@@ -777,17 +811,21 @@ public class IntermediateProofReplayer {
     }
 
     /**
-     * Instantiates a schema variable in the given taclet application.
-     * 2nd pass: All other schema variables.
+     * Instantiates a schema variable in the given taclet application. 2nd pass:
+     * All other schema variables.
      *
-     * @param app Application to instantiate.
-     * @param sv Schema variable to instantiate.
-     * @param value Name for the instantiated Skolem constant, program
-     *  element or term..
-     * @param targetGoal The goal corresponding to the given application.
-     * @return An instantiated taclet application, where the schema variable
-     *  has been instantiated, depending on its type, by a Skolem constant,
-     *  program element, or term of the given name.
+     * @param app
+     *            Application to instantiate.
+     * @param sv
+     *            Schema variable to instantiate.
+     * @param value
+     *            Name for the instantiated Skolem constant, program element or
+     *            term..
+     * @param targetGoal
+     *            The goal corresponding to the given application.
+     * @return An instantiated taclet application, where the schema variable has
+     *         been instantiated, depending on its type, by a Skolem constant,
+     *         program element, or term of the given name.
      * @see #parseSV1(TacletApp, SchemaVariable, String, Services)
      */
     public static TacletApp parseSV2(TacletApp app, SchemaVariable sv,
