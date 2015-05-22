@@ -506,7 +506,7 @@ public abstract class AbstractProblemLoader {
             status = parser.getStatus();
             errors.addAll(parser.getErrors());
             
-            status += "\n\n" + replayer.getStatus();
+            status += (status.isEmpty() ? "" : "\n\n") + replayer.getStatus();
             errors.addAll(replayer.getErrors());
         }
         	

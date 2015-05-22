@@ -401,9 +401,10 @@ public class IntermediateProofReplayer {
      *            The goal on which to apply the taclet app.
      * @return The taclet application corresponding to the supplied intermediate
      *         representation.
+     * @throws TacletConstructionException In case of an error during construction.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
-            Goal currGoal) {
+            Goal currGoal) throws TacletConstructionException {
 
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
@@ -423,10 +424,14 @@ public class IntermediateProofReplayer {
         Services services = proof.getServices();
 
         if (currFormula != 0) { // otherwise we have no pos
-            pos = PosInOccurrence.findInSequent(currGoal.sequent(),
-                    currFormula, currPosInTerm);
-            ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
-            ourApp = ourApp.setPosInOccurrence(pos, services);
+            try {
+                pos = PosInOccurrence.findInSequent(currGoal.sequent(),
+                        currFormula, currPosInTerm);
+                ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
+                ourApp = ourApp.setPosInOccurrence(pos, services);
+            } catch (Exception e) {
+                throw new TacletConstructionException("Wrong position information.");
+            }
         }
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(),
@@ -566,7 +571,7 @@ public class IntermediateProofReplayer {
                         currFormula, currPosInTerm);
             }
             catch (RuntimeException e) {
-                throw new BuiltInConstructionException(e);
+                throw new BuiltInConstructionException("Wrong position information.", e);
             }
         }
 
@@ -856,7 +861,22 @@ public class IntermediateProofReplayer {
     }
 
     /**
-     * Signals an error during construction of a built-in rule.
+     * Signals an error during construction of a taclet app.
+     */
+    static class TacletConstructionException extends Exception {
+        private static final long serialVersionUID = 7859543482157633999L;
+
+        TacletConstructionException(String s) {
+            super(s);
+        }
+
+        TacletConstructionException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    /**
+     * Signals an error during construction of a built-in rule app.
      */
     static class BuiltInConstructionException extends Exception {
         private static final long serialVersionUID = -735474220502290816L;
@@ -867,6 +887,10 @@ public class IntermediateProofReplayer {
 
         BuiltInConstructionException(Throwable cause) {
             super(cause);
+        }
+        
+        public BuiltInConstructionException(String s, Throwable cause) {
+            super(s, cause);
         }
     }
 
