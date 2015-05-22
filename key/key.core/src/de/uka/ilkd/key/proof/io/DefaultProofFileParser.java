@@ -72,6 +72,9 @@ import de.uka.ilkd.key.speclang.OperationContract;
  * Default implementation of {@link IProofFileParser}.
  * 
  * @author Martin Hentschel
+ * @deprecated This parser is not capable of parsing proofs including join rule applications.
+ *   Please use {@link IntermediatePresentationProofFileParser} and {@link IntermediateProofReplayer}
+ *   instead. (Dominic Scheurer)
  */
 public class DefaultProofFileParser implements IProofFileParser {
 
