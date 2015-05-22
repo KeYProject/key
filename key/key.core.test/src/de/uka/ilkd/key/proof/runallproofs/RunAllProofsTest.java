@@ -90,6 +90,8 @@ public class RunAllProofsTest implements Serializable {
 
    public static final File RUNALLPROOFS_TMP_FOLDER;
 
+   public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
+
    /**
     * Computes the constant values.
     */
