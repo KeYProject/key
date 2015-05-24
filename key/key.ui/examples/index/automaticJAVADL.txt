@@ -46,6 +46,14 @@ reloadEnabled = true
  */
 tempDir = ../../key.core.test/runallproofs_tmp
 
+/*
+ * If the fork mode is not set to noFork, the launched subprocesses are terminated as
+ * soon as the timeout specified here has elapsed.
+ * 
+ * Timeout per subprocess in seconds
+ */
+forkTimeout = 1000
+
 keySettings = "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
