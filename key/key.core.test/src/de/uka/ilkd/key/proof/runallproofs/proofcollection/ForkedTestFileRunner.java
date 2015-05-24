@@ -84,6 +84,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
       if (testFiles.isEmpty()) {
          return new ArrayList<>();
       }
+      ProofCollectionSettings settings = testFiles.get(0).getSettings();
 
       writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
                 testFiles.toArray(new TestFile[testFiles.size()]));

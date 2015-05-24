@@ -84,7 +84,7 @@ public final class RunAllProofsTestUnit implements Serializable {
         ForkMode forkMode = settings.getForkMode();
         switch(forkMode) {
         case PERGROUP:
-            testResults = ForkedTestFileRunner.processTestFiles(testFiles, settings, tempDirectory);
+            testResults = ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
             break;
 
         case NOFORK:
@@ -99,7 +99,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {
                 TestResult testResult =
-                        ForkedTestFileRunner.processTestFile(testFile, tempDirectory);
+                        ForkedTestFileRunner.processTestFile(testFile, getTempDir());
                 testResults.add(testResult);
             }
             break;
