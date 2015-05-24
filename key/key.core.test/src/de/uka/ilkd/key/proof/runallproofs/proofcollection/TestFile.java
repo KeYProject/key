@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -19,7 +20,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class TestFile {
+public class TestFile implements Serializable {
 
    private final TestProperty testProperty;
    private final String path;
