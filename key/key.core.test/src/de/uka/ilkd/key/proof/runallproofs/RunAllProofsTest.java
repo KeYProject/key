@@ -27,6 +27,7 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,6 +37,7 @@ import org.key_project.util.java.IOUtil;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 
 /**
  * <p>
@@ -87,6 +89,8 @@ public class RunAllProofsTest implements Serializable {
    public static final File EXAMPLE_DIR;
 
    public static final File KEY_CORE_TEST;
+
+   private static StatisticsFile statisticsFile = null;
 
    /**
     * Computes the constant values.
@@ -154,6 +158,12 @@ public class RunAllProofsTest implements Serializable {
       ProofCollection proofCollection = parseIndexFile();
 
       /*
+       * Set up statistics file.
+       */
+      statisticsFile = proofCollection.getSettings().getStatisticsFile();
+      statisticsFile.setUp();
+
+      /*
        * Create list of constructor parameters that will be returned by this
        * method. Suitable constructor is automatically determined by JUnit.
        */
@@ -164,6 +174,11 @@ public class RunAllProofsTest implements Serializable {
          data.add(new RunAllProofsTestUnit[] { unit });
       }
       return data;
+   }
+
+   @AfterClass
+   public static void computeSums() throws IOException {
+      statisticsFile.computeSums();
    }
 
    /**

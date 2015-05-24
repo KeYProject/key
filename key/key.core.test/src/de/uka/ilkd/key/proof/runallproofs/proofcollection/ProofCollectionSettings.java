@@ -35,6 +35,21 @@ public class ProofCollectionSettings implements Serializable {
    private static final String TEMP_DIR = "tempDir";
 
    /**
+    * File in which the present {@link ProofCollectionSettings} were declared.
+    */
+   private final File sourceProofCollectionFile;
+
+   /**
+    * String {@link Map} containing all settings entries.
+    */
+   private final Map<String, String> immutableSettingsMap;
+
+   /**
+    * File in which statistics are written.
+    */
+   private final StatisticsFile statisticsFile;
+
+   /**
     * {@link List} of settings entries that are created from system properties.
     * Those entries are copied into every {@link ProofCollectionSettings}
     * object. Every system property starting with "key.runallproofs." is
@@ -96,16 +111,6 @@ public class ProofCollectionSettings implements Serializable {
    }
 
    /**
-    * File in which the present {@link ProofCollectionSettings} were declared.
-    */
-   private final File sourceProofCollectionFile;
-
-   /**
-    * String {@link Map} containing all settings entries.
-    */
-   private final Map<String, String> immutableSettingsMap;
-
-   /**
     * Creates a {@link ProofCollectionSettings} object from the specified
     * parameters with no parent settings.
     */
@@ -126,6 +131,18 @@ public class ProofCollectionSettings implements Serializable {
        * Compute immutable map containing settings entries.
        */
       immutableSettingsMap = createUnmodifiableMapContainingDefaults(entries);
+
+      /*
+       * Compute location of statistics file.
+       */
+      String statisticsFileName = get(STATISTICS_FILE);
+      if (statisticsFileName == null) {
+         statisticsFile = null;
+      }
+      else {
+         statisticsFile = new StatisticsFile(getAbsoluteFile(
+               getBaseDirectory(), statisticsFileName));
+      }
    }
 
    /**
@@ -178,58 +195,46 @@ public class ProofCollectionSettings implements Serializable {
       return immutableSettingsMap.get(key);
    }
 
-   /**
-    * A warning will be printed out in case unknown value for forkMode is used.
-    * This helper variable ensures the warning is printed at most once.
-    */
-   private ForkMode forkMode = null;
-
    public ForkMode getForkMode() {
 
-      /*
-       * Since proof collection settings are immutable, fork mode needs to be
-       * computed only once and can be reused later. Warning in case of unknown
-       * value for fork mode will also be printed only once this way.
-       */
-      if (forkMode == null) {
-         String forkModeString = get(FORK_MODE);
+      ForkMode forkMode = null;
+      String forkModeString = get(FORK_MODE);
 
-         if (forkModeString == null || forkModeString.length() == 0) {
-            // Return default value in case no particular fork mode is
-            // specified.
-            forkMode = ForkMode.NOFORK;
-         }
-         else {
-            for (ForkMode mode : ForkMode.values()) {
-               if (mode.settingName.toLowerCase().equals(
-                     forkModeString.toLowerCase())) {
-                  forkMode = mode;
-                  break;
-               }
+      if (forkModeString == null || forkModeString.length() == 0) {
+         // Return default value in case no particular fork mode is
+         // specified.
+         forkMode = ForkMode.NOFORK;
+      }
+      else {
+         for (ForkMode mode : ForkMode.values()) {
+            if (mode.settingName.toLowerCase().equals(
+                  forkModeString.toLowerCase())) {
+               forkMode = mode;
+               break;
             }
          }
-
-         /*
-          * Warn user that specified fork mode was not recognized but use
-          * default fork mode rather than throwing an Exception.
-          */
-         if (forkMode == null) {
-            /*
-             * Unknown value used for fork mode. Printing out warning to the
-             * user.
-             */
-            System.out
-                  .println("Warning: Unknown value used for runAllProofs fork mode: "
-                        + forkModeString);
-            System.out
-                  .println("Use either of the following: noFork (default), perGroup, perFile");
-            System.out.println("Using default fork mode: noFork");
-            System.out
-                  .println("If you want to inspect source code, look up the following location:");
-            System.out.println(new Throwable().getStackTrace()[0]);
-            forkMode = ForkMode.NOFORK;
-         }
       }
+
+      /*
+       * Warn user that specified fork mode was not recognized but use default
+       * fork mode rather than throwing an Exception.
+       */
+      if (forkMode == null) {
+         /*
+          * Unknown value used for fork mode. Printing out warning to the user.
+          */
+         System.out
+               .println("Warning: Unknown value used for runAllProofs fork mode: "
+                     + forkModeString);
+         System.out
+               .println("Use either of the following: noFork (default), perGroup, perFile");
+         System.out.println("Using default fork mode: noFork");
+         System.out
+               .println("If you want to inspect source code, look up the following location:");
+         System.out.println(new Throwable().getStackTrace()[0]);
+         forkMode = ForkMode.NOFORK;
+      }
+
       return forkMode;
    }
 
@@ -253,25 +258,13 @@ public class ProofCollectionSettings implements Serializable {
             baseDirectoryName);
    }
 
-   private StatisticsFile statisticsFile = null;
-
    /**
     * Returns location of statistics file. Can be null. In this case no
     * statistics are saved.
     */
    public StatisticsFile getStatisticsFile() {
-      if (statisticsFile == null) {
-         String statisticsFileName = get(STATISTICS_FILE);
-         if (statisticsFileName == null) {
-            return null;
-         }
-         statisticsFile = new StatisticsFile(getAbsoluteFile(
-               getBaseDirectory(), statisticsFileName));
-      }
       return statisticsFile;
    }
-
-   private File tempDir = null;
 
    public File getTempDir() throws IOException {
       String tempDirString = get(TEMP_DIR);
@@ -282,9 +275,9 @@ public class ProofCollectionSettings implements Serializable {
                      + "To solve this, specify setting \"" + TEMP_DIR
                      + "\" in file " + sourceProofCollectionFile);
       }
-      tempDir = new File(TEMP_DIR);
+      File tempDir = new File(tempDirString);
       if (!tempDir.isAbsolute()) {
-         tempDir = new File(getBaseDirectory(), TEMP_DIR);
+         tempDir = new File(getBaseDirectory(), tempDirString);
       }
       if (tempDir.isFile()) {
          throw new IOException("Specified temporary directory is a file: "
@@ -294,23 +287,24 @@ public class ProofCollectionSettings implements Serializable {
       return tempDir;
    }
 
-   private Set<String> enabledTestCaseNames = null;
-
+   /**
+    * Retrieve names of test cases that are configured to be enabled. By
+    * default, all {@link RunAllProofsTest} test cases are enabled. If this
+    * method returns something else than null, then only test cases whose name
+    * is contained in the returned set are enabled.
+    */
    public Set<String> getEnabledTestCaseNames() {
       String testCases = get("testCases");
       if (testCases == null || testCases.length() == 0) {
          return null;
       }
 
-      if (enabledTestCaseNames == null) {
-         enabledTestCaseNames = new LinkedHashSet<>();
-         String[] testCaseList = testCases.split(",");
-         for (String testCaseName : testCaseList) {
-            enabledTestCaseNames.add(testCaseName);
-         }
-         enabledTestCaseNames = Collections
-               .unmodifiableSet(enabledTestCaseNames);
+      Set<String> enabledTestCaseNames = new LinkedHashSet<>();
+      String[] testCaseList = testCases.split(",");
+      for (String testCaseName : testCaseList) {
+         enabledTestCaseNames.add(testCaseName);
       }
+      enabledTestCaseNames = Collections.unmodifiableSet(enabledTestCaseNames);
       return enabledTestCaseNames;
    }
 

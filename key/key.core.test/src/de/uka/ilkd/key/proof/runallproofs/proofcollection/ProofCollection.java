@@ -77,4 +77,9 @@ public class ProofCollection {
          return ret;
       }
    }
+
+   public ProofCollectionSettings getSettings() {
+      return settings;
+   }
+
 }

@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,6 +17,9 @@ import de.uka.ilkd.key.proof.Statistics;
  * Class for managing a file which contains statistics recorded during a
  * {@link RunAllProofsTest} run. Statistics are recorded as a table, which
  * contains one line for each tested file.
+ * 
+ * This class must be immutable because it is part of
+ * {@link ProofCollectionSettings}, which is immutable as well.
  */
 public class StatisticsFile implements Serializable {
 
@@ -22,7 +27,7 @@ public class StatisticsFile implements Serializable {
 
    @SuppressWarnings("rawtypes")
    private static final Column[] columns = new Column[] {
-         new Column<String>("Name", "---SUM---") {
+         new Column<String>("Name") {
 
             @Override
             String addEntry(Statistics statistics, File keyFile,
@@ -30,6 +35,11 @@ public class StatisticsFile implements Serializable {
                String name = keyFile.getAbsolutePath();
                final int slashIndex = name.lastIndexOf("examples/");
                return slashIndex >= 0 ? name.substring(slashIndex) : name;
+            }
+
+            @Override
+            String computeSum(List<String> list) {
+               return "---SUM---";
             }
 
          }, new LongColumn("Total rule apps") {
@@ -67,23 +77,39 @@ public class StatisticsFile implements Serializable {
                return statistics.autoModeTimeInNano / 1000000;
             }
 
-         }, new Column<Integer>("Closed", 0) {
+         }, new Column<Integer>("Closed") {
 
             @Override
             Integer addEntry(Statistics statistics, File keyFile, boolean closed) {
                int proofClosed = closed ? 1 : 0;
-               sum += proofClosed;
                return proofClosed;
             }
 
-         }, new Column<Double>("Time per step", 0.0) {
+            @Override
+            String computeSum(List<String> list) {
+               long ret = 0;
+               for (String s : list) {
+                  ret += Long.parseLong(s);
+               }
+               return "" + ret;
+            }
+
+         }, new Column<Double>("Time per step") {
 
             @Override
             Double addEntry(Statistics statistics, File keyFile,
                   boolean proofClosed) {
                double value = statistics.timePerStepInNano / 1000000;
-               sum += value;
                return value;
+            }
+
+            @Override
+            String computeSum(List<String> list) {
+               double ret = 0.0;
+               for (String s : list) {
+                  ret += Double.parseDouble(s);
+               }
+               return "" + ret;
             }
 
          }, new LongColumn("Total Runtime Memory") {
@@ -104,37 +130,28 @@ public class StatisticsFile implements Serializable {
    }
 
    /**
-    * Is set false until method {@link #init()} has been called.
+    * Deletes an old statistics file and sets up a new one that has column names
+    * as first row.
     */
-   private boolean initialized = false;
-
-   /**
-    * Method for setting up statistics file. Deletes existing statistics file
-    * (if one exists). Creates a new one and writes column names in first row of
-    * table.
-    */
-   private void init() throws IOException {
-      if (!initialized) {
-         // Create parent directory if it does not exist yet.
-         if (!location.getParentFile().exists()) {
-            location.getParentFile().mkdirs();
-         }
-
-         // Delete old statistics file if it exists already.
-         if (location.exists()) {
-            System.out.println("Deleting old RunAllProofs statistics file: "
-                  + location);
-            location.delete();
-         }
-
-         // Write column names in the first line of statistics file.
-         List<String> columnNames = new LinkedList<>();
-         for (Column<?> column : columns) {
-            columnNames.add(column.name);
-         }
-         writeLine(columnNames);
-         initialized = true;
+   public void setUp() throws IOException {
+      // Create parent directory if it does not exist yet.
+      if (!location.getParentFile().exists()) {
+         location.getParentFile().mkdirs();
       }
+
+      // Delete old statistics file if it exists already.
+      if (location.exists()) {
+         System.out.println("Deleting old RunAllProofs statistics file: "
+               + location);
+         location.delete();
+      }
+
+      // Write column names in the first line of statistics file.
+      List<String> columnNames = new LinkedList<>();
+      for (Column<?> column : columns) {
+         columnNames.add(column.name);
+      }
+      writeLine(columnNames);
    }
 
    /**
@@ -173,7 +190,6 @@ public class StatisticsFile implements Serializable {
     *            Thrown in case statistics file is not accessible.
     */
    public void appendStatistics(Proof proof, File keyFile) throws IOException {
-      init();
       Statistics statistics = proof.getStatistics();
       boolean proofClosed = proof.closed();
       List<String> entries = new LinkedList<>();
@@ -187,13 +203,37 @@ public class StatisticsFile implements Serializable {
    /**
     * Print sum for each column as last line when closing statistics file.
     */
-   public void close() throws IOException {
-      init();
-      List<String> sums = new LinkedList<>();
-      for (Column<?> column : columns) {
-         sums.add(column.sum.toString());
+   public void computeSums() throws IOException {
+      try (BufferedReader br = new BufferedReader(new FileReader(location))) {
+         // strip first line containing column names
+         br.readLine();
+
+         // Convert statistics table into an array of lists.
+         @SuppressWarnings("unchecked")
+         List<String>[] lists = new List[columns.length];
+         for (int i = 0; i < lists.length; i++) {
+            lists[i] = new LinkedList<String>();
+         }
+         for (String row; (row = br.readLine()) != null;) {
+            String[] column = row.split("\\|");
+            if (column.length != columns.length) {
+               throw new RuntimeException(
+                     "Wrong number of columns after parsing statistics table.");
+            }
+            for (int i = 0; i < lists.length; i++) {
+               lists[i].add(column[i]);
+            }
+         }
+
+         // write line of sums into statistics file
+         List<String> entries = new LinkedList<>();
+         int i = 0;
+         for (Column<?> column : columns) {
+            entries.add(column.computeSum(lists[i]));
+            i++;
+         }
+         writeLine(entries);
       }
-      writeLine(sums);
    }
 
    /**
@@ -202,14 +242,22 @@ public class StatisticsFile implements Serializable {
     */
    private abstract static class LongColumn extends Column<Long> {
       LongColumn(String name) {
-         super(name, 0L);
+         super(name);
       }
 
       @Override
       Long addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
          long l = getLongValueFromStatistics(statistics);
-         sum = sum + l;
          return l;
+      }
+
+      @Override
+      String computeSum(List<String> list) {
+         long ret = 0;
+         for (String s : list) {
+            ret += Long.parseLong(s);
+         }
+         return "" + ret;
       }
 
       abstract long getLongValueFromStatistics(Statistics statistics);
@@ -221,12 +269,12 @@ public class StatisticsFile implements Serializable {
     */
    private abstract static class Column<T> {
       final String name;
-      T sum;
 
-      Column(String name, T sum) {
+      Column(String name) {
          this.name = name;
-         this.sum = sum;
       }
+
+      abstract String computeSum(List<String> list);
 
       abstract T addEntry(Statistics statistics, File keyFile,
             boolean proofClosed);
