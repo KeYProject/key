@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 /**
@@ -133,7 +134,6 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     ForkedTestFileRunner.readObject(
                             getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
             installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
-            Thread.sleep(4000);
          ArrayList<TestResult> testResults = new ArrayList<>();
          for (TestFile testFile : testFiles) {
             testResults.add(testFile.runKey());
@@ -164,7 +164,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
             return;
         }
 
-        final boolean verbose = "true".equals(settings.get("verboseOutput"));
+        final boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
 
         final int timeout;
         try {

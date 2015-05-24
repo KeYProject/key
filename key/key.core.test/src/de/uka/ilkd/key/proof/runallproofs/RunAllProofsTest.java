@@ -92,6 +92,8 @@ public class RunAllProofsTest implements Serializable {
 
    private static StatisticsFile statisticsFile = null;
 
+   public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
+
    /**
     * Computes the constant values.
     */

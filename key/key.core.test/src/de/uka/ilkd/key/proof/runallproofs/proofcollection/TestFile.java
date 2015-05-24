@@ -129,13 +129,17 @@ public class TestFile {
     */
    public TestResult runKey() throws Exception {
 
+      boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+
       // Initialize KeY settings.
       String gks = settings.getGlobalKeYSettings();
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
 
       // Name resolution for the available KeY file.
       File keyFile = getKeYFile();
-
+      if(verbose) {
+          System.err.println("Now processing file " + keyFile);
+      }
       // File that the created proof will be saved to.
       File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
 
@@ -149,6 +153,9 @@ public class TestFile {
 
          // For a reload test we are done at this point. Loading was successful.
          if (testProperty == TestProperty.LOADABLE) {
+            if(verbose) {
+               System.err.println("... success: loaded");
+            }
             return getRunAllProofsTestResult(true, settings);
          }
 
@@ -156,6 +163,9 @@ public class TestFile {
          env.getProofControl().startAndWaitForAutoMode(loadedProof);
          success = (testProperty == TestProperty.PROVABLE) == loadedProof
                .closed();
+         if(verbose) {
+            System.err.println("... finished proof: " + (success ? "closed.":"open goal(s)"));
+         }
 
          // Write statistics.
          StatisticsFile statisticsFile = settings.getStatisticsFile();
@@ -174,8 +184,14 @@ public class TestFile {
             reloadProof(proofFile);
          }
 
+         if(verbose) {
+            System.err.println("... success: reloaded.");
+         }
       }
       catch (Throwable t) {
+         if(verbose) {
+            t.printStackTrace(System.err);
+         }
          throw new Exception(
                "Exception while attempting to prove file (see cause for details): "
                      + keyFile, t);
