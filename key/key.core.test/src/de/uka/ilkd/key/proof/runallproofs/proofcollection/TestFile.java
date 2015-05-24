@@ -12,16 +12,16 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * Data structure for .key-files that will be tested during
- * {@link RunAllProofsTest} run. It consists of a {@link #testProperty} and a
- * {@link #path} String for the file location. Method
+ * {@link RunAllProofsTest} execution. It consists of a {@link #testProperty}
+ * and a {@link #path} String for the file location. Method
  * {@link #runKey(ProofCollectionSettings)} will verify {@link #testProperty}
  * for the given file.
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class TestFile extends ForkedTestFileRunner {
+public class TestFile {
 
-   final TestProperty testProperty;
+   private final TestProperty testProperty;
    private final String path;
    private final ProofCollectionSettings settings;
 
@@ -226,6 +226,10 @@ public class TestFile extends ForkedTestFileRunner {
             proofLoadEnvironment.dispose();
          }
       }
+   }
+   
+   public ProofCollectionSettings getSettings() {
+      return settings;
    }
 
 }
