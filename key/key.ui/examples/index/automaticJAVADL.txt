@@ -40,6 +40,12 @@ forkMode = perGroup
  */
 reloadEnabled = true
 
+/*
+ * Temporary directory, which is used for inter process communication when using forked mode.
+ * The given path is relative to baseDirectory.
+ */
+tempDir = ../../key.core.test/runallproofs_tmp
+
 keySettings = "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT

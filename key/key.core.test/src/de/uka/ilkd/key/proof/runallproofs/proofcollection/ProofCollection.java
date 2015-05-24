@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -20,18 +19,20 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  */
 public class ProofCollection {
 
-   private final List<ProofCollectionUnit> units;
+   private final List<ProofCollectionUnit> units = new LinkedList<>();
    private final ProofCollectionSettings settings;
 
-   ProofCollection(List<ProofCollectionUnit> units,
-         ProofCollectionSettings settings) {
-      this.units = units;
+   ProofCollection(ProofCollectionSettings settings) {
       this.settings = settings;
    }
 
+   void add(ProofCollectionUnit unit) {
+      units.add(unit);
+   }
+
    /**
-    * Converts this {@link ProofCollection} into a list of
-    * {@link RunAllProofsTestUnit}s.
+    * Create list of {@link RunAllProofsTestUnit}s from list of
+    * {@link ProofCollectionUnit}s.
     * 
     * @return A list of {@link RunAllProofsTestUnit}s.
     * @throws IOException
@@ -42,40 +43,22 @@ public class ProofCollection {
    public List<RunAllProofsTestUnit> createRunAllProofsTestUnits()
          throws IOException {
 
-      /*
-       * Delete old statistics file, if present.
-       */
-      File statisticsFile = settings.getStatisticsFile();
-      if (statisticsFile.exists()) {
-         System.out.println("Deleting old RunAllProofs statistics file: " + statisticsFile);
-         statisticsFile.delete();
-      }
-
-      /**
-       * Create list of {@link RunAllProofsTestUnit}s from list of units. This
-       * procedure avoids duplicate names for different test units.
-       */
       List<RunAllProofsTestUnit> ret = new LinkedList<>();
-      Set<String> testUnitNames = new LinkedHashSet<>();
+
+      Set<String> testCaseNames = new LinkedHashSet<>();
       for (ProofCollectionUnit proofCollectionUnit : units) {
 
-         RunAllProofsTestUnit testUnit = proofCollectionUnit
-               .createRunAllProofsTestUnit(settings);
-         String testUnitOriginalName = testUnit.testName;
-
-         /**
-          * Assign a new name to testUnit in case one of the previous
-          * {@link RunAllProofsTestUnit}s occupies its name already.
-          */
-         String testUnitName = testUnitOriginalName;
+         final String proposedTestCaseName = proofCollectionUnit.getName();
+         String testCaseName = proposedTestCaseName;
          int counter = 0;
-         while (testUnitNames.contains(testUnitName)) {
+         while (testCaseNames.contains(testCaseName)) {
             counter++;
-            testUnitName = testUnitOriginalName + "#" + counter;
+            testCaseName = proposedTestCaseName + "#" + counter;
          }
-         testUnit.testName = testUnitName;
-         testUnitNames.add(testUnitName);
+         testCaseNames.add(testCaseName);
 
+         RunAllProofsTestUnit testUnit = proofCollectionUnit
+               .createRunAllProofsTestUnit(testCaseName);
          ret.add(testUnit);
       }
 
@@ -87,7 +70,7 @@ public class ProofCollection {
          Iterator<RunAllProofsTestUnit> iterator = ret.iterator();
          while (iterator.hasNext()) {
             RunAllProofsTestUnit unit = iterator.next();
-            if (!enabledTestCaseNames.contains(unit.testName)) {
+            if (!enabledTestCaseNames.contains(unit.testCaseName)) {
                iterator.remove();
             }
          }

@@ -8,6 +8,8 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
+import java.util.Map.Entry;
+import static de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings.getSettingsEntry;
 }
 
 /*
@@ -16,68 +18,86 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 parserEntryPoint returns [ProofCollection proofCollection]
 @init {
-    List<ProofCollectionUnit> proofCollectionUnits = new ArrayList<>();
-    List<ProofCollectionSettings.Entry> settingsEntries = new ArrayList<>();
+    List<Entry<String, String>> settingsEntries = new ArrayList<>();
 }
     : settingAssignment[settingsEntries]*
-    
-      ( g=group { proofCollectionUnits.add(g); }
-      | t=testDeclaration { proofCollectionUnits.add(new SingletonProofCollectionUnit(t)); } )*
-      
-      EOF
-      { 
-         /*
-          * Because settings objects are immutable, we have to collect all settings entries
-          * in a list first and process them when parsing is finished.
-          */ 
-         ProofCollectionSettings globalSettings =
-         new ProofCollectionSettings(getTokenStream().getSourceName(), settingsEntries);
-         $proofCollection = new ProofCollection(proofCollectionUnits, globalSettings);
-      }
+    {
+        // Create global settings.
+        final ProofCollectionSettings globalSettings =
+            new ProofCollectionSettings(getTokenStream().getSourceName(), settingsEntries);
+        $proofCollection = new ProofCollection(globalSettings);
+    }
+    (
+        g=group[globalSettings] { $proofCollection.add(g); }
+        | file=testFile[globalSettings] 
+        {
+            $proofCollection.add(new SingletonProofCollectionUnit(file, globalSettings));
+        }
+    )*
+    EOF
 ;
 
-group returns [ProofCollectionUnit unit]
-@init{
-    List<TestFile> files = new ArrayList<>();
-    
-    // groups can have their own local settings 
-    List<ProofCollectionSettings.Entry> settingsEntries = new ArrayList<>();
-}
-    : 'group' nameToken=Identifier
-      '{'
-          settingAssignment[settingsEntries]*
-          (t=testDeclaration {files.add(t);} )*
-      '}'
-      {unit = new GroupedProofCollectionUnit(nameToken.getText(), settingsEntries, files);}
-;
-
-settingAssignment[List<ProofCollectionSettings.Entry> settingsEntries]
+settingAssignment[List<Entry<String, String>> settingsEntries]
     @init {
       String key;
       String value = null;
     }
     : k = Identifier { key = k.getText(); } '=' 
-      ( v = (Identifier | PathString | Number) { value = v.getText(); }
-      | v = QuotedString { String tmp = v.getText(); value = tmp.substring(1, tmp.length() - 1); } )
-      { 
-         settingsEntries.add(new ProofCollectionSettings.Entry(key, value));
-      }
+    v = valueDeclaration { value = v; }
+    { 
+        settingsEntries.add(getSettingsEntry(key, value));
+    }
 ;
 
-testDeclaration returns [TestFile file]
-@init{TestProperty testProperty = null;}
+valueDeclaration returns [String value]
+    : ( v = (Identifier | PathString | Number) { value = v.getText(); } ) |
+    (
+        v = QuotedString
+        {
+            String tmp = v.getText();
+            value = tmp.substring(1, tmp.length() - 1);
+        }
+    )
+;
+
+group[ProofCollectionSettings settings] returns [ProofCollectionUnit unit]
+@init{
+    List<TestFile> files = new ArrayList<>();
+
+    // groups can have their own local settings 
+    List<Entry<String, String>> settingsEntries = new ArrayList<>();
+}
+    : 'group' nameToken=Identifier
+    '{'
+        settingAssignment[settingsEntries]*
+        {
+            // Create local settings object.
+            settings = new ProofCollectionSettings(settings, settingsEntries);
+        }
+
+        ( t=testFile[settings]  {files.add(t);} )*
+    '}'
+    {
+        unit = new GroupedProofCollectionUnit(nameToken.getText(), settings, files);
+    }
+;
+
+testFile[ProofCollectionSettings settings]  returns [TestFile file]
+@init{
+    TestProperty testProperty = null;
+}
     : 
-      ('provable' {testProperty=TestProperty.PROVABLE;}
-      | 'notprovable' {testProperty=TestProperty.NOTPROVABLE;}
-      | 'loadable' {testProperty=TestProperty.LOADABLE;})
-      
-      ':'? // double colon is optional (doesn't hurt if omitted)
-       
-      pathToken=(PathString | Identifier | Number)
-      {
-        assert testProperty != null: "Parser should have assigned a value other that null to variable testProperty at this point.";
-        file = new TestFile(testProperty, pathToken);
-      }
+    (
+        'provable' {testProperty=TestProperty.PROVABLE;}
+        | 'notprovable' {testProperty=TestProperty.NOTPROVABLE;}
+        | 'loadable' {testProperty=TestProperty.LOADABLE;}
+    )
+    { assert testProperty != null: "Parser should have assigned a value other that null to variable testProperty at this point."; }
+    ':'? // double colon is optional (doesn't hurt if omitted)
+    path = valueDeclaration
+    {
+        file = new TestFile(testProperty, path, settings);
+    }
 ;
 
 /*

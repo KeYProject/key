@@ -2,10 +2,7 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 /**
@@ -19,19 +16,6 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  */
 public abstract class ProofCollectionUnit implements Serializable {
 
-   private Path pathToTempDir = null;
-
-   public Path getTempDirectory(String name) throws IOException {
-      if (pathToTempDir == null) {
-         if (!RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.exists()) {
-            RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.mkdirs();
-         }
-         pathToTempDir = Files.createTempDirectory(
-               RunAllProofsTest.RUNALLPROOFS_TMP_FOLDER.toPath(), name + "-");
-      }
-      return pathToTempDir;
-   }
-
    /**
     * 
     * Creates a {@link RunAllProofsTestUnit} from this
@@ -42,5 +26,15 @@ public abstract class ProofCollectionUnit implements Serializable {
     *           {@link RunAllProofsTestUnit}.
     */
    public abstract RunAllProofsTestUnit createRunAllProofsTestUnit(
-         ProofCollectionSettings parentSettings) throws IOException;
+         String testName) throws IOException;
+
+   /**
+    * Name of a {@link ProofCollectionUnit}, which is used as prefix for name of
+    * {@link RunAllProofsTestUnit} that can be created with method
+    * {@link #retrieveTestMethod(ProofCollectionSettings, String)}.
+    * 
+    * @return Name of this {@link ProofCollectionUnit}.
+    */
+   abstract String getName() throws IOException;
+
 }

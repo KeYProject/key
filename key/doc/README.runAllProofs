@@ -96,6 +96,7 @@ Examples:
     statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
     forkMode = perGroup
     reloadEnabled = true
+    tempDir = ../../key.core.test/runallproofs_tmp
 
 The following settings are currently supported:
 
@@ -116,6 +117,8 @@ The following settings are currently supported:
                   obligations ends up in a closed proof after prover finishes.
  - keySettings: String literal for default KeY settings, that will be loaded before each proof attempt.
                 Defaults to empty string.
+ - tempDir: Temporary directory that is used by RunAllProofs for inter process communication when running
+            in forked mode.
 
 Proof collection settings can be specified in the following ways:
 

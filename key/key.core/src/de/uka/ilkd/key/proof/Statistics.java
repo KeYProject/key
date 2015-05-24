@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -240,71 +236,5 @@ public class Statistics {
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
     }
-
-   /**
-    * Static method for appending one line in a statistics file, which collects
-    * statistics for several KeY problem files.
-    * 
-    * @param file
-    *           the String with the filename where to write the statistic data
-    * @param result
-    *           the Object encapsulating information about the result, e.g.
-    *           String "Error" if an error has occurred.
-    * @param statistics
-    *           the proof statistics object containing several proof statistics
-    *           like the number of applied rules and so on.
-    * @param proofClosed
-    *           information whether the proof has been closed.
-    */
-   public static void appendStatisticsToFile(File statisticsFile, Proof proof,
-         boolean error, File keyProblemFile) {
-
-      /*
-       * Create directory containing statistics file if it does not exist.
-       */
-      if (!statisticsFile.getParentFile().exists()) {
-         statisticsFile.getParentFile().mkdirs();
-      }
-
-      // get current memory consumption (after GC) in kB
-      Runtime.getRuntime().gc();
-      final long memory = (Runtime.getRuntime().totalMemory() - Runtime
-            .getRuntime().freeMemory()) / 1024;
-      boolean printColumnNames = !statisticsFile.exists();
-      try {
-         final FileWriter statisticsFileWriter = new FileWriter(statisticsFile,
-               true);
-         final PrintWriter statPrinter = new PrintWriter(statisticsFileWriter);
-
-         if (printColumnNames) {
-            statPrinter.println("Name | Total rule apps | Nodes | "
-                  + "Branches | Overall time | Automode time | "
-                  + "Closed | Time per step | Total Runtime Memory");
-         }
-
-         String name = keyProblemFile.getAbsolutePath();
-         final int slashIndex = name.lastIndexOf("examples/");
-         if (slashIndex >= 0)
-            name = name.substring(slashIndex);
-
-         statPrinter.print(name + " | ");
-         if (error) {
-            statPrinter.println("-1 | -1 | -1 | -1 | -1 | -1 | -1 | -1");
-         }
-         else {
-            Statistics statistics = proof.statistics();
-            statPrinter.println(statistics.totalRuleApps + " | "
-                  + statistics.nodes + " | " + statistics.branches + " | "
-                  + (statistics.timeInNano / 1000000) + " | "
-                  + (statistics.autoModeTimeInNano / 1000000) + " | "
-                  + (proof.closed() ? 1 : 0) + " | "
-                  + (statistics.timePerStepInNano / 1000000) + " | " + memory);
-         }
-         statPrinter.close();
-      }
-      catch (IOException e) {
-         e.printStackTrace();
-      }
-   }
 
 }

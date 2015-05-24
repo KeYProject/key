@@ -1,12 +1,14 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
@@ -30,6 +32,7 @@ public class ProofCollectionSettings implements Serializable {
    private static final String FORK_MODE = "forkMode";
    private static final String STATISTICS_FILE = "statisticsFile";
    private static final String RELOAD_ENABLED = "reloadEnabled";
+   private static final String TEMP_DIR = "tempDir";
 
    /**
     * {@link List} of settings entries that are created from system properties.
@@ -40,22 +43,21 @@ public class ProofCollectionSettings implements Serializable {
     * system properties by providing JVM arguments like:
     * "-Dkey.runallproofs.forkMode=perFile"
     */
-   private static final List<Entry> SYSTEM_PROPERTIES_ENTRIES;
+   private static final List<Entry<String, String>> SYSTEM_PROPERTIES_ENTRIES;
    static {
       /*
        * Iterating over all system properties to get settings entries. System
        * properties starting with "key.runallproofs." are relevant for proof
        * collection settings.
        */
-      List<Entry> tmp = new LinkedList<>();
-      Set<Map.Entry<Object, Object>> entrySet = System.getProperties()
-            .entrySet();
-      for (Map.Entry<Object, Object> entry : entrySet) {
+      List<Entry<String, String>> tmp = new LinkedList<>();
+      Set<Entry<Object, Object>> entrySet = System.getProperties().entrySet();
+      for (Entry<Object, Object> entry : entrySet) {
          String key = (String) entry.getKey();
          String value = (String) entry.getValue();
          if (key.startsWith("key.runallproofs.")) {
             key = key.substring(17);// strip "key.runallproofs." from key
-            tmp.add(new Entry(key, value));
+            tmp.add(getSettingsEntry(key, value));
          }
       }
       SYSTEM_PROPERTIES_ENTRIES = Collections.unmodifiableList(tmp);
@@ -67,22 +69,22 @@ public class ProofCollectionSettings implements Serializable {
     * {@link #SYSTEM_PROPERTIES_ENTRIES}.
     */
    private static Map<String, String> createUnmodifiableMapContainingDefaults(
-         List<Entry> entries) {
+         List<Entry<String, String>> entries) {
 
       Map<String, String> mutableMap = new LinkedHashMap<>();
 
       /*
        * Add specified entries.
        */
-      for (Entry entry : entries) {
-         mutableMap.put(entry.key, entry.value);
+      for (Entry<String, String> entry : entries) {
+         mutableMap.put(entry.getKey(), entry.getValue());
       }
 
       /*
        * Add entries created from system properties.
        */
-      for (Entry entry : SYSTEM_PROPERTIES_ENTRIES) {
-         mutableMap.put(entry.key, entry.value);
+      for (Entry<String, String> entry : SYSTEM_PROPERTIES_ENTRIES) {
+         mutableMap.put(entry.getKey(), entry.getValue());
       }
 
       /*
@@ -104,12 +106,11 @@ public class ProofCollectionSettings implements Serializable {
    private final Map<String, String> immutableSettingsMap;
 
    /**
-    * Creates a base {@link ProofCollectionSettings} object from the specified
-    * parameters with no parent settings. This method is called by
-    * {@link ProofCollectionParser}.
+    * Creates a {@link ProofCollectionSettings} object from the specified
+    * parameters with no parent settings.
     */
    ProofCollectionSettings(String proofCollectionFileLocation,
-         List<Entry> entries) {
+         List<Entry<String, String>> entries) {
       /*
        * Determine source proof collection file from string location.
        */
@@ -122,24 +123,6 @@ public class ProofCollectionSettings implements Serializable {
       assert sourceProofCollectionFile.exists() : "Given source proof collection file does not exist.";
 
       /*
-       * Warn about duplicate entries. We only do this in the constructor that
-       * is called directly by ProofCollectionParser so that user is informed
-       * about duplicate entries in proof collection text file.
-       */
-      Set<String> keys = new LinkedHashSet<>();
-      for (Entry entry : entries) {
-         String key = entry.key;
-         if (keys.contains(key)) {
-            System.out.println("Warning: The key \"" + key
-                  + "\" is assigned multiple times in file: "
-                  + sourceProofCollectionFile);
-         }
-         else {
-            keys.add(key);
-         }
-      }
-
-      /*
        * Compute immutable map containing settings entries.
        */
       immutableSettingsMap = createUnmodifiableMapContainingDefaults(entries);
@@ -150,7 +133,7 @@ public class ProofCollectionSettings implements Serializable {
     * existing {@link ProofCollectionSettings} object.
     */
    public ProofCollectionSettings(ProofCollectionSettings parentSettings,
-         List<Entry> entries) {
+         List<Entry<String, String>> entries) {
       /*
        * Use source proof collection from parent settings.
        */
@@ -161,15 +144,15 @@ public class ProofCollectionSettings implements Serializable {
        * Entries from parent ProofCollectionSettings are by local entries.
        */
       Set<String> localKeys = new LinkedHashSet<>();
-      for (Entry entry : entries) {
-         String key = entry.key;
+      for (Entry<String, String> entry : entries) {
+         String key = entry.getKey();
          localKeys.add(key);
       }
-      List<Entry> mergedEntries = new LinkedList<>(entries);
-      for (Map.Entry<String, String> entry : parentSettings.immutableSettingsMap
+      List<Entry<String, String>> mergedEntries = new LinkedList<>(entries);
+      for (Entry<String, String> entry : parentSettings.immutableSettingsMap
             .entrySet()) {
          if (!localKeys.contains(entry.getKey())) {
-            mergedEntries.add(new Entry(entry.getKey(), entry.getValue()));
+            mergedEntries.add(entry);
          }
       }
       mergedEntries.addAll(entries);
@@ -178,6 +161,11 @@ public class ProofCollectionSettings implements Serializable {
        * Compute immutable map containing settings entries.
        */
       immutableSettingsMap = createUnmodifiableMapContainingDefaults(mergedEntries);
+
+      /*
+       * Inherit statistics file from parent settings.
+       */
+      statisticsFile = parentSettings.getStatisticsFile();
    }
 
    /**
@@ -265,14 +253,45 @@ public class ProofCollectionSettings implements Serializable {
             baseDirectoryName);
    }
 
+   private StatisticsFile statisticsFile = null;
+
    /**
     * Returns location of statistics file. Can be null. In this case no
     * statistics are saved.
     */
-   public File getStatisticsFile() {
-      String statisticsFileName = get(STATISTICS_FILE);
-      return statisticsFileName == null ? null : getAbsoluteFile(
-            getBaseDirectory(), statisticsFileName);
+   public StatisticsFile getStatisticsFile() {
+      if (statisticsFile == null) {
+         String statisticsFileName = get(STATISTICS_FILE);
+         if (statisticsFileName == null) {
+            return null;
+         }
+         statisticsFile = new StatisticsFile(getAbsoluteFile(
+               getBaseDirectory(), statisticsFileName));
+      }
+      return statisticsFile;
+   }
+
+   private File tempDir = null;
+
+   public File getTempDir() throws IOException {
+      String tempDirString = get(TEMP_DIR);
+      if (tempDirString == null) {
+         throw new IOException(
+               "No temporary directory specified in RunAllProofs configuration file. "
+                     + "Cannot run in forked mode. "
+                     + "To solve this, specify setting \"" + TEMP_DIR
+                     + "\" in file " + sourceProofCollectionFile);
+      }
+      tempDir = new File(TEMP_DIR);
+      if (!tempDir.isAbsolute()) {
+         tempDir = new File(getBaseDirectory(), TEMP_DIR);
+      }
+      if (tempDir.isFile()) {
+         throw new IOException("Specified temporary directory is a file: "
+               + tempDir + "\n" + "Configure temporary directory in file "
+               + sourceProofCollectionFile + " to solve this.");
+      }
+      return tempDir;
    }
 
    private Set<String> enabledTestCaseNames = null;
@@ -318,15 +337,28 @@ public class ProofCollectionSettings implements Serializable {
    }
 
    /**
-    * Static class for {@link ProofCollectionSettings} entries.
+    * Static method for creation of {@link ProofCollectionSettings} entries.
     */
-   public static class Entry {
-      public final String key, value;
+   public static Entry<String, String> getSettingsEntry(final String key,
+         final String value) {
+      return new Entry<String, String>() {
 
-      public Entry(String key, String value) {
-         this.key = key;
-         this.value = value;
-      }
+         @Override
+         public String getKey() {
+            return key;
+         }
+
+         @Override
+         public String getValue() {
+            return value;
+         }
+
+         @Override
+         public String setValue(String value) {
+            throw new UnsupportedOperationException(
+                  "Proof collection settings are immutable. Changing settings values is not allowed.");
+         }
+      };
    }
 
 }

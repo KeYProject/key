@@ -88,8 +88,6 @@ public class RunAllProofsTest implements Serializable {
 
    public static final File KEY_CORE_TEST;
 
-   public static final File RUNALLPROOFS_TMP_FOLDER;
-
    /**
     * Computes the constant values.
     */
@@ -97,8 +95,6 @@ public class RunAllProofsTest implements Serializable {
       KEY_HOME = IOUtil.getProjectRoot(RunAllProofsTest.class).getParentFile();
       EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
       KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
-      RUNALLPROOFS_TMP_FOLDER = new File(KEY_CORE_TEST, "testresults"
-            + File.separator + "runallproofs");
    }
 
    private static void assertDirectoryExists(File dir) {

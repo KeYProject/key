@@ -17,24 +17,20 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
 
    private final String groupName;
    private final List<TestFile> testFiles;
-   private final List<ProofCollectionSettings.Entry> settingsEntries;
+   private final ProofCollectionSettings settings;
 
    public GroupedProofCollectionUnit(String groupName,
-         List<ProofCollectionSettings.Entry> settingsEntries,
-         List<TestFile> files) {
+         ProofCollectionSettings settings, List<TestFile> files) {
       this.groupName = groupName;
-      this.settingsEntries = settingsEntries;
+      this.settings = settings;
       this.testFiles = files;
    }
 
    @Override
-   public RunAllProofsTestUnit createRunAllProofsTestUnit(
-         final ProofCollectionSettings parentSettings) throws IOException {
+   public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName)
+         throws IOException {
 
-      final ProofCollectionSettings settings = new ProofCollectionSettings(
-            parentSettings, settingsEntries);
-
-      return new RunAllProofsTestUnit(groupName) {
+      return new RunAllProofsTestUnit(testName, settings) {
 
          @Override
          public TestResult runTest() throws Exception {
@@ -48,16 +44,15 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
             ForkMode forkMode = settings.getForkMode();
             if (forkMode == ForkMode.PERGROUP) {
                testResults = ForkedTestFileRunner.processTestFiles(testFiles,
-                     settings, getTempDirectory(groupName));
+                     getTempDir());
             }
             else if (forkMode == ForkMode.NOFORK
                   || forkMode == ForkMode.PERFILE) {
                testResults = new ArrayList<>();
                for (TestFile testFile : testFiles) {
                   TestResult testResult = forkMode == ForkMode.NOFORK ? testFile
-                        .runKey(settings) : ForkedTestFileRunner
-                        .processTestFile(testFile, settings,
-                              getTempDirectory(groupName));
+                        .runKey() : ForkedTestFileRunner.processTestFile(
+                        testFile, getTempDir());
                   testResults.add(testResult);
                }
             }
@@ -79,5 +74,10 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
          }
 
       };
+   }
+
+   @Override
+   String getName() {
+      return groupName;
    }
 }

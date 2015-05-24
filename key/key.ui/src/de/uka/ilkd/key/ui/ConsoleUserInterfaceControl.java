@@ -101,7 +101,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
            System.out.println("[ DONE  ... rule application ]");
            if (verbosity >= Verbosity.HIGH) {
                System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-               final Statistics stat = info.getProof().statistics();
+               final Statistics stat = info.getProof().getStatistics();
                System.out.println("Proof steps: "+stat.nodes);
                System.out.println("Branches: "+stat.branches);
                System.out.println("Automode Time: "+(stat.autoModeTimeInNano/1000000)+"ms");
@@ -217,7 +217,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
        mediator.setInteractive(false);
        getProofControl().startAndWaitForAutoMode(proof);
        if (verbosity >= Verbosity.HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
-           System.out.println(proof.statistics());
+           System.out.println(proof.getStatistics());
        }
    }
 
@@ -371,11 +371,6 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
    public static boolean saveProof(Object result, Proof proof,
          File keyProblemFile) {
-
-      if (Main.getStatisticsFile() != null) {
-         Statistics.appendStatisticsToFile(Main.getStatisticsFile(), proof,
-               "Error".equals(result.toString()), keyProblemFile);
-      }
 
       if (result instanceof Throwable) {
          throw new Error("Error in batchmode.", (Throwable) result);

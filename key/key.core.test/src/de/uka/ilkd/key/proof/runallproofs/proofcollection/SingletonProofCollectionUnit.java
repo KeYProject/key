@@ -14,27 +14,28 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
 public class SingletonProofCollectionUnit extends ProofCollectionUnit {
 
    private final TestFile file;
+   private final ProofCollectionSettings settings;
 
-   public SingletonProofCollectionUnit(TestFile fileWithTestProperty) {
-      this.file = fileWithTestProperty;
+   public SingletonProofCollectionUnit(TestFile testFile,
+         ProofCollectionSettings settings) {
+      this.file = testFile;
+      this.settings = settings;
    }
 
    @Override
-   public RunAllProofsTestUnit createRunAllProofsTestUnit(
-         final ProofCollectionSettings settings) throws IOException {
-      final String fileName = file.getKeYFile(settings).getName();
-      return new RunAllProofsTestUnit(fileName) {
+   public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName)
+         throws IOException {
+      return new RunAllProofsTestUnit(testName, settings) {
 
          @Override
          public TestResult runTest() throws Exception {
             ForkMode forkMode = settings.getForkMode();
             if (forkMode == ForkMode.NOFORK) {
-               return file.runKey(settings);
+               return file.runKey();
             }
             else if (forkMode == ForkMode.PERGROUP
                   || forkMode == ForkMode.PERFILE) {
-               return ForkedTestFileRunner.processTestFile(file, settings,
-                     getTempDirectory(fileName));
+               return ForkedTestFileRunner.processTestFile(file, getTempDir());
             }
             else {
                throw new RuntimeException("Unexpected value for fork mode: "
@@ -43,6 +44,11 @@ public class SingletonProofCollectionUnit extends ProofCollectionUnit {
          }
 
       };
+   }
+
+   @Override
+   String getName() throws IOException {
+      return file.getKeYFile().getName();
    }
 
 }

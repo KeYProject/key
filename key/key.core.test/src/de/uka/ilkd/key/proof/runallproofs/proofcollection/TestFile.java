@@ -3,12 +3,9 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 import java.io.File;
 import java.io.IOException;
 
-import org.antlr.runtime.Token;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -16,7 +13,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 /**
  * Data structure for .key-files that will be tested during
  * {@link RunAllProofsTest} run. It consists of a {@link #testProperty} and a
- * {@link #pathToFile} String for the file location. Method
+ * {@link #path} String for the file location. Method
  * {@link #runKey(ProofCollectionSettings)} will verify {@link #testProperty}
  * for the given file.
  * 
@@ -25,7 +22,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 public class TestFile extends ForkedTestFileRunner {
 
    final TestProperty testProperty;
-   private final String pathToFile;
+   private final String path;
+   private final ProofCollectionSettings settings;
 
    /**
     * In order to ensure that the implementation is independent of working
@@ -70,30 +68,24 @@ public class TestFile extends ForkedTestFileRunner {
       return ret;
    }
 
-   public TestFile(TestProperty testProperty, Token pathToken) {
-      this.pathToFile = pathToken.getText();
+   public TestFile(TestProperty testProperty, String path,
+         ProofCollectionSettings settings) {
+      this.path = path;
       this.testProperty = testProperty;
+      this.settings = settings;
    }
 
    /**
-    * Uses a {@link ProofCollectionSettings} object and the given
-    * {@link #pathToFile} string to create a {@link File} object that
-    * (presumable) points to a KeY file. Settings are necessary for name
-    * resolution of the file name.
+    * Returns a {@link File} object that points to the .key file that will be
+    * tested.
     * 
-    * @param settings
-    *           {@link ProofCollectionSettings} object that specifies the base
-    *           directory that will be used in case {@link #pathToFile}
-    *           specifies a relative path.
-    * @return A {@link File} object that points to the target .key-file that
-    *         will be tested.
     * @throws IOException
     *            Is thrown in case given .key-file is not a directory or does
     *            not exist.
     */
-   public File getKeYFile(ProofCollectionSettings settings) throws IOException {
+   public File getKeYFile() throws IOException {
       File baseDirectory = settings.getBaseDirectory();
-      File keyFile = getAbsoluteFile(baseDirectory, pathToFile);
+      File keyFile = getAbsoluteFile(baseDirectory, path);
 
       if (keyFile.isDirectory()) {
          String exceptionMessage = "Expecting a file, but found a directory: "
@@ -115,13 +107,13 @@ public class TestFile extends ForkedTestFileRunner {
       String message = (success ? "pass: " : "FAIL: ")
             + "Verifying property \"" + testProperty.toString().toLowerCase()
             + "\"" + (success ? " was successful " : " failed ") + "for file: "
-            + getKeYFile(settings).toString();
+            + getKeYFile().toString();
       return new TestResult(message, success);
    }
 
    /**
     * Use KeY to verify that given {@link #testProperty} holds for KeY file that
-    * is at file system location specified by {@link #pathToFile} string.
+    * is at file system location specified by {@link #path} string.
     * 
     * @param settings
     *           {@link ProofCollectionSettings} object that specifies settings
@@ -135,14 +127,14 @@ public class TestFile extends ForkedTestFileRunner {
     *            converted into an {@link Exception} object with original
     *            exception as cause.
     */
-   public TestResult runKey(ProofCollectionSettings settings) throws Exception {
+   public TestResult runKey() throws Exception {
 
       // Initialize KeY settings.
       String gks = settings.getGlobalKeYSettings();
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
 
       // Name resolution for the available KeY file.
-      File keyFile = getKeYFile(settings);
+      File keyFile = getKeYFile();
 
       // File that the created proof will be saved to.
       File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
@@ -166,10 +158,9 @@ public class TestFile extends ForkedTestFileRunner {
                .closed();
 
          // Write statistics.
-         File statisticsFile = settings.getStatisticsFile();
+         StatisticsFile statisticsFile = settings.getStatisticsFile();
          if (statisticsFile != null) {
-            Statistics.appendStatisticsToFile(statisticsFile, loadedProof,
-                  false, keyFile);
+            statisticsFile.appendStatistics(loadedProof, keyFile);
          }
 
          /*

@@ -38,12 +38,6 @@ public abstract class ForkedTestFileRunner implements Serializable {
       return Paths.get(tempDirectory.toString(), "TestResults.serialized");
    }
 
-   private static Path getLocationOfSerializedProofCollectionSettings(
-         Path tempDirectory) {
-      return Paths.get(tempDirectory.toString(),
-            "ProofCollectionSettings.serialized");
-   }
-
    /*
     * Converts a {@link Serializable} object into a byte array and stores it in
     * a file at given location.
@@ -90,14 +84,10 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
    /**
     * Process a single {@link TestFile} in a separate subprocess.
-    * 
-    * @param testName
-    *           Name of the test used as prefix for test folder.
     */
    public static TestResult processTestFile(TestFile testFile,
-         ProofCollectionSettings settings, Path pathToTempDir) throws Exception {
-      return processTestFiles(Arrays.asList(testFile), settings, pathToTempDir)
-            .get(0);
+         Path pathToTempDir) throws Exception {
+      return processTestFiles(Arrays.asList(testFile), pathToTempDir).get(0);
    }
 
    /**
@@ -107,13 +97,10 @@ public abstract class ForkedTestFileRunner implements Serializable {
     *           Name of the test used as prefix for test folder.
     */
    public static List<TestResult> processTestFiles(List<TestFile> testFiles,
-         ProofCollectionSettings settings, Path pathToTempDir) throws Exception {
+         Path pathToTempDir) throws Exception {
 
       writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
             (Serializable) testFiles);
-      writeObject(
-            getLocationOfSerializedProofCollectionSettings(pathToTempDir),
-            (Serializable) settings);
 
       ProcessBuilder pb = new ProcessBuilder("java", "-classpath",
             System.getProperty("java.class.path"),
@@ -160,11 +147,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
       try {
          List<TestFile> testFiles = ForkedTestFileRunner
                .<List<TestFile>> readObject(getLocationOfSerializedTestFiles(tempDirectory));
-         ProofCollectionSettings settings = ForkedTestFileRunner
-               .<ProofCollectionSettings> readObject(getLocationOfSerializedProofCollectionSettings(tempDirectory));
          ArrayList<TestResult> testResults = new ArrayList<>();
          for (TestFile testFile : testFiles) {
-            testResults.add(testFile.runKey(settings));
+            testResults.add(testFile.runKey());
          }
          writeObject(getLocationOfSerializedTestResults(tempDirectory),
                testResults);

@@ -959,7 +959,7 @@ public class Proof implements Named {
      * This implementation traverses the proof tree only once.
      * Statistics are not cached; don't call this method too often.
      */
-    public Statistics statistics() {
+    public Statistics getStatistics() {
         return new Statistics(this);
     }
 
