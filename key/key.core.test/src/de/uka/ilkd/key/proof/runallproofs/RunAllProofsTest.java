@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,7 +78,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
  * @author Martin Hentschel
  */
 @RunWith(Parameterized.class)
-public class RunAllProofsTest implements Serializable {
+public class RunAllProofsTest {
    /**
     * The path to the KeY repository. Configurable via system property
     * {@code key.home}.
@@ -93,6 +92,8 @@ public class RunAllProofsTest implements Serializable {
    private static StatisticsFile statisticsFile = null;
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
+
+   public static final String IGNORE_KEY = "ignore";
 
    /**
     * Computes the constant values.

@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 /**
  * A {@link ProofCollectionUnit} that is created from a single {@link TestFile}
@@ -25,25 +25,7 @@ public class SingletonProofCollectionUnit extends ProofCollectionUnit {
    @Override
    public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName)
          throws IOException {
-      return new RunAllProofsTestUnit(testName, settings) {
-
-         @Override
-         public TestResult runTest() throws Exception {
-            ForkMode forkMode = settings.getForkMode();
-            if (forkMode == ForkMode.NOFORK) {
-               return file.runKey();
-            }
-            else if (forkMode == ForkMode.PERGROUP
-                  || forkMode == ForkMode.PERFILE) {
-               return ForkedTestFileRunner.processTestFile(file, getTempDir());
-            }
-            else {
-               throw new RuntimeException("Unexpected value for fork mode: "
-                     + forkMode);
-            }
-         }
-
-      };
+      return new RunAllProofsTestUnit(testName, settings, Arrays.asList(file), true);
    }
 
    @Override

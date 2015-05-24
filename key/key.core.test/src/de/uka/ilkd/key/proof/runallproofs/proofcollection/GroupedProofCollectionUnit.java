@@ -29,51 +29,7 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
    @Override
    public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName)
          throws IOException {
-
-      return new RunAllProofsTestUnit(testName, settings) {
-
-         @Override
-         public TestResult runTest() throws Exception {
-
-            /*
-             * List of test results containing one test result for each test
-             * file contained in this group.
-             */
-            List<TestResult> testResults;
-
-            ForkMode forkMode = settings.getForkMode();
-            if (forkMode == ForkMode.PERGROUP) {
-               testResults = ForkedTestFileRunner.processTestFiles(testFiles,
-                     getTempDir());
-            }
-            else if (forkMode == ForkMode.NOFORK
-                  || forkMode == ForkMode.PERFILE) {
-               testResults = new ArrayList<>();
-               for (TestFile testFile : testFiles) {
-                  TestResult testResult = forkMode == ForkMode.NOFORK ? testFile
-                        .runKey() : ForkedTestFileRunner.processTestFile(
-                        testFile, getTempDir());
-                  testResults.add(testResult);
-               }
-            }
-            else {
-               throw new RuntimeException("Unexpected value for fork mode: "
-                     + forkMode);
-            }
-
-            /*
-             * Merge list of test results into one single test result.
-             */
-            boolean success = true;
-            String message = "group " + groupName + ":\n";
-            for (TestResult testResult : testResults) {
-               success &= testResult.success;
-               message += testResult.message + "\n";
-            }
-            return new TestResult(message, success);
-         }
-
-      };
+      return new RunAllProofsTestUnit(testName, settings, testFiles, false);
    }
 
    @Override

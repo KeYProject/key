@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -87,9 +88,19 @@ public abstract class ForkedTestFileRunner implements Serializable {
       writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
                 testFiles.toArray(new TestFile[testFiles.size()]));
 
-      ProcessBuilder pb = new ProcessBuilder("java", "-classpath",
-            System.getProperty("java.class.path"),
-            ForkedTestFileRunner.class.getName(), pathToTempDir.toString());
+      ProcessBuilder pb = new ProcessBuilder(
+              "java", "-classpath", System.getProperty("java.class.path"));
+      List<String> command = pb.command();
+
+      // TODO make sure no injection happens here?
+      String forkMemory = settings.get("forkMemory");
+      if(forkMemory != null) {
+          command.add("-Xmx" + forkMemory);
+      }
+
+      command.add(ForkedTestFileRunner.class.getName());
+      command.add(pathToTempDir.toString());
+
       Process process = pb.inheritIO().start();
       process.waitFor();
       assertEquals("Executed process terminated with non-zero exit value.",
@@ -141,7 +152,15 @@ public abstract class ForkedTestFileRunner implements Serializable {
          writeObject(getLocationOfSerializedTestResults(tempDirectory),
                     testResults.toArray(new TestResult[testResults.size()]));
         } catch (Throwable t) {
+          try {
          writeObject(getLocationOfSerializedException(tempDirectory), t);
+          } catch (NotSerializableException e) {
+              // There are cases when exceptions refer to objects that cannot be serialized ...
+              // then save the stacktrace at least
+              Exception subst = new Exception(t.getMessage());
+              subst.setStackTrace(t.getStackTrace());
+              writeObject(getLocationOfSerializedException(tempDirectory), subst);
+          }
       }
    }
 

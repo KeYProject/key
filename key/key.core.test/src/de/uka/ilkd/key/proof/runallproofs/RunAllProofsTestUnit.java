@@ -5,22 +5,26 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 
-/**
- * A single unit that will be tested during {@link RunAllProofsTest} run.
- * 
- * @author Kai Wallisch
- */
-public abstract class RunAllProofsTestUnit implements Serializable {
+public final class RunAllProofsTestUnit implements Serializable {
+
+   private static final long serialVersionUID = -2406881153415390937L;
 
    /**
     * The name of this test.
     */
-   public final String testCaseName;
+   private String testCaseName;
 
    private final ProofCollectionSettings settings;
+   private final List<TestFile> testFiles;
+   private final boolean ungrouped;
 
    /**
     * Method {@link Object#toString()} is used by class {@link RunAllProofsTest}
@@ -32,15 +36,103 @@ public abstract class RunAllProofsTestUnit implements Serializable {
       return testCaseName;
    }
 
-   public RunAllProofsTestUnit(String name, ProofCollectionSettings settings) {
+   public RunAllProofsTestUnit(String name, ProofCollectionSettings settings,
+         List<TestFile> testFiles, boolean ungrouped) {
       this.testCaseName = name;
       this.settings = settings;
+      this.testFiles = testFiles;
+      this.ungrouped = ungrouped;
    }
 
    /**
     * Run the test of this unit and return a {@link TestResult}.
+    *
+    * If {@link #ungrouped} is true, the result is the result of that single
+    * test. Otherwise all results are aggregated into a single testresult.
+    *
+    * The way of execution is determined by the {@link #settings}, in particular
+    * by the {@link ProofCollectionSettings#getForkMode() forkmode}.
+    *
+    * @return either a single test result or an aggregated test result, not
+    *         <code>null</code>.
     */
-   public abstract TestResult runTest() throws Exception;
+   public TestResult runTest() throws Exception {
+      /*
+       * List of test results containing one test result for each test file
+       * contained in this group.
+       */
+      List<TestResult> testResults;
+
+      boolean verbose = "true".equals(settings
+            .get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+      if (verbose) {
+         System.err.println("Running test " + testCaseName);
+      }
+
+      boolean ignoreTest = "true".equals(settings
+            .get(RunAllProofsTest.IGNORE_KEY));
+      if (ignoreTest) {
+         if (verbose) {
+            System.err
+                  .println("... ignoring this test due to 'ignore=true' in file");
+         }
+         return new TestResult("Test case has been ignored", true);
+      }
+
+      ForkMode forkMode = settings.getForkMode();
+      switch (forkMode) {
+      case PERGROUP:
+         testResults = ForkedTestFileRunner.processTestFiles(testFiles,
+               getTempDir());
+         break;
+
+      case NOFORK:
+         testResults = new ArrayList<>();
+         for (TestFile testFile : testFiles) {
+            TestResult testResult = testFile.runKey();
+            testResults.add(testResult);
+         }
+         break;
+
+      case PERFILE:
+         testResults = new ArrayList<>();
+         for (TestFile testFile : testFiles) {
+            TestResult testResult = ForkedTestFileRunner.processTestFile(
+                  testFile, getTempDir());
+            testResults.add(testResult);
+         }
+         break;
+
+      default:
+         throw new RuntimeException("Unexpected value for fork mode: "
+               + forkMode);
+      }
+
+      if (verbose) {
+         System.err.println("Returning from test " + testCaseName);
+      }
+
+      /*
+       * Merge list of test results into one single test result, unless it is a
+       * singleton case outside any group declaration.
+       */
+      if (ungrouped) {
+         assert testResults.size() == 1 : "Ungrouped test runs must have one case";
+         return testResults.get(0);
+      }
+
+      boolean success = true;
+      String message = "group " + testCaseName + ":\n";
+      for (TestResult testResult : testResults) {
+         success &= testResult.success;
+         message += testResult.message + "\n";
+      }
+      return new TestResult(message, success);
+   }
+
+   public String getTestName() {
+      return testCaseName;
+   }
 
    /*
     * Temporary directory used by this test unit to store serialized data when
