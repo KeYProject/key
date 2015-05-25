@@ -80,4 +80,22 @@
             name="Colors">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+      <renameParticipant
+            class="org.key_project.jmlediting.ui.refactoring.JMLRenameParticipant"
+            id="org.key_project.jmlediting.ui.renameJMLParticipant"
+            name="%renameJMLParticipant">
+            <enablement>
+              <with variable="affectedNatures">
+                <iterate operator="or">
+                  <equals value="org.eclipse.jdt.core.javanature"/>
+                </iterate>
+              </with>
+              <with variable="element">
+                <instanceof value="org.eclipse.jdt.core.IField"/>
+              </with>
+            </enablement>
+      </renameParticipant>
+   </extension>
 </plugin>
