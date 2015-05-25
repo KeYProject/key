@@ -32,6 +32,8 @@ import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPag
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 
+import de.uka.ilkd.key.smt.SolverType;
+
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
    private Button enableKeYResourcesBuildsButton;
@@ -48,7 +50,11 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
    private Button autoDeleteProofFilesButton;
    
+   private Button generateTestCasesButton;
+   
    private Text fillText;
+   
+   private static final String generateTestCasesButtonText = "Generate test cases";
 
    
    private SelectionListener buildProofButtonSelectionListener = new SelectionListener() {
@@ -60,6 +66,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          setEnabledForEnableMultiThreadingButton();
          setEnabledForSetNumberOfThreads();
          setEnabledForAutoDeleteProofFilesButton();
+         setEnabledForGenerateTestCasesButton();
       }
       
       @Override
@@ -150,6 +157,11 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
       setSelectionForAutoDeleteProofFilesButton();
       setEnabledForAutoDeleteProofFilesButton();
+
+      generateTestCasesButton = new Button(builderSettingsComposite, SWT.CHECK);
+      generateTestCasesButton.setText("Generate test cases");
+      setSelectionForGenerateTestCasesButton();
+      setEnabledForGenerateTestCasesButton();
             
       return root;
    }
@@ -234,6 +246,26 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       autoDeleteProofFilesButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
    }
    
+
+   /**
+    * Sets the selection for the AutoDeleteProofFilesButton CheckBox.
+    */
+   private void setSelectionForGenerateTestCasesButton(){
+      generateTestCasesButton.setSelection(KeYProjectProperties.isGenerateTestCases(getProject()));
+   }
+   
+   
+   private void setEnabledForGenerateTestCasesButton(){
+      if(!SolverType.Z3_CE_SOLVER.isInstalled(true)) {
+         generateTestCasesButton.setText(generateTestCasesButtonText + " - SMT Solver Z3 not installed!");
+         generateTestCasesButton.setEnabled(false);
+      }
+      else {
+         generateTestCasesButton.setText(generateTestCasesButtonText);
+         generateTestCasesButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
+      }
+   }
+   
    
    /**
     * {@inheritDoc}
@@ -248,6 +280,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
+         KeYProjectProperties.setGenerateTestCases(project, generateTestCasesButton.getSelection());
          return super.performOk();
       }
       catch (CoreException e) {
@@ -274,6 +307,8 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       numberOfThreadsSpinner.setSelection(2);
       autoDeleteProofFilesButton.setSelection(true);
       setEnabledForAutoDeleteProofFilesButton();
+      generateTestCasesButton.setSelection(false);
+      setEnabledForGenerateTestCasesButton();
       super.performDefaults();
    }
 }

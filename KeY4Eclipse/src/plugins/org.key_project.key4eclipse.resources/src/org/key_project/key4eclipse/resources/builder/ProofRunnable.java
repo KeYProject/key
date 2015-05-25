@@ -15,7 +15,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
+import org.key_project.key4eclipse.common.ui.testGeneration.ProofGenerateTestsJob;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
+import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -35,6 +38,9 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.testgen.MemoryTestGenerationLog;
+import de.uka.ilkd.key.smt.testgen.StopRequest;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.Pair;
@@ -46,6 +52,7 @@ import de.uka.ilkd.key.util.ProofStarter;
  */
 public class ProofRunnable implements Runnable {
    
+   private IProject project;
    private List<ProofElement> proofElements;
    private List<ProofElement> proofsToDo;
    private final KeYEnvironment<DefaultUserInterfaceControl> environment;
@@ -53,6 +60,7 @@ public class ProofRunnable implements Runnable {
    
    public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<DefaultUserInterfaceControl> environment, IProgressMonitor monitor){
       this.proofsToDo = Collections.synchronizedList(proofsToDo);
+      this.project = project;
       this.proofElements = proofElements;
       this.environment = environment;
       this.monitor = monitor;
@@ -91,6 +99,10 @@ public class ProofRunnable implements Runnable {
                   synchronized (ProofManager.proofsToSave) {
                      ProofManager.proofsToSave.add(new Pair<ProofElement, InputStream>(pe, generateSaveProof(proof, pe.getProofFile())));
                   }
+                  if(KeYProjectProperties.isGenerateTestCases(pe.getProofFile().getProject()) && SolverType.Z3_CE_SOLVER.isInstalled(true)){
+                     generateTestCases(proof);
+                  }
+                  //TODO When and how to dispose the proof now?
                   proof.dispose();
                }
             }
@@ -98,12 +110,28 @@ public class ProofRunnable implements Runnable {
          }
          environment.dispose();
    }
-   
-   //TODO:
-   // - add assumptions to pe
-   // - compute used Types
-   // - remove filtering from proofmetaref computation
-   // - 
+
+   private void generateTestCases(Proof proof){
+      EclipseTestGenerator testGenerator = null;
+      try {
+         MemoryTestGenerationLog log = new MemoryTestGenerationLog();
+         testGenerator = new EclipseTestGenerator(project, 
+                                                  proof.name().toString(), 
+                                                  environment.getUi(), 
+                                                  proof);
+         testGenerator.generateTestCases(new StopRequest() {
+            @Override
+            public boolean shouldStop() {
+               return monitor.isCanceled();
+            }
+         }, log);
+      }
+      finally {
+         if (testGenerator != null) {
+            testGenerator.dispose();
+         }
+      }
+   }
 
 
    /**

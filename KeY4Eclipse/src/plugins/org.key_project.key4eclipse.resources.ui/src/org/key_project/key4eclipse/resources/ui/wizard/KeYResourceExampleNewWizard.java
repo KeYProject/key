@@ -11,15 +11,19 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageOne;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.ui.Activator;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * {@link Wizard} to create a new KeY project filled with some example content.
@@ -83,6 +87,7 @@ public class KeYResourceExampleNewWizard extends KeYProjectWizard {
             IResource sourceDirectory = getSourceDirectory();
             // Check if a source code directory was found
             if (sourceDirectory instanceof IContainer) {
+               waitBuild();
                done = createExampleContent((IContainer)sourceDirectory);
             }
          }
@@ -91,6 +96,35 @@ public class KeYResourceExampleNewWizard extends KeYProjectWizard {
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
          return false;
+      }
+   }
+   
+   //TODO refactor out
+   public static void waitBuild() {
+      IJobManager manager = Job.getJobManager();
+      // Wait for jobs and builds.
+      Job[] keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
+      Job[] buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
+      while (!ArrayUtil.isEmpty(keyJobs) || !ArrayUtil.isEmpty(buildJobs)) {
+         // Sleep some time but allow the UI to do its tasks
+         if (Display.getDefault().getThread() == Thread.currentThread()) {
+            int i = 0;
+            while (Display.getDefault().readAndDispatch() && i < 1000) {
+               i++;
+            }
+         }
+         else {
+            try {
+               Thread.sleep(100);
+            }
+            catch (InterruptedException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+            }
+         }
+         // Check if jobs are still running
+         keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
+         buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
       }
    }
 

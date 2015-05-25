@@ -29,6 +29,7 @@ public final class KeYProjectProperties {
    public static final QualifiedName PROP_ENABLE_MULTITHREADING = new QualifiedName("org.key_project.key4eclipse.resources", "enableMultiThreading");
    public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
+   public static final QualifiedName PROP_GENERATE_TEST_CASES = new QualifiedName("org.key_project.key4eclipse.resources", "generateTestCases");
     
    public static boolean isEnableKeYResourcesBuilds(IProject project) {
       if (project != null) {
@@ -167,6 +168,31 @@ public final class KeYProjectProperties {
    public static void setAutoDeleteProofFiles(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
          project.setPersistentProperty(PROP_AUTO_DELETE_PROOFFILES, enabled + "");
+      }
+   }
+   
+   
+   public static boolean isGenerateTestCases(IProject project) {
+      if (project != null) {
+         String value;
+         try {
+            value = project.getPersistentProperty(PROP_GENERATE_TEST_CASES);
+            if(value == null){
+               return true;
+            }
+            return Boolean.parseBoolean(value);
+         }
+         catch (CoreException e) {
+            return true;
+         }
+      }
+      return false;
+   }
+   
+   
+   public static void setGenerateTestCases(IProject project,  boolean enabled) throws CoreException {
+      if (project != null) {
+         project.setPersistentProperty(PROP_GENERATE_TEST_CASES, enabled + "");
       }
    }
 }
