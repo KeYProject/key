@@ -262,6 +262,7 @@ public class IntermediateProofReplayer {
                                                     partnerNodeInfo.second));
                                 }
 
+                                joinApp.setJoinNode(currNode);
                                 joinApp.setJoinPartners(joinPartners);
 
                                 assert joinApp.complete() : "Join app should be automatically completed in replay";
