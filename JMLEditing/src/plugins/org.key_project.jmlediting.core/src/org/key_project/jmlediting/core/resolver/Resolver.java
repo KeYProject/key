@@ -132,6 +132,13 @@ public abstract class Resolver {
         
         //ResolveHelper rh = new ResolveHelper(iAstList);
         //jdtAST.accept(rh);
+        
+        // ResolveResult als BaumStruktur? ähnlich zu ASTNodes ?
+        // Vielleicht die IAST Struktur erweitern und alle StringNodes mit Klassen ersetzen, die Informationen
+        //      zum resolving halten. -> Scheint beste Idee bisher ?
+        // Eine Klasse, die alle Informationen über alle Variablen und Methoden deklerationen bekommt?
+        // Resolver benutzung.. ICompilationUnit übergeben ok? , andere übergabe werte?
+        // Resolver statische Methoden?
 
         return result;
     }
