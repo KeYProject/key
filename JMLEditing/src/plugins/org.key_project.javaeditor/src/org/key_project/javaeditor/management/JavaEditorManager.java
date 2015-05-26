@@ -18,7 +18,9 @@ import java.util.Arrays;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
+import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.eclipse.jdt.internal.ui.javaeditor.SemanticHighlightingManager;
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
@@ -28,10 +30,13 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -39,8 +44,13 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
+import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.eclipse.ui.views.contentoutline.ContentOutline;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
+import org.key_project.javaeditor.outline.IOutlineWrapper;
+import org.key_project.javaeditor.outline.OutlineCompilationUnitWrapper;
 import org.key_project.javaeditor.util.ExtendableConfigurationUtil;
 import org.key_project.javaeditor.util.LogUtil;
 import org.key_project.javaeditor.util.PreferenceUtil;
@@ -134,6 +144,7 @@ public final class JavaEditorManager {
       
       @Override
       public void partActivated(IWorkbenchPart part) {
+         handlePartActivated(part);
       }
    };
    
@@ -275,6 +286,18 @@ public final class JavaEditorManager {
       }
    }
    
+   /**
+    * Changes the {@link SourceViewerConfiguration} in the given {@link JavaEditor}.
+    * @param javaEditor The {@link JavaEditor} to modify.
+    * @param viewer The {@link SourceViewer} of the {@link JavaEditor} to modify.
+    * @param newConf The new {@link SourceViewerConfiguration} to use.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    * @throws InvocationTargetException Occurred Exception.
+    * @throws NoSuchMethodException Occurred Exception.
+    * @throws SecurityException Occurred Exception.
+    * @throws NoSuchFieldException Occurred Exception.
+    */
    private void changeConfiguration(JavaEditor javaEditor, SourceViewer viewer, SourceViewerConfiguration newConf) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
       // Change configuration in JavaEditor
       viewer.unconfigure();
@@ -290,6 +313,60 @@ public final class JavaEditorManager {
       }
       else {
          LogUtil.getLogger().logWarning("SemanticHighlightingManager no longer available.");
+      }
+      // Update outline if needed
+      updateOutline(javaEditor);
+   }
+   
+   /**
+    * Updates the outline of the given {@link JavaEditor} according to 
+    * {@link PreferenceUtil#isExtensionsEnabled()}.
+    * @param javaEditor The {@link JavaEditor} to update its outline.
+    */
+   private static void updateOutline(final JavaEditor javaEditor) {
+      javaEditor.getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            try {
+               IContentOutlinePage outline = (IContentOutlinePage)javaEditor.getAdapter(IContentOutlinePage.class);
+               updateOutline(outline);
+            }
+            catch (Exception e) {
+               LogUtil.getLogger().logError(e);
+            }
+         }
+      });
+   }
+   
+   /**
+    * Updates the given {@link IPage} of the outline view according to 
+    * {@link PreferenceUtil#isExtensionsEnabled()}.
+    * @param outlinePage The {@link IPage} to update.
+    * @throws NoSuchMethodException Occurred Exception.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    * @throws InvocationTargetException Occurred Exception.
+    */
+   private static void updateOutline(IPage outlinePage) throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+      if (outlinePage instanceof JavaOutlinePage) {
+         JavaOutlinePage joutline = (JavaOutlinePage) outlinePage;
+         TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
+         Object input = outlineViewer.getInput();
+         if (input instanceof IOutlineWrapper) {
+            if (!PreferenceUtil.isExtensionsEnabled()) { // Restore input if required
+               joutline.setInput(((IOutlineWrapper<?>) input).getWrappedObject());
+            }
+         }
+         else {
+            if (PreferenceUtil.isExtensionsEnabled()) { // Change input if required
+               if (input instanceof ICompilationUnit) {
+                  joutline.setInput(new OutlineCompilationUnitWrapper((ICompilationUnit)outlineViewer.getInput()));
+               }
+               else {
+                  throw new IllegalArgumentException("Original input '" + input + "' is not an ICompilationUnit.");
+               }
+            }
+         }
       }
    }
 
@@ -367,6 +444,8 @@ public final class JavaEditorManager {
                changeConfiguration(javaEditor, viewer, conf.getOriginalConfiguration());
             }
          }
+         // Restore outline
+         updateOutline(javaEditor);
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
@@ -421,6 +500,39 @@ public final class JavaEditorManager {
       if (PreferenceUtil.isExtensionsEnabled()) {
          if (part instanceof IEditorPart) {
             init((IEditorPart) part);
+         }
+         else if (part instanceof IViewPart) {
+            if (IPageLayout.ID_OUTLINE.equals(part.getSite().getId())) {
+               initOutline((IViewPart) part);
+            }
+         }
+      }
+   }
+
+   /**
+    * Initializes a newly opened outline view.
+    * @param part The newly opened outline view.
+    */
+   private void initOutline(IViewPart part) {
+      try {
+         if (part instanceof ContentOutline) {
+            ContentOutline co = (ContentOutline) part;
+            updateOutline(co.getCurrentPage());
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+      }
+   }
+
+   /**
+    * When an {@link IWorkbenchPart} is activated.
+    * @param part The activated {@link IWorkbenchPart}.
+    */
+   protected void handlePartActivated(IWorkbenchPart part) {
+      if (PreferenceUtil.isExtensionsEnabled()) {
+         if (part instanceof JavaEditor) {
+            updateOutline((JavaEditor) part);
          }
       }
    }
