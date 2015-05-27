@@ -203,7 +203,7 @@ public final class Resolver {
             if(((MethodDeclaration) context).getName().getIdentifier().equals(name)) {
                 return context;
             } else {
-                if(!((MethodDeclaration) context).isConstructor()) {
+                if(except == null && !((MethodDeclaration) context).isConstructor()) {
                     for(Object parameter : ((MethodDeclaration) context).parameters()) {
                         ASTNode result = findIdentifier(((SingleVariableDeclaration) parameter), name, except);
                         if(result != null) {
