@@ -4,5 +4,6 @@ public enum ResolveResultType {
     UNSPECIFIED,
     PARAMETER,
     METHOD,
-    FIELD
+    FIELD,
+    CLASS
 }
