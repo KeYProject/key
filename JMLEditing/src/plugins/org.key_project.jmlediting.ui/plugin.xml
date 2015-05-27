@@ -80,4 +80,10 @@
             name="Colors">
       </page>
    </extension>
+   <extension
+         point="org.key_project.javaeditor.javaOutlineCompilationUnitWrapper">
+      <Wrapper
+            class="org.key_project.jmlediting.ui.outlineView.OutlineCompilationUnitWrapperExtension">
+      </Wrapper>
+   </extension>
 </plugin>
