@@ -8,7 +8,7 @@ public class OutlineCompilationUnitWrapperExtension extends
 
     public OutlineCompilationUnitWrapperExtension(ICompilationUnit wrappedObject) {
         super(wrappedObject);
-        
+        System.out.println("CONSTREKTETRR CALLD");
         // TODO Auto-generated constructor stub
     }
 
