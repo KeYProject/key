@@ -1,48 +1,45 @@
 package org.key_project.jmlediting.core.resolver;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class ResolveResult {
     
-    private boolean isFinalized = false;
-    private String name = "";
+    private ASTNode jdtNode = null;
     private ResolveResultType type = ResolveResultType.UNSPECIFIED;
-    private List<Integer> indexOffsets = new ArrayList<Integer>();
-    private IBinding binding = null;    // Should I save this? :( Comment says it takes a LOT of resources.
+    private IBinding binding = null;
     
-    public ResolveResult(String name, ResolveResultType type, IBinding binding) {
-        this.name = name;
+    public ResolveResult(ASTNode jdtNode, ResolveResultType type, IBinding binding) {
+        this.jdtNode = jdtNode;
         this.type = type;
         this.binding = binding;
-    }
-    
-    public List<Integer> getIndexOffsets() {
-        return indexOffsets;
-    }
-    
-    public boolean addOffset(int offset) {
-        if(isFinalized) return false;
-        
-        indexOffsets.add(offset);
-        return true;
     }
 
     public IBinding getBinding() {
         return binding;
     }
-
-    public String getName() {
-        return name;
+    
+    public ASTNode getJDTNode() {
+        return jdtNode;
     }
 
-    public ResolveResultType getType() {
+    public String getName() {
+        return binding.getName();
+    }
+
+    public ResolveResultType getResolveType() {
         return type;
     }
     
-    public void finalize() {
-        isFinalized = true;
+    /** Get the return type.
+     * @return the return type of the Method. If the stored resolve information is not from a method, it returns null;
+     */
+    public ITypeBinding getMethodReturnType() {
+        if(type == ResolveResultType.METHOD) {
+            return ((IMethodBinding) binding).getReturnType();
+        }
+        return null;
     }
 }
