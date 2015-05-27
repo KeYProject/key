@@ -5,14 +5,14 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: JMLEditing
+    Checkstyle-Configuration: Checkstyle-JMLEditing
     Description: none
 -->
 <module name="Checker">
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
     <module name="JavadocMethod">
-      <property name="scope" value="public"/>
+      <property name="scope" value="package"/>
       <property name="excludeScope" value="private"/>
       <property name="suppressLoadErrors" value="true"/>
     </module>
