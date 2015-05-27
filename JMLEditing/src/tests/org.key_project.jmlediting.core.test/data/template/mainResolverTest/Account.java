@@ -21,7 +21,7 @@ public class Account {
 	  @ also
 	  @ 
 	  @ normal_behavior
-	  @ requires amount > balance || amount <= 0;
+	  @ requires amount > getBalance() || amount <= 0;
 	  @ assignable \nothing;
 	  @ ensures balance = \old(balance) && \result == false;
 	  @*/
@@ -44,4 +44,14 @@ public class Account {
 	public /*@ pure @*/ int getBalance() {
         return balance;
     }
+	
+	/*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures \result == User.getUserCount();
+	  @*/
+	public int getUserCount() {
+	    return User.getUserCount();
+	}
+	
+	
 }
