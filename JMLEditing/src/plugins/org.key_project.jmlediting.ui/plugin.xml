@@ -9,12 +9,6 @@
             name="JML"
             defaultEnabled="true">
       </javaConfigurationExtensions>
-      <javaConfigurationExtensions
-            class="org.key_project.jmlediting.ui.outlineView.JMLOutlineview"
-            defaultEnabled="true"
-            id="org.key_project.jmlediting.ui.Outlineview"
-            name="JMLOutlineExtension">
-      </javaConfigurationExtensions>
    </extension>
    <extension
          point="org.key_project.javaeditor.javaEditorPreferenceListener">
@@ -89,7 +83,7 @@
    <extension
          point="org.key_project.javaeditor.javaOutlineCompilationUnitWrapper">
       <Wrapper
-            class="org.key_project.jmlediting.ui.outlineView.OutlineCompilationUnitWrapper">
+            class="org.key_project.jmlediting.ui.outlineView.OutlineCompilationUnitWrapperExtension">
       </Wrapper>
    </extension>
 </plugin>
