@@ -100,6 +100,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean truthValueEvaluationEnabled = KeySEDUtil.isTruthValueEvaluationEnabled(configuration);
           boolean highlightReachedSourceCode = KeySEDUtil.isHighlightReachedSourceCode(configuration);
           boolean groupingEnabled = KeySEDUtil.isGroupingEnabled(configuration);
+          boolean simplifyConditions = KeySEDUtil.isSimplifyConditions(configuration);
           // Determine location and class path entries
           File location = null;
           List<File> classPaths = null;
@@ -153,7 +154,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                              variablesAreOnlyComputedFromUpdates,
                                                              truthValueEvaluationEnabled,
                                                              highlightReachedSourceCode,
-                                                             groupingEnabled); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+                                                             groupingEnabled,
+                                                             simplifyConditions); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
           if (newDebugSession) {
              if (method == null) {
@@ -264,7 +266,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           proof = ui.createProof(initConfig, input);
        }
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates());
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates(), settings.isSimplifyConditions());
        builder.analyse();
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterfaceControl>(ui, initConfig, builder);

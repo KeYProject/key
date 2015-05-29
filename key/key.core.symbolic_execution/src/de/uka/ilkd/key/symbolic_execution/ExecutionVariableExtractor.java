@@ -65,19 +65,30 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
    private final Map<LocationDefinition, StateExecutionVariable> allStateVariables;
    
    /**
+    * {@code true} simplify conditions, {@code false} do not simplify conditions.
+    */
+   private final boolean simplifyConditions;
+   
+   /**
     * Constructor.
     * @param node The {@link Node} which provides the state.
     * @param modalityPio The {@link PosInOccurrence} in the {@link Node}.
     * @param executionNode The current {@link IExecutionNode}.
     * @param condition An optional additional condition.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @throws ProofInputException Occurred Exception
     */
-   public ExecutionVariableExtractor(Node node, PosInOccurrence modalityPio, IExecutionNode<?> executionNode, Term condition) throws ProofInputException {
+   public ExecutionVariableExtractor(Node node, 
+                                     PosInOccurrence modalityPio, 
+                                     IExecutionNode<?> executionNode, 
+                                     Term condition,
+                                     boolean simplifyConditions) throws ProofInputException {
       super(node, modalityPio);
       this.executionNode = executionNode;
       this.additionalCondition = condition;
+      this.simplifyConditions = simplifyConditions;
       // Get path condition
-      Term pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), false);
+      Term pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), simplifyConditions, false);
       pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
       // Extract locations from updates
       Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -260,7 +271,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             }
             final Services services = getServices();
             Term comboundPathCondition = services.getTermBuilder().or(conditions);
-            comboundPathCondition = SymbolicExecutionUtil.simplify(getProof().getInitConfig(), getProof(), comboundPathCondition);
+            if (simplifyConditions) {
+               comboundPathCondition = SymbolicExecutionUtil.simplify(getProof().getInitConfig(), getProof(), comboundPathCondition);
+            }
             comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, services);
             ExtractedExecutionValue value = new ExtractedExecutionValue(executionNode, 
                                                                         node, 
@@ -449,7 +462,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             synchronized (allStateVariables) {
                if (values == null) {
                   // Compute values
-                  Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(getAdditionalCondition(), layoutTerm, currentLocations, true);
+                  Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(getAdditionalCondition(), layoutTerm, currentLocations, true, simplifyConditions);
                   // Analyze tree structure of pairs
                   Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables = new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
                   Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap = new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();

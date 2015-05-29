@@ -134,7 +134,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
          originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false, false, false, false, false, true);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
          assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", StringUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));

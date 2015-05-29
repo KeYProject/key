@@ -895,13 +895,15 @@ public abstract class AbstractUpdateExtractor {
     * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
     * @param currentLayout {@code true} current layout, {@code false} initial layout.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @return The computed {@link ExecutionVariableValuePair}s.
     * @throws ProofInputException Occurred Exception.
     */
    protected Set<ExecutionVariableValuePair> computeVariableValuePairs(Term layoutCondition,
                                                                        Term layoutTerm, 
                                                                        Set<ExtractLocationParameter> locations,
-                                                                       boolean currentLayout) throws ProofInputException {
+                                                                       boolean currentLayout,
+                                                                       boolean simplifyConditions) throws ProofInputException {
       // Get original updates
       ImmutableList<Term> originalUpdates;
       if (!currentLayout) {
@@ -965,7 +967,7 @@ public abstract class AbstractUpdateExtractor {
          int i = 0;
          for (ExtractLocationParameter param : locations) {
             for (Entry<Term, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
-               Map<Goal, Term> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache);
+               Map<Goal, Term> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache, simplifyConditions);
                if (param.isArrayIndex()) {
                   for (Goal goal : valueEntry.getValue()) {
                      ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
@@ -1028,11 +1030,13 @@ public abstract class AbstractUpdateExtractor {
     * </ol>
     * @param valueGoals All {@link Goal}s of the side proof which provide the same value (result).
     * @param branchConditionCache A cache of already computed branch conditions.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @return A {@link Map} which contains for each {@link Goal} the computed path condition consisting of only required splits.
     * @throws ProofInputException Occurred Exception
     */
    protected Map<Goal, Term> computeValueConditions(Set<Goal> valueGoals, 
-                                                    Map<Node, Term> branchConditionCache) throws ProofInputException {
+                                                    Map<Node, Term> branchConditionCache,
+                                                    boolean simplifyConditions) throws ProofInputException {
       Comparator<NodeGoal> comparator = new Comparator<NodeGoal>() {
          @Override
          public int compare(NodeGoal o1, NodeGoal o2) {
@@ -1069,7 +1073,7 @@ public abstract class AbstractUpdateExtractor {
                if (childGoals.size() != childGoal.getParent().childrenCount()) {
                   // Add branch condition to conditions of all child goals
                   for (NodeGoal nodeGoal : childGoals) {
-                     Term branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(), branchConditionCache);
+                     Term branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(), branchConditionCache, simplifyConditions);
                      for (Goal goal : nodeGoal.getStartingGoals()) {
                         Set<Term> conditions = goalConditions.get(goal);
                         conditions.add(branchCondition);
@@ -1244,14 +1248,16 @@ public abstract class AbstractUpdateExtractor {
     * cache it is returned from it.
     * @param node The {@link Node} to compute its branch condition.
     * @param branchConditionCache The cache of already computed branch conditions.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
    protected Term computeBranchCondition(Node node, 
-                                         Map<Node, Term> branchConditionCache) throws ProofInputException {
+                                         Map<Node, Term> branchConditionCache,
+                                         boolean simplifyConditions) throws ProofInputException {
       Term result = branchConditionCache.get(node);
       if (result == null) {
-         result = SymbolicExecutionUtil.computeBranchCondition(node, true, true);
+         result = SymbolicExecutionUtil.computeBranchCondition(node, simplifyConditions, true);
          branchConditionCache.put(node, result);
       }
       return result;

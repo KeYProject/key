@@ -66,6 +66,7 @@ public class SWTBotChangeAccessModification extends AbstractKeYDebugTargetTestCa
             Boolean.TRUE,
             Boolean.FALSE,
             Boolean.FALSE,
+            Boolean.TRUE,
             8, 
             executor);   
    } 
