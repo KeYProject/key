@@ -225,6 +225,24 @@ public class CollectionUtil {
    }
 
    /**
+    * Searches all elements accepted by the given {@link IFilter}.
+    * @param iterable The {@link Iterable} to search in.
+    * @param filter The {@link IFilter} to use.
+    * @return The elements accepted by the given {@link IFilter}.
+    */
+   public static <T> List<T> searchAll(Iterable<T> iterable, IFilter<T> filter) {
+      List<T> result = new LinkedList<T>();
+      if (iterable != null && filter != null) {
+         for (T element : iterable) {
+            if (filter.select(element)) {
+               result.add(element);
+            }
+         }
+      }
+      return result;
+   }
+
+   /**
     * Searches an element in the given {@link Iterable} instance.
     * @param iterable The instance to search in.
     * @param filter The filter to select an element.

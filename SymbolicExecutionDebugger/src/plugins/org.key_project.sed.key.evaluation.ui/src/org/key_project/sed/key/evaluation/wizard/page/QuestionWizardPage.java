@@ -14,6 +14,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.sed.key.evaluation.model.definition.BrowserQuestion;
+import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
+import org.key_project.sed.key.evaluation.model.definition.LabelQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -22,7 +24,9 @@ import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
+import org.key_project.sed.key.evaluation.wizard.manager.CheckboxManager;
 import org.key_project.sed.key.evaluation.wizard.manager.IQuestionInputManager;
+import org.key_project.sed.key.evaluation.wizard.manager.LabelManager;
 import org.key_project.sed.key.evaluation.wizard.manager.RadioButtonsManager;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -83,6 +87,14 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
             IQuestionInputManager manager = createRadioButtons(toolkit, parent, questionInput, (RadioButtonsQuestion) questionInput.getQuestion(), callback);
             managers.add(manager);
          }
+         else if (questionInput.getQuestion() instanceof CheckboxQuestion) {
+            IQuestionInputManager manager = createCheckboxes(toolkit, parent, questionInput, (CheckboxQuestion) questionInput.getQuestion(), callback);
+            managers.add(manager);
+         }
+         else if (questionInput.getQuestion() instanceof LabelQuestion) {
+            IQuestionInputManager manager = createLabel(toolkit, parent, (LabelQuestion) questionInput.getQuestion());
+            managers.add(manager);
+         }
          else {
             throw new IllegalStateException("Unsupported question: " + questionInput.getQuestion());
          }
@@ -96,6 +108,14 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
 
    public static RadioButtonsManager createRadioButtons(FormToolkit toolkit, Composite parent, QuestionInput questionInput, RadioButtonsQuestion question, ICreateControlCallback callback) {
       return new RadioButtonsManager(toolkit, parent, questionInput, question, callback);
+   }
+
+   public static CheckboxManager createCheckboxes(FormToolkit toolkit, Composite parent, QuestionInput questionInput, CheckboxQuestion question, ICreateControlCallback callback) {
+      return new CheckboxManager(toolkit, parent, questionInput, question, callback);
+   }
+
+   public static LabelManager createLabel(FormToolkit toolkit, Composite parent, LabelQuestion question) {
+      return new LabelManager(toolkit, parent, question);
    }
    
    public static interface ICreateControlCallback {

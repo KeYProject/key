@@ -39,4 +39,9 @@ public abstract class AbstractQuestion {
    public boolean isEditable() {
       return true;
    }
+
+   @Override
+   public String toString() {
+      return name + " (" + getClass().getName() + ")";
+   }
 }

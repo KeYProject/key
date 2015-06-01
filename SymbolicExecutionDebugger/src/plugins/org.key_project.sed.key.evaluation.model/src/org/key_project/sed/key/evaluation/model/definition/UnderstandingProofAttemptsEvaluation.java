@@ -148,17 +148,44 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    }
    
    protected QuestionPage createMyIntegerQuestionPage(String pageName, String title) {
-      String whyOpenTitle = "Why is the proof still open?";
-      RadioButtonsQuestion whyOpenQuestion = new RadioButtonsQuestion("whyOpen", 
-                                                                      whyOpenTitle, 
+      String howToCloseTitle = "How can the proof be closed?";
+      CheckboxQuestion howToCloseQuestion = new CheckboxQuestion("howToClose", 
+                                                                 howToCloseTitle, 
+                                                                 true,
+                                                                 null, 
+                                                                 new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
+                                                                 new Choice("Using the auto mode", "Using the auto mode"), 
+                                                                 new Choice("Applying rules interactively", "Applying rules interactively"));
+      String locationTitle = "Which not specified location(s) have changed?";
+      CheckboxQuestion locationQuestion = new CheckboxQuestion("whichLocationsHaveChanged", 
+                                                               locationTitle, 
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), 
+                                                               new Choice("self", "self"),
+                                                               new Choice("self.value", "self.value"),
+                                                               new Choice("summand", "summand"),
+                                                               new Choice("summand.value", "summand.value"));
+      String thrownExceptionTitle = "Which exception(s) are thrown?";
+      CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsAreThrown", 
+                                                                      thrownExceptionTitle, 
                                                                       true,
                                                                       null, 
-                                                                      new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
-                                                                      new Choice("Rule application stopped to early, proof is closeable", "Stopped to early"), 
-                                                                      new Choice("Precondition (true) is not established", "Precondition not established"),
-                                                                      new Choice("Postcondition does not hold", "Postcondition does not hold"),
-                                                                      new Choice("Assignable clause does not hold", "Assignable clause does not hold"),
-                                                                      new Choice("Exception might be thorwn (normal_behavior violated)", "Exception might be thrown"));
+                                                                      new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
+                                                                      new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
+                                                                      new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
+                                                                      new Choice("java.lang.OutOfMemoryError", "java.lang.OutOfMemoryError"));
+      String whyOpenTitle = "Why is the proof still open?";
+      CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
+                                                              whyOpenTitle, 
+                                                              true,
+                                                              null, 
+                                                              new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
+                                                              new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
+                                                              new Choice("Precondition (true) is not established", "Precondition not established"),
+                                                              new Choice("Postcondition (value == \\old(value) + summand.value) does not hold", "Postcondition does not hold"),
+                                                              new Choice("Assignable clause does not hold", "Assignable clause does not hold", locationQuestion),
+                                                              new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion));
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -170,11 +197,12 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
-                               new ProofAttemptJavaProjectModifier("MyInteger",
-                                                                   "add",
-                                                                   new String[] {"QMyInteger;"},
-                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
-                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)),
+                              new ProofAttemptJavaProjectModifier("MyInteger",
+                                                                  "add",
+                                                                  new String[] {"QMyInteger;"},
+                                                                  new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
+                                                                  new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)),
+                              new LabelQuestion("generalDescription", "Please inspect the current proof attempt carefully and answer the following question about it as best as possible."),
                               openQuestion);
       // Under which condition is the proof open
       // Which execution paths are feasible using specification?
