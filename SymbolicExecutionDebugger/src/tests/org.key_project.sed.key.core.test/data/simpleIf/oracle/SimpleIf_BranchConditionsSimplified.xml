@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_e5f5ef84-8300-41fe-8d06-45922254ebb9" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_5b761980-5a6d-4090-815a-fae2b14bf831" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+         <sedMethodCall xml:id="_1909f356-e2b7-4b0f-b4be-9d0e9d6a23ba" name="&lt;call self.min(i,j)&gt;" pathCondition="true" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java" groupable="true">
+            <sedStatement xml:id="_864494b8-6202-46c4-8090-57739414fbd7" name="int result;" pathCondition="true" lineNumber="-1" charStart="436" charEnd="447" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+               <sedBranchStatement xml:id="_de56e105-f02b-437a-9bf2-066c855839b5" name="if (i&lt;j)" pathCondition="true" lineNumber="-1" charStart="451" charEnd="462" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java" groupable="true">
+                  <sedBranchCondition xml:id="_8911b334-b14d-4de3-8bdf-cf95184faefd" name="gt(j,i)" pathCondition="gt(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+                     <sedStatement xml:id="_49ca08a1-bc19-48ff-8969-e81019dcb3ba" name="result_1=i;" pathCondition="gt(j,i)" lineNumber="-1" charStart="468" charEnd="479" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+                        <sedStatement xml:id="_5ebf1bca-10e9-485b-9cfd-03d7a5e39743" name="return result_1;" pathCondition="gt(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+                           <sedMethodReturn xml:id="_f41ac3f1-5a35-42a1-a103-771760cb84a1" name="&lt;return of min&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java" methodReturnConditionRef="_76aa8ea1-71e4-445e-a730-de4691653126">
+                              <sedTermination xml:id="_d9bfae29-aa85-4327-9b5e-0623215000ac" name="&lt;end&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java" verified="true">
+                              </sedTermination>
+                              <sedGroupEndConditionReference nodeIdRef="_76aa8ea1-71e4-445e-a730-de4691653126"/>
+                           </sedMethodReturn>
+                        </sedStatement>
+                        <sedGroupEndConditionReference nodeIdRef="_e4f8b422-6f9d-48f7-9d66-11d0e925cb1e"/>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_9e137aa6-ecaf-410d-85e1-6be0d8e6c86b" name="leq(j,i)" pathCondition="leq(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+                     <sedStatement xml:id="_2d897397-9539-4b7b-9f9e-5c3d81c0cfd3" name="result_1=j;" pathCondition="leq(j,i)" lineNumber="-1" charStart="499" charEnd="510" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+                        <sedStatement xml:id="_812d2207-04ee-4c46-a2d6-77c197a75af9" name="return result_1;" pathCondition="leq(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+                           <sedMethodReturn xml:id="_848c0742-3af6-4396-8914-e75b43dd7ec3" name="&lt;return of min&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java" methodReturnConditionRef="_ee6349fe-e940-46f8-a38b-f1d7bca32d82">
+                              <sedTermination xml:id="_f4d7b21f-d041-4789-ade5-35d6f9ef5fa2" name="&lt;end&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java" verified="true">
+                              </sedTermination>
+                              <sedGroupEndConditionReference nodeIdRef="_ee6349fe-e940-46f8-a38b-f1d7bca32d82"/>
+                           </sedMethodReturn>
+                        </sedStatement>
+                        <sedGroupEndConditionReference nodeIdRef="_993f5c73-5bb2-44ec-98bd-2cde1f99bd16"/>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedGroupEndCondition xml:id="_e4f8b422-6f9d-48f7-9d66-11d0e925cb1e" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+                     <sedChildReference nodeIdRef="_49ca08a1-bc19-48ff-8969-e81019dcb3ba"/>
+                  </sedGroupEndCondition>
+                  <sedGroupEndCondition xml:id="_993f5c73-5bb2-44ec-98bd-2cde1f99bd16" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+                     <sedChildReference nodeIdRef="_2d897397-9539-4b7b-9f9e-5c3d81c0cfd3"/>
+                  </sedGroupEndCondition>
+               </sedBranchStatement>
+            </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_76aa8ea1-71e4-445e-a730-de4691653126" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+               <sedChildReference nodeIdRef="_f41ac3f1-5a35-42a1-a103-771760cb84a1"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_ee6349fe-e940-46f8-a38b-f1d7bca32d82" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+               <sedChildReference nodeIdRef="_848c0742-3af6-4396-8914-e75b43dd7ec3"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_76aa8ea1-71e4-445e-a730-de4691653126" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+               <sedChildReference nodeIdRef="_f41ac3f1-5a35-42a1-a103-771760cb84a1"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_ee6349fe-e940-46f8-a38b-f1d7bca32d82" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions\src\SimpleIf.java">
+               <sedChildReference nodeIdRef="_848c0742-3af6-4396-8914-e75b43dd7ec3"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_d9bfae29-aa85-4327-9b5e-0623215000ac"/>
+         <sedTerminationEntry nodeIdRef="_f4d7b21f-d041-4789-ade5-35d6f9ef5fa2"/>
+      </sedThread>
+   </sedTarget>
+</launch>

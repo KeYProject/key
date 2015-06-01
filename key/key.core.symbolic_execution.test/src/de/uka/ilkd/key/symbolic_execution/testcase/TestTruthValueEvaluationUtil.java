@@ -350,6 +350,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                          false, 
                          false, 
                          false,
+                         true,
                          true);
          assertNotNull(env);
          // Evaluate truth values
@@ -398,6 +399,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                          false,
                          false,
                          false,
+                         true,
                          true);
          // Evaluate truth values
          doTruthValueEvaluationTest(env, expectedResults);

@@ -71,6 +71,7 @@ public class SWTBotChangeConditonWithErrorOKThenOKWithChange extends AbstractKeY
             Boolean.TRUE,
             Boolean.FALSE,
             Boolean.FALSE,
+            Boolean.TRUE,
             8, 
             executor);   
    } 

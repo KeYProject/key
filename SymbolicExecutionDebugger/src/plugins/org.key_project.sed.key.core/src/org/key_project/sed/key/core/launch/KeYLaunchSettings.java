@@ -163,6 +163,11 @@ public class KeYLaunchSettings {
    private final boolean groupingEnabled;
    
    /**
+    * {@code true} simplify conditions, {@code false} do not simplify conditions.
+    */
+   private final boolean simplifyConditions;
+   
+   /**
     * Constructor.
     * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
     * @param proofFileToContinue The path to the proof file to continue.
@@ -187,6 +192,7 @@ public class KeYLaunchSettings {
     * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
     * @param highlightReachedSourceCode Is reached source code highlighted?
     * @param groupingEnabled Is grouping enabled?
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -212,7 +218,8 @@ public class KeYLaunchSettings {
                             boolean variablesAreOnlyComputedFromUpdates,
                             boolean truthValueEvaluationEnabled,
                             boolean highlightReachedSourceCode,
-                            boolean groupingEnabled) throws JavaModelException {
+                            boolean groupingEnabled,
+                            boolean simplifyConditions) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -238,6 +245,7 @@ public class KeYLaunchSettings {
       this.truthValueEvaluationEnabled = truthValueEvaluationEnabled;
       this.highlightReachedSourceCode = highlightReachedSourceCode;
       this.groupingEnabled = groupingEnabled;
+      this.simplifyConditions = simplifyConditions;
    }
 
    /**
@@ -438,5 +446,13 @@ public class KeYLaunchSettings {
     */
    public boolean isGroupingEnabled() {
       return groupingEnabled;
+   }
+   
+   /**
+    * Checks if conditions should be simplified or not.
+    * @return {@code true} simplify conditions, {@code false} do not simplify conditions.
+    */
+   public boolean isSimplifyConditions() {
+      return simplifyConditions;
    }
 }

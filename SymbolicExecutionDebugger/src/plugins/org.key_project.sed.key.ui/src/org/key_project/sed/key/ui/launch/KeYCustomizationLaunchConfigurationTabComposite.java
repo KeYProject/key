@@ -92,6 +92,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button groupingEnabledButton;
    
    /**
+    * Defines if branch conditions are simplified.
+    */
+   private Button simplifyConditionsButton;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style.
@@ -221,6 +226,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
+      simplifyConditionsButton = widgetFactory.createButton(keyGroup, "Simplify conditions (recommended)", SWT.CHECK);
+      simplifyConditionsButton.setEnabled(isEditable());
+      simplifyConditionsButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
       updatePrettyPrintingDependingEnabledStates();
       updateShowVariablesEnabledState();
    }
@@ -264,6 +277,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          truthValueEvaluationEnabledButton.setSelection(KeySEDUtil.isTruthValueEvaluationEnabled(configuration));
          highlightReachedSourceCodeButton.setSelection(KeySEDUtil.isHighlightReachedSourceCode(configuration));
          groupingEnabledButton.setSelection(KeySEDUtil.isGroupingEnabled(configuration));
+         simplifyConditionsButton.setSelection(KeySEDUtil.isSimplifyConditions(configuration));
          updatePrettyPrintingDependingEnabledStates();
          updateShowVariablesEnabledState();
       } 
@@ -288,6 +302,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       truthValueEvaluationEnabledButton.setSelection(launchSettings.isTruthValueEvaluationEnabled());
       highlightReachedSourceCodeButton.setSelection(launchSettings.isHighlightReachedSourceCode());
       groupingEnabledButton.setSelection(launchSettings.isGroupingEnabled());
+      simplifyConditionsButton.setSelection(launchSettings.isSimplifyConditions());
       updatePrettyPrintingDependingEnabledStates();
       updateShowVariablesEnabledState();
    }
@@ -308,5 +323,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabledButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, highlightReachedSourceCodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_GROUPING_ENABLED, groupingEnabledButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, simplifyConditionsButton.getSelection());
    }
 }

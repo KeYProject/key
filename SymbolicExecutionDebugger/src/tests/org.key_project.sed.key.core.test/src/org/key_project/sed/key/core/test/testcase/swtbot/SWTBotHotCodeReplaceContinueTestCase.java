@@ -70,6 +70,7 @@ public class SWTBotHotCodeReplaceContinueTestCase extends
             Boolean.TRUE,
             Boolean.FALSE,
             Boolean.FALSE,
+            Boolean.TRUE,
             8, 
             executor);   
    
