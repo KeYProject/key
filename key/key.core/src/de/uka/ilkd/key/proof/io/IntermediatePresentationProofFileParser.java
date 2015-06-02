@@ -64,7 +64,9 @@ import de.uka.ilkd.key.util.Pair;
  * 
  * Note that the last open goal in an unfinished proof is not represented
  * by a node in the intermediate representation (since no rule has been
- * applied on the goal yet).
+ * applied on the goal yet).<p>
+ * 
+ * The results of the parser may be obtained by calling {@link #getResult()}.
  * 
  * @author Dominic Scheurer
  */
@@ -283,6 +285,13 @@ public class IntermediatePresentationProofFileParser implements
             break;
         }
     }
+    
+    /**
+     * @return The results of the parsing procedure.
+     */
+    public Result getResult() {
+        return new Result(getErrors(), getStatus(), root);
+    }
 
     @Override
     public String getStatus() {
@@ -420,6 +429,39 @@ public class IntermediatePresentationProofFileParser implements
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);
         }
+    }
+    
+
+
+    /**
+     * Simple structure comprising the results of the parser.
+     *
+     * @author Dominic Scheurer
+     */
+    static class Result {
+        private List<Throwable> errors;
+        private String status;
+        private BranchNodeIntermediate parsedResult = null;
+
+        public Result(List<Throwable> errors, String status,
+                BranchNodeIntermediate parsedResult) {
+            this.errors = errors;
+            this.status = status;
+            this.parsedResult = parsedResult;
+        }
+
+        public List<Throwable> getErrors() {
+            return errors;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public BranchNodeIntermediate getParsedResult() {
+            return parsedResult;
+        }
+
     }
 
 }
