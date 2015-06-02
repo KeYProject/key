@@ -349,17 +349,22 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @return The found {@link Term} or {@code null} if not available.
     */
    protected Term findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate) {
-      if (term.op() == uninterpretedPredicate.op()) {
-         return term;
-      }
-      else if (term.op() == Junctor.AND) {
-         Term result = null;
-         int i = 0;
-         while (result == null && i < term.arity()) {
-            result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate);
-            i++;
+      if (uninterpretedPredicate != null) {
+         if (term.op() == uninterpretedPredicate.op()) {
+            return term;
          }
-         return result;
+         else if (term.op() == Junctor.AND) {
+            Term result = null;
+            int i = 0;
+            while (result == null && i < term.arity()) {
+               result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate);
+               i++;
+            }
+            return result;
+         }
+         else {
+            return null;
+         }
       }
       else {
          return null;
