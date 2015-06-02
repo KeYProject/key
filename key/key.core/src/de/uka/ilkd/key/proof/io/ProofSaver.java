@@ -380,16 +380,15 @@ public class ProofSaver {
         
         if (appliedRuleApp instanceof JoinRuleBuiltInRuleApp) {
         	JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) appliedRuleApp;
-        	
-        	tree.append(" (joinproc \"");
+        	tree.append(" (joinProc \"");
         	tree.append(joinApp.getConcreteRule().toString());
             tree.append("\")");
         	
-        	tree.append(" (nrpartners \"");
+        	tree.append(" (nrJoinPartners \"");
         	tree.append(joinApp.getJoinPartners().size());
             tree.append("\")");
         	
-        	tree.append(" (id \"");
+        	tree.append(" (joinId \"");
         	tree.append(joinApp.getJoinNode().serialNr());
             tree.append("\")");
         }
@@ -397,7 +396,7 @@ public class ProofSaver {
         if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
         	CloseAfterJoinRuleBuiltInRuleApp closeApp = (CloseAfterJoinRuleBuiltInRuleApp) appliedRuleApp;
         	
-        	tree.append(" (joinnode \"");
+        	tree.append(" (joinNode \"");
         	tree.append(closeApp.getCorrespondingJoinNode().parent().serialNr());
             tree.append("\")");
         }

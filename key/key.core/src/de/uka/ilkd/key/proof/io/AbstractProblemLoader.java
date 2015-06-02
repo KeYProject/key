@@ -510,11 +510,14 @@ public abstract class AbstractProblemLoader {
         		errors.add(e);
         	}
         } finally {
-            status = parserResult.getStatus();
-            errors.addAll(parserResult.getErrors());
-            
-            status += (status.isEmpty() ? "" : "\n\n") + replayResult.getStatus();
-            errors.addAll(replayResult.getErrors());
+            if (parserResult != null) {
+                status = parserResult.getStatus();
+                errors.addAll(parserResult.getErrors());
+            }
+            status += (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus() : "Error while loading proof.");
+            if (replayResult != null) {
+                errors.addAll(replayResult.getErrors());
+            }
         }
         	
         ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);
