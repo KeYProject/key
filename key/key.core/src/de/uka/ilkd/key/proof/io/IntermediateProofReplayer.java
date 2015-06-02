@@ -140,11 +140,11 @@ public class IntermediateProofReplayer {
      * @param intermediate
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
-            IntermediatePresentationProofFileParser parser) {
+            IntermediatePresentationProofFileParser.Result parserResult) {
         this.proof = proof;
-        this.loader = loader;
-
-        queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(), parser
+        this.loader = loader; 
+        
+        queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(), parserResult
                 .getParsedResult()));
     }
 
@@ -160,7 +160,7 @@ public class IntermediateProofReplayer {
      * proof object; the last selected goal may be obtained by
      * {@link #getLastSelectedGoal()}.
      */
-    public void replay() {
+    public Result replay() {
         while (!queue.isEmpty()) {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
@@ -374,6 +374,8 @@ public class IntermediateProofReplayer {
                 }
             }
         }
+        
+        return new Result(status, errors, currGoal);
     }
 
     /**
@@ -901,5 +903,35 @@ public class IntermediateProofReplayer {
      */
     static class SkipSMTRuleException extends Exception {
         private static final long serialVersionUID = -2932282883810135168L;
+    }
+    
+    /**
+     * Simple structure containing the results of the replay procedure.
+     *
+     * @author Dominic Scheurer
+     */
+    static class Result {
+        private String status;
+        private List<Throwable> errors;
+        private Goal lastSelectedGoal = null;
+
+        public Result(String status, List<Throwable> errors,
+                Goal lastSelectedGoal) {
+            this.status = status;
+            this.errors = errors;
+            this.lastSelectedGoal = lastSelectedGoal;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public List<Throwable> getErrors() {
+            return errors;
+        }
+
+        public Goal getLastSelectedGoal() {
+            return lastSelectedGoal;
+        }
     }
 }

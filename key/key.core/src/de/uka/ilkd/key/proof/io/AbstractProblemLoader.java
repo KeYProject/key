@@ -488,26 +488,33 @@ public abstract class AbstractProblemLoader {
         
         IProofFileParser parser = null;
         IntermediateProofReplayer replayer = null;
+        IntermediatePresentationProofFileParser.Result parserResult = null;
+        IntermediateProofReplayer.Result replayResult = null;
         
         try {
         	if (envInput instanceof KeYUserProblemFile) {
+        	    
                 parser = new IntermediatePresentationProofFileParser(proof);
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-                replayer = new IntermediateProofReplayer(this, proof, (IntermediatePresentationProofFileParser) parser);
-                replayer.replay();
-                lastTouchedNode = replayer.getLastSelectedGoal() != null ? replayer.getLastSelectedGoal().node() : proof.root();
+                parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
+                
+                replayer = new IntermediateProofReplayer(this, proof, parserResult);
+                replayResult = replayer.replay();
+                
+                lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
         	}
         } catch (Exception e) {
-        	if (parser == null || parser.getErrors() == null || parser.getErrors().isEmpty()) {
+        	if (parser == null || parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
+        	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
         		// this exception was something unexpected
         		errors.add(e);
         	}
         } finally {
-            status = parser.getStatus();
-            errors.addAll(parser.getErrors());
+            status = parserResult.getStatus();
+            errors.addAll(parserResult.getErrors());
             
-            status += (status.isEmpty() ? "" : "\n\n") + replayer.getStatus();
-            errors.addAll(replayer.getErrors());
+            status += (status.isEmpty() ? "" : "\n\n") + replayResult.getStatus();
+            errors.addAll(replayResult.getErrors());
         }
         	
         ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);
