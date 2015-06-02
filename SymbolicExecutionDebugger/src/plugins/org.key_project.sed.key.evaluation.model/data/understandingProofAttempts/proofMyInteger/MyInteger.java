@@ -5,7 +5,7 @@ public class MyInteger {
      @ ensures value == \old(value) + summand.value;
      @ assignable value;
      @*/
-   public void add(MyInteger summand) {
+   public void add(/*@ non_null @*/ MyInteger summand) {
       value += summand.value;
    }
 }

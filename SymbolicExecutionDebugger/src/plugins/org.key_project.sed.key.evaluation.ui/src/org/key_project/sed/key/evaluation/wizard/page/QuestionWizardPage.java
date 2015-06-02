@@ -22,7 +22,6 @@ import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
-import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 import org.key_project.sed.key.evaluation.wizard.manager.CheckboxManager;
 import org.key_project.sed.key.evaluation.wizard.manager.IQuestionInputManager;
@@ -39,8 +38,6 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
          handleValueChange(evt);
       }
    };
-   
-   private String workbenchModifierFailure;
 
    public QuestionWizardPage(QuestionPageInput pageInput) {
       super(pageInput);
@@ -128,7 +125,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    
    @Override
    protected void updatePageCompleted() {
-      String errorMessage = workbenchModifierFailure;
+      String errorMessage = getRunnablesFailure();
       // Validate questions
       if (errorMessage == null) {
          QuestionInput[] inputs = getPageInput().getQuestionInputs();
@@ -144,44 +141,37 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    }
 
    @Override
-   public void setVisible(final boolean visible) {
-      super.setVisible(visible);
-      try {
-         final IWorkbenchModifier modifier = getPageInput().getPage().getWorkbenchModifier();
+   protected IRunnableWithProgress computeRunnable(final boolean visible) {
+      final IWorkbenchModifier modifier = getPageInput().getPage().getWorkbenchModifier();
+      if (modifier != null) {
          final Tool tool = getPageInput().getFormInput() instanceof RandomFormInput ?
                            ((RandomFormInput) getPageInput().getFormInput()).getTool(getPageInput()) :
                            null;
-         if (modifier != null) {
-            final IWorkbenchPage activePage = WorkbenchUtil.getActivePage(); 
-            getContainer().run(true, false, new IRunnableWithProgress() {
-               @Override
-               public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                  try {
-                     if (visible) {
-                        monitor.beginTask("Modifying Workbench", IProgressMonitor.UNKNOWN);
-                        modifier.init(activePage, getShell(), getPageInput(), tool);
-                        modifier.modifyWorkbench();
-                        monitor.done();
-                     }
-                     else {
-                        monitor.beginTask("Cleaning Workbench", IProgressMonitor.UNKNOWN);
-                        modifier.cleanWorkbench();
-                        monitor.done();
-                     }
+         final IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
+         return new IRunnableWithProgress() {
+            @Override
+            public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+               try {
+                  if (visible) {
+                     monitor.beginTask("Modifying Workbench", IProgressMonitor.UNKNOWN);
+                     modifier.init(activePage, getShell(), getPageInput(), tool);
+                     modifier.modifyWorkbench();
+                     monitor.done();
                   }
-                  catch (Exception e) {
-                     throw new InvocationTargetException(e, e.getMessage());
+                  else {
+                     monitor.beginTask("Cleaning Workbench", IProgressMonitor.UNKNOWN);
+                     modifier.cleanWorkbench();
+                     monitor.done();
                   }
                }
-            });
-         }
+               catch (Exception e) {
+                  throw new InvocationTargetException(e, e.getMessage());
+               }
+            }
+         };
       }
-      catch (Exception e) {
-         workbenchModifierFailure = e.getMessage();
-         LogUtil.getLogger().logError(e);
-      }
-      finally {
-         updatePageCompleted();
+      else {
+         return null;
       }
    }
 }

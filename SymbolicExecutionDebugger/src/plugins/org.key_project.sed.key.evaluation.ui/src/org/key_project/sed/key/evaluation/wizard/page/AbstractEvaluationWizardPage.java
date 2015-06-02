@@ -1,5 +1,6 @@
 package org.key_project.sed.key.evaluation.wizard.page;
 
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.layout.GridLayout;
@@ -7,11 +8,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
+import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
+import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 
 public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?>> extends WizardPage {
    private final P pageInput;
 
+   private String runnablesFailure;
+   
    public AbstractEvaluationWizardPage(P pageInput) {
       super(pageInput.getPage().getName());
       this.pageInput = pageInput;
@@ -46,5 +51,49 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    @Override
    public IWizardPage getNextPage() {
       return getWizard().getNextPage(this);
+   }
+   
+   @Override
+   public EvaluationWizard getWizard() {
+      return (EvaluationWizard) super.getWizard();
+   }
+   
+   @Override
+   public void setVisible(final boolean visible) {
+      super.setVisible(visible);
+      if (visible) {
+         getWizard().setCurrentPageRunnable(computeRunnable(visible));
+      }
+      if (!visible) { // The new page is set first to visible before the old page is set to hidden
+         perfomRunnables(computeRunnable(visible), getWizard().getCurrentPageRunnable());
+         getWizard().setCurrentPageRunnable(null);
+      }
+   }
+   
+   protected IRunnableWithProgress computeRunnable(boolean visible) {
+      return null;
+   }
+
+   protected void perfomRunnables(IRunnableWithProgress hiddenRunnable, 
+                                  IRunnableWithProgress visibleRunnable) {
+      try {
+         if (hiddenRunnable != null) {
+            getContainer().run(true, false, hiddenRunnable);
+         }
+         if (visibleRunnable != null) {
+            getContainer().run(true, false, visibleRunnable);
+         }
+      }
+      catch (Exception e) {
+         runnablesFailure = e.getMessage();
+         LogUtil.getLogger().logError(e);
+      }
+      finally {
+         updatePageCompleted();
+      }
+   }
+
+   public String getRunnablesFailure() {
+      return runnablesFailure;
    }
 }

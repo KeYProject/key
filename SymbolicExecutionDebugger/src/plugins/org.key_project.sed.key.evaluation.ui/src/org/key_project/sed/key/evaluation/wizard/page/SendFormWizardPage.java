@@ -78,7 +78,10 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
 
    @Override
    protected void updatePageCompleted() {
-      String errorMessage = getPageInput().getAcceptInput().validate();
+      String errorMessage = getRunnablesFailure();
+      if (errorMessage == null) {
+         errorMessage = getPageInput().getAcceptInput().validate();
+      }
       setPageComplete(errorMessage == null);
       setErrorMessage(errorMessage);
    }

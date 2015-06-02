@@ -23,6 +23,7 @@ import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage.ICreateControlCallback;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> extends AbstractQuestionInputManager {
    private final QuestionInput questionInput;
@@ -63,7 +64,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       questionSection = toolkit.createSection(composite, SWT.NONE);
       questionSection.setText(question.getLabel());
       for (final Choice choice : question.getChoices()) {
-         createChoiceControl(toolkit, choice);
+         createChoiceControl(toolkit, choice, question);
          QuestionInput[] choiceInputs = questionInput.getChoiceInputs(choice);
          if (!ArrayUtil.isEmpty(choiceInputs)) {
             Composite choiceComposite = toolkit.createComposite(composite);
@@ -101,14 +102,19 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          }
       }
       for (final Choice choice : question.getChoices()) {
-         createChoiceControl(toolkit, choice);
+         createChoiceControl(toolkit, choice, question);
       }
    }
    
-   protected void createChoiceControl(final FormToolkit toolkit, final Choice choice) {
+   protected void createChoiceControl(final FormToolkit toolkit, final Choice choice, final Q question) {
       final Button button = toolkit.createButton(composite, choice.getText(), getButtonStyle());
       button.setData(choice.getValue());
-      button.setToolTipText(choice.getTooltip());
+      if (!StringUtil.isEmpty(choice.getTooltip())) {
+         button.setToolTipText(choice.getTooltip() + StringUtil.NEW_LINE + question.getLabel());
+      }
+      else {
+         button.setToolTipText(question.getLabel());
+      }
       if (isChoiceSelected(questionInput.getValue(), choice.getValue())) {
          button.setSelection(true);
       }

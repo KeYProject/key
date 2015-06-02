@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -37,6 +38,8 @@ public class EvaluationWizard extends Wizard {
    private AbstractEvaluationWizardPage<?> lastPage;
    
    private IWizardPage currentPage;
+   
+   private IRunnableWithProgress currentPageRunnable;
    
    public EvaluationWizard(EvaluationInput evaluationInput) {
       assert evaluationInput != null;
@@ -343,6 +346,14 @@ public class EvaluationWizard extends Wizard {
 
    public void setCurrentPage(IWizardPage currentPage) {
       this.currentPage = currentPage;
+   }
+
+   public IRunnableWithProgress getCurrentPageRunnable() {
+      return currentPageRunnable;
+   }
+
+   public void setCurrentPageRunnable(IRunnableWithProgress currentPageRunnable) {
+      this.currentPageRunnable = currentPageRunnable;
    }
 
    /**
