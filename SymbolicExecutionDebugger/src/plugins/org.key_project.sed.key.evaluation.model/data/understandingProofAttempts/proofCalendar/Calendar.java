@@ -1,9 +1,9 @@
 public class Calendar {
-   private /*@ non_null @*/ Entry[] entries = new Entry[8];
+   protected /*@ non_null @*/ Entry[] entries = new Entry[8];
    
    /*@ invariant entrySize >= 0 && entrySize < entries.length;
      @*/
-   private int entrySize = 0;
+   protected int entrySize = 0;
 
    /*@ normal_behavior
      @ ensures entries[\old(entrySize)] == entry;
