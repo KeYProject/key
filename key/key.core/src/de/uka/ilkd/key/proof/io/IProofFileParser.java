@@ -25,10 +25,13 @@ import de.uka.ilkd.key.parser.KeYParser;
 public interface IProofFileParser {
  
     /**
-     * Enumeration of the different syntactic elements occurring in the saved proof tree
-     * representation 
-     * @author Richard Bubel
-     *
+     * Enumeration of the different syntactic elements occurring in a saved proof tree
+     * representation.
+     * 
+     * TODO: ProofSaver should not hardcode ids
+     *       Enum names should be used instead of rawnames (old proofs should be converted)     
+     * 
+     * @author Richard Bubel     
      */
     static enum ProofElementID {
            BRANCH ("branch"),  
