@@ -779,7 +779,7 @@ public final class SymbolicExecutionUtil {
                                                                PosInOccurrence modalityPIO, 
                                                                Term condition) throws ProofInputException {
       if (node.getSettings().isVariablesAreOnlyComputedFromUpdates()) {
-         ExecutionVariableExtractor extractor = new ExecutionVariableExtractor(proofNode, modalityPIO, node, condition);
+         ExecutionVariableExtractor extractor = new ExecutionVariableExtractor(proofNode, modalityPIO, node, condition, node.getSettings().isSimplifyConditions());
          return extractor.analyse();
       }
       else {
@@ -3239,13 +3239,15 @@ public final class SymbolicExecutionUtil {
    /**
     * Computes the path condition of the given {@link Node}.
     * @param node The {@link Node} to compute its path condition.
+    * @param simplify {@code true} simplify each branch condition in a side proof, {@code false} do not simplify branch conditions.
     * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
     * @return The computed path condition.
     * @throws ProofInputException Occurred Exception.
     */
    public static Term computePathCondition(Node node,
+                                           boolean simplify,
                                            boolean improveReadability) throws ProofInputException {
-      return computePathCondition(null, node, true, improveReadability);
+      return computePathCondition(null, node, simplify, improveReadability);
    }
 
    /**

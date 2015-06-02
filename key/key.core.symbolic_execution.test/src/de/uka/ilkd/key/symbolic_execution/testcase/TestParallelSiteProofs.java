@@ -50,7 +50,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       final String methodFullName = "compute";
       String oraclePathInBaseDirFile = "/set/magic42/oracle/Magic42.xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false, false);
       try {
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
@@ -69,7 +69,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       // Define test settings
       String javaPathInkeyRepDirectory = "/set/magic42/test/Magic42.proof";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, false, false, false, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, false, false, false, false, false, false, false, false, false, false);
       try {
          // Do test steps
          doParallelSiteProofTest(env);

@@ -101,6 +101,9 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       Composite keySpacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
       BooleanFieldEditor mainWindowEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_KEY_MAIN_WINDOW, "Show &KeY's main window (only for experienced user)", SWT.NONE, keySpacer);
       addField(mainWindowEdit);
+
+      BooleanFieldEditor simplifyConditionsEdit = new BooleanFieldEditor(KeYSEDPreferences.SIMPLIFY_CONDITIONS, "Simplify conditions (recommended)", SWT.NONE, keySpacer);
+      addField(simplifyConditionsEdit);
    }
 
    /**

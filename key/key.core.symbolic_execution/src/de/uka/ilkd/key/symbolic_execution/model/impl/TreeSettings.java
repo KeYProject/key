@@ -41,6 +41,11 @@ public class TreeSettings implements ITreeSettings {
     * {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
     */
    private final boolean variablesAreOnlyComputedFromUpdates;
+   
+   /**
+    * {@code true} simplify conditions, {@code false} do not simplify conditions.
+    */
+   private final boolean simplifyConditions;
 
    /**
     * Constructor.
@@ -48,15 +53,18 @@ public class TreeSettings implements ITreeSettings {
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     */
    public TreeSettings(boolean mergeBranchConditions, 
                        boolean useUnicode,
                        boolean usePrettyPrinting,
-                       boolean variablesAreOnlyComputedFromUpdates) {
+                       boolean variablesAreOnlyComputedFromUpdates,
+                       boolean simplifyConditions) {
       this.mergeBranchConditions = mergeBranchConditions;
       this.useUnicode = useUnicode;
       this.usePrettyPrinting = usePrettyPrinting;
       this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
+      this.simplifyConditions = simplifyConditions;
    }
 
    /**
@@ -89,5 +97,13 @@ public class TreeSettings implements ITreeSettings {
    @Override
    public boolean isVariablesAreOnlyComputedFromUpdates() {
       return variablesAreOnlyComputedFromUpdates;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isSimplifyConditions() {
+      return simplifyConditions;
    }
 }

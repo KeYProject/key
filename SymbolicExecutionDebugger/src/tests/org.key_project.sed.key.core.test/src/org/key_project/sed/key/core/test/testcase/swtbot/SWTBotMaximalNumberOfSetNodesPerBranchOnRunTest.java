@@ -86,6 +86,7 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
                            Boolean.TRUE,
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.TRUE,
                            8, 
                            executor);
    }

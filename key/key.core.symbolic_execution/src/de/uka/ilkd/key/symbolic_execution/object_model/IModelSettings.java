@@ -29,4 +29,10 @@ public interface IModelSettings {
     * @return {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
    public boolean isUsePrettyPrinting();
+   
+   /**
+    * Checks if conditions should be simplified or not.
+    * @return {@code true} simplify conditions, {@code false} do not simplify conditions.
+    */
+   public boolean isSimplifyConditions();
 }

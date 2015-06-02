@@ -236,13 +236,15 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     */
    public SymbolicLayoutExtractor(Node node, 
                                   PosInOccurrence modalityPio,
                                   boolean useUnicode,
-                                  boolean usePrettyPrinting) {
+                                  boolean usePrettyPrinting,
+                                  boolean simplifyConditions) {
       super(node, modalityPio);
-      this.settings = new ModelSettings(useUnicode, usePrettyPrinting);
+      this.settings = new ModelSettings(useUnicode, usePrettyPrinting, simplifyConditions);
    }
 
    /**
@@ -259,7 +261,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, false);
+            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, settings.isSimplifyConditions(), false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -628,7 +630,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             updateConditions.add(tb.applyParallel(updates, term));
          }
          Term layoutCondition = tb.and(updateConditions);
-         Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(layoutCondition, layoutTerm, locations, currentLayout);
+         Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(layoutCondition, layoutTerm, locations, currentLayout, settings.isSimplifyConditions());
          return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
       }
       else {

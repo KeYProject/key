@@ -66,6 +66,7 @@ public class SWTBotChangeConditonWithoutError extends AbstractKeYDebugTargetTest
             Boolean.TRUE,
             Boolean.FALSE,
             Boolean.FALSE,
+            Boolean.TRUE,
             8, 
             executor);   
    } 
