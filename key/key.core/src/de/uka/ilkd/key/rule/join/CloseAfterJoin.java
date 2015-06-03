@@ -47,237 +47,231 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
- * Rule for closing a partner goal after a join
- * operation. It does so by adding a formula corresponding
- * to the new join node as an implicative premise to the
- * goal to close; if the join rule is sound, the such
- * manipulated goal should be closable by KeY. This particular
- * way for closing partner goals should ensure that proofs
- * can only be closed for sound join rules, i.e. rules
- * producing join states that are weakenings of the parent
- * states.
+ * Rule for closing a partner goal after a join operation. It does so by adding
+ * a formula corresponding to the new join node as an implicative premise to the
+ * goal to close; if the join rule is sound, the such manipulated goal should be
+ * closable by KeY. This particular way for closing partner goals should ensure
+ * that proofs can only be closed for sound join rules, i.e. rules producing
+ * join states that are weakenings of the parent states.
  * 
  * @author Dominic Scheurer
  */
 public class CloseAfterJoin implements BuiltInRule {
-   
-   private static final String DISPLAY_NAME = "CloseAfterJoin";
-   private static final Name RULE_NAME = new Name(DISPLAY_NAME);
-   
-   private Node joinNode = null;
-   private SymbolicExecutionState joinState = null;
-   private SymbolicExecutionState thisSEState = null;
-   private Term pc = null;
-   private Services services = null;
-   
-   private static HashMap<Node, HashSet<Node>> JOIN_NODE_TO_PARTNERS_MAP =
-         new HashMap<Node, HashSet<Node>>();
-   
-   /**
-    * Returns the partner nodes for the given join node. Strictly
-    * speaking, these are the direct children of the partner nodes
-    * that were involved in joining.
-    * 
-    * @param joinNode Join node to get the partner nodes for.
-    * @return The partner nodes for the given join node.
-    */
-   public static HashSet<Node> getPartnerNodesFor(Node joinNode) {
-      return JOIN_NODE_TO_PARTNERS_MAP.get(joinNode);
-   }
-   
-   @SuppressWarnings("unused")
-   private CloseAfterJoin() {}
-   
-   /**
-    * Creates a new CloseAfterJoin rule.
-    * 
-    * @param joinNode The node for the join goal. This is needed
-    *    to add a reference to its parent in the partner goal at
-    *    the place of this rule application.
-    * @param joinState The join state; needed for adding an implicative
-    *    premise ensuring the soundness of join rules.
-    * @param thisSEState The SE state corresponding to this state.
-    * @param pc The program counter (formula of the form U\<{...}\> PHI,
-    *    where U is an update in normal form and PHI is a DL formula).
-    */
-   public CloseAfterJoin(
-         Node joinNode,
-         SymbolicExecutionState joinState,
-         SymbolicExecutionState thisSEState,
-         Term pc,
-         Services services) {
-      this.joinNode = joinNode;
-      this.joinState = joinState;
-      this.thisSEState = thisSEState;
-      this.pc = pc;
-      this.services = services;
-      
-      if (!JOIN_NODE_TO_PARTNERS_MAP.containsKey(joinNode)) {
-         JOIN_NODE_TO_PARTNERS_MAP.put(joinNode, new HashSet<Node>());
-      }
-   }
-   
-   @Override
-   public Name name() {
-      return RULE_NAME;
-   }
 
-   @Override
-   public String displayName() {
-      return DISPLAY_NAME;
-   }
+    private static final String DISPLAY_NAME = "CloseAfterJoin";
+    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
-   @Override
-   public ImmutableList<Goal> apply(
-         final Goal goal,
-         final Services services,
-         final RuleApp ruleApp) throws RuleAbortException {
-      
-      ImmutableList<Goal> jpNewGoals = goal.split(2);
-      
-      final Goal linkedGoal = jpNewGoals.head();
-      linkedGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
-      // Workaround: Disable linked goal to prevent strategies
-      // from automatically working further on it.
-      linkedGoal.setLinkedGoal(goal);
-      linkedGoal.setEnabled(false);
-      
-      // Add a listener to close this node if the associated join
-      // node has also been closed, and to remove the mark as linked
-      // node if the join node has been pruned.
-      final Node joinNodeF = joinNode;
-      services.getProof().addProofTreeListener(new ProofTreeAdapter() {
-         @Override
-         public void proofGoalsChanged(ProofTreeEvent e) {
-            if (joinNodeF.isClosed()) {
-               // The joined node has been closed; now also close this node.
-               services.getProof().closeGoal(linkedGoal);
+    public static final CloseAfterJoin INSTANCE = new CloseAfterJoin();
+
+    private CloseAfterJoin() {
+        /* Singleton class */
+    }
+
+    @Override
+    public Name name() {
+        return RULE_NAME;
+    }
+
+    @Override
+    public String displayName() {
+        return DISPLAY_NAME;
+    }
+
+    @Override
+    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+            final RuleApp ruleApp) throws RuleAbortException {
+
+        assert ruleApp instanceof CloseAfterJoinRuleBuiltInRuleApp : "Rule app for CloseAfterJoin has to be an instance of CloseAfterJoinRuleBuiltInRuleApp";
+
+        CloseAfterJoinRuleBuiltInRuleApp closeApp = (CloseAfterJoinRuleBuiltInRuleApp) ruleApp;
+
+        ImmutableList<Goal> jpNewGoals = goal.split(2);
+
+        final Goal linkedGoal = jpNewGoals.head();
+        linkedGoal.setBranchLabel("Joined with node "
+                + closeApp.getCorrespondingJoinNode().parent().serialNr());
+        // Workaround: Disable linked goal to prevent strategies
+        // from automatically working further on it.
+        linkedGoal.setLinkedGoal(goal);
+        // linkedGoal.setEnabled(false); //TODO: Test if this is necessary
+
+        // Add a listener to close this node if the associated join
+        // node has also been closed, and to remove the mark as linked
+        // node if the join node has been pruned.
+        final Node joinNodeF = closeApp.getCorrespondingJoinNode();
+        services.getProof().addProofTreeListener(new ProofTreeAdapter() {
+            @Override
+            public void proofGoalsChanged(ProofTreeEvent e) {
+                if (joinNodeF.isClosed()) {
+                    // The joined node has been closed; now also close this
+                    // node.
+                    services.getProof().closeGoal(linkedGoal);
+                }
             }
-         }
-         
-         @Override
-         public void proofPruned(ProofTreeEvent e) {
-            if (!e.getSource().root().find(joinNodeF)) {
-               // The joined node has been pruned; now mark this node
-               // as not linked and set it to automatic again.
-               linkedGoal.setLinkedGoal(null);
-               linkedGoal.setEnabled(true);
+
+            @Override
+            public void proofPruned(ProofTreeEvent e) {
+                if (!e.getSource().root().find(joinNodeF)) {
+                    // The joined node has been pruned; now mark this node
+                    // as not linked and set it to automatic again.
+                    linkedGoal.setLinkedGoal(null);
+                    linkedGoal.setEnabled(true);
+                }
             }
-         }
-         
-      });
-      
-      Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
-      ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
-            
-      Term isWeakeningForm = getSyntacticWeakeningFormula(services);
-      // Delete previous sequents      
-      clearSemisequent(ruleIsWeakeningGoal, true);
-      clearSemisequent(ruleIsWeakeningGoal, false);
-      ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), false, true);
-      
-      // Register partner nodes
-      JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(linkedGoal.node());
-      
-      return jpNewGoals;
-   }
-   
-   /**
-    * Constructs the actual syntactic weakening formula \phi(s1, s2)
-    * expressing that s2 is a weakening of s1.
-    * 
-    * @param services The services object.
-    * @return The syntactic weakening formula for this.joinState and
-    *    this.thisSEState.
-    */
-   private Term getSyntacticWeakeningFormula(Services services) {
-      TermBuilder tb = services.getTermBuilder();
-      
-      ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
-      allLocs = allLocs.union(getUpdateLeftSideLocations(thisSEState.getSymbolicState()));
-      allLocs = allLocs.union(getUpdateLeftSideLocations(joinState.getSymbolicState()));
-      allLocs = allLocs.union(getLocationVariables(thisSEState.getPathCondition(), services));
-      allLocs = allLocs.union(getLocationVariables(joinState.getPathCondition(), services));
-      
-      final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
-      
-      // Collect sorts and create logical variables for
-      // closing over program variables.
-      final LinkedList<Sort> argSorts = new LinkedList<Sort>();
-      for (LocationVariable var : allLocs) {
-         argSorts.add(var.sort());
-         origQfdVarTerms.add(tb.var(var));
-      }
-      
-      // Create and register the new predicate symbol
-      final Name predicateSymbName = new Name(tb.newName("P"));
-      
-      final Function predicateSymb =
-            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
-      
-      services.getNamespaces().functions().add(predicateSymb);
-      
-      // Create the predicate term
-      final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
-      
-      // Obtain set of new Skolem constants in join state
-      HashSet<Function> constantsOrigState =
-            JoinRuleUtils.getSkolemConstants(thisSEState.getSymbolicState());
-      HashSet<Function> newConstants =
-            JoinRuleUtils.getSkolemConstants(joinState.getSymbolicState());
-      newConstants.removeAll(constantsOrigState);
-      
-      // Create the formula \forall v1,...,vn. (C2 -> {U2} P(...)) -> (C1 -> {U1} P(...))
-      Term result = tb.imp(
-            allClosure(tb.imp(
-                  joinState.getPathCondition(),
-                  tb.apply(joinState.getSymbolicState(), predTerm)),
-                  newConstants),
-            tb.imp(
-                  thisSEState.getPathCondition(),
-                  tb.apply(thisSEState.getSymbolicState(), predTerm)));
-      
-      return result;
-   }
-   
-   /**
-    * Universally closes all logical variables in the given term. Before,
-    * all Skolem constants in the term are replaced by fresh logical
-    * variables, where multiple occurrences of the same constant are
-    * replaced by the same variable.
-    * 
-    * @param term Term to universally close.
-    * @param constsToReplace Skolem constants to replace before the universal
-    *    closure. 
-    * @param services The services object.
-    * @return A new term which is equivalent to the universal closure
-    *    of the argument term, with Skolem constants in constsToReplace
-    *    having been replaced by fresh variables before.
-    */
-   private Term allClosure(final Term term, final HashSet<Function> constsToReplace) {
-      TermBuilder tb = services.getTermBuilder();
-      
-      Term termWithReplConstants = substConstantsByFreshVars(
-            term, constsToReplace, new HashMap<Function, LogicVariable>(), services);
-      
-      return tb.all(
-            termWithReplConstants.freeVars(),
-            termWithReplConstants);
-   }
 
-   @Override
-   public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-      return joinNode != null && joinState != null &&  pc != null;
-   }
-   
-   @Override
-   public boolean isApplicableOnSubTerms() {
-       return false;
-   }
+        });
 
-   @Override
-   public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-      return new CloseAfterJoinRuleBuiltInRuleApp(this, pos, thisSEState.getCorrespondingNode(), joinNode);
-   }
-   
+        Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
+        ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
+
+        Term isWeakeningForm = getSyntacticWeakeningFormula(services, closeApp);
+        // Delete previous sequents
+        clearSemisequent(ruleIsWeakeningGoal, true);
+        clearSemisequent(ruleIsWeakeningGoal, false);
+        ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm),
+                false, true);
+
+        return jpNewGoals;
+    }
+
+    /**
+     * Constructs the actual syntactic weakening formula \phi(s1, s2) expressing
+     * that s2 is a weakening of s1.
+     * 
+     * @param services
+     *            The services object.
+     * @param closeApp
+     *            The rule application containing the required data.
+     * @return The syntactic weakening formula for this.joinState and
+     *         this.thisSEState.
+     */
+    private Term getSyntacticWeakeningFormula(Services services,
+            CloseAfterJoinRuleBuiltInRuleApp closeApp) {
+        TermBuilder tb = services.getTermBuilder();
+
+        ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
+        allLocs = allLocs.union(getUpdateLeftSideLocations(closeApp
+                .getPartnerSEState().getSymbolicState()));
+        allLocs = allLocs.union(getUpdateLeftSideLocations(closeApp
+                .getJoinState().getSymbolicState()));
+        allLocs = allLocs.union(getLocationVariables(closeApp
+                .getPartnerSEState().getPathCondition(), services));
+        allLocs = allLocs.union(getLocationVariables(closeApp.getJoinState()
+                .getPathCondition(), services));
+
+        final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
+
+        // Collect sorts and create logical variables for
+        // closing over program variables.
+        final LinkedList<Sort> argSorts = new LinkedList<Sort>();
+        for (LocationVariable var : allLocs) {
+            argSorts.add(var.sort());
+            origQfdVarTerms.add(tb.var(var));
+        }
+
+        // Create and register the new predicate symbol
+        final Name predicateSymbName = new Name(tb.newName("P"));
+
+        final Function predicateSymb = new Function(predicateSymbName,
+                Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
+
+        services.getNamespaces().functions().add(predicateSymb);
+
+        // Create the predicate term
+        final Term predTerm = tb.func(predicateSymb,
+                origQfdVarTerms.toArray(new Term[] {}));
+
+        // Obtain set of new Skolem constants in join state
+        HashSet<Function> constantsOrigState = JoinRuleUtils
+                .getSkolemConstants(closeApp.getPartnerSEState()
+                        .getSymbolicState());
+        HashSet<Function> newConstants = JoinRuleUtils
+                .getSkolemConstants(closeApp.getJoinState().getSymbolicState());
+        newConstants.removeAll(constantsOrigState);
+
+        // Create the formula \forall v1,...,vn. (C2 -> {U2} P(...)) -> (C1 ->
+        // {U1} P(...))
+        Term result = tb.imp(
+                allClosure(tb.imp(closeApp.getJoinState().getPathCondition(),
+                        tb.apply(closeApp.getJoinState().getSymbolicState(),
+                                predTerm)), newConstants, services), tb.imp(
+                        closeApp.getPartnerSEState().getPathCondition(), tb
+                                .apply(closeApp.getPartnerSEState()
+                                        .getSymbolicState(), predTerm)));
+
+        return result;
+    }
+
+    /**
+     * Universally closes all logical variables in the given term. Before, all
+     * Skolem constants in the term are replaced by fresh logical variables,
+     * where multiple occurrences of the same constant are replaced by the same
+     * variable.
+     * 
+     * @param term
+     *            Term to universally close.
+     * @param constsToReplace
+     *            Skolem constants to replace before the universal closure.
+     * @param services
+     *            The services object.
+     * @return A new term which is equivalent to the universal closure of the
+     *         argument term, with Skolem constants in constsToReplace having
+     *         been replaced by fresh variables before.
+     */
+    private Term allClosure(final Term term,
+            final HashSet<Function> constsToReplace, Services services) {
+        TermBuilder tb = services.getTermBuilder();
+
+        Term termWithReplConstants = substConstantsByFreshVars(term,
+                constsToReplace, new HashMap<Function, LogicVariable>(),
+                services);
+
+        return tb.all(termWithReplConstants.freeVars(), termWithReplConstants);
+    }
+
+    @Override
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+        return true;
+    }
+
+    @Override
+    public boolean isApplicableOnSubTerms() {
+        return false;
+    }
+
+    @Override
+    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+        return new CloseAfterJoinRuleBuiltInRuleApp(this, pos);
+    }
+
+    /**
+     * Creates a complete CloseAfterJoinBuiltInRuleApp.
+     *
+     * @param pio
+     *            Position of the Update-ProgramCounter formula.
+     * @param thePartnerNode
+     *            The partner node to close.
+     * @param correspondingJoinNode
+     *            The corresponding join node that is not closed. This is needed
+     *            to add a reference to its parent in the partner goal at the
+     *            place of this rule application.
+     * @param joinNodeState
+     *            The SE state for the join node; needed for adding an
+     *            implicative premise ensuring the soundness of join rules.
+     * @param partnerState
+     *            The SE state for the partner node.
+     * @param pc
+     *            The program counter common to the two states -- a formula of
+     *            the form U\<{...}\> PHI, where U is an update in normal form
+     *            and PHI is a DL formula).
+     * @return A complete {@link CloseAfterJoinRuleBuiltInRuleApp}.
+     */
+    public CloseAfterJoinRuleBuiltInRuleApp createApp(PosInOccurrence pio,
+            Node thePartnerNode, Node correspondingJoinNode,
+            SymbolicExecutionState joinNodeState,
+            SymbolicExecutionState partnerState, Term pc) {
+        return new CloseAfterJoinRuleBuiltInRuleApp(this, pio, thePartnerNode,
+                correspondingJoinNode, joinNodeState, partnerState, pc);
+    }
+
 }

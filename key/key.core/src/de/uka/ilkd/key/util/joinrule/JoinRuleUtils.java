@@ -853,11 +853,10 @@ public class JoinRuleUtils {
          SymbolicExecutionState joinPartnerState,
          Term pc) {
       
-      Services services = joinNodeParent.proof().getServices();
       InitConfig initConfig = joinNodeParent.proof().getInitConfig();
       
-      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, joinPartnerState, pc, services);
-      RuleApp app = closeRule.createApp(pio, services);
+      CloseAfterJoin closeRule = CloseAfterJoin.INSTANCE;
+      RuleApp app = closeRule.createApp(pio, joinPartner.node(), joinNodeParent, joinState, joinPartnerState, pc);
       
       // Register rule if not done yet.
       // This avoids error messages of the form "no justification found for rule...".
