@@ -58,6 +58,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  */
 public class CloseAfterJoin implements BuiltInRule {
 
+    private static final String JOINED_NODE_IS_WEAKENING_TITLE = "Joined node is weakening";
     private static final String DISPLAY_NAME = "CloseAfterJoin";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
@@ -93,7 +94,6 @@ public class CloseAfterJoin implements BuiltInRule {
         // Workaround: Disable linked goal to prevent strategies
         // from automatically working further on it.
         linkedGoal.setLinkedGoal(goal);
-        // linkedGoal.setEnabled(false); //TODO: Test if this is necessary
 
         // Add a listener to close this node if the associated join
         // node has also been closed, and to remove the mark as linked
@@ -135,7 +135,7 @@ public class CloseAfterJoin implements BuiltInRule {
         });
 
         Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
-        ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
+        ruleIsWeakeningGoal.setBranchLabel(JOINED_NODE_IS_WEAKENING_TITLE);
 
         Term isWeakeningForm = getSyntacticWeakeningFormula(services, closeApp);
         // Delete previous sequents
