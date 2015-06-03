@@ -60,7 +60,7 @@ import de.uka.ilkd.key.util.Pair;
  *   + BranchNodeIntermediate "x <= 0"
  *     > AppNodeIntermediate
  *     > ...
- * </pre>
+ * </pre><p>
  * 
  * Note that the last open goal in an unfinished proof is not represented
  * by a node in the intermediate representation (since no rule has been
