@@ -52,7 +52,12 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * goal to close; if the join rule is sound, the such manipulated goal should be
  * closable by KeY. This particular way for closing partner goals should ensure
  * that proofs can only be closed for sound join rules, i.e. rules producing
- * join states that are weakenings of the parent states.
+ * join states that are weakenings of the parent states.<p>
+ * 
+ * TODO: If a user attempts to prune away a "closed" partner node, he/she should
+ * also be asked whether the corresponding join node should also be pruned. Otherwise,
+ * the user might accidentally make it harder to close the whole proof (Add this
+ * to the bug tracker after merging the join branch into master).
  * 
  * @author Dominic Scheurer
  */
