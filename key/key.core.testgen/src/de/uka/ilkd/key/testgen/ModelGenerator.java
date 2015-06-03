@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -33,7 +34,7 @@ import de.uka.ilkd.key.smt.model.Model;
 public class ModelGenerator implements SolverLauncherListener{
    private final Services services;
 
-	private Sequent seq;
+	private Goal goal;
 
 
 	//models that have been found until now
@@ -42,8 +43,8 @@ public class ModelGenerator implements SolverLauncherListener{
 	private final int target;
 
 
-	public ModelGenerator(Sequent s, int target, Services services) {
-		this.seq = s;	
+	public ModelGenerator(Goal s, int target, Services services) {
+		this.goal = s;	
 		this.services = services;
 		this.target = target;
 		models = new LinkedList<Model>();
@@ -57,7 +58,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		System.out.println("Launch");
 		SolverLauncher launcher = prepareLauncher();
 		SolverType solver = SolverType.Z3_CE_SOLVER;
-		SMTProblem problem = new SMTProblem(sequentToTerm(seq));
+		SMTProblem problem = new SMTProblem(goal);
 		launcher.addListener(this);
 		launcher.launch(problem, services, solver);		
 	}
@@ -85,12 +86,23 @@ public class ModelGenerator implements SolverLauncherListener{
 		
 		for(SMTSolver solver : finishedSolvers){
 			
+			System.out.println("Translation: ");
+			System.out.println(solver.getTranslation());
+			//solver.getTranslation();
+			
 			SMTSolverResult result = solver.getFinalResult();
-			if(result.equals(SMTSolverResult.ThreeValuedTruth.VALID) && models.size() < target){
+			if(result.isValid().equals(SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) && models.size() < target){
 				Model model = solver.getSocket().getQuery().getModel();
 				models.add(model);
 				addModelToTerm(model);
-				launch();
+				
+				
+				if(models.size() >= target){
+					finish();
+				}
+				else{
+					launch();
+				}
 
 			}
 			else{
@@ -136,11 +148,14 @@ public class ModelGenerator implements SolverLauncherListener{
 
 
 		if(!tmodel.equals(tb.tt())){
-			System.out.println(tmodel);
+			//System.out.println(tmodel);
 			Term notTerm = tb.not(tmodel);
-			SequentFormula sf = new SequentFormula(notTerm);			
-			Semisequent antecedent = seq.antecedent().insertFirst(sf).semisequent();
-			seq = Sequent.createSequent(antecedent, seq.succedent());			
+			SequentFormula sf = new SequentFormula(notTerm);
+			
+			goal.addFormula(sf, true, true);
+			
+//			Semisequent antecedent = goal.antecedent().insertFirst(sf).semisequent();
+//			goal = Sequent.createSequent(antecedent, goal.succedent());			
 			return true;
 		}
 		return false;
@@ -148,10 +163,10 @@ public class ModelGenerator implements SolverLauncherListener{
 	}
 
 	private void finish(){
-		System.out.println("\n\nFinished:\n");
-		for(Model m :  models){
-			System.out.println(m.toString());
-		}
+		System.out.println("\n\nFinished: found "+models.size()+"\n");
+//		for(Model m :  models){
+//			System.out.println(m.toString());
+//		}
 	}
 
 	@Override

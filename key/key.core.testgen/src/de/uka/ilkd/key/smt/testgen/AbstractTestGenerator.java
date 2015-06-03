@@ -42,6 +42,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
+import de.uka.ilkd.key.testgen.ModelGenerator;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -71,6 +72,8 @@ public abstract class AbstractTestGenerator {
 
    public void generateTestCases(final StopRequest stopRequest,
                                  final TestGenerationLog log) {
+	   
+	         
       TestGenerationSettings settings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
 
@@ -123,6 +126,15 @@ public abstract class AbstractTestGenerator {
              synchronized(macro) {
                           info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
              }
+             
+             System.out.println("Testing model generator");
+             
+             ModelGenerator mg = new ModelGenerator(proof.openGoals().iterator().next(), 3, originalProof.getServices());
+             mg.launch();
+      	   boolean b = true;
+      	   if(b)
+      		   return;
+             
              
            //  System.out.println("Proof after:"+proof.toString());
              problems.addAll(SMTProblem.createSMTProblems(proof));

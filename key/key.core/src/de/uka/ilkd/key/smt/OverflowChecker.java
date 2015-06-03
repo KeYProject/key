@@ -169,12 +169,18 @@ public class OverflowChecker {
 
 			 if(t instanceof SMTTermMultOp){
 				 SMTTermMultOp tm = (SMTTermMultOp) t;
+				 SMTTerm guard = null;
 				 if(isAddOp(tm.getOperator())){
-
-					 args.add(createGuardForAdd(tm));					
+					 guard = createGuardForAdd(tm);
+					 					
 				 }
 				 else if(isMulOp(tm.getOperator())){
-					 args.add(createGuardForMul(tm));
+					 guard = createGuardForMul(tm);
+				 }
+				 if(guard != null){
+					 //System.out.println("Guard for term: "+t);
+					 //System.out.println(guard);
+					 args.add(guard);
 				 }
 
 			 }
