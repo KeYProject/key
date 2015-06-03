@@ -74,8 +74,8 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
       return null;
    }
 
-   protected void perfomRunnables(IRunnableWithProgress hiddenRunnable, 
-                                  IRunnableWithProgress visibleRunnable) {
+   public void perfomRunnables(IRunnableWithProgress hiddenRunnable, 
+                               IRunnableWithProgress visibleRunnable) {
       try {
          if (hiddenRunnable != null) {
             getContainer().run(true, false, hiddenRunnable);

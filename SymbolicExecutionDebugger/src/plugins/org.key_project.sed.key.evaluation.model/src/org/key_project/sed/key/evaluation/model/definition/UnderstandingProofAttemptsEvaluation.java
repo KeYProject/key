@@ -131,8 +131,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       // Create evaluation form
       ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
       ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME));
-      QuestionPage proof1Page = createMinQuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt 1");
-      QuestionPage proof2Page = createCalendarQuestionPage(PROOF_2_PAGE_NAME, "Proof Attempt 2");
+      QuestionPage proof1Page = createCalendarQuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt 1");
+      QuestionPage proof2Page = createAccountQuestionPage(PROOF_2_PAGE_NAME, "Proof Attempt 2");
       QuestionPage proof3Page = createMinQuestionPage(PROOF_3_PAGE_NAME, "Proof Attempt 3");
       QuestionPage proof4Page = createMyIntegerQuestionPage(PROOF_4_PAGE_NAME, "Proof Attempt 4");
       SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
@@ -210,7 +210,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                   new String[] {"QMyInteger;"},
                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)),
-                              new LabelQuestion("generalDescription", "Please inspect the current proof attempt carefully and answer the following questions about it as best as possible."),
+                              new LabelQuestion("generalDescription", createGeneralDescription("add(MyInteger)")),
                               openQuestion,
                               executedQuestion);
       // TODO: How to fix code or specifications?
@@ -292,7 +292,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                   new String[] {"[I"},
                                                                   new FileDefinition("data/understandingProofAttempts/proofMin/ArrayUtil.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayUtil.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofMin/ArrayUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayUtil.java", true)),
-                              new LabelQuestion("generalDescription", "Please inspect the current proof attempt carefully and answer the following questions about it as best as possible."),
+                              new LabelQuestion("generalDescription", createGeneralDescription("minIndex(int[])")),
                               openQuestion,
                               executedQuestion);
       // TODO: How to fix code or specifications?
@@ -399,7 +399,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                   new String[] {"QMyInteger;"},
                                                                   new FileDefinition("data/understandingProofAttempts/proofCalendar/Calendar.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Calendar.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofCalendar/Calendar.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Calendar.java", true)),
-                              new LabelQuestion("generalDescription", "Please inspect the current proof attempt carefully and answer the following questions about it as best as possible."),
+                              new LabelQuestion("generalDescription", createGeneralDescription("addEntry(Entry)")),
                               openQuestion,
                               executedQuestion);
       // TODO: How to fix code or specifications?
@@ -426,5 +426,115 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    
    public RandomForm getEvaluationForm() {
       return (RandomForm) getForm("evaluationForm");
+   }
+   
+
+   protected QuestionPage createAccountQuestionPage(String pageName, String title) {
+      String howToCloseTitle = "How can the proof be closed?";
+      CheckboxQuestion howToCloseQuestion = new CheckboxQuestion("howToClose", 
+                                                                 howToCloseTitle, 
+                                                                 true,
+                                                                 null, 
+                                                                 new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
+                                                                 new Choice("Using the auto mode", "Using the auto mode"), 
+                                                                 new Choice("Applying rules interactively", "Applying rules interactively"));
+      String thrownExceptionTitle = "Which exception(s) are thrown?";
+      CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsAreThrown", 
+                                                                      thrownExceptionTitle, 
+                                                                      true,
+                                                                      null, 
+                                                                      new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
+                                                                      new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
+                                                                      new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
+                                                                      new Choice("java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException"),
+                                                                      new Choice("java.lang.IllegalStateException", "java.lang.IllegalStateException"),
+                                                                      new Choice("java.lang.invoke.WrongMethodTypeException", "java.lang.invoke.WrongMethodTypeException"),
+                                                                      new Choice("javax.naming.OperationNotSupportedException", "javax.naming.OperationNotSupportedException"),
+                                                                      new Choice("java.lang.OutOfMemoryError", "java.lang.OutOfMemoryError"));
+      String whyOpenTitle = "Why is the proof still open?";
+      CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
+                                                              whyOpenTitle, 
+                                                              true,
+                                                              null, 
+                                                              new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
+                                                              new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
+                                                              new Choice("Precondition (amount > 0) of checkAndWithdraw(int) is not established", "checkAndWithdraw: Precondition not established ("),
+                                                              new Choice("Postcondition (balance == \\old(balance) - \\result) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about balance does not hold"),
+                                                              new Choice("Postcondition (\\result == amount) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about result does not hold"),
+                                                              new Choice("Assignable clause (\\everything) of method contract of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("checkAndWithdrawLocations")),
+
+                                                              new Choice("Precondition (amount > 0) of withdraw(int) is not established", "withdraw: Precondition not established"),
+                                                              new Choice("Postcondition (balance == \\old(balance) - amount) of withdraw(int) does not hold", "withdraw: Postcondition about balance does not hold"),
+                                                              new Choice("Assignable clause (balance) of method contract of withdraw(int) does not hold", "withdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("withdrawLocations")),
+
+                                                              new Choice("Precondition (amount > 0) of canWithdraw(int) is not established", "canWithdraw: Precondition not established"),
+                                                              new Choice("Postcondition (true) of canWithdraw(int) does not hold", "canWithdraw: Postcondition about balance does not hold"),
+                                                              new Choice("Assignable clause (\\everything) of method contract of canWithdraw(int) does not hold", "canWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("canWithdrawLocations")),
+
+                                                              new Choice("Precondition (true) of getBalance() is not established", "getBalance: Precondition not established"),
+                                                              new Choice("Postcondition (\result == balance) of getBalance() does not hold", "getBalance: Postcondition about balance does not hold"),
+                                                              new Choice("Assignable clause (\\everything) of method contract of getBalance(int) does not hold", "getBalance: Assignable clause of method contract does not hold", createAccountLocationQuestion("getBalanceLocations")),
+                                                              
+                                                              new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion));
+      String openQuestionTitle = "Is the proof closed?";
+      RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
+                                                                   openQuestionTitle, 
+                                                                   true,
+                                                                   null, 
+                                                                   new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
+                                                                   new Choice("Yes", "Yes"), 
+                                                                   new Choice("No", "No", whyOpenQuestion));
+      String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
+      CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
+                                                               executedTitle, 
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               new Choice("Line 10 (if (canWithdraw(amount)))", "Line 10"),
+                                                               new Choice("Line 11 (withdraw(amount))", "Line 11"),
+                                                               new Choice("Line 12 (return amount)", "Line 12"),
+                                                               new Choice("Line 15 (return 0)", "Line 15"),
+                                                               new Choice("Line 25 (balance -= amount)", "Line 25"),
+                                                               new Choice("Line 32 (return amount > 0)", "Line 32"),
+                                                               new Choice("Line 39 (return balance)", "Line 39"));
+      String contractsTitle = "Which method contracts are applied at least once during symbolic execution of the proof?";
+      CheckboxQuestion contractsQuestion = new CheckboxQuestion("executedStatements", 
+                                                                contractsTitle, 
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + contractsTitle + "' not answered."), 
+                                                               new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
+                                                               new Choice("Contract of method withdraw(int)", "withdraw"),
+                                                               new Choice("Contract of method canWithdraw(int)", "canWithdraw"),
+                                                               new Choice("Contract of method getBalance()", "getBalance"));
+      return new QuestionPage(pageName, 
+                              title, 
+                              "Please answer the question to the best of your knowledge.", 
+                              new ProofAttemptJavaProjectModifier("MyInteger",
+                                                                  "add",
+                                                                  new String[] {"QMyInteger;"},
+                                                                  new FileDefinition("data/understandingProofAttempts/proofAccount/Account.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Account.proof", false),
+                                                                  new FileDefinition("data/understandingProofAttempts/proofAccount/Account.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Account.java", true)),
+                              new LabelQuestion("generalDescription", createGeneralDescription("checkAndWithdraw(int)")),
+                              openQuestion,
+                              executedQuestion,
+                              contractsQuestion);
+      // TODO: How to fix code or specifications?
+      // TODO: Question about not fulfilled pre/post conditions
+   }
+   
+   protected CheckboxQuestion createAccountLocationQuestion(String name) {
+      String title = "Which not specified location(s) have changed?";
+      return new CheckboxQuestion(name, 
+                                  title, 
+                                  true,
+                                  null, 
+                                  new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  new Choice("balance", "balance"),
+                                  new Choice("amount", "amount"));
+   }
+   
+   protected String createGeneralDescription(String po) {
+      return "Please inspect the current proof attempt of method '" + po + "' carefully and answer the following questions about it as best as possible.";
    }
 }

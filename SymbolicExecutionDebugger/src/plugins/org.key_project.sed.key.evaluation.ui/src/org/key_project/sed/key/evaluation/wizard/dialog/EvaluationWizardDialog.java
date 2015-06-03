@@ -137,6 +137,16 @@ public class EvaluationWizardDialog extends WizardDialog {
       if (!getButton(IDialogConstants.NEXT_ID).isEnabled()) {
          getButton(IDialogConstants.CANCEL_ID).forceFocus();
       }
+      // Perform runnable of current page if available
+      if (getWizard().getCurrentPageRunnable() != null) {
+         getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               getCurrentPage().perfomRunnables(null, getWizard().getCurrentPageRunnable());
+               getWizard().setCurrentPageRunnable(null);
+            }
+         });
+      }
    }
 
    @Override
