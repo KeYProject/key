@@ -37,10 +37,8 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
@@ -274,7 +272,6 @@ public class CloseAfterJoin implements BuiltInRule {
    
    @Override
    public boolean isApplicableOnSubTerms() {
-       // TODO: Check if something has to be changed here. This is a stub!
        return false;
    }
 
