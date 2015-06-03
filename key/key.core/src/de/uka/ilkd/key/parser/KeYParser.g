@@ -135,6 +135,7 @@ options {
          prooflabel2tag.put("nrJoinPartners", ProofElementID.NUMBER_JOIN_PARTNERS);
          prooflabel2tag.put("joinNode", ProofElementID.JOIN_NODE);
          prooflabel2tag.put("joinId", ProofElementID.JOIN_ID);
+         prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
    }
 
    private NamespaceSet nss;
