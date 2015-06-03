@@ -159,7 +159,7 @@ public class CloseAfterJoin implements BuiltInRule {
          
          @Override
          public void proofPruned(ProofTreeEvent e) {
-            if (!proofContainsNode(e.getSource(), joinNodeF)) {
+            if (!e.getSource().root().find(joinNodeF)) {
                // The joined node has been pruned; now mark this node
                // as not linked and set it to automatic again.
                linkedGoal.setLinkedGoal(null);
@@ -283,51 +283,4 @@ public class CloseAfterJoin implements BuiltInRule {
       return new CloseAfterJoinRuleBuiltInRuleApp(this, pos, thisSEState.getCorrespondingNode(), joinNode);
    }
    
-   /**
-    * Checks if the given node is contained in the given proof.
-    * 
-    * @param proof Proof to search.
-    * @param node Node to search for.
-    * @return True iff node is contained in proof.
-    */
-   private static boolean proofContainsNode(Proof proof, Node node) {
-      FindNodeVisitor visitor = new FindNodeVisitor(node);
-      proof.breadthFirstSearch(proof.root(), visitor);
-      return visitor.success();
-   }
-   
-   /**
-    * Visitor for finding a node in a proof.
-    * 
-    * @author Dominic Scheurer
-    */
-   private static class FindNodeVisitor implements ProofVisitor {
-      private boolean found = false;
-      private Node node = null;
-      
-      @SuppressWarnings("unused")
-      private FindNodeVisitor() {}
-      
-      /**
-       * @param node The node to find in the proof.
-       */
-      public FindNodeVisitor(Node node) {
-         this.node = node;
-      }
-      
-      /**
-       * @return True iff the given node has been found.
-       */
-      public boolean success() {
-         return found;
-      }
-      
-      @Override
-      public void visit(Proof proof, Node visitedNode) {
-         if (visitedNode.equals(node)) {
-            found = true;
-         }
-      }
-   }
-
 }
