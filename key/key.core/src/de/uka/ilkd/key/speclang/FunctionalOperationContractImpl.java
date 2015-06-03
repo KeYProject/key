@@ -49,6 +49,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -672,8 +673,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                  Services services,
                                  boolean usePrettyPrinting, 
                                  boolean useUnicodeSymbols) {
-       ProgramVariable originalSelfVar = contractSelf != null ? (ProgramVariable)contractSelf.op() : null;
-       ProgramVariable originalResultVar = resultTerm != null ? (ProgramVariable)resultTerm.op() : null;
+       Operator originalSelfVar = contractSelf != null ? contractSelf.op() : null;
+       Operator originalResultVar = resultTerm != null ? resultTerm.op() : null;
        final TermBuilder tb = services.getTermBuilder();
        
        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
@@ -770,8 +771,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private static String getText(IProgramMethod pm, 
-                                  ProgramVariable originalResultVar, 
-                                  ProgramVariable originalSelfVar, 
+                                  Operator originalResultVar, 
+                                  Operator originalSelfVar, 
                                   ImmutableList<? extends SVSubstitute> originalParamVars,
                                   ProgramVariable originalExcVar,
                                   boolean hasMby,
