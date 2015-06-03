@@ -107,11 +107,8 @@ public class CloseAfterJoin implements BuiltInRule {
                 if (joinNodeF.isClosed()) {
                     // The joined node was closed; now also close this node.
                     
-                    // FIXME (SOUNDNESS ISSUE): This is problematic in the case
-                    //   where a closed join node that has unclosed siblings is
-                    //   pruned away. In this case, the partner has to be reopened again.
-                    
                     e.getSource().closeGoal(linkedGoal);
+                    linkedGoal.clearAndDetachRuleAppIndex();
                 }
             }
 
@@ -124,11 +121,16 @@ public class CloseAfterJoin implements BuiltInRule {
             @Override
             public void proofPruned(ProofTreeEvent e) {
                 if (!prunedNode.find(joinNodeF)) {
+                    if (linkedGoal.node().isClosed()) {
+                        // The partner node has already been closed; we have to
+                        // add the goal again.
+                        e.getSource().add(linkedGoal);
+                        e.getSource().reOpenGoal(linkedGoal);
+                    }
+                    
                     // The joined node has been pruned; now mark this node
                     // as not linked and set it to automatic again.
                     linkedGoal.setLinkedGoal(null);
-
-                    services.getProof().removeProofTreeListener(this);
                 }
             }
 

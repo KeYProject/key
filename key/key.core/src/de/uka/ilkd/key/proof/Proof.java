@@ -501,6 +501,22 @@ public class Proof implements Named {
             // in order to detect branch closing.
             fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );
     }
+    
+    /**
+     * Opens a previously closed node (the one corresponding to p_goal)
+     * and all its closed parents.<p>
+     * 
+     * This is, for instance, needed for the join rule: In
+     * a situation where a join node and its associated partners
+     * have been closed and the join node is then pruned away,
+     * the partners have to be reopened again. Otherwise, we
+     * have a soundness issue.
+     *
+     * @param p_goal The goal to be opened again.
+     */
+    public void reOpenGoal(Goal p_goal) {
+        p_goal.node().reopen();
+    }
 
     /** removes the given goal from the list of open goals. Take care
      * removing the last goal will fire the proofClosed event
