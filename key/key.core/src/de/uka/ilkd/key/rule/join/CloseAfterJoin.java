@@ -105,6 +105,10 @@ public class CloseAfterJoin implements BuiltInRule {
         // node if the join node has been pruned.
         final Node joinNodeF = closeApp.getCorrespondingJoinNode();
         services.getProof().addProofTreeListener(new ProofTreeAdapter() {
+            
+            //TODO: It could (possibly) be sensible to add this functionality
+            //      to ProofPruner, such that everything is in one place.
+            
             private Node prunedNode = null;
 
             @Override
