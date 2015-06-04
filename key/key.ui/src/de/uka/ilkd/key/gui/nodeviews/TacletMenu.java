@@ -280,12 +280,13 @@ public class TacletMenu extends JMenu {
         }
 
         private void ceateJoinMenu(MenuControl control){
-
+            if(JoinMenuItem.FEATURE.active()) {
                List<ProspectivePartner> partner =
                        JoinIsApplicable.INSTANCE.isApplicable(mediator.getSelectedGoal(),pos.getPosInOccurrence());
                if(!partner.isEmpty()){
                    JMenuItem item = new JoinMenuItem(partner,mediator.getSelectedProof(),mediator);
-                   if (JoinMenuItem.FEATURE.active()) add(item);
+                   add(item);
+               }
                }
         }
 

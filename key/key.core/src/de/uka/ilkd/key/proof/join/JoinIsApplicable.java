@@ -29,7 +29,7 @@ public class JoinIsApplicable {
     private JoinIsApplicable() {/*It's a singleton*/}
     
     public List<ProspectivePartner> isApplicable(Goal goal ,PosInOccurrence pio){
-        if(pio == null || !pio.isTopLevel() || pio.isInAntec()){
+        if(pio == null || !pio.isTopLevel() || !pio.isInAntec()){
             return new LinkedList<ProspectivePartner>();
         }
         return computeProspecitvePartner(goal, pio);
@@ -66,12 +66,12 @@ public class JoinIsApplicable {
             Term formula = sf.formula();
             Term update2 = tb.skip();
             if(formula.op() instanceof UpdateApplication 
-               && !formula.equals(referenceFormula)){
+               && !formula.equalsModRenaming(referenceFormula)){
                     update2 = formula.sub(0);// don't change the order of this and the following line.
                     formula = formula.sub(1);
                     
             }
-            if(formula.equals(referenceFormula)){
+            if(formula.equalsModRenaming(referenceFormula)){
                 return new ProspectivePartner(referenceFormula,g1.node(),
                         pio.constrainedFormula(),update1,g2.node(),sf,update2
                         );
