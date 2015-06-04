@@ -93,9 +93,6 @@ public abstract class Taclet implements Rule, Named {
     /** name displayed by the pretty printer */
     private final String displayName;
     
-    /** contains useful text explaining the taclet */
-    private final String helpText = null;
-    
     /** the set of taclet options for this taclet */
     protected final ImmutableSet<Choice> choices;
     
@@ -349,11 +346,6 @@ public abstract class Taclet implements Rule, Named {
      */
     public String displayName() {
 	return displayName;
-    }
-    
-    
-    public String helpText() {
-       return helpText;
     }
  
    /** 
