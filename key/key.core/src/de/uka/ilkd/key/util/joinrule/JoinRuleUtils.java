@@ -651,9 +651,7 @@ public class JoinRuleUtils {
       for (int i = 0; i < semiseq.size(); i++) {
          SequentFormula f = semiseq.get(i);
          
-         PosInTerm pit = PosInTerm.getTopLevel();
-         pit.down(i);
-         
+         PosInTerm pit = PosInTerm.getTopLevel();         
          PosInOccurrence gPio = new PosInOccurrence(f, pit, antec);
          goal.removeFormula(gPio);
       }
