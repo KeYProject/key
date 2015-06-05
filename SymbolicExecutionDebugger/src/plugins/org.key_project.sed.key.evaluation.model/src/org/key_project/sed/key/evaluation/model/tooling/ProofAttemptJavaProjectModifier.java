@@ -1,7 +1,9 @@
 package org.key_project.sed.key.evaluation.model.tooling;
 
+import org.eclipse.core.internal.jobs.JobManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -14,6 +16,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
+import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -84,6 +87,7 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
                         launchConfiguration = KeySEDUtil.createConfiguration(projectFile, method);
                         launchConfiguration = KeySEDUtil.updateLaunchConfiguration(launchConfiguration, null, null, true, true, false, false, false, true, true, true, true);
                         DebugUIPlugin.launchInForeground(launchConfiguration, KeySEDUtil.MODE);
+                        // TODO: Wait for jobs like synchronization which throws exceptions otherwise
                      }
                      catch (CoreException e) {
                         setException(e);

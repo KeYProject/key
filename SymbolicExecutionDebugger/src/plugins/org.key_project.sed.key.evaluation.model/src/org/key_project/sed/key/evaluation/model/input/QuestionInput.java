@@ -20,8 +20,14 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 public class QuestionInput extends Bean {
    public static final String PROP_VALUE = "value";
+
+   public static final String PROP_VALUE_SET_AT = "valueSetAt";
    
    public static final String PROP_TRUST = "trust";
+
+   public static final String PROP_TRUST_SET_AT = "trustSetAt";
+   
+   private final AbstractPageInput<?> pageInput;
    
    private final AbstractQuestion question;
    
@@ -29,14 +35,19 @@ public class QuestionInput extends Bean {
    
    private String value;
    
+   private long valueSetAt;
+   
    /**
     * {@code Boolean#TRUE} if the user believes the value is right,
     * {@code Boolean#FALSE} if the user believes the value is wrong,
     * {@code null} if not yet defined. 
     */
    private Boolean trust;
+   
+   private long trustSetAt;
 
-   public QuestionInput(AbstractQuestion question) {
+   public QuestionInput(AbstractPageInput<?> pageInput, AbstractQuestion question) {
+      this.pageInput = pageInput;
       this.question = question;
       this.value = question.getDefaultValue();
       if (question instanceof AbstractChoicesQuestion) {
@@ -48,7 +59,7 @@ public class QuestionInput extends Bean {
                if (!ArrayUtil.isEmpty(childQuestions)) {
                   List<QuestionInput> childInputs = new ArrayList<QuestionInput>(childQuestions.length);
                   for (AbstractQuestion childQuestion : childQuestions) {
-                     childInputs.add(new QuestionInput(childQuestion));
+                     childInputs.add(new QuestionInput(pageInput, childQuestion));
                   }
                   choiceInputs.put(choice, childInputs); 
                }
@@ -61,6 +72,10 @@ public class QuestionInput extends Bean {
       else {
          choiceInputs = null;
       }
+   }
+
+   public AbstractPageInput<?> getPageInput() {
+      return pageInput;
    }
 
    public AbstractQuestion getQuestion() {
@@ -115,6 +130,16 @@ public class QuestionInput extends Bean {
       firePropertyChange(PROP_VALUE, oldValue, getValue());
    }
    
+   public long getValueSetAt() {
+      return valueSetAt;
+   }
+
+   public void setValueSetAt(long valueSetAt) {
+      long oldValue = getValueSetAt();
+      this.valueSetAt = valueSetAt;
+      firePropertyChange(PROP_VALUE_SET_AT, oldValue, getValueSetAt());
+   }
+
    public Boolean getTrust() {
       return trust;
    }
@@ -123,6 +148,16 @@ public class QuestionInput extends Bean {
       Boolean oldValue = getTrust();
       this.trust = trust;
       firePropertyChange(PROP_TRUST, oldValue, getTrust());
+   }
+
+   public long getTrustSetAt() {
+      return trustSetAt;
+   }
+
+   public void setTrustSetAt(long trustSetAt) {
+      long oldValue = getTrustSetAt();
+      this.trustSetAt = trustSetAt;
+      firePropertyChange(PROP_TRUST_SET_AT, oldValue, getTrustSetAt());
    }
 
    public String validate() {

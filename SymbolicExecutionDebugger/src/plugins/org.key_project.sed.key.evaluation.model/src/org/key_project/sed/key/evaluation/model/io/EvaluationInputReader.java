@@ -230,12 +230,36 @@ public class EvaluationInputReader {
             questionInputStack.addFirst(questionInput);
             String questionValue = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_VALUE);
             questionInput.setValue(questionValue);
+            String questionValueSetAt = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_VALUE_SET_AT);
+            if (!StringUtil.isTrimmedEmpty(questionValueSetAt)) {
+               try {
+                  questionInput.setValueSetAt(Long.parseLong(questionValueSetAt));
+               }
+               catch (NumberFormatException e) {
+                  throw new SAXException("Value set at '" + questionValueSetAt + "' is not a valid long number.");
+               }
+            }
+            else {
+               questionInput.setValueSetAt(0);
+            }
             String questionTrust = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_TRUST);
             if (!StringUtil.isEmpty(questionTrust)) {
                questionInput.setTrust(Boolean.valueOf(questionTrust));
             }
             else {
                questionInput.setTrust(null);
+            }
+            String questionTrustSetAt = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_TRUST_SET_AT);
+            if (!StringUtil.isTrimmedEmpty(questionTrustSetAt)) {
+               try {
+                  questionInput.setTrustSetAt(Long.parseLong(questionTrustSetAt));
+               }
+               catch (NumberFormatException e) {
+                  throw new SAXException("Trust set at '" + questionTrustSetAt + "' is not a valid long number.");
+               }
+            }
+            else {
+               questionInput.setTrustSetAt(0);
             }
          }
          else if (EvaluationInputWriter.TAG_RANDOM_PAGE_ORDER.equals(qName)) {

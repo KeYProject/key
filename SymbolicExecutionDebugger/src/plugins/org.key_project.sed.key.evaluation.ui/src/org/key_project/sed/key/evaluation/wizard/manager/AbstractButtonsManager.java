@@ -19,6 +19,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.key_project.sed.key.evaluation.model.definition.AbstractButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage.ICreateControlCallback;
 import org.key_project.util.java.ArrayUtil;
@@ -26,6 +27,8 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> extends AbstractQuestionInputManager {
+   private final AbstractEvaluationWizardPage<?> wizardPage;
+   
    private final QuestionInput questionInput;
    
    private final List<Button> buttons = new LinkedList<Button>();
@@ -45,11 +48,13 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
    
    private TrustManager trustManager;
    
-   public AbstractButtonsManager(FormToolkit toolkit, 
+   public AbstractButtonsManager(AbstractEvaluationWizardPage<?> wizardPage,
+                                 FormToolkit toolkit, 
                                  Composite parent, 
                                  QuestionInput questionInput, 
                                  Q question,
                                  ICreateControlCallback callback) {
+      this.wizardPage = wizardPage;
       questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, questionListener);
       this.questionInput = questionInput;
       composite = toolkit.createComposite(parent);
@@ -61,6 +66,10 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       }
    }
    
+   public AbstractEvaluationWizardPage<?> getWizardPage() {
+      return wizardPage;
+   }
+
    protected void createwithChildQuestionControls(FormToolkit toolkit, Q question, ICreateControlCallback callback) {
       composite.setLayout(new GridLayout(1, false));
       createSection(toolkit, composite, question);
@@ -76,7 +85,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
             layout.horizontalSpacing = 0;
             layout.verticalSpacing = 0;
             choiceComposite.setLayout(layout);
-            List<IQuestionInputManager> managers = QuestionWizardPage.createQuestionControls(toolkit, choiceComposite, choiceInputs, callback);
+            List<IQuestionInputManager> managers = QuestionWizardPage.createQuestionControls(wizardPage, toolkit, choiceComposite, choiceInputs, callback);
             choiceManagers.put(choice, managers);
          }
       }
@@ -89,7 +98,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       questionSection = toolkit.createSection(sectionComposite, SWT.NONE);
       questionSection.setText(question.getLabel());
       if (question.isAskForTrust()) {
-         trustManager = new TrustManager(sectionComposite, questionInput);
+         trustManager = new TrustManager(wizardPage, sectionComposite, questionInput);
       }
    }
    
@@ -154,6 +163,16 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          }
       }
       updateChoiceChildrenEnabled();
+   }
+
+   protected void updateValueSetAt(QuestionInput questionInput) {
+      if (!questionInput.getPageInput().getPage().isReadonly() &&
+          questionInput.getPageInput().getFormInput().getForm().isCollectTimes()) {
+         long previousTimes = questionInput.getPageInput().getShownTime();
+         long pageShownAt = getWizardPage().getShownAt();
+         long now = System.currentTimeMillis();
+         questionInput.setValueSetAt(previousTimes + (now - pageShownAt));
+      }
    }
    
    @Override

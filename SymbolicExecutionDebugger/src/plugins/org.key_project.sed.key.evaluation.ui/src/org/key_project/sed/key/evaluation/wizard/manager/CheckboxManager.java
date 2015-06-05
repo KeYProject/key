@@ -10,14 +10,15 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage.ICreateControlCallback;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 
 public class CheckboxManager extends AbstractButtonsManager<CheckboxQuestion> {
-   public CheckboxManager(FormToolkit toolkit, Composite parent, QuestionInput questionInput, CheckboxQuestion question, ICreateControlCallback callback) {
-      super(toolkit, parent, questionInput, question, callback);
+   public CheckboxManager(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, CheckboxQuestion question, ICreateControlCallback callback) {
+      super(wizardPage, toolkit, parent, questionInput, question, callback);
    }
 
    @Override
@@ -47,6 +48,7 @@ public class CheckboxManager extends AbstractButtonsManager<CheckboxQuestion> {
             value = choice.getValue();
          }
          questionInput.setValue(value);
+         updateValueSetAt(questionInput);
          updateChoiceChildrenEnabled();
       }
       else {
@@ -61,6 +63,7 @@ public class CheckboxManager extends AbstractButtonsManager<CheckboxQuestion> {
             valuesList = new LinkedList<String>();
          }
          questionInput.setValue(valuesList.isEmpty() ? null : CollectionUtil.toString(valuesList, CheckboxQuestion.VALUE_SEPARATOR));
+         updateValueSetAt(questionInput);
       }
    }
 }

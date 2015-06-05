@@ -68,7 +68,7 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
          getWizard().setCurrentPageRunnable(computeRunnable(visible));
       }
       if (!visible) { // The new page is set first to visible before the old page is set to hidden
-         if (pageInput.getFormInput().getForm().isCollectTimes()) {
+         if (!pageInput.getPage().isReadonly() && pageInput.getFormInput().getForm().isCollectTimes()) {
             pageInput.addShownTime(System.currentTimeMillis() - shownAt);
          }
          perfomRunnables(computeRunnable(visible), getWizard().getCurrentPageRunnable());
@@ -101,5 +101,9 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
 
    public String getRunnablesFailure() {
       return runnablesFailure;
+   }
+
+   public long getShownAt() {
+      return shownAt;
    }
 }

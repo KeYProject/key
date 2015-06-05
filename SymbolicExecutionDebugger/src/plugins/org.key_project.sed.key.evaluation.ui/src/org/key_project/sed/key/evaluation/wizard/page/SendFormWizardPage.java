@@ -58,7 +58,7 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
       Text additionalText = toolkit.createText(form.getBody(), getPageInput().getPage().getAdditionalDataCollectedByServer(), SWT.READ_ONLY | SWT.MULTI);
       additionalText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       
-      acceptManager = new RadioButtonsManager(toolkit, form.getBody(), getPageInput().getAcceptInput(), (RadioButtonsQuestion) getPageInput().getAcceptInput().getQuestion(), null);
+      acceptManager = new RadioButtonsManager(this, toolkit, form.getBody(), getPageInput().getAcceptInput(), (RadioButtonsQuestion) getPageInput().getAcceptInput().getQuestion(), null);
       GridData managerData = new GridData();
       managerData.horizontalSpan = 2;
       acceptManager.getComposite().setLayoutData(managerData);
@@ -67,7 +67,13 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
    @Override
    public void setVisible(boolean visible) {
       if (visible) {
-         SWTUtil.setText(contentText, EvaluationInputWriter.toFormAnswerXML(formInput));
+         // Update shown text asynchronously because this page becomes visible before old page has updated the times.
+         getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               SWTUtil.setText(contentText, EvaluationInputWriter.toFormAnswerXML(formInput));
+            }
+         });
       }
       super.setVisible(visible);
    }

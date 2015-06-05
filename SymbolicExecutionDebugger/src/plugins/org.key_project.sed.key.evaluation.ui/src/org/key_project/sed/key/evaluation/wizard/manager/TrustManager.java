@@ -11,8 +11,11 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
+import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 
 public class TrustManager extends AbstractQuestionInputManager {
+   private final AbstractEvaluationWizardPage<?> wizardPage;
+   
    private final QuestionInput questionInput;
    
    private final PropertyChangeListener questionInputListener = new PropertyChangeListener() {
@@ -26,8 +29,10 @@ public class TrustManager extends AbstractQuestionInputManager {
    
    private ToolItem dontTrustItem;
    
-   public TrustManager(Composite parent, 
+   public TrustManager(AbstractEvaluationWizardPage<?> wizardPage,
+                       Composite parent, 
                        QuestionInput questionInput) {
+      this.wizardPage = wizardPage;
       this.questionInput = questionInput;
       this.questionInput.addPropertyChangeListener(QuestionInput.PROP_TRUST, questionInputListener);
       ToolBar toolBar = new ToolBar(parent, SWT.FLAT | SWT.NO_FOCUS);
@@ -58,6 +63,7 @@ public class TrustManager extends AbstractQuestionInputManager {
       dontTrustItem.setSelection(false);
       if (trustItem.getSelection()) {
          questionInput.setTrust(Boolean.TRUE);
+         updateTrustSetAt();
       }
       else {
          questionInput.setTrust(null);
@@ -68,9 +74,20 @@ public class TrustManager extends AbstractQuestionInputManager {
       trustItem.setSelection(false);
       if (dontTrustItem.getSelection()) {
          questionInput.setTrust(Boolean.FALSE);
+         updateTrustSetAt();
       }
       else {
          questionInput.setTrust(null);
+      }
+   }
+
+   protected void updateTrustSetAt() {
+      if (!questionInput.getPageInput().getPage().isReadonly() &&
+          questionInput.getPageInput().getFormInput().getForm().isCollectTimes()) {
+         long previousTimes = questionInput.getPageInput().getShownTime();
+         long pageShownAt = wizardPage.getShownAt();
+         long now = System.currentTimeMillis();
+         questionInput.setTrustSetAt(previousTimes + (now - pageShownAt));
       }
    }
 

@@ -109,6 +109,16 @@ public class EvaluationInputWriter {
    public static final String ATTRIBUTE_PAGE_SHOWN_TIME = "shownTime";
 
    /**
+    * Attribute name to store {@link QuestionInput#getValueSetAt()} entries.
+    */
+   public static final String ATTRIBUTE_QUESTION_VALUE_SET_AT = "valueSetAt";
+
+   /**
+    * Attribute name to store {@link QuestionInput#getTrustSetAt()} entries.
+    */
+   public static final String ATTRIBUTE_QUESTION_TRUST_SET_AT = "trustSetAt";
+
+   /**
     * Converts the orders of the given {@link RandomFormInput}s into XML.
     * @param evaluationInput The {@link EvaluationInput}.
     * @param updatedOrders The {@link RandomFormInput}s.
@@ -266,8 +276,14 @@ public class EvaluationInputWriter {
          Map<String, String> questionAttributes = new LinkedHashMap<String, String>();
          questionAttributes.put(ATTRIBUTE_QUESTION_NAME, XMLUtil.encodeText(questionInput.getQuestion().getName()));
          questionAttributes.put(ATTRIBUTE_QUESTION_VALUE, XMLUtil.encodeText(questionInput.getValue()));
+         if (questionInput.getValueSetAt() > 0) {
+            questionAttributes.put(ATTRIBUTE_QUESTION_VALUE_SET_AT, questionInput.getValueSetAt() + "");
+         }
          if (questionInput.getTrust() != null) {
             questionAttributes.put(ATTRIBUTE_QUESTION_TRUST, questionInput.getTrust().toString());
+         }
+         if (questionInput.getTrustSetAt() > 0) {
+            questionAttributes.put(ATTRIBUTE_QUESTION_TRUST_SET_AT, questionInput.getTrustSetAt() + "");
          }
          if (questionInput.hasChoiceInputs()) {
             XMLUtil.appendStartTag(level, TAG_QUESTION, questionAttributes, sb);

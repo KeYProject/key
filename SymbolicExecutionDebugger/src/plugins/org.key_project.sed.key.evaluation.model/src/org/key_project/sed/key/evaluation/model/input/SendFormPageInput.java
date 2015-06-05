@@ -11,7 +11,7 @@ public class SendFormPageInput extends AbstractPageInput<SendFormPage> {
    
    public SendFormPageInput(AbstractFormInput<?> formInput, SendFormPage page) {
       super(formInput, page);
-      acceptInput = new QuestionInput(page.getAcceptQuestion());
+      acceptInput = new QuestionInput(this, page.getAcceptQuestion());
    }
 
    public QuestionInput getAcceptInput() {

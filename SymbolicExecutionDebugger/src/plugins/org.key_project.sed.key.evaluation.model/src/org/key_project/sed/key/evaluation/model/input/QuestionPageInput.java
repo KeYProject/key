@@ -16,7 +16,7 @@ public class QuestionPageInput extends AbstractPageInput<QuestionPage> {
       super(formInput, page);
       this.questionInputs = new ArrayList<QuestionInput>(page.countQuestions());
       for (AbstractQuestion question : page.getQuestions()) {
-         this.questionInputs.add(new QuestionInput(question));
+         this.questionInputs.add(new QuestionInput(this, question));
       }
    }
 

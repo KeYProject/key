@@ -69,14 +69,16 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
             observedInputs.add(questionInput);
          }
       };
-      List<IQuestionInputManager> managers = createQuestionControls(toolkit, 
+      List<IQuestionInputManager> managers = createQuestionControls(this,
+                                                                    toolkit, 
                                                                     form.getBody(), 
                                                                     getPageInput().getQuestionInputs(),
                                                                     callBack);
       controls.addAll(managers);
    }
    
-   public static List<IQuestionInputManager> createQuestionControls(FormToolkit toolkit, 
+   public static List<IQuestionInputManager> createQuestionControls(AbstractEvaluationWizardPage<?> wizardPage,
+                                                                    FormToolkit toolkit, 
                                                                     Composite parent, 
                                                                     QuestionInput[] questionInputs,
                                                                     ICreateControlCallback callback) {
@@ -88,11 +90,11 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
             managers.add(manager);
          }
          else if (questionInput.getQuestion() instanceof RadioButtonsQuestion) {
-            IQuestionInputManager manager = createRadioButtons(toolkit, parent, questionInput, (RadioButtonsQuestion) questionInput.getQuestion(), callback);
+            IQuestionInputManager manager = createRadioButtons(wizardPage, toolkit, parent, questionInput, (RadioButtonsQuestion) questionInput.getQuestion(), callback);
             managers.add(manager);
          }
          else if (questionInput.getQuestion() instanceof CheckboxQuestion) {
-            IQuestionInputManager manager = createCheckboxes(toolkit, parent, questionInput, (CheckboxQuestion) questionInput.getQuestion(), callback);
+            IQuestionInputManager manager = createCheckboxes(wizardPage, toolkit, parent, questionInput, (CheckboxQuestion) questionInput.getQuestion(), callback);
             managers.add(manager);
          }
          else if (questionInput.getQuestion() instanceof LabelQuestion) {
@@ -110,12 +112,12 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       return new BrowserManager(toolkit, parent, question);
    }
 
-   public static RadioButtonsManager createRadioButtons(FormToolkit toolkit, Composite parent, QuestionInput questionInput, RadioButtonsQuestion question, ICreateControlCallback callback) {
-      return new RadioButtonsManager(toolkit, parent, questionInput, question, callback);
+   public static RadioButtonsManager createRadioButtons(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, RadioButtonsQuestion question, ICreateControlCallback callback) {
+      return new RadioButtonsManager(wizardPage, toolkit, parent, questionInput, question, callback);
    }
 
-   public static CheckboxManager createCheckboxes(FormToolkit toolkit, Composite parent, QuestionInput questionInput, CheckboxQuestion question, ICreateControlCallback callback) {
-      return new CheckboxManager(toolkit, parent, questionInput, question, callback);
+   public static CheckboxManager createCheckboxes(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, CheckboxQuestion question, ICreateControlCallback callback) {
+      return new CheckboxManager(wizardPage, toolkit, parent, questionInput, question, callback);
    }
 
    public static LabelManager createLabel(FormToolkit toolkit, Composite parent, LabelQuestion question) {
