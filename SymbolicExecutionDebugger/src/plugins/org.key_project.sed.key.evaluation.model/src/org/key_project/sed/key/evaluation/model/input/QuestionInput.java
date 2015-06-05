@@ -86,7 +86,7 @@ public class QuestionInput extends Bean {
          return CollectionUtil.search(choiceInputs.keySet(), new IFilter<Choice>() {
             @Override
             public boolean select(Choice element) {
-               return ObjectUtil.equals(element.getText(), choiceText);
+               return ObjectUtil.equals(element.getValue(), choiceText);
             }
          });
       }

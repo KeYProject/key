@@ -99,9 +99,9 @@ public class EvaluationInputWriter {
    public static final String TAG_CHOICE = "choice";
 
    /**
-    * Attribute name to store {@link Choice#getText()} entries.
+    * Attribute name to store {@link Choice#getValue()} entries.
     */
-   public static final String ATTRIBUTE_CHOICE_TEXT = "text";
+   public static final String ATTRIBUTE_CHOICE_VALUE = "value";
 
    /**
     * Converts the orders of the given {@link RandomFormInput}s into XML.
@@ -265,7 +265,7 @@ public class EvaluationInputWriter {
             XMLUtil.appendStartTag(level, TAG_QUESTION, questionAttributes, sb);
             for (Choice choice : questionInput.getChoices()) {
                Map<String, String> choiceAttributes = new LinkedHashMap<String, String>();
-               choiceAttributes.put(ATTRIBUTE_CHOICE_TEXT, XMLUtil.encodeText(choice.getText()));
+               choiceAttributes.put(ATTRIBUTE_CHOICE_VALUE, XMLUtil.encodeText(choice.getValue()));
                XMLUtil.appendStartTag(level + 1, TAG_CHOICE, choiceAttributes, sb);
                for (QuestionInput childQuestionInput : questionInput.getChoiceInputs(choice)) {
                   appendQuestionInput(level + 2, childQuestionInput, sb);

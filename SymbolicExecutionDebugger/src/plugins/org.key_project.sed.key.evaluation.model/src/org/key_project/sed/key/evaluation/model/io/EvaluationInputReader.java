@@ -233,11 +233,11 @@ public class EvaluationInputReader {
             if (questionInputStack.isEmpty()) {
                throw new SAXException("Choice is not a child of a question input.");
             }
-            String choiceText = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_CHOICE_TEXT);
+            String choiceValue = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_CHOICE_VALUE);
             QuestionInput parentInput = questionInputStack.getFirst();
-            Choice choice = parentInput.getChoice(choiceText);
+            Choice choice = parentInput.getChoice(choiceValue);
             if (choice == null) {
-               throw new SAXException("Choice '" + choiceText + "' is not part of question '" + parentInput.getQuestion().getName() + "'.");
+               throw new SAXException("Choice '" + choiceValue + "' is not part of question '" + parentInput.getQuestion().getName() + "'.");
             }
             choiceStack.addFirst(choice);
          }

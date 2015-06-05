@@ -12,6 +12,7 @@ import org.key_project.sed.key.evaluation.model.definition.FixedForm;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
 import org.key_project.sed.key.evaluation.model.definition.TestEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
+import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
@@ -31,6 +32,26 @@ import org.key_project.util.java.CollectionUtil;
  * @author Martin Hentschel
  */
 public class FormInputWriterAndReaderTest extends TestCase {
+   /**
+    * Tests writing and reading of {@link UnderstandingProofAttemptsEvaluation#INSTANCE}.
+    */
+   @Test
+   public void testUnderstandingProofAttemptsEvaluation() throws Exception {
+      AbstractEvaluation evaluation = UnderstandingProofAttemptsEvaluation.INSTANCE;
+      EvaluationInput evaluationInput = new EvaluationInput(evaluation);
+      for (AbstractFormInput<?> formInput : evaluationInput.getFormInputs()) {
+         evaluationInput.setCurrentFormInput(formInput);
+         // Convert to xml
+         String xml = EvaluationInputWriter.toFormAnswerXML(formInput);
+         // Parse xml
+         EvaluationInput parsedInput = EvaluationInputReader.parse(xml);
+         // Compare inputs
+         assertNotNull(parsedInput);
+         assertNotSame(evaluationInput, parsedInput);
+         assertEvaluationInput(evaluationInput, parsedInput);
+      }
+   }
+   
    /**
     * Test parsings of {@link EvaluationInputWriter#toFormAnswerXML(AbstractFormInput, List)}.
     * @throws Exception Occurred Exception.
