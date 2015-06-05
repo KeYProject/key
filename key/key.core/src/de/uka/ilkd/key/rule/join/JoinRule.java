@@ -158,13 +158,7 @@ public class JoinRule implements BuiltInRule {
             new SymbolicExecutionState(thisSEState.first, thisSEState.second, goal.node());    
       ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       
-      int progress = 0;
       for (SymbolicExecutionState state : joinPartnerStates) {
-         System.out.print("Joining state ");
-         System.out.print(progress + 1);
-         System.out.print(" of ");
-         System.out.println(joinPartners.size());
-         
          Pair<SymbolicExecutionState, ImmutableSet<Name>> joinResult = joinStates(joinRule, joinedState, state, thisSEState.third, services);
          newNames = newNames.union(joinResult.second);
          
