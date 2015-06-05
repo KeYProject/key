@@ -16,7 +16,6 @@ package de.uka.ilkd.key.util.joinrule;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -44,6 +43,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.VariableNamer.Globals;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -55,10 +55,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -506,7 +506,7 @@ public class JoinRuleUtils {
       String base = stripIndex(var.name().toString());
       
       int newCounter = 0;
-      String branchUniqueName = base;
+      String branchUniqueName = base;      
       while (!isUniqueInGlobals(branchUniqueName.toString(), intrNode.getGlobalProgVars()) ||
             (lookupVarInNS(branchUniqueName, services) != null &&
                !lookupVarInNS(branchUniqueName, services).sort().equals(var.sort()))) {
@@ -645,14 +645,10 @@ public class JoinRuleUtils {
     *    succedent formulae.
     */
    public static void clearSemisequent(Goal goal, boolean antec) {
-      Semisequent semiseq = antec ?
-            goal.sequent().antecedent() :
-            goal.sequent().succedent();
-      for (int i = 0; i < semiseq.size(); i++) {
-         SequentFormula f = semiseq.get(i);
-         
-         PosInTerm pit = PosInTerm.getTopLevel();         
-         PosInOccurrence gPio = new PosInOccurrence(f, pit, antec);
+      final Semisequent semiseq = antec ?
+            goal.sequent().antecedent() : goal.sequent().succedent();
+      for (final SequentFormula f : semiseq) {         
+         final PosInOccurrence gPio = new PosInOccurrence(f, PosInTerm.getTopLevel() , antec);
          goal.removeFormula(gPio);
       }
    }
@@ -1260,9 +1256,7 @@ public class JoinRuleUtils {
     * @see VariableNamer#isUniqueInGlobals(String, Globals)
     */
    private static boolean isUniqueInGlobals(String name, ImmutableSet<ProgramVariable> globals) {
-      Iterator<ProgramVariable> it = globals.iterator();
-      while (it.hasNext()) {
-         ProgramVariable n = it.next();
+      for (final ProgramVariable n : globals) {
          if (n.toString().equals(name)) {
             return false;
          }
