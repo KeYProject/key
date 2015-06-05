@@ -13,10 +13,12 @@
 
 package de.uka.ilkd.key.util.joinrule;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -43,7 +45,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.VariableNamer.Globals;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -468,8 +469,8 @@ public class JoinRuleUtils {
     *     the resulting list will contain exactly the supplied formula.
     * @return The conjunctive elements of the supplied formula.
     */
-   public static LinkedList<Term> getConjunctiveElementsFor(final Term term) {
-      LinkedList<Term> result = new LinkedList<Term>();
+   public static ArrayList<Term> getConjunctiveElementsFor(final Term term) {
+      ArrayList<Term> result = new ArrayList<Term>();
       
       if (term.op().equals(Junctor.AND)) {
          result.addAll(getConjunctiveElementsFor(term.sub(0)));
@@ -498,7 +499,7 @@ public class JoinRuleUtils {
          LocationVariable var,
          Node startLeaf) {
        
-       Services services = startLeaf.proof().getServices();
+      Services services = startLeaf.proof().getServices();
       
       // Find the node where the variable was introduced
       Node intrNode = getIntroducingNodeforLocVar(var, startLeaf);
@@ -719,11 +720,11 @@ public class JoinRuleUtils {
       
       TermBuilder tb = services.getTermBuilder();
       
-      LinkedList<Term> cond1ConjElems = getConjunctiveElementsFor(cond1);
-      LinkedList<Term> cond2ConjElems = getConjunctiveElementsFor(cond2);
+      ArrayList<Term> cond1ConjElems = getConjunctiveElementsFor(cond1);
+      ArrayList<Term> cond2ConjElems = getConjunctiveElementsFor(cond2);
       
-      final LinkedList<Term> fCond1ConjElems = new LinkedList<Term>(cond1ConjElems);
-      final LinkedList<Term> fCond2ConjElems = new LinkedList<Term>(cond2ConjElems);
+      final ArrayList<Term> fCond1ConjElems = new ArrayList<Term>(cond1ConjElems);
+      final ArrayList<Term> fCond2ConjElems = new ArrayList<Term>(cond2ConjElems);
       
       if (cond1ConjElems.size() == cond2ConjElems.size()) {
          for (int i = 0; i < fCond1ConjElems.size(); i++) {
@@ -758,7 +759,7 @@ public class JoinRuleUtils {
       } else {
          Pair<Term, Term> distinguishingAndEqual =
                getDistinguishingFormula(result1, result2, services);
-         LinkedList<Term> equalConjunctiveElems =
+         ArrayList<Term> equalConjunctiveElems =
                getConjunctiveElementsFor(distinguishingAndEqual.second);
          
          // Apply distributivity to simplify the formula
@@ -812,10 +813,10 @@ public class JoinRuleUtils {
          Term pathCondition2,
          Services services) {
       
-      LinkedList<Term> cond1ConjElems = getConjunctiveElementsFor(pathCondition1);
-      LinkedList<Term> cond2ConjElems = getConjunctiveElementsFor(pathCondition2);
+       ArrayList<Term> cond1ConjElems = getConjunctiveElementsFor(pathCondition1);
+       ArrayList<Term> cond2ConjElems = getConjunctiveElementsFor(pathCondition2);
       
-      LinkedList<Term> distinguishingElements = new LinkedList<Term>(cond1ConjElems);
+       ArrayList<Term> distinguishingElements = new ArrayList<Term>(cond1ConjElems);
       
       for (int i = 0; i < cond1ConjElems.size(); i++) {
          Term elem1 = cond1ConjElems.get(i);
@@ -1109,14 +1110,14 @@ public class JoinRuleUtils {
     * @param services The services object.
     * @return A conjunction of the supplied formulae.
     */
-   private static Term joinConjuctiveElements(final LinkedList<Term> elems, Services services) {
+   private static Term joinConjuctiveElements(final List<Term> elems, Services services) {
       TermBuilder tb = services.getTermBuilder();
       
       if (elems.isEmpty()) {
          return tb.tt();
       }
       
-      Term result = elems.getFirst();
+      Term result = elems.get(0);
       for (int i = 1; i < elems.size(); i++) {
          Term term = elems.get(i);
          result = tb.and(result, term);
