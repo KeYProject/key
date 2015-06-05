@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,6 +45,7 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -68,6 +70,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * of the proof.
  */
 public class Proof implements Named {
+   
     /**
      * The time when the {@link Proof} instance was created.
      */
@@ -972,11 +975,12 @@ public class Proof implements Named {
      * This implementation traverses the proof tree only once.
      * Statistics are not cached; don't call this method too often.
      */
-    public Statistics statistics() {
+    public Statistics getStatistics() {
         return new Statistics(this);
     }
 
     /** toString */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append("Proof -- ");
@@ -1079,5 +1083,10 @@ public class Proof implements Named {
      */
     public void setProofFile(File proofFile) {
        this.proofFile = proofFile;
+    }
+    
+    public void saveToFile(File file) throws IOException{
+       ProofSaver saver = new ProofSaver(this, file);
+       saver.save();
     }
 }

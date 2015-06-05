@@ -69,6 +69,7 @@ import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -77,10 +78,9 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class ProofSaver {
 
-   final protected String filename;
-   protected Proof proof;
-   final protected String internalVersion;
-   public static final String PROOF_SUBDIRECTORY = "/proof";
+   private final File file;
+   private final Proof proof;
+   private final String internalVersion;
 
    LogicPrinter printer;
 
@@ -95,14 +95,18 @@ public class ProofSaver {
     */
    private static final List<ProofSaverListener> listeners = new LinkedList<ProofSaverListener>();
    
-   public ProofSaver(Proof proof, String filename, String internalVersion) {
-      this.filename = filename;
+   public ProofSaver(Proof proof, String fileName, String internalVersion) {
+      this(proof, new File(fileName), internalVersion);
+   }
+   
+   public ProofSaver(Proof proof, File file) {
+      this(proof, file, KeYConstants.INTERNAL_VERSION);
+   }
+   
+   public ProofSaver(Proof proof, File file, String internalVersion) {
+      this.file = file;
       this.proof = proof;
       this.internalVersion = internalVersion;
-   }
-
-   public void setProof(Proof p) {
-       proof = p;
    }
 
    public StringBuffer writeLog(Proof p){
@@ -132,8 +136,8 @@ public class ProofSaver {
    }
 
    public String save() throws IOException {
-      String errorMsg = save(new FileOutputStream(filename));
-      fireProofSaved(new ProofSaverEvent(this, filename, errorMsg));
+      String errorMsg = save(new FileOutputStream(file));
+      fireProofSaved(new ProofSaverEvent(this, filename(), errorMsg));
       return errorMsg;
    }
 
@@ -218,10 +222,10 @@ public class ProofSaver {
           ps.println("}");
 
       } catch (IOException ioe) {
-          errorMsg = "Could not save \n"+filename+".\n";
+          errorMsg = "Could not save \n"+filename()+".\n";
           errorMsg += ioe.toString();	    
       } catch (NullPointerException npe) {
-          errorMsg = "Could not save \n"+filename+"\n";
+          errorMsg = "Could not save \n"+filename()+"\n";
           errorMsg += "No proof present?";
           npe.printStackTrace();
       } catch (Exception e) {
@@ -245,9 +249,9 @@ public class ProofSaver {
        final String basePath;
        String tmp = header;
        try {
-    	   File file = new File(filename).getCanonicalFile();
+    	   File canonicalFile = file.getCanonicalFile();
 
-    	   basePath = file.getParentFile().getCanonicalPath(); // File file is always a file and not a directory. Thus we have to go back exactly one fragment in the path.
+    	   basePath = canonicalFile.getParentFile().getCanonicalPath(); // File file is always a file and not a directory. Thus we have to go back exactly one fragment in the path.
            
     	   // locate filenames in header
            for (String s: search){
@@ -654,5 +658,9 @@ public class ProofSaver {
        for (ProofSaverListener l : toInform) {
           l.proofSaved(e);
        }
+    }
+    
+    private String filename(){
+       return file.getAbsolutePath();
     }
 }

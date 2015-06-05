@@ -29,6 +29,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
    
@@ -54,6 +55,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
    
@@ -79,6 +81,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
    
@@ -104,6 +107,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
    
@@ -129,6 +133,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
 
@@ -154,6 +159,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
    
@@ -179,6 +185,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
    
@@ -204,6 +211,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
    
@@ -229,6 +237,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
    
@@ -254,6 +263,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
                 false,
                 false,
                 false,
+                true,
                 true);
    }
 }

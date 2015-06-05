@@ -515,6 +515,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
+    * @param simplifyConditions Simplify conditions?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -535,6 +536,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
                                        Boolean truthValueEvaluationEnabled,
+                                       Boolean simplifyConditions,
                                        int timeoutFactor, 
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
@@ -554,6 +556,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showSignatureOnMethodReturnNodes,
                            higlightReachedSourceCode,
                            truthValueEvaluationEnabled,
+                           simplifyConditions,
                            timeoutFactor, 
                            executor);
    }
@@ -578,6 +581,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
+    * @param simplifyConditions Simplify conditions?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -599,6 +603,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
                                        Boolean truthValueEvaluationEnabled,
+                                       Boolean simplifyConditions,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName, 
@@ -619,6 +624,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showSignatureOnMethodReturnNodes,
                            higlightReachedSourceCode,
                            truthValueEvaluationEnabled,
+                           simplifyConditions,
                            timeoutFactor, 
                            executor);
    }
@@ -643,6 +649,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
+    * @param simplifyConditions Simplify conditions?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -665,6 +672,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
                                        Boolean truthValueEvaluationEnabled,
+                                       Boolean simplifyConditions,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create test project
@@ -674,7 +682,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          projectConfigurator.configure(project);
       }
       // Do test steps
-      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueEvaluationEnabled, timeoutFactor, executor);
+      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueEvaluationEnabled, simplifyConditions, timeoutFactor, executor);
    }
    
    /**
@@ -694,6 +702,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
+    * @param simplifyConditions Simplify conditions?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -713,6 +722,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
                                        Boolean truthValueEvaluationEnabled,
+                                       Boolean simplifyConditions,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
@@ -749,7 +759,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueEvaluationEnabled);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueEvaluationEnabled, simplifyConditions);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -1016,6 +1026,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
     * @param truthValueEvaluationEnabled Truth value evaluation enabled?
+    * @param simplifyConditions Simplify conditions?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetProofFileTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -1032,6 +1043,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean mergeBranchConditions,
                                        Boolean usePrettyPrinting,
                                        Boolean truthValueEvaluationEnabled,
+                                       Boolean simplifyConditions,
                                        int timeoutFactor,
                                        IKeYDebugTargetProofFileTestExecutor executor) throws Exception {
       // Create bot
@@ -1064,7 +1076,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, truthValueEvaluationEnabled);
+         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, truthValueEvaluationEnabled, simplifyConditions);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();

@@ -228,7 +228,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                          Position endPosition,
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, startPosition, endPosition, false, false, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, startPosition, endPosition, false, false, false, false, false, false, false, false, true);
       try {
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());

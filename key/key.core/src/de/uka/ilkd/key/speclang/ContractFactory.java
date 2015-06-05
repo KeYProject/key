@@ -513,7 +513,7 @@ public class ContractFactory {
                         } else if (m2 == null) {
                             nm = m1;
                         } else {
-                            Term ownPre = pres.get(h) == null ? pres.get(h) : tb.tt();
+                            Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
                             nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
                                     tb.ife(otherPre, m2, tb.allLocs()));
                         }
