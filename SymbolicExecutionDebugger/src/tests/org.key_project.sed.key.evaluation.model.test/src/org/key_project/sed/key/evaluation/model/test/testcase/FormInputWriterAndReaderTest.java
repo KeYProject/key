@@ -41,14 +41,25 @@ public class FormInputWriterAndReaderTest extends TestCase {
       EvaluationInput evaluationInput = new EvaluationInput(evaluation);
       for (AbstractFormInput<?> formInput : evaluationInput.getFormInputs()) {
          evaluationInput.setCurrentFormInput(formInput);
+         if (formInput.getForm().isCollectTimes()) {
+            for (int i = 0; i < formInput.countPageInputs(); i++) {
+               AbstractPageInput<?> pageInput = formInput.getPageInput(i);
+               if (!pageInput.getPage().isReadonly()) {
+                  pageInput.setShownTime(i);
+               }
+            }
+         }
          // Convert to xml
          String xml = EvaluationInputWriter.toFormAnswerXML(formInput);
          // Parse xml
          EvaluationInput parsedInput = EvaluationInputReader.parse(xml);
+         AbstractFormInput<?> parsedFormInput = parsedInput.getCurrentFormInput();
          // Compare inputs
          assertNotNull(parsedInput);
          assertNotSame(evaluationInput, parsedInput);
-         assertEvaluationInput(evaluationInput, parsedInput);
+         assertNotNull(parsedFormInput);
+         assertNotSame(formInput, parsedFormInput);
+         assertFormInput(formInput, parsedFormInput);
       }
    }
    
@@ -58,7 +69,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
     */
    @Test
    public void testAnswersAndRandomOrder() throws Exception {
-      doAnswersAndRandomOrder(createFixedInputChanger(), createFixedOrderComputer());
+      doAnswersAndRandomOrder(createFixedInputChanger(100), createFixedOrderComputer());
    }
    
    /**
@@ -166,18 +177,20 @@ public class FormInputWriterAndReaderTest extends TestCase {
     */
    @Test
    public void testAnswerXmlWithExampleForm_modifiedValues() throws Exception {
-      doAnswerTest(createFixedInputChanger());
+      doAnswerTest(createFixedInputChanger(0));
    }
    
    /**
     * Creates an {@link IFormInputChanger} which sets fixed values.
+    * @param pageShownTime The shown time to set.
     * @return The created {@link IFormInputChanger}.
     */
-   protected IFormInputChanger createFixedInputChanger() {
+   protected IFormInputChanger createFixedInputChanger(final long pageShownTime) {
       return new IFormInputChanger() {
          @Override
          public void changeFormInput(AbstractFormInput<?> formInput) {
             QuestionPageInput pageInput = (QuestionPageInput)formInput.getPageInputs()[0];
+            pageInput.setShownTime(pageShownTime);
             assertFalse(pageInput.getQuestionInputs()[0].getQuestion().isEditable()); // Browser
             assertTrue(pageInput.getQuestionInputs()[1].getQuestion().isEditable()); // RadioButtons
             // Change question 1
@@ -379,6 +392,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
          assertNotNull(actual);
          assertNotSame(expected, actual);
          assertEquals(expected.getPage(), actual.getPage());
+         assertEquals(expected.getShownTime(), actual.getShownTime());
          if (expected instanceof QuestionPageInput) {
             assertTrue(actual instanceof QuestionPageInput);
             assertQuestionInputs(((QuestionPageInput) expected).getQuestionInputs(), ((QuestionPageInput) actual).getQuestionInputs());

@@ -104,6 +104,11 @@ public class EvaluationInputWriter {
    public static final String ATTRIBUTE_CHOICE_VALUE = "value";
 
    /**
+    * Attribute name to store {@link AbstractPageInput#getShownTime()} entries.
+    */
+   public static final String ATTRIBUTE_PAGE_SHOWN_TIME = "shownTime";
+
+   /**
     * Converts the orders of the given {@link RandomFormInput}s into XML.
     * @param evaluationInput The {@link EvaluationInput}.
     * @param updatedOrders The {@link RandomFormInput}s.
@@ -232,6 +237,9 @@ public class EvaluationInputWriter {
    protected static void appendPageInput(int level, AbstractPageInput<?> pageInput, StringBuffer sb) {
       Map<String, String> pageAttributes = new LinkedHashMap<String, String>();
       pageAttributes.put(ATTRIBUTE_PAGE_NAME, XMLUtil.encodeText(pageInput.getPage().getName()));
+      if (pageInput.getShownTime() > 0) {
+         pageAttributes.put(ATTRIBUTE_PAGE_SHOWN_TIME, pageInput.getShownTime() + "");
+      }
       XMLUtil.appendStartTag(level, TAG_PAGE, pageAttributes, sb);
       if (pageInput instanceof QuestionPageInput) {
          for (QuestionInput questionInput : ((QuestionPageInput) pageInput).getQuestionInputs()) {

@@ -128,6 +128,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Inspect the content to be send.", 
                                                          "Current date and time (nothing else!)");
       FixedForm introductionForm = new FixedForm("introductionForm", 
+                                                 false,
                                                  new UnderstandingProofAttemptsRandomFormOrderComputer(),
                                                  conditionsPage, 
                                                  backgroundPage,
@@ -143,10 +144,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Confirm Sending Content", 
                                                          "Inspect the content to be send.", 
                                                          "Current date and time (nothing else!)");
-      RandomForm evaluationForm = new RandomForm("evaluationForm", keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, sendEvaluationPage);
+      RandomForm evaluationForm = new RandomForm("evaluationForm", true, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, sendEvaluationPage);
       // Create thanks form
       QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.", null);
-      FixedForm thanksForm = new FixedForm("thanksForm", thanksPage);
+      FixedForm thanksForm = new FixedForm("thanksForm", false, thanksPage);
       // Create forms
       return CollectionUtil.toList(introductionForm, evaluationForm, thanksForm);
    }

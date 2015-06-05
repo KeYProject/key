@@ -186,6 +186,18 @@ public class EvaluationInputReader {
             }
             else {
                currentPageInput = pageInput;
+               String shownTime = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_PAGE_SHOWN_TIME);
+               if (!StringUtil.isTrimmedEmpty(shownTime)) {
+                  try {
+                     pageInput.setShownTime(Long.parseLong(shownTime));
+                  }
+                  catch (NumberFormatException e) {
+                     throw new SAXException("Shown time '" + shownTime + "' is not a valid long number.");
+                  }
+               }
+               else {
+                  pageInput.setShownTime(0);
+               }
             }
          }
          else if (EvaluationInputWriter.TAG_QUESTION.equals(qName)) {

@@ -14,22 +14,25 @@ public abstract class AbstractForm {
    
    private final IRandomCompletion randomOrderComputer;
    
+   private final boolean collectTimes;
+   
    private AbstractEvaluation evaluation;
 
-   public AbstractForm(String name, AbstractPage... pages) {
-      this(name, null, CollectionUtil.toList(pages));
+   public AbstractForm(String name, boolean collectTimes, AbstractPage... pages) {
+      this(name, collectTimes, null, CollectionUtil.toList(pages));
    }
 
-   public AbstractForm(String name, List<AbstractPage> pages) {
-      this(name, null, pages);
+   public AbstractForm(String name, boolean collectTimes, List<AbstractPage> pages) {
+      this(name, collectTimes, null, pages);
    }
 
-   public AbstractForm(String name, IRandomCompletion randomOrderComputer, AbstractPage... pages) {
-      this(name, randomOrderComputer, CollectionUtil.toList(pages));
+   public AbstractForm(String name, boolean collectTimes, IRandomCompletion randomOrderComputer, AbstractPage... pages) {
+      this(name, collectTimes, randomOrderComputer, CollectionUtil.toList(pages));
    }
 
-   public AbstractForm(String name, IRandomCompletion randomOrderComputer, List<AbstractPage> pages) {
+   public AbstractForm(String name, boolean collectTimes, IRandomCompletion randomOrderComputer, List<AbstractPage> pages) {
       this.name = name;
+      this.collectTimes = collectTimes;
       this.randomOrderComputer = randomOrderComputer;
       this.pages = pages;
       for (AbstractPage page : pages) {
@@ -39,6 +42,10 @@ public abstract class AbstractForm {
 
    public String getName() {
       return name;
+   }
+
+   public boolean isCollectTimes() {
+      return collectTimes;
    }
 
    public AbstractPage[] getPages() {
