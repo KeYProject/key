@@ -89,6 +89,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               "no", 
                                                                               new FixedValueValidator("yes", "Conditions are not accepted."), 
+                                                                              false,
                                                                               new Choice("I &accept the conditions", "yes"), 
                                                                               new Choice("I do &not accept the conditions", "no")));
       QuestionPage backgroundPage = new QuestionPage("backgroundPage", 
@@ -100,6 +101,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with Java not defined."), 
+                                                                              false,
                                                                               new Choice("None", "None"), 
                                                                               new Choice("< 2 years", "Less than 2 years"), 
                                                                               new Choice(">= 2 years", "More than 2 years")),
@@ -108,6 +110,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with KeY not defined."), 
+                                                                              false,
                                                                               new Choice("None", "None"), 
                                                                               new Choice("< 2 years", "Less than 2 years"), 
                                                                               new Choice(">= 2 years", "More than 2 years")),
@@ -116,6 +119,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with SED not defined."), 
+                                                                              false,
                                                                               new Choice("None", "None"), 
                                                                               new Choice("< 1 year", "Less than 1 year"), 
                                                                               new Choice(">= 1 year", "More than 1 year")));
@@ -154,6 +158,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                  true,
                                                                  null, 
                                                                  new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
+                                                                 true,
                                                                  new Choice("Using the auto mode", "Using the auto mode"), 
                                                                  new Choice("Applying rules interactively", "Applying rules interactively"));
       String locationTitle = "Which not specified location(s) have changed?";
@@ -162,6 +167,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                true,
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), 
+                                                               true,
                                                                new Choice("self", "self"),
                                                                new Choice("self.value", "self.value"),
                                                                new Choice("summand", "summand"),
@@ -172,6 +178,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       true,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
+                                                                      true,
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.OutOfMemoryError", "java.lang.OutOfMemoryError"));
@@ -181,6 +188,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               true,
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
+                                                              true,
                                                               new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
                                                               new Choice("Precondition (summand != null) is not established", "Precondition not established"),
                                                               new Choice("Postcondition (value == \\old(value) + summand.value) does not hold", "Postcondition does not hold"),
@@ -192,6 +200,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    true,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
+                                                                   true,
                                                                    new Choice("Yes", "Yes"), 
                                                                    new Choice("No", "No", whyOpenQuestion));
       String executedTitle = "Was statement (value += summand.value) at line 9 executed during symbolic execution of the proof?";
@@ -200,6 +209,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                        true,
                                                                        null, 
                                                                        new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                                       true,
                                                                        new Choice("Yes", "Yes"),
                                                                        new Choice("No", "No"));
       return new QuestionPage(pageName, 
@@ -223,6 +233,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                  true,
                                                                  null, 
                                                                  new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
+                                                                 true,
                                                                  new Choice("Using the auto mode", "Using the auto mode"), 
                                                                  new Choice("Applying rules interactively", "Applying rules interactively"));
       String thrownExceptionTitle = "Which exception(s) are thrown?";
@@ -231,6 +242,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       true,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
+                                                                      true,
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException"),
@@ -242,6 +254,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               true,
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
+                                                              true,
                                                               new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
                                                               new Choice("Precondition (array != null) is not established", "Precondition not established"),
                                                               new Choice("Postcondition (array == null || array.length == 0 ==> \\result == -1) does not hold", "Not found postcondition does not hold", createMinTerminationQuestion("postNotFoundTermination")),
@@ -262,6 +275,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    true,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
+                                                                   true,
                                                                    new Choice("Yes", "Yes"), 
                                                                    new Choice("No", "No", whyOpenQuestion));
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
@@ -270,6 +284,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                true,
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
                                                                new Choice("None of the statements was executed", "None"),
                                                                new Choice("Line 8 (if (array != null))", "Line 8"),
                                                                new Choice("Line 9 (if (array.length == 0))", "Line 9"),
@@ -305,6 +320,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   true,
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  true,
                                   new Choice("array", "array"),
                                   new Choice("array.length", "array.length"),
                                   new Choice("array[0]", "array[0]"),
@@ -320,6 +336,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   true,
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  true,
                                   new Choice("Return 1 (array != null & array.length == 0)", "Return 1"),
                                   new Choice("Return 2 (array != null & array.length == 1)", "Return 2"),
                                   new Choice("Return 3 (array != null & array.length > 1)", "Return 3"),
@@ -335,6 +352,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                  true,
                                                                  null, 
                                                                  new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
+                                                                 true,
                                                                  new Choice("Using the auto mode", "Using the auto mode"), 
                                                                  new Choice("Applying rules interactively", "Applying rules interactively"));
       String thrownExceptionTitle = "Which exception(s) are thrown?";
@@ -343,6 +361,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       true,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
+                                                                      true,
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException"),
@@ -354,6 +373,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               true,
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
+                                                              true,
                                                               new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
                                                               new Choice("Precondition (entry != null) is not established", "Precondition not established"),
                                                               new Choice("Invariant (entrySize >= 0 && entrySize < entries.length) is not established", "Invariant not established"),
@@ -374,6 +394,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    true,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
+                                                                   true,
                                                                    new Choice("Yes", "Yes"), 
                                                                    new Choice("No", "No", whyOpenQuestion));
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
@@ -382,6 +403,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                true,
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
                                                                new Choice("Line 14 (if (entrySize == entries.length))", "Line 14"),
                                                                new Choice("Line 15 (Entry[] newEntries = new Entry[entries.length * 2])", "Line 15"),
                                                                new Choice("Line 22 (int i = 0)", "Line 22 initial"),
@@ -412,6 +434,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   true,
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  true,
                                   new Choice("None of the statements was executed", "None"),
                                   new Choice("entries", "entries"),
                                   new Choice("entries[entrySize]", "entries[entrySize]"),
@@ -436,6 +459,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                  true,
                                                                  null, 
                                                                  new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
+                                                                 true,
                                                                  new Choice("Using the auto mode", "Using the auto mode"), 
                                                                  new Choice("Applying rules interactively", "Applying rules interactively"));
       String thrownExceptionTitle = "Which exception(s) are thrown?";
@@ -444,6 +468,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       true,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
+                                                                      true,
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException"),
@@ -457,6 +482,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               true,
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
+                                                              true,
                                                               new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
                                                               new Choice("Precondition (amount > 0) of checkAndWithdraw(int) is not established", "checkAndWithdraw: Precondition not established ("),
                                                               new Choice("Postcondition (balance == \\old(balance) - \\result) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about balance does not hold"),
@@ -482,6 +508,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    true,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
+                                                                   true,
                                                                    new Choice("Yes", "Yes"), 
                                                                    new Choice("No", "No", whyOpenQuestion));
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
@@ -490,6 +517,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                true,
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
                                                                new Choice("Line 10 (if (canWithdraw(amount)))", "Line 10"),
                                                                new Choice("Line 11 (withdraw(amount))", "Line 11"),
                                                                new Choice("Line 12 (return amount)", "Line 12"),
@@ -503,6 +531,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                true,
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + contractsTitle + "' not answered."), 
+                                                               true,
                                                                new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
                                                                new Choice("Contract of method withdraw(int)", "withdraw"),
                                                                new Choice("Contract of method canWithdraw(int)", "canWithdraw"),
@@ -530,6 +559,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   true,
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  true,
                                   new Choice("balance", "balance"),
                                   new Choice("amount", "amount"));
    }

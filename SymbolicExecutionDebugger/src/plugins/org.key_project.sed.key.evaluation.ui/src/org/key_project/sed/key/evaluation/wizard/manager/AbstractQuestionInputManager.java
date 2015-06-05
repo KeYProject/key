@@ -2,7 +2,7 @@ package org.key_project.sed.key.evaluation.wizard.manager;
 
 public abstract class AbstractQuestionInputManager implements IQuestionInputManager {
    private boolean enabled = true;
-
+   
    @Override
    public boolean isEnabled() {
       return enabled;

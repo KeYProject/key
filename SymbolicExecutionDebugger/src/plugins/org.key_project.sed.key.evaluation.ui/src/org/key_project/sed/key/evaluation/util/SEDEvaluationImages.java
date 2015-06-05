@@ -37,7 +37,17 @@ public final class SEDEvaluationImages {
     /**
      * The key for the image that is used for method calls.
      */
-    public static final String EVALUATION_WIZARD = "org.key_project.sed.ui.images.methodCall";
+    public static final String EVALUATION_WIZARD = "org.key_project.sed.ui.images.methodCall.evaluationWizard";
+    
+    /**
+     * The key for the emoticon fantasy dreaming.
+     */
+    public static final String EMOTICON_FANTASY_DREAMING = "org.key_project.sed.ui.images.methodCall.emoticonFantasyDreaming";
+
+    /**
+     * The key for the emoticon omg.
+     */
+    public static final String EMOTICON_OMG = "org.key_project.sed.ui.images.methodCall.emoticonOmg";
     
     /**
      * Forbid instances.
@@ -101,6 +111,12 @@ public final class SEDEvaluationImages {
         String path = null;
         if (EVALUATION_WIZARD.equals(key)) {
            path = "icons/evaluation_wizard.png";
+        }
+        else if (EMOTICON_FANTASY_DREAMING.equals(key)) {
+           path = "icons/emoticons/fantasy_dreams.png";
+        }
+        else if (EMOTICON_OMG.equals(key)) {
+           path = "icons/emoticons/omg.png";
         }
         // Load image if possible
         if (path != null) {

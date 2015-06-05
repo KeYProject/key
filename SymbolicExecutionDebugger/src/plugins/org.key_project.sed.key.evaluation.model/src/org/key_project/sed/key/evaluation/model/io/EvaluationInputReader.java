@@ -218,6 +218,13 @@ public class EvaluationInputReader {
             questionInputStack.addFirst(questionInput);
             String questionValue = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_VALUE);
             questionInput.setValue(questionValue);
+            String questionTrust = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_TRUST);
+            if (!StringUtil.isEmpty(questionTrust)) {
+               questionInput.setTrust(Boolean.valueOf(questionTrust));
+            }
+            else {
+               questionInput.setTrust(null);
+            }
          }
          else if (EvaluationInputWriter.TAG_RANDOM_PAGE_ORDER.equals(qName)) {
             parsingPageOrder = true;

@@ -79,6 +79,11 @@ public class EvaluationInputWriter {
    public static final String ATTRIBUTE_QUESTION_VALUE = "value";
 
    /**
+    * Attribute name to store {@link QuestionInput#getTrust()}.
+    */
+   public static final String ATTRIBUTE_QUESTION_TRUST = "trust";
+
+   /**
     * Tag name to store {@link RandomFormInput#getPageOrder()}.
     */
    public static final String TAG_RANDOM_PAGE_ORDER = "pageOrder";
@@ -253,6 +258,9 @@ public class EvaluationInputWriter {
          Map<String, String> questionAttributes = new LinkedHashMap<String, String>();
          questionAttributes.put(ATTRIBUTE_QUESTION_NAME, XMLUtil.encodeText(questionInput.getQuestion().getName()));
          questionAttributes.put(ATTRIBUTE_QUESTION_VALUE, XMLUtil.encodeText(questionInput.getValue()));
+         if (questionInput.getTrust() != null) {
+            questionAttributes.put(ATTRIBUTE_QUESTION_TRUST, questionInput.getTrust().toString());
+         }
          if (questionInput.hasChoiceInputs()) {
             XMLUtil.appendStartTag(level, TAG_QUESTION, questionAttributes, sb);
             for (Choice choice : questionInput.getChoices()) {

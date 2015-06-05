@@ -3,8 +3,10 @@ package org.key_project.sed.key.evaluation.wizard.page;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -32,12 +34,14 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPageInput> {
    private final List<IDisposable> controls = new LinkedList<IDisposable>();
    
-   private final PropertyChangeListener valueListener = new PropertyChangeListener() {
+   private final PropertyChangeListener valueAndTrustListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-         handleValueChange(evt);
+         handleValueOrTrustChange(evt);
       }
    };
+   
+   private final Set<QuestionInput> observedInputs = new HashSet<QuestionInput>();
 
    public QuestionWizardPage(QuestionPageInput pageInput) {
       super(pageInput);
@@ -45,8 +49,9 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
 
    @Override
    public void dispose() {
-      for (QuestionInput questionInput : getPageInput().getQuestionInputs()) {
-         questionInput.removePropertyChangeListener(QuestionInput.PROP_VALUE, valueListener);
+      for (QuestionInput questionInput : observedInputs) {
+         questionInput.removePropertyChangeListener(QuestionInput.PROP_VALUE, valueAndTrustListener);
+         questionInput.removePropertyChangeListener(QuestionInput.PROP_TRUST, valueAndTrustListener);
       }
       for (IDisposable control : controls) {
          control.dispose();
@@ -59,7 +64,9 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       ICreateControlCallback callBack = new ICreateControlCallback() {
          @Override
          public void handleQuestionInput(QuestionInput questionInput) {
-            questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, valueListener);
+            questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, valueAndTrustListener);
+            questionInput.addPropertyChangeListener(QuestionInput.PROP_TRUST, valueAndTrustListener);
+            observedInputs.add(questionInput);
          }
       };
       List<IQuestionInputManager> managers = createQuestionControls(toolkit, 
@@ -119,7 +126,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       public void handleQuestionInput(QuestionInput questionInput);
    }
 
-   protected void handleValueChange(PropertyChangeEvent evt) {
+   protected void handleValueOrTrustChange(PropertyChangeEvent evt) {
       updatePageCompleted();
    }
    

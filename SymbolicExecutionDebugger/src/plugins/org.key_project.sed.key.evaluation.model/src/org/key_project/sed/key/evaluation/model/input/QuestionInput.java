@@ -21,11 +21,20 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 public class QuestionInput extends Bean {
    public static final String PROP_VALUE = "value";
    
+   public static final String PROP_TRUST = "trust";
+   
    private final AbstractQuestion question;
    
    private final Map<Choice, List<QuestionInput>> choiceInputs;
    
    private String value;
+   
+   /**
+    * {@code Boolean#TRUE} if the user believes the value is right,
+    * {@code Boolean#FALSE} if the user believes the value is wrong,
+    * {@code null} if not yet defined. 
+    */
+   private Boolean trust;
 
    public QuestionInput(AbstractQuestion question) {
       this.question = question;
@@ -106,9 +115,24 @@ public class QuestionInput extends Bean {
       firePropertyChange(PROP_VALUE, oldValue, getValue());
    }
    
+   public Boolean getTrust() {
+      return trust;
+   }
+
+   public void setTrust(Boolean trust) {
+      Boolean oldValue = getTrust();
+      this.trust = trust;
+      firePropertyChange(PROP_TRUST, oldValue, getTrust());
+   }
+
    public String validate() {
       // Validate input
       String errorMessage = question.validate(getValue());
+      if (errorMessage == null && question.isAskForTrust()) {
+         if (getTrust() == null) {
+            errorMessage = "Trust into answer of question '" + question.getLabel() + "' is not defined.";
+         }
+      }
       // Validate child inputs
       if (errorMessage == null && hasChoiceInputs()) {
          Choice[] selectedChoices = getSelectedChoices();

@@ -43,6 +43,8 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
    
    private Section questionSection;
    
+   private TrustManager trustManager;
+   
    public AbstractButtonsManager(FormToolkit toolkit, 
                                  Composite parent, 
                                  QuestionInput questionInput, 
@@ -61,8 +63,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
    
    protected void createwithChildQuestionControls(FormToolkit toolkit, Q question, ICreateControlCallback callback) {
       composite.setLayout(new GridLayout(1, false));
-      questionSection = toolkit.createSection(composite, SWT.NONE);
-      questionSection.setText(question.getLabel());
+      createSection(toolkit, composite, question);
       for (final Choice choice : question.getChoices()) {
          createChoiceControl(toolkit, choice, question);
          QuestionInput[] choiceInputs = questionInput.getChoiceInputs(choice);
@@ -82,6 +83,16 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       updateChoiceChildrenEnabled();
    }
    
+   protected void createSection(FormToolkit toolkit, Composite parent, Q question) {
+      Composite sectionComposite = toolkit.createComposite(parent);
+      sectionComposite.setLayout(new GridLayout(3, false));
+      questionSection = toolkit.createSection(sectionComposite, SWT.NONE);
+      questionSection.setText(question.getLabel());
+      if (question.isAskForTrust()) {
+         trustManager = new TrustManager(sectionComposite, questionInput);
+      }
+   }
+   
    protected void createNoChildQuestionControls(FormToolkit toolkit, Q question) {
       if (question.getLabel() != null) {
          if (question.isVertical()) {
@@ -90,8 +101,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          else {
             composite.setLayout(new GridLayout(question.countChoices() + 1, false));
          }
-         questionSection = toolkit.createSection(composite, SWT.NONE);
-         questionSection.setText(question.getLabel());
+         createSection(toolkit, composite, question);
       }
       else {
          if (question.isVertical()) {
@@ -154,6 +164,9 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
             manager.dispose();
          }
       }
+      if (trustManager != null) {
+         trustManager.dispose();
+      }
    }
 
    public Composite getComposite() {
@@ -167,6 +180,9 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       }
       for (Button button : buttons) {
          button.setEnabled(enabled);
+      }
+      if (trustManager != null) {
+         trustManager.setEnabled(enabled);
       }
       updateChoiceChildrenEnabled();
    }

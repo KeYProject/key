@@ -162,9 +162,11 @@ public class FormInputWriterAndReaderTest extends TestCase {
             // Change question 1
             QuestionInput radioInput = pageInput.getQuestionInputs()[1];
             radioInput.setValue("This is not a valid radio button value!");
+            radioInput.setTrust(Boolean.TRUE);
             // Change yes sub question
             QuestionInput childInput = radioInput.getChoiceInputs(radioInput.getChoices()[0])[0];
             childInput.setValue("two");
+            childInput.setTrust(Boolean.FALSE);
          }         
       };
    }
@@ -402,6 +404,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
          assertNotSame(expected, actual);
          assertEquals(expected.getQuestion(), actual.getQuestion());
          assertEquals(expected.getValue(), actual.getValue());
+         assertEquals(expected.getTrust(), actual.getTrust());
          assertEquals(expected.hasChoiceInputs(), actual.hasChoiceInputs());
          if (expected.hasChoiceInputs()) {
             for (Choice choice : expected.getChoices()) {
