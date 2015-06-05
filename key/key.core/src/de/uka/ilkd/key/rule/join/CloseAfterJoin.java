@@ -96,8 +96,6 @@ public class CloseAfterJoin implements BuiltInRule {
         final Goal linkedGoal = jpNewGoals.head();
         linkedGoal.setBranchLabel("Joined with node "
                 + closeApp.getCorrespondingJoinNode().parent().serialNr());
-        // Workaround: Disable linked goal to prevent strategies
-        // from automatically working further on it.
         linkedGoal.setLinkedGoal(goal);
 
         // Add a listener to close this node if the associated join
@@ -147,10 +145,10 @@ public class CloseAfterJoin implements BuiltInRule {
 
         });
 
-        Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
+        final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
         ruleIsWeakeningGoal.setBranchLabel(JOINED_NODE_IS_WEAKENING_TITLE);
 
-        Term isWeakeningForm = getSyntacticWeakeningFormula(services, closeApp);
+        final Term isWeakeningForm = getSyntacticWeakeningFormula(services, closeApp);
         // Delete previous sequents
         clearSemisequent(ruleIsWeakeningGoal, true);
         clearSemisequent(ruleIsWeakeningGoal, false);
