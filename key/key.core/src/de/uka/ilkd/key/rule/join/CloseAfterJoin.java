@@ -140,6 +140,8 @@ public class CloseAfterJoin implements BuiltInRule {
                     // The joined node has been pruned; now mark this node
                     // as not linked and set it to automatic again.
                     linkedGoal.setLinkedGoal(null);
+                    
+                    e.getSource().removeProofTreeListener(this);
                 }
             }
 
