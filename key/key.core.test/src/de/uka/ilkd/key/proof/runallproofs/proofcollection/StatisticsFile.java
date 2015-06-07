@@ -7,11 +7,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 
 /**
  * Class for managing a file which contains statistics recorded during a
@@ -225,14 +230,34 @@ public class StatisticsFile implements Serializable {
             }
          }
 
-         // write line of sums into statistics file
-         List<String> entries = new LinkedList<>();
+         /*
+          * Append line of sums to statistics file.
+          */
+         List<String> sums = new LinkedList<>();
          int i = 0;
          for (Column<?> column : columns) {
-            entries.add(column.computeSum(lists[i]));
+            sums.add(column.computeSum(lists[i]));
             i++;
          }
-         writeLine(entries);
+         writeLine(sums);
+
+         /*
+          * Create *.sum.properties files for Jenkins.
+          */
+         File statisticsDir = location.getParentFile();
+         for (i = 1 /* Omit first column. */; i < columns.length; i++) {
+            Path propertiesFile = new File(statisticsDir, columns[i].name
+                  + ".sum.properties").toPath();
+            String jobName = System.getenv("JOB_NAME");
+            if (jobName != null) {
+               String[] lines = new String[] {
+                     "YVALUE=" + sums.get(i),
+                     "URL=http://hudson.se.informatik.tu-darmstadt.de/userContent/statistics-"
+                           + jobName };
+               Files.write(propertiesFile, Arrays.asList(lines),
+                     Charset.defaultCharset());
+            }
+         }
       }
    }
 
