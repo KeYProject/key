@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
-import org.key_project.key4eclipse.common.ui.testGeneration.ProofGenerateTestsJob;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -102,7 +101,6 @@ public class ProofRunnable implements Runnable {
                   if(KeYProjectProperties.isGenerateTestCases(pe.getProofFile().getProject()) && SolverType.Z3_CE_SOLVER.isInstalled(true)){
                      generateTestCases(proof);
                   }
-                  //TODO When and how to dispose the proof now?
                   proof.dispose();
                }
             }

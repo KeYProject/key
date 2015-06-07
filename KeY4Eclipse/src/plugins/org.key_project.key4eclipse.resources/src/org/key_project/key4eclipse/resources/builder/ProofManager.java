@@ -930,16 +930,6 @@ public class ProofManager {
    /**
     * Restores the old marker of the proof if the proof is no longer part of a cycle.
     */
-   private KeYJavaType getkeYJavaType(KeYEnvironment<DefaultUserInterfaceControl> env, String type){
-      Set<KeYJavaType> envKjts = env.getServices().getJavaInfo().getAllKeYJavaTypes();
-      for(KeYJavaType kjt : envKjts){
-         if(type.equals(kjt.getFullName())){
-            return kjt;
-         }
-      }
-      return null;
-   }
-   
    private void restoreOldMarkerForRemovedCycles() {
       for(ProofElement pe : proofElements){
          if(pe.getProofMarker() == null && (pe.getRecursionMarker() == null || pe.getRecursionMarker().isEmpty())){

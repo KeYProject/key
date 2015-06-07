@@ -87,7 +87,6 @@ public class KeYResourceExampleNewWizard extends KeYProjectWizard {
             IResource sourceDirectory = getSourceDirectory();
             // Check if a source code directory was found
             if (sourceDirectory instanceof IContainer) {
-               waitBuild();
                done = createExampleContent((IContainer)sourceDirectory);
             }
          }
@@ -96,35 +95,6 @@ public class KeYResourceExampleNewWizard extends KeYProjectWizard {
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
          return false;
-      }
-   }
-   
-   //TODO refactor out
-   public static void waitBuild() {
-      IJobManager manager = Job.getJobManager();
-      // Wait for jobs and builds.
-      Job[] keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
-      Job[] buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
-      while (!ArrayUtil.isEmpty(keyJobs) || !ArrayUtil.isEmpty(buildJobs)) {
-         // Sleep some time but allow the UI to do its tasks
-         if (Display.getDefault().getThread() == Thread.currentThread()) {
-            int i = 0;
-            while (Display.getDefault().readAndDispatch() && i < 1000) {
-               i++;
-            }
-         }
-         else {
-            try {
-               Thread.sleep(100);
-            }
-            catch (InterruptedException e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-            }
-         }
-         // Check if jobs are still running
-         keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
-         buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
       }
    }
 

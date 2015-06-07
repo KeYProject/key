@@ -31,7 +31,7 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    @Test
    public void testInvalidXMLFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testInvalidXMLFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testInvalidXMLFile", true, false, true, false, 1, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testInvalidXMLFile/File");
       project.close(null);
    }
@@ -39,7 +39,7 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    @Test
    public void testNoMD5InMetaFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNoMD5InMetaFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNoMD5InMetaFile", true, false, true, false, 1, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testNoMD5InMetaFile/File");
       project.close(null);
    }
@@ -47,14 +47,14 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    @Test
    public void testMoreThenOneMD5InMetaFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testMoreThenOneMD5InMetaFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testMoreThenOneMD5InMetaFile", true, false, true, false, 1, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testMoreThenOneMD5InMetaFile/File");
       project.close(null);
    }
    
    @Test
    public void testNotATypeNodeInMetaFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNotATypeNodeInMetaFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNotATypeNodeInMetaFile", true, false, true, false, 1, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testNotATypeNodeInMetaFile/File");
       project.close(null);
    }
@@ -62,7 +62,7 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    @Test
    public void testNotASubTypeNodeInMetaFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNotASubTypeNodeInMetaFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNotASubTypeNodeInMetaFile", true, false, true, false, 1, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testNotASubTypeNodeInMetaFile/File");
       project.close(null);
    }
