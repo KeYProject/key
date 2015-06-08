@@ -1,8 +1,196 @@
 <html>
    <head>
       <title>KeY</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
    </head>
    <body>
       <h1>KeY</h1>
+      <p>
+         KeY is a semi-automatic verification tool which allows to prove the correctness of sequential Java programs specified with JML.
+      </p>
+      <p>
+         The relevant knowledge for this evaluation about KeY is explained in the following sections.
+         <b>Please read them carefully before you continue.</b>
+         <ul>
+            <li><a href="#proving">1 Proving with KeY</a></li>
+            <li>
+               <a href="#javaDL">2 Java Dynamic Logic</a>
+               <ul>
+                  <li><a href="#sequent">2.1 Sequent</a></li>
+                  <li><a href="#modalities">2.2 Modalities</a></li>
+                  <li><a href="#updates">2.3 Updates</a></li>
+                  <li><a href="#heap">2.4 Heap Updates</a></li>
+                  <li><a href="#po">2.5 Proof Obligation</a></li>
+               </ul>
+            </li>
+            <li>
+               <a href="#ui">3 KeY's User Interface</a>
+               <ul>
+                  <li><a href="#goals">3.1 Jump to a Goal</a></li>
+                  <li><a href="#hide">3.2 Hide intermediate Proofsteps</a></li>
+                  <li><a href="#search_sequent">3.3 Search in Sequent</a></li>
+                  <li><a href="#search_node">3.4 Search in Proof Tree</a></li>
+               </ul>
+            </li>
+            <li><a href="#best">4 Best Practices to understand a Proof Attempt</a></li>
+         </ul>
+      </p>
+
+      <h2><a name="proving">1 Proving with KeY</a></h2>
+      <p>
+         KeY represents the Java program to execute and the JML specification to show in a <i>sequent</i> of <i>Java Dynamic Logic</i>.
+         During prove, syntactical rewrite rules are applied on a sequent or a contained term resulting in one or more child sequents.
+         This forms a so called <i>proof tree</i>. The leafs of the proof tree on which no rule are applied yet are called <i>goals</i>.
+         A proof is successful, if all leafs of the proof tree evaluate to true. A successful proof is called <i>closed</i>.
+      </p>
+      <p>
+         Rules can be applied interactively or automatically using a strategy based on heuristics. 
+         In many cases is the strategy powerful enough to close a proof automatically.
+         A remaining open proof can be caused by the following reasons:
+         <ul>
+           <li>The analyzed source code is buggy which caused a state in which the Java program does not fulfill its specification.</li>
+           <li>
+              The strategy was stopped to early or is not powerful enough to close the proof automatically. 
+              In this case it is possible to close the proof interactively.
+           </li>
+         </ul>
+      </p>
+      
+      <h2><a name="javaDL">2 Java Dynamic Logic</a></h2>
+      The following sub sections give a short introduction into Java Dynamic Logic.
+      
+      <h3><a name="sequent">2.1 Sequent</a></h3>
+      <p>
+         A sequent in Java Dynamic Logic consists of first order formulas. The general shape is:
+         <code>
+         <pre>
+formula_1, 
+..., 
+formula_n 
+==> 
+formula_n+1, 
+..., 
+formula_m
+         </pre>
+         </code>
+         The left side of the implication <code>==></code> is named <i>antecedent</i> and the right side <i>succedent</i>. 
+         Formulas in the antecedent are connected by conjunction (<code>,</code> means <code>&</code>) while succedent formulas are connected by disjunction (<code>,</code> means <code>|</code>).
+         Thus the sequent can be read as "Assuming <code>formula_1</code> to <code>formula_n</code> hold, at least one of the formula <code>formula_n+1</code> to <code>formula_m</code> has to hold".
+      </p>
+      
+      <h3><a name="modalities">2.2 Modalities</a></h3>
+      <p>
+         Within a sequent, the Java program to execute is contained in a diamond or box modality.
+         A diamond modality <code>\&lt;javaProgram\&gt; postcondition</code> evaluates to true, if the java program terminates in a state which fulfills the postcondition.
+         The box modality <code>\[javaProgram\] postcondition</code> evaluates additionally to true, if the java program never terminates or terminates with a thrown exception.
+      </p>
+      
+      <h3><a name="updates">2.3 Updates</a></h3>
+      <p>
+         Rules applied on a modality symbolically execute the first active Java statement.
+         Resulting state changes are represented by so called updates of the form <code>{variable_1 := value_1 || ... || variable_n := value_n} formula</code>. 
+         The meaning is that the formula is evaluated in a state where each variable has the specified value.
+      </p>
+      
+      <h3><a name="heap">2.4 Heap Updates</a></h3>
+      <p>
+         The heap containing Java objects is represented in a sequent by a variable named <code>heap</code>. 
+         Modifications on the heap in the form of created objects or changed instance fields are listed in square brackets and applied in order.
+         Consider for instance the following update:
+         <code>
+            <pre>
+{heapAtPre:=heap || heap:=heap[create(newObj)] 
+                              [newObj.intField := 42]}
+            </pre>
+         </code>
+         The update creates a new object <code>newObj</code> in the right part on the heap and sets than its instance field <code>intField</code> to <code>42</code>.
+         The left side stores the initial state of the heap (before <code>newObj</code> is created) in variable <code>heapAtPre</code>.
+      </p>
+      <p>
+         The meaning of the <code>anon(locations, anotherHeap)</code> function is that fresh symbolic values nothing is known about are assigned to all specified locations.
+         Technically, the locations are assigned with the value the location has in <code>anotherHeap</code> which is in this evaluation always a fresh heap nothing is known about.
+      </p>
+      <p>
+         Field accesses within formulas either specify the target heap or target the heap named <code>heap</code> otherwise. 
+         The following formula for instance says that in the state specified by the update the value of <code>intField</code> 
+         in heap <code>heapAtPre</code> is the same as on the default heap <code>heap</code>.
+         <code>
+            <pre>
+{heapAtPre:=heap} 
+  (obj.intField@heapAtPre = obj.intField);
+            </pre>
+         </code>
+      </p>
+      
+      <h3><a name="po">2.5 Proof Obligation</a></h3>
+      <p>
+         In this evaluation, the initial sequent (root of the proof tree) has always the following shape:
+         <code>
+            <pre>
+==>
+   assumptionsAboutJava & precondition;
+-> {updateToStoreCallState} \<{javaProgramToExecut}\> (postcondition)
+            </pre>
+         </code>
+         It can be read as: "Assuming a valid Java state and the specified preconditions, after termination of the Java program to execute the postcondition has to hold."
+         The update is used to store the initial state before execution started.
+      </p>
+      
+      <h2><a name="ui">3 KeY's User Interface</a></h2>
+      <p>
+         KeY is launched in a separate shell and is not integrated in Eclipse. The user interface is separated into three parts:
+         <ul>
+            <li><i>Proofs</i> shows the currently available proofs.</li>
+            <li>Tab <i>Proof</i> shows the proof tree and allows to switch between proof nodes.</li>
+            <li><i>Current Goal</i> shows the sequent of the selected proof node.</li>
+         </ul>
+      </p>
+      <img src="KeY/KeY_UI.png" />
+
+      <h3><a name="goals">3.1 Jump to a Goal</a></h3>
+      <p>
+         You can easily switch to goals by:
+         <ol>
+            <li>Selecting tab <i>Goals</i></li>
+            <li>Selecting the goal of interest</li>
+            <li>Optionally, selecting tab <i>Proof</i></li>
+         </ol>
+      </p>
+      <img src="KeY/KeY_Goal.png" />
+      
+      <h3><a name="hide">3.2 Hide intermediate Proofsteps</a></h3>
+      <p>
+         You can hide intermediate proofsteps via context menu item 'Hide intermediate Proofsteps'.
+      </p>
+      <img src="KeY/KeY_Intermediate.png" />
+      
+      <h3><a name="search_sequent">3.3 Search in Sequent</a></h3>
+      <p>
+         You can search a text in the current Sequent by pressing <i>Ctrl+F</i> and by typing the text to search.
+      </p>
+      <img src="KeY/KeY_Search_Sequent.png" />
+      
+      <h3><a name="search_node">3.4 Search in Proof Tree</a></h3>
+      <p>
+         You can search a text in the proof tree by following the mentioned steps:
+         <ol>
+            <li>Press 'Ctrl+Shift+F'.</li>
+            <li>Type the text to search.</li>
+            <li>Use the green navigation Buttons to switch between matching nodes.</li>
+         </ol>
+      </p>
+      <img src="KeY/KeY_Search_Node.png" />
+
+
+      <h2><a name="best">4 Best Practices to understand a Proof Attempt</a></h3>
+      <ol>
+         <li>Focus on a goal</li>
+         <li>Inspect the parent nodes of the goal to understand
+             <ol>
+                <li>The followed execution path</li>
+                <li>The part of the postcondition which could be proven and are currently still open</li>
+             </ol>
+         </li>
+      </ol>
    </body>
 </html>
