@@ -335,7 +335,7 @@ public class IntermediateProofReplayer {
                             int i = 0;
                             Iterator<Node> children = currNode
                                     .childrenIterator();
-                            while (children.hasNext()) {
+                            while (children.hasNext() && currInterm.getChildren().size() > i) {
                                 Node child = children.next();
                                 queue.addLast(new Pair<Node, NodeIntermediate>(
                                         child, currInterm.getChildren()
