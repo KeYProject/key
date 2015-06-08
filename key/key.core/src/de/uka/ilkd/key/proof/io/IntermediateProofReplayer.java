@@ -207,7 +207,7 @@ public class IntermediateProofReplayer {
                             // check in the above conjunction.
 
                             Node child = children.next();
-                            queue.addLast(new Pair<Node, NodeIntermediate>(
+                            queue.addFirst(new Pair<Node, NodeIntermediate>(
                                     child, currInterm.getChildren().get(i++)));
                         }
                     }
@@ -239,14 +239,15 @@ public class IntermediateProofReplayer {
                         if (partnerNodesInfo == null
                                 || partnerNodesInfo.size() < joinAppInterm
                                         .getNrPartners()) {
-                            // Wait until all partners are found
+                            // Wait until all partners are found: Add node
+                            // at the end of the queue. NOTE: DO NOT CHANGE
+                            // THIS to adding the node to the front! This will
+                            // result in non-termination!
                             queue.addLast(new Pair<Node, NodeIntermediate>(
                                     currNode, currNodeInterm));
                         }
                         else {
                             try {
-                                // TODO: Check if this works with the
-                                // constructBuiltinApp method out-of-the-box
                                 JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) constructBuiltinApp(
                                         joinAppInterm, currGoal);
                                 joinApp.setConcreteRule(JoinProcedure
@@ -270,7 +271,7 @@ public class IntermediateProofReplayer {
                                 currGoal.apply(joinApp);
 
                                 // Join node has exactly one child
-                                queue.addLast(new Pair<Node, NodeIntermediate>(
+                                queue.addFirst(new Pair<Node, NodeIntermediate>(
                                         currNode.childrenIterator().next(),
                                         currInterm.getChildren().get(0)));
 
@@ -337,7 +338,7 @@ public class IntermediateProofReplayer {
                                     .childrenIterator();
                             while (children.hasNext() && currInterm.getChildren().size() > i) {
                                 Node child = children.next();
-                                queue.addLast(new Pair<Node, NodeIntermediate>(
+                                queue.addFirst(new Pair<Node, NodeIntermediate>(
                                         child, currInterm.getChildren()
                                                 .get(i++)));
                             }
