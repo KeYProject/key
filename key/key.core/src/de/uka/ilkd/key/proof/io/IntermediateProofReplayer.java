@@ -122,6 +122,7 @@ public class IntermediateProofReplayer {
      * the "skipBranch - 1" parent branch of the current branch is ignored. a
      * value == 0 means that no branch is ignored
      */
+    @SuppressWarnings("unused")
     private int skipBranch = 0;
     // TODO: Implement skipBranch feature.
     // TODO: Could be that this is not needed: If an exception occurs, the
@@ -142,10 +143,10 @@ public class IntermediateProofReplayer {
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
             IntermediatePresentationProofFileParser.Result parserResult) {
         this.proof = proof;
-        this.loader = loader; 
-        
-        queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(), parserResult
-                .getParsedResult()));
+        this.loader = loader;
+
+        queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(),
+                parserResult.getParsedResult()));
     }
 
     /**
@@ -194,22 +195,11 @@ public class IntermediateProofReplayer {
                     try {
                         currGoal.apply(constructTacletApp(appInterm, currGoal));
 
-                        int i = 0;
                         Iterator<Node> children = currNode.childrenIterator();
-                        while (!currGoal.node().isClosed()
-                                && children.hasNext()
-                                && currInterm.getChildren().size() > 0) {
+                        LinkedList<NodeIntermediate> intermChildren = currInterm
+                                .getChildren();
 
-                            // NOTE: In the case of an unfinished proof, there
-                            // is another node after the last application which
-                            // is not represented by an intermediate
-                            // application. Therefore, we have to add the last
-                            // check in the above conjunction.
-
-                            Node child = children.next();
-                            queue.addFirst(new Pair<Node, NodeIntermediate>(
-                                    child, currInterm.getChildren().get(i++)));
-                        }
+                        addChildren(children, intermChildren);
                     }
                     catch (Exception e) {
                         skipBranch = 1;
@@ -277,19 +267,12 @@ public class IntermediateProofReplayer {
 
                                 // Now add children of partner nodes
                                 for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
-                                    int i = 0;
                                     Iterator<Node> children = partnerNodeInfo.first
                                             .childrenIterator();
-                                    while (children.hasNext()) {
-                                        Node child = children.next();
-                                        if (!proof.getGoal(child).isLinked()) {
-                                            queue.addLast(new Pair<Node, NodeIntermediate>(
-                                                    child,
-                                                    partnerNodeInfo.third
-                                                            .getChildren().get(
-                                                                    i++)));
-                                        }
-                                    }
+                                    LinkedList<NodeIntermediate> intermChildren = partnerNodeInfo.third
+                                            .getChildren();
+
+                                    addChildren(children, intermChildren);
                                 }
                             }
                             catch (SkipSMTRuleException e) {
@@ -333,15 +316,12 @@ public class IntermediateProofReplayer {
                             }
                             currGoal.apply(app);
 
-                            int i = 0;
                             Iterator<Node> children = currNode
                                     .childrenIterator();
-                            while (children.hasNext() && currInterm.getChildren().size() > i) {
-                                Node child = children.next();
-                                queue.addFirst(new Pair<Node, NodeIntermediate>(
-                                        child, currInterm.getChildren()
-                                                .get(i++)));
-                            }
+                            LinkedList<NodeIntermediate> intermChildren = currInterm
+                                    .getChildren();
+
+                            addChildren(children, intermChildren);
                         }
                         catch (SkipSMTRuleException e) {
                             // silently continue; status will be reported via
@@ -375,8 +355,41 @@ public class IntermediateProofReplayer {
                 }
             }
         }
-        
+
         return new Result(status, errors, currGoal);
+    }
+
+    /**
+     * Adds the pairs of proof node children and intermediate children to the
+     * queue. At the moment, they are added in the order they were parsed. For
+     * the future, it may be sensible to choose a different procedure, for
+     * instance one that minimizes the number of open goals per time interval to
+     * save memory. Note that in this case, some test cases might be adapted
+     * which depend on fixed node serial numbers.
+     *
+     * @param children
+     *            Iterator of proof node children.
+     * @param intermChildren
+     *            List of corresponding intermediate children.
+     */
+    private void addChildren(Iterator<Node> children,
+            LinkedList<NodeIntermediate> intermChildren) {
+        int i = 0;
+        while (!currGoal.node().isClosed() && children.hasNext()
+                && intermChildren.size() > 0) {
+
+            // NOTE: In the case of an unfinished proof, there
+            // is another node after the last application which
+            // is not represented by an intermediate
+            // application. Therefore, we have to add the last
+            // check in the above conjunction.
+
+            Node child = children.next();
+            if (!proof.getGoal(child).isLinked()) {
+                queue.add(i, new Pair<Node, NodeIntermediate>(child,
+                        intermChildren.get(i++)));
+            }
+        }
     }
 
     /**
@@ -405,7 +418,8 @@ public class IntermediateProofReplayer {
      *            The goal on which to apply the taclet app.
      * @return The taclet application corresponding to the supplied intermediate
      *         representation.
-     * @throws TacletConstructionException In case of an error during construction.
+     * @throws TacletConstructionException
+     *             In case of an error during construction.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
             Goal currGoal) throws TacletConstructionException {
@@ -433,8 +447,10 @@ public class IntermediateProofReplayer {
                         currFormula, currPosInTerm);
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
-            } catch (Exception e) {
-                throw new TacletConstructionException("Wrong position information.");
+            }
+            catch (Exception e) {
+                throw new TacletConstructionException(
+                        "Wrong position information.");
             }
         }
 
@@ -575,7 +591,8 @@ public class IntermediateProofReplayer {
                         currFormula, currPosInTerm);
             }
             catch (RuntimeException e) {
-                throw new BuiltInConstructionException("Wrong position information.", e);
+                throw new BuiltInConstructionException(
+                        "Wrong position information.", e);
             }
         }
 
@@ -892,7 +909,7 @@ public class IntermediateProofReplayer {
         BuiltInConstructionException(Throwable cause) {
             super(cause);
         }
-        
+
         public BuiltInConstructionException(String s, Throwable cause) {
             super(s, cause);
         }
@@ -905,7 +922,7 @@ public class IntermediateProofReplayer {
     static class SkipSMTRuleException extends Exception {
         private static final long serialVersionUID = -2932282883810135168L;
     }
-    
+
     /**
      * Simple structure containing the results of the replay procedure.
      *
