@@ -35,26 +35,13 @@ post: (   i &lt; 0
               \then (TRUE)
               \else (FALSE)
       &amp; exc_6 = null)
-mod: \if (i &lt; 0 | !array = null &amp; i &gt;= 0)
-         \then (     \if (  i &lt; 0
-                          | !array = null
-                          &amp; i &gt;= 0)
-                         \then (     \if (  i &lt; 0
-                                          | !  array
-                                             = null
-                                          &amp; i &gt;= 0)
-                                         \then (     \if (    i
-                                                            &lt; 0
-                                                          | !  array
-                                                             = null
-                                                          &amp;    i
-                                                            &gt;= 0)
-                                                         \then (     \if (    i
-                                                                            &lt; 0
-                                                                          | !  array
-                                                                             = null
-                                                                          &amp;    i
-                                                                            &gt;= 0)
+mod: \if (i &lt; 0)
+         \then (     \if (i &lt; 0)
+                         \then (     \if (i &lt; 0)
+                                         \then (     \if (  i
+                                                          &lt; 0)
+                                                         \then (     \if (  i
+                                                                          &lt; 0)
                                                                          \then (allLocs)
                                                                          \else (allLocs)
                                                                 \cap \if (  !  array
@@ -166,26 +153,13 @@ post: (   i &lt; 0
               \then (TRUE)
               \else (FALSE)
       &amp; exc_7 = null)
-mod: \if (i &lt; 0 | !array = null &amp; i &gt;= 0)
-         \then (     \if (  i &lt; 0
-                          | !array = null
-                          &amp; i &gt;= 0)
-                         \then (     \if (  i &lt; 0
-                                          | !  array
-                                             = null
-                                          &amp; i &gt;= 0)
-                                         \then (     \if (    i
-                                                            &lt; 0
-                                                          | !  array
-                                                             = null
-                                                          &amp;    i
-                                                            &gt;= 0)
-                                                         \then (     \if (    i
-                                                                            &lt; 0
-                                                                          | !  array
-                                                                             = null
-                                                                          &amp;    i
-                                                                            &gt;= 0)
+mod: \if (i &lt; 0)
+         \then (     \if (i &lt; 0)
+                         \then (     \if (i &lt; 0)
+                                         \then (     \if (  i
+                                                          &lt; 0)
+                                                         \then (     \if (  i
+                                                                          &lt; 0)
                                                                          \then (allLocs)
                                                                          \else (allLocs)
                                                                 \cap \if (  !  array
