@@ -238,9 +238,6 @@ public final class MainWindow extends JFrame  {
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
-    /** for locking of threads waiting for the prover to exit */
-    public final Object monitor = new Object();
-
     private final NotificationManager notificationManager;
     
     private final PreferenceSaver prefSaver =

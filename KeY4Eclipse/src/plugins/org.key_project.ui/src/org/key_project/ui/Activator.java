@@ -2,9 +2,14 @@ package org.key_project.ui;
 
 import java.io.File;
 
+import javax.swing.SwingUtilities;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.ui.util.EclipseKeYDesktop;
 import org.key_project.ui.util.KeYExampleUtil;
+import org.key_project.util.java.SwingUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.osgi.framework.BundleContext;
 
 import de.uka.ilkd.key.core.Main;
@@ -69,10 +74,22 @@ public class Activator extends AbstractUIPlugin {
 		super.stop(context);
 	   // Close main window of KeY to store settings
 	   if (MainWindow.hasInstance()) {
-         MainWindow main = MainWindow.getInstance();
-         if (main.getExitMainAction() != null) {
-            main.getExitMainAction().exitMainWithoutInteraction();
-         }
+         final MainWindow main = MainWindow.getInstance();
+         if (main.getExitMainAction() != null) {             
+             IRunnableWithResult<Boolean> runnable = new AbstractRunnableWithResult<Boolean>() {
+                @Override
+                public void run() {
+                    // Closing the window causes a deadlock under OS X;
+                    // hence we just save the settings here (because eclipse will call System.exit later)
+                    main.getExitMainAction().saveSettings();                    
+                    setResult(Boolean.TRUE);
+                }
+            };
+            SwingUtil.invokeLater(runnable);
+            while (runnable.getResult()==null) {
+                Thread.sleep(10);
+            }
+         }            
 	   }
 	}
 
