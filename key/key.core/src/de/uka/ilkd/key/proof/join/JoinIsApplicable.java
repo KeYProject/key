@@ -29,7 +29,7 @@ public class JoinIsApplicable {
     private JoinIsApplicable() {/*It's a singleton*/}
     
     public List<ProspectivePartner> isApplicable(Goal goal ,PosInOccurrence pio){
-        if(pio == null || !pio.isTopLevel() || !pio.isInAntec()){
+        if(pio == null || !pio.isTopLevel() || pio.isInAntec()){
             return new LinkedList<ProspectivePartner>();
         }
         return computeProspecitvePartner(goal, pio);
