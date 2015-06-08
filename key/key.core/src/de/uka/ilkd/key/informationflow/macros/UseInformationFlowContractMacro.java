@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -60,6 +62,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULENAME_SET =
             asSet(ADMITTED_RULENAMES);
 
+    private static ImmutableSet<String> appliedInfFlowRules =
+            DefaultImmutableSet.<String>nil();
 
     /**
      * Gets the set of admitted rule names.
@@ -214,19 +218,31 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             // abort if
             //  - the parent.parent rule application is an information
             //    flow contract rule application,
-            //  - the parent rule application is an impLeft rule applicatoin
+            //  - the parent rule application is an impLeft rule application
             //    and
             //  - we are in the branch where we have to show the left hand side
             //    of the implication
             if (goal.node().parent() != null &&
                 goal.node().parent().parent() != null) {
                 Node parent = goal.node().parent();
-                return !(getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
-                         getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
-                         parent.child(0) == goal.node() ||
-                         getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME) &&
-                         getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
-                         parent.child(2) != goal.node());
+                final boolean approved =
+                        !(getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
+                                && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)
+                                && parent.child(0) == goal.node()
+                                || getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME)
+                                && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)
+                                && parent.child(2) != goal.node());
+                final String name = app.rule().name().toString();
+                if (approved && name.startsWith(INF_FLOW_RULENAME_PREFIX)) {
+                    if (appliedInfFlowRules.contains(name)) {
+                        return false;
+                    } else {
+                        appliedInfFlowRules = appliedInfFlowRules.add(name);
+                        return approved;
+                    }
+                } else {
+                    return approved;
+                }
             }
             return true;
         }
