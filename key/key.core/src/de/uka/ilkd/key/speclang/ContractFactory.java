@@ -484,22 +484,8 @@ public class ContractFactory {
                         mby = tb.ife(otherPre, otherMby, mby);
                     }
                 }
-                if(otherPre != null) {
-                    pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
-                }
-                if(otherPost != null) {
-                    final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
-                    posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
-                }
-                if(otherFreePost != null) {
-                    final Term oFreePost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
-                    freePosts.put(h, freePosts.get(h) == null ? oFreePost : tb.and(freePosts.get(h), oFreePost));
-                }
-                if(otherAxiom != null) {
-                    final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
-                    axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
-                }
-
+                
+                // the modifies clause must be computed before the preconditions
                 if (hasMod.get(h) || other.hasModifiesClause(h)) {
                     hasMod.put(h, true);
                     Term m1 = mods.get(h);
@@ -520,6 +506,24 @@ public class ContractFactory {
                         mods.put(h, nm);
                     }
                 }
+                
+                if(otherPre != null) {
+                    pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
+                }
+                if(otherPost != null) {
+                    final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
+                    posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
+                }
+                if(otherFreePost != null) {
+                    final Term oFreePost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
+                    freePosts.put(h, freePosts.get(h) == null ? oFreePost : tb.and(freePosts.get(h), oFreePost));
+                }
+                if(otherAxiom != null) {
+                    final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
+                    axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
+                }
+
+                
             }
 
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
