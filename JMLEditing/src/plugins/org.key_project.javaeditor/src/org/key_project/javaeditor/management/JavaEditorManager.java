@@ -18,7 +18,6 @@ import java.util.Arrays;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.eclipse.jdt.internal.ui.javaeditor.SemanticHighlightingManager;
@@ -30,6 +29,7 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -49,8 +49,7 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
-import org.key_project.javaeditor.outline.ExtendableCompilationUnitWrapper;
-import org.key_project.javaeditor.outline.IOutlineWrapper;
+import org.key_project.javaeditor.outline.OutlineContentProviderWrapper;
 import org.key_project.javaeditor.util.ExtendableConfigurationUtil;
 import org.key_project.javaeditor.util.LogUtil;
 import org.key_project.javaeditor.util.PreferenceUtil;
@@ -356,20 +355,15 @@ public final class JavaEditorManager {
       if (outlinePage instanceof JavaOutlinePage) {
          JavaOutlinePage joutline = (JavaOutlinePage) outlinePage;
          TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
-         Object input = outlineViewer.getInput();
-         if (input instanceof IOutlineWrapper) {
+         ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
+         if (contentProvider instanceof OutlineContentProviderWrapper) {
             if (!PreferenceUtil.isExtensionsEnabled()) { // Restore input if required
-               joutline.setInput(((IOutlineWrapper<?>) input).getWrappedObject());
+               outlineViewer.setContentProvider(((OutlineContentProviderWrapper) contentProvider).getOriginalProvider());
             }
          }
          else {
             if (PreferenceUtil.isExtensionsEnabled()) { // Change input if required
-               if (input instanceof ICompilationUnit) {
-                  joutline.setInput(new ExtendableCompilationUnitWrapper((ICompilationUnit)outlineViewer.getInput()));
-               }
-               else {
-                  throw new IllegalArgumentException("Original input '" + input + "' is not an ICompilationUnit.");
-               }
+               outlineViewer.setContentProvider(new OutlineContentProviderWrapper(contentProvider));
             }
          }
       }
