@@ -3,11 +3,14 @@ package org.key_project.javaeditor.outline;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IOpenable;
+import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.JavaModelException;
 
 /**
@@ -15,7 +18,7 @@ import org.eclipse.jdt.core.JavaModelException;
  * @author Martin Hentschel
  * @param <J> The type of the wrapped {@link IJavaElement}.
  */
-public class OutlineJavaElementWrapper<J extends IJavaElement> implements IJavaElement, IOutlineWrapper<J> {
+public class OutlineJavaElementWrapper<J extends IJavaElement> implements IJavaElement, ISourceReference, IOutlineWrapper<J> {
    /**
     * The wrapped {@link IJavaElement}.
     */
@@ -129,4 +132,23 @@ public class OutlineJavaElementWrapper<J extends IJavaElement> implements IJavaE
    public boolean isStructureKnown() throws JavaModelException {
       return wrappedObject.isStructureKnown();
    }
+
+   @Override
+   public String getSource() throws JavaModelException {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   @Override
+   public ISourceRange getSourceRange() throws JavaModelException {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   @Override
+   public ISourceRange getNameRange() throws JavaModelException {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
 }
