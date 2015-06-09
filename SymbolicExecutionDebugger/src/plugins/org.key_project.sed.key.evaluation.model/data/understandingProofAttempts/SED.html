@@ -1,8 +1,54 @@
 <html>
    <head>
       <title>SED</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
    </head>
    <body>
       <h1>SED</h1>
+      
+      
+      <h2><a name="set">1 Symbolic Execution</a></h2>
+      <p>
+         Symbolic execution allows to explore all feasible execution paths of a program at once.
+         This is achieved by using symbolic values in lieu of concrete values.
+         Whenever the knowledge about a symbolic value is not enough to follow a single execution path,
+         symbolic execution splits to cover all feasible execution paths.
+         This results in a so called <i>symbolic execution tree</i>
+      </p> 
+      <p>
+         Consider for instance the following Java program.
+         Method <code>equals</code> checks if the given <code>Number</code> instance has the same <code>content</code> as the current one.
+         <code>
+         <pre>
+public class Number {
+   private int content;
+
+   public boolean equals(Number n) {
+      if (content == n.content) {
+         return true;
+      }
+      else {
+         return false;
+      }
+   }
+}         
+         </pre>
+         </code>
+      </p>
+      <p>
+         The resulting symbolic execution tree of method <code>equals</code> is shown in the following.
+         The root is a <i>start</i> node representing the program fragment to execute.
+         As we are interested in method <code>equals</code>, it is called next represented by a <i>method call</i> node.
+         The if statement is supposed to split execution and thus represented as <i>branch statement</i>.
+         Here execution splits first in case that <code>n</code> is <code>null</code> or not and in latter case again in case that the <code>content</code> is identical or not.
+         The conditions under which a branch is taken are shown as <i>branch condition</i> nodes.
+         In case that <code>n</code> is <code>null</code>, the method returns with an uncaught <i>NullPointerException</i> indicated by the <i>exceptional method return</i> node.
+         Finally, this path terminates exceptionally shown by the <i>exceptional termination</i> node.
+         In case that <code>n</code> is not <code>null</code>, a return statement is executed. As this statement is not supposed to split execution, a <i>statement</i> node is used.
+         The <i>method return</i> nodes indicate that a called method is now returned and for non void methods the possible return values are shown as part of the node label.
+         Finally, a <i>termination</i> node indicate that an execution path terminates normally without an uncaught exception.
+      </p>      
+      <img src="SED/SED_SymbolicExecutionTree.png" />
+      
    </body>
 </html>
