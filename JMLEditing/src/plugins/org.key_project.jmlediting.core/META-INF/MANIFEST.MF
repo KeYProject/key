@@ -13,7 +13,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.javaeditor;bundle-version="1.0.0",
  org.eclipse.ltk.core.refactoring,
- org.eclipse.core.filebuffers
+ org.eclipse.core.filebuffers,
+ org.key_project.jmlediting.core,
+ org.key_project.jmlediting.core,
+ org.key_project.jmlediting.core,
+ org.key_project.jmlediting.core,
+ org.key_project.jmlediting.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
@@ -26,6 +31,6 @@ Export-Package: org.key_project.jmlediting.core.compilation,
  org.key_project.jmlediting.core.profile.syntax,
  org.key_project.jmlediting.core.profile.syntax.user,
  org.key_project.jmlediting.core.resolver,
+ org.key_project.jmlediting.core.typechecker,
  org.key_project.jmlediting.core.utilities,
  org.key_project.jmlediting.core.validation
-Import-Package: org.key_project.jmlediting.core.resolver
