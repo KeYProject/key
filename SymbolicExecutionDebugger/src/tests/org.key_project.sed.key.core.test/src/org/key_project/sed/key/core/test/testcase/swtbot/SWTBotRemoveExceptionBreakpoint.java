@@ -65,6 +65,7 @@ public class SWTBotRemoveExceptionBreakpoint extends AbstractKeYDebugTargetTestC
             Boolean.TRUE,
             Boolean.FALSE,
             Boolean.FALSE,
+            Boolean.TRUE,
             8, 
             executor);   
    } 

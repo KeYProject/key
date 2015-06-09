@@ -211,7 +211,8 @@ public class TestTermFactory extends TestCase {
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
-	assertTrue(exc instanceof TermCreationException );
+	assertTrue("Expected " + exc + " to be of type TermCreation but was: " + 
+	        (exc != null ? exc.getClass().getName() : "null"), exc instanceof TermCreationException );
     }    
     
 

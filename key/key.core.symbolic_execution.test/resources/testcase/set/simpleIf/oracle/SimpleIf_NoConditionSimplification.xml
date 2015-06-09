@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.min(i,j)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result;" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="if (i&lt;j)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="result_1=i;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of min&gt;" signature="&lt;return of self.min(i,j)&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))">
+                        <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+                  <completedBlockEntry path="/0/0/0" conditionString="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,TRUE))"/>
+               </statement>
+            </branchCondition>
+            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="result_1=j;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of min&gt;" signature="&lt;return of self.min(i,j)&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))">
+                        <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+                  <completedBlockEntry path="/0/0/0" conditionString="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(lt(i,j),TRUE,FALSE))),equals(x,FALSE))"/>
+               </statement>
+            </branchCondition>
+            <blockCompletionEntry path="/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/1/0"/>
+         </branchStatement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0/0"/>
+</start>

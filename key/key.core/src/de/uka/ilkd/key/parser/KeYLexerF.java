@@ -35,8 +35,8 @@ public class KeYLexerF extends KeYLexer {
         super(getStream(new ANTLRReaderStream(file), fileName));
     }
 
-    public KeYLexerF(String file, String fileName) {
-        super(getStream(new ANTLRStringStream(file), fileName));
+    public KeYLexerF(String formula, String fileName) {
+        super(getStream(new ANTLRStringStream(formula), fileName));
     }
 
     /*

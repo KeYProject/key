@@ -68,7 +68,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     protected final Goal goal;
 
     protected final TermLabelState termLabelState;
-    protected final Object labelHint;
+    protected final TacletLabelHint labelHint;
 
     /**
      * the stack contains the subterms that will be added in the next step of
@@ -84,12 +84,12 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     /**
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
-            Services services,
-            SVInstantiations svInst,
+            TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence,
-            Rule rule,                                     
-            Object labelHint,
-            Goal goal) {
+            SVInstantiations svInst,
+            Goal goal,                                     
+            Rule rule,
+            Services services) {
         this.termLabelState   = termLabelState;
         this.services         = services;
         this.svInst           = svInst;
@@ -107,15 +107,15 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Services services,
             PosInOccurrence applicationPosInOccurrence,
             Rule rule,
-            Object labelHint, 
+            TacletLabelHint labelHint, 
             Goal goal) {
         this(termLabelState,
-                services,
-                SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                applicationPosInOccurrence,
-                rule,          
                 labelHint,
-                goal);
+                applicationPosInOccurrence,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS,
+                goal,          
+                rule,
+                services);
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {

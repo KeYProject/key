@@ -118,7 +118,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private void renameProgramVariable(Term term) {
-        assert term.subs().isEmpty();
+        assert term.arity() == 0;
         final ProgramVariable pv = (ProgramVariable) term.op();
         final Name newName =
                 VariableNameProposer.DEFAULT.getNewName(services,
@@ -177,12 +177,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private Term[] renameSubs(Term term) {
-        Term[] renamedSubs = null;
-        if (term.subs() != null) {
-            renamedSubs = new Term[term.subs().size()];
-            for (int i = 0; i < renamedSubs.length; i++) {
-                renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i));
-            }
+        Term[] renamedSubs = new Term[term.arity()];
+        for (int i = 0; i < renamedSubs.length; i++) {
+            renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i));
         }
         return renamedSubs;
     }
@@ -210,13 +207,10 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
     private Term[] applyProgramRenamingsToSubs(Term term,
                                                Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
-        Term[] appliedSubs = null;
-        if (term.subs() != null) {
-            appliedSubs = new Term[term.subs().size()];
-            for (int i = 0; i < appliedSubs.length; i++) {
-                appliedSubs[i] = applyRenamingsToPrograms(term.sub(i),
-                                                          progVarReplaceMap);
-            }
+        Term[] appliedSubs = new Term[term.arity()];
+        for (int i = 0; i < appliedSubs.length; i++) {
+            appliedSubs[i] = applyRenamingsToPrograms(term.sub(i),
+                    progVarReplaceMap);
         }
         return appliedSubs;
     }

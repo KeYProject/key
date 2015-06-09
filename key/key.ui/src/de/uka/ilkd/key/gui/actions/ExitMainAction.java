@@ -68,6 +68,16 @@ public class ExitMainAction extends MainWindowAction {
            exitMainWithoutInteraction();
        }
    }
+   
+   
+    /**
+     * makes all GUI settings persistence; this method is also called by the Eclipse
+     * integration to store the settings   
+     */
+    public void saveSettings() {
+       mainWindow.savePreferences(mainWindow);
+       mainWindow.syncPreferences();
+    }
 
     /**
      * <p>
@@ -85,18 +95,13 @@ public class ExitMainAction extends MainWindowAction {
         getMediator().fireShutDown(new EventObject(this));
 
         System.out.println("Have a nice day.");
-        mainWindow.savePreferences(mainWindow);
-        mainWindow.syncPreferences();
+        saveSettings();
         if (exitSystem) {
             // TODO: why -1 and not 0 ???
            System.exit(-1);
         }
         else {
             mainWindow.setVisible(false);
-        }
-        // Release threads waiting for the prover to exit // TODO: After System.exist all Threads are killed, so the following code is never available.
-        synchronized (mainWindow.monitor) {
-            mainWindow.monitor.notifyAll();
         }
     }
 

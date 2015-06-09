@@ -243,16 +243,18 @@ public class SymbolicExecutionTreeBuilder {
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     */
    public SymbolicExecutionTreeBuilder(Proof proof,
                                        boolean mergeBranchConditions,
                                        boolean useUnicode,
                                        boolean usePrettyPrinting,
-                                       boolean variablesAreOnlyComputedFromUpdates) {
+                                       boolean variablesAreOnlyComputedFromUpdates,
+                                       boolean simplifyConditions) {
       assert proof != null;
       this.proof = proof;
       this.isUninterpretedPredicateUsed = AbstractOperationPO.getUninterpretedPredicate(getProof()) != null;
-      this.settings = new TreeSettings(mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
+      this.settings = new TreeSettings(mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
       this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(proof);
       this.startNode = new ExecutionStart(settings, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);

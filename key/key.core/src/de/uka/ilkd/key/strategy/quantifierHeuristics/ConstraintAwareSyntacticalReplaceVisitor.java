@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
+import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 
 
 /**
@@ -25,7 +26,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             TermLabelState termLabelState, Services services,
             Constraint metavariableInst,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            Object labelHint, Goal goal) {
+            TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, services,
                 applicationPosInOccurrence, rule, labelHint, goal);
         this.metavariableInst = metavariableInst;

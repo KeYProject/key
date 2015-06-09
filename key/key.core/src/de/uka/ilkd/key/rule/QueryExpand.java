@@ -157,7 +157,7 @@ public class QueryExpand implements BuiltInRule {
            //  LogicVariable logicResultQV = new LogicVariable(new Name("res_"+method.getName()),query.sort());
 
            KeYJavaType calleeType = services.getJavaInfo().getKeYJavaType(
-             query.subs().size() == 1 ? // static query
+             query.arity() == 1 ? // static query
                 query.sort()
                 :
                 query.sub(1).sort());

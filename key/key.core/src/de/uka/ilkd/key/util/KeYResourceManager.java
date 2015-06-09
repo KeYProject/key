@@ -28,10 +28,16 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class KeYResourceManager {
 
     private static final String DEFAULT_VERSION = "x.z.y";
+    private static final Set<String> INVISIBLE_BRANCHES =
+            Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(new String[]{"master"})));
 
     /** the unique instance */
     private static final KeYResourceManager instance 
@@ -39,6 +45,7 @@ public class KeYResourceManager {
 
     private String version = null;
     private String sha1 = null;
+    private String branch = null;
 
     private KeYResourceManager() {
     }
@@ -83,8 +90,7 @@ public class KeYResourceManager {
     }
 
     /**
-     * returns the SHA 1 git code from which this version has been 
-     * derived
+     * returns the SHA 1 git code from which this version has been derived
      * @return returns the SHA1 hash uniquely identifying the version
      */
     public String getSHA1() {
@@ -92,9 +98,29 @@ public class KeYResourceManager {
 	    return sha1;
 	}
 	sha1 = 
-	    readVersionString(getResourceFile(this, "sha1")); 
+	    readVersionString(getResourceFile(this, "sha1"));
 
 	return sha1;
+    }
+
+    /**
+     * returns the git branch from which this version has been derived
+     * @return returns the git branch partially identifying the version
+     */
+    public String getBranch() {
+        if (branch != null) {
+            return branch;
+        }
+        branch = readVersionString(getResourceFile(this, "branch"));
+
+        return branch;
+    }
+
+    public boolean visibleBranch() {
+        final String b = getBranch();
+        return !b.equals("")
+                && !INVISIBLE_BRANCHES.contains(b)
+                && !b.startsWith("KeY" + getVersion());
     }
 
     /**
@@ -224,6 +250,6 @@ public class KeYResourceManager {
      *         <code>UserInterfaces</code>
      */
     public String getUserInterfaceTitle() {
-	return "KeY " + this.getVersion();
+        return "KeY " + this.getVersion() + (visibleBranch() ? " [" + getBranch() + "]" : "");
     }
 }

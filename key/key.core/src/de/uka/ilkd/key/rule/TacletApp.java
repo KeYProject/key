@@ -1146,9 +1146,9 @@ public abstract class TacletApp implements RuleApp {
           return false;
        }
        final TacletApp s = (TacletApp) o;
-       return (s.taclet.equals(taclet) && s.instantiations.equals(
-             instantiations));// && (ifInstantiations == null ? s.ifInstantiations == null : 
-                //ifInstantiations.equals(s.ifInstantiations));
+       return (s.taclet.equals(taclet) && s.instantiations.equals(instantiations)) && 
+               (ifInstantiations == null ? s.ifInstantiations == null : 
+                ifInstantiations.equals(s.ifInstantiations));
     }
 
     public int hashCode() {

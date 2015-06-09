@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -65,6 +66,7 @@ public final class TestSEDKeyCoreUtil {
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
     * @param truthValueEvaluationEnabled Truth value evaluation enabled?
+    * @param simplifyConditions Simplify conditions?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IFile file,
@@ -73,7 +75,8 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
                                 final Boolean usePrettyPrinting,
-                                final Boolean truthValueEvaluationEnabled) throws Exception {
+                                final Boolean truthValueEvaluationEnabled,
+                                final Boolean simplifyConditions) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -90,7 +93,8 @@ public final class TestSEDKeyCoreUtil {
                                                   usePrettyPrinting, 
                                                   Boolean.FALSE, 
                                                   Boolean.FALSE,
-                                                  truthValueEvaluationEnabled);
+                                                  truthValueEvaluationEnabled,
+                                                  simplifyConditions);
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {
@@ -136,6 +140,7 @@ public final class TestSEDKeyCoreUtil {
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
     * @param truthValueEvaluationEnabled Truth value evaluation enabled?
+    * @param simplifyConditions Simplify conditions?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
@@ -149,7 +154,8 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean usePrettyPrinting,
                                 final Boolean showSignatureOnMethodReturnNodes,
                                 final Boolean higlightReachedSourceCode,
-                                final Boolean truthValueEvaluationEnabled) throws Exception {
+                                final Boolean truthValueEvaluationEnabled,
+                                final Boolean simplifyConditions) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -166,7 +172,8 @@ public final class TestSEDKeyCoreUtil {
                                                   usePrettyPrinting, 
                                                   showSignatureOnMethodReturnNodes, 
                                                   higlightReachedSourceCode,
-                                                  truthValueEvaluationEnabled);
+                                                  truthValueEvaluationEnabled,
+                                                  simplifyConditions);
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {
@@ -191,19 +198,57 @@ public final class TestSEDKeyCoreUtil {
                                                                    Boolean usePrettyPrinting,
                                                                    Boolean showSignatureOnMethodReturnNodes,
                                                                    Boolean higlightReachedSourceCode,
-                                                                   Boolean truthValueEvaluationEnabled) throws CoreException {
-      return KeySEDUtil.updateLaunchConfiguration(config, 
-                                                  useExistingContract, 
-                                                  preconditionOrExistingContract, 
-                                                  showMethodReturnValues, 
-                                                  showVariablesOfSelectedDebugNode, 
-                                                  showKeYMainWindow, 
-                                                  mergeBranchConditions, 
-                                                  useUnicode, 
-                                                  usePrettyPrinting, 
-                                                  showSignatureOnMethodReturnNodes, 
-                                                  higlightReachedSourceCode, 
-                                                  truthValueEvaluationEnabled);
+                                                                   Boolean truthValueEvaluationEnabled,
+                                                                   Boolean simplifyConditions) throws CoreException {
+      ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+      if (useExistingContract != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
+         if (preconditionOrExistingContract != null) {
+            if (useExistingContract) {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
+            }
+            else {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+            }
+         }
+      }
+      else {
+         if (preconditionOrExistingContract != null) {
+            wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+         }
+      }
+      if (showMethodReturnValues != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+      }
+      if (showVariablesOfSelectedDebugNode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+      }
+      if (showKeYMainWindow != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+      }
+      if (mergeBranchConditions != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+      }
+      if (useUnicode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
+      }
+      if (usePrettyPrinting != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
+      }
+      if (showSignatureOnMethodReturnNodes != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
+      }
+      if (higlightReachedSourceCode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
+      }
+      if (truthValueEvaluationEnabled != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
+      }
+      if (simplifyConditions != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, simplifyConditions);
+      }
+      config = wc.doSave();
+      return config;
    }
    
    /**

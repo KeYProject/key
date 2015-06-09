@@ -48,8 +48,6 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
         final InfFlowProof proof = new InfFlowProof(proofName,
                 poTerm,
                 proofHeader,
-                proofConfig.createTacletIndex(),
-                proofConfig.createBuiltInRuleIndex(),
                 proofConfig);
 
         return proof;

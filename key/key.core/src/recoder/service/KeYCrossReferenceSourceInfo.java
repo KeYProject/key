@@ -56,14 +56,17 @@ import de.uka.ilkd.key.java.recoderext.EscapeExpression;
 import de.uka.ilkd.key.java.recoderext.ExecutionContext;
 import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
 import de.uka.ilkd.key.java.recoderext.adt.AllFields;
+import de.uka.ilkd.key.java.recoderext.adt.AllObjects;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.Intersect;
 import de.uka.ilkd.key.java.recoderext.adt.SeqConcat;
 import de.uka.ilkd.key.java.recoderext.adt.SeqIndexOf;
 import de.uka.ilkd.key.java.recoderext.adt.SeqLength;
 import de.uka.ilkd.key.java.recoderext.adt.SeqReverse;
 import de.uka.ilkd.key.java.recoderext.adt.SeqSingleton;
 import de.uka.ilkd.key.java.recoderext.adt.SeqSub;
+import de.uka.ilkd.key.java.recoderext.adt.SetMinus;
 import de.uka.ilkd.key.java.recoderext.adt.SetUnion;
 import de.uka.ilkd.key.java.recoderext.adt.Singleton;
 import de.uka.ilkd.key.util.Debug;
@@ -624,6 +627,9 @@ public class KeYCrossReferenceSourceInfo
 	if(expr instanceof EmptySetLiteral
            || expr instanceof Singleton
            || expr instanceof SetUnion
+           || expr instanceof SetMinus
+           || expr instanceof Intersect
+           || expr instanceof AllObjects
            || expr instanceof AllFields) {
 	    return name2primitiveType.get("\\locset");
 	} else if(expr instanceof EmptySeqLiteral

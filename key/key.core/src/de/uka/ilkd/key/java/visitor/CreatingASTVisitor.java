@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -147,8 +148,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     boolean preservesPositionInfo = true;
 
     /**  */
-    //protected SimpleStackOfExtList stack = new SimpleStackOfExtList();
-    protected Stack<ExtList> stack = new Stack<ExtList>();
+    protected Deque<ExtList> stack = new ArrayDeque<ExtList>();
     
     /**
      * create the CreatingASTVisitor

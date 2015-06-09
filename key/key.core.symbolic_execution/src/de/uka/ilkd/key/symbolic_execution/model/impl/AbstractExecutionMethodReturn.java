@@ -136,7 +136,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
          // Add current branch condition to path
          methodReturnCondition = services.getTermBuilder().and(bcs);
          // Simplify path condition
-         methodReturnCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), methodReturnCondition);
+         if (getSettings().isSimplifyConditions()) {
+            methodReturnCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), methodReturnCondition);
+         }
          methodReturnCondition = SymbolicExecutionUtil.improveReadability(methodReturnCondition, services);
          // Format path condition
          formatedMethodReturnCondition = formatTerm(methodReturnCondition, services);

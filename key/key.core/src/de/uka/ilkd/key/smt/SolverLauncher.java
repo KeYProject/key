@@ -402,7 +402,14 @@ public class SolverLauncher implements SolverListener {
     private void notifyListenersOfStop()  {
 	Collection<SMTSolver> problemSolvers = session.getProblemSolvers();
 	Collection<SMTSolver> finishedSolvers = session.getFinishedSolvers();
-	finishedSolvers.addAll(problemSolvers);
+	//finishedSolvers.addAll(problemSolvers);
+	
+	for(SMTSolver solver : problemSolvers){
+		if(!finishedSolvers.contains(solver)){
+			finishedSolvers.add(solver);
+		}
+	}
+	
 	for (SolverLauncherListener listener : listeners) {
 	    listener.launcherStopped(this, finishedSolvers);
 	}

@@ -20,13 +20,16 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.reference.MetaClassReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  *  Synchronized block.
@@ -46,8 +49,12 @@ public class SynchronizedBlock extends JavaStatement
      */
 
     protected final StatementBlock body;
+
+    private final MethodFrame innerMostMethodFrame;
+
+    private final int prefixLength;
     
-    private final ImmutableArray<ProgramPrefix> prefixElementArray;
+   
     
     /**
  *      Synchronized block.
@@ -57,7 +64,10 @@ public class SynchronizedBlock extends JavaStatement
     public SynchronizedBlock(StatementBlock body) {
         this.body=body;
 	this.expression=null;
-        prefixElementArray = computePrefix(body);
+    ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+    prefixLength = info.getLength();
+    innerMostMethodFrame = info.getInnerMostMethodFrame();
+
     }
 
     /**
@@ -69,7 +79,10 @@ public class SynchronizedBlock extends JavaStatement
     public SynchronizedBlock(Expression e, StatementBlock body) {
         expression=e;
         this.body=body;
-        prefixElementArray = computePrefix(body);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+
     }
 
     /**
@@ -81,31 +94,71 @@ public class SynchronizedBlock extends JavaStatement
         super(children);
 	expression = children.get(Expression.class);
 	body = children.get(StatementBlock.class);
-        prefixElementArray = computePrefix(body); 
+    ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+    prefixLength = info.getLength();
+    innerMostMethodFrame = info.getInnerMostMethodFrame();
+
+    }
+
+    @Override
+    public int hashCode() {
+        return 17*super.hashCode() + body.hashCode();
     }
 
 
-
-    private ImmutableArray<ProgramPrefix> computePrefix(StatementBlock b) {
-        return StatementBlock.
-           computePrefixElements(b.getBody(), 0, this);                
-}
-
-    public int getPrefixLength() {        
-        return prefixElementArray.size();
+    @Override
+    public boolean hasNextPrefixElement() {
+        return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
     }
 
-    public ProgramPrefix getPrefixElementAt(int i) {       
-        return prefixElementArray.get(i);
+    @Override
+    public ProgramPrefix getNextPrefixElement() {
+        if (hasNextPrefixElement()) {
+            return (ProgramPrefix) body.getStatementAt(0);
+        } else {
+            throw new IndexOutOfBoundsException("No next prefix element " + this);
+        }
+    }
+    
+    @Override
+    public ProgramPrefix getLastPrefixElement() {
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : 
+            this;
+    }
+    
+    @Override
+    public int getPrefixLength() {
+        return prefixLength;
     }
 
+    @Override
+    public MethodFrame getInnerMostMethodFrame() {
+        return innerMostMethodFrame;
+    }
+
+    @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return prefixElementArray;
+        return StatementBlock.computePrefixElements(body.getBody(), this);
+    }    
+
+    /**
+     * The method checks whether the expression in the synchronized
+     * prefix is either a local variable or a meta class reference
+     * (as local variables of this type are not supported by KeY,
+     * see return value for
+     * {@link MetaClassReference#getKeYJavaType(Services, ExecutionContext)}.
+     * @return true iff the above stated condition holds.
+     */
+    private boolean expressionWithoutSideffects() {
+        return (expression instanceof ProgramVariable
+                    && !((ProgramVariable)expression).isMember())
+                || (expression instanceof MetaClassReference);
     }
-    
-    
+
     public PosInProgram getFirstActiveChildPos() {
-        return getStatementCount() == 0 ? PosInProgram.TOP : PosInProgram.ONE;
+        return getStatementCount() == 0 ?
+                PosInProgram.TOP : (expressionWithoutSideffects() ?
+                        PosInProgram.TOP.down(getChildCount()-1).down(0) : PosInProgram.ONE);
     }
     
     /**
