@@ -38,13 +38,9 @@ public class OutlineCompilationUnitWrapper extends OutlineJavaElementWrapper<ICo
 
    @Override
    public IJavaElement[] getChildren() throws JavaModelException {
-      // TODO: Define an extension point and API to extend and modify the children shown in the oultine. Realize the extension point for JML in plug-in org.key_project.jmlediting.ui.
-      IJavaElement[] children = getWrappedObject().getChildren();
-      return children.length >= 1 ?
-             new IJavaElement[] {children[0]} :
-             children;
+       return getWrappedObject().getChildren();
    }
-
+   
    @Override
    public boolean hasChildren() throws JavaModelException {
       return getWrappedObject().hasChildren();

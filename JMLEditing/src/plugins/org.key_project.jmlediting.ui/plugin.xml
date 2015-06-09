@@ -81,9 +81,9 @@
       </page>
    </extension>
    <extension
-         point="org.key_project.javaeditor.javaOutlineCompilationUnitWrapper">
-      <Wrapper
-            class="org.key_project.jmlediting.ui.outlineView.OutlineCompilationUnitWrapperExtension">
-      </Wrapper>
+         point="org.key_project.javaeditor.javaOutlineExtension">
+      <modifyer
+            class="org.key_project.jmlediting.ui.outlineView.TestOutlineExtension">
+      </modifyer>
    </extension>
 </plugin>

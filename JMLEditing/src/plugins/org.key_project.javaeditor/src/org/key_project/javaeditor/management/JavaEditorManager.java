@@ -49,8 +49,8 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
+import org.key_project.javaeditor.outline.ExtendableCompilationUnitWrapper;
 import org.key_project.javaeditor.outline.IOutlineWrapper;
-import org.key_project.javaeditor.outline.OutlineCompilationUnitWrapper;
 import org.key_project.javaeditor.util.ExtendableConfigurationUtil;
 import org.key_project.javaeditor.util.LogUtil;
 import org.key_project.javaeditor.util.PreferenceUtil;
@@ -231,6 +231,7 @@ public final class JavaEditorManager {
             @Override
             public void run() {
                replaceConfiguration((JavaEditor) editor);
+               
             }
          });
       }
@@ -258,6 +259,10 @@ public final class JavaEditorManager {
                   IPreferenceStore store = ObjectUtil.get(oldConf.getOriginalConfiguration(), TextSourceViewerConfiguration.class, "fPreferenceStore");
                   String partitioning = ObjectUtil.get(oldConf.getOriginalConfiguration(), JavaSourceViewerConfiguration.class, "fDocumentPartitioning");
                   ExtendableJavaSourceViewerConfiguration newConf = new ExtendableJavaSourceViewerConfiguration(colorManager, store, javaEditor, partitioning, oldConf.getOriginalConfiguration(), newExtensions);
+                  
+                  
+                  
+                  
                   // Replace configuration
                   changeConfiguration(javaEditor, viewer, newConf);
                }
@@ -360,7 +365,7 @@ public final class JavaEditorManager {
          else {
             if (PreferenceUtil.isExtensionsEnabled()) { // Change input if required
                if (input instanceof ICompilationUnit) {
-                  joutline.setInput(new OutlineCompilationUnitWrapper((ICompilationUnit)outlineViewer.getInput()));
+                  joutline.setInput(new ExtendableCompilationUnitWrapper((ICompilationUnit)outlineViewer.getInput()));
                }
                else {
                   throw new IllegalArgumentException("Original input '" + input + "' is not an ICompilationUnit.");
