@@ -27,15 +27,17 @@ public class Account {
 
    /*@ normal_behavior
      @ requires amount > 0;
+     @ assignable \nothing;
      @*/
-   public /*@ pure @*/ boolean canWithdraw(int amount) {
+   public boolean canWithdraw(int amount) {
       return amount > 0;
    }
    
    /*@ normal_behavior
      @ ensures \result == balance;
+     @ assignable \nothing;
      @*/
-   public /*@ pure @*/ int getBalance() {
+   public int getBalance() {
       return balance;
    }
 }

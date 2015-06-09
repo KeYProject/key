@@ -1,0 +1,145 @@
+<html>
+   <head>
+      <title>JML</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
+   </head>
+   <body>
+      <h1>JML</h1>
+      <p>
+         The Java Modeling Language (JML) is a specification languages used to specify the expected behavior of Java modules.
+      </p>
+      <p>
+         The relevant knowledge for this evaluation about JML is explained in the following sections.
+         <b>Please read them carefully before you continue.</b>
+         <ul>
+            <li>
+               <a href="#set">1 Symbolic Execution</a>
+               <ul>
+                  <li><a href="#set_mc">1.1 Symbolic Execution with Method Contracts</a></li>
+                  <li><a href="#set_li">1.2 Symbolic Execution with Loop Invariants</a></li>
+                  <li><a href="#verification">1.3 Proving by Symbolic Execution</a></li>
+               </ul>
+            </li>
+            <li>
+               <a href="#sed">2 User Interface of the Symbolic Execution Debugger (SED)</a>
+               <ul>
+                  <li><a href="#state">2.1 Inspecting a Symbolic State</a></li>
+                  <li><a href="#layout">2.2 Visualizing Memory Layouts</a></li>
+                  <li><a href="#truth">2.3 Comprehend Truth Values of Postconditions, Preconditions and Loop Invariants</a></li>
+               </ul>
+            </li>
+            <li><a href="#best">3 Best Practices to understand a Proof Attempt using SED</a></li>
+         </ul>
+      </p>      
+      
+      <h2><a name="set">1 JML comments</a></h2>
+      <p>
+         JML specifications are placed as special comments within the Java source code.
+         Such comments have to start with the <code>@</code> character.
+         During the evaluation JML comments look as follows:
+         <code>
+         <pre>
+/*@ ...
+  @ ... 
+  @*/</pre></code>
+      </p>
+
+      <h2><a name="mc">1 Method Contracts</a></h2>
+      <p>
+         A method contract specifies the expected behavior of a method in terms of pre and postconditions.
+         Assuming that the precondition is fulfilled when the method is called, the method guarantees that the postcondition is established when it returns.
+         In JML the keywords <code>normal_behavior</code> and <code>exceptional_behavior</code> are used to specify that a method should terminate normally without a thrown exception or exceptionally.
+         Keyword <code>requires</code> followed by an expression defines a precondition while <code>ensures</code> also followed by an expression defines a postcondition.
+         An expression is basically a normal Java expression as used for instance in <code>if</code> statements.
+         But additionally the implication operator <code>==></code> and quantors (e.g. <code>\forall</code>) can be used.
+         The expression of the ensures clause is evaluated in the state when the method returns.
+         This forms the need to access the call state (keword <code>\old</code>) and the method return value (keyword <code>\result</code>) within expressions.
+         The last part of a method contract is the assignable clause.
+         It lists all locations the method is allowed to change. In case the method should change nothing keyword <code>\nothing</code> is used.
+      </p>
+      <p>
+         Consider the following example. 
+         The method contract of <code>addCredits</code> says that the method parameter <code>credits</code> should be greater than zero (<code>requires</code>).
+         The method will guarantee that no exception is thrown (<code>normal_behavior</code>) and that the value of <code>acquiredCredits</code> is increased by <code>credits</code> (first <code>ensures</code>).
+         It also guarantees that the returned value is the new value of <code>acquiredCredits</code> (second <code>ensures</code>).
+         Finally, the method can only change <code>acquiredCredits</code> and not other locations like <code>firstname</code> or <code>surname</code> (<code>assignable</code>).
+      </p>
+         For method parameters as well as for instance and class fields with a reference type its ability to be <code>null</code> needs to be specified.
+         Keyword <code>nullable</code> allows the <code>null</code> value while <code>non_null</code> forbids it.
+         This means for this example that <code>firstname</code> might be <code>null</code> while <code>surname</code> is never <code>null</code>.
+      <p>
+         <code>
+         <pre>
+public class Student {
+   private /*@ nullable @*/ String firstname;
+   
+   private /*@ non_null @*/ String surname;
+
+   private int acquiredCredits = 0;
+   
+   /*@ normal_behavior
+     @ requires credits > 0;
+     @ ensures acquiredCredits == \old(acquiredCredits) + credits;
+     @ ensures \result == acquiredCredits;
+     @ assignable acquiredCredits;
+     @*/
+   public int addCredits(int credits) {
+      acquiredCredits += credits;
+      return acquiredCredits;
+   }
+}</pre></code>
+      </p>
+
+      <h2><a name="invariants">2 Invariants</a></h2>
+      <p>
+         An invariant is a property used to limit the possible state space of instances.
+         All Constructors of a class have to establish the invariant while all methods have to preserve it.
+         It can only be broken temporary within a method execution.
+         Technically, an invariant can be seen as pre and postcondition added to all method contracts.
+      </p>
+      <p>
+         Let us add the following invariant to class <code>Student</code>.
+         It says that the value of <code>acquiredCredits</code> is never negative.
+      <p>
+         <code>
+         <pre>
+/*@ invariant acquiredCredits >= 0;
+  @*/
+private int acquiredCredits = 0;</pre></code>
+      </p>
+
+      <h2><a name="invariants">3 Loop Invariants</a></h2>
+      <p>
+         A loop invariant is a property which needs to hold before a loop is entered
+         and which is preserved by each loop iteration (loop guard and loop body). 
+         Thus it also holds after the loop. 
+      </p>
+      <p>
+         A loop invariant in JML consists of three parts:
+         <ul>
+            <li>Keyword <code>loop_invariant</code> is used to specify a loop invariant.</li>
+            <li>Keyword <code>decreasing</code> specifies a value which is always positive and decreased in each loop iteration. It is used by verification tools to prove termination of the loop.</li>
+            <li>Keyword <code>assignable</code> is used as for method contracts to limit the locations may changed by the loop.</li>
+         </ul> 
+      </p>
+      <p>
+         The following example restricts with the first loop invariant the range of index variable <code>i</code>.
+         The second loop invariant ensures that the array contains on all already visisted array elements the correct value.
+         Termination can be proven with help of the array length and the index variable (<code>decreasing</code> term).
+         Finally, the loop can change all fields of <code>array</code> and <code>i</code>.
+         <code>
+         <pre>
+public static void fillArray(int[] array) {
+   /*@ loop_invariant i >= 0 && i <= array.length;
+     @ loop_invariant (\forall int j; j >= 0 && j < i; array[j] == j);
+     @ decreasing array.length - i;
+     @ assignable array[*], i;
+     @*/      
+   for (int i = 0; i < array.length; i++) {
+      array[i] = i;
+   }
+}</pre></code>
+      </p>
+      
+   </body>
+</html>

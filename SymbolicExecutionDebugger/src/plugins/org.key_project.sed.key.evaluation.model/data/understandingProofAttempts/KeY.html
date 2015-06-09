@@ -70,9 +70,7 @@ formula_n
 ==> 
 formula_n+1, 
 ..., 
-formula_m
-         </pre>
-         </code>
+formula_m</pre></code>
          The left side of the implication <code>==></code> is named <i>antecedent</i> and the right side <i>succedent</i>. 
          Formulas in the antecedent are connected by conjunction (<code>,</code> means <code>&</code>) while succedent formulas are connected by disjunction (<code>,</code> means <code>|</code>).
          Thus the sequent can be read as "Assuming <code>formula_1</code> to <code>formula_n</code> hold, at least one of the formula <code>formula_n+1</code> to <code>formula_m</code> has to hold".
@@ -100,9 +98,7 @@ formula_m
          <code>
             <pre>
 {heapAtPre:=heap || heap:=heap[create(newObj)] 
-                              [newObj.intField := 42]}
-            </pre>
-         </code>
+                              [newObj.intField := 42]}</pre></code>
          The update creates a new object <code>newObj</code> in the right part on the heap and sets than its instance field <code>intField</code> to <code>42</code>.
          The left side stores the initial state of the heap (before <code>newObj</code> is created) in variable <code>heapAtPre</code>.
       </p>
@@ -117,9 +113,7 @@ formula_m
          <code>
             <pre>
 {heapAtPre:=heap} 
-  (obj.intField@heapAtPre = obj.intField);
-            </pre>
-         </code>
+  (obj.intField@heapAtPre = obj.intField);</pre></code>
       </p>
       
       <h3><a name="po">2.5 Proof Obligation</a></h3>
@@ -129,9 +123,7 @@ formula_m
             <pre>
 ==>
    assumptionsAboutJava & precondition;
--> {updateToStoreCallState} \<{javaProgramToExecut}\> (postcondition)
-            </pre>
-         </code>
+-> {updateToStoreCallState} \<{javaProgramToExecut}\> (postcondition)</pre></code>
          It can be read as: "Assuming a valid Java state and the specified preconditions, after termination of the Java program to execute the postcondition has to hold."
          The update is used to store the initial state before execution started.
       </p>
