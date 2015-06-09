@@ -15,6 +15,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
@@ -116,7 +117,7 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
       VisibleTermLabels visibleTermLabels = new VisibleTermLabels() {
          @Override
          public boolean contains(Name name) {
-            return true; //!ObjectUtil.equals(name, branchResult.getTermLabelName());
+            return !ObjectUtil.equals(name, branchResult.getTermLabelName());
          }
       };
       String text = showSequent(sequent, services, notationInfo, visibleTermLabels);
