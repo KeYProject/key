@@ -51,17 +51,5 @@
             </command>
          </menu>
       </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="org.key_project.sed.key.evaluation.toolbars.evaluationToolbar">
-            <command
-                  commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
-                  icon="icons/evaluation.png"
-                  tooltip="Understanding Proof Attempts"
-                  id="org.key_project.sed.key.evaluation.toolbars.sampleCommand">
-            </command>
-         </toolbar>
-      </menuContribution>
    </extension>
 </plugin>
