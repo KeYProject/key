@@ -8,8 +8,8 @@
 
 	<target name="test-deploy" depends="compile">
   	        <mkdir dir="${test.reports}" />
-		<junit printsummary="withOutAndErr" haltonfailure="yes"
-		       fork="yes" forkMode="once" haltonerror="yes"
+		<junit printsummary="withOutAndErr" haltonfailure="no"
+		       fork="yes" forkMode="once" haltonerror="no"
 		       failureproperty="test.failedOrError"
 		       errorproperty="test.failedOrError"
 		       enableTestListenerEvents="false"
@@ -34,8 +34,8 @@
 	</target>
 
 	<target name="runTests" depends="compile">
-		<junit printsummary="yes" haltonfailure="yes"
-		       fork="withOutAndErr" forkMode="once" haltonerror="yes"
+		<junit printsummary="yes" haltonfailure="no"
+		       fork="withOutAndErr" forkMode="once" haltonerror="no"
 		       enableTestListenerEvents="false"
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>

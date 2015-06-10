@@ -7,11 +7,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 
 /**
  * Class for managing a file which contains statistics recorded during a
@@ -23,7 +28,7 @@ import de.uka.ilkd.key.proof.Statistics;
  */
 public class StatisticsFile implements Serializable {
 
-   private final File location;
+   private final File statisticsFile;
 
    @SuppressWarnings("rawtypes")
    private static final Column[] columns = new Column[] {
@@ -38,8 +43,8 @@ public class StatisticsFile implements Serializable {
             }
 
             @Override
-            String computeSum(List<String> list) {
-               return "---SUM---";
+            String[] computeSumAndAverage(List<String> list) {
+               return new String[] { "---SUM---", "---AVG---" };
             }
 
          }, new LongColumn("Total rule apps") {
@@ -86,12 +91,13 @@ public class StatisticsFile implements Serializable {
             }
 
             @Override
-            String computeSum(List<String> list) {
-               long ret = 0;
+            String[] computeSumAndAverage(List<String> list) {
+               long sum = 0;
                for (String s : list) {
-                  ret += Long.parseLong(s);
+                  sum += Long.parseLong(s);
                }
-               return "" + ret;
+               double avg = ((double) sum) / ((double) list.size());
+               return new String[] { "" + sum, "" + avg };
             }
 
          }, new Column<Double>("Time per step") {
@@ -104,12 +110,13 @@ public class StatisticsFile implements Serializable {
             }
 
             @Override
-            String computeSum(List<String> list) {
-               double ret = 0.0;
+            String[] computeSumAndAverage(List<String> list) {
+               double sum = 0.0;
                for (String s : list) {
-                  ret += Double.parseDouble(s);
+                  sum += Double.parseDouble(s);
                }
-               return "" + ret;
+               double avg = sum / ((double) list.size());
+               return new String[] { "" + sum, "" + avg };
             }
 
          }, new LongColumn("Total Runtime Memory") {
@@ -126,7 +133,7 @@ public class StatisticsFile implements Serializable {
          } };
 
    public StatisticsFile(File location) {
-      this.location = location;
+      this.statisticsFile = location;
    }
 
    /**
@@ -135,15 +142,15 @@ public class StatisticsFile implements Serializable {
     */
    public void setUp() throws IOException {
       // Create parent directory if it does not exist yet.
-      if (!location.getParentFile().exists()) {
-         location.getParentFile().mkdirs();
+      if (!statisticsFile.getParentFile().exists()) {
+         statisticsFile.getParentFile().mkdirs();
       }
 
       // Delete old statistics file if it exists already.
-      if (location.exists()) {
+      if (statisticsFile.exists()) {
          System.out.println("Deleting old RunAllProofs statistics file: "
-               + location);
-         location.delete();
+               + statisticsFile);
+         statisticsFile.delete();
       }
 
       // Write column names in the first line of statistics file.
@@ -164,7 +171,8 @@ public class StatisticsFile implements Serializable {
     *            In case statistics file is not accessible for some reason.
     */
    private void writeLine(List<String> entries) throws IOException {
-      final FileWriter statisticsFileWriter = new FileWriter(location, true);
+      final FileWriter statisticsFileWriter = new FileWriter(statisticsFile,
+            true);
       final PrintWriter statPrinter = new PrintWriter(statisticsFileWriter);
       String line = "";
       boolean first = true;
@@ -203,8 +211,9 @@ public class StatisticsFile implements Serializable {
    /**
     * Print sum for each column as last line when closing statistics file.
     */
-   public void computeSums() throws IOException {
-      try (BufferedReader br = new BufferedReader(new FileReader(location))) {
+   public void computeSumsAndAverages() throws IOException {
+      try (BufferedReader br = new BufferedReader(
+            new FileReader(statisticsFile))) {
          // strip first line containing column names
          br.readLine();
 
@@ -225,14 +234,50 @@ public class StatisticsFile implements Serializable {
             }
          }
 
-         // write line of sums into statistics file
-         List<String> entries = new LinkedList<>();
-         int i = 0;
-         for (Column<?> column : columns) {
-            entries.add(column.computeSum(lists[i]));
-            i++;
+         /*
+          * Compute sums and averages.
+          */
+         List<String> sums = new LinkedList<>();
+         sums.add("---SUM---");
+         List<String> avgs = new LinkedList<>();
+         avgs.add("---AVG---");
+         for (int i = 1 /* Omit first column. */; i < columns.length; i++) {
+            Column<?> column = columns[i];
+            String[] sumAndAverage = column.computeSumAndAverage(lists[i]);
+            assert sumAndAverage.length == 2 : "Expecting exactly 2 strings returned by computeSumAndAverage()";
+            sums.add(sumAndAverage[0]);
+            avgs.add(sumAndAverage[1]);
          }
-         writeLine(entries);
+         // Append lines of sums and averages to statistics file.
+         writeLine(sums);
+         writeLine(avgs);
+
+         /*
+          * Create *.sum.properties and *.avg.properties files for Jenkins.
+          */
+         String jobName = System.getenv("JOB_NAME");
+         if (jobName != null) {
+            String url = "URL=http://hudson.se.informatik.tu-darmstadt.de/userContent/statistics-"
+                  + jobName;
+            File statisticsDir = statisticsFile.getParentFile();
+            for (int i = 1 /* Omit first column. */; i < columns.length; i++) {
+
+               // Create *.sum.properties file
+               Path sumFile = new File(statisticsDir, columns[i].name
+                     + ".sum.properties").toPath();
+               String[] lines = new String[] { "YVALUE=" + sums.get(i), url };
+               Files.write(sumFile, Arrays.asList(lines),
+                     Charset.defaultCharset());
+
+               // Create *.avg.properties file
+               Path avgFile = new File(statisticsDir, columns[i].name
+                     + ".avg.properties").toPath();
+               lines = new String[] { "YVALUE=" + avgs.get(i), url };
+               Files.write(avgFile, Arrays.asList(lines),
+                     Charset.defaultCharset());
+
+            }
+         }
       }
    }
 
@@ -252,12 +297,13 @@ public class StatisticsFile implements Serializable {
       }
 
       @Override
-      String computeSum(List<String> list) {
-         long ret = 0;
+      String[] computeSumAndAverage(List<String> list) {
+         long sum = 0;
          for (String s : list) {
-            ret += Long.parseLong(s);
+            sum += Long.parseLong(s);
          }
-         return "" + ret;
+         double avg = ((double) sum) / ((double) list.size());
+         return new String[] { "" + sum, "" + avg };
       }
 
       abstract long getLongValueFromStatistics(Statistics statistics);
@@ -274,7 +320,7 @@ public class StatisticsFile implements Serializable {
          this.name = name;
       }
 
-      abstract String computeSum(List<String> list);
+      abstract String[] computeSumAndAverage(List<String> list);
 
       abstract T addEntry(Statistics statistics, File keyFile,
             boolean proofClosed);

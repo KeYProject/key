@@ -35,11 +35,13 @@ post: (   i &lt; 0
               \then (TRUE)
               \else (FALSE)
       &amp; exc_6 = null)
-mod: \if (true)
-         \then (     \if (true)
-                         \then (     \if (true)
-                                         \then (     \if (true)
-                                                         \then (     \if (true)
+mod: \if (i &lt; 0)
+         \then (     \if (i &lt; 0)
+                         \then (     \if (i &lt; 0)
+                                         \then (     \if (  i
+                                                          &lt; 0)
+                                                         \then (     \if (  i
+                                                                          &lt; 0)
                                                                          \then (allLocs)
                                                                          \else (allLocs)
                                                                 \cap \if (  !  array
@@ -151,11 +153,13 @@ post: (   i &lt; 0
               \then (TRUE)
               \else (FALSE)
       &amp; exc_7 = null)
-mod: \if (true)
-         \then (     \if (true)
-                         \then (     \if (true)
-                                         \then (     \if (true)
-                                                         \then (     \if (true)
+mod: \if (i &lt; 0)
+         \then (     \if (i &lt; 0)
+                         \then (     \if (i &lt; 0)
+                                         \then (     \if (  i
+                                                          &lt; 0)
+                                                         \then (     \if (  i
+                                                                          &lt; 0)
                                                                          \then (allLocs)
                                                                          \else (allLocs)
                                                                 \cap \if (  !  array
