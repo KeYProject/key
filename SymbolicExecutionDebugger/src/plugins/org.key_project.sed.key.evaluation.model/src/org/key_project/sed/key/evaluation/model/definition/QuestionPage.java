@@ -1,6 +1,8 @@
 package org.key_project.sed.key.evaluation.model.definition;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.util.java.CollectionUtil;
@@ -18,6 +20,19 @@ public class QuestionPage extends AbstractPage {
       super(name, title, message);
       this.workbenchModifier = workbenchModifier;
       this.questions = questions;
+      validateQuestions();
+   }
+   
+   protected void validateQuestions() {
+      // Ensure that all children have different names
+      Set<String> usedNames = new HashSet<String>();
+      if (questions != null) {
+         for (AbstractQuestion question : questions) {
+            if (!usedNames.add(question.getName())) {
+               throw new IllegalStateException("Question name '" + question.getName() + "' used multiple times.");
+            }
+         }
+      }
    }
 
    public AbstractQuestion[] getQuestions() {

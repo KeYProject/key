@@ -210,7 +210,12 @@ public class EvaluationInputReader {
             final String questionName = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_NAME);
             QuestionInput questionInput;
             if (choiceStack.isEmpty()) {
-               questionInput = ((QuestionPageInput) currentPageInput).getQuestionInput(questionName);
+               if (questionInputStack.isEmpty()) {
+                  questionInput = ((QuestionPageInput) currentPageInput).getQuestionInput(questionName);
+               }
+               else {
+                  questionInput = questionInputStack.getFirst().getChildInput(questionName);
+               }
             }
             else {
                QuestionInput[] choiceInputs = questionInputStack.getFirst().getChoiceInputs(choiceStack.getFirst());

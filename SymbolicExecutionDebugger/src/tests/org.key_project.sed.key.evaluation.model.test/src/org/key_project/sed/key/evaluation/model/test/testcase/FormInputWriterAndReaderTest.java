@@ -194,7 +194,10 @@ public class FormInputWriterAndReaderTest extends TestCase {
             pageInput.setShownTime(pageShownTime);
             assertFalse(pageInput.getQuestionInputs()[0].getQuestion().isEditable()); // Browser
             assertTrue(pageInput.getQuestionInputs()[1].getQuestion().isEditable()); // RadioButtons
-            // Change question 1
+            assertTrue(pageInput.getQuestionInputs()[2].getQuestion().isEditable()); // Checkbox
+            assertFalse(pageInput.getQuestionInputs()[3].getQuestion().isEditable()); // Label
+            assertFalse(pageInput.getQuestionInputs()[4].getQuestion().isEditable()); // Section
+            // Change question 1 (radio)
             QuestionInput radioInput = pageInput.getQuestionInputs()[1];
             radioInput.setValue("This is not a valid radio button value!");
             radioInput.setTrust(Boolean.TRUE);
@@ -202,15 +205,40 @@ public class FormInputWriterAndReaderTest extends TestCase {
                radioInput.setTrustSetAt(111);
                radioInput.setValueSetAt(100);
             }
-            // Change yes sub question
-            QuestionInput childInput = radioInput.getChoiceInputs(radioInput.getChoices()[0])[0];
-            childInput.setValue("two");
-            childInput.setTrust(Boolean.FALSE);
+            // Change yes sub question of radio
+            QuestionInput radioChildInput = radioInput.getChoiceInputs(radioInput.getChoices()[0])[0];
+            radioChildInput.setValue("two");
+            radioChildInput.setTrust(Boolean.FALSE);
             if (pageShownTime > 0) {
                radioInput.setTrustSetAt(4242);
-               childInput.setValueSetAt(24);
+               radioChildInput.setValueSetAt(24);
             }
-         }         
+            // Change question 2 (checkbox)
+            QuestionInput checkboxInput = pageInput.getQuestionInputs()[2];
+            checkboxInput.setValue("This is not a valid checkbox button value!");
+            checkboxInput.setTrust(Boolean.TRUE);
+            if (pageShownTime > 0) {
+               radioInput.setTrustSetAt(111);
+               radioInput.setValueSetAt(100);
+            }
+            // Change yes sub question of checkbox
+            QuestionInput checkboxChildInput = checkboxInput.getChoiceInputs(checkboxInput.getChoices()[0])[0];
+            checkboxChildInput.setValue("two");
+            checkboxChildInput.setTrust(Boolean.FALSE);
+            if (pageShownTime > 0) {
+               checkboxInput.setTrustSetAt(4242);
+               checkboxChildInput.setValueSetAt(24);
+            }
+            // Change yes sub question of section
+            QuestionInput sectionInput = pageInput.getQuestionInputs()[4];
+            QuestionInput sectionChildInput = sectionInput.getChildInputs()[0];
+            sectionChildInput.setValue("two");
+            sectionChildInput.setTrust(Boolean.FALSE);
+            if (pageShownTime > 0) {
+               sectionInput.setTrustSetAt(4242);
+               sectionChildInput.setValueSetAt(24);
+            }
+         }
       };
    }
    
@@ -457,10 +485,16 @@ public class FormInputWriterAndReaderTest extends TestCase {
          assertEquals(expected.getTrustSetAt(), actual.getTrustSetAt());
          assertEquals(expected.hasChoiceInputs(), actual.hasChoiceInputs());
          if (expected.hasChoiceInputs()) {
+            assertTrue(actual.hasChoiceInputs());
             for (Choice choice : expected.getChoices()) {
                assertQuestionInputs(expected.getChoiceInputs(choice), actual.getChoiceInputs(choice));
             }
          }
+         else {
+            assertFalse(actual.hasChoiceInputs());
+         }
+         assertEquals(expected.countChildInputs(), actual.countChildInputs());
+         assertQuestionInputs(expected.getChildInputs(), actual.getChildInputs());
       }
       else {
          assertNull(actual);

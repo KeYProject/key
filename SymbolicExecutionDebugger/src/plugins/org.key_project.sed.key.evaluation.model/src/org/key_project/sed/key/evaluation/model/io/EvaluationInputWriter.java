@@ -272,10 +272,12 @@ public class EvaluationInputWriter {
     * @param sb The {@link StringBuffer} to append to.
     */
    protected static void appendQuestionInput(int level, QuestionInput questionInput, StringBuffer sb) {
-      if (questionInput.getQuestion().isEditable()) {
+      if (questionInput.getQuestion().isEditable() || questionInput.countChildInputs() > 0) {
          Map<String, String> questionAttributes = new LinkedHashMap<String, String>();
          questionAttributes.put(ATTRIBUTE_QUESTION_NAME, XMLUtil.encodeText(questionInput.getQuestion().getName()));
-         questionAttributes.put(ATTRIBUTE_QUESTION_VALUE, XMLUtil.encodeText(questionInput.getValue()));
+         if (questionInput.getValue() != null) {
+            questionAttributes.put(ATTRIBUTE_QUESTION_VALUE, XMLUtil.encodeText(questionInput.getValue()));
+         }
          if (questionInput.getValueSetAt() > 0) {
             questionAttributes.put(ATTRIBUTE_QUESTION_VALUE_SET_AT, questionInput.getValueSetAt() + "");
          }
@@ -285,16 +287,23 @@ public class EvaluationInputWriter {
          if (questionInput.getTrustSetAt() > 0) {
             questionAttributes.put(ATTRIBUTE_QUESTION_TRUST_SET_AT, questionInput.getTrustSetAt() + "");
          }
-         if (questionInput.hasChoiceInputs()) {
+         if (questionInput.hasChoiceInputs() || questionInput.countChildInputs() > 0) {
             XMLUtil.appendStartTag(level, TAG_QUESTION, questionAttributes, sb);
-            for (Choice choice : questionInput.getChoices()) {
-               Map<String, String> choiceAttributes = new LinkedHashMap<String, String>();
-               choiceAttributes.put(ATTRIBUTE_CHOICE_VALUE, XMLUtil.encodeText(choice.getValue()));
-               XMLUtil.appendStartTag(level + 1, TAG_CHOICE, choiceAttributes, sb);
-               for (QuestionInput childQuestionInput : questionInput.getChoiceInputs(choice)) {
-                  appendQuestionInput(level + 2, childQuestionInput, sb);
+            if (questionInput.hasChoiceInputs()) {
+               for (Choice choice : questionInput.getChoices()) {
+                  Map<String, String> choiceAttributes = new LinkedHashMap<String, String>();
+                  choiceAttributes.put(ATTRIBUTE_CHOICE_VALUE, XMLUtil.encodeText(choice.getValue()));
+                  XMLUtil.appendStartTag(level + 1, TAG_CHOICE, choiceAttributes, sb);
+                  for (QuestionInput childQuestionInput : questionInput.getChoiceInputs(choice)) {
+                     appendQuestionInput(level + 2, childQuestionInput, sb);
+                  }
+                  XMLUtil.appendEndTag(level + 1, TAG_CHOICE, sb);
                }
-               XMLUtil.appendEndTag(level + 1, TAG_CHOICE, sb);
+            }
+            if (questionInput.countChildInputs() > 0) {
+               for (QuestionInput childInput : questionInput.getChildInputs()) {
+                  appendQuestionInput(level + 1, childInput, sb);
+               }
             }
             XMLUtil.appendEndTag(level, TAG_QUESTION, sb);
          }

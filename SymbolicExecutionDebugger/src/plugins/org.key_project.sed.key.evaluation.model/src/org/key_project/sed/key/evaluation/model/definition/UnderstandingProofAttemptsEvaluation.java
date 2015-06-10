@@ -59,6 +59,12 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    public static final String JML_PAGE_NAME = "JML";
 
    /**
+    * Page name of the summary page.
+    */
+   public static final String FEEDBACK_PAGE = "summary";
+
+
+   /**
     * Forbid additional instances.
     */
    private UnderstandingProofAttemptsEvaluation() {
@@ -147,18 +153,19 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       QuestionPage proof2Page = createAccountQuestionPage(PROOF_2_PAGE_NAME, "Proof Attempt 2");
       QuestionPage proof3Page = createMinQuestionPage(PROOF_3_PAGE_NAME, "Proof Attempt 3");
       QuestionPage proof4Page = createMyIntegerQuestionPage(PROOF_4_PAGE_NAME, "Proof Attempt 4");
+      QuestionPage feedbackPage = createFeedbackPage();
       SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
                                                          "Confirm Sending Content", 
                                                          "Inspect the content to be send.", 
                                                          "Current date and time (nothing else!)");
-      RandomForm evaluationForm = new RandomForm("evaluationForm", true, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, sendEvaluationPage);
+      RandomForm evaluationForm = new RandomForm("evaluationForm", true, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
       // Create thanks form
       QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.", null);
       FixedForm thanksForm = new FixedForm("thanksForm", false, thanksPage);
       // Create forms
       return CollectionUtil.toList(introductionForm, evaluationForm, thanksForm);
    }
-   
+
    protected QuestionPage createMyIntegerQuestionPage(String pageName, String title) {
       String howToCloseTitle = "How can the proof be closed?";
       CheckboxQuestion howToCloseQuestion = new CheckboxQuestion("howToClose", 
@@ -534,16 +541,16 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 32 (return amount > 0)", "Line 32"),
                                                                new Choice("Line 39 (return balance)", "Line 39"));
       String contractsTitle = "Which method contracts are applied at least once during symbolic execution of the proof?";
-      CheckboxQuestion contractsQuestion = new CheckboxQuestion("executedStatements", 
+      CheckboxQuestion contractsQuestion = new CheckboxQuestion("appliedContracts", 
                                                                 contractsTitle, 
-                                                               true,
-                                                               null, 
-                                                               new NotUndefinedValueValidator("Question '" + contractsTitle + "' not answered."), 
-                                                               true,
-                                                               new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
-                                                               new Choice("Contract of method withdraw(int)", "withdraw"),
-                                                               new Choice("Contract of method canWithdraw(int)", "canWithdraw"),
-                                                               new Choice("Contract of method getBalance()", "getBalance"));
+                                                                true,
+                                                                null, 
+                                                                new NotUndefinedValueValidator("Question '" + contractsTitle + "' not answered."), 
+                                                                true,
+                                                                new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
+                                                                new Choice("Contract of method withdraw(int)", "withdraw"),
+                                                                new Choice("Contract of method canWithdraw(int)", "canWithdraw"),
+                                                                new Choice("Contract of method getBalance()", "getBalance"));
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
@@ -574,5 +581,118 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    
    protected String createGeneralDescription(String po) {
       return "Please inspect the current proof attempt of method '" + po + "' carefully and answer the following questions about it as best as possible.";
+   }
+   
+   private QuestionPage createFeedbackPage() {
+      List<Choice> choices = CollectionUtil.toList(new Choice("Very Helpful", "Very Helpful"), 
+                                                   new Choice("Helpful", "Helpful"), 
+                                                   new Choice("Little Helpful", "Little Helpful"), 
+                                                   new Choice("Not Helpful", "Not Helpful"), 
+                                                   new Choice("Never Used", "Never Used"));
+      // KeY
+      String proofTreeTitle = "Shown proof tree (tab 'Proof')";
+      RadioButtonsQuestion proofTreeQuestion = new RadioButtonsQuestion("proofTree", 
+                                                                        proofTreeTitle, 
+                                                                        false,
+                                                                        null, 
+                                                                        new NotUndefinedValueValidator("Question '" + proofTreeTitle + "' not answered."), 
+                                                                        false,
+                                                                        choices);
+      String goalsTitle = "Shown goals  (tab 'Goals')";
+      RadioButtonsQuestion goalsQuestion = new RadioButtonsQuestion("goals", 
+                                                                    goalsTitle, 
+                                                                    false,
+                                                                    null, 
+                                                                    new NotUndefinedValueValidator("Question '" + goalsTitle + "' not answered."), 
+                                                                    false,
+                                                                    choices);
+      String sequentTitle = "Shown sequent";
+      RadioButtonsQuestion sequentQuestion = new RadioButtonsQuestion("sequent", 
+                                                                      sequentTitle, 
+                                                                      false,
+                                                                      null, 
+                                                                      new NotUndefinedValueValidator("Question '" + sequentTitle + "' not answered."), 
+                                                                      false,
+                                                                      choices);
+      String hideTitle = "Hiding of intermediate proofsteps";
+      RadioButtonsQuestion hideQuestion = new RadioButtonsQuestion("hideIntermediateProofsteps", 
+                                                                   hideTitle, 
+                                                                   false,
+                                                                   null, 
+                                                                   new NotUndefinedValueValidator("Question '" + hideTitle + "' not answered."), 
+                                                                   false,
+                                                                   choices);
+      String searchProofTreeTitle = "Search in proof tree";
+      RadioButtonsQuestion searchProofTreeQuestion = new RadioButtonsQuestion("searchProofTree", 
+                                                                              searchProofTreeTitle, 
+                                                                              false,
+                                                                              null, 
+                                                                              new NotUndefinedValueValidator("Question '" + searchProofTreeTitle + "' not answered."), 
+                                                                              false,
+                                                                              choices);
+      String searchSequentTitle = "Search in sequent";
+      RadioButtonsQuestion searchSequentQuestion = new RadioButtonsQuestion("searchSequent", 
+                                                                            searchSequentTitle, 
+                                                                            false,
+                                                                            null, 
+                                                                            new NotUndefinedValueValidator("Question '" + searchSequentTitle + "' not answered."), 
+                                                                            false,
+                                                                            choices);
+      SectionQuestion keySection = new SectionQuestion("KeY", "KeY", proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, searchProofTreeQuestion, searchSequentQuestion);
+      // SED
+      String setTitle = "Show symbolic execution tree";
+      RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
+                                                                  setTitle, 
+                                                                  false,
+                                                                  null, 
+                                                                  new NotUndefinedValueValidator("Question '" + setTitle + "' not answered."), 
+                                                                  false,
+                                                                  choices);
+      String variablesTitle = "Shown variables of a node (view 'Variables')";
+      RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
+                                                                        variablesTitle, 
+                                                                        false,
+                                                                        null, 
+                                                                        new NotUndefinedValueValidator("Question '" + variablesTitle + "' not answered."), 
+                                                                        false,
+                                                                        choices);
+      String layoutTitle = "Visualization of memory layouts";
+      RadioButtonsQuestion layoutQuestion = new RadioButtonsQuestion("layouts", 
+                                                                     layoutTitle, 
+                                                                     false,
+                                                                     null, 
+                                                                     new NotUndefinedValueValidator("Question '" + layoutTitle + "' not answered."), 
+                                                                     false,
+                                                                     choices);
+      String truthTitle = "Truth value evaluation";
+      RadioButtonsQuestion truthQuestion = new RadioButtonsQuestion("truth", 
+                                                                    truthTitle, 
+                                                                    false,
+                                                                    null, 
+                                                                    new NotUndefinedValueValidator("Question '" + truthTitle + "' not answered."), 
+                                                                    false,
+                                                                    choices);
+      SectionQuestion sedSection = new SectionQuestion("SED", "SED", setQuestion, variablesQuestion, layoutQuestion, truthQuestion);
+      // KeY vs SED
+      String keyVsSedTitle = "I prefer to inspect proofs with";
+      RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion("toolPreference", 
+                                                                       keyVsSedTitle, 
+                                                                       true,
+                                                                       null, 
+                                                                       new NotUndefinedValueValidator("Question '" + keyVsSedTitle + "' not answered."), 
+                                                                       false,
+                                                                       new Choice("KeY", "KeY"),
+                                                                       new Choice("KeY and SED, both are equally good", "KeYandSEDequal"),
+                                                                       new Choice("KeY and SED, depending on the proof", "KeYandSEDproof"),
+                                                                       new Choice("SED", "SED"));
+      SectionQuestion keyVsSedSection = new SectionQuestion("KeYvsSED", "KeY vs SED", keyVsSedQuestion);
+      
+      return new QuestionPage(FEEDBACK_PAGE,
+                              "Feedback", 
+                              "Please answer the question to give us some feeback about the tools and the evaluation.", 
+                              null,
+                              keySection,
+                              sedSection,
+                              keyVsSedSection);
    }
 }

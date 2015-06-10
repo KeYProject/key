@@ -9,6 +9,7 @@ import java.util.Set;
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
+import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -32,6 +33,8 @@ public class QuestionInput extends Bean {
    private final AbstractQuestion question;
    
    private final Map<Choice, List<QuestionInput>> choiceInputs;
+   
+   private final List<QuestionInput> childInputs;
    
    private String value;
    
@@ -71,6 +74,40 @@ public class QuestionInput extends Bean {
       }
       else {
          choiceInputs = null;
+      }
+      if (question instanceof SectionQuestion) {
+         SectionQuestion sectionQuestion = (SectionQuestion) question;
+         childInputs = new ArrayList<QuestionInput>(sectionQuestion.countChildQuestions());
+         for (AbstractQuestion childQuestion : sectionQuestion.getChildQuestions()) {
+            childInputs.add(new QuestionInput(pageInput, childQuestion));
+         }
+      }
+      else {
+         childInputs = null;
+      }
+   }
+
+   public QuestionInput[] getChildInputs() {
+      return childInputs != null ?
+             childInputs.toArray(new QuestionInput[childInputs.size()]) :
+             new QuestionInput[0];
+   }
+   
+   public int countChildInputs() {
+      return childInputs != null ? childInputs.size() : 0;
+   }
+
+   public QuestionInput getChildInput(final String questionName) {
+      if (childInputs != null) {
+         return CollectionUtil.search(childInputs, new IFilter<QuestionInput>() {
+            @Override
+            public boolean select(QuestionInput element) {
+               return ObjectUtil.equals(questionName, element.getQuestion().getName());
+            }
+         });
+      }
+      else {
+         return null;
       }
    }
 
@@ -168,7 +205,7 @@ public class QuestionInput extends Bean {
             errorMessage = "Trust into answer of question '" + question.getLabel() + "' is not defined.";
          }
       }
-      // Validate child inputs
+      // Validate choice inputs
       if (errorMessage == null && hasChoiceInputs()) {
          Choice[] selectedChoices = getSelectedChoices();
          for (int i = 0; errorMessage == null && i < selectedChoices.length; i++) {
@@ -179,6 +216,13 @@ public class QuestionInput extends Bean {
                   errorMessage = iter.next().validate();
                }
             }
+         }
+      }
+      // Validate child inputs
+      if (errorMessage == null && childInputs != null) {
+         Iterator<QuestionInput> iter = childInputs.iterator();
+         while (errorMessage == null && iter.hasNext()) {
+            errorMessage = iter.next().validate();
          }
       }
       return errorMessage;

@@ -36,7 +36,10 @@ public class TestEvaluation extends AbstractEvaluation {
                                                       "questionPageMessage",
                                                       null,
                                                       new BrowserQuestion("browserQuestion", new URL("http://key-project.org/")),
-                                                      new RadioButtonsQuestion("radioQuestions", "radioQuestionsLabel", false, "no", new FixedValueValidator("yes", "errorMessage"), true, new Choice("Yes", "yes", yesSubQuestion), new Choice("No", "no")));
+                                                      new RadioButtonsQuestion("radioQuestions", "radioQuestionsLabel", false, "no", new FixedValueValidator("yes", "errorMessage"), true, new Choice("Yes", "yes", yesSubQuestion), new Choice("No", "no")),
+                                                      new CheckboxQuestion("checkboxQuestion", "checkboxQuestionLabel", false, "option1", new FixedValueValidator("option2", "errorMessage"), true, new Choice("option2", "option2", yesSubQuestion), new Choice("option1", "option1")),
+                                                      new LabelQuestion("labelQuestion", "labelQuestionLabel"),
+                                                      new SectionQuestion("sectionQuestion", "sectionQuestionLabel", yesSubQuestion));
          SendFormPage sendFixedPage = new SendFormPage("sendFixedPage", "sendFixedPageTitle", "sendFixedPageMessage", "additionalDataCollectedByServer");
          FixedForm fixedForm = new FixedForm("fixedForm", false, questionPage, sendFixedPage);
          InstructionPage instructionPage = new InstructionPage("instructionPage", "instructionPageTitle", "instructionPageMessage", new URL("http://key-project.org/"));

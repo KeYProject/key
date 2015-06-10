@@ -26,9 +26,10 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
       AbstractPageInput<?> proof2Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME);
       AbstractPageInput<?> proof3Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME);
       AbstractPageInput<?> proof4Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME);
+      AbstractPageInput<?> feedbackPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.FEEDBACK_PAGE);
       AbstractPageInput<?> sendPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SEND_EVALUATION_PAGE_NAME);
       // Set order and tools
-      evaluationFormInput.setPageOrder(CollectionUtil.toList(jmlPage, keyPage, proof2Page, proof1Page, sedPage, proof4Page, proof3Page, sendPage));
+      evaluationFormInput.setPageOrder(CollectionUtil.toList(jmlPage, keyPage, proof2Page, proof1Page, sedPage, proof4Page, proof3Page, feedbackPage, sendPage));
       Tool keyTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
       Tool sedTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
       evaluationFormInput.setTool(proof2Page, keyTool);

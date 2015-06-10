@@ -19,6 +19,7 @@ import org.key_project.sed.key.evaluation.model.definition.BrowserQuestion;
 import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
 import org.key_project.sed.key.evaluation.model.definition.LabelQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
+import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
@@ -29,6 +30,7 @@ import org.key_project.sed.key.evaluation.wizard.manager.CheckboxManager;
 import org.key_project.sed.key.evaluation.wizard.manager.IQuestionInputManager;
 import org.key_project.sed.key.evaluation.wizard.manager.LabelManager;
 import org.key_project.sed.key.evaluation.wizard.manager.RadioButtonsManager;
+import org.key_project.sed.key.evaluation.wizard.manager.SectionManager;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPageInput> {
@@ -101,6 +103,10 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
             IQuestionInputManager manager = createLabel(toolkit, parent, (LabelQuestion) questionInput.getQuestion());
             managers.add(manager);
          }
+         else if (questionInput.getQuestion() instanceof SectionQuestion) {
+            IQuestionInputManager manager = createSection(wizardPage, toolkit, parent, questionInput, (SectionQuestion) questionInput.getQuestion(), callback);
+            managers.add(manager);
+         }
          else {
             throw new IllegalStateException("Unsupported question: " + questionInput.getQuestion());
          }
@@ -122,6 +128,10 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
 
    public static LabelManager createLabel(FormToolkit toolkit, Composite parent, LabelQuestion question) {
       return new LabelManager(toolkit, parent, question);
+   }
+
+   public static SectionManager createSection(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, SectionQuestion question, ICreateControlCallback callback) {
+      return new SectionManager(wizardPage, toolkit, parent, questionInput, question, callback);
    }
    
    public static interface ICreateControlCallback {
