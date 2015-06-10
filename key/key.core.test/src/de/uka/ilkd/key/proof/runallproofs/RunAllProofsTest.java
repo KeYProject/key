@@ -180,8 +180,8 @@ public class RunAllProofsTest {
    }
 
    @AfterClass
-   public static void computeSums() throws IOException {
-      statisticsFile.computeSums();
+   public static void computeSumsAndAverages() throws IOException {
+      statisticsFile.computeSumsAndAverages();
    }
 
    /**
