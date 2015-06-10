@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
+import org.key_project.sed.key.evaluation.model.definition.InstructionPage;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.SendFormPage;
 import org.key_project.sed.key.evaluation.model.definition.ToolPage;
@@ -39,6 +40,9 @@ public abstract class AbstractFormInput<F extends AbstractForm> extends Bean {
          }
          else if (page instanceof ToolPage) {
             this.pageInputs.add(new ToolPageInput(this, (ToolPage) page));
+         }
+         else if (page instanceof InstructionPage) {
+            this.pageInputs.add(new InstructionPageInput(this, (InstructionPage) page));
          }
          else {
             throw new IllegalStateException("Unsupported page: " + page);

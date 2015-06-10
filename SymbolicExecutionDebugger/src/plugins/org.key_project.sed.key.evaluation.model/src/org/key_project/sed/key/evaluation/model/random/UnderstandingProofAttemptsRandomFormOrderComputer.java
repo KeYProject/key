@@ -19,6 +19,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
       // Get needed objects
       RandomForm evaluationForm = ((UnderstandingProofAttemptsEvaluation) evaluationInput.getEvaluation()).getEvaluationForm();
       RandomFormInput evaluationFormInput = (RandomFormInput) evaluationInput.getFormInput(evaluationForm);
+      AbstractPageInput<?> jmlPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.JML_PAGE_NAME);
       AbstractPageInput<?> keyPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
       AbstractPageInput<?> sedPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
       AbstractPageInput<?> proof1Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME);
@@ -27,7 +28,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
       AbstractPageInput<?> proof4Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME);
       AbstractPageInput<?> sendPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SEND_EVALUATION_PAGE_NAME);
       // Set order and tools
-      evaluationFormInput.setPageOrder(CollectionUtil.toList(keyPage, proof2Page, proof1Page, sedPage, proof4Page, proof3Page, sendPage));
+      evaluationFormInput.setPageOrder(CollectionUtil.toList(jmlPage, keyPage, proof2Page, proof1Page, sedPage, proof4Page, proof3Page, sendPage));
       Tool keyTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
       Tool sedTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
       evaluationFormInput.setTool(proof2Page, keyTool);
@@ -36,5 +37,4 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
       evaluationFormInput.setTool(proof3Page, sedTool);
       return CollectionUtil.toList(evaluationFormInput);
    }
-
 }

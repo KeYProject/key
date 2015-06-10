@@ -54,6 +54,11 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    public static final String SEND_EVALUATION_PAGE_NAME = "sendEvaluation";
 
    /**
+    * Page name of the JML introduction page.
+    */
+   public static final String JML_PAGE_NAME = "JML";
+
+   /**
     * Forbid additional instances.
     */
    private UnderstandingProofAttemptsEvaluation() {
@@ -134,6 +139,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                  backgroundPage,
                                                  sendConditionsPage);
       // Create evaluation form
+      URL jmlURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/JML.html");
+      InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL);
       ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
       ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME));
       QuestionPage proof1Page = createCalendarQuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt 1");
@@ -144,7 +151,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Confirm Sending Content", 
                                                          "Inspect the content to be send.", 
                                                          "Current date and time (nothing else!)");
-      RandomForm evaluationForm = new RandomForm("evaluationForm", true, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, sendEvaluationPage);
+      RandomForm evaluationForm = new RandomForm("evaluationForm", true, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, sendEvaluationPage);
       // Create thanks form
       QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.", null);
       FixedForm thanksForm = new FixedForm("thanksForm", false, thanksPage);

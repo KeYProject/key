@@ -17,6 +17,7 @@ import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.FixedFormInput;
+import org.key_project.sed.key.evaluation.model.input.InstructionPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
@@ -411,6 +412,10 @@ public class FormInputWriterAndReaderTest extends TestCase {
          }
          else if (expected instanceof ToolPageInput) {
             assertTrue(actual instanceof ToolPageInput);
+            // Nothing else to do as nothing is stored
+         }
+         else if (expected instanceof InstructionPageInput) {
+            assertTrue(actual instanceof InstructionPageInput);
             // Nothing else to do as nothing is stored
          }
          else {

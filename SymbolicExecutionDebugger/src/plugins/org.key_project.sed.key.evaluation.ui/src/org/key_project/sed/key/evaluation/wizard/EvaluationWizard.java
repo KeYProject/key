@@ -15,6 +15,7 @@ import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
+import org.key_project.sed.key.evaluation.model.input.InstructionPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
@@ -23,6 +24,7 @@ import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
+import org.key_project.sed.key.evaluation.wizard.page.InstructionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.SendFormWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.ToolWizardPage;
@@ -62,6 +64,9 @@ public class EvaluationWizard extends Wizard {
             }
             else if (page instanceof ToolPageInput) {
                lastPage = new ToolWizardPage((ToolPageInput) page);
+            }
+            else if (page instanceof InstructionPageInput) {
+               lastPage = new InstructionWizardPage((InstructionPageInput) page);
             }
             else {
                throw new IllegalStateException("Unsupported page input: " + page);

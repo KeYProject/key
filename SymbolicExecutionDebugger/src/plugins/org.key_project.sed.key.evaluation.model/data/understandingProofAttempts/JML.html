@@ -12,27 +12,14 @@
          The relevant knowledge for this evaluation about JML is explained in the following sections.
          <b>Please read them carefully before you continue.</b>
          <ul>
-            <li>
-               <a href="#set">1 Symbolic Execution</a>
-               <ul>
-                  <li><a href="#set_mc">1.1 Symbolic Execution with Method Contracts</a></li>
-                  <li><a href="#set_li">1.2 Symbolic Execution with Loop Invariants</a></li>
-                  <li><a href="#verification">1.3 Proving by Symbolic Execution</a></li>
-               </ul>
-            </li>
-            <li>
-               <a href="#sed">2 User Interface of the Symbolic Execution Debugger (SED)</a>
-               <ul>
-                  <li><a href="#state">2.1 Inspecting a Symbolic State</a></li>
-                  <li><a href="#layout">2.2 Visualizing Memory Layouts</a></li>
-                  <li><a href="#truth">2.3 Comprehend Truth Values of Postconditions, Preconditions and Loop Invariants</a></li>
-               </ul>
-            </li>
-            <li><a href="#best">3 Best Practices to understand a Proof Attempt using SED</a></li>
+            <li><a href="#comments">1 JML comments</a></li>
+            <li><a href="#mc">2 Method Contracts</a></li>
+            <li><a href="#invariants">3 Invariants</a></li>
+            <li><a href="#loop">4 Loop Invariants</a></li>
          </ul>
       </p>      
       
-      <h2><a name="set">1 JML comments</a></h2>
+      <h2><a name="comments">1 JML comments</a></h2>
       <p>
          JML specifications are placed as special comments within the Java source code.
          Such comments have to start with the <code>@</code> character.
@@ -44,7 +31,7 @@
   @*/</pre></code>
       </p>
 
-      <h2><a name="mc">1 Method Contracts</a></h2>
+      <h2><a name="mc">2 Method Contracts</a></h2>
       <p>
          A method contract specifies the expected behavior of a method in terms of pre and postconditions.
          Assuming that the precondition is fulfilled when the method is called, the method guarantees that the postcondition is established when it returns.
@@ -90,7 +77,7 @@ public class Student {
 }</pre></code>
       </p>
 
-      <h2><a name="invariants">2 Invariants</a></h2>
+      <h2><a name="invariants">3 Invariants</a></h2>
       <p>
          An invariant is a property used to limit the possible state space of instances.
          All Constructors of a class have to establish the invariant while all methods have to preserve it.
@@ -108,7 +95,7 @@ public class Student {
 private int acquiredCredits = 0;</pre></code>
       </p>
 
-      <h2><a name="invariants">3 Loop Invariants</a></h2>
+      <h2><a name="loop">4 Loop Invariants</a></h2>
       <p>
          A loop invariant is a property which needs to hold before a loop is entered
          and which is preserved by each loop iteration (loop guard and loop body). 
