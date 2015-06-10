@@ -45,43 +45,18 @@ post: (   i &lt; 0 &amp; x.&lt;inv&gt;@heapBefore_goOnNice_5
               \else (FALSE)
       &amp; x.&lt;inv&gt;
       &amp; exc_8 = null)
-mod: \if (  i &lt; 0 &amp; x.&lt;inv&gt;
-          | !array = null
-          &amp; i &gt;= 0
-          &amp; x.&lt;inv&gt;)
-         \then (     \if (  i &lt; 0 &amp; x.&lt;inv&gt;
-                          | !array = null
-                          &amp; i &gt;= 0
-                          &amp; x.&lt;inv&gt;)
-                         \then (     \if (    i &lt; 0
-                                            &amp; x.&lt;inv&gt;
-                                          | !  array
-                                             = null
-                                          &amp; i &gt;= 0
+mod: \if (i &lt; 0 &amp; x.&lt;inv&gt;)
+         \then (     \if (i &lt; 0 &amp; x.&lt;inv&gt;)
+                         \then (     \if (  i &lt; 0
                                           &amp; x.&lt;inv&gt;)
-                                         \then (     \if (      i
-                                                              &lt; 0
-                                                            &amp; x.&lt;inv&gt;
-                                                          | !  array
-                                                             = null
-                                                          &amp;    i
-                                                            &gt;= 0
+                                         \then (     \if (    i
+                                                            &lt; 0
                                                           &amp; x.&lt;inv&gt;)
-                                                         \then (     \if (      i
-                                                                              &lt; 0
-                                                                            &amp; x.&lt;inv&gt;
-                                                                          | !  array
-                                                                             = null
-                                                                          &amp;    i
-                                                                            &gt;= 0
+                                                         \then (     \if (    i
+                                                                            &lt; 0
                                                                           &amp; x.&lt;inv&gt;)
-                                                                         \then (     \if (      i
-                                                                                              &lt; 0
-                                                                                            &amp; x.&lt;inv&gt;
-                                                                                          | !  array
-                                                                                             = null
-                                                                                          &amp;    i
-                                                                                            &gt;= 0
+                                                                         \then (     \if (    i
+                                                                                            &lt; 0
                                                                                           &amp; x.&lt;inv&gt;)
                                                                                          \then (allLocs)
                                                                                          \else (allLocs)
@@ -217,43 +192,18 @@ post: (   i &lt; 0 &amp; x.&lt;inv&gt;@heapBefore_goOnNice_5
               \else (FALSE)
       &amp; x.&lt;inv&gt;
       &amp; exc_9 = null)
-mod: \if (  i &lt; 0 &amp; x.&lt;inv&gt;
-          | !array = null
-          &amp; i &gt;= 0
-          &amp; x.&lt;inv&gt;)
-         \then (     \if (  i &lt; 0 &amp; x.&lt;inv&gt;
-                          | !array = null
-                          &amp; i &gt;= 0
-                          &amp; x.&lt;inv&gt;)
-                         \then (     \if (    i &lt; 0
-                                            &amp; x.&lt;inv&gt;
-                                          | !  array
-                                             = null
-                                          &amp; i &gt;= 0
+mod: \if (i &lt; 0 &amp; x.&lt;inv&gt;)
+         \then (     \if (i &lt; 0 &amp; x.&lt;inv&gt;)
+                         \then (     \if (  i &lt; 0
                                           &amp; x.&lt;inv&gt;)
-                                         \then (     \if (      i
-                                                              &lt; 0
-                                                            &amp; x.&lt;inv&gt;
-                                                          | !  array
-                                                             = null
-                                                          &amp;    i
-                                                            &gt;= 0
+                                         \then (     \if (    i
+                                                            &lt; 0
                                                           &amp; x.&lt;inv&gt;)
-                                                         \then (     \if (      i
-                                                                              &lt; 0
-                                                                            &amp; x.&lt;inv&gt;
-                                                                          | !  array
-                                                                             = null
-                                                                          &amp;    i
-                                                                            &gt;= 0
+                                                         \then (     \if (    i
+                                                                            &lt; 0
                                                                           &amp; x.&lt;inv&gt;)
-                                                                         \then (     \if (      i
-                                                                                              &lt; 0
-                                                                                            &amp; x.&lt;inv&gt;
-                                                                                          | !  array
-                                                                                             = null
-                                                                                          &amp;    i
-                                                                                            &gt;= 0
+                                                                         \then (     \if (    i
+                                                                                            &lt; 0
                                                                                           &amp; x.&lt;inv&gt;)
                                                                                          \then (allLocs)
                                                                                          \else (allLocs)

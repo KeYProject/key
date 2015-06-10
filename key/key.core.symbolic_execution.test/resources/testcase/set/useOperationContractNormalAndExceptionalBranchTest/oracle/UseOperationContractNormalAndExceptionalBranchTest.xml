@@ -20,20 +20,15 @@ post: (   value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
 mod: \if (  value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
           | value &lt; javaUnaryMinusInt(10)
           | value &gt;= 0
-          &amp; value &lt; 10
-          | value &gt;= 10)
+          &amp; value &lt; 10)
          \then (     \if (    value &lt; 0
                             &amp;    value
                               &gt;= javaUnaryMinusInt(10)
                           |   value
-                            &lt; javaUnaryMinusInt(10)
-                          | value &gt;= 0
-                          &amp; value &lt; 10)
-                         \then (     \if (    value &lt; 0
-                                            &amp;    value
-                                              &gt;= javaUnaryMinusInt(10)
-                                          |   value
-                                            &lt; javaUnaryMinusInt(10))
+                            &lt; javaUnaryMinusInt(10))
+                         \then (     \if (  value &lt; 0
+                                          &amp;    value
+                                            &gt;= javaUnaryMinusInt(10))
                                          \then (allLocs)
                                          \else (allLocs)
                                 \cap \if (  value
