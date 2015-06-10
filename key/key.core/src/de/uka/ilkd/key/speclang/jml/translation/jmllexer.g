@@ -212,7 +212,7 @@ options {
 
 LT_IMPLICIT_GT_DISPATCH
     :
-      LT (LETTER)+ GT {$setType(IDENT);}
+      (LT (LETTER)+ GT) => LT (LETTER)+ GT {$setType(IDENT);}
     |
       LT {$setType(LT);}
     |
