@@ -127,7 +127,7 @@ public class CloseAfterJoin implements BuiltInRule {
 
             @Override
             public void proofPruned(ProofTreeEvent e) {
-                if (!prunedNode.find(joinNodeF)) {
+                if (!findJoinNode()) {
                     if (linkedGoal.node().isClosed()) {
                         // The partner node has already been closed; we have to
                         // add the goal again.
@@ -139,8 +139,26 @@ public class CloseAfterJoin implements BuiltInRule {
                     // as not linked and set it to automatic again.
                     linkedGoal.setLinkedGoal(null);
                     
-                    e.getSource().removeProofTreeListener(this);
+                    //TODO: The below removal of the listener leads to a
+                    // ConcurrentModificationException during the application
+                    // of FinishSymbolicExecutionUntilJoinPointMacro in certain
+                    // cases - that is, when the macro prunes the proof in order
+                    // to "clean up"
+                    // e.getSource().removeProofTreeListener(this);
                 }
+            }
+            
+            private boolean findJoinNode() {
+                Node currNode = prunedNode;
+                while (currNode != null) {
+                    if (currNode.equals(joinNodeF)) {
+                        return true;
+                    }
+                    
+                    currNode = currNode.parent();
+                }
+                
+                return prunedNode.find(joinNodeF);
             }
 
         });
