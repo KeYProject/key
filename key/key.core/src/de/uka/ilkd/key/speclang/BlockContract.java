@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
@@ -53,6 +54,7 @@ public interface BlockContract extends SpecificationElement {
     public Variables getPlaceholderVariables();
     public boolean isTransactionApplicable();
     public boolean isReadOnly(Services services);
+    
     /**
      * Returns <code>true</code> iff the method (according to the contract) does
      * not modify the heap at all, i.e., iff it is "strictly pure."
@@ -88,6 +90,8 @@ public interface BlockContract extends SpecificationElement {
     public Term getEnsures(LocationVariable heap);
 
     public Term getAssignable(LocationVariable heap);
+    
+    public JoinProcedure getJoinProcedure();
 
     public void visit(Visitor visitor);
 
@@ -101,6 +105,7 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newPostconditions,
                                 Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newInfFlowSpecs,
+                                final JoinProcedure newJoinProcedure,
                                 Variables newVariables);
 
     public BlockContract setBlock(StatementBlock newBlock);
