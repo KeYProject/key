@@ -178,12 +178,12 @@ public final class KeYProjectProperties {
          try {
             value = project.getPersistentProperty(PROP_GENERATE_TEST_CASES);
             if(value == null){
-               return true;
+               return false;
             }
             return Boolean.parseBoolean(value);
          }
          catch (CoreException e) {
-            return true;
+            return false;
          }
       }
       return false;
