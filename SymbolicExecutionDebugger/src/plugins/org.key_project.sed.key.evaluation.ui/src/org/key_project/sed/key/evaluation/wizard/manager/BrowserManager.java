@@ -9,6 +9,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.key_project.sed.key.evaluation.model.definition.BrowserQuestion;
 
@@ -44,5 +45,10 @@ public class BrowserManager extends AbstractQuestionInputManager {
    @Override
    protected void enableControls(boolean enabled) {
       browser.setEnabled(enabled);
+   }
+
+   @Override
+   public Control getFocusControl() {
+      return browser;
    }
 }

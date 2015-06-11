@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
@@ -51,5 +52,10 @@ public class SectionManager extends AbstractQuestionInputManager {
       for (IQuestionInputManager manager : childManagers) {
          manager.setEnabled(enabled);
       }
+   }
+
+   @Override
+   public Control getFocusControl() {
+      return section;
    }
 }

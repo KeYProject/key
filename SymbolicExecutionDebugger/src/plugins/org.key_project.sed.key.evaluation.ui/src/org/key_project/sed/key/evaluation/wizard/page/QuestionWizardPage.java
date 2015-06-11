@@ -11,6 +11,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -36,7 +37,7 @@ import org.key_project.sed.key.evaluation.wizard.manager.TextManager;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPageInput> {
-   private final List<IDisposable> controls = new LinkedList<IDisposable>();
+   private final List<IQuestionInputManager> controls = new LinkedList<IQuestionInputManager>();
    
    private final PropertyChangeListener valueAndTrustListener = new PropertyChangeListener() {
       @Override
@@ -154,6 +155,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    
    @Override
    protected void updatePageCompleted() {
+      Control errornousControl = null;
       String errorMessage = getRunnablesFailure();
       // Validate questions
       if (errorMessage == null) {
@@ -161,10 +163,14 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
          int i = 0;
          while (errorMessage == null && i < inputs.length) {
             errorMessage = inputs[i].validate();
+            if (errorMessage != null) {
+               errornousControl = controls.get(i).getFocusControl();
+            }
             i++;
          }
       }
       // Update page completed state
+      setErrornousControl(errornousControl);
       setPageComplete(errorMessage == null);
       setErrorMessage(errorMessage);
    }

@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -84,10 +85,15 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
 
    @Override
    protected void updatePageCompleted() {
+      Control errornousControl = null;
       String errorMessage = getRunnablesFailure();
       if (errorMessage == null) {
          errorMessage = getPageInput().getAcceptInput().validate();
+         if (errorMessage != null) {
+            errornousControl = acceptManager.getComposite();
+         }
       }
+      setErrornousControl(errornousControl);
       setPageComplete(errorMessage == null);
       setErrorMessage(errorMessage);
    }

@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
@@ -72,5 +73,10 @@ public abstract class AbstractEditableQuestionInputManager extends AbstractQuest
       if (trustManager != null) {
          trustManager.dispose();
       }
+   }
+
+   @Override
+   public Control getFocusControl() {
+      return questionSection;
    }
 }

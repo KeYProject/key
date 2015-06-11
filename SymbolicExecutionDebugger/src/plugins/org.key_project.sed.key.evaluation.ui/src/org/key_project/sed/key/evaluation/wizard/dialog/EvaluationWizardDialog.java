@@ -11,7 +11,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
@@ -24,6 +29,7 @@ import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.SendFormWizardPage;
+import org.key_project.util.java.ObjectUtil;
 
 public class EvaluationWizardDialog extends WizardDialog {
    private static final Map<EvaluationInput, WeakHashMap<EvaluationWizardDialog, Void>> dialogInstances = new HashMap<EvaluationInput, WeakHashMap<EvaluationWizardDialog, Void>>();
@@ -41,6 +47,26 @@ public class EvaluationWizardDialog extends WizardDialog {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
          handleSendingInProgressChanged(evt);
+      }
+   };
+   
+   private boolean messageClickable = false;
+   
+   private Cursor handCursor;
+   
+   private final MouseListener messageMouseListener = new MouseListener() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+         handleMessageClick(e);
+      }
+      
+      @Override
+      public void mouseDown(MouseEvent e) {
+      }
+      
+      @Override
+      public void mouseDoubleClick(MouseEvent e) {
+         handleMessageClick(e);
       }
    };
 
@@ -150,6 +176,12 @@ public class EvaluationWizardDialog extends WizardDialog {
       }
    }
    
+   @Override
+   protected Control createContents(Composite parent) {
+      handCursor = new Cursor(getShell().getDisplay(), SWT.CURSOR_HAND);
+      return super.createContents(parent);
+   }
+
    protected Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
       Rectangle result = super.getConstrainedShellBounds(preferredSize);
       if (result.width > 600) {
@@ -171,6 +203,7 @@ public class EvaluationWizardDialog extends WizardDialog {
    public boolean close() {
       boolean closed = super.close();
       if (closed) {
+         handCursor.dispose();
          unregisterDialog(this);
          removeListener();
          try {
@@ -229,6 +262,57 @@ public class EvaluationWizardDialog extends WizardDialog {
          else {
             return false;
          }
+      }
+   }
+   
+   @Override
+   public void updateMessage() {
+      super.updateMessage();
+      boolean newClickable = getCurrentPage() != null && getCurrentPage().isMessageClickable();
+      if (newClickable != messageClickable) {
+         Control messageLabel = getMessageLabel();
+         Control messageImageLabel = getMessageImageLabel();
+         if (newClickable) {
+            messageLabel.setCursor(handCursor);
+            messageLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_LINK_FOREGROUND));
+            messageLabel.addMouseListener(messageMouseListener);
+            messageImageLabel.setCursor(handCursor);
+            messageImageLabel.addMouseListener(messageMouseListener);
+         }
+         else {
+            messageLabel.setCursor(null);
+            messageLabel.setForeground(null);
+            messageLabel.removeMouseListener(messageMouseListener);
+            messageImageLabel.setCursor(null);
+            messageImageLabel.removeMouseListener(messageMouseListener);
+         }
+         messageClickable = newClickable;
+      }
+   }
+
+   protected void handleMessageClick(MouseEvent e) {
+      if (getCurrentPage() != null) {
+         getCurrentPage().performMessageClick();
+      }
+   }
+
+   protected Control getMessageLabel() {
+      try {
+         return (Control) ObjectUtil.get(this, "messageLabel");
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         return null;
+      }
+   }
+   
+   protected Control getMessageImageLabel() {
+      try {
+         return (Control) ObjectUtil.get(this, "messageImageLabel");
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         return null;
       }
    }
 }

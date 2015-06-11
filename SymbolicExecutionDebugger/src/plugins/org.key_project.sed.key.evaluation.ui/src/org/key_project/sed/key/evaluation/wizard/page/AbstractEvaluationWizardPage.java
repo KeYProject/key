@@ -5,6 +5,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
@@ -19,6 +20,10 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    
    private long shownAt;
    
+   private Control errornousControl;
+   
+   private ScrolledForm form;
+   
    public AbstractEvaluationWizardPage(P pageInput) {
       super(pageInput.getPage().getName());
       this.pageInput = pageInput;
@@ -30,7 +35,7 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    @Override
    public void createControl(Composite parent) {
       FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-      ScrolledForm form = toolkit.createScrolledForm(parent);
+      form = toolkit.createScrolledForm(parent);
       form.getBody().setLayout(new GridLayout(1, false));
       createContent(toolkit, form);
       setControl(form);
@@ -105,5 +110,23 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
 
    public long getShownAt() {
       return shownAt;
+   }
+   
+   public Control getErrornousControl() {
+      return errornousControl;
+   }
+
+   public void setErrornousControl(Control errornousControl) {
+      this.errornousControl = errornousControl;
+   }
+
+   public boolean isMessageClickable() {
+      return errornousControl != null;
+   }
+   
+   public void performMessageClick() {
+      if (errornousControl != null) {
+         form.showControl(errornousControl);
+      }
    }
 }

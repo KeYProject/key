@@ -20,6 +20,7 @@ public class InstructionWizardPage extends AbstractEvaluationWizardPage<Instruct
    @Override
    protected void updatePageCompleted() {
       String errorMessage = getRunnablesFailure();
+      setErrornousControl(null);
       setPageComplete(errorMessage == null);
       setErrorMessage(errorMessage);
    }

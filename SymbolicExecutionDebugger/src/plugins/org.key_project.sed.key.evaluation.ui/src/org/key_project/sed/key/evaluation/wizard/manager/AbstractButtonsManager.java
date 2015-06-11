@@ -12,6 +12,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.key_project.sed.key.evaluation.model.definition.AbstractButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
@@ -171,5 +172,14 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
             manager.setEnabled(enabled);
          }
       }
+   }
+
+   @Override
+   public Control getFocusControl() {
+      Control control = super.getFocusControl();
+      if (control == null) {
+         control = buttons.get(0);
+      }
+      return control;
    }
 }

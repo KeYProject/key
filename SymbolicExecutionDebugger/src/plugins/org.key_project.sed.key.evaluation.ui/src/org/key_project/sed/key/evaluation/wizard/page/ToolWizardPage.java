@@ -20,6 +20,7 @@ public class ToolWizardPage extends AbstractEvaluationWizardPage<ToolPageInput> 
    @Override
    protected void updatePageCompleted() {
       String errorMessage = getRunnablesFailure();
+      setErrornousControl(null);
       setPageComplete(errorMessage == null);
       setErrorMessage(errorMessage);
    }

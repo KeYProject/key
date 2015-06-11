@@ -8,6 +8,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.key_project.sed.key.evaluation.model.definition.TextQuestion;
@@ -55,5 +56,10 @@ public class TextManager extends AbstractEditableQuestionInputManager {
    @Override
    protected void enableControls(boolean enabled) {
       text.setEnabled(enabled);
+   }
+
+   @Override
+   public Control getFocusControl() {
+      return text;
    }
 }
