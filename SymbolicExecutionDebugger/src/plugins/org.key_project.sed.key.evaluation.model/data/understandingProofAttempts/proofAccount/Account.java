@@ -10,10 +10,10 @@ public class Account {
    public int checkAndWithdraw(int amount) {
       if (canWithdraw(amount)) {
          withdraw(amount);
-         return amount;
+         return amount; // Return 1
       }
       else {
-         return 0;
+         return 0; // Return 2
       }
    }
 

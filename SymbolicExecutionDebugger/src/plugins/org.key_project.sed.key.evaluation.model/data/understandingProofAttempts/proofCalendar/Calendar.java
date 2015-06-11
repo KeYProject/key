@@ -21,8 +21,13 @@ public class Calendar {
            @*/
          for (int i = 0; i < entries.length; i++) {
             newEntries[i] = entries[i];
+            // Loop End
          }
          entries = newEntries;
+         // After Then
+      }
+      else {
+         // After Else
       }
       entries[entrySize] = entry;
       entrySize++;

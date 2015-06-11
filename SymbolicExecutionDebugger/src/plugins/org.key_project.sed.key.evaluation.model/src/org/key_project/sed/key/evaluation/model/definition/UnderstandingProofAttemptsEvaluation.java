@@ -271,7 +271,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
                                                               new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
-                                                              new Choice("Precondition (array != null) is not established", "Precondition not established"),
+                                                              new Choice("Precondition (array != null) is not established", "Precondition not established", createMinTerminationQuestion("preconditionTermination")),
                                                               new Choice("Postcondition (array == null || array.length == 0 ==> \\result == -1) does not hold", "Not found postcondition does not hold", createMinTerminationQuestion("postNotFoundTermination")),
                                                               new Choice("Postcondition (array != null && array.length >= 1 ==> (\\forall int i; i >= 0 && i < array.length; array[\\result] <= array[i])) does not hold", "Found postcondition does not hold", createMinTerminationQuestion("postFoundTermination")),
                                                               new Choice("Assignable clause of method contract does not hold", "Assignable clause of method contract does not hold", createMinLocationQuestion("whichMethodLocationsHaveChanged"), createMinTerminationQuestion("methodAssignableTermination")),
@@ -390,19 +390,19 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
                                                               new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
-                                                              new Choice("Precondition (entry != null) is not established", "Precondition not established"),
-                                                              new Choice("Invariant (entrySize >= 0 && entrySize < entries.length) is not established", "Invariant not established"),
-                                                              new Choice("Postcondition (entries[\\old(entrySize)] == entry) does not hold", "Postcondition about entry does not hold"),
-                                                              new Choice("Postcondition (entrySize == \\old(entrySize) + 1) does not hold", "Postcondition about entrySize does not hold"),
-                                                              new Choice("Invariant (entrySize >= 0 && entrySize < entries.length) is not preserved", "Invariant not preserved"),
-                                                              new Choice("Assignable clause does not hold", "Assignable clause does not hold", createCalendarLocationQuestion("whichMethodLocationsHaveChanged")),
+                                                              new Choice("Precondition (entry != null) is not established", "Precondition not established", createCalendarTerminationQuestion("preconditionTermination")),
+                                                              new Choice("Invariant (entrySize >= 0 && entrySize < entries.length) is not established", "Invariant not established", createCalendarTerminationQuestion("invariantEstablishedTermination")),
+                                                              new Choice("Postcondition (entries[\\old(entrySize)] == entry) does not hold", "Postcondition about entry does not hold", createCalendarTerminationQuestion("postEntryTermination")),
+                                                              new Choice("Postcondition (entrySize == \\old(entrySize) + 1) does not hold", "Postcondition about entrySize does not hold", createCalendarTerminationQuestion("postEntrySizeTermination")),
+                                                              new Choice("Invariant (entrySize >= 0 && entrySize < entries.length) is not preserved", "Invariant not preserved", createCalendarTerminationQuestion("invariantNotPreservedTermination")),
+                                                              new Choice("Assignable clause does not hold", "Assignable clause does not hold", createCalendarLocationQuestion("whichMethodLocationsHaveChanged"), createCalendarTerminationQuestion("assignableTermination")),
                                                               new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion),
-                                                              new Choice("Loop invariant (i >= 0 && i <= entries.length) does not hold initially", "Loop invariant about i does not hold initially"),
-                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]) does not hold initially", "Loop invariant about array elements does not hold initially"),
-                                                              new Choice("Loop invariant (i >= 0 && i <= entries.length) is not preserved by loop guard and loop body", "Loop invariant about i is not preserved"),
-                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]) is not preserved by loop guard and loop body", "Loop invariant about array elements is not preserved"),
-                                                              new Choice("Decreasing term (entries.length - i) is not fulfilled by loop", "Decreasing term is not fulfilled"),
-                                                              new Choice("Assignable clause of loop does not hold", "Assignable clause of loop does not hold", createCalendarLocationQuestion("whichLoopLocationsHaveChanged")));
+                                                              new Choice("Loop invariant (i >= 0 && i <= entries.length) does not hold initially", "Loop invariant about i does not hold initially", createCalendarTerminationQuestion("loopInvariantIInitialTermination")),
+                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]) does not hold initially", "Loop invariant about array elements does not hold initially", createCalendarTerminationQuestion("loopInvariantArrayElementsInitialTermination")),
+                                                              new Choice("Loop invariant (i >= 0 && i <= entries.length) is not preserved by loop guard and loop body", "Loop invariant about i is not preserved", createCalendarTerminationQuestion("loopInvariantIPreservedTermination")),
+                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]) is not preserved by loop guard and loop body", "Loop invariant about array elements is not preserved", createCalendarTerminationQuestion("loopInvariantArrayElementsPreservedTermination")),
+                                                              new Choice("Decreasing term (entries.length - i) is not fulfilled by loop", "Decreasing term is not fulfilled", createCalendarTerminationQuestion("decreasingTermination")),
+                                                              new Choice("Assignable clause of loop does not hold", "Assignable clause of loop does not hold", createCalendarLocationQuestion("whichLoopLocationsHaveChanged"), createCalendarTerminationQuestion("loopAssingableTermination")));
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -463,6 +463,19 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("newEntries[*]", "newEntries[*]"));
    }
    
+   protected CheckboxQuestion createCalendarTerminationQuestion(String name) {
+      String title = "At which execution path?";
+      return new CheckboxQuestion(name, 
+                                  title, 
+                                  true,
+                                  null, 
+                                  new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  true,
+                                  new Choice("After Then (entrySize == entries.length)", "After Then"),
+                                  new Choice("After Else (entrySize != entries.length)", "After Else"),
+                                  new Choice("Loop End", "Loop End"));
+   }
+   
    public RandomForm getEvaluationForm() {
       return (RandomForm) getForm("evaluationForm");
    }
@@ -500,22 +513,22 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
                                                               new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
-                                                              new Choice("Precondition (amount > 0) of checkAndWithdraw(int) is not established", "checkAndWithdraw: Precondition not established ("),
-                                                              new Choice("Postcondition (balance == \\old(balance) - \\result) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about balance does not hold"),
-                                                              new Choice("Postcondition (\\result == amount) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about result does not hold"),
-                                                              new Choice("Assignable clause (balance) of method contract of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("checkAndWithdrawLocations")),
+                                                              new Choice("Precondition (amount > 0) of checkAndWithdraw(int) is not established", "checkAndWithdraw: Precondition not established", createAccountTerminationQuestion("checkAndWithdrawPreTermination")),
+                                                              new Choice("Postcondition (balance == \\old(balance) - \\result) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("checkAndWithdrawPostconditionBalanceTermination")),
+                                                              new Choice("Postcondition (\\result == amount) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about result does not hold", createAccountTerminationQuestion("checkAndWithdrawPostcondtionResultTermination")),
+                                                              new Choice("Assignable clause (balance) of method contract of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("checkAndWithdrawLocations"), createAccountTerminationQuestion("checkAndWithdrawAssignableTermination")),
 
-                                                              new Choice("Precondition (amount > 0) of withdraw(int) is not established", "withdraw: Precondition not established"),
-                                                              new Choice("Postcondition (balance == \\old(balance) - amount) of withdraw(int) does not hold", "withdraw: Postcondition about balance does not hold"),
-                                                              new Choice("Assignable clause (balance) of method contract of withdraw(int) does not hold", "withdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("withdrawLocations")),
+                                                              new Choice("Precondition (amount > 0) of withdraw(int) is not established", "withdraw: Precondition not established", createAccountTerminationQuestion("withdrawPreconditionTermination")),
+                                                              new Choice("Postcondition (balance == \\old(balance) - amount) of withdraw(int) does not hold", "withdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("withdrawPostconditionTermination")),
+                                                              new Choice("Assignable clause (balance) of method contract of withdraw(int) does not hold", "withdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("withdrawLocations"), createAccountTerminationQuestion("withdrawAssignableTermination")),
 
-                                                              new Choice("Precondition (amount > 0) of canWithdraw(int) is not established", "canWithdraw: Precondition not established"),
-                                                              new Choice("Postcondition (true) of canWithdraw(int) does not hold", "canWithdraw: Postcondition about balance does not hold"),
-                                                              new Choice("Assignable clause (\\nothing) of method contract of canWithdraw(int) does not hold", "canWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("canWithdrawLocations")),
+                                                              new Choice("Precondition (amount > 0) of canWithdraw(int) is not established", "canWithdraw: Precondition not established", createAccountTerminationQuestion("canWithdrawPreconditionTermination")),
+                                                              new Choice("Postcondition (true) of canWithdraw(int) does not hold", "canWithdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("canWithdrawPostconditionTermination")),
+                                                              new Choice("Assignable clause (\\nothing) of method contract of canWithdraw(int) does not hold", "canWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("canWithdrawLocations"), createAccountTerminationQuestion("canWithdrawAssignableTermination")),
 
-                                                              new Choice("Precondition (true) of getBalance() is not established", "getBalance: Precondition not established"),
-                                                              new Choice("Postcondition (\result == balance) of getBalance() does not hold", "getBalance: Postcondition about balance does not hold"),
-                                                              new Choice("Assignable clause (\\nothing) of method contract of getBalance(int) does not hold", "getBalance: Assignable clause of method contract does not hold", createAccountLocationQuestion("getBalanceLocations")),
+                                                              new Choice("Precondition (true) of getBalance() is not established", "getBalance: Precondition not established", createAccountTerminationQuestion("getBalancePreconditionTermination")),
+                                                              new Choice("Postcondition (\result == balance) of getBalance() does not hold", "getBalance: Postcondition about balance does not hold", createAccountTerminationQuestion("getBalancePostconditionTermination")),
+                                                              new Choice("Assignable clause (\\nothing) of method contract of getBalance(int) does not hold", "getBalance: Assignable clause of method contract does not hold", createAccountLocationQuestion("getBalanceLocations"), createAccountTerminationQuestion("getBalanceAssignableTermination")),
                                                               
                                                               new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion));
       String openQuestionTitle = "Is the proof closed?";
@@ -580,6 +593,18 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   true,
                                   new Choice("balance", "balance"),
                                   new Choice("amount", "amount"));
+   }
+   
+   protected CheckboxQuestion createAccountTerminationQuestion(String name) {
+      String title = "At which execution path?";
+      return new CheckboxQuestion(name, 
+                                  title, 
+                                  true,
+                                  null, 
+                                  new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  true,
+                                  new Choice("Return 1 (canWithdraw(amount))", "Return amount"),
+                                  new Choice("Return 2 (!canWithdraw(amount))", "Return 0"));
    }
    
    protected String createGeneralDescription(String po) {
