@@ -147,13 +147,8 @@ public class CloseAfterJoin implements BuiltInRule {
                     // The joined node has been pruned; now mark this node
                     // as not linked and set it to automatic again.
                     linkedGoal.setLinkedGoal(null);
-                    
-                    //TODO: The below removal of the listener leads to a
-                    // ConcurrentModificationException during the application
-                    // of FinishSymbolicExecutionUntilJoinPointMacro in certain
-                    // cases - that is, when the macro prunes the proof in order
-                    // to "clean up"
-                    // e.getSource().removeProofTreeListener(this);
+
+                     e.getSource().removeProofTreeListener(this);
                 }
             }
             
