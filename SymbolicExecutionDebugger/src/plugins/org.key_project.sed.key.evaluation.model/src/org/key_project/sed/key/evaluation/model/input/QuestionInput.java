@@ -199,7 +199,7 @@ public class QuestionInput extends Bean {
 
    public String validate() {
       // Validate input
-      String errorMessage = question.validate(getValue());
+      String errorMessage = validateValue();
       if (errorMessage == null && question.isAskForTrust()) {
          if (getTrust() == null) {
             errorMessage = "Trust into answer of question '" + question.getLabel() + "' is not defined.";
@@ -226,6 +226,10 @@ public class QuestionInput extends Bean {
          }
       }
       return errorMessage;
+   }
+   
+   public String validateValue() {
+      return question.validate(getValue());
    }
 
    public Choice[] getSelectedChoices() {

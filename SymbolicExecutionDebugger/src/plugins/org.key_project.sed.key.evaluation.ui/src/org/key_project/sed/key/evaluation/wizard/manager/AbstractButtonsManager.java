@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
@@ -26,6 +29,7 @@ import org.key_project.util.java.StringUtil;
 
 public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> extends AbstractEditableQuestionInputManager {
    private final List<Button> buttons = new LinkedList<Button>();
+   private final List<ControlDecoration> buttonDecorations = new LinkedList<ControlDecoration>();
    
    private final Map<Choice, List<IQuestionInputManager>> choiceManagers = new HashMap<Choice, List<IQuestionInputManager>>();
    
@@ -111,6 +115,22 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          }
       });
       buttons.add(button);
+      ControlDecoration buttonDecoration = new ControlDecoration(button, SWT.RIGHT | SWT.TOP);
+      buttonDecoration.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
+      buttonDecorations.add(buttonDecoration);
+      updateButtonDecorations();
+   }
+   
+   protected void updateButtonDecorations() {
+      boolean valid = getQuestionInput().validateValue() == null;
+      for (ControlDecoration decoration : buttonDecorations) {
+         if (valid || !isEnabled() || ((Button) decoration.getControl()).getSelection()) {
+            decoration.hide();
+         }
+         else {
+            decoration.show();
+         }
+      }
    }
    
    protected abstract boolean isChoiceSelected(String inputValue, String choiceValue);
@@ -130,6 +150,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          }
       }
       updateChoiceChildrenEnabled();
+      updateButtonDecorations();
    }
 
    protected void updateValueSetAt(QuestionInput questionInput) {
@@ -163,6 +184,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          button.setEnabled(enabled);
       }
       updateChoiceChildrenEnabled();
+      updateButtonDecorations();
    }
    
    protected void updateChoiceChildrenEnabled() {

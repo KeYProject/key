@@ -16,8 +16,10 @@ package org.key_project.sed.key.evaluation.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.key.evaluation.Activator;
@@ -43,11 +45,21 @@ public final class SEDEvaluationImages {
      * The key for the emoticon fantasy dreaming.
      */
     public static final String EMOTICON_FANTASY_DREAMING = "org.key_project.sed.ui.images.methodCall.emoticonFantasyDreaming";
+    
+    /**
+     * The key for the emoticon fantasy dreaming.
+     */
+    public static final String EMOTICON_FANTASY_DREAMING_ERROR = "org.key_project.sed.ui.images.methodCall.emoticonFantasyDreamingError";
 
     /**
      * The key for the emoticon omg.
      */
     public static final String EMOTICON_OMG = "org.key_project.sed.ui.images.methodCall.emoticonOmg";
+
+    /**
+     * The key for the emoticon omg.
+     */
+    public static final String EMOTICON_OMG_ERROR = "org.key_project.sed.ui.images.methodCall.emoticonOmgError";
     
     /**
      * Forbid instances.
@@ -115,8 +127,14 @@ public final class SEDEvaluationImages {
         else if (EMOTICON_FANTASY_DREAMING.equals(key)) {
            path = "icons/emoticons/fantasy_dreams.png";
         }
+        else if (EMOTICON_FANTASY_DREAMING_ERROR.equals(key)) {
+           return decorateImage(getImage(EMOTICON_FANTASY_DREAMING), FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
+        }
         else if (EMOTICON_OMG.equals(key)) {
            path = "icons/emoticons/omg.png";
+        }
+        else if (EMOTICON_OMG_ERROR.equals(key)) {
+           return decorateImage(getImage(EMOTICON_OMG), FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
         }
         // Load image if possible
         if (path != null) {
@@ -143,5 +161,16 @@ public final class SEDEvaluationImages {
         else {
            return null;
         }
+    }
+    
+    protected static Image decorateImage(Image baseImage, Image decorationImage) {
+       Image result = new Image(Display.getDefault(), baseImage.getBounds().width, baseImage.getBounds().height);
+       GC gc = new GC(result);
+       gc.drawImage(baseImage, 0, 0);
+       int decX = result.getBounds().width - decorationImage.getBounds().width;
+       int decY = result.getBounds().height - decorationImage.getBounds().height;
+       gc.drawImage(decorationImage, decX, decY);
+       gc.dispose();
+       return result;
     }
 }

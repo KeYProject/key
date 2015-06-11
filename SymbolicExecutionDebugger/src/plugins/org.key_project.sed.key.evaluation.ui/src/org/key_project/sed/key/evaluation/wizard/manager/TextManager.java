@@ -2,6 +2,8 @@ package org.key_project.sed.key.evaluation.wizard.manager;
 
 import java.beans.PropertyChangeEvent;
 
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -17,8 +19,11 @@ import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPa
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 
+// TODO: Show different icon when trust is not set.
 public class TextManager extends AbstractEditableQuestionInputManager {
    private final Text text;
+   
+   private final ControlDecoration textDecoration;
    
    public TextManager(AbstractEvaluationWizardPage<?> wizardPage,
                       FormToolkit toolkit, 
@@ -38,6 +43,18 @@ public class TextManager extends AbstractEditableQuestionInputManager {
             handleTextChanged(e);
          }
       });
+      textDecoration = new ControlDecoration(text, SWT.RIGHT | SWT.TOP);
+      textDecoration.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
+      updateTextDecoration();
+   }
+   
+   protected void updateTextDecoration() {
+      if (isEnabled() && getQuestionInput().validateValue() != null) {
+         textDecoration.show();
+      }
+      else {
+         textDecoration.hide();
+      }
    }
 
    protected void handleTextChanged(ModifyEvent e) {
@@ -51,11 +68,13 @@ public class TextManager extends AbstractEditableQuestionInputManager {
       if (!ObjectUtil.equals(getQuestionInput().getValue(), text.getText())) {
          SWTUtil.setText(text, getQuestionInput().getValue());
       }
+      updateTextDecoration();
    }
 
    @Override
    protected void enableControls(boolean enabled) {
       text.setEnabled(enabled);
+      updateTextDecoration();
    }
 
    @Override

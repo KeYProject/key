@@ -58,6 +58,18 @@ public class TrustManager extends AbstractQuestionInputManager {
             handleDontTrustItemSelectionChanged();
          }
       });
+      updateIcons();
+   }
+
+   protected void updateIcons() {
+      if (questionInput.getTrust() != null) {
+         trustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_FANTASY_DREAMING));
+         dontTrustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_OMG));
+      }
+      else {
+         trustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_FANTASY_DREAMING_ERROR));
+         dontTrustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_OMG_ERROR));
+      }
    }
 
    protected void handleTrustItemSelectionChanged() {
@@ -101,6 +113,7 @@ public class TrustManager extends AbstractQuestionInputManager {
          trustItem.setSelection(questionInput.getTrust());
          dontTrustItem.setSelection(!questionInput.getTrust());
       }
+      updateIcons();
    }
    
    @Override
