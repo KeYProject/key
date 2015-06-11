@@ -117,7 +117,9 @@ public class EvaluationInputReader {
                if (evaluation == null) {
                   throw new SAXException("Evaluation '" + evaluationName + "' is not available.");
                }
-               evaluationInput = new EvaluationInput(evaluation);
+               String version = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_VERSION);
+               String internalVersion = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_INTERNAL_VERSION);
+               evaluationInput = new EvaluationInput(evaluation, version, internalVersion);
                String uuid = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_UUID);
                evaluationInput.setUUID(uuid);
             }
@@ -128,13 +130,15 @@ public class EvaluationInputReader {
          else if (EvaluationInputWriter.TAG_FORM.equals(qName)) {
             String evaluationName = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_NAME);
             String uuid = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_UUID);
+            String version = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_VERSION);
+            String internalVersion = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_INTERNAL_VERSION);
             boolean setAsCurrentForm;
             if (evaluationInput == null) {
                AbstractEvaluation evaluation = AbstractEvaluation.getEvaluationForName(evaluationName);
                if (evaluation == null) {
                   throw new SAXException("Evaluation '" + evaluationName + "' is not available.");
                }
-               evaluationInput = new EvaluationInput(evaluation);
+               evaluationInput = new EvaluationInput(evaluation, version, internalVersion);
                evaluationInput.setUUID(uuid);
                setAsCurrentForm = true;
             }

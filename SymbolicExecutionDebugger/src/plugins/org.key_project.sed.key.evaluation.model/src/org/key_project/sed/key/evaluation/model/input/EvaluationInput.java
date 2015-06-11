@@ -11,6 +11,8 @@ import org.key_project.util.bean.Bean;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
+import de.uka.ilkd.key.util.KeYResourceManager;
+
 public class EvaluationInput extends Bean {
    public static final String PROP_CURRENT_FORM_INPUT = "currentFormInput";
 
@@ -23,10 +25,20 @@ public class EvaluationInput extends Bean {
    private AbstractFormInput<?> currentFormInput;
    
    private String UUID;
+   
+   private final String keyVersion;
+   
+   private final String keyInternalVersion;
 
    public EvaluationInput(AbstractEvaluation evaluation) {
+      this(evaluation, KeYResourceManager.getManager().getVersion(), KeYResourceManager.getManager().getSHA1());
+   }
+
+   public EvaluationInput(AbstractEvaluation evaluation, String keyVersion, String keyInternalVersion) {
       assert evaluation != null;
       this.evaluation = evaluation;
+      this.keyVersion = keyVersion;
+      this.keyInternalVersion = keyInternalVersion;
       this.formInputs = new ArrayList<AbstractFormInput<?>>(evaluation.countForms());
       for (AbstractForm form : evaluation.getForms()) {
          if (form instanceof FixedForm) {
@@ -46,6 +58,14 @@ public class EvaluationInput extends Bean {
 
    public AbstractEvaluation getEvaluation() {
       return evaluation;
+   }
+
+   public String getKeyVersion() {
+      return keyVersion;
+   }
+
+   public String getKeyInternalVersion() {
+      return keyInternalVersion;
    }
 
    public AbstractFormInput<?>[] getFormInputs() {

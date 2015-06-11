@@ -39,7 +39,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
    @Test
    public void testUnderstandingProofAttemptsEvaluation() throws Exception {
       AbstractEvaluation evaluation = UnderstandingProofAttemptsEvaluation.INSTANCE;
-      EvaluationInput evaluationInput = new EvaluationInput(evaluation);
+      EvaluationInput evaluationInput = new EvaluationInput(evaluation, "keyVersion123", "keyInternalVersionABC");
       for (AbstractFormInput<?> formInput : evaluationInput.getFormInputs()) {
          evaluationInput.setCurrentFormInput(formInput);
          if (formInput.getForm().isCollectTimes()) {
@@ -86,7 +86,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
       FixedForm fixedForm = (FixedForm) evaluation.getForms()[0];
       RandomForm randomForm = (RandomForm) evaluation.getForms()[1];
       // Create inputs
-      EvaluationInput evaluationInput = new EvaluationInput(evaluation);
+      EvaluationInput evaluationInput = new EvaluationInput(evaluation, "keyVersion123", "keyInternalVersionABC");
       evaluationInput.setUUID("MyUUID");
       AbstractFormInput<?> fixedFormInput = evaluationInput.getFormInput(fixedForm);
       evaluationInput.setCurrentFormInput(fixedFormInput);
@@ -156,7 +156,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
       AbstractEvaluation evaluation = TestEvaluation.INSTANCE;
       RandomForm randomForm = (RandomForm) evaluation.getForms()[1];
       // Create inputs
-      EvaluationInput evaluationInput = new EvaluationInput(evaluation);
+      EvaluationInput evaluationInput = new EvaluationInput(evaluation, "keyVersion123", "keyInternalVersionABC");
       evaluationInput.setUUID("MyUUID");
       AbstractFormInput<?> randomFormInput = evaluationInput.getFormInput(randomForm);
       // Convert to xml
@@ -270,7 +270,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
       AbstractEvaluation evaluation = TestEvaluation.INSTANCE;
       FixedForm fixedForm = (FixedForm) evaluation.getForms()[0];
       // Create inputs
-      EvaluationInput evaluationInput = new EvaluationInput(evaluation);
+      EvaluationInput evaluationInput = new EvaluationInput(evaluation, "keyVersion123", "keyInternalVersionABC");
       AbstractFormInput<?> fixedFormInput = evaluationInput.getFormInput(fixedForm);
       evaluationInput.setCurrentFormInput(fixedFormInput);
       if (changer != null) {
@@ -309,6 +309,8 @@ public class FormInputWriterAndReaderTest extends TestCase {
          assertNotSame(expected, actual);
          assertEquals(expected.getEvaluation().getName(), actual.getEvaluation().getName());
          assertEquals(expected.getUUID(), actual.getUUID());
+         assertEquals(expected.getKeyVersion(), actual.getKeyVersion());
+         assertEquals(expected.getKeyInternalVersion(), actual.getKeyInternalVersion());
          assertFormInput(expected.getCurrentFormInput(), actual.getCurrentFormInput());
          assertFormInputs(expected.getFormInputs(), actual.getFormInputs());
       }

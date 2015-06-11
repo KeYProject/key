@@ -119,6 +119,16 @@ public class EvaluationInputWriter {
    public static final String ATTRIBUTE_QUESTION_TRUST_SET_AT = "trustSetAt";
 
    /**
+    * Attribute name to store {@link EvaluationInput#getKeyVersion()}.
+    */
+   public static final String ATTRIBUTE_EVALUATION_VERSION = "keyVersion";
+
+   /**
+    * Attribute name to store {@link EvaluationInput#getKeyInternalVersion()}.
+    */
+   public static final String ATTRIBUTE_EVALUATION_INTERNAL_VERSION = "keyInternalVersion";
+
+   /**
     * Converts the orders of the given {@link RandomFormInput}s into XML.
     * @param evaluationInput The {@link EvaluationInput}.
     * @param updatedOrders The {@link RandomFormInput}s.
@@ -128,9 +138,11 @@ public class EvaluationInputWriter {
       StringBuffer sb = new StringBuffer();
       XMLUtil.appendXmlHeader(IOUtil.DEFAULT_CHARSET.displayName(), sb);
       Map<String, String> evaluationAttributes = new LinkedHashMap<String, String>();
-      evaluationAttributes.put(ATTRIBUTE_EVALUATION_NAME, XMLUtil.encodeText(evaluationInput.getEvaluation().getName()));
+      evaluationAttributes.put(ATTRIBUTE_EVALUATION_NAME, evaluationInput.getEvaluation().getName());
+      evaluationAttributes.put(ATTRIBUTE_EVALUATION_VERSION, evaluationInput.getKeyVersion());
+      evaluationAttributes.put(ATTRIBUTE_EVALUATION_INTERNAL_VERSION, evaluationInput.getKeyInternalVersion());
       if (!StringUtil.isTrimmedEmpty(evaluationInput.getUUID())) {
-         evaluationAttributes.put(ATTRIBUTE_EVALUATION_UUID, XMLUtil.encodeText(evaluationInput.getUUID()));
+         evaluationAttributes.put(ATTRIBUTE_EVALUATION_UUID, evaluationInput.getUUID());
       }
       XMLUtil.appendStartTag(0, TAG_EVALUATION, evaluationAttributes, sb);
       if (!CollectionUtil.isEmpty(updatedOrders)) {
@@ -153,14 +165,16 @@ public class EvaluationInputWriter {
       StringBuffer sb = new StringBuffer();
       XMLUtil.appendXmlHeader(IOUtil.DEFAULT_CHARSET.displayName(), sb);
       Map<String, String> evaluationAttributes = new LinkedHashMap<String, String>();
-      evaluationAttributes.put(ATTRIBUTE_EVALUATION_NAME, XMLUtil.encodeText(evaluationInput.getEvaluation().getName()));
+      evaluationAttributes.put(ATTRIBUTE_EVALUATION_NAME, evaluationInput.getEvaluation().getName());
+      evaluationAttributes.put(ATTRIBUTE_EVALUATION_VERSION, evaluationInput.getKeyVersion());
+      evaluationAttributes.put(ATTRIBUTE_EVALUATION_INTERNAL_VERSION, evaluationInput.getKeyInternalVersion());
       if (!StringUtil.isTrimmedEmpty(evaluationInput.getUUID())) {
-         evaluationAttributes.put(ATTRIBUTE_EVALUATION_UUID, XMLUtil.encodeText(evaluationInput.getUUID()));
+         evaluationAttributes.put(ATTRIBUTE_EVALUATION_UUID, evaluationInput.getUUID());
       }
       XMLUtil.appendStartTag(0, TAG_EVALUATION, evaluationAttributes, sb);
       // Append answers
       Map<String, String> formAttributes = new LinkedHashMap<String, String>();
-      formAttributes.put(ATTRIBUTE_FORM_NAME, XMLUtil.encodeText(formInput.getForm().getName()));
+      formAttributes.put(ATTRIBUTE_FORM_NAME, formInput.getForm().getName());
       XMLUtil.appendStartTag(1, TAG_FORM, formAttributes, sb);
       for (AbstractPageInput<?> pageInput : formInput.getPageInputs()) {
          if (!pageInput.getPage().isReadonly()) {
@@ -186,7 +200,7 @@ public class EvaluationInputWriter {
     */
    protected static void appendRandomOrderFormInput(int level, AbstractFormInput<?> formInput, StringBuffer sb) {
       Map<String, String> formAttributes = new LinkedHashMap<String, String>();
-      formAttributes.put(ATTRIBUTE_FORM_NAME, XMLUtil.encodeText(formInput.getForm().getName()));
+      formAttributes.put(ATTRIBUTE_FORM_NAME, formInput.getForm().getName());
       XMLUtil.appendStartTag(level, TAG_FORM, formAttributes, sb);
       if (formInput instanceof FixedFormInput) {
          // Nothing to do
@@ -198,10 +212,10 @@ public class EvaluationInputWriter {
             XMLUtil.appendStartTag(level + 1, TAG_RANDOM_PAGE_ORDER, null, sb);
             for (AbstractPageInput<?> pageInput : pageOrder) {
                Map<String, String> pageAttributes = new LinkedHashMap<String, String>();
-               pageAttributes.put(ATTRIBUTE_PAGE_NAME, XMLUtil.encodeText(pageInput.getPage().getName()));
+               pageAttributes.put(ATTRIBUTE_PAGE_NAME, pageInput.getPage().getName());
                Tool tool = rfi.getTool(pageInput);
                if (tool != null) {
-                  pageAttributes.put(ATTRIBUTE_TOOL_NAME, XMLUtil.encodeText(tool.getName()));
+                  pageAttributes.put(ATTRIBUTE_TOOL_NAME, tool.getName());
                }
                XMLUtil.appendEmptyTag(level + 2, TAG_PAGE, pageAttributes, sb);
             }
@@ -223,10 +237,12 @@ public class EvaluationInputWriter {
       StringBuffer sb = new StringBuffer();
       XMLUtil.appendXmlHeader(IOUtil.DEFAULT_CHARSET.displayName(), sb);
       Map<String, String> formAttributes = new LinkedHashMap<String, String>();
-      formAttributes.put(ATTRIBUTE_FORM_NAME, XMLUtil.encodeText(formInput.getForm().getName()));
-      formAttributes.put(ATTRIBUTE_EVALUATION_NAME, XMLUtil.encodeText(formInput.getEvaluationInput().getEvaluation().getName()));
+      formAttributes.put(ATTRIBUTE_FORM_NAME, formInput.getForm().getName());
+      formAttributes.put(ATTRIBUTE_EVALUATION_NAME, formInput.getEvaluationInput().getEvaluation().getName());
+      formAttributes.put(ATTRIBUTE_EVALUATION_VERSION, formInput.getEvaluationInput().getKeyVersion());
+      formAttributes.put(ATTRIBUTE_EVALUATION_INTERNAL_VERSION, formInput.getEvaluationInput().getKeyInternalVersion());
       if (!StringUtil.isTrimmedEmpty(formInput.getEvaluationInput().getUUID())) {
-         formAttributes.put(ATTRIBUTE_EVALUATION_UUID, XMLUtil.encodeText(formInput.getEvaluationInput().getUUID()));
+         formAttributes.put(ATTRIBUTE_EVALUATION_UUID, formInput.getEvaluationInput().getUUID());
       }
       XMLUtil.appendStartTag(0, TAG_FORM, formAttributes, sb);
       for (AbstractPageInput<?> pageInput : formInput.getPageInputs()) {
@@ -246,7 +262,7 @@ public class EvaluationInputWriter {
     */
    protected static void appendPageInput(int level, AbstractPageInput<?> pageInput, StringBuffer sb) {
       Map<String, String> pageAttributes = new LinkedHashMap<String, String>();
-      pageAttributes.put(ATTRIBUTE_PAGE_NAME, XMLUtil.encodeText(pageInput.getPage().getName()));
+      pageAttributes.put(ATTRIBUTE_PAGE_NAME, pageInput.getPage().getName());
       if (pageInput.getShownTime() > 0) {
          pageAttributes.put(ATTRIBUTE_PAGE_SHOWN_TIME, pageInput.getShownTime() + "");
       }
@@ -274,9 +290,9 @@ public class EvaluationInputWriter {
    protected static void appendQuestionInput(int level, QuestionInput questionInput, StringBuffer sb) {
       if (questionInput.getQuestion().isEditable() || questionInput.countChildInputs() > 0) {
          Map<String, String> questionAttributes = new LinkedHashMap<String, String>();
-         questionAttributes.put(ATTRIBUTE_QUESTION_NAME, XMLUtil.encodeText(questionInput.getQuestion().getName()));
+         questionAttributes.put(ATTRIBUTE_QUESTION_NAME, questionInput.getQuestion().getName());
          if (questionInput.getValue() != null) {
-            questionAttributes.put(ATTRIBUTE_QUESTION_VALUE, XMLUtil.encodeText(questionInput.getValue()));
+            questionAttributes.put(ATTRIBUTE_QUESTION_VALUE, questionInput.getValue());
          }
          if (questionInput.getValueSetAt() > 0) {
             questionAttributes.put(ATTRIBUTE_QUESTION_VALUE_SET_AT, questionInput.getValueSetAt() + "");
@@ -292,7 +308,7 @@ public class EvaluationInputWriter {
             if (questionInput.hasChoiceInputs()) {
                for (Choice choice : questionInput.getChoices()) {
                   Map<String, String> choiceAttributes = new LinkedHashMap<String, String>();
-                  choiceAttributes.put(ATTRIBUTE_CHOICE_VALUE, XMLUtil.encodeText(choice.getValue()));
+                  choiceAttributes.put(ATTRIBUTE_CHOICE_VALUE, choice.getValue());
                   XMLUtil.appendStartTag(level + 1, TAG_CHOICE, choiceAttributes, sb);
                   for (QuestionInput childQuestionInput : questionInput.getChoiceInputs(choice)) {
                      appendQuestionInput(level + 2, childQuestionInput, sb);
