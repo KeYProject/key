@@ -260,10 +260,13 @@ public class IntermediateProofReplayer {
 
                                 currGoal.apply(joinApp);
 
-                                // Join node has exactly one child
-                                queue.addFirst(new Pair<Node, NodeIntermediate>(
-                                        currNode.childrenIterator().next(),
-                                        currInterm.getChildren().get(0)));
+                                // Join node has exactly one child in a closed proof, and
+                                // zero or one children in an open proof.
+                                if (currInterm.getChildren().size() > 0) {
+                                    queue.addFirst(new Pair<Node, NodeIntermediate>(
+                                            currNode.childrenIterator().next(),
+                                            currInterm.getChildren().get(0)));
+                                }
 
                                 // Now add children of partner nodes
                                 for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
