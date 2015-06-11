@@ -8,14 +8,17 @@ import org.key_project.util.java.CollectionUtil;
 
 public class SectionQuestion extends AbstractQuestion {
    private final List<AbstractQuestion> childQuestions;
+   
+   private final boolean grapVerticalSpace;
 
-   public SectionQuestion(String name, String label, AbstractQuestion... childQuestions) {
-      this(name, label, CollectionUtil.toList(childQuestions));
+   public SectionQuestion(String name, String label, boolean grapVerticalSpace, AbstractQuestion... childQuestions) {
+      this(name, label, grapVerticalSpace, CollectionUtil.toList(childQuestions));
    }
 
-   public SectionQuestion(String name, String label, List<AbstractQuestion> childQuestions) {
+   public SectionQuestion(String name, String label, boolean grapVerticalSpace, List<AbstractQuestion> childQuestions) {
       super(name, label, null, null, false);
       this.childQuestions = childQuestions;
+      this.grapVerticalSpace = grapVerticalSpace;
       validateChildren();
    }
    
@@ -29,6 +32,10 @@ public class SectionQuestion extends AbstractQuestion {
             }
          }
       }
+   }
+
+   public boolean isGrapVerticalSpace() {
+      return grapVerticalSpace;
    }
 
    public AbstractQuestion[] getChildQuestions() {

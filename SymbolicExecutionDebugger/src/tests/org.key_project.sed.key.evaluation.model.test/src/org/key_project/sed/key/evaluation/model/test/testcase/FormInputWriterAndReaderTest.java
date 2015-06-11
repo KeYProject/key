@@ -197,6 +197,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
             assertTrue(pageInput.getQuestionInputs()[2].getQuestion().isEditable()); // Checkbox
             assertFalse(pageInput.getQuestionInputs()[3].getQuestion().isEditable()); // Label
             assertFalse(pageInput.getQuestionInputs()[4].getQuestion().isEditable()); // Section
+            assertTrue(pageInput.getQuestionInputs()[5].getQuestion().isEditable()); // Text
             // Change question 1 (radio)
             QuestionInput radioInput = pageInput.getQuestionInputs()[1];
             radioInput.setValue("This is not a valid radio button value!");
@@ -237,6 +238,14 @@ public class FormInputWriterAndReaderTest extends TestCase {
             if (pageShownTime > 0) {
                sectionInput.setTrustSetAt(4242);
                sectionChildInput.setValueSetAt(24);
+            }
+            // Change question 5 (text)
+            QuestionInput textInput = pageInput.getQuestionInputs()[5];
+            textInput.setValue("This is a valid text value!");
+            textInput.setTrust(Boolean.TRUE);
+            if (pageShownTime > 0) {
+               textInput.setTrustSetAt(111);
+               textInput.setValueSetAt(100);
             }
          }
       };

@@ -2,6 +2,7 @@ package org.key_project.sed.key.evaluation.wizard.manager;
 
 import java.util.List;
 
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -23,9 +24,13 @@ public class SectionManager extends AbstractQuestionInputManager {
                          QuestionInput questionInput,
                          SectionQuestion question,
                          ICreateControlCallback callback) {
-      Composite sectionComposite = toolkit.createComposite(parent);
-      sectionComposite.setLayout(new GridLayout(1, false));
-      section = toolkit.createSection(sectionComposite, Section.TITLE_BAR | Section.EXPANDED);
+      section = toolkit.createSection(parent, Section.TITLE_BAR | Section.EXPANDED);
+      if (question.isGrapVerticalSpace()) {
+         section.setLayoutData(new GridData(GridData.FILL_BOTH));
+      }
+      else {
+         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      }
       section.setText(question.getLabel());
       Composite sectionClient = toolkit.createComposite(section);
       sectionClient.setLayout(new GridLayout(1, false));

@@ -1,21 +1,18 @@
 package org.key_project.sed.key.evaluation.wizard.manager;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Section;
 import org.key_project.sed.key.evaluation.model.definition.AbstractButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -26,27 +23,12 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
-public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> extends AbstractQuestionInputManager {
-   private final AbstractEvaluationWizardPage<?> wizardPage;
-   
-   private final QuestionInput questionInput;
-   
+public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> extends AbstractEditableQuestionInputManager {
    private final List<Button> buttons = new LinkedList<Button>();
-   
-   private final PropertyChangeListener questionListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-         handleQuestionValueChanged(evt);
-      }
-   };
    
    private final Map<Choice, List<IQuestionInputManager>> choiceManagers = new HashMap<Choice, List<IQuestionInputManager>>();
    
    private Composite composite;
-   
-   private Section questionSection;
-   
-   private TrustManager trustManager;
    
    public AbstractButtonsManager(AbstractEvaluationWizardPage<?> wizardPage,
                                  FormToolkit toolkit, 
@@ -54,9 +36,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
                                  QuestionInput questionInput, 
                                  Q question,
                                  ICreateControlCallback callback) {
-      this.wizardPage = wizardPage;
-      questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, questionListener);
-      this.questionInput = questionInput;
+      super(wizardPage, questionInput);
       composite = toolkit.createComposite(parent);
       if (questionInput.hasChoiceInputs()) {
          createwithChildQuestionControls(toolkit, question, callback);
@@ -65,17 +45,13 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          createNoChildQuestionControls(toolkit, question);
       }
    }
-   
-   public AbstractEvaluationWizardPage<?> getWizardPage() {
-      return wizardPage;
-   }
 
    protected void createwithChildQuestionControls(FormToolkit toolkit, Q question, ICreateControlCallback callback) {
       composite.setLayout(new GridLayout(1, false));
       createSection(toolkit, composite, question);
       for (final Choice choice : question.getChoices()) {
          createChoiceControl(toolkit, choice, question);
-         QuestionInput[] choiceInputs = questionInput.getChoiceInputs(choice);
+         QuestionInput[] choiceInputs = getQuestionInput().getChoiceInputs(choice);
          if (!ArrayUtil.isEmpty(choiceInputs)) {
             Composite choiceComposite = toolkit.createComposite(composite);
             GridLayout layout = new GridLayout(1, false);
@@ -85,21 +61,11 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
             layout.horizontalSpacing = 0;
             layout.verticalSpacing = 0;
             choiceComposite.setLayout(layout);
-            List<IQuestionInputManager> managers = QuestionWizardPage.createQuestionControls(wizardPage, toolkit, choiceComposite, choiceInputs, callback);
+            List<IQuestionInputManager> managers = QuestionWizardPage.createQuestionControls(getWizardPage(), toolkit, choiceComposite, choiceInputs, callback);
             choiceManagers.put(choice, managers);
          }
       }
       updateChoiceChildrenEnabled();
-   }
-   
-   protected void createSection(FormToolkit toolkit, Composite parent, Q question) {
-      Composite sectionComposite = toolkit.createComposite(parent);
-      sectionComposite.setLayout(new GridLayout(3, false));
-      questionSection = toolkit.createSection(sectionComposite, SWT.NONE);
-      questionSection.setText(question.getLabel());
-      if (question.isAskForTrust()) {
-         trustManager = new TrustManager(wizardPage, sectionComposite, questionInput);
-      }
    }
    
    protected void createNoChildQuestionControls(FormToolkit toolkit, Q question) {
@@ -134,13 +100,13 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       else {
          button.setToolTipText(question.getLabel());
       }
-      if (isChoiceSelected(questionInput.getValue(), choice.getValue())) {
+      if (isChoiceSelected(getQuestionInput().getValue(), choice.getValue())) {
          button.setSelection(true);
       }
       button.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            handleButtonSelected(questionInput, button, choice);
+            handleButtonSelected(getQuestionInput(), button, choice);
          }
       });
       buttons.add(button);
@@ -177,14 +143,11 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
    
    @Override
    public void dispose() {
-      questionInput.removePropertyChangeListener(QuestionInput.PROP_VALUE, questionListener);
+      super.dispose();
       for (List<IQuestionInputManager> managers : choiceManagers.values()) {
          for (IQuestionInputManager manager : managers) {
             manager.dispose();
          }
-      }
-      if (trustManager != null) {
-         trustManager.dispose();
       }
    }
 
@@ -194,21 +157,16 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
 
    @Override
    protected void enableControls(boolean enabled) {
-      if (questionSection != null) {
-         questionSection.setEnabled(enabled);
-      }
+      super.enableControls(enabled);
       for (Button button : buttons) {
          button.setEnabled(enabled);
-      }
-      if (trustManager != null) {
-         trustManager.setEnabled(enabled);
       }
       updateChoiceChildrenEnabled();
    }
    
    protected void updateChoiceChildrenEnabled() {
       for (Entry<Choice, List<IQuestionInputManager>> entry : choiceManagers.entrySet()) {
-         boolean enabled = isEnabled() && isChoiceSelected(questionInput.getValue(), entry.getKey().getValue());
+         boolean enabled = isEnabled() && isChoiceSelected(getQuestionInput().getValue(), entry.getKey().getValue());
          for (IQuestionInputManager manager : entry.getValue()) {
             manager.setEnabled(enabled);
          }

@@ -638,7 +638,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                             new NotUndefinedValueValidator("Question '" + searchSequentTitle + "' not answered."), 
                                                                             false,
                                                                             choices);
-      SectionQuestion keySection = new SectionQuestion("KeY", "KeY", proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, searchProofTreeQuestion, searchSequentQuestion);
+      SectionQuestion keySection = new SectionQuestion("KeY", "KeY", false, proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, searchProofTreeQuestion, searchSequentQuestion);
       // SED
       String setTitle = "Show symbolic execution tree";
       RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
@@ -672,7 +672,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                     new NotUndefinedValueValidator("Question '" + truthTitle + "' not answered."), 
                                                                     false,
                                                                     choices);
-      SectionQuestion sedSection = new SectionQuestion("SED", "SED", setQuestion, variablesQuestion, layoutQuestion, truthQuestion);
+      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, variablesQuestion, layoutQuestion, truthQuestion);
       // KeY vs SED
       String keyVsSedTitle = "I prefer to inspect proofs with";
       RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion("toolPreference", 
@@ -685,14 +685,19 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                        new Choice("KeY and SED, both are equally good", "KeYandSEDequal"),
                                                                        new Choice("KeY and SED, depending on the proof", "KeYandSEDproof"),
                                                                        new Choice("SED", "SED"));
-      SectionQuestion keyVsSedSection = new SectionQuestion("KeYvsSED", "KeY vs SED", keyVsSedQuestion);
-      
+      SectionQuestion keyVsSedSection = new SectionQuestion("KeYvsSED", "KeY vs SED", false, keyVsSedQuestion);
+      // Feedback
+      SectionQuestion feedbackSection = new SectionQuestion("feedback", 
+                                                            "Feedback", 
+                                                            true, 
+                                                            new TextQuestion("feedback", "Feedback about the tools or the evaluation (optional)", null, null, false));
       return new QuestionPage(FEEDBACK_PAGE,
                               "Feedback", 
                               "Please answer the question to give us some feeback about the tools and the evaluation.", 
                               null,
                               keySection,
                               sedSection,
-                              keyVsSedSection);
+                              keyVsSedSection,
+                              feedbackSection);
    }
 }
