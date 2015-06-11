@@ -29,7 +29,7 @@ import de.uka.ilkd.key.util.ProofStarter;
  * @author Dominic Scheurer
  */
 public class JoinRuleTests extends TestCase {
-    
+
     private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/join/";
 
     /**
@@ -67,34 +67,54 @@ public class JoinRuleTests extends TestCase {
     @Test
     public void testDoManualGcdProof() throws Exception {
         final Proof proof = loadProof("gcd.key");
-        final Services services = proof.getServices();
-        final JoinRule joinRule = JoinRule.INSTANCE;
 
         for (int i = 0; i < 2; i++) {
             runSymbExMacro(proof.openGoals().head().node());
-
-            final Goal joinGoal = proof.openGoals().head();
-            final Node joinNode = joinGoal.node();
-            final PosInOccurrence joinPio = getPioFirstFormula(joinNode
-                    .sequent());
-            final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
-                    .createApp(joinPio, services);
-            {
-                joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(
-                        proof.openGoals().head(), joinPio));
-                joinApp.setConcreteRule(JoinIfThenElseAntecedent.instance());
-                joinApp.setJoinNode(joinNode);
-            }
-
-            assertTrue(joinApp.complete());
-            joinGoal.apply(joinApp);
+            joinFirstGoal(proof);
         }
 
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed());
+    }
+
+    /**
+     * Runs the automatic JavaDL strategy on the given proof.
+     *
+     * @param proof Proof to prove automatically.
+     */
+    private void startAutomaticStrategy(final Proof proof) {
         ProofStarter starter = new ProofStarter(false);
         starter.init(proof);
         starter.start();
+    }
 
-        assertTrue(proof.closed());
+    /**
+     * Joins the first open goal in the given proof. Asserts that the
+     * constructed join rule application is complete.
+     *
+     * @param proof
+     *            The proof the first goal of which to join with suitable
+     *            partner(s).
+     */
+    private void joinFirstGoal(final Proof proof) {
+        final Services services = proof.getServices();
+        final JoinRule joinRule = JoinRule.INSTANCE;
+
+        final Goal joinGoal = proof.openGoals().head();
+        final Node joinNode = joinGoal.node();
+        final PosInOccurrence joinPio = getPioFirstFormula(joinNode.sequent());
+        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
+                .createApp(joinPio, services);
+
+        {
+            joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(proof
+                    .openGoals().head(), joinPio));
+            joinApp.setConcreteRule(JoinIfThenElseAntecedent.instance());
+            joinApp.setJoinNode(joinNode);
+        }
+
+        assertTrue(joinApp.complete());
+        joinGoal.apply(joinApp);
     }
 
     /**
@@ -128,7 +148,8 @@ public class JoinRuleTests extends TestCase {
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
      *
-     * @param proofFileName The file name of the proof file to load.
+     * @param proofFileName
+     *            The file name of the proof file to load.
      * @return The loaded proof.
      */
     private Proof loadProof(String proofFileName) {
