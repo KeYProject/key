@@ -11,6 +11,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
@@ -147,6 +148,17 @@ public class EvaluationWizardDialog extends WizardDialog {
             }
          });
       }
+   }
+   
+   protected Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
+      Rectangle result = super.getConstrainedShellBounds(preferredSize);
+      if (result.width > 550) {
+         result.width = 550;
+      }
+      if (result.height > 600) {
+         result.height = 600;
+      }
+      return result;
    }
 
    @Override
