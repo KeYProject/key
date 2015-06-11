@@ -23,7 +23,7 @@ public class JoinRuleTests extends TestCase {
 
     /**
      * Simple regression test case loading an existing closed proof (standard
-     * Gcd example) and trying to replay it.
+     * Gcd example) including two joins and trying to replay it.
      *
      * @throws ProblemLoaderException If the proof could not be loaded.
      */
