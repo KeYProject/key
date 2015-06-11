@@ -3,10 +3,9 @@
  */
 package de.uka.ilkd.key.rule.join;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
+
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -20,7 +19,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  *
  * @author Dominic Scheurer
  */
-public class JoinRuleTests {
+public class JoinRuleTests extends TestCase {
 
     /**
      * Simple regression test case loading an existing closed proof (standard
