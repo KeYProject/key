@@ -108,15 +108,24 @@ public class CloseAfterJoin implements BuiltInRule {
             //      to ProofPruner, such that everything is in one place.
             
             private Node prunedNode = null;
-
+            
             @Override
-            public void proofGoalsChanged(ProofTreeEvent e) {
-                if (joinNodeF.isClosed()) {
+            public void proofGoalsAdded(ProofTreeEvent e) {
+                // Note: The method proofGoalsChanged(...) is only called when
+                //       a proof is pruned or when the GUI is updated. Therefore,
+                //       we have to exploit an already existing hack which calls
+                //       proofGoalsAdded with an empty list of arguments if a
+                //       goal is closed. Otherwise, we would not be notified about
+                //       a closed goal when loading a proof without the GUI (e.g.
+                //       in a JUnit test).
+                
+                if (e.getGoals().size() == 0 && joinNodeF.isClosed()) {
                     // The joined node was closed; now also close this node.
                     
                     e.getSource().closeGoal(linkedGoal);
                     linkedGoal.clearAndDetachRuleAppIndex();
                 }
+                
             }
 
             @Override
