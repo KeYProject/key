@@ -57,7 +57,7 @@ public class JoinRuleTests extends TestCase {
      * <li>Again run the macro on the one open goal</li>
      * <li>Do another join</li>
      * <li>Let the automatic strategy finish the proof</li>
-     * </ol>
+     * </ol><p>
      * 
      * At the end, the proof should be closed.
      *
