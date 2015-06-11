@@ -152,11 +152,11 @@ public class EvaluationWizardDialog extends WizardDialog {
    
    protected Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
       Rectangle result = super.getConstrainedShellBounds(preferredSize);
-      if (result.width > 550) {
-         result.width = 550;
+      if (result.width > 600) {
+         result.width = 600;
       }
-      if (result.height > 600) {
-         result.height = 600;
+      if (result.height > 700) {
+         result.height = 700;
       }
       return result;
    }

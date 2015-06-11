@@ -5,6 +5,7 @@ public class Account {
      @ requires amount > 0;
      @ ensures balance == \old(balance) - \result;
      @ ensures \result == amount;
+     @ assignable balance;
      @*/
    public int checkAndWithdraw(int amount) {
       if (canWithdraw(amount)) {
@@ -27,6 +28,7 @@ public class Account {
 
    /*@ normal_behavior
      @ requires amount > 0;
+     @ ensures true;
      @ assignable \nothing;
      @*/
    public boolean canWithdraw(int amount) {
@@ -34,6 +36,7 @@ public class Account {
    }
    
    /*@ normal_behavior
+     @ requires true;
      @ ensures \result == balance;
      @ assignable \nothing;
      @*/

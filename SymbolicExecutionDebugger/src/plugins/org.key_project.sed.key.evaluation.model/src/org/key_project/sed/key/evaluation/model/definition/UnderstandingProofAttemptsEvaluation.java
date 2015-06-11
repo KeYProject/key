@@ -419,6 +419,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
+                                                               new Choice("None of the statements was executed", "None"),
                                                                new Choice("Line 14 (if (entrySize == entries.length))", "Line 14"),
                                                                new Choice("Line 15 (Entry[] newEntries = new Entry[entries.length * 2])", "Line 15"),
                                                                new Choice("Line 22 (int i = 0)", "Line 22 initial"),
@@ -502,7 +503,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice("Precondition (amount > 0) of checkAndWithdraw(int) is not established", "checkAndWithdraw: Precondition not established ("),
                                                               new Choice("Postcondition (balance == \\old(balance) - \\result) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about balance does not hold"),
                                                               new Choice("Postcondition (\\result == amount) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about result does not hold"),
-                                                              new Choice("Assignable clause (\\everything) of method contract of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("checkAndWithdrawLocations")),
+                                                              new Choice("Assignable clause (balance) of method contract of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("checkAndWithdrawLocations")),
 
                                                               new Choice("Precondition (amount > 0) of withdraw(int) is not established", "withdraw: Precondition not established"),
                                                               new Choice("Postcondition (balance == \\old(balance) - amount) of withdraw(int) does not hold", "withdraw: Postcondition about balance does not hold"),
@@ -510,11 +511,11 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
 
                                                               new Choice("Precondition (amount > 0) of canWithdraw(int) is not established", "canWithdraw: Precondition not established"),
                                                               new Choice("Postcondition (true) of canWithdraw(int) does not hold", "canWithdraw: Postcondition about balance does not hold"),
-                                                              new Choice("Assignable clause (\\everything) of method contract of canWithdraw(int) does not hold", "canWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("canWithdrawLocations")),
+                                                              new Choice("Assignable clause (\\nothing) of method contract of canWithdraw(int) does not hold", "canWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("canWithdrawLocations")),
 
                                                               new Choice("Precondition (true) of getBalance() is not established", "getBalance: Precondition not established"),
                                                               new Choice("Postcondition (\result == balance) of getBalance() does not hold", "getBalance: Postcondition about balance does not hold"),
-                                                              new Choice("Assignable clause (\\everything) of method contract of getBalance(int) does not hold", "getBalance: Assignable clause of method contract does not hold", createAccountLocationQuestion("getBalanceLocations")),
+                                                              new Choice("Assignable clause (\\nothing) of method contract of getBalance(int) does not hold", "getBalance: Assignable clause of method contract does not hold", createAccountLocationQuestion("getBalanceLocations")),
                                                               
                                                               new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion));
       String openQuestionTitle = "Is the proof closed?";
@@ -533,13 +534,14 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
-                                                               new Choice("Line 10 (if (canWithdraw(amount)))", "Line 10"),
-                                                               new Choice("Line 11 (withdraw(amount))", "Line 11"),
-                                                               new Choice("Line 12 (return amount)", "Line 12"),
-                                                               new Choice("Line 15 (return 0)", "Line 15"),
-                                                               new Choice("Line 25 (balance -= amount)", "Line 25"),
-                                                               new Choice("Line 32 (return amount > 0)", "Line 32"),
-                                                               new Choice("Line 39 (return balance)", "Line 39"));
+                                                               new Choice("None of the statements was executed", "None"),
+                                                               new Choice("Line 11 (if (canWithdraw(amount)))", "Line 10"),
+                                                               new Choice("Line 12 (withdraw(amount))", "Line 11"),
+                                                               new Choice("Line 13 (return amount)", "Line 12"),
+                                                               new Choice("Line 16 (return 0)", "Line 15"),
+                                                               new Choice("Line 26 (balance -= amount)", "Line 25"),
+                                                               new Choice("Line 35 (return amount > 0)", "Line 32"),
+                                                               new Choice("Line 44 (return balance)", "Line 39"));
       String contractsTitle = "Which method contracts are applied at least once during symbolic execution of the proof?";
       CheckboxQuestion contractsQuestion = new CheckboxQuestion("appliedContracts", 
                                                                 contractsTitle, 
@@ -547,6 +549,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                 null, 
                                                                 new NotUndefinedValueValidator("Question '" + contractsTitle + "' not answered."), 
                                                                 true,
+                                                                new Choice("None of the contracts was applied", "None"),
                                                                 new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
                                                                 new Choice("Contract of method withdraw(int)", "withdraw"),
                                                                 new Choice("Contract of method canWithdraw(int)", "canWithdraw"),

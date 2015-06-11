@@ -6,7 +6,7 @@
    <body>
       <h1>JML</h1>
       <p>
-         The Java Modeling Language (JML) is a specification languages used to specify the expected behavior of Java modules.
+         The <a href="http://www.jmlspecs.org" target="_blank">Java Modeling Language (JML)</a> is a specification languages used to specify the expected behavior of Java modules.
       </p>
       <p>
          The relevant knowledge for this evaluation about JML is explained in the following sections.
@@ -23,7 +23,7 @@
       <p>
          JML specifications are placed as special comments within the Java source code.
          Such comments have to start with the <code>@</code> character.
-         During the evaluation JML comments look as follows:
+         JML comments used in this evaluation look as follows:
          <code>
          <pre>
 /*@ ...
@@ -35,7 +35,7 @@
       <p>
          A method contract specifies the expected behavior of a method in terms of pre and postconditions.
          Assuming that the precondition is fulfilled when the method is called, the method guarantees that the postcondition is established when it returns.
-         In JML the keywords <code>normal_behavior</code> and <code>exceptional_behavior</code> are used to specify that a method should terminate normally without a thrown exception or exceptionally.
+         In JML the keywords <code>normal_behavior</code> and <code>exceptional_behavior</code> are used to specify that a method should terminate normally without a thrown exception or exceptionally otherwise.
          Keyword <code>requires</code> followed by an expression defines a precondition while <code>ensures</code> also followed by an expression defines a postcondition.
          An expression is basically a normal Java expression as used for instance in <code>if</code> statements.
          But additionally the implication operator <code>==></code> and quantors (e.g. <code>\forall</code>) can be used.
@@ -46,15 +46,10 @@
       </p>
       <p>
          Consider the following example. 
-         The method contract of <code>addCredits</code> says that the method parameter <code>credits</code> should be greater than zero (<code>requires</code>).
-         The method will guarantee that no exception is thrown (<code>normal_behavior</code>) and that the value of <code>acquiredCredits</code> is increased by <code>credits</code> (first <code>ensures</code>).
+         The method contract of <code>addCredits</code> says that the method should be called in a state in which <code>credits</code> is greater than zero (<code>requires</code>).
+         Then the method will guarantee, that no exception is thrown (<code>normal_behavior</code>) and that the value of <code>acquiredCredits</code> is increased by <code>credits</code> (first <code>ensures</code>).
          It also guarantees that the returned value is the new value of <code>acquiredCredits</code> (second <code>ensures</code>).
          Finally, the method can only change <code>acquiredCredits</code> and not other locations like <code>firstname</code> or <code>surname</code> (<code>assignable</code>).
-      </p>
-         For method parameters as well as for instance and class fields with a reference type its ability to be <code>null</code> needs to be specified.
-         Keyword <code>nullable</code> allows the <code>null</code> value while <code>non_null</code> forbids it.
-         This means for this example that <code>firstname</code> might be <code>null</code> while <code>surname</code> is never <code>null</code>.
-      <p>
          <code>
          <pre>
 public class Student {
@@ -76,6 +71,11 @@ public class Student {
    }
 }</pre></code>
       </p>
+      <p>
+         For method parameters as well as for instance and class fields with a reference type its ability to be <code>null</code> needs to be specified.
+         Keyword <code>nullable</code> allows the <code>null</code> value while <code>non_null</code> forbids it.
+         In the example above, <code>firstname</code> might be <code>null</code> while <code>surname</code> will be never <code>null</code>.
+      </p>
 
       <h2><a name="invariants">3 Invariants</a></h2>
       <p>
@@ -87,7 +87,6 @@ public class Student {
       <p>
          Let us add the following invariant to class <code>Student</code>.
          It says that the value of <code>acquiredCredits</code> is never negative.
-      <p>
          <code>
          <pre>
 /*@ invariant acquiredCredits >= 0;
@@ -111,7 +110,7 @@ private int acquiredCredits = 0;</pre></code>
       </p>
       <p>
          The following example restricts with the first loop invariant the range of index variable <code>i</code>.
-         The second loop invariant ensures that the array contains on all already visisted array elements the correct value.
+         The second loop invariant ensures that all already visisted array elements are assigned with the array index.
          Termination can be proven with help of the array length and the index variable (<code>decreasing</code> term).
          Finally, the loop can change all fields of <code>array</code> and <code>i</code>.
          <code>
