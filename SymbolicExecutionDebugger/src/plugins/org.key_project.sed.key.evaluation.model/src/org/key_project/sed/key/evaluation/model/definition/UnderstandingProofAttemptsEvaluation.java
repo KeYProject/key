@@ -104,7 +104,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               new Choice("I &accept the conditions", "yes"), 
                                                                               new Choice("I do &not accept the conditions", "no")));
       QuestionPage backgroundPage = new QuestionPage("backgroundPage", 
-                                                     "Background", 
+                                                     "Background Knowledge", 
                                                      "Please fill out the form with your background knowledge.",
                                                      null,
                                                      new RadioButtonsQuestion("experienceWithJava",
@@ -135,8 +135,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               new Choice("< 1 year", "Less than 1 year"), 
                                                                               new Choice(">= 1 year", "More than 1 year")));
       SendFormPage sendConditionsPage = new SendFormPage("sendConditions", 
-                                                         "Confirm Sending Content", 
-                                                         "Inspect the content to be send.", 
+                                                         "Confirm Sending Background Knowledge (used to order proof attempts)", 
+                                                         "Optionally, inspect the answers to be send.", 
                                                          "Current date and time (nothing else!)");
       FixedForm introductionForm = new FixedForm("introductionForm", 
                                                  false,
@@ -155,8 +155,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       QuestionPage proof4Page = createMyIntegerQuestionPage(PROOF_4_PAGE_NAME, "Proof Attempt of MyInteger#add(MyInteger)");
       QuestionPage feedbackPage = createFeedbackPage();
       SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
-                                                         "Confirm Sending Content", 
-                                                         "Inspect the content to be send.", 
+                                                         "Confirm Sending Evaluation Answers", 
+                                                         "Optionally, inspect the answers to be send.", 
                                                          "Current date and time (nothing else!)");
       RandomForm evaluationForm = new RandomForm("evaluationForm", true, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
       // Create thanks form
