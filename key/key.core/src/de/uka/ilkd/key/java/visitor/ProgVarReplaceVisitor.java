@@ -280,7 +280,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ImmutableList<InfFlowSpec> newInfFlowSpecs =
                 replaceVariablesInTermListTriples(oldContract.getInfFlowSpecs());
         return oldContract.update(newBlock, newPreconditions, newPostconditions,
-                                  newModifiesClauses, newInfFlowSpecs, null, newVariables);
+                                  newModifiesClauses, newInfFlowSpecs, oldContract.getJoinProcedure(), newVariables);
     }
 
     private BlockContract.Variables replaceBlockContractVariables(
