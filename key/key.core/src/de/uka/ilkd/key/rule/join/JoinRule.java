@@ -173,6 +173,8 @@ public class JoinRule implements BuiltInRule {
       clearSemisequent(newGoal, true);
       clearSemisequent(newGoal, false);
       
+      newGoal.indexOfTaclets().removeTaclets(newGoal.indexOfTaclets().getPartialInstantiatedApps());
+      
       // Add new antecedent (path condition)
       for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
          SequentFormula newAntecedent = new SequentFormula(antecedentFormula);
@@ -183,8 +185,8 @@ public class JoinRule implements BuiltInRule {
       Term succedentFormula = tb.apply(joinedState.first, thisSEState.third);
       SequentFormula newSuccedent = new SequentFormula(succedentFormula);
       newGoal.addFormula(
-            new SequentFormula(succedentFormula),
-            new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
+              newSuccedent,
+              new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
       // The following line has the only effect of emptying the
       // name recorder -- the name recorder for currentNode will
@@ -192,7 +194,7 @@ public class JoinRule implements BuiltInRule {
       // measure is to avoid new names of join nodes being added as
       // new names of the partners.
       services.saveNameRecorder(currentNode);
-      
+            
       // Close partner goals
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          closeJoinPartnerGoal(
