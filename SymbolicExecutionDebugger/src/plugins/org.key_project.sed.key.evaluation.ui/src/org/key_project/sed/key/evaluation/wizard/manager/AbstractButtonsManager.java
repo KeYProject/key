@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.key_project.sed.key.evaluation.model.definition.AbstractButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -46,18 +47,18 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
                                  Q question,
                                  ICreateControlCallback callback) {
       super(wizardPage, questionInput);
-      composite = toolkit.createComposite(parent);
       if (questionInput.hasChoiceInputs()) {
-         createwithChildQuestionControls(toolkit, question, callback);
+         createwithChildQuestionControls(toolkit, parent, question, callback);
       }
       else {
-         createNoChildQuestionControls(toolkit, question);
+         createNoChildQuestionControls(toolkit, parent, question);
       }
    }
       
-   protected void createwithChildQuestionControls(FormToolkit toolkit, Q question, ICreateControlCallback callback) {
-      composite.setLayout(new GridLayout(1, false));
-      createSection(toolkit, composite, question);
+   protected void createwithChildQuestionControls(FormToolkit toolkit, Composite parent, Q question, ICreateControlCallback callback) {
+      createSection(toolkit, parent, question);
+      composite = toolkit.createComposite(parent, SWT.WRAP);
+      composite.setLayout(new TableWrapLayout());
       for (final Choice choice : question.getChoices()) {
          createChoiceControl(toolkit, choice, question);
          QuestionInput[] choiceInputs = getQuestionInput().getChoiceInputs(choice);
@@ -77,10 +78,11 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
             choiceStackComposite.setLayout(choiceStackLayout);
             
             Composite choiceContentComposite = toolkit.createComposite(choiceStackComposite);
-            GridLayout layout = new GridLayout(1, false);
-            layout.marginWidth = 0;
-            layout.marginHeight = 0;
-            layout.marginLeft = 30;
+            TableWrapLayout layout = new TableWrapLayout();
+            layout.leftMargin = 30;
+            layout.rightMargin = 0;
+            layout.bottomMargin = 0;
+            layout.topMargin = 0;
             layout.horizontalSpacing = 0;
             layout.verticalSpacing = 0;
             choiceContentComposite.setLayout(layout);
@@ -93,17 +95,21 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       updateChoiceChildrenEnabled();
    }
    
-   protected void createNoChildQuestionControls(FormToolkit toolkit, Q question) {
+   protected void createNoChildQuestionControls(FormToolkit toolkit, Composite parent, Q question) {
       if (question.getLabel() != null) {
+         createSection(toolkit, parent, question);
+         composite = toolkit.createComposite(parent, SWT.WRAP);
+         composite.setLayout(new TableWrapLayout());
          if (question.isVertical()) {
             composite.setLayout(new GridLayout(1, false));
          }
          else {
             composite.setLayout(new GridLayout(question.countChoices() + 1, false));
          }
-         createSection(toolkit, composite, question);
       }
       else {
+         composite = toolkit.createComposite(parent, SWT.WRAP);
+         composite.setLayout(new TableWrapLayout());
          if (question.isVertical()) {
             composite.setLayout(new GridLayout(1, false));
          }

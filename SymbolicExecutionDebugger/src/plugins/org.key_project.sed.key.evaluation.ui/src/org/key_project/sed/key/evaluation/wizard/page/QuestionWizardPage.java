@@ -164,6 +164,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
          while (errorMessage == null && i < inputs.length) {
             errorMessage = inputs[i].validate();
             if (errorMessage != null) {
+               // TODO: Control of child question needs to be returned.
                errornousControl = controls.get(i).getFocusControl();
             }
             i++;

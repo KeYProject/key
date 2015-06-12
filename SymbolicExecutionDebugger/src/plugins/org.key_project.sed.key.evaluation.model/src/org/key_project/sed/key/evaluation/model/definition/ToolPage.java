@@ -4,7 +4,7 @@ public class ToolPage extends AbstractPage {
    private final Tool tool;
    
    public ToolPage(Tool tool) {
-      super(tool.getName(), tool.getName(), "Read the tool description carefully before continuing.");
+      super(tool.getName(), tool.getName(), "Read the tool description carefully before continuing.", false);
       this.tool = tool;
    }
    

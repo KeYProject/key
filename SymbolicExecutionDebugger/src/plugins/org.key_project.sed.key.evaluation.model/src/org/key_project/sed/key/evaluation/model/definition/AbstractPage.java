@@ -10,11 +10,14 @@ public abstract class AbstractPage {
    
    private AbstractForm form;
    
-   public AbstractPage(String name, String title, String message) {
+   private final boolean wrapLayout;
+   
+   public AbstractPage(String name, String title, String message, boolean wrapLayout) {
       assert name != null;
       this.name = name;
       this.title = title;
       this.message = message;
+      this.wrapLayout = wrapLayout;
    }
    
    public boolean isReadonly() {
@@ -35,6 +38,10 @@ public abstract class AbstractPage {
 
    public AbstractForm getForm() {
       return form;
+   }
+
+   public boolean isWrapLayout() {
+      return wrapLayout;
    }
 
    public void setForm(AbstractForm form) {

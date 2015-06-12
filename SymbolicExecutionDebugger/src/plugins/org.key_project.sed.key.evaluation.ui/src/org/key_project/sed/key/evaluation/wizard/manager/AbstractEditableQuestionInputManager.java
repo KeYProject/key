@@ -4,11 +4,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
@@ -37,8 +37,10 @@ public abstract class AbstractEditableQuestionInputManager extends AbstractQuest
    
    protected void createSection(FormToolkit toolkit, Composite parent, AbstractQuestion question) {
       Composite sectionComposite = toolkit.createComposite(parent);
-      sectionComposite.setLayout(new GridLayout(3, false));
-      questionSection = toolkit.createSection(sectionComposite, SWT.NONE);
+      TableWrapLayout sectionLayout = new TableWrapLayout();
+      sectionLayout.numColumns = 2;
+      sectionComposite.setLayout(sectionLayout);
+      questionSection = toolkit.createSection(sectionComposite, SWT.WRAP);
       if (question.getLabel() != null) {
          questionSection.setText(question.getLabel());
       }

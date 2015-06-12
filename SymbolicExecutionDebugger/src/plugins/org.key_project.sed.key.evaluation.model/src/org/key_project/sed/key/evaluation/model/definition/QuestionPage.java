@@ -12,12 +12,12 @@ public class QuestionPage extends AbstractPage {
 
    private final IWorkbenchModifier workbenchModifier;
    
-   public QuestionPage(String name, String title, String message, IWorkbenchModifier workbenchModifier, AbstractQuestion... questions) {
-      this(name, title, message, workbenchModifier, CollectionUtil.toList(questions));
+   public QuestionPage(String name, String title, String message, boolean wrapLayout, IWorkbenchModifier workbenchModifier, AbstractQuestion... questions) {
+      this(name, title, message, wrapLayout, workbenchModifier, CollectionUtil.toList(questions));
    }
 
-   public QuestionPage(String name, String title, String message, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
-      super(name, title, message);
+   public QuestionPage(String name, String title, String message, boolean wrapLayout, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
+      super(name, title, message, wrapLayout);
       this.workbenchModifier = workbenchModifier;
       this.questions = questions;
       validateQuestions();

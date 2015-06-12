@@ -6,7 +6,7 @@ public class InstructionPage extends AbstractPage {
    private final URL descriptionURL;
    
    public InstructionPage(String name, String title, String message, URL descriptionURL) {
-      super(name, title, message);
+      super(name, title, message, false);
       this.descriptionURL = descriptionURL;
    }
 

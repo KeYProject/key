@@ -93,6 +93,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       QuestionPage conditionsPage = new QuestionPage("conditionsPage", 
                                                      "Introduction", 
                                                      "Please read the information and conditions of the evaluation carefully.",
+                                                     false,
                                                      null,
                                                      new BrowserQuestion("conditions", conditionsURL),
                                                      new RadioButtonsQuestion("acceptConditions",
@@ -106,6 +107,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       QuestionPage backgroundPage = new QuestionPage("backgroundPage", 
                                                      "Background Knowledge", 
                                                      "Please fill out the form with your background knowledge.",
+                                                     true,
                                                      null,
                                                      new RadioButtonsQuestion("experienceWithJava",
                                                                               "Experience with Java", 
@@ -160,7 +162,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Current date and time (nothing else!)");
       RandomForm evaluationForm = new RandomForm("evaluationForm", true, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
       // Create thanks form
-      QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.", null);
+      QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.", true, null);
       FixedForm thanksForm = new FixedForm("thanksForm", false, thanksPage);
       // Create forms
       return CollectionUtil.toList(introductionForm, evaluationForm, thanksForm);
@@ -230,6 +232,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
+                              true,
                               new ProofAttemptJavaProjectModifier("MyInteger",
                                                                   "add",
                                                                   new String[] {"QMyInteger;"},
@@ -318,6 +321,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
+                              true,
                               new ProofAttemptJavaProjectModifier("ArrayUtil",
                                                                   "minIndex",
                                                                   new String[] {"[I"},
@@ -434,6 +438,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
+                              true,
                               new ProofAttemptJavaProjectModifier("Calendar",
                                                                   "addEntry",
                                                                   new String[] {"QEntry;"},
@@ -573,6 +578,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
+                              true,
                               new ProofAttemptJavaProjectModifier("Account",
                                                                   "checkAndWithdraw",
                                                                   new String[] {"I"},
@@ -726,6 +732,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new QuestionPage(FEEDBACK_PAGE,
                               "Feedback", 
                               "Please answer the question to give us some feeback about the tools and the evaluation.", 
+                              false,
                               null,
                               keySection,
                               sedSection,

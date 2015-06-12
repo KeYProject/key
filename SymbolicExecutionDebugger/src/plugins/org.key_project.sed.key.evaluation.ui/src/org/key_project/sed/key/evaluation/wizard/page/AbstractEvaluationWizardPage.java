@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
@@ -36,11 +37,17 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
 
    @Override
    public void createControl(Composite parent) {
+      // Tutorial about Forms: https://eclipse.org/articles/Article-Forms/article.html
       FormToolkit toolkit = new FormToolkit(parent.getDisplay());
       form = new SharedScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL) {};
       toolkit.adapt(form);
       Composite content = toolkit.createComposite(form);
-      content.setLayout(new GridLayout(1, false));
+      if (getPageInput().getPage().isWrapLayout()) {
+         content.setLayout(new TableWrapLayout());
+      }
+      else {
+         content.setLayout(new GridLayout(1, false));
+      }
       form.setContent(content);
       form.setExpandHorizontal(true);
       form.setExpandVertical(true);
