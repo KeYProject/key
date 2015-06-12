@@ -243,6 +243,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(), loader.getResult());
    }
+   
+   public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile) throws ProblemLoaderException {
+      return load(keyFile, null, null, null);
+   }
 
    /**
     * Disposes this {@link KeYEnvironment}.

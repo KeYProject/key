@@ -984,7 +984,7 @@ public class LogicPrinter {
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
         if (notationInfo.isPrettySyntax()
-                && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT())
+                && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT(), services)
                 && getNotationInfo().isHidePackagePrefix()) {
             // Hide package prefix when printing field constants.
             startTerm(0);
