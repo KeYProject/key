@@ -3,11 +3,13 @@ package org.key_project.sed.key.evaluation.wizard.page;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
@@ -23,7 +25,7 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    
    private Control errornousControl;
    
-   private ScrolledForm form;
+   private ScrolledComposite form;
    
    public AbstractEvaluationWizardPage(P pageInput) {
       super(pageInput.getPage().getName());
@@ -36,14 +38,20 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    @Override
    public void createControl(Composite parent) {
       FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-      form = toolkit.createScrolledForm(parent);
-      form.getBody().setLayout(new GridLayout(1, false));
-      createContent(toolkit, form);
+      form = new SharedScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL) {};
+      toolkit.adapt(form);
+      Composite content = toolkit.createComposite(form);
+      content.setLayout(new GridLayout(1, false));
+      form.setContent(content);
+      form.setExpandHorizontal(true);
+      form.setExpandVertical(true);
+      
+      createContent(toolkit, content);
       setControl(form);
       updatePageCompleted();
    }
 
-   protected abstract void createContent(FormToolkit toolkit, ScrolledForm form);
+   protected abstract void createContent(FormToolkit toolkit, Composite parent);
    
    protected abstract void updatePageCompleted();
 

@@ -1,8 +1,8 @@
 package org.key_project.sed.key.evaluation.wizard.page;
 
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.key_project.sed.key.evaluation.model.input.InstructionPageInput;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 
@@ -12,9 +12,9 @@ public class InstructionWizardPage extends AbstractEvaluationWizardPage<Instruct
    }
 
    @Override
-   protected void createContent(FormToolkit toolkit, ScrolledForm form) {
-      form.getBody().setLayout(new GridLayout(1, false));
-      BrowserManager.createBrowser(toolkit, form.getBody(), getPageInput().getPage().getDescriptionURL());
+   protected void createContent(FormToolkit toolkit, Composite parent) {
+      parent.setLayout(new GridLayout(1, false));
+      BrowserManager.createBrowser(toolkit, parent, getPageInput().getPage().getDescriptionURL());
    }
 
    @Override

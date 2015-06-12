@@ -43,7 +43,7 @@ public class TextManager extends AbstractEditableQuestionInputManager {
             handleTextChanged(e);
          }
       });
-      textDecoration = new ControlDecoration(text, SWT.RIGHT | SWT.TOP);
+      textDecoration = new ControlDecoration(text, SWT.RIGHT | SWT.TOP, text.getParent());
       textDecoration.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
       updateTextDecoration();
    }

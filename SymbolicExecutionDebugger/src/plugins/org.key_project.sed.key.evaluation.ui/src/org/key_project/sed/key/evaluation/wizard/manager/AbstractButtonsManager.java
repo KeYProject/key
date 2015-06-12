@@ -115,7 +115,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          }
       });
       buttons.add(button);
-      ControlDecoration buttonDecoration = new ControlDecoration(button, SWT.RIGHT | SWT.TOP);
+      ControlDecoration buttonDecoration = new ControlDecoration(button, SWT.RIGHT | SWT.TOP, button.getParent());
       buttonDecoration.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
       buttonDecorations.add(buttonDecoration);
       updateButtonDecorations();

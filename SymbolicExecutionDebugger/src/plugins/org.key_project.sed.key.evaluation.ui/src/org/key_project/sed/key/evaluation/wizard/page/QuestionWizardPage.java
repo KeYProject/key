@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.sed.key.evaluation.model.definition.BrowserQuestion;
 import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
@@ -66,7 +65,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    }
 
    @Override
-   protected void createContent(FormToolkit toolkit, ScrolledForm form) {
+   protected void createContent(FormToolkit toolkit, Composite parent) {
       ICreateControlCallback callBack = new ICreateControlCallback() {
          @Override
          public void handleQuestionInput(QuestionInput questionInput) {
@@ -77,7 +76,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       };
       List<IQuestionInputManager> managers = createQuestionControls(this,
                                                                     toolkit, 
-                                                                    form.getBody(), 
+                                                                    parent, 
                                                                     getPageInput().getQuestionInputs(),
                                                                     callBack);
       controls.addAll(managers);
