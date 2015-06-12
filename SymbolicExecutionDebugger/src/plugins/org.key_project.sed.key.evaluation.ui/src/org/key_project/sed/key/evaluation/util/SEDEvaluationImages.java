@@ -21,6 +21,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.key.evaluation.Activator;
 import org.key_project.util.eclipse.BundleUtil;
@@ -163,12 +164,31 @@ public final class SEDEvaluationImages {
         }
     }
     
+    /**
+     * Creates a new {@link Image} equal to the base {@link Image} on
+     * which additional the decoration {@link Image} is drawn bottom right.
+     * @param baseImage The base {@link Image}.
+     * @param decorationImage The decoration {@link Image} to draw on base {@link Image}.
+     * @return The new {@link Image}.
+     */
     protected static Image decorateImage(Image baseImage, Image decorationImage) {
-       Image result = new Image(Display.getDefault(), baseImage.getBounds().width, baseImage.getBounds().height);
+       ImageData decorationData = decorationImage.getImageData();
+       // Create result image data
+       ImageData resultData = baseImage.getImageData();
+       // Make area on which decoration will be placed transparent
+       int decX = resultData.width - decorationData.width;
+       int decY = resultData.height - decorationData.height;
+       for (int x = 0; x < decorationData.width; x++) {
+          for (int y = 0; y < decorationData.height; y++) {
+             resultData.setAlpha(decX + x, decY + y, decorationData.getAlpha(x, y));
+             resultData.setPixel(decX + x, decY + y, resultData.transparentPixel);
+          }
+       }
+       // Create result image
+       Image result = new Image(baseImage.getDevice(), resultData);
+       // Draw decoration image
        GC gc = new GC(result);
        gc.drawImage(baseImage, 0, 0);
-       int decX = result.getBounds().width - decorationImage.getBounds().width;
-       int decY = result.getBounds().height - decorationImage.getBounds().height;
        gc.drawImage(decorationImage, decX, decY);
        gc.dispose();
        return result;

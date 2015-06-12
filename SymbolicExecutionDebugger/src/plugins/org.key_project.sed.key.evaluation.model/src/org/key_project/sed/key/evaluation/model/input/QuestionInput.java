@@ -202,7 +202,7 @@ public class QuestionInput extends Bean {
       String errorMessage = validateValue();
       if (errorMessage == null && question.isAskForTrust()) {
          if (getTrust() == null) {
-            errorMessage = "Trust into answer of question '" + question.getLabel() + "' is not defined.";
+            errorMessage = "Emoticon defining trust into answer of question '" + question.getLabel() + "' not selected.";
          }
       }
       // Validate choice inputs
