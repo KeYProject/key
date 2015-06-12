@@ -70,7 +70,7 @@ public class ProveRulesTest {
    }
 
    @Test
-   public void loadTacletProof() {
+   public void loadTacletProof() throws ProblemLoaderException {
       assertNotNull("Taclet " + tacletName
             + " was annoted with \\lemma but no taclet proof was found.",
             proofFile);
@@ -83,7 +83,10 @@ public class ProveRulesTest {
                   + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
                   + "adding annotation \\lemma to the declaration of the taclet.",
             taclet.getRuleJustification() instanceof LemmaJustification);
-      throw new UnsupportedOperationException();
+      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment
+            .load(proofFile);
+      assertTrue("Taclet proof of taclet " + tacletName + " did not close.",
+            env.getLoadedProof().isDisposed());
    }
 
    private static List<File> getFilesRecursive(File directory) {
