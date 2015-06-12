@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -104,8 +105,8 @@ public class ProveRulesTest {
        * test case of a taclet will fail if no proof file containg a taclet
        * proof for it can be found.
        */
-      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
-            null, null, null, null);
+      KeYEnvironment<DefaultUserInterfaceControl> env = HelperClassForTests
+            .createKeYEnvironment();
       Profile p = env.getProfile();
       Map<String, Taclet> tacletObjectByTacletName = new LinkedHashMap<>();
       for (Taclet taclet : env.getInitConfig().getTaclets()) {

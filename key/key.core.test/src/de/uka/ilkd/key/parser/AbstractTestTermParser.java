@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -10,7 +9,6 @@ import junit.framework.TestCase;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
 
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -39,10 +37,6 @@ public class AbstractTestTermParser extends TestCase {
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
-    
-    static final String javaPath = HelperClassForTests.TESTCASE_DIRECTORY + 
-                                   File.separator + "termParser" + 
-                                   File.separator + "parserTest.key";
 
     AbstractTestTermParser(String name) {
         super(name);
@@ -215,9 +209,7 @@ public class AbstractTestTermParser extends TestCase {
     }
 
     protected Services getServices() {
-        JavaInfo javaInfo = new HelperClassForTests().parse(
-                new File(javaPath)).getFirstProof().getJavaInfo();
-        return javaInfo.getServices();
+        return HelperClassForTests.createServices();
     }
 
 }

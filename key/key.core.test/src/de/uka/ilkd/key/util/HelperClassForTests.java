@@ -32,6 +32,7 @@ import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -59,6 +60,8 @@ import de.uka.ilkd.key.speclang.Contract;
 public class HelperClassForTests {
    public static final String TESTCASE_DIRECTORY;
    
+   public static final File DUMMY_KEY_FILE;
+   
    static {
       File projectRoot = IOUtil.getProjectRoot(HelperClassForTests.class);
       // Update path in Eclipse Plug-ins executed as JUnit Test.
@@ -72,12 +75,14 @@ public class HelperClassForTests {
          projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
       }
       TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+ File.separator + "testcase";
+      DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY + File.separator + "dummyTrue.key");
    }
 
     
     private static final Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
-	    public RuleCollection getStandardRules() {
+	    @Override
+      public RuleCollection getStandardRules() {
                 return new RuleCollection(
                                 RuleSourceFactory.fromDefaultLocation(ldtFile), 
                                 ImmutableSLList.<BuiltInRule>nil());
@@ -306,4 +311,15 @@ public class HelperClassForTests {
        Assert.assertNotNull(pm);
        return pm;
     }
+    
+   public static Services createServices() {
+      JavaInfo javaInfo = new HelperClassForTests().parse(DUMMY_KEY_FILE)
+            .getFirstProof().getJavaInfo();
+      return javaInfo.getServices();
+   }
+   
+   public static KeYEnvironment<DefaultUserInterfaceControl> createKeYEnvironment() throws ProblemLoaderException {
+      return KeYEnvironment.load(DUMMY_KEY_FILE);
+   }
+   
 }
