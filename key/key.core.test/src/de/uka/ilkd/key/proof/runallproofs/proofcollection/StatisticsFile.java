@@ -246,7 +246,18 @@ public class StatisticsFile implements Serializable {
             String[] sumAndAverage = column.computeSumAndAverage(lists[i]);
             assert sumAndAverage.length == 2 : "Expecting exactly 2 strings returned by computeSumAndAverage()";
             sums.add(sumAndAverage[0]);
-            avgs.add(sumAndAverage[1]);
+            if (i != 6) {
+               avgs.add(sumAndAverage[1]);
+            }
+            else {
+               /*
+                * Adjust average calculation for "Time per step" so that it is more stable.
+                * (see bug #1442)
+                */
+               int sumNodes = Integer.parseInt(sums.get(1));
+               int sumAutomodeTime = Integer.parseInt(sums.get(4));
+               avgs.add(sumAutomodeTime / sumNodes + "");
+            }
          }
          // Append lines of sums and averages to statistics file.
          writeLine(sums);
