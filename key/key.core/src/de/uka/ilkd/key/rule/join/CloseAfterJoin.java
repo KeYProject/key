@@ -119,7 +119,7 @@ public class CloseAfterJoin implements BuiltInRule {
                 //       a closed goal when loading a proof without the GUI (e.g.
                 //       in a JUnit test).
                 
-                if (e.getGoals().size() == 0 && joinNodeF.isClosed()) {
+                if (e.getGoals().isEmpty() && joinNodeF.isClosed()) {
                     // The joined node was closed; now also close this node.
                     
                     e.getSource().closeGoal(linkedGoal);
@@ -150,6 +150,8 @@ public class CloseAfterJoin implements BuiltInRule {
 
                      e.getSource().removeProofTreeListener(this);
                 }
+                // clean up and avoid memory leak
+                prunedNode = null;
             }
             
             private boolean findJoinNode() {
