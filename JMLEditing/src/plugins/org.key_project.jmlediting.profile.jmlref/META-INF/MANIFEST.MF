@@ -12,7 +12,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.jmlediting.core;bundle-version="1.0.0",
  org.key_project.jmlediting.ui;bundle-version="1.0.0",
- org.eclipse.ltk.core.refactoring
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.core.filebuffers,
+ org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: org.key_project.jmlediting.profile.jmlref,
