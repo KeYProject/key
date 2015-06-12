@@ -58,12 +58,13 @@ class SelectPrinter extends FieldPrinter {
             } else if (isGenericFieldConstant(fieldTerm)) {
                 // object properties denoted like o.<created>
                 printGenericObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (isFieldConstant(fieldTerm) && getFieldSort(fieldTerm).equals(t.sort())) {
-                if (isStaticFieldConstant(objectTerm, fieldTerm)) {
-                    // static field access
+            } else if (isStaticFieldConstant(objectTerm, fieldTerm)
+                       && getFieldSort(fieldTerm).equals(t.sort())) {
+                // static field access with its own type
                     printStaticJavaFieldConstant(fieldTerm, heapTerm, tacitHeap);
-                } else if (isJavaFieldConstant(fieldTerm)) {
-                    // non-static field access
+            } else if (isJavaFieldConstant(fieldTerm)
+                       && getFieldSort(fieldTerm).equals(t.sort())) {
+                // non-static field access with its own type
                     printNonStaticJavaFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
                 } else {
                     lp.printFunctionTerm(t);
@@ -71,9 +72,6 @@ class SelectPrinter extends FieldPrinter {
             } else {
                 lp.printFunctionTerm(t);
             }
-        } else {
-            lp.printFunctionTerm(t);
-        }
     }
 
     /*
