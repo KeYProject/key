@@ -149,10 +149,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL);
       ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
       ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME));
-      QuestionPage proof1Page = createCalendarQuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt 1");
-      QuestionPage proof2Page = createAccountQuestionPage(PROOF_2_PAGE_NAME, "Proof Attempt 2");
-      QuestionPage proof3Page = createMinQuestionPage(PROOF_3_PAGE_NAME, "Proof Attempt 3");
-      QuestionPage proof4Page = createMyIntegerQuestionPage(PROOF_4_PAGE_NAME, "Proof Attempt 4");
+      QuestionPage proof1Page = createCalendarQuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt of Calendar#addEntry(Entry)");
+      QuestionPage proof2Page = createAccountQuestionPage(PROOF_2_PAGE_NAME, "Proof Attempt of Account#checkAndWithdraw(int)");
+      QuestionPage proof3Page = createMinQuestionPage(PROOF_3_PAGE_NAME, "Proof Attempt of ArrayUtil#minIndex(int[])");
+      QuestionPage proof4Page = createMyIntegerQuestionPage(PROOF_4_PAGE_NAME, "Proof Attempt of MyInteger#add(MyInteger)");
       QuestionPage feedbackPage = createFeedbackPage();
       SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
                                                          "Confirm Sending Content", 
@@ -233,9 +233,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               new ProofAttemptJavaProjectModifier("MyInteger",
                                                                   "add",
                                                                   new String[] {"QMyInteger;"},
+                                                                  "add(MyInteger)",
                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralDescription("add(MyInteger)")),
+                              new LabelQuestion("generalDescription", createGeneralDescription("MyInteger#add(MyInteger)")),
                               openQuestion,
                               executedQuestion);
       // TODO: How to fix code or specifications?
@@ -320,9 +321,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               new ProofAttemptJavaProjectModifier("ArrayUtil",
                                                                   "minIndex",
                                                                   new String[] {"[I"},
+                                                                  "minIndex(int[])",
                                                                   new FileDefinition("data/understandingProofAttempts/proofMin/ArrayUtil.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayUtil.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofMin/ArrayUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayUtil.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralDescription("minIndex(int[])")),
+                              new LabelQuestion("generalDescription", createGeneralDescription("ArrayUtil#minIndex(int[])")),
                               openQuestion,
                               executedQuestion);
       // TODO: How to fix code or specifications?
@@ -432,12 +434,13 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
-                              new ProofAttemptJavaProjectModifier("MyInteger",
-                                                                  "add",
-                                                                  new String[] {"QMyInteger;"},
+                              new ProofAttemptJavaProjectModifier("Calendar",
+                                                                  "addEntry",
+                                                                  new String[] {"QEntry;"},
+                                                                  "addEntry(Entry)",
                                                                   new FileDefinition("data/understandingProofAttempts/proofCalendar/Calendar.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Calendar.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofCalendar/Calendar.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Calendar.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralDescription("addEntry(Entry)")),
+                              new LabelQuestion("generalDescription", createGeneralDescription("Calendar#addEntry(Entry)")),
                               openQuestion,
                               executedQuestion);
       // TODO: How to fix code or specifications?
@@ -570,12 +573,13 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
-                              new ProofAttemptJavaProjectModifier("MyInteger",
-                                                                  "add",
-                                                                  new String[] {"QMyInteger;"},
+                              new ProofAttemptJavaProjectModifier("Account",
+                                                                  "checkAndWithdraw",
+                                                                  new String[] {"I"},
+                                                                  "checkAndWithdraw(int)",
                                                                   new FileDefinition("data/understandingProofAttempts/proofAccount/Account.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Account.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofAccount/Account.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Account.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralDescription("checkAndWithdraw(int)")),
+                              new LabelQuestion("generalDescription", createGeneralDescription("Account#checkAndWithdraw(int)")),
                               openQuestion,
                               executedQuestion,
                               contractsQuestion);

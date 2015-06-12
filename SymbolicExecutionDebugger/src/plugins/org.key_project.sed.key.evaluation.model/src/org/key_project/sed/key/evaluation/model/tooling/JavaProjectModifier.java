@@ -25,7 +25,7 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
    }
 
    @Override
-   public synchronized void modifyWorkbench() throws Exception {
+   public synchronized String modifyWorkbench() throws Exception {
       if (javaProject == null) {
          String projectName = getPageInput().getFormInput().getEvaluationInput().getEvaluation().getName();
          IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -57,12 +57,18 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
             }
             fileCreated(definition, projectFile);
          }
+         return getCompletionMessage();
       }
       else {
          // Workspace was already modified, nothing to do.
+         return null;
       }
    }
    
+   protected String getCompletionMessage() {
+      return null;
+   }
+
    protected void fileCreated(FileDefinition definition, IFile projectFile) throws Exception {
    }
 

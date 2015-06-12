@@ -1,6 +1,6 @@
 package org.key_project.sed.key.evaluation.wizard.page;
 
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.layout.GridLayout;
@@ -12,6 +12,7 @@ import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
+import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?>> extends WizardPage {
    private final P pageInput;
@@ -81,18 +82,45 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
       }
    }
    
-   protected IRunnableWithProgress computeRunnable(boolean visible) {
+   protected IRunnableWithProgressAndResult<String> computeRunnable(boolean visible) {
       return null;
    }
 
-   public void perfomRunnables(IRunnableWithProgress hiddenRunnable, 
-                               IRunnableWithProgress visibleRunnable) {
+   public void perfomRunnables(IRunnableWithProgressAndResult<String> hiddenRunnable, 
+                               IRunnableWithProgressAndResult<String> visibleRunnable) {
       try {
+         final String hiddenCompletionMessage;
          if (hiddenRunnable != null) {
             getContainer().run(true, false, hiddenRunnable);
+            hiddenCompletionMessage = hiddenRunnable.getResult();
          }
+         else {
+            hiddenCompletionMessage = null;
+         }
+         final String visibleCompletionMessage;
          if (visibleRunnable != null) {
             getContainer().run(true, false, visibleRunnable);
+            visibleCompletionMessage = visibleRunnable.getResult();
+         }
+         else {
+            visibleCompletionMessage = null;
+         }
+         if (hiddenRunnable != null || visibleRunnable != null) {
+            getShell().forceActive();
+            getShell().forceFocus();
+         }
+         if (hiddenCompletionMessage != null || visibleCompletionMessage != null) {
+            getShell().getDisplay().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+                  if (hiddenCompletionMessage != null) {
+                     MessageDialog.openInformation(getShell(), "Information", hiddenCompletionMessage);
+                  }
+                  if (visibleCompletionMessage != null) {
+                     MessageDialog.openInformation(getShell(), "Information", visibleCompletionMessage);            
+                  }
+               }
+            });
          }
       }
       catch (Exception e) {

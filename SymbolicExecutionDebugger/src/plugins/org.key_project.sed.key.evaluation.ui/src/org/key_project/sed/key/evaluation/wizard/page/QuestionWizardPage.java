@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPage;
@@ -35,6 +34,8 @@ import org.key_project.sed.key.evaluation.wizard.manager.RadioButtonsManager;
 import org.key_project.sed.key.evaluation.wizard.manager.SectionManager;
 import org.key_project.sed.key.evaluation.wizard.manager.TextManager;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
+import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPageInput> {
    private final List<IQuestionInputManager> controls = new LinkedList<IQuestionInputManager>();
@@ -176,27 +177,29 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    }
 
    @Override
-   protected IRunnableWithProgress computeRunnable(final boolean visible) {
+   protected IRunnableWithProgressAndResult<String> computeRunnable(final boolean visible) {
       final IWorkbenchModifier modifier = getPageInput().getPage().getWorkbenchModifier();
       if (modifier != null) {
          final Tool tool = getPageInput().getFormInput() instanceof RandomFormInput ?
                            ((RandomFormInput) getPageInput().getFormInput()).getTool(getPageInput()) :
                            null;
          final IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
-         return new IRunnableWithProgress() {
+         return new AbstractRunnableWithProgressAndResult<String>() {
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                try {
                   if (visible) {
                      monitor.beginTask("Modifying Workbench", IProgressMonitor.UNKNOWN);
                      modifier.init(activePage, getShell(), getPageInput(), tool);
-                     modifier.modifyWorkbench();
+                     String completionMessage = modifier.modifyWorkbench();
                      monitor.done();
+                     setResult(completionMessage);
                   }
                   else {
                      monitor.beginTask("Cleaning Workbench", IProgressMonitor.UNKNOWN);
                      modifier.cleanWorkbench();
                      monitor.done();
+                     setResult(null);
                   }
                }
                catch (Exception e) {

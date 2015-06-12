@@ -35,6 +35,8 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
    
    private final String[] methodParameters;
    
+   private final String methodSignature;
+   
    private IPerspectiveDescriptor originalPerspective;
    
    private Proof proof;
@@ -44,13 +46,34 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
    public ProofAttemptJavaProjectModifier(String typeName, 
                                           String methodName, 
                                           String[] methodParameters, 
+                                          String methodSignature,
                                           FileDefinition proofFileDefinition, 
                                           FileDefinition... files) {
       super(ArrayUtil.add(files, proofFileDefinition));
       this.typeName = typeName;
       this.methodName = methodName;
       this.methodParameters = methodParameters;
+      this.methodSignature = methodSignature;
       this.proofFileDefinition = proofFileDefinition;
+   }
+
+   @Override
+   protected String getCompletionMessage() {
+      if (UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME.equals(getTool().getName())) {
+         return "The proof attempt of '" + typeName + "#" + methodSignature + "' is now shown in KeY (separte shell). " +
+                "The corresponding source code is shown in Eclipse (active editor).\n\n" +
+                "Please answer now the questions shown in the evaluation wizard.\n" +
+                "Do NOT open the proof attempt with SED!";
+      }
+      else if (UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME.equals(getTool().getName())) {
+         return "The symbolic execution tree of the proof attempt of '" + typeName + "#" + methodSignature + "' is now shown in Eclipse. " +
+                "The corresponding source code is shown in the active editor.\n\n" +
+                "Please answer now the questions shown in the evaluation wizard.\n" +
+                "Do NOT open the proof attempt with KeY!";
+      }
+      else {
+         return null;
+      }
    }
 
    @Override
