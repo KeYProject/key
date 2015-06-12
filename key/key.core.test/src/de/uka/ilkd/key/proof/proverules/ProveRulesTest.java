@@ -18,6 +18,7 @@ import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
@@ -85,8 +86,11 @@ public class ProveRulesTest {
             taclet.getRuleJustification() instanceof LemmaJustification);
       KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment
             .load(proofFile);
+      Proof proof = env.getLoadedProof();
       assertTrue("Taclet proof of taclet " + tacletName + " did not close.",
-            env.getLoadedProof().isDisposed());
+            proof.closed());
+      proof.dispose();
+      env.dispose();
    }
 
    private static List<File> getFilesRecursive(File directory) {
