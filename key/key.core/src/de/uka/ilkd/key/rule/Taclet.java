@@ -90,7 +90,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  */
 public abstract class Taclet implements Rule, Named {
    
-   private final ImmutableSet<TacletAnnotation> tacletAnnotations;
+   protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
    public RuleJustification getRuleJustification() {
       if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
