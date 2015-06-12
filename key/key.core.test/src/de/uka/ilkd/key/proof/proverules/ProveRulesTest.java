@@ -126,7 +126,9 @@ public class ProveRulesTest {
       Map<String, Taclet> tacletObjectByTacletName = new LinkedHashMap<>();
       for (Taclet taclet : env.getInitConfig().getTaclets()) {
          if (p.getJustification(taclet) == LemmaJustification.INSTANCE) {
-            tacletNames.add(taclet.name().toString());
+            String tacletName = taclet.name().toString();
+            tacletNames.add(tacletName);
+            tacletObjectByTacletName.put(tacletName, taclet);
          }
       }
 
