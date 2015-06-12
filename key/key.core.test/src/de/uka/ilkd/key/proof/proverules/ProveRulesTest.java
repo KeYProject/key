@@ -83,7 +83,10 @@ public class ProveRulesTest {
       List<File> list = new LinkedList<>();
       for (File file : directory.listFiles()) {
          if (file.isFile()) {
-            list.add(file);
+            String fileName = file.getName();
+            if (fileName.startsWith("Taclet_") && fileName.endsWith(".proof")) {
+               list.add(file);
+            }
          }
          else {
             list.addAll(getFilesRecursive(file));
@@ -125,7 +128,9 @@ public class ProveRulesTest {
       Map<String, File> proofFileByTacletName = new LinkedHashMap<>();
       List<File> proofFiles = getFilesRecursive(PROOF_DIRECTORY);
       for (File proofFile : proofFiles) {
-         String tacletName = proofFile.getName();
+         String fileName = proofFile.getName();
+         // Remove Taclet_* beginning and *.proof ending from fileName.
+         String tacletName = fileName.substring(7, fileName.length() - 6);
          proofFileByTacletName.put(tacletName, proofFile);
          tacletNames.add(tacletName);
       }
