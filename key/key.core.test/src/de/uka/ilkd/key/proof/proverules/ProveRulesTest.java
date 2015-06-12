@@ -66,7 +66,7 @@ public class ProveRulesTest {
             + " was annoted with \\lemma but no taclet proof was found.",
             proofFile);
       assertNotNull("Proof file " + proofFile
-            + " claims it has a proof for taclet " + tacletName
+            + " claims that it contains a proof for taclet " + tacletName
             + " but corresponding taclet seems to be unavailable.", taclet);
       assertTrue(
             "Found a taclet proof for taclet "
