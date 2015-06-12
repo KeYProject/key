@@ -318,10 +318,15 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         /**
-         * TODO: Document.
+         * Removes the <code>try { method-frame { ... }}</code> parts from the
+         * given statement block, i.e. returns the inner code. If there is
+         * nothing to remove, the original block is returned.
          *
          * @param sb
-         * @return
+         *            The statement block to remove the try/method-frame parts
+         *            from.
+         * @return The stripped inner statement block or the original argument,
+         *         if the removal was not applicable.
          */
         private StatementBlock stripMethodFrame(final StatementBlock sb) {
             if (sb.getBody().get(0) instanceof Try) {
