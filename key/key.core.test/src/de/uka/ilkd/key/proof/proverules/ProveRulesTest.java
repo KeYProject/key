@@ -27,7 +27,16 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * JUnit test class for re-running taclet proofs (formerly implemented as Perl
- * script proveRules.pl).
+ * script proveRules.pl). The following procedure is executed during test run:
+ * 
+ * 1) Retrieve names of all taclets that have annotation "\lemma" in their
+ * declaration. <br>
+ * 2) Retrieve all names of taclets for which there is a taclet proof available.
+ * Expected file name pattern is as follows: Taclet_$TACLETNAME.proof<br>
+ * 3) Create a test case for each registered taclet name.<br>
+ * 4) Run the test cases. Each test case will check that its corresponding
+ * taclet is annotated with "\lemma" and then attempt to load the proof of the
+ * taclet.
  * 
  * @author Kai Wallisch
  *
