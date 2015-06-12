@@ -21,13 +21,13 @@ public class Calendar {
            @*/
          for (int i = 0; i < entries.length; i++) {
             newEntries[i] = entries[i];
-            // Loop End
+            //XXX: Loop Body Termination (of the 'Body Preserves Invariant' branch)
          }
          entries = newEntries;
-         // After Then
+         //XXX: Continuation After Then
       }
       else {
-         // After Else
+         //XXX: Continuation After Else
       }
       entries[entrySize] = entry;
       entrySize++;

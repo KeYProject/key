@@ -305,16 +305,16 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 8 (if (array != null))", "Line 8"),
                                                                new Choice("Line 9 (if (array.length == 0))", "Line 9"),
                                                                new Choice("Line 10 (return -1)", "Line 10"),
-                                                               new Choice("Line 12 (array.length == 1)", "Line 12"),
-                                                               new Choice("Line 13 (return array[0])", "Line 13"),
-                                                               new Choice("Line 16 (int minIndex = 0)", "Line 16"),
-                                                               new Choice("Line 24 (int i = 1)", "Line 24 initial"),
-                                                               new Choice("Line 24 (i < array.length)", "Line 24 condition"),
-                                                               new Choice("Line 24 (i++)", "Line 24 update"),
-                                                               new Choice("Line 25 (if (array[i] < array[minIndex]))", "Line 25"),
-                                                               new Choice("Line 26 (minIndex = 1)", "Line 26"),
-                                                               new Choice("Line 33 (return minIndex)", "Line 33"),
-                                                               new Choice("Line 37 (return -1)", "Line 37"));
+                                                               new Choice("Line 13 (array.length == 1)", "Line 13"),
+                                                               new Choice("Line 14 (return array[0])", "Line 14"),
+                                                               new Choice("Line 17 (int minIndex = 0)", "Line 17"),
+                                                               new Choice("Line 25 (int i = 1)", "Line 25 initial"),
+                                                               new Choice("Line 25 (i < array.length)", "Line 25 condition"),
+                                                               new Choice("Line 25 (i++)", "Line 25 update"),
+                                                               new Choice("Line 26 (if (array[i] < array[minIndex]))", "Line 26"),
+                                                               new Choice("Line 27 (minIndex = 1)", "Line 27"),
+                                                               new Choice("Line 34 (return minIndex)", "Line 34"),
+                                                               new Choice("Line 39 (return -1)", "Line 39"));
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
@@ -354,12 +354,12 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
-                                  new Choice("Return 1 (array != null & array.length == 0)", "Return 1"),
-                                  new Choice("Return 2 (array != null & array.length == 1)", "Return 2"),
-                                  new Choice("Return 3 (array != null & array.length > 1)", "Return 3"),
-                                  new Choice("Return 4 (array == null)", "Return 4"),
-                                  new Choice("Loop End 1 (array[i] < array[minIndex])", "Loop End 1"),
-                                  new Choice("Loop End 2 (array[i] >= array[minIndex])", "Loop End 2"));
+                                  new Choice("Termination 1 (array != null & array.length == 0)", "Termination 1"),
+                                  new Choice("Termination 2 (array != null & array.length == 1)", "Termination 2"),
+                                  new Choice("Termination 3 (array != null & array.length > 1)", "Termination 3"),
+                                  new Choice("Termination 4 (array == null)", "Termination 4"),
+                                  new Choice("Loop Body Termination 1 (array[i] < array[minIndex])", "Loop Body Termination 1"),
+                                  new Choice("Loop Body Termination 2 (array[i] >= array[minIndex])", "Loop Body Termination 2"));
    }
    
    protected QuestionPage createCalendarQuestionPage(String pageName, String title) {
@@ -428,9 +428,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 22 (i < entries.length)", "Line 22 condition"),
                                                                new Choice("Line 22 (i++)", "Line 22 update"),
                                                                new Choice("Line 23 (newEntries[i] = entries[i])", "Line 23"),
-                                                               new Choice("Line 25 (entries = newEntries)", "Line 25"),
-                                                               new Choice("Line 27 (entries[entrySize] = entry)", "Line 27"),
-                                                               new Choice("Line 28 (entrySize++)", "Line 28"));
+                                                               new Choice("Line 26 (entries = newEntries)", "Line 26"),
+                                                               new Choice("Line 32 (entries[entrySize] = entry)", "Line 32"),
+                                                               new Choice("Line 33 (entrySize++)", "Line 33"));
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
@@ -474,9 +474,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
-                                  new Choice("After Then (entrySize == entries.length)", "After Then"),
-                                  new Choice("After Else (entrySize != entries.length)", "After Else"),
-                                  new Choice("Loop End", "Loop End"));
+                                  new Choice("Continuation After Then (entrySize == entries.length)", "Continuation After Then"),
+                                  new Choice("Continuation After Else (entrySize != entries.length)", "Continuation After Else"),
+                                  new Choice("Loop Body Termination (of the 'Body Preserves Invariant' branch)", "Loop Body Termination"));
    }
    
    public RandomForm getEvaluationForm() {
@@ -607,8 +607,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
-                                  new Choice("Return 1 (canWithdraw(amount))", "Return amount"),
-                                  new Choice("Return 2 (!canWithdraw(amount))", "Return 0"));
+                                  new Choice("Termination 1 (canWithdraw(amount))", "Termination 1"),
+                                  new Choice("Termination 2 (!canWithdraw(amount))", "Termination 2"));
    }
    
    protected String createGeneralDescription(String po) {
