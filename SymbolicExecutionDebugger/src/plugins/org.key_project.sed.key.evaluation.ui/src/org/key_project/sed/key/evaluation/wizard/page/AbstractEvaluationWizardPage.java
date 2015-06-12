@@ -4,7 +4,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -25,7 +24,7 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    
    private Control errornousControl;
    
-   private ScrolledComposite form;
+   private SharedScrolledComposite form;
    
    public AbstractEvaluationWizardPage(P pageInput) {
       super(pageInput.getPage().getName());
@@ -164,5 +163,9 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
       if (errornousControl != null) {
          form.showControl(errornousControl);
       }
+   }
+
+   public SharedScrolledComposite getForm() {
+      return form;
    }
 }

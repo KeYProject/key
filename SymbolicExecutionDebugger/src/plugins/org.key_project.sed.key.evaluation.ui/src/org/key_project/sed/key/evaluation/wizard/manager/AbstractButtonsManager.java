@@ -10,8 +10,10 @@ import java.util.Map.Entry;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -35,6 +37,8 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
    
    private Composite composite;
    
+   private final Map<Choice, CompositePair> choiceCompositesMap = new HashMap<Choice, CompositePair>();
+   
    public AbstractButtonsManager(AbstractEvaluationWizardPage<?> wizardPage,
                                  FormToolkit toolkit, 
                                  Composite parent, 
@@ -50,7 +54,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          createNoChildQuestionControls(toolkit, question);
       }
    }
-
+      
    protected void createwithChildQuestionControls(FormToolkit toolkit, Q question, ICreateControlCallback callback) {
       composite.setLayout(new GridLayout(1, false));
       createSection(toolkit, composite, question);
@@ -58,15 +62,31 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          createChoiceControl(toolkit, choice, question);
          QuestionInput[] choiceInputs = getQuestionInput().getChoiceInputs(choice);
          if (!ArrayUtil.isEmpty(choiceInputs)) {
-            Composite choiceComposite = toolkit.createComposite(composite);
+            StackLayout choiceStackLayout = new StackLayout() {
+               @Override
+               protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
+                  if (topControl != null) {
+                     return super.computeSize(composite, wHint, hHint, flushCache);
+                  }
+                  else {
+                     return new Point(0, 0);
+                  }
+               }
+            };
+            Composite choiceStackComposite = toolkit.createComposite(composite);
+            choiceStackComposite.setLayout(choiceStackLayout);
+            
+            Composite choiceContentComposite = toolkit.createComposite(choiceStackComposite);
             GridLayout layout = new GridLayout(1, false);
             layout.marginWidth = 0;
             layout.marginHeight = 0;
             layout.marginLeft = 30;
             layout.horizontalSpacing = 0;
             layout.verticalSpacing = 0;
-            choiceComposite.setLayout(layout);
-            List<IQuestionInputManager> managers = QuestionWizardPage.createQuestionControls(getWizardPage(), toolkit, choiceComposite, choiceInputs, callback);
+            choiceContentComposite.setLayout(layout);
+            
+            choiceCompositesMap.put(choice, new CompositePair(choiceStackLayout, choiceStackComposite, choiceContentComposite));
+            List<IQuestionInputManager> managers = QuestionWizardPage.createQuestionControls(getWizardPage(), toolkit, choiceContentComposite, choiceInputs, callback);
             choiceManagers.put(choice, managers);
          }
       }
@@ -193,6 +213,16 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          for (IQuestionInputManager manager : entry.getValue()) {
             manager.setEnabled(enabled);
          }
+         CompositePair pair = choiceCompositesMap.get(entry.getKey());
+         if (pair != null) {
+            if (enabled) {
+               pair.getStackLayout().topControl = pair.getContentComposite();
+            }
+            else {
+               pair.getStackLayout().topControl = null;
+            }
+            getWizardPage().getForm().reflow(true);
+         }
       }
    }
 
@@ -203,5 +233,31 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
          control = buttons.get(0);
       }
       return control;
+   }
+   
+   protected static class CompositePair {
+      private final StackLayout stackLayout;
+      
+      private final Composite stackComposite;
+      
+      private final Composite contentComposite;
+
+      public CompositePair(StackLayout stackLayout, Composite stackComposite, Composite contentComposite) {
+         this.stackLayout = stackLayout;
+         this.stackComposite = stackComposite;
+         this.contentComposite = contentComposite;
+      }
+
+      public StackLayout getStackLayout() {
+         return stackLayout;
+      }
+
+      public Composite getStackComposite() {
+         return stackComposite;
+      }
+
+      public Composite getContentComposite() {
+         return contentComposite;
+      }
    }
 }
