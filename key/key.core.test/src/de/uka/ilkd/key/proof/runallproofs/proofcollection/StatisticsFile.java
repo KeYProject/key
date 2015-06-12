@@ -251,8 +251,8 @@ public class StatisticsFile implements Serializable {
             }
             else {
                /*
-                * Adjust average calculation for "Time per step" so that it is more stable.
-                * (see bug #1442)
+                * Adjust average calculation for "Time per step" so that it is
+                * more stable. (see bug #1442)
                 */
                int sumNodes = Integer.parseInt(sums.get(1));
                int sumAutomodeTime = Integer.parseInt(sums.get(4));
@@ -288,6 +288,16 @@ public class StatisticsFile implements Serializable {
                      Charset.defaultCharset());
 
             }
+
+            /*
+             * Create properties file for number of test files.
+             */
+            int countFiles = lists[0].size();
+            Path countFilesPath = new File(statisticsDir,
+                  "NumberTestFiles.properties").toPath();
+            String[] lines = new String[] { "YVALUE=" + countFiles, url };
+            Files.write(countFilesPath, Arrays.asList(lines),
+                  Charset.defaultCharset());
          }
       }
    }
