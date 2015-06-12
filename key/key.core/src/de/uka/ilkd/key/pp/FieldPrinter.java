@@ -142,7 +142,7 @@ class FieldPrinter {
      * Determine whether the field constant is a generic object property.
      * Those are surrounded by angle brackets, e.g. o.<created>
      */
-    protected boolean isGenericFieldConstant(Term fieldTerm) {
+    protected boolean isBuiltinObjectProperty(Term fieldTerm) {
         return fieldTerm.op().name().toString().contains("::<")
                 && isFieldConstant(fieldTerm, lp.getHeapLDT());
     }
