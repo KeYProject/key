@@ -917,7 +917,7 @@ public class JoinRuleUtils {
       Term selected = pio.subTerm();
       
       for (SequentFormula sf : goal.sequent().succedent()) {
-         if (!sf.formula().equals(selected)) {
+         if (!sf.formula().equalsModRenaming(selected)) {
             pathConditionSet = pathConditionSet.prepend(
                   new SequentFormula(services.getTermBuilder().not(sf.formula())));
          }
