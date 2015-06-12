@@ -123,6 +123,11 @@ public interface BlockContract extends SpecificationElement {
 
 
     public boolean hasInfFlowSpecs();
+    
+    /**
+     * @return True iff a join procedure has been specified for this block contract.
+     */
+    public boolean hasJoinProcedure();
 
 
     public void setInstantiationSelf(Term selfInstantiation);

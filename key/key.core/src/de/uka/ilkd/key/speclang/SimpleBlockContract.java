@@ -548,6 +548,11 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
+    public boolean hasJoinProcedure() {
+        return joinProcedure != null;
+    }
+
+    @Override
     public void setInstantiationSelf(Term selfInstantiation) {
         this.instantiationSelf = selfInstantiation;
     }
