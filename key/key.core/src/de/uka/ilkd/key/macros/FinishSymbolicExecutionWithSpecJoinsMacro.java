@@ -38,7 +38,10 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.macros.ProofMacro.ProgressBarListener;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -48,8 +51,12 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * TODO
@@ -58,7 +65,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * @see FinishSymbolicExecutionMacro
  */
 public class FinishSymbolicExecutionWithSpecJoinsMacro extends
-        StrategyProofMacro {
+    AbstractProofMacro {
 
     private HashSet<ProgramElement> breakpoints = new HashSet<ProgramElement>();
     private HashMap<ProgramElement, Node> commonParents = new HashMap<ProgramElement, Node>();
@@ -137,12 +144,110 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
             Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
-//        this.uic = uic;
-        return super.applyTo(uic, proof, goals, posInOcc, listener);
+        if (goals == null || goals.isEmpty()) {
+            // should not happen, because in this case canApplyTo returns
+            // false
+            return null;
+        }
+
+        final IGoalChooser goalChooser = proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
+        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
+        final ImmutableList<Goal> ignoredOpenGoals =
+                setDifference(proof.openGoals(), goals);
+
+        final ProofMacro macroAdapter = new SkipMacro() {
+            @Override
+            public String getName() { return ""; }
+            @Override
+            public String getDescription() { return "Anonymous macro"; }
+        };
+        macroAdapter.setNumberSteps(getNumberSteps());
+        //
+        // The observer to handle the progress bar
+        final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
+                                                                getNumberSteps(), listener);
+        applyStrategy.addProverTaskObserver(pml);
+        // add a focus manager if there is a focus
+        if(posInOcc != null && goals != null) {
+            AutomatedRuleApplicationManager realManager = null;
+            FocussedRuleApplicationManager manager = null;
+            for (Goal goal: goals) {
+                realManager = goal.getRuleAppManager();
+                realManager.clearCache();
+                manager = new FocussedRuleApplicationManager(realManager, goal, posInOcc);
+                goal.setRuleAppManager(manager);
+            }
+        }
+
+        // set a new strategy.
+        Strategy oldStrategy = proof.getActiveStrategy();
+        FilterSymbexStrategy strategy = createStrategy(proof, posInOcc);
+        proof.setActiveStrategy(strategy);
+
+        ProofMacroFinishedInfo info =
+                new ProofMacroFinishedInfo(this, goals, proof);
+        try {
+            // find the relevant goals
+            // and start
+            boolean joined;
+            do {
+                joined = false;
+                applyStrategy.start(proof, goals);
+                synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
+                    if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
+                        throw new InterruptedException();
+                    }
+                }
+                
+                Pair<Goal, JoinRuleBuiltInRuleApp> joinInfo = strategy.getAndResetJoinInformation();
+                if (joinInfo != null) {
+                    joinInfo.first.apply(joinInfo.second);
+                    joined = true;
+                }
+            } while (joined);
+        } finally {
+            // this resets the proof strategy and the managers after the automation
+            // has run
+            for (final Goal openGoal : proof.openGoals()) {
+                AutomatedRuleApplicationManager manager = openGoal.getRuleAppManager();
+                // touch the manager only if necessary
+                if(manager.getDelegate() != null) {
+                    while(manager.getDelegate() != null) {
+                        manager = manager.getDelegate();
+                    }
+                    manager.clearCache();
+                    openGoal.setRuleAppManager(manager);
+                }
+            }
+            final ImmutableList<Goal> resultingGoals =
+                    setDifference(proof.openGoals(), ignoredOpenGoals);
+            info = new ProofMacroFinishedInfo(this, resultingGoals);
+            proof.setActiveStrategy(oldStrategy);
+//            doPostProcessing(proof);
+            applyStrategy.removeProverTaskObserver(pml);
+        }
+        return info;
+    }
+    
+
+    /**
+     * 
+     * TODO: Document.
+     *
+     * @param goals1
+     * @param goals2
+     * @return
+     */
+    private static ImmutableList<Goal> setDifference(ImmutableList<Goal> goals1,
+                                                     ImmutableList<Goal> goals2) {
+        ImmutableList<Goal> difference = goals1;
+        for (Goal goal : goals2) {
+            difference = difference.removeFirst(goal);
+        }
+        return difference;
     }
 
-    @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected FilterSymbexStrategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
@@ -209,6 +314,20 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 FilterSymbexStrategy.class.getSimpleName());
         
         private boolean enforceJoin = false;
+        
+        private Pair<Goal, JoinRuleBuiltInRuleApp> joinInformation = null;
+        
+        /**
+         * TODO: Document.
+         *
+         * @return
+         */
+        public Pair<Goal, JoinRuleBuiltInRuleApp> getAndResetJoinInformation() {
+            final Pair<Goal, JoinRuleBuiltInRuleApp> oldJoinInformation = joinInformation;
+            enforceJoin = false;
+            joinInformation = null;
+            return oldJoinInformation;
+        }
 
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
@@ -222,7 +341,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             if (enforceJoin) {
-                return (app instanceof JoinRuleBuiltInRuleApp && ((JoinRuleBuiltInRuleApp) app).complete());
+                return false;
             }
             
             if (!hasModality(goal.node())) {
@@ -259,12 +378,10 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     }
                     breakpoints.remove(breakpoint);
                     commonParents.remove(breakpoint);
-
-                    goal.getRuleAppManager().clearCache();
-//                    goal.getRuleAppManager().ruleAdded(joinApp, joinPio);
-//                    goal.updateRuleAppIndex();
                     
-                    goal.apply(joinApp);
+//                    goal.apply(joinApp);
+                    joinInformation = new Pair<Goal, JoinRuleBuiltInRuleApp>(goal, joinApp);
+                    enforceJoin = true;
                 } else {
                     stoppedGoals.add(goal);
                 }
@@ -412,6 +529,15 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             return false;
         }
 
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.macros.ProofMacro#canApplyTo(de.uka.ilkd.key.proof.Proof, org.key_project.util.collection.ImmutableList, de.uka.ilkd.key.logic.PosInOccurrence)
+     */
+    @Override
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
+        return goals != null && !goals.isEmpty();
     }
 
 }
