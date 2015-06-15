@@ -3,9 +3,11 @@ package org.key_project.sed.key.evaluation.wizard.page;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -16,6 +18,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.sed.key.evaluation.model.definition.BrowserQuestion;
 import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.LabelQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
@@ -47,6 +50,8 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    };
    
    private final Set<QuestionInput> observedInputs = new HashSet<QuestionInput>();
+   
+   private final Map<QuestionInput, IQuestionInputManager> input2managerMap = new HashMap<QuestionInput, IQuestionInputManager>();
 
    public QuestionWizardPage(QuestionPageInput pageInput) {
       super(pageInput);
@@ -73,6 +78,11 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
             questionInput.addPropertyChangeListener(QuestionInput.PROP_TRUST, valueAndTrustListener);
             observedInputs.add(questionInput);
          }
+
+         @Override
+         public void handleManagerCreated(QuestionInput questionInput, IQuestionInputManager manager) {
+            input2managerMap.put(questionInput, manager);
+         }
       };
       List<IQuestionInputManager> managers = createQuestionControls(this,
                                                                     toolkit, 
@@ -90,33 +100,30 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       List<IQuestionInputManager> managers = new LinkedList<IQuestionInputManager>();
       for (QuestionInput questionInput : questionInputs) {
          callback.handleQuestionInput(questionInput);
+         IQuestionInputManager manager;
          if (questionInput.getQuestion() instanceof BrowserQuestion) {
-            IQuestionInputManager manager = createBrowser(toolkit, parent, (BrowserQuestion) questionInput.getQuestion());
-            managers.add(manager);
+            manager = createBrowser(toolkit, parent, (BrowserQuestion) questionInput.getQuestion());
          }
          else if (questionInput.getQuestion() instanceof RadioButtonsQuestion) {
-            IQuestionInputManager manager = createRadioButtons(wizardPage, toolkit, parent, questionInput, (RadioButtonsQuestion) questionInput.getQuestion(), callback);
-            managers.add(manager);
+            manager = createRadioButtons(wizardPage, toolkit, parent, questionInput, (RadioButtonsQuestion) questionInput.getQuestion(), callback);
          }
          else if (questionInput.getQuestion() instanceof CheckboxQuestion) {
-            IQuestionInputManager manager = createCheckboxes(wizardPage, toolkit, parent, questionInput, (CheckboxQuestion) questionInput.getQuestion(), callback);
-            managers.add(manager);
+            manager = createCheckboxes(wizardPage, toolkit, parent, questionInput, (CheckboxQuestion) questionInput.getQuestion(), callback);
          }
          else if (questionInput.getQuestion() instanceof LabelQuestion) {
-            IQuestionInputManager manager = createLabel(toolkit, parent, (LabelQuestion) questionInput.getQuestion());
-            managers.add(manager);
+            manager = createLabel(toolkit, parent, (LabelQuestion) questionInput.getQuestion());
          }
          else if (questionInput.getQuestion() instanceof SectionQuestion) {
-            IQuestionInputManager manager = createSection(wizardPage, toolkit, parent, questionInput, (SectionQuestion) questionInput.getQuestion(), callback);
-            managers.add(manager);
+            manager = createSection(wizardPage, toolkit, parent, questionInput, (SectionQuestion) questionInput.getQuestion(), callback);
          }
          else if (questionInput.getQuestion() instanceof TextQuestion) {
-            IQuestionInputManager manager = createText(wizardPage, toolkit, parent, questionInput, (TextQuestion) questionInput.getQuestion());
-            managers.add(manager);
+            manager = createText(wizardPage, toolkit, parent, questionInput, (TextQuestion) questionInput.getQuestion());
          }
          else {
             throw new IllegalStateException("Unsupported question: " + questionInput.getQuestion());
          }
+         managers.add(manager);
+         callback.handleManagerCreated(questionInput, manager);
       }
       return managers;
    }
@@ -147,6 +154,8 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    
    public static interface ICreateControlCallback {
       public void handleQuestionInput(QuestionInput questionInput);
+      
+      public void handleManagerCreated(QuestionInput questionInput, IQuestionInputManager manager);
    }
 
    protected void handleValueOrTrustChange(PropertyChangeEvent evt) {
@@ -164,8 +173,18 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
          while (errorMessage == null && i < inputs.length) {
             errorMessage = inputs[i].validate();
             if (errorMessage != null) {
-               // TODO: Control of child question needs to be returned.
-               errornousControl = controls.get(i).getFocusControl();
+               if (isInputErrornous(inputs[i])) {
+                  errornousControl = controls.get(i).getFocusControl();
+               }
+               else {
+                  QuestionInput errornousInput = findErrornousInput(inputs[i]);
+                  if (errornousInput != null) {
+                     IQuestionInputManager errornousManager = input2managerMap.get(errornousInput);
+                     if (errornousManager != null) {
+                        errornousControl = errornousManager.getFocusControl();
+                     }
+                  }
+               }
             }
             i++;
          }
@@ -174,6 +193,43 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       setErrornousControl(errornousControl);
       setPageComplete(errorMessage == null);
       setErrorMessage(errorMessage);
+   }
+
+   protected QuestionInput findErrornousInput(QuestionInput questionInput) {
+      QuestionInput errornousInput = null;
+      // Search in choice inputs
+      if (questionInput.hasChoiceInputs()) {
+         Choice[] selectedChoices = questionInput.getSelectedChoices();
+         for (int i = 0; errornousInput == null && i < selectedChoices.length; i++) {
+            QuestionInput[] childInputs = questionInput.getChoiceInputs(selectedChoices[i]);
+            for (int j = 0; errornousInput == null && j < childInputs.length; j++) {
+               if (isInputErrornous(childInputs[j])) {
+                  errornousInput = childInputs[j];
+               }
+               else {
+                  errornousInput = findErrornousInput(childInputs[j]);
+               }
+            }
+         }
+      }
+      // Search in child inputs
+      if (errornousInput == null && questionInput.countChildInputs() > 0) {
+         QuestionInput[] childInputs = questionInput.getChildInputs();
+         for (int i = 0; errornousInput == null && i < childInputs.length; i++) {
+            if (isInputErrornous(childInputs[i])) {
+               errornousInput = childInputs[i];
+            }
+            else {
+               errornousInput = findErrornousInput(childInputs[i]);
+            }
+         }
+      }
+      return errornousInput;
+   }
+   
+   protected boolean isInputErrornous(QuestionInput questionInput) {
+      return questionInput.validateValue() != null || 
+             questionInput.validateTrust() != null;
    }
 
    @Override

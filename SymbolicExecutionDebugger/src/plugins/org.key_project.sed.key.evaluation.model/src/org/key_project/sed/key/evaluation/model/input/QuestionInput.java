@@ -201,9 +201,7 @@ public class QuestionInput extends Bean {
       // Validate input
       String errorMessage = validateValue();
       if (errorMessage == null && question.isAskForTrust()) {
-         if (getTrust() == null) {
-            errorMessage = "Emoticon defining trust into answer of question '" + question.getLabel() + "' not selected.";
-         }
+         errorMessage = validateTrust();
       }
       // Validate choice inputs
       if (errorMessage == null && hasChoiceInputs()) {
@@ -230,6 +228,15 @@ public class QuestionInput extends Bean {
    
    public String validateValue() {
       return question.validate(getValue());
+   }
+   
+   public String validateTrust() {
+      if (getTrust() == null) {
+         return "Emoticon defining trust into answer of question '" + question.getLabel() + "' not selected.";
+      }
+      else {
+         return null;
+      }
    }
 
    public Choice[] getSelectedChoices() {
