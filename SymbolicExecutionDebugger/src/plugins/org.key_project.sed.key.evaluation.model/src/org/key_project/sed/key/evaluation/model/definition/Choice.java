@@ -14,19 +14,34 @@ public class Choice {
    private final String tooltip;
    
    private final List<AbstractQuestion> childQuestions;
+   
+   private final boolean expectedChecked;
 
    public Choice(String text, String value, AbstractQuestion... childQuestions) {
-      this(text, value, null, childQuestions);
+      this(text, value, null, false, childQuestions);
    }
 
    public Choice(String text, String value, String tooltip, AbstractQuestion... childQuestions) {
-      this(text, value, tooltip, CollectionUtil.toList(childQuestions));
+      this(text, value, tooltip, false, CollectionUtil.toList(childQuestions));
    }
 
    public Choice(String text, String value, String tooltip, List<AbstractQuestion> childQuestions) {
+      this(text, value, tooltip, false, childQuestions);
+   }
+
+   public Choice(String text, String value, boolean expectedChecked, AbstractQuestion... childQuestions) {
+      this(text, value, null, expectedChecked, childQuestions);
+   }
+
+   public Choice(String text, String value, String tooltip, boolean expectedChecked, AbstractQuestion... childQuestions) {
+      this(text, value, tooltip, expectedChecked, CollectionUtil.toList(childQuestions));
+   }
+
+   public Choice(String text, String value, String tooltip, boolean expectedChecked, List<AbstractQuestion> childQuestions) {
       this.text = text;
       this.value = value;
       this.tooltip = tooltip;
+      this.expectedChecked = expectedChecked;
       this.childQuestions = childQuestions;
       validateChildren();
    }
@@ -41,6 +56,10 @@ public class Choice {
             }
          }
       }
+   }
+
+   public boolean isExpectedChecked() {
+      return expectedChecked;
    }
 
    public String getText() {

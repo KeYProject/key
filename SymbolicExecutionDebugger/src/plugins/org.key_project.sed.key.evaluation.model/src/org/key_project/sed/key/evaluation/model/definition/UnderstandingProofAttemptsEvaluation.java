@@ -170,15 +170,6 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    }
 
    protected QuestionPage createMyIntegerQuestionPage(String pageName, String title) {
-      String howToCloseTitle = "How can the proof be closed?";
-      CheckboxQuestion howToCloseQuestion = new CheckboxQuestion("howToClose", 
-                                                                 howToCloseTitle, 
-                                                                 true,
-                                                                 null, 
-                                                                 new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
-                                                                 true,
-                                                                 new Choice("Using the auto mode", "Using the auto mode"), 
-                                                                 new Choice("Applying rules interactively", "Applying rules interactively"));
       String locationTitle = "Which not specified location(s) have changed?";
       CheckboxQuestion locationQuestion = new CheckboxQuestion("whichLocationsHaveChanged", 
                                                                locationTitle, 
@@ -207,11 +198,11 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
-                                                              new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
-                                                              new Choice("Precondition (summand != null) is not established", "Precondition not established"),
-                                                              new Choice("Postcondition (value == \\old(value) + summand.value) does not hold", "Postcondition does not hold"),
-                                                              new Choice("Assignable clause does not hold", "Assignable clause does not hold", locationQuestion),
-                                                              new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion));
+                                                              new Choice(createPreconditionOption("summand != null"), "Precondition does not hold"),
+                                                              new Choice(createPostconditionOption("value == \\old(value) + summand.value"), "Postcondition does not hold", true),
+                                                              new Choice(createAssignableOption(), createAssignableOption(), locationQuestion),
+                                                              new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion),
+                                                              createBugfreeChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -220,7 +211,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
                                                                    true,
                                                                    new Choice("Yes", "Yes"), 
-                                                                   new Choice("No", "No", whyOpenQuestion));
+                                                                   new Choice("No", "No", true, whyOpenQuestion));
       String executedTitle = "Was statement (value += summand.value) at line 9 executed during symbolic execution of the proof?";
       RadioButtonsQuestion executedQuestion = new RadioButtonsQuestion("executedStatements", 
                                                                        executedTitle, 
@@ -228,7 +219,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                        null, 
                                                                        new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                        true,
-                                                                       new Choice("Yes", "Yes"),
+                                                                       new Choice("Yes", "Yes", true),
                                                                        new Choice("No", "No"));
       return new QuestionPage(pageName, 
                               title, 
@@ -243,19 +234,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               new LabelQuestion("generalDescription", createGeneralDescription("MyInteger#add(MyInteger)")),
                               openQuestion,
                               executedQuestion);
-      // TODO: How to fix code or specifications?
    }
    
    protected QuestionPage createMinQuestionPage(String pageName, String title) {
-      String howToCloseTitle = "How can the proof be closed?";
-      CheckboxQuestion howToCloseQuestion = new CheckboxQuestion("howToClose", 
-                                                                 howToCloseTitle, 
-                                                                 true,
-                                                                 null, 
-                                                                 new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
-                                                                 true,
-                                                                 new Choice("Using the auto mode", "Using the auto mode"), 
-                                                                 new Choice("Applying rules interactively", "Applying rules interactively"));
       String thrownExceptionTitle = "Which exception(s) are thrown?";
       CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsAreThrown", 
                                                                       thrownExceptionTitle, 
@@ -275,20 +256,20 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
-                                                              new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
-                                                              new Choice("Precondition (array != null) is not established", "Precondition not established", createMinTerminationQuestion("preconditionTermination")),
-                                                              new Choice("Postcondition (array == null || array.length == 0 ==> \\result == -1) does not hold", "Not found postcondition does not hold", createMinTerminationQuestion("postNotFoundTermination")),
-                                                              new Choice("Postcondition (array != null && array.length >= 1 ==> (\\forall int i; i >= 0 && i < array.length; array[\\result] <= array[i])) does not hold", "Found postcondition does not hold", createMinTerminationQuestion("postFoundTermination")),
-                                                              new Choice("Assignable clause of method contract does not hold", "Assignable clause of method contract does not hold", createMinLocationQuestion("whichMethodLocationsHaveChanged"), createMinTerminationQuestion("methodAssignableTermination")),
+                                                              new Choice(createPreconditionOption("array != null"), "Precondition does not hold", createMinTerminationQuestion("preconditionTermination", false, false)),
+                                                              new Choice(createPostconditionOption("array == null || array.length == 0 ==> \\result == -1"), "Not found postcondition does not hold", createMinTerminationQuestion("postNotFoundTermination", false, false)),
+                                                              new Choice(createPostconditionOption("array != null && array.length >= 1 ==> (\\forall int i; i >= 0 && i < array.length; array[\\result] <= array[i])"), "Found postcondition does not hold", true, createMinTerminationQuestion("postFoundTermination", true, false)),
+                                                              new Choice(createMethodAssignableOption(), createMethodAssignableOption(), createMinLocationQuestion("whichMethodLocationsHaveChanged"), createMinTerminationQuestion("methodAssignableTermination", false, false)),
                                                               new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion),
-                                                              new Choice("Loop invariant (i >= 1 && i <= array.length) does not hold initially", "Loop invariant about i does not hold initially", createMinTerminationQuestion("initialITermination")),
-                                                              new Choice("Loop invariant (minIndex >= 0 && minIndex < i) does not hold initially", "Loop invariant about minIndex does not hold initially", createMinTerminationQuestion("initialMinIndexTermination")),
-                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]) does not hold initially", "Loop invariant about array elements does not hold initially", createMinTerminationQuestion("initialArrayElementsTermination")),
-                                                              new Choice("Loop invariant (i >= 1 && i <= array.length) is not preserved by loop guard and loop body", "Loop invariant about i is not preserved", createMinTerminationQuestion("preservedITermination")),
-                                                              new Choice("Loop invariant (minIndex >= 0 && minIndex < i) is not preserved by loop guard and loop body", "Loop invariant about minIndex is not preserved", createMinTerminationQuestion("preservedMinIndexTermination")),
-                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]) is not preserved by loop guard and loop body", "Loop invariant about array elements is not preserved", createMinTerminationQuestion("preservedArrayElementsTermination")),
-                                                              new Choice("Decreasing term (array.length - i) is not fulfilled by loop", "Decreasing term is not fulfilled", createMinTerminationQuestion("decreasingTermination")),
-                                                              new Choice("Assignable clause of loop does not hold", "Assignable clause of loop does not hold", createMinLocationQuestion("whichLoopLocationsHaveChanged"), createMinTerminationQuestion("loopAssignableTermination")));
+                                                              new Choice("Loop invariant (i >= 1 && i <= array.length) does not hold initially", "Loop invariant about i does not hold initially", createMinTerminationQuestion("initialITermination", false, false)),
+                                                              new Choice("Loop invariant (minIndex >= 0 && minIndex < i) does not hold initially", "Loop invariant about minIndex does not hold initially", createMinTerminationQuestion("initialMinIndexTermination", false, false)),
+                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]) does not hold initially", "Loop invariant about array elements does not hold initially", createMinTerminationQuestion("initialArrayElementsTermination", false, false)),
+                                                              new Choice("Loop invariant (i >= 1 && i <= array.length) is not preserved by loop guard and loop body", "Loop invariant about i is not preserved", createMinTerminationQuestion("preservedITermination", false, false)),
+                                                              new Choice("Loop invariant (minIndex >= 0 && minIndex < i) is not preserved by loop guard and loop body", "Loop invariant about minIndex is not preserved", createMinTerminationQuestion("preservedMinIndexTermination", false, false)),
+                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]) is not preserved by loop guard and loop body", "Loop invariant about array elements is not preserved", true, createMinTerminationQuestion("preservedArrayElementsTermination", false, true)),
+                                                              new Choice("Decreasing term (array.length - i) is not fulfilled by loop", "Decreasing term is not fulfilled", createMinTerminationQuestion("decreasingTermination", false, false)),
+                                                              new Choice(createLoopAssignableOption(), createLoopAssignableOption(), createMinLocationQuestion("whichLoopLocationsHaveChanged"), createMinTerminationQuestion("loopAssignableTermination", false, false)),
+                                                              createBugfreeChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -297,7 +278,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
                                                                    true,
                                                                    new Choice("Yes", "Yes"), 
-                                                                   new Choice("No", "No", whyOpenQuestion));
+                                                                   new Choice("No", "No", true, whyOpenQuestion));
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
@@ -306,19 +287,19 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements was executed", "None"),
-                                                               new Choice("Line 8 (if (array != null))", "Line 8"),
-                                                               new Choice("Line 9 (if (array.length == 0))", "Line 9"),
-                                                               new Choice("Line 10 (return -1)", "Line 10"),
-                                                               new Choice("Line 13 (array.length == 1)", "Line 13"),
-                                                               new Choice("Line 14 (return array[0])", "Line 14"),
-                                                               new Choice("Line 17 (int minIndex = 0)", "Line 17"),
-                                                               new Choice("Line 25 (int i = 1)", "Line 25 initial"),
-                                                               new Choice("Line 25 (i < array.length)", "Line 25 condition"),
-                                                               new Choice("Line 25 (i++)", "Line 25 update"),
-                                                               new Choice("Line 26 (if (array[i] < array[minIndex]))", "Line 26"),
-                                                               new Choice("Line 27 (minIndex = 1)", "Line 27"),
-                                                               new Choice("Line 34 (return minIndex)", "Line 34"),
-                                                               new Choice("Line 39 (return -1)", "Line 39"));
+                                                               new Choice("Line 8 (if (array != null))", "Line 8", true),
+                                                               new Choice("Line 9 (if (array.length == 0))", "Line 9", true),
+                                                               new Choice("Line 10 (return -1)", "Line 10", true),
+                                                               new Choice("Line 13 (array.length == 1)", "Line 13", true),
+                                                               new Choice("Line 14 (return array[0])", "Line 14", true),
+                                                               new Choice("Line 17 (int minIndex = 0)", "Line 17", true),
+                                                               new Choice("Line 25 (int i = 1)", "Line 25 initial", true),
+                                                               new Choice("Line 25 (i < array.length)", "Line 25 condition", true),
+                                                               new Choice("Line 25 (i++)", "Line 25 update", true),
+                                                               new Choice("Line 26 (if (array[i] < array[minIndex]))", "Line 26", true),
+                                                               new Choice("Line 27 (minIndex = 1)", "Line 27", true),
+                                                               new Choice("Line 34 (return minIndex)", "Line 34", true),
+                                                               new Choice("Line 39 (return -1)", "Line 39", true));
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
@@ -332,7 +313,6 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               new LabelQuestion("generalDescription", createGeneralDescription("ArrayUtil#minIndex(int[])")),
                               openQuestion,
                               executedQuestion);
-      // TODO: How to fix code or specifications?
    }
    
    protected CheckboxQuestion createMinLocationQuestion(String name) {
@@ -351,7 +331,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("i", "i"));
    }
    
-   protected CheckboxQuestion createMinTerminationQuestion(String name) {
+   protected CheckboxQuestion createMinTerminationQuestion(String name, boolean termination2expected, boolean loop1expected) {
       String title = "At which execution path?";
       return new CheckboxQuestion(name, 
                                   title, 
@@ -363,20 +343,11 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("Termination 2 (array != null & array.length == 1)", "Termination 2"),
                                   new Choice("Termination 3 (array != null & array.length > 1)", "Termination 3"),
                                   new Choice("Termination 4 (array == null)", "Termination 4"),
-                                  new Choice("Loop Body Termination 1 (array[i] < array[minIndex])", "Loop Body Termination 1"),
+                                  new Choice("Loop Body Termination 1 (array[i] < array[minIndex])", "Loop Body Termination 1", loop1expected),
                                   new Choice("Loop Body Termination 2 (array[i] >= array[minIndex])", "Loop Body Termination 2"));
    }
    
    protected QuestionPage createCalendarQuestionPage(String pageName, String title) {
-      String howToCloseTitle = "How can the proof be closed?";
-      CheckboxQuestion howToCloseQuestion = new CheckboxQuestion("howToClose", 
-                                                                 howToCloseTitle, 
-                                                                 true,
-                                                                 null, 
-                                                                 new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
-                                                                 true,
-                                                                 new Choice("Using the auto mode", "Using the auto mode"), 
-                                                                 new Choice("Applying rules interactively", "Applying rules interactively"));
       String thrownExceptionTitle = "Which exception(s) are thrown?";
       CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsAreThrown", 
                                                                       thrownExceptionTitle, 
@@ -387,7 +358,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException"),
-                                                                      new Choice("java.lang.ArrayStoreException", "java.lang.ArrayStoreException"),
+                                                                      new Choice("java.lang.ArrayStoreException", "java.lang.ArrayStoreException", true),
                                                                       new Choice("java.lang.OutOfMemoryError", "java.lang.OutOfMemoryError"));
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
@@ -396,20 +367,20 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
-                                                              new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
-                                                              new Choice("Precondition (entry != null) is not established", "Precondition not established", createCalendarTerminationQuestion("preconditionTermination")),
-                                                              new Choice("Invariant (entrySize >= 0 && entrySize < entries.length) is not established", "Invariant not established", createCalendarTerminationQuestion("invariantEstablishedTermination")),
-                                                              new Choice("Postcondition (entries[\\old(entrySize)] == entry) does not hold", "Postcondition about entry does not hold", createCalendarTerminationQuestion("postEntryTermination")),
-                                                              new Choice("Postcondition (entrySize == \\old(entrySize) + 1) does not hold", "Postcondition about entrySize does not hold", createCalendarTerminationQuestion("postEntrySizeTermination")),
-                                                              new Choice("Invariant (entrySize >= 0 && entrySize < entries.length) is not preserved", "Invariant not preserved", createCalendarTerminationQuestion("invariantNotPreservedTermination")),
-                                                              new Choice("Assignable clause does not hold", "Assignable clause does not hold", createCalendarLocationQuestion("whichMethodLocationsHaveChanged"), createCalendarTerminationQuestion("assignableTermination")),
-                                                              new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion),
-                                                              new Choice("Loop invariant (i >= 0 && i <= entries.length) does not hold initially", "Loop invariant about i does not hold initially", createCalendarTerminationQuestion("loopInvariantIInitialTermination")),
-                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]) does not hold initially", "Loop invariant about array elements does not hold initially", createCalendarTerminationQuestion("loopInvariantArrayElementsInitialTermination")),
-                                                              new Choice("Loop invariant (i >= 0 && i <= entries.length) is not preserved by loop guard and loop body", "Loop invariant about i is not preserved", createCalendarTerminationQuestion("loopInvariantIPreservedTermination")),
-                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]) is not preserved by loop guard and loop body", "Loop invariant about array elements is not preserved", createCalendarTerminationQuestion("loopInvariantArrayElementsPreservedTermination")),
-                                                              new Choice("Decreasing term (entries.length - i) is not fulfilled by loop", "Decreasing term is not fulfilled", createCalendarTerminationQuestion("decreasingTermination")),
-                                                              new Choice("Assignable clause of loop does not hold", "Assignable clause of loop does not hold", createCalendarLocationQuestion("whichLoopLocationsHaveChanged"), createCalendarTerminationQuestion("loopAssingableTermination")));
+                                                              new Choice(createPreconditionOption("entry != null"), "Precondition does not hold", createCalendarTerminationQuestion("preconditionTermination", false)),
+                                                              new Choice("Class Invariant (entrySize >= 0 && entrySize < entries.length) does not hold initially", "Invariant does not hold", createCalendarTerminationQuestion("invariantEstablishedTermination", false)),
+                                                              new Choice(createPostconditionOption("entries[\\old(entrySize)] == entry"), "Postcondition about entry does not hold", createCalendarTerminationQuestion("postEntryTermination", false)),
+                                                              new Choice(createPostconditionOption("entrySize == \\old(entrySize) + 1"), "Postcondition about entrySize does not hold", createCalendarTerminationQuestion("postEntrySizeTermination", false)),
+                                                              new Choice("Class Invariant (entrySize >= 0 && entrySize < entries.length) is not preserved", "Invariant not preserved", true, createCalendarTerminationQuestion("invariantNotPreservedTermination", true)),
+                                                              new Choice(createMethodAssignableOption(), createMethodAssignableOption(), createCalendarLocationQuestion("whichMethodLocationsHaveChanged"), createCalendarTerminationQuestion("assignableTermination", false)),
+                                                              new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", true, thrownExceptionQuestion),
+                                                              new Choice("Loop invariant (i >= 0 && i <= entries.length) does not hold initially", "Loop invariant about i does not hold initially", createCalendarTerminationQuestion("loopInvariantIInitialTermination", false)),
+                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]) does not hold initially", "Loop invariant about array elements does not hold initially", createCalendarTerminationQuestion("loopInvariantArrayElementsInitialTermination", false)),
+                                                              new Choice("Loop invariant (i >= 0 && i <= entries.length) is not preserved by loop guard and loop body", "Loop invariant about i is not preserved", createCalendarTerminationQuestion("loopInvariantIPreservedTermination", false)),
+                                                              new Choice("Loop invariant (\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]) is not preserved by loop guard and loop body", "Loop invariant about array elements is not preserved", createCalendarTerminationQuestion("loopInvariantArrayElementsPreservedTermination", false)),
+                                                              new Choice("Decreasing term (entries.length - i) is not fulfilled by loop", "Decreasing term is not fulfilled", createCalendarTerminationQuestion("decreasingTermination", false)),
+                                                              new Choice(createLoopAssignableOption(), createLoopAssignableOption(), createCalendarLocationQuestion("whichLoopLocationsHaveChanged"), createCalendarTerminationQuestion("loopAssingableTermination", false)),
+                                                              createBugfreeChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -418,7 +389,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
                                                                    true,
                                                                    new Choice("Yes", "Yes"), 
-                                                                   new Choice("No", "No", whyOpenQuestion));
+                                                                   new Choice("No", "No", true, whyOpenQuestion));
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
@@ -427,15 +398,15 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements was executed", "None"),
-                                                               new Choice("Line 14 (if (entrySize == entries.length))", "Line 14"),
+                                                               new Choice("Line 14 (if (entrySize == entries.length))", "Line 14", true),
                                                                new Choice("Line 15 (Entry[] newEntries = new Entry[entries.length * 2])", "Line 15"),
                                                                new Choice("Line 22 (int i = 0)", "Line 22 initial"),
                                                                new Choice("Line 22 (i < entries.length)", "Line 22 condition"),
                                                                new Choice("Line 22 (i++)", "Line 22 update"),
                                                                new Choice("Line 23 (newEntries[i] = entries[i])", "Line 23"),
                                                                new Choice("Line 26 (entries = newEntries)", "Line 26"),
-                                                               new Choice("Line 32 (entries[entrySize] = entry)", "Line 32"),
-                                                               new Choice("Line 33 (entrySize++)", "Line 33"));
+                                                               new Choice("Line 32 (entries[entrySize] = entry)", "Line 32", true),
+                                                               new Choice("Line 33 (entrySize++)", "Line 33", true));
       return new QuestionPage(pageName, 
                               title, 
                               "Please answer the question to the best of your knowledge.", 
@@ -449,7 +420,6 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               new LabelQuestion("generalDescription", createGeneralDescription("Calendar#addEntry(Entry)")),
                               openQuestion,
                               executedQuestion);
-      // TODO: How to fix code or specifications?
    }
    
    protected CheckboxQuestion createCalendarLocationQuestion(String name) {
@@ -472,7 +442,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("newEntries[*]", "newEntries[*]"));
    }
    
-   protected CheckboxQuestion createCalendarTerminationQuestion(String name) {
+   protected CheckboxQuestion createCalendarTerminationQuestion(String name, boolean expectedAfterElse) {
       String title = "At which execution path?";
       return new CheckboxQuestion(name, 
                                   title, 
@@ -481,7 +451,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
                                   new Choice("Continuation After Then (entrySize == entries.length)", "Continuation After Then"),
-                                  new Choice("Continuation After Else (entrySize != entries.length)", "Continuation After Else"),
+                                  new Choice("Continuation After Else (entrySize != entries.length)", "Continuation After Else", expectedAfterElse),
                                   new Choice("Loop Body Termination (of the 'Body Preserves Invariant' branch)", "Loop Body Termination"));
    }
    
@@ -491,15 +461,6 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    
 
    protected QuestionPage createAccountQuestionPage(String pageName, String title) {
-      String howToCloseTitle = "How can the proof be closed?";
-      CheckboxQuestion howToCloseQuestion = new CheckboxQuestion("howToClose", 
-                                                                 howToCloseTitle, 
-                                                                 true,
-                                                                 null, 
-                                                                 new NotUndefinedValueValidator("Question '" + howToCloseTitle + "' not answered."), 
-                                                                 true,
-                                                                 new Choice("Using the auto mode", "Using the auto mode"), 
-                                                                 new Choice("Applying rules interactively", "Applying rules interactively"));
       String thrownExceptionTitle = "Which exception(s) are thrown?";
       CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsAreThrown", 
                                                                       thrownExceptionTitle, 
@@ -521,25 +482,25 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
-                                                              new Choice("Rule application stopped to early, proof is closeable", "Stopped to early", howToCloseQuestion), 
-                                                              new Choice("Precondition (amount > 0) of checkAndWithdraw(int) is not established", "checkAndWithdraw: Precondition not established", createAccountTerminationQuestion("checkAndWithdrawPreTermination")),
-                                                              new Choice("Postcondition (balance == \\old(balance) - \\result) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("checkAndWithdrawPostconditionBalanceTermination")),
-                                                              new Choice("Postcondition (\\result == amount) of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Postcondition about result does not hold", createAccountTerminationQuestion("checkAndWithdrawPostcondtionResultTermination")),
-                                                              new Choice("Assignable clause (balance) of method contract of checkAndWithdraw(int) does not hold", "checkAndWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("checkAndWithdrawLocations"), createAccountTerminationQuestion("checkAndWithdrawAssignableTermination")),
+                                                              new Choice(createPreconditionOption("amount > 0", "checkAndWithdraw(int)"), "checkAndWithdraw: Precondition does not hold", createAccountTerminationQuestion("checkAndWithdrawPreTermination", false)),
+                                                              new Choice(createPostconditionOption("balance == \\old(balance) - \\result", "checkAndWithdraw(int)"), "checkAndWithdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("checkAndWithdrawPostconditionBalanceTermination", false)),
+                                                              new Choice(createPostconditionOption("\\result == amount", "checkAndWithdraw(int)"), "checkAndWithdraw: Postcondition about result does not hold", true, createAccountTerminationQuestion("checkAndWithdrawPostcondtionResultTermination", true)),
+                                                              new Choice(createMethodAssignableOption("balance", "checkAndWithdraw(int)"), "checkAndWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("checkAndWithdrawLocations"), createAccountTerminationQuestion("checkAndWithdrawAssignableTermination", false)),
 
-                                                              new Choice("Precondition (amount > 0) of withdraw(int) is not established", "withdraw: Precondition not established", createAccountTerminationQuestion("withdrawPreconditionTermination")),
-                                                              new Choice("Postcondition (balance == \\old(balance) - amount) of withdraw(int) does not hold", "withdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("withdrawPostconditionTermination")),
-                                                              new Choice("Assignable clause (balance) of method contract of withdraw(int) does not hold", "withdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("withdrawLocations"), createAccountTerminationQuestion("withdrawAssignableTermination")),
+                                                              new Choice(createPreconditionOption("amount > 0", "withdraw(int)"), "withdraw: Precondition does not hold", createAccountTerminationQuestion("withdrawPreconditionTermination", false)),
+//                                                              new Choice(createPostconditionOption("balance == \\old(balance) - amount", "withdraw(int)"), "withdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("withdrawPostconditionTermination")),
+//                                                              new Choice(createMethodAssignableOption("balance", "withdraw(int)"), "withdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("withdrawLocations"), createAccountTerminationQuestion("withdrawAssignableTermination")),
 
-                                                              new Choice("Precondition (amount > 0) of canWithdraw(int) is not established", "canWithdraw: Precondition not established", createAccountTerminationQuestion("canWithdrawPreconditionTermination")),
-                                                              new Choice("Postcondition (true) of canWithdraw(int) does not hold", "canWithdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("canWithdrawPostconditionTermination")),
-                                                              new Choice("Assignable clause (\\nothing) of method contract of canWithdraw(int) does not hold", "canWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("canWithdrawLocations"), createAccountTerminationQuestion("canWithdrawAssignableTermination")),
+                                                              new Choice(createPreconditionOption("amount > 0", "canWithdraw(int)"), "canWithdraw: Precondition does not hold", createAccountTerminationQuestion("canWithdrawPreconditionTermination", false)),
+//                                                              new Choice(createPostconditionOption("true", "canWithdraw(int)"), "canWithdraw: Postcondition about balance does not hold", createAccountTerminationQuestion("canWithdrawPostconditionTermination")),
+//                                                              new Choice(createMethodAssignableOption("\\nothing", "canWithdraw(int)"), "canWithdraw: Assignable clause of method contract does not hold", createAccountLocationQuestion("canWithdrawLocations"), createAccountTerminationQuestion("canWithdrawAssignableTermination")),
 
-                                                              new Choice("Precondition (true) of getBalance() is not established", "getBalance: Precondition not established", createAccountTerminationQuestion("getBalancePreconditionTermination")),
-                                                              new Choice("Postcondition (\result == balance) of getBalance() does not hold", "getBalance: Postcondition about balance does not hold", createAccountTerminationQuestion("getBalancePostconditionTermination")),
-                                                              new Choice("Assignable clause (\\nothing) of method contract of getBalance(int) does not hold", "getBalance: Assignable clause of method contract does not hold", createAccountLocationQuestion("getBalanceLocations"), createAccountTerminationQuestion("getBalanceAssignableTermination")),
+                                                              new Choice(createPreconditionOption("true", "getBalance()"), "getBalance: Precondition does not hold", createAccountTerminationQuestion("getBalancePreconditionTermination", false)),
+//                                                              new Choice(createPostconditionOption("\result == balance", "getBalance()"), "getBalance: Postcondition about balance does not hold", createAccountTerminationQuestion("getBalancePostconditionTermination")),
+//                                                              new Choice(createMethodAssignableOption("\\nothing", "getBalance(int)"), "getBalance: Assignable clause of method contract does not hold", createAccountLocationQuestion("getBalanceLocations"), createAccountTerminationQuestion("getBalanceAssignableTermination")),
                                                               
-                                                              new Choice("Exception is thrown (normal_behavior violated)", "Exception is thrown", thrownExceptionQuestion));
+                                                              new Choice("Exception is thrown (normal_behavior of checkAndWithdraw(int) violated)", "Exception is thrown", thrownExceptionQuestion),
+                                                              createBugfreeChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -548,7 +509,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
                                                                    true,
                                                                    new Choice("Yes", "Yes"), 
-                                                                   new Choice("No", "No", whyOpenQuestion));
+                                                                   new Choice("No", "No", true, whyOpenQuestion));
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
@@ -557,13 +518,13 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements was executed", "None"),
-                                                               new Choice("Line 11 (if (canWithdraw(amount)))", "Line 10"),
-                                                               new Choice("Line 12 (withdraw(amount))", "Line 11"),
-                                                               new Choice("Line 13 (return amount)", "Line 12"),
-                                                               new Choice("Line 16 (return 0)", "Line 15"),
-                                                               new Choice("Line 26 (balance -= amount)", "Line 25"),
-                                                               new Choice("Line 35 (return amount > 0)", "Line 32"),
-                                                               new Choice("Line 44 (return balance)", "Line 39"));
+                                                               new Choice("Line 11 (if (canWithdraw(amount)))", "Line 11", true),
+                                                               new Choice("Line 12 (withdraw(amount))", "Line 12", true),
+                                                               new Choice("Line 13 (return amount)", "Line 13", true),
+                                                               new Choice("Line 16 (return 0)", "Line 16", true),
+                                                               new Choice("Line 26 (balance -= amount)", "Line 26"),
+                                                               new Choice("Line 35 (return amount > 0)", "Line 35"),
+                                                               new Choice("Line 44 (return balance)", "Line 44"));
       String contractsTitle = "Which method contracts are applied at least once during symbolic execution of the proof?";
       CheckboxQuestion contractsQuestion = new CheckboxQuestion("appliedContracts", 
                                                                 contractsTitle, 
@@ -573,8 +534,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                 true,
                                                                 new Choice("None of the contracts was applied", "None"),
                                                                 new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
-                                                                new Choice("Contract of method withdraw(int)", "withdraw"),
-                                                                new Choice("Contract of method canWithdraw(int)", "canWithdraw"),
+                                                                new Choice("Contract of method withdraw(int)", "withdraw", true),
+                                                                new Choice("Contract of method canWithdraw(int)", "canWithdraw", true),
                                                                 new Choice("Contract of method getBalance()", "getBalance"));
       return new QuestionPage(pageName, 
                               title, 
@@ -590,10 +551,12 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               openQuestion,
                               executedQuestion,
                               contractsQuestion);
-      // TODO: How to fix code or specifications?
-      // TODO: Question about not fulfilled pre/post conditions
    }
    
+   private Choice createBugfreeChoice() {
+      return new Choice("Code and specifications are bug free, proof can be closed interactively", "Bug free");
+   }
+
    protected CheckboxQuestion createAccountLocationQuestion(String name) {
       String title = "Which not specified location(s) have changed?";
       return new CheckboxQuestion(name, 
@@ -606,7 +569,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("amount", "amount"));
    }
    
-   protected CheckboxQuestion createAccountTerminationQuestion(String name) {
+   protected CheckboxQuestion createAccountTerminationQuestion(String name, boolean termination2expected) {
       String title = "At which execution path?";
       return new CheckboxQuestion(name, 
                                   title, 
@@ -615,7 +578,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
                                   new Choice("Termination 1 (canWithdraw(amount))", "Termination 1"),
-                                  new Choice("Termination 2 (!canWithdraw(amount))", "Termination 2"));
+                                  new Choice("Termination 2 (!canWithdraw(amount))", "Termination 2", termination2expected));
    }
    
    protected String createGeneralDescription(String po) {
@@ -739,5 +702,37 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               sedSection,
                               keyVsSedSection,
                               feedbackSection);
+   }
+
+   protected static String createPreconditionOption(String precondition) {
+      return "Precondition (" + precondition + ") could not be proven to hold";
+   }
+
+   protected static String createPreconditionOption(String precondition, String method) {
+      return "Precondition (" + precondition + ") of " + method + " could not be proven to hold";
+   }
+
+   protected static String createPostconditionOption(String postcondition) {
+      return "Postcondition (" + postcondition + ") could not be proven to hold";
+   }
+
+   protected static String createPostconditionOption(String postcondition, String method) {
+      return "Postcondition (" + postcondition + ") of " + method + " could not be proven to hold";
+   }
+
+   protected static String createAssignableOption() {
+      return "Assignable clause could not be proven to hold";
+   }
+
+   protected static String createMethodAssignableOption() {
+      return "Assignable clause of method contract could not be proven to hold";
+   }
+
+   protected static String createLoopAssignableOption() {
+      return "Assignable clause of loop invariant could not be proven to hold";
+   }
+
+   protected static String createMethodAssignableOption(String postcondition, String method) {
+      return "Assignable clause (" + postcondition + ") of method contract of " + method + " could not be proven to hold";
    }
 }

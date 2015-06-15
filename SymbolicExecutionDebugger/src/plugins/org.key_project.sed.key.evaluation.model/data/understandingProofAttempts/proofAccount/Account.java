@@ -3,7 +3,7 @@ public class Account {
    
    /*@ normal_behavior
      @ requires amount > 0;
-     @ ensures balance == \old(balance) - \result;
+     @ ensures balance == \old(balance) - amount;
      @ ensures \result == amount;
      @ assignable balance;
      @*/
