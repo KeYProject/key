@@ -154,68 +154,6 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         return new FilterSymbexStrategy(proof.getActiveStrategy());
     }
 
-//    @Override
-//    protected void doPostProcessing(Proof proof) {
-//        // This hack was introduced since in a "while loop with break"
-//        // I discovered that the execution stopped early, that is three
-//        // automatic steps before a join would be possible.
-//        // So we do single automatic steps until our break point
-//        // vanishes; then we undo until the break point is there again.
-//
-//        for (Goal goal : proof.openEnabledGoals()) {
-//
-//            if (getBreakPoint(goal.sequent().succedent()) == null) {
-//                continue;
-//            }
-//
-//            Node lastNode = goal.node();
-//            do {
-//                try {
-//                    // Do single proof step
-//                    new OneStepProofMacro().applyTo(uic, goal.node(), null,
-//                            DUMMY_PROVER_TASK_LISTENER); // TODO Change
-//                }
-//                catch (InterruptedException e) {
-//                }
-//                catch (Exception e) {
-//                }
-//
-//                // We want no splits, but the proof must have changed
-//                if (lastNode.childrenCount() == 1) {
-//                    lastNode = lastNode.child(0);
-//                }
-//                else {
-//                    break;
-//                }
-//            }
-//            while (getBreakPoint(goal.sequent().succedent()) != null);
-//
-//            // Undo until a break condition is the first active statement again.
-//            while (getBreakPoint(lastNode.sequent().succedent()) == null) {
-//                lastNode = lastNode.parent();
-//                proof.pruneProof(lastNode);
-//            }
-//
-//        }
-//    }
-
-//    /**
-//     * Dummy ProverTaskListener.
-//     */
-//    private static final ProverTaskListener DUMMY_PROVER_TASK_LISTENER = new ProverTaskListener() {
-//        @Override
-//        public void taskProgress(int position) {
-//        }
-//
-//        @Override
-//        public void taskStarted(TaskStartedInfo info) {
-//        }
-//
-//        @Override
-//        public void taskFinished(TaskFinishedInfo info) {
-//        }
-//    };
-
     /**
      * @param succedent
      *            Succedent of a sequent.
@@ -269,6 +207,8 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
         private final Name NAME = new Name(
                 FilterSymbexStrategy.class.getSimpleName());
+        
+        private boolean enforceJoin = false;
 
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
@@ -281,13 +221,16 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+            if (enforceJoin) {
+                return (app instanceof JoinRuleBuiltInRuleApp && ((JoinRuleBuiltInRuleApp) app).complete());
+            }
+            
             if (!hasModality(goal.node())) {
                 return false;
             }
             
             Statement breakpoint;
             if ((breakpoint = getBreakPoint(goal.sequent().succedent())) != null) {
-                
                 final ImmutableList<Goal> subtreeGoals = goal.proof().getSubtreeGoals(commonParents.get(breakpoint));
                 boolean allStopped = true;
                 for (Goal subGoal : subtreeGoals) {
@@ -317,13 +260,16 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     breakpoints.remove(breakpoint);
                     commonParents.remove(breakpoint);
 
-                    goal.apply(joinApp);
+                    goal.getRuleAppManager().clearCache();
+//                    goal.getRuleAppManager().ruleAdded(joinApp, joinPio);
+//                    goal.updateRuleAppIndex();
                     
-                    return false;
+                    goal.apply(joinApp);
                 } else {
                     stoppedGoals.add(goal);
-                    return false;
                 }
+                
+                return false;
             }
 
             if (pio != null) {
@@ -404,14 +350,17 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          *         if the removal was not applicable.
          */
         private StatementBlock stripMethodFrame(final StatementBlock sb) {
-            if (sb.getBody().get(0) instanceof Try) {
-                Try theTry = (Try) sb.getBody().get(0);
-                if (theTry.getBody().getBody().get(0) instanceof MethodFrame) {
-                    MethodFrame theMethodFrame = (MethodFrame) theTry.getBody()
-                            .getBody().get(0);
-                    return theMethodFrame.getBody();
+            try {
+                if (sb.getBody().get(0) instanceof Try) {
+                    Try theTry = (Try) sb.getBody().get(0);
+                    if (theTry.getBody().getBody().get(0) instanceof MethodFrame) {
+                        MethodFrame theMethodFrame = (MethodFrame) theTry.getBody()
+                                .getBody().get(0);
+                        return theMethodFrame.getBody();
+                    }
                 }
             }
+            catch (ArrayIndexOutOfBoundsException e) {}
 
             return sb;
         }
@@ -435,6 +384,11 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             }
 
             StatementBlock blockWithoutMethodFrame = stripMethodFrame(toSearch);
+            
+            if (blockWithoutMethodFrame.isEmpty()) {
+                return result;
+            }
+            
             Statement firstElem = blockWithoutMethodFrame.getBody().get(0);
             ImmutableSet<BlockContract> contracts;
             if (firstElem instanceof StatementBlock
