@@ -2,7 +2,10 @@ package org.key_project.sed.key.evaluation.wizard.dialog;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -13,22 +16,40 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
+import org.key_project.sed.key.evaluation.model.definition.InstructionPage;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
+import org.key_project.sed.key.evaluation.model.input.FixedFormInput;
+import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
+import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.SendFormWizardPage;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 
 public class EvaluationWizardDialog extends WizardDialog {
@@ -53,6 +74,8 @@ public class EvaluationWizardDialog extends WizardDialog {
    private boolean messageClickable = false;
    
    private Cursor handCursor;
+   
+   private ToolBar toolBar;
    
    private final MouseListener messageMouseListener = new MouseListener() {
       @Override
@@ -93,6 +116,7 @@ public class EvaluationWizardDialog extends WizardDialog {
       }
       getWizard().setCurrentPage(page);
       super.showPage(page);
+      updateToolbar();
       assert page instanceof AbstractEvaluationWizardPage<?>;
       AbstractEvaluationWizardPage<?> evaluationPage = (AbstractEvaluationWizardPage<?>) page;
       evaluationInput.getCurrentFormInput().setCurrentPageInput(evaluationPage.getPageInput());
@@ -101,6 +125,115 @@ public class EvaluationWizardDialog extends WizardDialog {
       }
    }
    
+   protected void updateToolbar() {
+      // Dispose old items
+      for (ToolItem item : toolBar.getItems()) {
+         item.dispose();
+      }
+      // Create instruction items
+      AbstractEvaluationWizardPage<?> currentWizardPage = getCurrentPage();
+      AbstractPageInput<?> pageInput = currentWizardPage.getPageInput();
+      AbstractFormInput<?> formInput = pageInput.getFormInput();
+      if (currentWizardPage != null) {
+         AbstractForm form = formInput.getForm();
+         for (AbstractPage page : form.getPages()) {
+            if (page instanceof InstructionPage && wasShownBefore(pageInput, page)) {
+               InstructionPage ip = (InstructionPage) page;
+               createToolBarItem(ip.getImage(), ip.getTitle(), ip.getDescriptionURL());
+            }
+         }
+      }
+      // Create tool items
+      Tool tool = formInput instanceof RandomFormInput ?
+                  ((RandomFormInput) formInput).getTool(pageInput) :
+                  null;
+      if (tool != null) {
+         createToolBarItem(tool.getImage(), tool.getName(), tool.getDescriptionURL());
+      }
+      // Layout toolbar
+      toolBar.layout();
+      toolBar.getParent().layout();
+   }
+   
+   protected boolean wasShownBefore(AbstractPageInput<?> currentPageInput, AbstractPage toCheck) {
+      if (currentPageInput.getFormInput() instanceof FixedFormInput) {
+         boolean before = false;
+         boolean goOn = true;
+         AbstractPage[] pages = currentPageInput.getFormInput().getForm().getPages();
+         int i = 0;
+         while (goOn && i < pages.length) {
+            if (pages[i] == currentPageInput.getPage()) {
+               goOn = false;
+            }
+            else if (pages[i] == toCheck) {
+               before = true;
+               goOn = false;
+            }
+            i++;
+         }
+         return before;
+      }
+      else if (currentPageInput.getFormInput() instanceof RandomFormInput) {
+         boolean before = false;
+         boolean goOn = true;
+         List<AbstractPageInput<?>> pages = ((RandomFormInput) currentPageInput.getFormInput()).getPageOrder();
+         Iterator<AbstractPageInput<?>> iter = pages.iterator();
+         while (goOn && iter.hasNext()) {
+            AbstractPage next = iter.next().getPage();
+            if (next == currentPageInput.getPage()) {
+               goOn = false;
+            }
+            else if (next == toCheck) {
+               before = true;
+               goOn = false;
+            }
+         }
+         return before;
+      }
+      else {
+         throw new IllegalStateException("Unsupported form input: " + currentPageInput.getFormInput());
+      }
+   }
+
+   protected void createToolBarItem(final Image image, final String name, final URL url) {
+      ToolItem item = new ToolItem(toolBar, SWT.PUSH);
+      if (image != null) {
+         item.setImage(image);
+      }
+      else {
+         item.setText(name);
+      }
+      item.setToolTipText("Open instructions about " + name + " in a new shell.");
+      item.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            openURL(image, name, url);
+         }
+      });
+   }
+
+   protected void openURL(Image image, String title, URL url) {
+      final Shell shell = new Shell(getShell().getDisplay());
+      if (title != null) {
+         shell.setText(title);
+      }
+      shell.setImage(image);
+      shell.addTraverseListener(new TraverseListener() {
+         @Override
+         public void keyTraversed(TraverseEvent e) {
+            if (e.detail == SWT.TRAVERSE_ESCAPE) {
+               shell.close();
+            }
+         }
+      });
+      shell.setLayout(new FillLayout());
+      FormToolkit toolkit = new FormToolkit(shell.getDisplay());
+      BrowserManager.createBrowser(toolkit, shell, url);
+      shell.setSize(400, 400);
+      SWTUtil.centerOn(getShell(), shell);
+      shell.open();
+   }
+
    @Override
    protected void nextPressed() {
       if (getWizard().nextPressed(getCurrentPage())) {
@@ -179,7 +312,30 @@ public class EvaluationWizardDialog extends WizardDialog {
    @Override
    protected Control createContents(Composite parent) {
       handCursor = new Cursor(getShell().getDisplay(), SWT.CURSOR_HAND);
-      return super.createContents(parent);
+      Control control = super.createContents(parent);
+      updateToolbar();
+      return control;
+   }
+
+   @Override
+   protected Control createButtonBar(Composite parent) {
+      Composite composite = new Composite(parent, SWT.NONE);
+      GridLayout layout = new GridLayout(2, false);
+      layout.marginWidth = 0;
+      layout.marginHeight = 0;
+      layout.horizontalSpacing = 0;
+      composite.setLayout(layout);
+      composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+      composite.setFont(parent.getFont());
+      // Create additional buttons
+      toolBar = new ToolBar(composite, SWT.FLAT | SWT.NO_FOCUS);
+      toolBar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+      ((GridData) toolBar.getLayoutData()).horizontalIndent = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+      
+      // Create original buttons
+      Control buttonSection = super.createButtonBar(composite);
+      ((GridData) buttonSection.getLayoutData()).grabExcessHorizontalSpace = true;
+      return composite;
    }
 
    protected Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
