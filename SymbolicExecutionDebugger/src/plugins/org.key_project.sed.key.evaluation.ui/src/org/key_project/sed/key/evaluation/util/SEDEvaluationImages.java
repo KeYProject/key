@@ -37,30 +37,40 @@ import org.key_project.util.eclipse.BundleUtil;
  * @author Martin Hentschel
  */
 public final class SEDEvaluationImages {
+   /**
+    * The key for the image that is used for the evaluation.
+    */
+   public static final String EVALUATION = "org.key_project.sed.key.evaluation.ui.evaluation";
+   
     /**
-     * The key for the image that is used for method calls.
+     * The key for the image that is used for the evaluation wizard.
      */
-    public static final String EVALUATION_WIZARD = "org.key_project.sed.ui.images.methodCall.evaluationWizard";
+    public static final String EVALUATION_WIZARD = "org.key_project.sed.key.evaluation.ui.evaluationWizard";
     
     /**
      * The key for the emoticon fantasy dreaming.
      */
-    public static final String EMOTICON_FANTASY_DREAMING = "org.key_project.sed.ui.images.methodCall.emoticonFantasyDreaming";
+    public static final String EMOTICON_FANTASY_DREAMING = "org.key_project.sed.key.evaluation.ui.emoticonFantasyDreaming";
     
     /**
      * The key for the emoticon fantasy dreaming.
      */
-    public static final String EMOTICON_FANTASY_DREAMING_ERROR = "org.key_project.sed.ui.images.methodCall.emoticonFantasyDreamingError";
+    public static final String EMOTICON_FANTASY_DREAMING_ERROR = "org.key_project.sed.key.evaluation.ui.emoticonFantasyDreamingError";
 
     /**
      * The key for the emoticon omg.
      */
-    public static final String EMOTICON_OMG = "org.key_project.sed.ui.images.methodCall.emoticonOmg";
+    public static final String EMOTICON_OMG = "org.key_project.sed.key.evaluation.ui.emoticonOmg";
 
     /**
      * The key for the emoticon omg.
      */
-    public static final String EMOTICON_OMG_ERROR = "org.key_project.sed.ui.images.methodCall.emoticonOmgError";
+    public static final String EMOTICON_OMG_ERROR = "org.key_project.sed.key.evaluation.ui.emoticonOmgError";
+
+    /**
+     * The key for the pin shell image.
+     */
+    public static final String PIN_SHELL = "org.key_project.sed.key.evaluation.ui.pinShell";
     
     /**
      * Forbid instances.
@@ -122,7 +132,10 @@ public final class SEDEvaluationImages {
     protected static Image createImage(String key) {
         // Compute path to image in bundle.
         String path = null;
-        if (EVALUATION_WIZARD.equals(key)) {
+        if (EVALUATION.equals(key)) {
+           path = "icons/evaluation.png";
+        }
+        else if (EVALUATION_WIZARD.equals(key)) {
            path = "icons/evaluation_wizard.png";
         }
         else if (EMOTICON_FANTASY_DREAMING.equals(key)) {
@@ -136,6 +149,9 @@ public final class SEDEvaluationImages {
         }
         else if (EMOTICON_OMG_ERROR.equals(key)) {
            return decorateImage(getImage(EMOTICON_OMG), FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
+        }
+        else if (PIN_SHELL.equals(key)) {
+           path = "icons/pin_view.gif";
         }
         // Load image if possible
         if (path != null) {

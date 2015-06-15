@@ -45,6 +45,7 @@ import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.util.LogUtil;
+import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
@@ -77,6 +78,8 @@ public class EvaluationWizardDialog extends WizardDialog {
    
    private ToolBar toolBar;
    
+   private final boolean alwaysOnTop;
+   
    private final MouseListener messageMouseListener = new MouseListener() {
       @Override
       public void mouseUp(MouseEvent e) {
@@ -92,10 +95,29 @@ public class EvaluationWizardDialog extends WizardDialog {
          handleMessageClick(e);
       }
    };
+   
+   private final Shell originalParentShell;
+   
+   private EvaluationWizardDialog wizardToClose;
+   
+   private final Rectangle initialBounds;
 
-   public EvaluationWizardDialog(Shell parentShell, EvaluationInput evaluationInput) {
-      super(parentShell, new EvaluationWizard(evaluationInput));
+   public EvaluationWizardDialog(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput) {
+      this(parentShell, alwaysOnTop, evaluationInput, null);
+   }
+
+   protected EvaluationWizardDialog(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput, EvaluationWizardDialog wizardDialogToClose) {
+      super(alwaysOnTop ? parentShell : null, new EvaluationWizard(evaluationInput));
+      this.originalParentShell = parentShell;
+      this.alwaysOnTop = alwaysOnTop;
       this.evaluationInput = evaluationInput;
+      this.wizardToClose = wizardDialogToClose;
+      if (wizardToClose != null) {
+         initialBounds = wizardDialogToClose.getShell().getBounds();
+      }
+      else {
+         initialBounds = null;
+      }
       evaluationInput.getCurrentFormInput().addPropertyChangeListener(AbstractFormInput.PROP_CURRENT_PAGE_INPUT, currentPageListener);
       setHelpAvailable(false);
    }
@@ -131,6 +153,7 @@ public class EvaluationWizardDialog extends WizardDialog {
          item.dispose();
       }
       // Create instruction items
+      boolean separatorNeeded = false;
       AbstractEvaluationWizardPage<?> currentWizardPage = getCurrentPage();
       AbstractPageInput<?> pageInput = currentWizardPage.getPageInput();
       AbstractFormInput<?> formInput = pageInput.getFormInput();
@@ -140,6 +163,7 @@ public class EvaluationWizardDialog extends WizardDialog {
             if (page instanceof InstructionPage && wasShownBefore(pageInput, page)) {
                InstructionPage ip = (InstructionPage) page;
                createToolBarItem(ip.getImage(), ip.getTitle(), ip.getDescriptionURL());
+               separatorNeeded = true;
             }
          }
       }
@@ -149,12 +173,32 @@ public class EvaluationWizardDialog extends WizardDialog {
                   null;
       if (tool != null) {
          createToolBarItem(tool.getImage(), tool.getName(), tool.getDescriptionURL());
+         separatorNeeded = true;
       }
+      // Create pin item
+      if (separatorNeeded) {
+         new ToolItem(toolBar, SWT.SEPARATOR);
+      }
+      ToolItem pinItem = new ToolItem(toolBar, SWT.CHECK);
+      pinItem.setSelection(alwaysOnTop);
+      pinItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.PIN_SHELL));
+      pinItem.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            togglePinnedState();
+         }
+      });
+      pinItem.setToolTipText("Show wizard always on top?");
       // Layout toolbar
       toolBar.layout();
       toolBar.getParent().layout();
    }
    
+   protected void togglePinnedState() {
+      EvaluationWizardDialog dialog = new EvaluationWizardDialog(originalParentShell, !alwaysOnTop, evaluationInput, this);
+      dialog.open();
+   }
+
    protected boolean wasShownBefore(AbstractPageInput<?> currentPageInput, AbstractPage toCheck) {
       if (currentPageInput.getFormInput() instanceof FixedFormInput) {
          boolean before = false;
@@ -311,6 +355,7 @@ public class EvaluationWizardDialog extends WizardDialog {
    
    @Override
    protected Control createContents(Composite parent) {
+      getShell().setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EVALUATION));
       handCursor = new Cursor(getShell().getDisplay(), SWT.CURSOR_HAND);
       Control control = super.createContents(parent);
       updateToolbar();
@@ -339,19 +384,28 @@ public class EvaluationWizardDialog extends WizardDialog {
    }
 
    protected Rectangle getConstrainedShellBounds(Rectangle preferredSize) {
-      Rectangle result = super.getConstrainedShellBounds(preferredSize);
-      if (result.width > 600) {
-         result.width = 600;
+      if (initialBounds != null && !getShell().isVisible()) {
+         return initialBounds;
       }
-      if (result.height > 700) {
-         result.height = 700;
+      else {
+         Rectangle result = super.getConstrainedShellBounds(preferredSize);
+         if (result.width > 600) {
+            result.width = 600;
+         }
+         if (result.height > 700) {
+            result.height = 700;
+         }
+         return result;
       }
-      return result;
    }
 
    @Override
    public int open() {
       registerDialog(this);
+      if (wizardToClose != null) {
+         wizardToClose.close();
+         wizardToClose = null;
+      }
       return super.open();
    }
 

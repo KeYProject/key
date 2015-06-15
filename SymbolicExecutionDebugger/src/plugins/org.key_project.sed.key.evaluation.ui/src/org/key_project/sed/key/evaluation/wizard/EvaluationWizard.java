@@ -363,11 +363,11 @@ public class EvaluationWizard extends Wizard {
    /**
     * Opens the {@link EvaluationWizard} in a {@link WizardDialog}.
     * @param parentShell The parent {@link Shell}.
+    * @param alwaysOnTop {@code true} The wizard is always on top, {@code false} the wizard is not always on top.
     * @param evaluationInput The {@link EvaluationInput} to perform.
-    * @return The dialog result.
     */
-   public static int openWizard(Shell parentShell, EvaluationInput evaluationInput) {
-      EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, evaluationInput);
-      return dialog.open();
+   public static void openWizard(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput) {
+      EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput);
+      dialog.open();
    }
 }
