@@ -535,8 +535,9 @@ public class JMLSpecFactory {
             return null;
         }
         
-        //TODO: (DS) This is a stub for testing. Replace by implementation taking originalClauses into account.
-        return JoinIfThenElse.instance();
+        // Extract the name of the join procedure: Remove beginning "join_proc " and trailing ";".
+        String joinProcName = originalClauses.head().text.substring(10, originalClauses.head().text.length() - 1);
+        return JoinProcedure.getProcedureByName(joinProcName);
     }
         
     /**
