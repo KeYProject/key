@@ -183,7 +183,7 @@ public class JoinRule implements BuiltInRule {
       Term succedentFormula = tb.apply(joinedState.first, thisSEState.third);
       SequentFormula newSuccedent = new SequentFormula(succedentFormula);
       newGoal.addFormula(
-            new SequentFormula(succedentFormula),
+            newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
       // The following line has the only effect of emptying the
