@@ -3,7 +3,6 @@ package org.key_project.sed.key.evaluation.model.definition;
 import java.net.URL;
 import java.util.List;
 
-import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.sed.key.evaluation.model.random.UnderstandingProofAttemptsRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier;
@@ -12,7 +11,6 @@ import org.key_project.sed.key.evaluation.model.tooling.ProofAttemptJavaProjectM
 import org.key_project.sed.key.evaluation.model.util.EvaluationModelImages;
 import org.key_project.sed.key.evaluation.model.validation.FixedValueValidator;
 import org.key_project.sed.key.evaluation.model.validation.NotUndefinedValueValidator;
-import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.java.CollectionUtil;
 
 public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
@@ -81,8 +79,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    protected List<Tool> computeTools() {
       URL keyURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/KeY.html");
       URL sedURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/SED.html");
-      Tool key = new Tool(KEY_TOOL_NAME, keyURL, KeYImages.getImage(KeYImages.KEY_LOGO));
-      Tool sed = new Tool(SED_TOOL_NAME, sedURL, SEDImages.getImage(SEDImages.SYMBOLIC_DEBUG));
+      Tool key = new Tool(KEY_TOOL_NAME, keyURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
+      Tool sed = new Tool(SED_TOOL_NAME, sedURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
       return CollectionUtil.toList(key, sed);
    }
    
@@ -151,7 +149,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                  sendConditionsPage);
       // Create evaluation form
       URL jmlURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/JML.html");
-      InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO));
+      InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO) : null);
       ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
       ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME));
       QuestionPage proof1Page = createCalendarQuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt of Calendar#addEntry(Entry)");

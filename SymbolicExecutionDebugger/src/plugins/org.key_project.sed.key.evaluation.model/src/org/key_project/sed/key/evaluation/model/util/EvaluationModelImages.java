@@ -35,9 +35,19 @@ import org.key_project.util.eclipse.BundleUtil;
  */
 public final class EvaluationModelImages {
     /**
-     * The key for the image that is used for method calls.
+     * The key for the JML logo.
      */
     public static final String JML_LOGO = "org.key_project.sed.key.evaluation.model.jmlLogo";
+    
+    /**
+     * The key for the SED logo.
+     */
+    public static final String SED_LOGO = "org.key_project.sed.key.evaluation.model.sedLogo";
+    
+    /**
+     * The key for the KeY logo.
+     */
+    public static final String KEY_LOGO = "org.key_project.sed.key.evaluation.model.keyLogo";
     
     /**
      * Forbid instances.
@@ -101,6 +111,12 @@ public final class EvaluationModelImages {
         String path = null;
         if (JML_LOGO.equals(key)) {
            path = "data/understandingProofAttempts/icons/jml-writing-16x16.png";
+        }
+        else if (SED_LOGO.equals(key)) {
+           path = "data/understandingProofAttempts/icons/symbolic_debug.gif";
+        }
+        else if (KEY_LOGO.equals(key)) {
+           path = "data/understandingProofAttempts/icons/logo16.gif";
         }
         // Load image if possible
         if (path != null) {

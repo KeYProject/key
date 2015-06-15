@@ -18,6 +18,7 @@ public class SEDServer {
     */
    public static void main(String[] args) {
       try {
+         // Start server
          System.out.println("Forms will be stored at " + FileStorage.FORM_STORAGE_LOCATION);
          start();
       }
