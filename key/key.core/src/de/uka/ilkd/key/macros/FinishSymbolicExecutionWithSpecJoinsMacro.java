@@ -21,11 +21,12 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -401,18 +402,15 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if (enforceJoin) {
-                return false;
-            }
-
-            if (!hasModality(goal.node())) {
+            if (enforceJoin || stoppedGoals.contains(goal) || !hasModality(goal.node())) {
                 return false;
             }
 
             if (pio != null) {
                 JavaBlock theJavaBlock = getJavaBlockRecursive(pio.subTerm());
-                Statement activeStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) theJavaBlock
-                        .program());
+//                Statement activeStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) theJavaBlock
+//                        .program());
+                SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
 
                 if (!(theJavaBlock.program() instanceof StatementBlock)
                         || (alreadySeen.contains(theJavaBlock) && !breakpoints
@@ -546,10 +544,11 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             Semisequent succedent = sequent.succedent();
 
             for (SequentFormula formula : succedent) {
-                Statement firstStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) getJavaBlockRecursive(
-                        formula.formula()).program());
+//                Statement firstStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) getJavaBlockRecursive(
+//                        formula.formula()).program());
+                SourceElement activeStmt = JavaTools.getActiveStatement(getJavaBlockRecursive(formula.formula()));
 
-                if (firstStmt != null && firstStmt.equals(breakpoint)) {
+                if (activeStmt != null && ((Statement) activeStmt).equals(breakpoint)) {
                     return new PosInOccurrence(formula,
                             PosInTerm.getTopLevel(), false);
                 }
@@ -632,11 +631,9 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     continue;
                 }
 
-                Statement firstStatement = getFirstStatementOfMethodFrameBlock(blockWithoutMethodFrame);
-                if (firstStatement != null) {
-                    if (breakpoints.contains(firstStatement)) {
-                        return firstStatement;
-                    }
+                SourceElement activeStatement = JavaTools.getActiveStatement(getJavaBlockRecursive(formula.formula()));
+                if (activeStatement instanceof Statement && breakpoints.contains((Statement) activeStatement)) {
+                    return (Statement) activeStatement;
                 }
             }
 
