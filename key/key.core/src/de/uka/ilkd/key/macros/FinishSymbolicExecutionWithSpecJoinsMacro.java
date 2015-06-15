@@ -20,10 +20,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -54,29 +52,14 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * TODO
+ * Finishes symbolic execution while taking JML join specifications into
+ * account: Branches are joined at defined points during the execution.
  * 
  * @author Dominic Scheurer
  * @see FinishSymbolicExecutionMacro
  */
 public class FinishSymbolicExecutionWithSpecJoinsMacro extends
-    AbstractProofMacro {
-
-    private HashSet<ProgramElement> breakpoints = new HashSet<ProgramElement>();
-    private HashMap<ProgramElement, Node> commonParents = new HashMap<ProgramElement, Node>();
-    private HashMap<ProgramElement, BlockContract> joinContracts = new HashMap<ProgramElement, BlockContract>();
-    private HashSet<Goal> stoppedGoals = new HashSet<Goal>();
-    private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
-
-    public FinishSymbolicExecutionWithSpecJoinsMacro() {
-    }
-
-    public FinishSymbolicExecutionWithSpecJoinsMacro(
-            HashSet<ProgramElement> breakpoints,
-            HashMap<ProgramElement, Node> commonParents) {
-        this.breakpoints = breakpoints;
-        this.commonParents = commonParents;
-    }
+        AbstractProofMacro {
 
     @Override
     public String getName() {
@@ -87,6 +70,143 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
     public String getDescription() {
         return "Continue automatic strategy application and take join procedures "
                 + "specified in block contracts into account.";
+    }
+
+    @Override
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
+        return goals != null && !goals.isEmpty();
+    }
+
+    @Override
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+            Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+
+        if (goals == null || goals.isEmpty()) {
+            // Should not happen, because in this case canApplyTo returns false
+            return null;
+        }
+
+        final IGoalChooser goalChooser = proof.getInitConfig().getProfile()
+                .getSelectedGoalChooserBuilder().create();
+        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
+        final ImmutableList<Goal> ignoredOpenGoals = setDifference(
+                proof.openGoals(), goals);
+
+        final ProofMacro macroAdapter = new SkipMacro() {
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public String getDescription() {
+                return "Anonymous macro";
+            }
+        };
+
+        macroAdapter.setNumberSteps(getNumberSteps());
+
+        // The observer to handle the progress bar
+        final ProofMacroListener pml = new ProgressBarListener(macroAdapter,
+                goals.size(), getNumberSteps(), listener);
+        applyStrategy.addProverTaskObserver(pml);
+
+        // Add a focus manager if there is a focus
+        if (posInOcc != null && goals != null) {
+            AutomatedRuleApplicationManager realManager = null;
+            FocussedRuleApplicationManager manager = null;
+            for (Goal goal : goals) {
+                realManager = goal.getRuleAppManager();
+                realManager.clearCache();
+                manager = new FocussedRuleApplicationManager(realManager, goal,
+                        posInOcc);
+                goal.setRuleAppManager(manager);
+            }
+        }
+
+        // Set the FilterSymbexStrategy as new strategy.
+        Strategy oldStrategy = proof.getActiveStrategy();
+        FilterSymbexStrategy strategy = new FilterSymbexStrategy(
+                proof.getActiveStrategy());
+        proof.setActiveStrategy(strategy);
+
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals,
+                proof);
+        try {
+            // Run symbolic execution and join until the execution finishes
+            // with no join applicable. Whenever the FilterSymbexStrategy
+            // finds a join point, it stops the execution such that we can
+            // apply the join at this place.
+            boolean joined;
+            do {
+                joined = false;
+                applyStrategy.start(proof, goals);
+                synchronized (applyStrategy) { // wait for applyStrategy to
+                                               // finish its last rule
+                                               // application
+                    if (applyStrategy.hasBeenInterrupted()) { // reraise
+                                                              // interrupted
+                                                              // exception if
+                                                              // necessary
+                        throw new InterruptedException();
+                    }
+                }
+
+                Pair<Goal, JoinRuleBuiltInRuleApp> joinInfo = strategy
+                        .getAndResetJoinInformation();
+                if (joinInfo != null) {
+                    // We are at a join point: Execute the join.
+                    joinInfo.first.apply(joinInfo.second);
+                    joined = true;
+                }
+            }
+            while (joined);
+        }
+        finally {
+            // This resets the proof strategy and the managers after the
+            // automation has run.
+            for (final Goal openGoal : proof.openGoals()) {
+                AutomatedRuleApplicationManager manager = openGoal
+                        .getRuleAppManager();
+
+                // Touch the manager only if necessary.
+                if (manager.getDelegate() != null) {
+                    while (manager.getDelegate() != null) {
+                        manager = manager.getDelegate();
+                    }
+                    manager.clearCache();
+                    openGoal.setRuleAppManager(manager);
+                }
+            }
+
+            final ImmutableList<Goal> resultingGoals = setDifference(
+                    proof.openGoals(), ignoredOpenGoals);
+            info = new ProofMacroFinishedInfo(this, resultingGoals);
+            proof.setActiveStrategy(oldStrategy);
+            applyStrategy.removeProverTaskObserver(pml);
+        }
+        return info;
+    }
+
+    /**
+     * Computes the set difference of the two given lists.
+     *
+     * @param list1
+     *            First list.
+     * @param list2
+     *            Second list.
+     * @return A list containing all elements that are in the first but not in
+     *         the second list.
+     */
+    private static <T> ImmutableList<T> setDifference(ImmutableList<T> list1,
+            ImmutableList<T> list2) {
+        ImmutableList<T> difference = list1;
+        for (T elem : list2) {
+            difference = difference.removeFirst(elem);
+        }
+        return difference;
     }
 
     /**
@@ -133,154 +253,6 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         return false;
     }
 
-    @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-            Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
-        if (goals == null || goals.isEmpty()) {
-            // should not happen, because in this case canApplyTo returns
-            // false
-            return null;
-        }
-
-        final IGoalChooser goalChooser = proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
-        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
-        final ImmutableList<Goal> ignoredOpenGoals =
-                setDifference(proof.openGoals(), goals);
-
-        final ProofMacro macroAdapter = new SkipMacro() {
-            @Override
-            public String getName() { return ""; }
-            @Override
-            public String getDescription() { return "Anonymous macro"; }
-        };
-        macroAdapter.setNumberSteps(getNumberSteps());
-        //
-        // The observer to handle the progress bar
-        final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
-                                                                getNumberSteps(), listener);
-        applyStrategy.addProverTaskObserver(pml);
-        // add a focus manager if there is a focus
-        if(posInOcc != null && goals != null) {
-            AutomatedRuleApplicationManager realManager = null;
-            FocussedRuleApplicationManager manager = null;
-            for (Goal goal: goals) {
-                realManager = goal.getRuleAppManager();
-                realManager.clearCache();
-                manager = new FocussedRuleApplicationManager(realManager, goal, posInOcc);
-                goal.setRuleAppManager(manager);
-            }
-        }
-
-        // set a new strategy.
-        Strategy oldStrategy = proof.getActiveStrategy();
-        FilterSymbexStrategy strategy = createStrategy(proof, posInOcc);
-        proof.setActiveStrategy(strategy);
-
-        ProofMacroFinishedInfo info =
-                new ProofMacroFinishedInfo(this, goals, proof);
-        try {
-            // find the relevant goals
-            // and start
-            boolean joined;
-            do {
-                joined = false;
-                applyStrategy.start(proof, goals);
-                synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
-                    if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
-                        throw new InterruptedException();
-                    }
-                }
-                
-                Pair<Goal, JoinRuleBuiltInRuleApp> joinInfo = strategy.getAndResetJoinInformation();
-                if (joinInfo != null) {
-                    joinInfo.first.apply(joinInfo.second);
-                    joined = true;
-                }
-            } while (joined);
-        } finally {
-            // this resets the proof strategy and the managers after the automation
-            // has run
-            for (final Goal openGoal : proof.openGoals()) {
-                AutomatedRuleApplicationManager manager = openGoal.getRuleAppManager();
-                // touch the manager only if necessary
-                if(manager.getDelegate() != null) {
-                    while(manager.getDelegate() != null) {
-                        manager = manager.getDelegate();
-                    }
-                    manager.clearCache();
-                    openGoal.setRuleAppManager(manager);
-                }
-            }
-            final ImmutableList<Goal> resultingGoals =
-                    setDifference(proof.openGoals(), ignoredOpenGoals);
-            info = new ProofMacroFinishedInfo(this, resultingGoals);
-            proof.setActiveStrategy(oldStrategy);
-//            doPostProcessing(proof);
-            applyStrategy.removeProverTaskObserver(pml);
-        }
-        return info;
-    }
-    
-
-    /**
-     * 
-     * TODO: Document.
-     *
-     * @param goals1
-     * @param goals2
-     * @return
-     */
-    private static ImmutableList<Goal> setDifference(ImmutableList<Goal> goals1,
-                                                     ImmutableList<Goal> goals2) {
-        ImmutableList<Goal> difference = goals1;
-        for (Goal goal : goals2) {
-            difference = difference.removeFirst(goal);
-        }
-        return difference;
-    }
-
-    protected FilterSymbexStrategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        // Need to clear the data structures since no new instance of this
-        // macro is created across multiple calls, so sometimes it would have
-        // no effect in a successive call.
-        breakpoints.clear();
-        alreadySeen.clear();
-        commonParents.clear();
-        stoppedGoals.clear();
-
-        return new FilterSymbexStrategy(proof.getActiveStrategy());
-    }
-
-    /**
-     * @param succedent
-     *            Succedent of a sequent.
-     * @return A Statement (the registered breakpoint) iff the given succedent has one formula with a break point
-     *         statement, else null;
-     */
-    private Statement getBreakPoint(Semisequent succedent) {
-        for (SequentFormula formula : succedent.asList()) {
-//            Statement activeStmt = (Statement) JavaTools
-//                    .getActiveStatement(getJavaBlockRecursive(formula
-//                            .formula()));//TODO
-            
-            StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) getJavaBlockRecursive(formula.formula()).program());
-            
-            if (blockWithoutMethodFrame.isEmpty()) {
-                continue;
-            }
-            
-            Statement firstStatement = getFirstStatementOfMethodFrameBlock(blockWithoutMethodFrame);
-            if (firstStatement != null) {
-                if (breakpoints.contains(firstStatement)) {
-                    return firstStatement;
-                }
-            }
-        }
-
-        return null;
-    }
-
     /**
      * Returns the first Java block in the given term that can be found by
      * recursive search, or the empty block if there is no non-empty Java block
@@ -307,6 +279,75 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
     }
 
     /**
+     * @param block
+     *            The statement block which is assumed to wrap another block by
+     *            a method frame.
+     * @return The first element within the Java block inside the method frame
+     *         of the given block, or null if no such element exists.
+     */
+    private Statement getFirstStatementOfMethodFrameBlock(StatementBlock block) {
+        return getNthStatementOfMethodFrameBlock(block, 0);
+    }
+
+    /**
+     * @param block
+     *            The statement block which is assumed to wrap another block by
+     *            a method frame.
+     * @return The second element within the Java block inside the method frame
+     *         of the given block, or null if no such element exists.
+     */
+    private Statement getSecondStatementOfMethodFrameBlock(StatementBlock block) {
+        return getNthStatementOfMethodFrameBlock(block, 1);
+    }
+
+    /**
+     * @param block
+     *            The statement block which is assumed to wrap another block by
+     *            a method frame.
+     * @param n
+     *            Specification of the element to obtain.
+     * @return The n-th element within the Java block inside the method frame of
+     *         the given block, or null if no such element exists.
+     */
+    private Statement getNthStatementOfMethodFrameBlock(StatementBlock block,
+            int n) {
+        StatementBlock blockWithoutMethodFrame = stripMethodFrame(block);
+
+        if (blockWithoutMethodFrame.getBody().size() < n + 1) {
+            return null;
+        }
+
+        return blockWithoutMethodFrame.getBody().get(n);
+    }
+
+    /**
+     * Removes the <code>try { method-frame { ... }}</code> parts from the given
+     * statement block, i.e. returns the inner code. If there is nothing to
+     * remove, the original block is returned.
+     *
+     * @param sb
+     *            The statement block to remove the try/method-frame parts from.
+     * @return The stripped inner statement block or the original argument, if
+     *         the removal was not applicable.
+     */
+    private StatementBlock stripMethodFrame(final StatementBlock sb) {
+        try {
+            if (sb.getBody().get(0) instanceof Try) {
+                Try theTry = (Try) sb.getBody().get(0);
+                if (theTry.getBody().getBody().get(0) instanceof MethodFrame) {
+                    MethodFrame theMethodFrame = (MethodFrame) theTry.getBody()
+                            .getBody().get(0);
+                    return theMethodFrame.getBody();
+                }
+            }
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+        }
+
+        return sb;
+    }
+
+    /**
      * The Class FilterSymbexStrategy is a special strategy assigning to any
      * rule infinite costs if the goal has no modality or if a join point is
      * reached.
@@ -315,15 +356,24 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
         private final Name NAME = new Name(
                 FilterSymbexStrategy.class.getSimpleName());
-        
+
         private boolean enforceJoin = false;
-        
+
         private Pair<Goal, JoinRuleBuiltInRuleApp> joinInformation = null;
-        
+
+        private HashSet<ProgramElement> breakpoints = new HashSet<ProgramElement>();
+        private HashMap<ProgramElement, Node> commonParents = new HashMap<ProgramElement, Node>();
+        private HashMap<ProgramElement, BlockContract> joinContracts = new HashMap<ProgramElement, BlockContract>();
+        private HashSet<Goal> stoppedGoals = new HashSet<Goal>();
+        private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
+
         /**
-         * TODO: Document.
+         * Returns the information for a join to apply if applicable, or null if
+         * there is no join to execute. Every call reset the join information,
+         * such that the strategy can continue.
          *
-         * @return
+         * @return The information for a join to apply if applicable, or null if
+         *         there is no join to execute.
          */
         public Pair<Goal, JoinRuleBuiltInRuleApp> getAndResetJoinInformation() {
             final Pair<Goal, JoinRuleBuiltInRuleApp> oldJoinInformation = joinInformation;
@@ -332,6 +382,12 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             return oldJoinInformation;
         }
 
+        /**
+         * Creates a new FilterSymbexStrategy based on the given delegate.
+         *
+         * @param delegate
+         *            The strategy to wrap.
+         */
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
         }
@@ -346,17 +402,16 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             if (enforceJoin) {
                 return false;
             }
-            
+
             if (!hasModality(goal.node())) {
                 return false;
             }
 
             if (pio != null) {
                 JavaBlock theJavaBlock = getJavaBlockRecursive(pio.subTerm());
-//                SourceElement activeStmt = JavaTools
-//                        .getActiveStatement(theJavaBlock);
-                Statement activeStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) theJavaBlock.program());
-                
+                Statement activeStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) theJavaBlock
+                        .program());
+
                 if (!(theJavaBlock.program() instanceof StatementBlock)
                         || (alreadySeen.contains(theJavaBlock) && !breakpoints
                                 .contains(activeStmt))) {
@@ -369,61 +424,76 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     alreadySeen.add(theJavaBlock);
 
                     // Find break points
-                    breakpoints.addAll(findJoinPoints((StatementBlock) theJavaBlock
-                            .program(), goal));
-                    
+                    breakpoints.addAll(findJoinPoints(
+                            (StatementBlock) theJavaBlock.program(), goal));
+
                     Statement breakpoint;
                     if ((breakpoint = getBreakPoint(goal.sequent().succedent())) != null) {
-                        final ImmutableList<Goal> subtreeGoals = goal.proof().getSubtreeGoals(commonParents.get(breakpoint));
+                        final ImmutableList<Goal> subtreeGoals = goal.proof()
+                                .getSubtreeGoals(commonParents.get(breakpoint));
                         boolean allStopped = true;
                         for (Goal subGoal : subtreeGoals) {
                             if (!subGoal.equals(goal)) {
-                                allStopped = allStopped && stoppedGoals.contains(subGoal);
+                                allStopped = allStopped
+                                        && stoppedGoals.contains(subGoal);
                             }
                         }
-                        
+
                         if (allStopped) {
-                            // Not it's time for a join
+                            // We stopped all Goals potentially participating in the join;
+                            // now we collect the information about the join. After a successful
+                            // join app initialization, we do not allow any other rule applications
+                            // (realized by setting enforceJoin to true).
+                            
                             final JoinRule joinRule = JoinRule.INSTANCE;
 
                             final Node joinNode = goal.node();
-                            final PosInOccurrence joinPio = getPioForBreakpoint(breakpoint, goal.sequent());
+                            final PosInOccurrence joinPio = getPioForBreakpoint(
+                                    breakpoint, goal.sequent());
                             final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
-                                    .createApp(joinPio, goal.proof().getServices());
+                                    .createApp(joinPio, goal.proof()
+                                            .getServices());
 
                             {
-                                joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(goal, joinPio));
-                                joinApp.setConcreteRule(joinContracts.get(breakpoint).getJoinProcedure());
+                                joinApp.setJoinPartners(JoinRule
+                                        .findPotentialJoinPartners(goal,
+                                                joinPio));
+                                joinApp.setConcreteRule(joinContracts.get(
+                                        breakpoint).getJoinProcedure());
                                 joinApp.setJoinNode(joinNode);
                             }
-                            
+
                             for (Goal subgoal : subtreeGoals) {
                                 stoppedGoals.remove(subgoal);
                             }
                             breakpoints.remove(breakpoint);
                             commonParents.remove(breakpoint);
-                            
-                            joinInformation = new Pair<Goal, JoinRuleBuiltInRuleApp>(goal, joinApp);
+
+                            joinInformation = new Pair<Goal, JoinRuleBuiltInRuleApp>(
+                                    goal, joinApp);
                             enforceJoin = true;
-                        } else {
+                        }
+                        else {
                             stoppedGoals.add(goal);
                         }
-                        
+
                         return false;
                     }
 
                     if (app.rule().name().toString()
                             .equals("One Step Simplification")) {
 
-                        // We allow One Step Simplification, otherwise we sometimes
-                        // would
-                        // have to do a simplification ourselves before joining
+                        // We allow One Step Simplification, otherwise we
+                        // sometimes
+                        // would have to do a simplification ourselves before
+                        // joining
                         // nodes.
                         return true;
 
                     }
                     else if (breakpoints.contains((ProgramElement) activeStmt)) {
-                        // TODO: This check could be superfluous, since we already
+                        // TODO: This check could be superfluous, since we
+                        // already
                         // check whether there is a break point at the beginning
                         // of this method.
                         return false;
@@ -434,49 +504,62 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
             return super.isApprovedApp(app, pio, goal);
         }
-        
+
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+            return false;
+        }
+
         /**
-         * TODO: Document.
+         * Returns the {@link PosInOccurrence} for the given breakpoint
+         * statement inside the given sequent, or null if the statement does not
+         * exist within the sequent. The returned {@link PosInOccurrence} is the
+         * top level formula inside the sequent containing the breakpoint
+         * statement.
          *
          * @param breakpoint
+         *            The statement to locate inside the sequent.
          * @param sequent
-         * @return
+         *            The sequent to find the statement in.
+         * @return The top level formula inside the sequent containing the
+         *         breakpoint statement.
          */
-        private PosInOccurrence getPioForBreakpoint(Statement breakpoint, Sequent sequent) {
+        private PosInOccurrence getPioForBreakpoint(Statement breakpoint,
+                Sequent sequent) {
             Semisequent succedent = sequent.succedent();
-            
+
             for (SequentFormula formula : succedent) {
-//                Statement activeStmt = (Statement) JavaTools
-//                        .getActiveStatement(getJavaBlockRecursive(formula
-//                                .formula()));
-                Statement firstStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) getJavaBlockRecursive(formula.formula()).program());
-                
+                Statement firstStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) getJavaBlockRecursive(
+                        formula.formula()).program());
+
                 if (firstStmt != null && firstStmt.equals(breakpoint)) {
-                    return new PosInOccurrence(formula, PosInTerm.getTopLevel(), false);
+                    return new PosInOccurrence(formula,
+                            PosInTerm.getTopLevel(), false);
                 }
             }
-            
+
             return null;
         }
 
         /**
-         * Returns a set of join points for the given statement block. Join points
-         * are directly registered once they are found.
+         * Returns a set of join points for the given statement block. Join
+         * points are directly registered once they are found.
          * 
          * @param toSearch
          *            The statement block to search for join points.
-         * @param goal The goal corresponding to the statement block.
+         * @param goal
+         *            The goal corresponding to the statement block.
          * @return A set of join points for the given statement block.
          */
-        private HashSet<ProgramElement> findJoinPoints(final StatementBlock toSearch,
-                final Goal goal) {
+        private HashSet<ProgramElement> findJoinPoints(
+                final StatementBlock toSearch, final Goal goal) {
             final Services services = goal.proof().getServices();
             final HashSet<ProgramElement> result = new HashSet<ProgramElement>();
 
             if (toSearch.isEmpty()) {
                 return result;
             }
-            
+
             final Statement firstElem = getFirstStatementOfMethodFrameBlock(toSearch);
             ImmutableSet<BlockContract> contracts;
             if (firstElem instanceof StatementBlock
@@ -495,86 +578,33 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             return result;
         }
 
-        @Override
-        public boolean isStopAtFirstNonCloseableGoal() {
-            return false;
-        }
+        /**
+         * @param succedent
+         *            Succedent of a sequent.
+         * @return A Statement (the registered breakpoint) iff the given
+         *         succedent has one formula with a break point statement, else
+         *         null;
+         */
+        private Statement getBreakPoint(Semisequent succedent) {
+            for (SequentFormula formula : succedent.asList()) {
+                StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) getJavaBlockRecursive(
+                        formula.formula()).program());
 
-    }
-    
-    /**
-     * TODO: Document.
-     *
-     * @param stmt
-     * @return
-     */
-    private Statement getFirstStatementOfMethodFrameBlock(StatementBlock block) {
-        return getNthStatementOfMethodFrameBlock(block, 0);
-    }
-    
-    /**
-     * TODO: Document.
-     *
-     * @param stmt
-     * @return
-     */
-    private Statement getSecondStatementOfMethodFrameBlock(StatementBlock block) {
-        return getNthStatementOfMethodFrameBlock(block, 1);
-    }
-    
-    /**
-     * TODO: Document.
-     *
-     * @param block
-     * @param n
-     * @return
-     */
-    private Statement getNthStatementOfMethodFrameBlock(StatementBlock block, int n) {
-        StatementBlock blockWithoutMethodFrame = stripMethodFrame(block);
-        
-        if (blockWithoutMethodFrame.getBody().size() < n+1) {
-            return null;
-        }
-        
-        return blockWithoutMethodFrame.getBody().get(n);
-    }
+                if (blockWithoutMethodFrame.isEmpty()) {
+                    continue;
+                }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.macros.ProofMacro#canApplyTo(de.uka.ilkd.key.proof.Proof, org.key_project.util.collection.ImmutableList, de.uka.ilkd.key.logic.PosInOccurrence)
-     */
-    @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
-        return goals != null && !goals.isEmpty();
-    }
-    
-
-
-    /**
-     * Removes the <code>try { method-frame { ... }}</code> parts from the
-     * given statement block, i.e. returns the inner code. If there is
-     * nothing to remove, the original block is returned.
-     *
-     * @param sb
-     *            The statement block to remove the try/method-frame parts
-     *            from.
-     * @return The stripped inner statement block or the original argument,
-     *         if the removal was not applicable.
-     */
-    private StatementBlock stripMethodFrame(final StatementBlock sb) {
-        try {
-            if (sb.getBody().get(0) instanceof Try) {
-                Try theTry = (Try) sb.getBody().get(0);
-                if (theTry.getBody().getBody().get(0) instanceof MethodFrame) {
-                    MethodFrame theMethodFrame = (MethodFrame) theTry.getBody()
-                            .getBody().get(0);
-                    return theMethodFrame.getBody();
+                Statement firstStatement = getFirstStatementOfMethodFrameBlock(blockWithoutMethodFrame);
+                if (firstStatement != null) {
+                    if (breakpoints.contains(firstStatement)) {
+                        return firstStatement;
+                    }
                 }
             }
-        }
-        catch (ArrayIndexOutOfBoundsException e) {}
 
-        return sb;
+            return null;
+        }
+
     }
 
 }
