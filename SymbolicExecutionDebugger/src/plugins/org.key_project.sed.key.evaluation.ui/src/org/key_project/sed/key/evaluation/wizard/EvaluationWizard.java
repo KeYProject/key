@@ -367,7 +367,13 @@ public class EvaluationWizard extends Wizard {
     * @param evaluationInput The {@link EvaluationInput} to perform.
     */
    public static void openWizard(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput) {
-      EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput);
-      dialog.open();
+      EvaluationWizardDialog openedDialog = EvaluationWizardDialog.getFirstVisibleWizardDialog(evaluationInput);
+      if (openedDialog != null) {
+         openedDialog.getShell().setFocus();
+      }
+      else {
+         EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput);
+         dialog.open();
+      }
    }
 }

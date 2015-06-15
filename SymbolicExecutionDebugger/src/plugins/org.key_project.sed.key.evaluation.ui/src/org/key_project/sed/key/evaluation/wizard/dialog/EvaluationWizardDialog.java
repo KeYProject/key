@@ -18,6 +18,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Cursor;
@@ -51,6 +53,8 @@ import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.SendFormWizardPage;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 public class EvaluationWizardDialog extends WizardDialog {
@@ -101,6 +105,29 @@ public class EvaluationWizardDialog extends WizardDialog {
    private EvaluationWizardDialog wizardToClose;
    
    private final Rectangle initialBounds;
+   
+   private final ShellListener parentShellListener = new ShellListener() {
+      @Override
+      public void shellIconified(ShellEvent e) {
+      }
+      
+      @Override
+      public void shellDeiconified(ShellEvent e) {
+      }
+      
+      @Override
+      public void shellDeactivated(ShellEvent e) {
+      }
+      
+      @Override
+      public void shellClosed(ShellEvent e) {
+         handleParentShellClosed(e);
+      }
+      
+      @Override
+      public void shellActivated(ShellEvent e) {
+      }
+   };
 
    public EvaluationWizardDialog(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput) {
       this(parentShell, alwaysOnTop, evaluationInput, null);
@@ -117,6 +144,9 @@ public class EvaluationWizardDialog extends WizardDialog {
       }
       else {
          initialBounds = null;
+      }
+      if (originalParentShell != null) {
+         originalParentShell.addShellListener(parentShellListener);
       }
       evaluationInput.getCurrentFormInput().addPropertyChangeListener(AbstractFormInput.PROP_CURRENT_PAGE_INPUT, currentPageListener);
       setHelpAvailable(false);
@@ -435,6 +465,9 @@ public class EvaluationWizardDialog extends WizardDialog {
    }
    
    protected void removeListener() {
+      if (originalParentShell != null && !originalParentShell.isDisposed()) {
+         originalParentShell.removeShellListener(parentShellListener);
+      }
       if (getCurrentPage() instanceof SendFormWizardPage) {
          ((SendFormWizardPage) getCurrentPage()).getPageInput().removePropertyChangeListener(SendFormPageInput.PROP_SENDING_IN_PROGRESS, sendingListener);
       }
@@ -472,6 +505,27 @@ public class EvaluationWizardDialog extends WizardDialog {
          else {
             return false;
          }
+      }
+   }
+   
+   public static EvaluationWizardDialog getFirstVisibleWizardDialog(EvaluationInput evaluationInput) {
+      WeakHashMap<EvaluationWizardDialog, Void> evaluationMap = dialogInstances.get(evaluationInput);
+      if (evaluationMap != null) {
+         return CollectionUtil.search(evaluationMap.keySet(), new IFilter<EvaluationWizardDialog>() {
+            @Override
+            public boolean select(EvaluationWizardDialog element) {
+               return !element.getShell().isDisposed() && element.getShell().isVisible();
+            }
+         });
+      }
+      else {
+         return null;
+      } 
+   }
+
+   protected void handleParentShellClosed(ShellEvent e) {
+      if (!getShell().isDisposed()) {
+         close();
       }
    }
    
