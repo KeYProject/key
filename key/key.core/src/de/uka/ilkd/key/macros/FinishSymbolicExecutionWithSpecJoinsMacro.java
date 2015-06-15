@@ -38,20 +38,15 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.macros.ProofMacro.ProgressBarListener;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
@@ -72,8 +67,6 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
     private HashMap<ProgramElement, BlockContract> joinContracts = new HashMap<ProgramElement, BlockContract>();
     private HashSet<Goal> stoppedGoals = new HashSet<Goal>();
     private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
-
-//    private UserInterfaceControl uic = null;
 
     public FinishSymbolicExecutionWithSpecJoinsMacro() {
     }
@@ -267,11 +260,21 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      */
     private Statement getBreakPoint(Semisequent succedent) {
         for (SequentFormula formula : succedent.asList()) {
-            Statement activeStmt = (Statement) JavaTools
-                    .getActiveStatement(getJavaBlockRecursive(formula
-                            .formula()));
-            if (breakpoints.contains(activeStmt)) {
-                return activeStmt;
+//            Statement activeStmt = (Statement) JavaTools
+//                    .getActiveStatement(getJavaBlockRecursive(formula
+//                            .formula()));//TODO
+            
+            StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) getJavaBlockRecursive(formula.formula()).program());
+            
+            if (blockWithoutMethodFrame.isEmpty()) {
+                continue;
+            }
+            
+            Statement firstStatement = getFirstStatementOfMethodFrameBlock(blockWithoutMethodFrame);
+            if (firstStatement != null) {
+                if (breakpoints.contains(firstStatement)) {
+                    return firstStatement;
+                }
             }
         }
 
@@ -347,53 +350,13 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             if (!hasModality(goal.node())) {
                 return false;
             }
-            
-            Statement breakpoint;
-            if ((breakpoint = getBreakPoint(goal.sequent().succedent())) != null) {
-                final ImmutableList<Goal> subtreeGoals = goal.proof().getSubtreeGoals(commonParents.get(breakpoint));
-                boolean allStopped = true;
-                for (Goal subGoal : subtreeGoals) {
-                    if (!subGoal.equals(goal)) {
-                        allStopped = allStopped && stoppedGoals.contains(subGoal);
-                    }
-                }
-                
-                if (allStopped) {
-                    // Not it's time for a join
-                    final JoinRule joinRule = JoinRule.INSTANCE;
-
-                    final Node joinNode = goal.node();
-                    final PosInOccurrence joinPio = getPioForBreakpoint(breakpoint, goal.sequent());
-                    final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
-                            .createApp(joinPio, goal.proof().getServices());
-
-                    {
-                        joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(goal, joinPio));
-                        joinApp.setConcreteRule(joinContracts.get(breakpoint).getJoinProcedure());
-                        joinApp.setJoinNode(joinNode);
-                    }
-                    
-                    for (Goal subgoal : subtreeGoals) {
-                        stoppedGoals.remove(subgoal);
-                    }
-                    breakpoints.remove(breakpoint);
-                    commonParents.remove(breakpoint);
-                    
-//                    goal.apply(joinApp);
-                    joinInformation = new Pair<Goal, JoinRuleBuiltInRuleApp>(goal, joinApp);
-                    enforceJoin = true;
-                } else {
-                    stoppedGoals.add(goal);
-                }
-                
-                return false;
-            }
 
             if (pio != null) {
                 JavaBlock theJavaBlock = getJavaBlockRecursive(pio.subTerm());
-                SourceElement activeStmt = JavaTools
-                        .getActiveStatement(theJavaBlock);
-
+//                SourceElement activeStmt = JavaTools
+//                        .getActiveStatement(theJavaBlock);
+                Statement activeStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) theJavaBlock.program());
+                
                 if (!(theJavaBlock.program() instanceof StatementBlock)
                         || (alreadySeen.contains(theJavaBlock) && !breakpoints
                                 .contains(activeStmt))) {
@@ -404,28 +367,68 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 }
                 else if (!theJavaBlock.equals(JavaBlock.EMPTY_JAVABLOCK)) {
                     alreadySeen.add(theJavaBlock);
-                }
 
-                // Find break points
-                breakpoints.addAll(findJoinPoints((StatementBlock) theJavaBlock
-                        .program(), goal));
+                    // Find break points
+                    breakpoints.addAll(findJoinPoints((StatementBlock) theJavaBlock
+                            .program(), goal));
+                    
+                    Statement breakpoint;
+                    if ((breakpoint = getBreakPoint(goal.sequent().succedent())) != null) {
+                        final ImmutableList<Goal> subtreeGoals = goal.proof().getSubtreeGoals(commonParents.get(breakpoint));
+                        boolean allStopped = true;
+                        for (Goal subGoal : subtreeGoals) {
+                            if (!subGoal.equals(goal)) {
+                                allStopped = allStopped && stoppedGoals.contains(subGoal);
+                            }
+                        }
+                        
+                        if (allStopped) {
+                            // Not it's time for a join
+                            final JoinRule joinRule = JoinRule.INSTANCE;
 
-                if (app.rule().name().toString()
-                        .equals("One Step Simplification")) {
+                            final Node joinNode = goal.node();
+                            final PosInOccurrence joinPio = getPioForBreakpoint(breakpoint, goal.sequent());
+                            final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) joinRule
+                                    .createApp(joinPio, goal.proof().getServices());
 
-                    // We allow One Step Simplification, otherwise we sometimes
-                    // would
-                    // have to do a simplification ourselves before joining
-                    // nodes.
-                    return true;
+                            {
+                                joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(goal, joinPio));
+                                joinApp.setConcreteRule(joinContracts.get(breakpoint).getJoinProcedure());
+                                joinApp.setJoinNode(joinNode);
+                            }
+                            
+                            for (Goal subgoal : subtreeGoals) {
+                                stoppedGoals.remove(subgoal);
+                            }
+                            breakpoints.remove(breakpoint);
+                            commonParents.remove(breakpoint);
+                            
+                            joinInformation = new Pair<Goal, JoinRuleBuiltInRuleApp>(goal, joinApp);
+                            enforceJoin = true;
+                        } else {
+                            stoppedGoals.add(goal);
+                        }
+                        
+                        return false;
+                    }
 
-                }
-                else if (breakpoints.contains((ProgramElement) activeStmt)) {
-                    // TODO: This check could be superfluous, since we already
-                    // check whether there is a break point at the beginning
-                    // of this method.
-                    return false;
+                    if (app.rule().name().toString()
+                            .equals("One Step Simplification")) {
 
+                        // We allow One Step Simplification, otherwise we sometimes
+                        // would
+                        // have to do a simplification ourselves before joining
+                        // nodes.
+                        return true;
+
+                    }
+                    else if (breakpoints.contains((ProgramElement) activeStmt)) {
+                        // TODO: This check could be superfluous, since we already
+                        // check whether there is a break point at the beginning
+                        // of this method.
+                        return false;
+
+                    }
                 }
             }
 
@@ -443,43 +446,17 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             Semisequent succedent = sequent.succedent();
             
             for (SequentFormula formula : succedent) {
-                Statement activeStmt = (Statement) JavaTools
-                        .getActiveStatement(getJavaBlockRecursive(formula
-                                .formula()));
+//                Statement activeStmt = (Statement) JavaTools
+//                        .getActiveStatement(getJavaBlockRecursive(formula
+//                                .formula()));
+                Statement firstStmt = getFirstStatementOfMethodFrameBlock((StatementBlock) getJavaBlockRecursive(formula.formula()).program());
                 
-                if (activeStmt.equals(breakpoint)) {
+                if (firstStmt != null && firstStmt.equals(breakpoint)) {
                     return new PosInOccurrence(formula, PosInTerm.getTopLevel(), false);
                 }
             }
             
             return null;
-        }
-
-        /**
-         * Removes the <code>try { method-frame { ... }}</code> parts from the
-         * given statement block, i.e. returns the inner code. If there is
-         * nothing to remove, the original block is returned.
-         *
-         * @param sb
-         *            The statement block to remove the try/method-frame parts
-         *            from.
-         * @return The stripped inner statement block or the original argument,
-         *         if the removal was not applicable.
-         */
-        private StatementBlock stripMethodFrame(final StatementBlock sb) {
-            try {
-                if (sb.getBody().get(0) instanceof Try) {
-                    Try theTry = (Try) sb.getBody().get(0);
-                    if (theTry.getBody().getBody().get(0) instanceof MethodFrame) {
-                        MethodFrame theMethodFrame = (MethodFrame) theTry.getBody()
-                                .getBody().get(0);
-                        return theMethodFrame.getBody();
-                    }
-                }
-            }
-            catch (ArrayIndexOutOfBoundsException e) {}
-
-            return sb;
         }
 
         /**
@@ -499,22 +476,16 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             if (toSearch.isEmpty()) {
                 return result;
             }
-
-            StatementBlock blockWithoutMethodFrame = stripMethodFrame(toSearch);
             
-            if (blockWithoutMethodFrame.isEmpty()) {
-                return result;
-            }
-            
-            Statement firstElem = blockWithoutMethodFrame.getBody().get(0);
+            final Statement firstElem = getFirstStatementOfMethodFrameBlock(toSearch);
             ImmutableSet<BlockContract> contracts;
             if (firstElem instanceof StatementBlock
                     && !(contracts = services.getSpecificationRepository()
                             .getBlockContracts((StatementBlock) firstElem))
                             .isEmpty()
                     && contracts.iterator().next().hasJoinProcedure()) {
-                if (blockWithoutMethodFrame.getBody().size() > 1) {
-                    Statement breakpoint = blockWithoutMethodFrame.getBody().get(1);
+                final Statement breakpoint = getSecondStatementOfMethodFrameBlock(toSearch);
+                if (breakpoint != null) {
                     breakpoints.add(breakpoint);
                     commonParents.put(breakpoint, goal.node());
                     joinContracts.put(breakpoint, contracts.iterator().next());
@@ -530,6 +501,43 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
     }
+    
+    /**
+     * TODO: Document.
+     *
+     * @param stmt
+     * @return
+     */
+    private Statement getFirstStatementOfMethodFrameBlock(StatementBlock block) {
+        return getNthStatementOfMethodFrameBlock(block, 0);
+    }
+    
+    /**
+     * TODO: Document.
+     *
+     * @param stmt
+     * @return
+     */
+    private Statement getSecondStatementOfMethodFrameBlock(StatementBlock block) {
+        return getNthStatementOfMethodFrameBlock(block, 1);
+    }
+    
+    /**
+     * TODO: Document.
+     *
+     * @param block
+     * @param n
+     * @return
+     */
+    private Statement getNthStatementOfMethodFrameBlock(StatementBlock block, int n) {
+        StatementBlock blockWithoutMethodFrame = stripMethodFrame(block);
+        
+        if (blockWithoutMethodFrame.getBody().size() < n+1) {
+            return null;
+        }
+        
+        return blockWithoutMethodFrame.getBody().get(n);
+    }
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.macros.ProofMacro#canApplyTo(de.uka.ilkd.key.proof.Proof, org.key_project.util.collection.ImmutableList, de.uka.ilkd.key.logic.PosInOccurrence)
@@ -538,6 +546,35 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
             PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
+    }
+    
+
+
+    /**
+     * Removes the <code>try { method-frame { ... }}</code> parts from the
+     * given statement block, i.e. returns the inner code. If there is
+     * nothing to remove, the original block is returned.
+     *
+     * @param sb
+     *            The statement block to remove the try/method-frame parts
+     *            from.
+     * @return The stripped inner statement block or the original argument,
+     *         if the removal was not applicable.
+     */
+    private StatementBlock stripMethodFrame(final StatementBlock sb) {
+        try {
+            if (sb.getBody().get(0) instanceof Try) {
+                Try theTry = (Try) sb.getBody().get(0);
+                if (theTry.getBody().getBody().get(0) instanceof MethodFrame) {
+                    MethodFrame theMethodFrame = (MethodFrame) theTry.getBody()
+                            .getBody().get(0);
+                    return theMethodFrame.getBody();
+                }
+            }
+        }
+        catch (ArrayIndexOutOfBoundsException e) {}
+
+        return sb;
     }
 
 }
