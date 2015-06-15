@@ -288,9 +288,9 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      * @return The first element within the Java block inside the method frame
      *         of the given block, or null if no such element exists.
      */
-    private Statement getFirstStatementOfMethodFrameBlock(StatementBlock block) {
-        return getNthStatementOfMethodFrameBlock(block, 0);
-    }
+//    private Statement getFirstStatementOfMethodFrameBlock(StatementBlock block) {
+//        return getNthStatementOfMethodFrameBlock(block, 0);
+//    }
 
     /**
      * @param block
@@ -609,6 +609,10 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 }
                 
                 breakpoint = getSecondStatementOfMethodFrameBlock((StatementBlock) stmt);
+                if (breakpoint instanceof StatementBlock) {
+                    breakpoint = (Statement) JavaTools.getActiveStatement(JavaBlock.createJavaBlock(((StatementBlock) breakpoint)));
+                }
+                
                 stmt = (Statement) stmt.getFirstElementIncludingBlocks();
             }
             
