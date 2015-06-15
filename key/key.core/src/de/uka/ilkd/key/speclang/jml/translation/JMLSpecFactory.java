@@ -530,14 +530,22 @@ public class JMLSpecFactory {
         }
     }
     
-    private JoinProcedure translateJoinProcedure(ImmutableList<PositionedString> originalClauses) {
+    private JoinProcedure translateJoinProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
         if (originalClauses == null || originalClauses.size() == 0) {
             return null;
         }
         
         // Extract the name of the join procedure: Remove beginning "join_proc " and trailing ";".
         String joinProcName = originalClauses.head().text.substring(10, originalClauses.head().text.length() - 1);
-        return JoinProcedure.getProcedureByName(joinProcName);
+        JoinProcedure chosenProc = JoinProcedure.getProcedureByName(joinProcName);
+        
+        if (chosenProc == null) {
+            throw new SLTranslationException("Unknown join procedure: \"" + joinProcName + "\"",
+                    originalClauses.head().fileName,
+                    originalClauses.head().pos);
+        }
+        
+        return chosenProc;
     }
         
     /**
