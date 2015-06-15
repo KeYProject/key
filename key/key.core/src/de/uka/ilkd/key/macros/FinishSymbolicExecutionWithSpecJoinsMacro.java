@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -440,11 +442,14 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                         }
 
                         if (allStopped) {
-                            // We stopped all Goals potentially participating in the join;
-                            // now we collect the information about the join. After a successful
-                            // join app initialization, we do not allow any other rule applications
+                            // We stopped all Goals potentially participating in
+                            // the join;
+                            // now we collect the information about the join.
+                            // After a successful
+                            // join app initialization, we do not allow any
+                            // other rule applications
                             // (realized by setting enforceJoin to true).
-                            
+
                             final JoinRule joinRule = JoinRule.INSTANCE;
 
                             final Node joinNode = goal.node();
@@ -455,9 +460,21 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                                             .getServices());
 
                             {
-                                joinApp.setJoinPartners(JoinRule
+                                // Consider only the partners below the common
+                                // parent node. Otherwise, we obtain
+                                // behavior that may be hard to understand.
+                                ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = ImmutableSLList
+                                        .nil();
+                                for (Pair<Goal, PosInOccurrence> potentialPartner : JoinRule
                                         .findPotentialJoinPartners(goal,
-                                                joinPio));
+                                                joinPio)) {
+                                    if (subtreeGoals
+                                            .contains(potentialPartner.first)) {
+                                        joinPartners = joinPartners.prepend(potentialPartner);
+                                    }
+                                }
+
+                                joinApp.setJoinPartners(joinPartners);
                                 joinApp.setConcreteRule(joinContracts.get(
                                         breakpoint).getJoinProcedure());
                                 joinApp.setJoinNode(joinNode);
@@ -560,22 +577,43 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 return result;
             }
 
-            final Statement firstElem = getFirstStatementOfMethodFrameBlock(toSearch);
-            ImmutableSet<BlockContract> contracts;
-            if (firstElem instanceof StatementBlock
-                    && !(contracts = services.getSpecificationRepository()
-                            .getBlockContracts((StatementBlock) firstElem))
-                            .isEmpty()
-                    && contracts.iterator().next().hasJoinProcedure()) {
-                final Statement breakpoint = getSecondStatementOfMethodFrameBlock(toSearch);
+            final Pair<BlockContract, Statement> contractAndBreakpoint = getBlockContractFor(stripMethodFrame(toSearch), services);
+            if (contractAndBreakpoint != null) {
+                final Statement breakpoint = contractAndBreakpoint.second;
                 if (breakpoint != null) {
                     breakpoints.add(breakpoint);
                     commonParents.put(breakpoint, goal.node());
-                    joinContracts.put(breakpoint, contracts.iterator().next());
+                    joinContracts.put(breakpoint, contractAndBreakpoint.first);
                 }
             }
 
             return result;
+        }
+        
+        /**
+         * TODO: Document.
+         *
+         * @param stmt
+         * @param services
+         * @return
+         */
+        private Pair<BlockContract, Statement> getBlockContractFor(Statement stmt, Services services) {
+            Statement breakpoint = null;
+            
+            while (stmt instanceof StatementBlock && !((StatementBlock) stmt).isEmpty()) {
+                ImmutableSet<BlockContract> contracts;
+                if (!(contracts = services.getSpecificationRepository()
+                            .getBlockContracts((StatementBlock) stmt))
+                            .isEmpty()) {
+                    return contracts.iterator().next().hasJoinProcedure() ?
+                            new Pair<BlockContract, Statement>(contracts.iterator().next(), breakpoint) : null;
+                }
+                
+                breakpoint = getSecondStatementOfMethodFrameBlock((StatementBlock) stmt);
+                stmt = (Statement) stmt.getFirstElementIncludingBlocks();
+            }
+            
+            return null;
         }
 
         /**
