@@ -285,18 +285,6 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      * @param block
      *            The statement block which is assumed to wrap another block by
      *            a method frame.
-     * @return The first element within the Java block inside the method frame
-     *         of the given block, or null if no such element exists.
-     */
-    // private Statement getFirstStatementOfMethodFrameBlock(StatementBlock
-    // block) {
-    // return getNthStatementOfMethodFrameBlock(block, 0);
-    // }
-
-    /**
-     * @param block
-     *            The statement block which is assumed to wrap another block by
-     *            a method frame.
      * @return The second element within the Java block inside the method frame
      *         of the given block, or null if no such element exists.
      */
