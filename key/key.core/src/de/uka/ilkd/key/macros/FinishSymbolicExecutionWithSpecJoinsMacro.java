@@ -602,11 +602,19 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         /**
-         * TODO: Document.
+         * Obtains the pair of block contract containing a join specification
+         * and the corresponding breakpoint, if any, for the given statement. If
+         * there is no such contract, null is returned.
          *
          * @param stmt
+         *            Statement to find a contract and breakpoint for. This
+         *            should be the whole "program counter", i.e. the next
+         *            statement that will be the breakpoint should also be
+         *            included.
          * @param services
-         * @return
+         *            The services object.
+         * @return If any, a join block contract and corresponding break point
+         *         for the given statement; null otherwise.
          */
         private Pair<BlockContract, Statement> getBlockContractFor(
                 Statement stmt, Services services) {
