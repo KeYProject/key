@@ -501,13 +501,6 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                         return true;
 
                     }
-                    else if (breakpoints.contains((ProgramElement) activeStmt)) {
-                        // TODO: This check could be superfluous, since we
-                        // already check whether there is a break point at
-                        // the beginning of this method.
-                        return false;
-
-                    }
                 }
             }
 
