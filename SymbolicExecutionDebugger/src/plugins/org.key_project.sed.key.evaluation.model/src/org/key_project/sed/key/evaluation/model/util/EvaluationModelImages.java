@@ -56,6 +56,16 @@ public final class EvaluationModelImages {
     public static final String KEY_THANKS = "org.key_project.sed.key.evaluation.model.keyThanks";
     
     /**
+     * The key for the browser image.
+     */
+    public static final String BROWSER = "org.key_project.sed.key.evaluation.model.browser";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String EVALUATION = "org.key_project.sed.key.evaluation.model.evaluation";
+    
+    /**
      * Forbid instances.
      */
     private EvaluationModelImages() {
@@ -126,6 +136,12 @@ public final class EvaluationModelImages {
         }
         else if (KEY_THANKS.equals(key)) {
            path = "data/understandingProofAttempts/icons/Thanks.png";
+        }
+        else if (BROWSER.equals(key)) {
+           path = "data/browser/icons/internal_browser.gif";
+        }
+        else if (EVALUATION.equals(key)) {
+           path = "data/understandingProofAttempts/icons/evaluation.png";
         }
         // Load image if possible
         if (path != null) {

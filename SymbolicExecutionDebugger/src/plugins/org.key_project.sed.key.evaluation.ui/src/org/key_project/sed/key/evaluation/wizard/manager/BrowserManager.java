@@ -33,8 +33,10 @@ public class BrowserManager extends AbstractQuestionInputManager {
       browser.setLayoutData(new GridData(GridData.FILL_BOTH));
       browser.setMenu(new MenuManager().createContextMenu(browser)); // Disable context menu
       try {
-         URL fileUrl = FileLocator.toFileURL(url); 
-         browser.setUrl(fileUrl.toString());
+         if (url != null) {
+            URL fileUrl = FileLocator.toFileURL(url); 
+            browser.setUrl(fileUrl.toString());
+         }
       }
       catch (IOException e) {
          browser.setText(e.getMessage());

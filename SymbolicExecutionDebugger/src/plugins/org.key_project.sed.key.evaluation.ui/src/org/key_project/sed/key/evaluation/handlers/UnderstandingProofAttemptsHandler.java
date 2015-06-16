@@ -61,6 +61,7 @@ public class UnderstandingProofAttemptsHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 	   EvaluationWizard.openWizard(HandlerUtil.getActiveShell(event), true, INPUT_INSTANCE);
+//	   new EvaluationWizardDialog(HandlerUtil.getActiveShell(event), true, BrowserExampleEvaluation.INSTANCE_INPUT).open();
 		return null;
 	}
 

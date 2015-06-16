@@ -64,6 +64,11 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     */
    public static final String FEEDBACK_PAGE = "summary";
 
+   /**
+    * Page name of the evaluation instruction page.
+    */
+   public static final String EVALUATION_PAGE_NAME = "evaluationInstructions";
+
 
    /**
     * Forbid additional instances.
@@ -148,7 +153,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                  backgroundPage,
                                                  sendConditionsPage);
       // Create evaluation form
+      URL evaluationURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/EvaluationIntroduction.html");
       URL jmlURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/JML.html");
+      InstructionPage evaluationPage = new InstructionPage(EVALUATION_PAGE_NAME, "Evaluation Instructions", "Read the evaluation instructions carefully before continuing.", evaluationURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.EVALUATION) : null);
       InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO) : null);
       ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
       ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME));
@@ -161,7 +168,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Confirm Sending Evaluation Answers", 
                                                          "Optionally, inspect the answers to be send.", 
                                                          "Current date and time (nothing else!)");
-      RandomForm evaluationForm = new RandomForm("evaluationForm", true, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
+      RandomForm evaluationForm = new RandomForm("evaluationForm", true, evaluationPage, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
       // Create thanks form
       QuestionPage thanksPage = new QuestionPage("thanksPage", 
                                                  "Evaluation sucessfully completed", 
@@ -222,7 +229,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                        new Choice("No", "No"));
       return new QuestionPage(pageName, 
                               title, 
-                              "Please answer the question to the best of your knowledge.", 
+                              createQuestionPageMessage(), 
                               true,
                               new ProofAttemptJavaProjectModifier("MyInteger",
                                                                   "add",
@@ -289,7 +296,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 39: return -1", "Line 39", true));
       return new QuestionPage(pageName, 
                               title, 
-                              "Please answer the question to the best of your knowledge.", 
+                              createQuestionPageMessage(), 
                               true,
                               new ProofAttemptJavaProjectModifier("ArrayUtil",
                                                                   "minIndex",
@@ -404,7 +411,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 33: entrySize++", "Line 33", true));
       return new QuestionPage(pageName, 
                               title, 
-                              "Please answer the question to the best of your knowledge.", 
+                              createQuestionPageMessage(), 
                               true,
                               new ProofAttemptJavaProjectModifier("Calendar",
                                                                   "addEntry",
@@ -416,7 +423,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               openQuestion,
                               executedQuestion);
    }
-
+   
    private CheckboxQuestion createCalendarLocationQuestion(String name) {
       String title = "Which not specified location(s) have changed?";
       return new CheckboxQuestion(name, 
@@ -505,7 +512,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                 new Choice("Contract of method getBalance()", "getBalance"));
       return new QuestionPage(pageName, 
                               title, 
-                              "Please answer the question to the best of your knowledge.", 
+                              createQuestionPageMessage(), 
                               true,
                               new ProofAttemptJavaProjectModifier("Account",
                                                                   "checkAndWithdraw",
@@ -781,4 +788,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    protected String createClassInvariantInitiallyValue() {
       return "Class Invariant does not hold";
    }
+
+   protected String createQuestionPageMessage() {
+      return "Please answer the questions to the best of your knowledge.";
+   }
+
 }
