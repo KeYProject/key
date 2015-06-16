@@ -135,6 +135,7 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
          for (ILaunch launch : launchManager.getLaunches()) {
             if (launchConfiguration.equals(launch.getLaunchConfiguration())) {
                launch.terminate();
+               DebugPlugin.getDefault().getLaunchManager().removeLaunch(launch);
             }
          }
          launchConfiguration.delete();

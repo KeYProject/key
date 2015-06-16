@@ -91,8 +91,15 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
          if (!pageInput.getPage().isReadonly() && pageInput.getFormInput().getForm().isCollectTimes()) {
             pageInput.addShownTime(System.currentTimeMillis() - shownAt);
          }
-         perfomRunnables(computeRunnable(visible), getWizard().getCurrentPageRunnable());
+         final IRunnableWithProgressAndResult<String> hiddenRunnable = computeRunnable(visible);
+         final IRunnableWithProgressAndResult<String> visibleRunnable = getWizard().getCurrentPageRunnable();
          getWizard().setCurrentPageRunnable(null);
+         getShell().getDisplay().asyncExec(new Runnable() { // Execute runnables asynchronously to ensure that title and toolbar is already updated.
+            @Override
+            public void run() {
+               perfomRunnables(hiddenRunnable, visibleRunnable);
+            }
+         });
       }
    }
    
