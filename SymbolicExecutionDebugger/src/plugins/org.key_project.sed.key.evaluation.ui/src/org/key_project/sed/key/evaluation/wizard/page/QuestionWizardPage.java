@@ -242,7 +242,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    }
 
    @Override
-   protected IRunnableWithProgressAndResult<String> computeRunnable(final boolean visible) {
+   public IRunnableWithProgressAndResult<String> computeRunnable(final boolean visible) {
       final IWorkbenchModifier modifier = getPageInput().getPage().getWorkbenchModifier();
       if (modifier != null) {
          final Tool tool = getPageInput().getFormInput() instanceof RandomFormInput ?

@@ -71,6 +71,11 @@ public final class SEDEvaluationImages {
      * The key for the pin shell image.
      */
     public static final String PIN_SHELL = "org.key_project.sed.key.evaluation.ui.pinShell";
+
+    /**
+     * The key for the reset workbench image.
+     */
+    public static final String RESET_WORKBENCH = "org.key_project.sed.key.evaluation.ui.resetWorkbench";
     
     /**
      * Forbid instances.
@@ -152,6 +157,9 @@ public final class SEDEvaluationImages {
         }
         else if (PIN_SHELL.equals(key)) {
            path = "icons/pin_view.gif";
+        }
+        else if (RESET_WORKBENCH.equals(key)) {
+           path = "icons/resetWorkbench.gif";
         }
         // Load image if possible
         if (path != null) {

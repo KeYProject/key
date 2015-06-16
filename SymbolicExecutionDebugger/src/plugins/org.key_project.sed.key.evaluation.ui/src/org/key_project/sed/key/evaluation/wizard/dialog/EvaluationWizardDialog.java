@@ -56,6 +56,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 public class EvaluationWizardDialog extends WizardDialog {
    private static final Map<EvaluationInput, WeakHashMap<EvaluationWizardDialog, Void>> dialogInstances = new HashMap<EvaluationInput, WeakHashMap<EvaluationWizardDialog, Void>>();
@@ -208,6 +209,24 @@ public class EvaluationWizardDialog extends WizardDialog {
          createToolBarItem(tool.getImage(), tool.getName(), tool.getDescriptionURL());
          separatorNeeded = true;
       }
+      // Create reset workbench item
+      if (pageInput.getPage() instanceof QuestionPage &&
+          ((QuestionPage) pageInput.getPage()).getWorkbenchModifier() != null) {
+         // Create pin item
+         if (separatorNeeded) {
+            new ToolItem(toolBar, SWT.SEPARATOR);
+         }
+         ToolItem resetItem = new ToolItem(toolBar, SWT.PUSH);
+         resetItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.RESET_WORKBENCH));
+         resetItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               resetWorkbench();
+            }
+         });
+         resetItem.setToolTipText("Reset workbench to the state when the current wizard page was shown?");
+         separatorNeeded = true;
+      }
       // Create pin item
       if (separatorNeeded) {
          new ToolItem(toolBar, SWT.SEPARATOR);
@@ -227,6 +246,12 @@ public class EvaluationWizardDialog extends WizardDialog {
       toolBar.getParent().layout();
    }
    
+   protected void resetWorkbench() {
+      IRunnableWithProgressAndResult<String> hiddenRunnable = getCurrentPage().computeRunnable(false);
+      IRunnableWithProgressAndResult<String> visibleRunnable = getCurrentPage().computeRunnable(true);
+      getCurrentPage().perfomRunnables(hiddenRunnable, visibleRunnable);
+   }
+
    protected void togglePinnedState() {
       EvaluationWizardDialog dialog = new EvaluationWizardDialog(originalParentShell, !alwaysOnTop, evaluationInput, this);
       dialog.open();

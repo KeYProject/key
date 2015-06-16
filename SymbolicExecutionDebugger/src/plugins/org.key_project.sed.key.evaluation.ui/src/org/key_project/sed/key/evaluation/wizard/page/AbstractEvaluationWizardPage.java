@@ -96,7 +96,7 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
       }
    }
    
-   protected IRunnableWithProgressAndResult<String> computeRunnable(boolean visible) {
+   public IRunnableWithProgressAndResult<String> computeRunnable(boolean visible) {
       return null;
    }
 
