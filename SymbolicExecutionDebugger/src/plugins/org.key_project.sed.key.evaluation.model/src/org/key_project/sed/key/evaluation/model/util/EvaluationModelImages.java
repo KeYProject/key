@@ -19,6 +19,7 @@ import java.io.InputStream;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.util.eclipse.BundleUtil;
@@ -48,6 +49,11 @@ public final class EvaluationModelImages {
      * The key for the KeY logo.
      */
     public static final String KEY_LOGO = "org.key_project.sed.key.evaluation.model.keyLogo";
+    
+    /**
+     * The key for the thanks image.
+     */
+    public static final String KEY_THANKS = "org.key_project.sed.key.evaluation.model.keyThanks";
     
     /**
      * Forbid instances.
@@ -118,6 +124,9 @@ public final class EvaluationModelImages {
         else if (KEY_LOGO.equals(key)) {
            path = "data/understandingProofAttempts/icons/logo16.gif";
         }
+        else if (KEY_THANKS.equals(key)) {
+           path = "data/understandingProofAttempts/icons/Thanks.png";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -144,4 +153,26 @@ public final class EvaluationModelImages {
            return null;
         }
     }
+
+   /**
+    * Returns a scaled version of the {@link Image} registered under the given key.
+    * @param key The key.
+    * @param scaleFactor The scale factor.
+    * @return The new image.
+    */
+   public static ImageData getImage(String key, int scaleFactor) {
+      Image image = getImage(key);
+      if (image != null) {
+         if (scaleFactor < 0) {
+            scaleFactor = scaleFactor * -1;
+         }
+         ImageData data = image.getImageData();
+         int newWidth = data.width / 100 * scaleFactor;
+         int newHeight = data.height / 100 * scaleFactor;
+         return data.scaledTo(newWidth, newHeight);
+      }
+      else {
+         return null;
+      }
+   }
 }

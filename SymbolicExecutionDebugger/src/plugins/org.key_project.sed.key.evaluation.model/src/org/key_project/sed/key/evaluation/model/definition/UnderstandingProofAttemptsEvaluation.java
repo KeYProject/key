@@ -163,7 +163,12 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Current date and time (nothing else!)");
       RandomForm evaluationForm = new RandomForm("evaluationForm", true, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
       // Create thanks form
-      QuestionPage thanksPage = new QuestionPage("thanksPage", "Evaluation sucessfully completed", "Thank you for participating in the evaluation.", true, null);
+      QuestionPage thanksPage = new QuestionPage("thanksPage", 
+                                                 "Evaluation sucessfully completed", 
+                                                 "Thank you for participating in the evaluation.", 
+                                                 false, 
+                                                 null,
+                                                 new ImageQuestion("thanksImage", isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_THANKS, 25) : null));
       FixedForm thanksForm = new FixedForm("thanksForm", false, thanksPage);
       // Create forms
       return CollectionUtil.toList(introductionForm, evaluationForm, thanksForm);

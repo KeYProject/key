@@ -19,6 +19,7 @@ import org.eclipse.ui.services.IDisposable;
 import org.key_project.sed.key.evaluation.model.definition.BrowserQuestion;
 import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
+import org.key_project.sed.key.evaluation.model.definition.ImageQuestion;
 import org.key_project.sed.key.evaluation.model.definition.LabelQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
@@ -31,6 +32,7 @@ import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 import org.key_project.sed.key.evaluation.wizard.manager.CheckboxManager;
 import org.key_project.sed.key.evaluation.wizard.manager.IQuestionInputManager;
+import org.key_project.sed.key.evaluation.wizard.manager.ImageManager;
 import org.key_project.sed.key.evaluation.wizard.manager.LabelManager;
 import org.key_project.sed.key.evaluation.wizard.manager.RadioButtonsManager;
 import org.key_project.sed.key.evaluation.wizard.manager.SectionManager;
@@ -113,6 +115,9 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
          else if (questionInput.getQuestion() instanceof LabelQuestion) {
             manager = createLabel(toolkit, parent, (LabelQuestion) questionInput.getQuestion());
          }
+         else if (questionInput.getQuestion() instanceof ImageQuestion) {
+            manager = createImage(toolkit, parent, (ImageQuestion) questionInput.getQuestion());
+         }
          else if (questionInput.getQuestion() instanceof SectionQuestion) {
             manager = createSection(wizardPage, toolkit, parent, questionInput, (SectionQuestion) questionInput.getQuestion(), callback);
          }
@@ -142,6 +147,10 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
 
    public static LabelManager createLabel(FormToolkit toolkit, Composite parent, LabelQuestion question) {
       return new LabelManager(toolkit, parent, question);
+   }
+
+   public static ImageManager createImage(FormToolkit toolkit, Composite parent, ImageQuestion question) {
+      return new ImageManager(toolkit, parent, question);
    }
 
    public static SectionManager createSection(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, SectionQuestion question, ICreateControlCallback callback) {
