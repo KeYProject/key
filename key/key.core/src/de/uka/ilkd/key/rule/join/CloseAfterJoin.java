@@ -72,6 +72,8 @@ public class CloseAfterJoin implements BuiltInRule {
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
     public static final CloseAfterJoin INSTANCE = new CloseAfterJoin();
+    
+    private static final ForkJoinPool FORK_JOIN_POOL = new ForkJoinPool(2);
 
     private CloseAfterJoin() {
         /* Singleton class */
@@ -153,8 +155,7 @@ public class CloseAfterJoin implements BuiltInRule {
                     linkedGoal.setLinkedGoal(null);
                     
                     final ProofTreeAdapter thisCaptured = this;
-                    ForkJoinPool pool = new ForkJoinPool();
-                    pool.submit(new Runnable() {
+                    FORK_JOIN_POOL.submit(new Runnable() {
                         public void run() {
                             e.getSource().removeProofTreeListener(thisCaptured);
                         }
