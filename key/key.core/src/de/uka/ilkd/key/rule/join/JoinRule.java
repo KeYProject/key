@@ -125,20 +125,20 @@ public class JoinRule implements BuiltInRule {
    public final ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
       
+      final JoinRuleBuiltInRuleApp joinRuleApp = (JoinRuleBuiltInRuleApp) ruleApp;
       final TermBuilder tb = services.getTermBuilder();
       final PosInOccurrence pio = ruleApp.posInOccurrence();
-      final JoinProcedure joinRule = ((JoinRuleBuiltInRuleApp) ruleApp).getConcreteRule();
+      final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
+      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = joinRuleApp.getJoinPartners();
       final Node currentNode = goal.node();
       
-      if (findPotentialJoinPartners(goal, pio) == null) {
+      if (joinPartners == null) {
          return null;
       }
       
       ImmutableList<Goal> newGoals = goal.split(1);
       
       final Goal newGoal = newGoals.head();
-      
-      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = ((JoinRuleBuiltInRuleApp) ruleApp).getJoinPartners();
       
       // Convert sequents to SE states
       ImmutableList<SymbolicExecutionState> joinPartnerStates = ImmutableSLList.nil();      
@@ -503,7 +503,7 @@ public class JoinRule implements BuiltInRule {
 	   //       formula of suitable form, but then with empty
 	   //       list of candidates.
 	   
-      return isOfAdmissibleForm(goal, pio, false); // Do the check for partner existence
+      return isOfAdmissibleForm(goal, pio, false); // Don't do the check for partner existence
    }
    
    /**
@@ -586,11 +586,25 @@ public class JoinRule implements BuiltInRule {
     */
    public static ImmutableList<Pair<Goal,PosInOccurrence>> findPotentialJoinPartners(
          Goal goal, PosInOccurrence pio) {
+       return findPotentialJoinPartners(goal, pio, goal.proof().root());
+   }
+   
+   /**
+    * Finds all suitable join partners below the start node.
+    * 
+    * @param goal Current goal to join.
+    * @param pio Position of update-program counter formula in goal.
+    * @param start Node to start the search with.
+    * @param services The services object.
+    * @return A list of suitable join partners. May be empty if none exist.
+    */
+   public static ImmutableList<Pair<Goal,PosInOccurrence>> findPotentialJoinPartners(
+         Goal goal, PosInOccurrence pio, Node start) {
       
       Services services = goal.proof().getServices();
       
       ImmutableList<Goal> allGoals =
-            services.getProof().getSubtreeGoals(services.getProof().root());
+            services.getProof().getSubtreeGoals(start);
       
       // Find potential partners -- for which isApplicable is true and
       // they have the same program counter (and post condition).

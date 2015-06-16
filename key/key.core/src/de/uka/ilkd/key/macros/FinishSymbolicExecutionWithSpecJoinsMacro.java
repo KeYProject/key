@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -457,17 +456,10 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                                 // Consider only the partners below the common
                                 // parent node. Otherwise, we obtain
                                 // behavior that may be hard to understand.
-                                ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = ImmutableSLList
-                                        .nil();
-                                for (Pair<Goal, PosInOccurrence> potentialPartner : JoinRule
+                                ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = JoinRule
                                         .findPotentialJoinPartners(goal,
-                                                joinPio)) {
-                                    if (subtreeGoals
-                                            .contains(potentialPartner.first)) {
-                                        joinPartners = joinPartners
-                                                .prepend(potentialPartner);
-                                    }
-                                }
+                                                joinPio,
+                                                commonParents.get(breakpoint));
 
                                 joinApp.setJoinPartners(joinPartners);
                                 joinApp.setConcreteRule(joinContracts.get(
