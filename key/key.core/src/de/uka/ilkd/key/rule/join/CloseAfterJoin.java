@@ -18,6 +18,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.concurrent.ForkJoinPool;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -66,6 +67,8 @@ public class CloseAfterJoin implements BuiltInRule {
     private static final String JOINED_NODE_IS_WEAKENING_TITLE = "Joined node is weakening";
     private static final String DISPLAY_NAME = "CloseAfterJoin";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
+    
+    private static final ForkJoinPool FORK_JOIN_POOL = new ForkJoinPool(2);
 
     public static final CloseAfterJoin INSTANCE = new CloseAfterJoin();
 
@@ -135,7 +138,7 @@ public class CloseAfterJoin implements BuiltInRule {
             }
 
             @Override
-            public void proofPruned(ProofTreeEvent e) {
+            public void proofPruned(final ProofTreeEvent e) {
                 if (!findJoinNode()) {
                     if (linkedGoal.node().isClosed()) {
                         // The partner node has already been closed; we have to
@@ -148,7 +151,14 @@ public class CloseAfterJoin implements BuiltInRule {
                     // as not linked and set it to automatic again.
                     linkedGoal.setLinkedGoal(null);
 
-                     e.getSource().removeProofTreeListener(this);
+                    // Removing the listener in an own thread prevents
+                    // ConcurrentModificationExceptions being thrown.
+                    final ProofTreeAdapter thisCaptured = this;
+                    FORK_JOIN_POOL.submit(new Runnable() {
+                        public void run() {
+                            e.getSource().removeProofTreeListener(thisCaptured);
+                        }
+                    });
                 }
                 // clean up and avoid memory leak
                 prunedNode = null;
