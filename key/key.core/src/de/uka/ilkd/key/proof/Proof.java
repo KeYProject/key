@@ -760,24 +760,30 @@ public class Proof implements Named {
     /** fires the event that the proof has been expanded at the given node */
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofExpanded(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofExpanded(e);
+            }
         }
     }
 
     /** fires the event that the proof is being pruned at the given node */
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofIsBeingPruned(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofIsBeingPruned(e);
+            }
         }
     }
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofPruned(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofPruned(e);
+            }
         }
     }
 
@@ -785,8 +791,10 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofStructureChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofStructureChanged(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofStructureChanged(e);
+            }
         }
     }
 
@@ -794,8 +802,10 @@ public class Proof implements Named {
     /** fires the event that a goal has been removed from the list of goals */
     protected void fireProofGoalRemoved(Goal goal) {
         ProofTreeEvent e = new ProofTreeEvent(this, goal);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalRemoved(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalRemoved(e);
+            }
         }
     }
 
@@ -805,8 +815,10 @@ public class Proof implements Named {
      */
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
         ProofTreeEvent e = new ProofTreeEvent(this, goals);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalsAdded(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalsAdded(e);
+            }
         }
     }
 
@@ -822,8 +834,10 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofGoalsChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalsChanged(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalsChanged(e);
+            }
         }
     }
 
@@ -834,8 +848,10 @@ public class Proof implements Named {
      */
     protected void fireProofClosed() {
         ProofTreeEvent e = new ProofTreeEvent(this);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofClosed(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofClosed(e);
+            }
         }
     }
 
@@ -858,7 +874,7 @@ public class Proof implements Named {
      */
     public synchronized void removeProofTreeListener
     (ProofTreeListener listener) {
-        if (listenerList != null) {
+        if (listenerList != null) { // TODO: check if necessary
             synchronized(listenerList) {
                 listenerList.remove(listener);
             }

@@ -431,14 +431,18 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     Statement breakpoint;
                     if ((breakpoint = getBreakPoint(goal.sequent().succedent())) != null) {
                         final ImmutableList<Goal> subtreeGoals = goal.proof()
-                                .getSubtreeEnabledGoals(commonParents.get(breakpoint));
-                        // FIXME: The presence of new goals currently disturbs
-                        // this. Example: Nested join, new CloseAfterJoin nodes.
+                                .getSubtreeEnabledGoals(
+                                        commonParents.get(breakpoint));
+
                         boolean allStopped = true;
                         for (Goal subGoal : subtreeGoals) {
-                            if (!subGoal.equals(goal) &&
-                                    (subGoal.node().getNodeInfo().getBranchLabel() == null || !subGoal.node().getNodeInfo().getBranchLabel().equals("Joined node is weakening")) &&
-                                    !subGoal.isLinked()) {
+                            if (!subGoal.equals(goal)
+                                    && (subGoal.node().getNodeInfo()
+                                            .getBranchLabel() == null || !subGoal
+                                            .node().getNodeInfo()
+                                            .getBranchLabel()
+                                            .equals("Joined node is weakening"))
+                                    && !subGoal.isLinked()) {
                                 allStopped = allStopped
                                         && stoppedGoals.contains(subGoal);
                             }
@@ -446,12 +450,11 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
                         if (allStopped) {
                             // We stopped all Goals potentially participating in
-                            // the join;
-                            // now we collect the information about the join.
-                            // After a successful
-                            // join app initialization, we do not allow any
-                            // other rule applications
-                            // (realized by setting enforceJoin to true).
+                            // the join; now we collect the information about
+                            // the join. After a successful join app
+                            // initialization, we do not allow any other rule
+                            // applications (realized by setting enforceJoin to
+                            // true).
 
                             final JoinRule joinRule = JoinRule.INSTANCE;
 

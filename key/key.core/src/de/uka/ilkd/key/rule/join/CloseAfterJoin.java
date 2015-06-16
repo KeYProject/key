@@ -13,11 +13,15 @@
 
 package de.uka.ilkd.key.rule.join;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.substConstantsByFreshVars;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.concurrent.ForkJoinPool;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -135,7 +139,7 @@ public class CloseAfterJoin implements BuiltInRule {
             }
 
             @Override
-            public void proofPruned(ProofTreeEvent e) {
+            public void proofPruned(final ProofTreeEvent e) {
                 if (!findJoinNode()) {
                     if (linkedGoal.node().isClosed()) {
                         // The partner node has already been closed; we have to
@@ -147,8 +151,14 @@ public class CloseAfterJoin implements BuiltInRule {
                     // The joined node has been pruned; now mark this node
                     // as not linked and set it to automatic again.
                     linkedGoal.setLinkedGoal(null);
-
-                     e.getSource().removeProofTreeListener(this);
+                    
+                    final ProofTreeAdapter thisCaptured = this;
+                    ForkJoinPool pool = new ForkJoinPool();
+                    pool.submit(new Runnable() {
+                        public void run() {
+                            e.getSource().removeProofTreeListener(thisCaptured);
+                        }
+                    });
                 }
             }
             
