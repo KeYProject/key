@@ -2,15 +2,22 @@ package org.key_project.sed.key.evaluation.model.tooling;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
+import org.key_project.sed.core.model.ISEDDebugElement;
+import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
@@ -94,31 +101,75 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
                proof = loader.getProof();
             }
             else if (UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME.equals(getTool().getName())) {
+               // Open Symbolic Debug perspective
                getWorkbenchPage().setPerspective(WorkbenchUtil.getPerspectiveDescriptor(SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID));
-               IRunnableWithException run = new AbstractRunnableWithException() {
-                  @Override
-                  public void run() {
-                     try {
-                        IType type = getJavaProject().findType(typeName);
-                        IMethod method = type != null ?
-                                         type.getMethod(methodName, methodParameters) : 
-                                         null;
-                        launchConfiguration = KeySEDUtil.createConfiguration(projectFile, method);
-                        launchConfiguration = KeySEDUtil.updateLaunchConfiguration(launchConfiguration, null, null, true, true, false, false, false, true, true, true, true);
-                        DebugUIPlugin.launchInForeground(launchConfiguration, KeySEDUtil.MODE);
-                        // TODO: Wait for jobs like synchronization which throws exceptions otherwise
+               // Launch proof in SED
+               boolean launchSuccessful = false;
+               while (!launchSuccessful) {
+                  IRunnableWithException run = new AbstractRunnableWithException() {
+                     @Override
+                     public void run() {
+                        try {
+                           IType type = getJavaProject().findType(typeName);
+                           IMethod method = type != null ?
+                                            type.getMethod(methodName, methodParameters) : 
+                                            null;
+                           launchConfiguration = KeySEDUtil.createConfiguration(projectFile, method);
+                           launchConfiguration = KeySEDUtil.updateLaunchConfiguration(launchConfiguration, null, null, true, true, false, false, false, true, true, true, true);
+                           DebugUIPlugin.launchInForeground(launchConfiguration, KeySEDUtil.MODE);
+                        }
+                        catch (CoreException e) {
+                           setException(e);
+                        }
                      }
-                     catch (CoreException e) {
-                        setException(e);
+                  };
+                  getShell().getDisplay().syncExec(run);
+                  if (run.getException() != null) {
+                     throw run.getException();
+                  }
+                  // Perform lazy side proofs to ensure fast tree rendering
+                  ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+                  for (ILaunch launch : launchManager.getLaunches()) {
+                     if (!launch.isTerminated() && launchConfiguration.equals(launch.getLaunchConfiguration())) {
+                        launchSuccessful = true;
+                        performLazyWork(launch);
                      }
                   }
-               };
-               getShell().getDisplay().syncExec(run);
-               if (run.getException() != null) {
-                  throw run.getException();
                }
             }
          }
+      }
+   }
+
+   protected void performLazyWork(ILaunch launch) {
+      if (launch != null) {
+         for (IDebugTarget target : launch.getDebugTargets()) {
+            performLazyWork(target);
+         }
+      }
+   }
+   
+   protected void performLazyWork(IDebugTarget target) {
+      try {
+         if (target instanceof ISEDDebugTarget) {
+            for (ISEDThread thread : ((ISEDDebugTarget) target).getSymbolicThreads()) {
+               try {
+                  SEDPreorderIterator iterator = new SEDPreorderIterator(thread);
+                  while (iterator.hasNext()) {
+                     ISEDDebugElement next = iterator.next();
+                     if (next instanceof ISEDDebugNode) {
+                        ((ISEDDebugNode) next).getName(); // May performs side proofs
+                     }
+                  }
+               }
+               catch (DebugException e) {
+                  // Nothing to do.
+               }
+            }
+         }
+      }
+      catch (DebugException e) {
+         // Nothing to do.
       }
    }
 
