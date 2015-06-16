@@ -1,28 +1,19 @@
 package org.key_project.sed.key.evaluation.model.test.testcase;
 
-import java.util.Iterator;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
-import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.FixedForm;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
 import org.key_project.sed.key.evaluation.model.definition.TestEvaluation;
-import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
-import org.key_project.sed.key.evaluation.model.input.FixedFormInput;
-import org.key_project.sed.key.evaluation.model.input.InstructionPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
-import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
-import org.key_project.sed.key.evaluation.model.input.ToolPageInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
@@ -32,7 +23,7 @@ import org.key_project.util.java.CollectionUtil;
  * Tests for {@link EvaluationInputWriter} and {@link EvaluationInputReader}.
  * @author Martin Hentschel
  */
-public class FormInputWriterAndReaderTest extends TestCase {
+public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
    /**
     * Tests writing and reading of {@link UnderstandingProofAttemptsEvaluation#INSTANCE}.
     */
@@ -60,8 +51,25 @@ public class FormInputWriterAndReaderTest extends TestCase {
          assertNotSame(evaluationInput, parsedInput);
          assertNotNull(parsedFormInput);
          assertNotSame(formInput, parsedFormInput);
-         assertFormInput(formInput, parsedFormInput);
+         assertFormInput(formInput, parsedFormInput, false);
+         // Test complete xml
+         doCompleteXmlTest(evaluationInput);
       }
+   }
+   
+   /**
+    * Tests the complete storage via {@link EvaluationInputWriter#toXML(EvaluationInput)}.
+    * @param evaluationInput The {@link EvaluationInput} to test.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doCompleteXmlTest(EvaluationInput evaluationInput) throws Exception {
+      // Covert to complete xml
+      String completeXml = EvaluationInputWriter.toXML(evaluationInput);
+      // Parse complete xml
+      EvaluationInput completeInput = EvaluationInputReader.parse(completeXml);
+      // Compare complete inputs
+      assertNotSame(evaluationInput, completeInput);
+      assertEvaluationInput(evaluationInput, completeInput, false, true);
    }
    
    /**
@@ -104,7 +112,9 @@ public class FormInputWriterAndReaderTest extends TestCase {
       // Compare inputs
       assertNotNull(parsedInput);
       assertNotSame(evaluationInput, parsedInput);
-      assertEvaluationInput(evaluationInput, parsedInput);
+      assertEvaluationInput(evaluationInput, parsedInput, true, false);
+      // Test complete xml
+      doCompleteXmlTest(evaluationInput);
    }
    
    /**
@@ -169,7 +179,7 @@ public class FormInputWriterAndReaderTest extends TestCase {
       // Compare inputs
       assertNotNull(parsedInput);
       assertNotSame(evaluationInput, parsedInput);
-      assertEvaluationInput(evaluationInput, parsedInput);
+      assertEvaluationInput(evaluationInput, parsedInput, true, false);
    }
    
    /**
@@ -283,7 +293,9 @@ public class FormInputWriterAndReaderTest extends TestCase {
       // Compare inputs
       assertNotNull(parsedInput);
       assertNotSame(evaluationInput, parsedInput);
-      assertEvaluationInput(evaluationInput, parsedInput);
+      assertEvaluationInput(evaluationInput, parsedInput, true, false);
+      // Test complete xml
+      doCompleteXmlTest(evaluationInput);
    }
    
    /**
@@ -296,219 +308,5 @@ public class FormInputWriterAndReaderTest extends TestCase {
        * @param formInput The {@link AbstractFormInput} to modify.
        */
       public void changeFormInput(AbstractFormInput<?> formInput);
-   }
-
-   /**
-    * Ensures that the given {@link EvaluationInput}s are equal.
-    * @param expected The expected {@link EvaluationInput}.
-    * @param actual The actual {@link EvaluationInput}.
-    */
-   protected void assertEvaluationInput(EvaluationInput expected, EvaluationInput actual) {
-      if (expected != null) {
-         assertNotNull(actual);
-         assertNotSame(expected, actual);
-         assertEquals(expected.getEvaluation().getName(), actual.getEvaluation().getName());
-         assertEquals(expected.getUUID(), actual.getUUID());
-         assertEquals(expected.getKeyVersion(), actual.getKeyVersion());
-         assertEquals(expected.getKeyInternalVersion(), actual.getKeyInternalVersion());
-         assertFormInput(expected.getCurrentFormInput(), actual.getCurrentFormInput());
-         assertFormInputs(expected.getFormInputs(), actual.getFormInputs());
-      }
-      else {
-         assertNull(actual);
-      }
-   }
-
-   /**
-    * Ensures that the given {@link AbstractFormInput}s are equal.
-    * @param expected The expected {@link AbstractFormInput}s.
-    * @param actual The actual {@link AbstractFormInput}s.
-    */
-   protected void assertFormInputs(AbstractFormInput<?>[] expected, AbstractFormInput<?>[] actual) {
-      assertNotNull(expected);
-      assertNotNull(actual);
-      assertEquals(expected.length, actual.length);
-      for (int i = 0; i < expected.length; i++) {
-         assertFormInput(expected[i], actual[i]);
-      }
-   }
-
-   /**
-    * Ensures that the given {@link AbstractFormInput}s are equal.
-    * @param expected The expected {@link AbstractFormInput}.
-    * @param actual The actual {@link AbstractFormInput}.
-    */
-   protected void assertFormInput(AbstractFormInput<?> expected, AbstractFormInput<?> actual) {
-      if (expected != null) {
-         assertNotNull(actual);
-         assertNotSame(expected, actual);
-         assertEquals(expected.getForm(), actual.getForm());
-         assertPageInputs(expected.getPageInputs(), actual.getPageInputs());
-         if (expected instanceof RandomFormInput) {
-            assertTrue(actual instanceof RandomFormInput);
-            assertPageInputs(((RandomFormInput) expected).getPageOrder(), ((RandomFormInput) actual).getPageOrder());
-            assertTools((RandomFormInput) expected, (RandomFormInput) actual);
-         }
-         else if (expected instanceof FixedFormInput) {
-            assertTrue(actual instanceof FixedFormInput);
-         }
-         else {
-            fail("Unsupported form input: " + expected);
-         }
-      }
-      else {
-         assertNull(actual);
-      }
-   }
-
-   /**
-    * Ensures that the given {@link Tool}s are equal.
-    * @param expected The expected {@link Tool}s.
-    * @param actual The actual {@link Tool}s.
-    */
-   protected void assertTools(RandomFormInput expected, RandomFormInput actual) {
-      assertNotNull(expected);
-      assertNotNull(actual);
-      for (AbstractPageInput<?> expectedPageInput : expected.getPageInputs()) {
-         AbstractPageInput<?> actualPageInput = actual.getPageInput(expectedPageInput.getPage());
-         assertTool(expected.getTool(expectedPageInput), actual.getTool(actualPageInput));
-      }
-      for (AbstractPageInput<?> actualPageInput : actual.getPageInputs()) {
-         AbstractPageInput<?> expectedPageInput = expected.getPageInput(actualPageInput.getPage());
-         assertTool(expected.getTool(expectedPageInput), actual.getTool(actualPageInput));
-      }
-   }
-
-   /**
-    * Ensures that the given {@link Tool}s are equal.
-    * @param expected The expected {@link Tool}s.
-    * @param actual The actual {@link Tool}s.
-    */
-   private void assertTool(Tool expected, Tool actual) {
-      if (expected != null) {
-         assertNotNull(actual);
-         assertEquals(expected.getName(), actual.getName());
-      }
-      else {
-         assertNull(actual);
-      }
-   }
-
-   /**
-    * Ensures that the given {@link AbstractPageInput}s are equal.
-    * @param expected The expected {@link AbstractPageInput}s.
-    * @param actual The actual {@link AbstractPageInput}s.
-    */
-   protected void assertPageInputs(List<AbstractPageInput<?>> expected, List<AbstractPageInput<?>> actual) {
-      if (expected != null) {
-         assertNotNull(actual);
-         assertEquals(expected.size(), actual.size());
-         Iterator<AbstractPageInput<?>> expectedIter = expected.iterator();
-         Iterator<AbstractPageInput<?>> actualIter = actual.iterator();
-         while (expectedIter.hasNext() && actualIter.hasNext()) {
-            assertPageInput(expectedIter.next(), actualIter.next());
-         }
-         assertFalse(expectedIter.hasNext());
-         assertFalse(actualIter.hasNext());
-      }
-      else {
-         assertNull(actual);
-      }
-   }
-
-   /**
-    * Ensures that the given {@link AbstractPageInput}s are equal.
-    * @param expected The expected {@link AbstractPageInput}s.
-    * @param actual The actual {@link AbstractPageInput}s.
-    */
-   protected void assertPageInputs(AbstractPageInput<?>[] expected, AbstractPageInput<?>[] actual) {
-      assertNotNull(expected);
-      assertNotNull(actual);
-      assertEquals(expected.length, actual.length);
-      for (int i = 0; i < expected.length; i++) {
-         assertPageInput(expected[i], actual[i]);
-      }
-   }
-
-   /**
-    * Ensures that the given {@link AbstractPageInput}s are equal.
-    * @param expected The expected {@link AbstractPageInput}.
-    * @param actual The actual {@link AbstractPageInput}.
-    */
-   protected void assertPageInput(AbstractPageInput<?> expected, AbstractPageInput<?> actual) {
-      if (expected != null) {
-         assertNotNull(actual);
-         assertNotSame(expected, actual);
-         assertEquals(expected.getPage(), actual.getPage());
-         assertEquals(expected.getShownTime(), actual.getShownTime());
-         if (expected instanceof QuestionPageInput) {
-            assertTrue(actual instanceof QuestionPageInput);
-            assertQuestionInputs(((QuestionPageInput) expected).getQuestionInputs(), ((QuestionPageInput) actual).getQuestionInputs());
-         }
-         else if (expected instanceof SendFormPageInput) {
-            assertTrue(actual instanceof SendFormPageInput);
-            // Nothing else to do as accept state is not stored
-         }
-         else if (expected instanceof ToolPageInput) {
-            assertTrue(actual instanceof ToolPageInput);
-            // Nothing else to do as nothing is stored
-         }
-         else if (expected instanceof InstructionPageInput) {
-            assertTrue(actual instanceof InstructionPageInput);
-            // Nothing else to do as nothing is stored
-         }
-         else {
-            fail("Unsupported page input '" + expected.getClass() + "'.");
-         }
-      }
-      else {
-         assertNull(actual);
-      }
-   }
-
-   /**
-    * Ensures that the given {@link QuestionInput}s are equal.
-    * @param expected The expected {@link QuestionInput}s.
-    * @param actual The actual {@link QuestionInput}s.
-    */
-   protected void assertQuestionInputs(QuestionInput[] expected, QuestionInput[] actual) {
-      assertNotNull(expected);
-      assertNotNull(actual);
-      assertEquals(expected.length, actual.length);
-      for (int i = 0; i < expected.length; i++) {
-         assertQuestionInput(expected[i], actual[i]);
-      }
-   }
-
-   /**
-    * Ensures that the given {@link QuestionInput}s are equal.
-    * @param expected The expected {@link QuestionInput}.
-    * @param actual The actual {@link QuestionInput}.
-    */
-   protected void assertQuestionInput(QuestionInput expected, QuestionInput actual) {
-      if (expected != null) {
-         assertNotNull(actual);
-         assertNotSame(expected, actual);
-         assertEquals(expected.getQuestion(), actual.getQuestion());
-         assertEquals(expected.getValue(), actual.getValue());
-         assertEquals(expected.getValueSetAt(), actual.getValueSetAt());
-         assertEquals(expected.getTrust(), actual.getTrust());
-         assertEquals(expected.getTrustSetAt(), actual.getTrustSetAt());
-         assertEquals(expected.hasChoiceInputs(), actual.hasChoiceInputs());
-         if (expected.hasChoiceInputs()) {
-            assertTrue(actual.hasChoiceInputs());
-            for (Choice choice : expected.getChoices()) {
-               assertQuestionInputs(expected.getChoiceInputs(choice), actual.getChoiceInputs(choice));
-            }
-         }
-         else {
-            assertFalse(actual.hasChoiceInputs());
-         }
-         assertEquals(expected.countChildInputs(), actual.countChildInputs());
-         assertQuestionInputs(expected.getChildInputs(), actual.getChildInputs());
-      }
-      else {
-         assertNull(actual);
-      }
    }
 }

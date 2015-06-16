@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.AbstractTableViewer;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -37,6 +38,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -661,5 +663,42 @@ public final class SWTUtil {
          // Set shell location
          toCenter.setLocation(x, y);
       }
+   }
+
+   /**
+    * Opens a {@link MessageDialog}.
+    * @param parent The parent {@link Shell}.
+    * @param title The title.
+    * @param dialogTitleImage The title {@link Image}.
+    * @param message The message.
+    * @param kind The kind.
+    * @param buttons The button texts.
+    * @return The dialog result or {@code -1} if cancelled.
+    */
+   public static int openMessageDialog(Shell parent, String title, Image dialogTitleImage, String message, int kind, String[] buttons) {
+      return openMessageDialog(parent, title, dialogTitleImage, message, kind, buttons, 0, SWT.NONE);
+   }
+
+   /**
+    * Opens a {@link MessageDialog}.
+    * @param parent The parent {@link Shell}.
+    * @param title The title.
+    * @param dialogTitleImage The title {@link Image}.
+    * @param message The message.
+    * @param kind The kind.
+    * @param buttons The button texts.
+    * @param defaultButtonIndex The index of the default button.
+    * @param style The {@link Shell} style.
+    * @return The dialog result or {@code -1} if cancelled.
+    */
+   public static int openMessageDialog(Shell parent, String title, Image dialogTitleImage, String message, int kind, String[] buttons, int defaultButtonIndex, final int style) {
+      MessageDialog dialog = new MessageDialog(parent, title, dialogTitleImage, message, kind, buttons, defaultButtonIndex) {
+         @Override
+         protected int getShellStyle() {
+            int newStyle = style & SWT.SHEET;
+            return super.getShellStyle() | newStyle;
+         }
+      };
+      return dialog.open();
    }
 }

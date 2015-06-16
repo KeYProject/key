@@ -16,6 +16,7 @@ package org.key_project.sed.key.evaluation.model.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.sed.key.evaluation.model.test.testcase.FormInputWriterAndReaderTest;
+import org.key_project.sed.key.evaluation.model.test.testcase.ResetTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -23,7 +24,8 @@ import org.key_project.sed.key.evaluation.model.test.testcase.FormInputWriterAnd
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   FormInputWriterAndReaderTest.class
+   FormInputWriterAndReaderTest.class,
+   ResetTest.class
 })
 public class AllEvaluationModelTests {
 }

@@ -13,6 +13,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
+import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
@@ -21,6 +22,7 @@ import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
+import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -119,9 +121,26 @@ public class EvaluationInputReader {
                }
                String version = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_VERSION);
                String internalVersion = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_INTERNAL_VERSION);
-               evaluationInput = new EvaluationInput(evaluation, version, internalVersion);
+               if (!StringUtil.isEmpty(version) || !StringUtil.isEmpty(internalVersion)) {
+                  evaluationInput = new EvaluationInput(evaluation, version, internalVersion);
+               }
+               else {
+                  evaluationInput = new EvaluationInput(evaluation);
+               }
                String uuid = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_UUID);
                evaluationInput.setUUID(uuid);
+               String currentForm = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_CURRENT_FORM);
+               if (!StringUtil.isEmpty(currentForm)) {
+                  AbstractForm form = evaluationInput.getEvaluation().getForm(currentForm);
+                  if (form == null) {
+                     throw new SAXException("Form '" + currentForm + "' is not available.");
+                  }
+                  AbstractFormInput<?> formInput = evaluationInput.getFormInput(form);
+                  if (formInput == null) {
+                     throw new SAXException("FormInput of '" + currentForm + "' is not available.");
+                  }
+                  evaluationInput.setCurrentFormInput(formInput);
+               }
             }
             else {
                throw new SAXException("Tag '" + qName + "' found multiple times.");
@@ -159,6 +178,18 @@ public class EvaluationInputReader {
             currentFormInput = evaluationInput.getFormInput(form);
             if (setAsCurrentForm) {
                evaluationInput.setCurrentFormInput(currentFormInput);                  
+            }
+            String currentPage = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_FORM_CURRENT_PAGE);
+            if (!StringUtil.isEmpty(currentPage)) {
+               AbstractPage page = form.getPage(currentPage);
+               if (page == null) {
+                  throw new SAXException("Page '" + currentPage + "' is not available.");
+               }
+               AbstractPageInput<?> pageInput = currentFormInput.getPageInput(page);
+               if (pageInput == null) {
+                  throw new SAXException("PageInput of '" + currentPage + "' is not available.");
+               }
+               currentFormInput.setCurrentPageInput(pageInput);
             }
          }
          else if (EvaluationInputWriter.TAG_PAGE.equals(qName)) {
@@ -208,67 +239,45 @@ public class EvaluationInputReader {
             if (currentPageInput == null) {
                throw new SAXException("Page is not defined.");
             }
-            if (!(currentPageInput instanceof QuestionPageInput)) {
-               throw new SAXException("Page does not support questions.");
-            }
-            final String questionName = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_NAME);
-            QuestionInput questionInput;
-            if (choiceStack.isEmpty()) {
-               if (questionInputStack.isEmpty()) {
-                  questionInput = ((QuestionPageInput) currentPageInput).getQuestionInput(questionName);
+            if (currentPageInput instanceof QuestionPageInput) {
+               final String questionName = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_NAME);
+               QuestionInput questionInput;
+               if (choiceStack.isEmpty()) {
+                  if (questionInputStack.isEmpty()) {
+                     questionInput = ((QuestionPageInput) currentPageInput).getQuestionInput(questionName);
+                  }
+                  else {
+                     questionInput = questionInputStack.getFirst().getChildInput(questionName);
+                  }
                }
                else {
-                  questionInput = questionInputStack.getFirst().getChildInput(questionName);
-               }
-            }
-            else {
-               QuestionInput[] choiceInputs = questionInputStack.getFirst().getChoiceInputs(choiceStack.getFirst());
-               if (choiceInputs == null) {
-                  throw new SAXException("Question Inputs of '" + choiceStack.getFirst() + "' are not available.");
-               }
-               questionInput = ArrayUtil.search(choiceInputs, new IFilter<QuestionInput>() {
-                  @Override
-                  public boolean select(QuestionInput element) {
-                     return ObjectUtil.equals(element.getQuestion().getName(), questionName);
+                  QuestionInput[] choiceInputs = questionInputStack.getFirst().getChoiceInputs(choiceStack.getFirst());
+                  if (choiceInputs == null) {
+                     throw new SAXException("Question Inputs of '" + choiceStack.getFirst() + "' are not available.");
                   }
-               });
-            }
-            if (questionInput == null) {
-               throw new SAXException("Question '" + questionInput + "' is not part of page '" + currentPageInput.getPage().getName() + "'.");
-            }
-            questionInputStack.addFirst(questionInput);
-            String questionValue = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_VALUE);
-            questionInput.setValue(questionValue);
-            String questionValueSetAt = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_VALUE_SET_AT);
-            if (!StringUtil.isTrimmedEmpty(questionValueSetAt)) {
-               try {
-                  questionInput.setValueSetAt(Long.parseLong(questionValueSetAt));
+                  questionInput = ArrayUtil.search(choiceInputs, new IFilter<QuestionInput>() {
+                     @Override
+                     public boolean select(QuestionInput element) {
+                        return ObjectUtil.equals(element.getQuestion().getName(), questionName);
+                     }
+                  });
                }
-               catch (NumberFormatException e) {
-                  throw new SAXException("Value set at '" + questionValueSetAt + "' is not a valid long number.");
+               if (questionInput == null) {
+                  throw new SAXException("Question '" + questionInput + "' is not part of page '" + currentPageInput.getPage().getName() + "'.");
                }
+               questionInputStack.addFirst(questionInput);
+               updateQuestionInput(questionInput, attributes);
+            }
+            else if (currentPageInput instanceof SendFormPageInput) {
+               final String questionName = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_NAME);
+               QuestionInput questionInput = ((SendFormPageInput) currentPageInput).getAcceptInput();
+               if (!ObjectUtil.equals(questionName, questionInput.getQuestion().getName())) {
+                  throw new SAXException("SendFormPageInput does not support question '" + questionName + "' questions.");
+               }
+               updateQuestionInput(questionInput, attributes);
             }
             else {
-               questionInput.setValueSetAt(0);
-            }
-            String questionTrust = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_TRUST);
-            if (!StringUtil.isEmpty(questionTrust)) {
-               questionInput.setTrust(Boolean.valueOf(questionTrust));
-            }
-            else {
-               questionInput.setTrust(null);
-            }
-            String questionTrustSetAt = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_TRUST_SET_AT);
-            if (!StringUtil.isTrimmedEmpty(questionTrustSetAt)) {
-               try {
-                  questionInput.setTrustSetAt(Long.parseLong(questionTrustSetAt));
-               }
-               catch (NumberFormatException e) {
-                  throw new SAXException("Trust set at '" + questionTrustSetAt + "' is not a valid long number.");
-               }
-            }
-            else {
-               questionInput.setTrustSetAt(0);
+               throw new SAXException("Page does not support questions.");
             }
          }
          else if (EvaluationInputWriter.TAG_RANDOM_PAGE_ORDER.equals(qName)) {
@@ -292,6 +301,48 @@ public class EvaluationInputReader {
       }
 
       /**
+       * Updates the given {@link QuestionInput} with the content provided by the {@link Attributes}.
+       * @param questionInput The {@link QuestionInput} to update
+       * @param attributes The content to set.
+       * @throws SAXException Occurred Exception.
+       */
+      protected void updateQuestionInput(QuestionInput questionInput, Attributes attributes) throws SAXException {
+         String questionValue = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_VALUE);
+         questionInput.setValue(questionValue);
+         String questionValueSetAt = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_VALUE_SET_AT);
+         if (!StringUtil.isTrimmedEmpty(questionValueSetAt)) {
+            try {
+               questionInput.setValueSetAt(Long.parseLong(questionValueSetAt));
+            }
+            catch (NumberFormatException e) {
+               throw new SAXException("Value set at '" + questionValueSetAt + "' is not a valid long number.");
+            }
+         }
+         else {
+            questionInput.setValueSetAt(0);
+         }
+         String questionTrust = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_TRUST);
+         if (!StringUtil.isEmpty(questionTrust)) {
+            questionInput.setTrust(Boolean.valueOf(questionTrust));
+         }
+         else {
+            questionInput.setTrust(null);
+         }
+         String questionTrustSetAt = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_TRUST_SET_AT);
+         if (!StringUtil.isTrimmedEmpty(questionTrustSetAt)) {
+            try {
+               questionInput.setTrustSetAt(Long.parseLong(questionTrustSetAt));
+            }
+            catch (NumberFormatException e) {
+               throw new SAXException("Trust set at '" + questionTrustSetAt + "' is not a valid long number.");
+            }
+         }
+         else {
+            questionInput.setTrustSetAt(0);
+         }
+      }
+
+      /**
        * {@inheritDoc}
        */
       @Override
@@ -300,7 +351,9 @@ public class EvaluationInputReader {
             parsingPageOrder = false;
          }
          else if (EvaluationInputWriter.TAG_QUESTION.equals(qName)) {
-            questionInputStack.removeFirst();
+            if (!questionInputStack.isEmpty()) { // Empty in case of send form page
+               questionInputStack.removeFirst();
+            }
          }
          else if (EvaluationInputWriter.TAG_CHOICE.equals(qName)) {
             choiceStack.removeFirst();

@@ -166,11 +166,13 @@ public final class SEDUIUtil {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
+                  SWTUtil.checkCanceled(monitor);
                   // Expand viewer up to the elements to select.
                   final Viewer debugViewer = debugView.getViewer();
                   if (debugViewer instanceof TreeViewer) {
                      TreeViewer treeViewer = (TreeViewer)debugViewer;
                      for (Object element : selection) {
+                        SWTUtil.checkCanceled(monitor);
                         try {
                            monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
                            monitor.subTask("Collecting unknown elements");
@@ -185,6 +187,7 @@ public final class SEDUIUtil {
                      }
                   }
                   // Select new elements
+                  SWTUtil.checkCanceled(monitor);
                   monitor.beginTask("Select element", 1);
                   ISelection newSelection = SWTUtil.createSelection(selection);
                   SWTUtil.select(debugViewer, newSelection, true);

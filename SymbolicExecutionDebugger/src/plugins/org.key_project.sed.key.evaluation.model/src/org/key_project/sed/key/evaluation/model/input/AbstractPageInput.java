@@ -41,4 +41,8 @@ public class AbstractPageInput<P extends AbstractPage> extends Bean {
       this.shownTime = shownTime;
       firePropertyChange(PROP_SHOWN_TIME, oldValue, getShownTime());
    }
+
+   public void reset() {
+      setShownTime(0);
+   }
 }

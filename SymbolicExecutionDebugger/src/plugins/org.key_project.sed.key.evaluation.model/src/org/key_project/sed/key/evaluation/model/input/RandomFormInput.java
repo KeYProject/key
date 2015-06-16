@@ -24,10 +24,16 @@ public class RandomFormInput extends AbstractFormInput<RandomForm> {
    }
 
    public void setPageOrder(List<AbstractPageInput<?>> pageOrder) {
+      List<AbstractPageInput<?>> newPageOrder;
       // Update page order
-      List<AbstractPageInput<?>> newPageOrder = new ArrayList<AbstractPageInput<?>>(pageOrder.size());
-      for (AbstractPageInput<?> entry: pageOrder) {
-         newPageOrder.add(getPageInput(entry.getPage()));
+      if (pageOrder != null) {
+         newPageOrder = new ArrayList<AbstractPageInput<?>>(pageOrder.size());
+         for (AbstractPageInput<?> entry: pageOrder) {
+            newPageOrder.add(getPageInput(entry.getPage()));
+         }
+      }
+      else {
+         newPageOrder = null;
       }
       // Change value
       List<AbstractPageInput<?>> oldValue = getPageOrder();
@@ -41,5 +47,12 @@ public class RandomFormInput extends AbstractFormInput<RandomForm> {
    
    public void setTool(AbstractPageInput<?> page, Tool tool) {
       pageToolMap.put(page, tool);
+   }
+
+   @Override
+   public void reset() {
+      setPageOrder(null);
+      pageToolMap.clear();
+      super.reset();
    }
 }

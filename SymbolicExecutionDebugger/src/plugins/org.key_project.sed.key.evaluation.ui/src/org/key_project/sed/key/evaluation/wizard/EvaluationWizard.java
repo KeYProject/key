@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -21,12 +23,14 @@ import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
 import org.key_project.sed.key.evaluation.model.input.ToolPageInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.util.LogUtil;
+import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.InstructionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.SendFormWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.ToolWizardPage;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -372,8 +376,43 @@ public class EvaluationWizard extends Wizard {
          openedDialog.getShell().setFocus();
       }
       else {
-         EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput);
-         dialog.open();
+         boolean openWizard = true;
+         // Check existing input
+         if (evaluationInput.getCurrentFormInput() == evaluationInput.getFormInput(0)) {
+            // Ensure that evaluation always start from beginning
+            evaluationInput.reset();
+         }
+         else {
+            // Ask to restart evaluation
+            int result = SWTUtil.openMessageDialog(parentShell, 
+                                                   "Continue Evaluation?", 
+                                                   SEDEvaluationImages.getImage(SEDEvaluationImages.EVALUATION),
+                                                   "Continue the already started evaluation? (Recommended)", 
+                                                   MessageDialog.QUESTION, 
+                                                   new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL});
+            if (result == 1) {
+               int secondResult = SWTUtil.openMessageDialog(parentShell, 
+                                                            "Continue Evaluation?", 
+                                                            SEDEvaluationImages.getImage(SEDEvaluationImages.EVALUATION),
+                                                            "Please do only restart the evaluation if you have not participated before and if you have not seen parts of the evaluation.\n\nContinue the already started evaluation? (Recommended)", 
+                                                            MessageDialog.WARNING, 
+                                                            new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL});
+               if (secondResult == 1) {
+                  evaluationInput.reset();
+               }
+               else if (secondResult != 0) {
+                  openWizard = false; // -1 if cancelled, e.g. ESC
+               }
+            }
+            else if (result != 0) { // -1 if cancelled, e.g. ESC
+               openWizard = false;
+            }
+         }
+         // Open wizard
+         if (openWizard) {
+            EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput);
+            dialog.open();
+         }
       }
    }
 }

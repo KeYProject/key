@@ -171,7 +171,10 @@ public class EvaluationWizardDialog extends WizardDialog {
       updateToolbar();
       assert page instanceof AbstractEvaluationWizardPage<?>;
       AbstractEvaluationWizardPage<?> evaluationPage = (AbstractEvaluationWizardPage<?>) page;
-      evaluationInput.getCurrentFormInput().setCurrentPageInput(evaluationPage.getPageInput());
+      AbstractPageInput<?> currentPageInput = evaluationPage.getPageInput();
+      AbstractFormInput<?> currentFormInput = currentPageInput.getFormInput();
+      evaluationInput.setCurrentFormInput(currentFormInput);
+      currentFormInput.setCurrentPageInput(currentPageInput);
       if (page instanceof SendFormWizardPage) {
          ((SendFormWizardPage) page).getPageInput().addPropertyChangeListener(SendFormPageInput.PROP_SENDING_IN_PROGRESS, sendingListener);
       }
@@ -514,7 +517,8 @@ public class EvaluationWizardDialog extends WizardDialog {
          return CollectionUtil.search(evaluationMap.keySet(), new IFilter<EvaluationWizardDialog>() {
             @Override
             public boolean select(EvaluationWizardDialog element) {
-               return !element.getShell().isDisposed() && element.getShell().isVisible();
+               Shell shell = element.getShell();
+               return shell != null && !shell.isDisposed() && shell.isVisible();
             }
          });
       }

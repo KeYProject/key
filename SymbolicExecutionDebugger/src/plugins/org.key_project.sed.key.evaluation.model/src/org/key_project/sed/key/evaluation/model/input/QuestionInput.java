@@ -276,4 +276,23 @@ public class QuestionInput extends Bean {
    public String toString() {
       return "Input of " + question;
    }
+
+   public void reset() {
+      setValue(question.getDefaultValue());
+      setValueSetAt(0);
+      setTrust(null);
+      setTrustSetAt(0);
+      if (choiceInputs != null) {
+         for (List<QuestionInput> choiceInputList : choiceInputs.values()) {
+            for (QuestionInput choiceInput : choiceInputList) {
+               choiceInput.reset();
+            }
+         }
+      }
+      if (childInputs != null) {
+         for (QuestionInput childInput : childInputs) {
+            childInput.reset();
+         }
+      }
+   }
 }

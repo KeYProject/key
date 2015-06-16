@@ -27,4 +27,11 @@ public class SendFormPageInput extends AbstractPageInput<SendFormPage> {
       this.sendingInProgress = sendingInProgress;
       firePropertyChange(PROP_SENDING_IN_PROGRESS, oldValue, isSendingInProgress());
    }
+
+   @Override
+   public void reset() {
+      acceptInput.reset();
+      setSendingInProgress(false);
+      super.reset();
+   }
 }

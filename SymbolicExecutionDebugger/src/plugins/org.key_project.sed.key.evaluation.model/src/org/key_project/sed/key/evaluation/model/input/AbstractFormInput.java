@@ -100,4 +100,16 @@ public abstract class AbstractFormInput<F extends AbstractForm> extends Bean {
    public int countPageInputs() {
       return pageInputs.size();
    }
+
+   public void reset() {
+      if (!pageInputs.isEmpty()) {
+         setCurrentPageInput(pageInputs.get(0));
+      }
+      else {
+         setCurrentPageInput(null);
+      }
+      for (AbstractPageInput<?> pageInput : pageInputs) {
+         pageInput.reset();
+      }
+   }
 }

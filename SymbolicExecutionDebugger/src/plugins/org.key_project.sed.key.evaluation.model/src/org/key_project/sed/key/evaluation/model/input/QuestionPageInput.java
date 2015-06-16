@@ -32,4 +32,12 @@ public class QuestionPageInput extends AbstractPageInput<QuestionPage> {
          }
       });
    }
+
+   @Override
+   public void reset() {
+      for (QuestionInput questionInput : questionInputs) {
+         questionInput.reset();
+      }
+      super.reset();
+   }
 }

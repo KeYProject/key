@@ -112,4 +112,17 @@ public class EvaluationInput extends Bean {
    public AbstractFormInput<?> getFormInput(int index) {
       return formInputs.get(index);
    }
+
+   public void reset() {
+      if (!formInputs.isEmpty()) {
+         setCurrentFormInput(formInputs.get(0));
+      }
+      else {
+         setCurrentFormInput(null);
+      }
+      setUUID(null);
+      for (AbstractFormInput<?> formInput : formInputs) {
+         formInput.reset();
+      }
+   }
 }
