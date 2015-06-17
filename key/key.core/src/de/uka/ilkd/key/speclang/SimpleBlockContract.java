@@ -596,6 +596,22 @@ public final class SimpleBlockContract implements BlockContract {
         return result;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "SimpleBlockContract [block=" + block + ", labels=" + labels
+                + ", method=" + method + ", modality=" + modality
+                + ", instantiationSelf=" + instantiationSelf
+                + ", preconditions=" + preconditions + ", postconditions="
+                + postconditions + ", modifiesClauses=" + modifiesClauses
+                + ", infFlowSpecs=" + infFlowSpecs + ", joinProcedure="
+                + joinProcedure + ", variables=" + variables
+                + ", transactionApplicable=" + transactionApplicable
+                + ", hasMod=" + hasMod + "]";
+    }
+
     private Map<ProgramVariable, ProgramVariable>
                 createReplacementMap(final Variables newVariables,
                                      final Services services) {
