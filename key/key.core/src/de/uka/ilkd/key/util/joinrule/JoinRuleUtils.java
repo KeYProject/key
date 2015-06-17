@@ -580,6 +580,35 @@ public class JoinRuleUtils {
 
     }
 
+    /**
+     * Returns the first Java block in the given term that can be found by
+     * recursive search, or the empty block if there is no non-empty Java block
+     * in the term.
+     * 
+     * @param term
+     *            The term to extract Java blocks for.
+     * @return The first Java block in the given term or the empty block if
+     *         there is no non-empty Java block.
+     */
+    public static JavaBlock getJavaBlockRecursive(Term term) {
+        if (!term.isContainsJavaBlockRecursive()) {
+            return JavaBlock.EMPTY_JAVABLOCK;
+        }
+
+        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
+            return term.javaBlock();
+        }
+        else {
+            for (Term sub : term.subs()) {
+                JavaBlock subJavaBlock = getJavaBlockRecursive(sub);
+                if (!subJavaBlock.isEmpty()) {
+                    return subJavaBlock;
+                }
+            }
+            return JavaBlock.EMPTY_JAVABLOCK;
+        }
+    }
+
     // /////////////////////////////////////////////////
     // //////////////// GENERAL LOGIC //////////////////
     // //////////////// (Provability) //////////////////

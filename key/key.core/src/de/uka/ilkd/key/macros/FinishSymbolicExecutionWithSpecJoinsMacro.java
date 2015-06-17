@@ -52,6 +52,7 @@ import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * Finishes symbolic execution while taking JML join specifications into
@@ -256,31 +257,6 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
     }
 
     /**
-     * Returns the first Java block in the given term that can be found by
-     * recursive search, or the empty block if there is no non-empty Java block
-     * in the term.
-     * 
-     * @param term
-     *            The term to extract Java blocks for.
-     * @return The first Java block in the given term or the empty block if
-     *         there is no non-empty Java block.
-     */
-    private static JavaBlock getJavaBlockRecursive(Term term) {
-        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
-            return term.javaBlock();
-        }
-        else {
-            for (Term sub : term.subs()) {
-                JavaBlock subJavaBlock = getJavaBlockRecursive(sub);
-                if (!subJavaBlock.isEmpty()) {
-                    return subJavaBlock;
-                }
-            }
-            return JavaBlock.EMPTY_JAVABLOCK;
-        }
-    }
-
-    /**
      * @param block
      *            The statement block which is assumed to wrap another block by
      *            a method frame.
@@ -396,7 +372,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             }
 
             if (pio != null) {
-                JavaBlock theJavaBlock = getJavaBlockRecursive(pio.subTerm());
+                JavaBlock theJavaBlock = JoinRuleUtils.getJavaBlockRecursive(pio.subTerm());
                 SourceElement activeStmt = JavaTools
                         .getActiveStatement(theJavaBlock);
 
@@ -528,7 +504,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 // getJavaBlockRecursive(
                 // formula.formula()).program());
                 SourceElement activeStmt = JavaTools
-                        .getActiveStatement(getJavaBlockRecursive(formula
+                        .getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(formula
                                 .formula()));
 
                 if (activeStmt != null
@@ -624,16 +600,17 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          */
         private Statement getBreakPoint(Semisequent succedent) {
             for (SequentFormula formula : succedent.asList()) {
-                StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) getJavaBlockRecursive(
-                        formula.formula()).program());
+                JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
+                        formula.formula());
+                
+                StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program());
 
                 if (blockWithoutMethodFrame.isEmpty()) {
                     continue;
                 }
 
                 SourceElement activeStatement = JavaTools
-                        .getActiveStatement(getJavaBlockRecursive(formula
-                                .formula()));
+                        .getActiveStatement(javaBlock);
                 if (activeStatement instanceof Statement
                         && breakpoints.contains((Statement) activeStatement)) {
                     return (Statement) activeStatement;
