@@ -662,14 +662,14 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             .getActiveStatement(javaBlock);
                     
                     if (oldActiveStatement != null && oldActiveStatement.equals(activeStatement)) {
-                        continue;
+                        break;
                     }
                     
                     try {
                         javaBlock = JavaTools.removeActiveStatement(javaBlock, services);
                     } catch (IndexOutOfBoundsException e) {
                         // No more statement to check
-                        continue;
+                        break;
                     }
                     
                     if (activeStatement instanceof Statement
