@@ -400,6 +400,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                         boolean allStopped = true;
                         for (Goal subGoal : subtreeGoals) {
                             if (!subGoal.equals(goal)
+                                    && getBreakPoint(subGoal.sequent().succedent()) != null
                                     && (subGoal.node().getNodeInfo()
                                             .getBranchLabel() == null || !subGoal
                                             .node().getNodeInfo()
