@@ -42,10 +42,10 @@ public abstract class JoinProcedure {
     
     static {
         CONCRETE_RULES = ImmutableSLList.<JoinProcedure>nil()
-                .append(JoinIfThenElse.instance())
-                .append(JoinIfThenElseAntecedent.instance())
-                .append(JoinWithSignLattice.instance())
-                .append(JoinWeaken.instance());
+                .prepend(JoinWeaken.instance())
+                .prepend(JoinWithSignLattice.instance())
+                .prepend(JoinIfThenElseAntecedent.instance())
+                .prepend(JoinIfThenElse.instance());
     }
 
     /**

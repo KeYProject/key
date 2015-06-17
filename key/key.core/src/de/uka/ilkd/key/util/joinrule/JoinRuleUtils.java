@@ -1302,7 +1302,7 @@ public class JoinRuleUtils {
             for (Goal goal : openGoals) {
                 Term goalImplication = sequentToFormula(goal.sequent(),
                         services);
-                goalImplications = goalImplications.append(goalImplication);
+                goalImplications = goalImplications.prepend(goalImplication);
             }
 
             return tb.and(goalImplications);
@@ -1416,12 +1416,17 @@ public class JoinRuleUtils {
         private static final long serialVersionUID = 2305410114265133879L;
 
         private Node node = null;
-        private ImmutableSet<LocationVariable> doNotRename = null;
+        private HashSet<LocationVariable> doNotRename =
+                new HashSet<LocationVariable>();
 
         public LocVarReplBranchUniqueMap(Node goal,
                 ImmutableSet<LocationVariable> doNotRename) {
             this.node = goal;
-            this.doNotRename = doNotRename;
+            
+            // Use a HashSet for constant time lookup
+            for (LocationVariable locVar : doNotRename) {
+                this.doNotRename.add(locVar);
+            }
         }
 
         @Override
