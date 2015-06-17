@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.List;
 
 import org.key_project.sed.key.evaluation.model.Activator;
-import org.key_project.sed.key.evaluation.model.random.UnderstandingProofAttemptsRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier;
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier.FileDefinition;
 import org.key_project.sed.key.evaluation.model.tooling.ProofAttemptJavaProjectModifier;
@@ -68,6 +67,11 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     * Page name of the evaluation instruction page.
     */
    public static final String EVALUATION_PAGE_NAME = "evaluationInstructions";
+
+   /**
+    * The name of the used random order computer.
+    */
+   public static final String RANDOM_COMPUTER_NAME = "UnderstandingProofAttemptsRandomFormOrderComputer";
 
 
    /**
@@ -148,7 +152,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Current date and time (nothing else!)");
       FixedForm introductionForm = new FixedForm("introductionForm", 
                                                  false,
-                                                 new UnderstandingProofAttemptsRandomFormOrderComputer(),
+                                                 RANDOM_COMPUTER_NAME,
                                                  conditionsPage, 
                                                  backgroundPage,
                                                  sendConditionsPage);

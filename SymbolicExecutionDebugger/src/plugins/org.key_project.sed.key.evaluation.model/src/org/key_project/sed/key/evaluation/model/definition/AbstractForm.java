@@ -2,7 +2,6 @@ package org.key_project.sed.key.evaluation.model.definition;
 
 import java.util.List;
 
-import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -12,7 +11,7 @@ public abstract class AbstractForm {
    
    private final List<AbstractPage> pages;
    
-   private final IRandomCompletion randomOrderComputer;
+   private final String randomOrderComputerName;
    
    private final boolean collectTimes;
    
@@ -26,14 +25,14 @@ public abstract class AbstractForm {
       this(name, collectTimes, null, pages);
    }
 
-   public AbstractForm(String name, boolean collectTimes, IRandomCompletion randomOrderComputer, AbstractPage... pages) {
-      this(name, collectTimes, randomOrderComputer, CollectionUtil.toList(pages));
+   public AbstractForm(String name, boolean collectTimes, String randomOrderComputerName, AbstractPage... pages) {
+      this(name, collectTimes, randomOrderComputerName, CollectionUtil.toList(pages));
    }
 
-   public AbstractForm(String name, boolean collectTimes, IRandomCompletion randomOrderComputer, List<AbstractPage> pages) {
+   public AbstractForm(String name, boolean collectTimes, String randomOrderComputerName, List<AbstractPage> pages) {
       this.name = name;
       this.collectTimes = collectTimes;
-      this.randomOrderComputer = randomOrderComputer;
+      this.randomOrderComputerName = randomOrderComputerName;
       this.pages = pages;
       for (AbstractPage page : pages) {
          page.setForm(this);
@@ -74,7 +73,7 @@ public abstract class AbstractForm {
       this.evaluation = evaluation;
    }
 
-   public IRandomCompletion getRandomOrderComputer() {
-      return randomOrderComputer;
+   public String getRandomOrderComputerName() {
+      return randomOrderComputerName;
    }
 }

@@ -13,9 +13,8 @@
 
 package org.key_project.util.java;
 
-import java.util.ArrayList;
+import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -571,17 +570,19 @@ public final class ArrayUtil {
     * Computes all permutations of the given array using the
     * '<a href="https://en.wikipedia.org/wiki/Heap's_algorithm">Heap's algorithm</a>'.
     * @param array The array to generate its permutations.
-    * @return The generated permutations.
+    * @return The generated permutations or {@code null} if the given array is {@code null}.
     * @see https://en.wikipedia.org/wiki/Heap's_algorithm
     */
-   public static <T> List<T[]> generatePermutations(T[] array) {
+   public static <T> T[][] generatePermutations(T[] array) {
       if (array != null) {
-         List<T[]> permutations = new ArrayList<T[]>(IntegerUtil.factorial(array.length));
-         generatePermutations(array, array.length, permutations);
+         @SuppressWarnings("unchecked")
+         T[][] permutations = (T[][])Array.newInstance(array.getClass(), 
+                                                       array.length > 0 ? IntegerUtil.factorial(array.length) : 0);
+         generatePermutations(array, array.length, permutations, 0);
          return permutations;
       }
       else {
-         return Collections.emptyList();
+         return null;
       }
    }
 
@@ -607,16 +608,18 @@ public final class ArrayUtil {
     * @param array The array to generate its permutations.
     * @param n The recursive termination criterion.
     * @param permutations The result {@link List} to fill.
+    * @return The next index in permutations to fill.
     * @see https://en.wikipedia.org/wiki/Heap's_algorithm
     */
-   private static <T> void generatePermutations(T[] array, int n, List<T[]> permutations) {
+   private static <T> int generatePermutations(T[] array, int n, T[][] permutations, int permutationsIndex) {
       if (n == 1) {
          T[] copy = Arrays.copyOf(array, array.length);
-         permutations.add(copy);
+         permutations[permutationsIndex] = copy;
+         permutationsIndex++; 
       }
       else {
          for (int i = 0; i < n; i++) {
-            generatePermutations(array, n - 1, permutations);
+            permutationsIndex = generatePermutations(array, n - 1, permutations, permutationsIndex);
             if (n % 2 != 0) {
                T tmp = array[i];
                array[i] = array[n - 1];
@@ -629,5 +632,6 @@ public final class ArrayUtil {
             }
          }
       }
+      return permutationsIndex;
    }
 }

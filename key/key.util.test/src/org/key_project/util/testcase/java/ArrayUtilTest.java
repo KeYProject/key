@@ -15,7 +15,6 @@ package org.key_project.util.testcase.java;
 
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -84,25 +83,30 @@ public class ArrayUtilTest extends TestCase {
     * @param expected The expected permutations.
     */
    private <T> void assertPermutations(T[] originalArray, @SuppressWarnings("unchecked") T[]... expected) {
-      List<T[]> current = ArrayUtil.generatePermutations(originalArray);
-      assertNotNull(current);
-      assertEquals(current.size(), expected.length);
-      Set<String> visitedExpectedPermutations = new HashSet<String>();
-      Set<String> visitedCurrentPermutations = new HashSet<String>();
-      for (int i = 0; i < current.size(); i++) {
-         T[] currentArray = current.get(i);
-         T[] expectedArray = expected[i];
-         assertNotSame(originalArray, currentArray);
-         assertNotSame(originalArray, expectedArray);
-         assertEquals(originalArray.length, currentArray.length);
-         assertEquals(originalArray.length, expectedArray.length);
-         assertArrayEquals(currentArray, expectedArray);
-         assertTrue("Expected permutation found multiple times!", visitedExpectedPermutations.add(ArrayUtil.toString(expectedArray)));
-         assertTrue("Current permutation found multiple times!", visitedCurrentPermutations.add(ArrayUtil.toString(currentArray)));
-         for (T element : originalArray) {
-            assertTrue(ArrayUtil.contains(expectedArray, element));
-            assertTrue(ArrayUtil.contains(currentArray, element));
+      T[][] current = ArrayUtil.generatePermutations(originalArray);
+      if (originalArray != null) {
+         assertNotNull(current);
+         assertEquals(current.length, expected.length);
+         Set<String> visitedExpectedPermutations = new HashSet<String>();
+         Set<String> visitedCurrentPermutations = new HashSet<String>();
+         for (int i = 0; i < current.length; i++) {
+            T[] currentArray = current[i];
+            T[] expectedArray = expected[i];
+            assertNotSame(originalArray, currentArray);
+            assertNotSame(originalArray, expectedArray);
+            assertEquals(originalArray.length, currentArray.length);
+            assertEquals(originalArray.length, expectedArray.length);
+            assertArrayEquals(currentArray, expectedArray);
+            assertTrue("Expected permutation found multiple times!", visitedExpectedPermutations.add(ArrayUtil.toString(expectedArray)));
+            assertTrue("Current permutation found multiple times!", visitedCurrentPermutations.add(ArrayUtil.toString(currentArray)));
+            for (T element : originalArray) {
+               assertTrue(ArrayUtil.contains(expectedArray, element));
+               assertTrue(ArrayUtil.contains(currentArray, element));
+            }
          }
+      }
+      else {
+         assertNull(current);
       }
    }
 

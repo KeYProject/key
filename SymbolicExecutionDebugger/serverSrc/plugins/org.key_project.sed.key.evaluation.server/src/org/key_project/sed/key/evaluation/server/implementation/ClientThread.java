@@ -8,10 +8,11 @@ import java.util.List;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
-import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
-import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
+import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
+import org.key_project.sed.key.evaluation.server.random.IRandomCompletion;
+import org.key_project.sed.key.evaluation.server.random.RandomCompletionManager;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -50,7 +51,8 @@ public class ClientThread extends Thread {
             EvaluationInput evaluationInput = EvaluationInputReader.parse(message);
             AbstractFormInput<?> formInput = evaluationInput.getCurrentFormInput();
             // Compute random orders
-            IRandomCompletion computer = formInput.getForm().getRandomOrderComputer();
+            String randomOrderComputer = formInput.getForm().getRandomOrderComputerName();
+            IRandomCompletion computer = RandomCompletionManager.createRandomCompletion(randomOrderComputer);
             List<RandomFormInput> updatedOrders = computer != null ? 
                                                   computer.computeRandomValues(evaluationInput, formInput) : 
                                                   null;

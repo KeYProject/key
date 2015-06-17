@@ -16,7 +16,6 @@ import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
-import org.key_project.sed.key.evaluation.model.random.IRandomCompletion;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -145,6 +144,20 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
             return CollectionUtil.toList(formInput);
          }
       };
+   }
+   
+   /**
+    * Interface to compute random values.
+    * @author Martin Hentschel
+    */
+   protected static interface IRandomCompletion {
+      /**
+       * Computes the random values.
+       * @param evaluationInput The current {@link EvaluationInput}.
+       * @param currentForm The current {@link AbstractFormInput}.
+       * @return The computed {@link RandomFormInput}s.
+       */
+      public List<RandomFormInput> computeRandomValues(EvaluationInput evaluationInput, AbstractFormInput<?> currentForm);
    }
    
    /**

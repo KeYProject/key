@@ -25,7 +25,6 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.key.evaluation.model.definition,
  org.key_project.sed.key.evaluation.model.input,
  org.key_project.sed.key.evaluation.model.io,
- org.key_project.sed.key.evaluation.model.random,
  org.key_project.sed.key.evaluation.model.tooling,
  org.key_project.sed.key.evaluation.model.util,
  org.key_project.sed.key.evaluation.model.validation

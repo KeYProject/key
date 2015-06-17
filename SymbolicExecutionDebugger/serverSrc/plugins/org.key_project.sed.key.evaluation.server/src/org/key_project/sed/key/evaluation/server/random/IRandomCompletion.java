@@ -1,4 +1,4 @@
-package org.key_project.sed.key.evaluation.model.random;
+package org.key_project.sed.key.evaluation.server.random;
 
 import java.util.List;
 
