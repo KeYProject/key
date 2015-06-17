@@ -164,6 +164,15 @@ public class CloseAfterJoin implements BuiltInRule {
                 }
             }
             
+            /**
+             * Returns true iff the join node is still contained in the proof.
+             * The method is optimized for the optimistic case that the join node
+             * is either a parent of the prune node or a child in the near neighborhood.
+             * This could be better than proof.root().find(joinNodeF) in many cases, and
+             * should not be worse in average.
+             *
+             * @return True iff the join node is still contained in the proof.
+             */
             private boolean findJoinNode() {
                 LinkedList<Node> queue = new LinkedList<Node>();
                 queue.add(prunedNode);
