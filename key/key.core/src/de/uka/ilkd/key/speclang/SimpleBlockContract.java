@@ -474,28 +474,127 @@ public final class SimpleBlockContract implements BlockContract {
                                      ImmutableSLList.<ProgramVariable>nil());
     }
 
-    // TODO Implement equals and hashCode properly.
-    /* @Override
-    public boolean equals(final Object object)
-    {
-        if (object == null) {
-            return false;
-        }
-        if (object == this) {
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        }
-        if (object.getClass() != getClass()) {
+        if (obj == null)
             return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SimpleBlockContract other = (SimpleBlockContract) obj;
+        if (block == null) {
+            if (other.block != null)
+                return false;
         }
-        final SimpleBlockContract contract = (SimpleBlockContract) object;
-        return ...
+        else if (!block.equals(other.block))
+            return false;
+        if (hasMod == null) {
+            if (other.hasMod != null)
+                return false;
+        }
+        else if (!hasMod.equals(other.hasMod))
+            return false;
+        if (infFlowSpecs == null) {
+            if (other.infFlowSpecs != null)
+                return false;
+        }
+        else if (!infFlowSpecs.equals(other.infFlowSpecs))
+            return false;
+        if (instantiationSelf == null) {
+            if (other.instantiationSelf != null)
+                return false;
+        }
+        else if (!instantiationSelf.equals(other.instantiationSelf))
+            return false;
+        if (joinProcedure == null) {
+            if (other.joinProcedure != null)
+                return false;
+        }
+        else if (!joinProcedure.equals(other.joinProcedure))
+            return false;
+        if (labels == null) {
+            if (other.labels != null)
+                return false;
+        }
+        else if (!labels.equals(other.labels))
+            return false;
+        if (method == null) {
+            if (other.method != null)
+                return false;
+        }
+        else if (!method.equals(other.method))
+            return false;
+        if (modality == null) {
+            if (other.modality != null)
+                return false;
+        }
+        else if (!modality.equals(other.modality))
+            return false;
+        if (modifiesClauses == null) {
+            if (other.modifiesClauses != null)
+                return false;
+        }
+        else if (!modifiesClauses.equals(other.modifiesClauses))
+            return false;
+        if (postconditions == null) {
+            if (other.postconditions != null)
+                return false;
+        }
+        else if (!postconditions.equals(other.postconditions))
+            return false;
+        if (preconditions == null) {
+            if (other.preconditions != null)
+                return false;
+        }
+        else if (!preconditions.equals(other.preconditions))
+            return false;
+        if (transactionApplicable != other.transactionApplicable)
+            return false;
+        if (variables == null) {
+            if (other.variables != null)
+                return false;
+        }
+        else if (!variables.equals(other.variables))
+            return false;
+        return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
-    public int hashCode()
-    {
-        return super.hashCode();
-    }*/
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((block == null) ? 0 : block.hashCode());
+        result = prime * result + ((hasMod == null) ? 0 : hasMod.hashCode());
+        result = prime * result
+                + ((infFlowSpecs == null) ? 0 : infFlowSpecs.hashCode());
+        result = prime
+                * result
+                + ((instantiationSelf == null) ? 0 : instantiationSelf
+                        .hashCode());
+        result = prime * result
+                + ((joinProcedure == null) ? 0 : joinProcedure.hashCode());
+        result = prime * result + ((labels == null) ? 0 : labels.hashCode());
+        result = prime * result + ((method == null) ? 0 : method.hashCode());
+        result = prime * result
+                + ((modality == null) ? 0 : modality.hashCode());
+        result = prime * result
+                + ((modifiesClauses == null) ? 0 : modifiesClauses.hashCode());
+        result = prime * result
+                + ((postconditions == null) ? 0 : postconditions.hashCode());
+        result = prime * result
+                + ((preconditions == null) ? 0 : preconditions.hashCode());
+        result = prime * result + (transactionApplicable ? 1231 : 1237);
+        result = prime * result
+                + ((variables == null) ? 0 : variables.hashCode());
+        return result;
+    }
 
     private Map<ProgramVariable, ProgramVariable>
                 createReplacementMap(final Variables newVariables,

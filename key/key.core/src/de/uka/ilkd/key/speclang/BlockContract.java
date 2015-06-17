@@ -272,6 +272,99 @@ public interface BlockContract extends SpecificationElement {
             }
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Object#hashCode()
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result
+                    + ((breakFlags == null) ? 0 : breakFlags.hashCode());
+            result = prime * result
+                    + ((continueFlags == null) ? 0 : continueFlags.hashCode());
+            result = prime * result
+                    + ((exception == null) ? 0 : exception.hashCode());
+            result = prime
+                    * result
+                    + ((remembranceHeaps == null) ? 0 : remembranceHeaps
+                            .hashCode());
+            result = prime
+                    * result
+                    + ((remembranceLocalVariables == null) ? 0
+                            : remembranceLocalVariables.hashCode());
+            result = prime * result
+                    + ((this.result == null) ? 0 : this.result.hashCode());
+            result = prime * result
+                    + ((returnFlag == null) ? 0 : returnFlag.hashCode());
+            result = prime * result + ((self == null) ? 0 : self.hashCode());
+            return result;
+        }
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Variables other = (Variables) obj;
+            if (breakFlags == null) {
+                if (other.breakFlags != null)
+                    return false;
+            }
+            else if (!breakFlags.equals(other.breakFlags))
+                return false;
+            if (continueFlags == null) {
+                if (other.continueFlags != null)
+                    return false;
+            }
+            else if (!continueFlags.equals(other.continueFlags))
+                return false;
+            if (exception == null) {
+                if (other.exception != null)
+                    return false;
+            }
+            else if (!exception.equals(other.exception))
+                return false;
+            if (remembranceHeaps == null) {
+                if (other.remembranceHeaps != null)
+                    return false;
+            }
+            else if (!remembranceHeaps.equals(other.remembranceHeaps))
+                return false;
+            if (remembranceLocalVariables == null) {
+                if (other.remembranceLocalVariables != null)
+                    return false;
+            }
+            else if (!remembranceLocalVariables
+                    .equals(other.remembranceLocalVariables))
+                return false;
+            if (result == null) {
+                if (other.result != null)
+                    return false;
+            }
+            else if (!result.equals(other.result))
+                return false;
+            if (returnFlag == null) {
+                if (other.returnFlag != null)
+                    return false;
+            }
+            else if (!returnFlag.equals(other.returnFlag))
+                return false;
+            if (self == null) {
+                if (other.self != null)
+                    return false;
+            }
+            else if (!self.equals(other.self))
+                return false;
+            return true;
+        }
+
     }
 
     public static class VariablesCreator extends TermBuilder {
