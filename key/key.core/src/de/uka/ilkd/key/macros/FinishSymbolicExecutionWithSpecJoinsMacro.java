@@ -406,7 +406,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                                             .node().getNodeInfo()
                                             .getBranchLabel()
                                             .equals("Joined node is weakening"))
-                                    && getBreakPoint(subGoal.sequent().succedent()) != null) {
+                                    && hasBreakPoint(subGoal.sequent().succedent(), goal.proof().getServices())) {
                                 allStopped = allStopped
                                         && stoppedGoals.contains(subGoal);
                             }
@@ -619,6 +619,48 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             }
 
             return null;
+        }
+
+        /**
+         * TODO
+         * 
+         * @param succedent
+         *            Succedent of a sequent.
+         * @return A Statement (the registered breakpoint) iff the given
+         *         succedent has one formula with a break point statement, else
+         *         null;
+         */
+        private boolean hasBreakPoint(Semisequent succedent, Services services) {
+            for (SequentFormula formula : succedent.asList()) {
+                JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
+                        formula.formula());
+                
+                StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program());
+                
+                if (blockWithoutMethodFrame.isEmpty()) {
+                    continue;
+                }
+                
+                SourceElement activeStatement = null;
+                do {
+                    final SourceElement oldActiveStatement = activeStatement;
+                    activeStatement = JavaTools
+                            .getActiveStatement(javaBlock);
+                    
+                    if (oldActiveStatement != null && oldActiveStatement.equals(activeStatement)) {
+                        break;
+                    }
+                    
+                    javaBlock = JavaTools.removeActiveStatement(javaBlock, services);
+                    
+                    if (activeStatement instanceof Statement
+                            && breakpoints.contains((Statement) activeStatement)) {
+                        return true;
+                    }
+                } while (true);
+            }
+
+            return false;
         }
 
     }
