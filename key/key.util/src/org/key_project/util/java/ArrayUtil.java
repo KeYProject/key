@@ -13,6 +13,9 @@
 
 package org.key_project.util.java;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -561,6 +564,70 @@ public final class ArrayUtil {
       }
       else {
          return null;
+      }
+   }
+   
+   /**
+    * Computes all permutations of the given array using the
+    * '<a href="https://en.wikipedia.org/wiki/Heap's_algorithm">Heap's algorithm</a>'.
+    * @param array The array to generate its permutations.
+    * @return The generated permutations.
+    * @see https://en.wikipedia.org/wiki/Heap's_algorithm
+    */
+   public static <T> List<T[]> generatePermutations(T[] array) {
+      if (array != null) {
+         List<T[]> permutations = new ArrayList<T[]>(IntegerUtil.factorial(array.length));
+         generatePermutations(array, array.length, permutations);
+         return permutations;
+      }
+      else {
+         return Collections.emptyList();
+      }
+   }
+
+   /**
+    * Recursive implementation of the '<a href="https://en.wikipedia.org/wiki/Heap's_algorithm">Heap's algorithm</a>':
+    * <code>
+    * <pre>
+    * procedure generate(n : integer, A : array of any):
+    *    if n = 1 then
+    *       output(A)
+    *    else
+    *       for i := 0; i < n; i += 1 do
+    *          generate(n - 1, A)
+    *          if n is even then
+    *             swap(A[i], A[n-1])
+    *          else
+    *             swap(A[0], A[n-1])
+    *          end if
+    *       end for
+    *    end if
+    * </pre>
+    * </code>
+    * @param array The array to generate its permutations.
+    * @param n The recursive termination criterion.
+    * @param permutations The result {@link List} to fill.
+    * @see https://en.wikipedia.org/wiki/Heap's_algorithm
+    */
+   private static <T> void generatePermutations(T[] array, int n, List<T[]> permutations) {
+      if (n == 1) {
+         T[] copy = Arrays.copyOf(array, array.length);
+         permutations.add(copy);
+      }
+      else {
+         for (int i = 0; i < n; i++) {
+            generatePermutations(array, n - 1, permutations);
+            if (n % 2 != 0) {
+               T tmp = array[i];
+               array[i] = array[n - 1];
+               array[n - 1] = tmp;
+            }
+            else {
+               T tmp = array[0];
+               array[0] = array[n - 1];
+               array[n - 1] = tmp;
+            }
+         }
       }
    }
 }
