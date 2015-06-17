@@ -395,24 +395,20 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                     if ((breakpoint = getBreakPoint(goal.sequent().succedent())) != null) {
                         final ImmutableList<Goal> subtreeGoals = goal.proof()
                                 .getSubtreeEnabledGoals(
-                                        commonParents.get(breakpoint));
+                                        commonParents.get(breakpoint)).removeFirst(goal);
 
                         boolean allStopped = true;
+                        int nrCandidates = 0;
                         for (Goal subGoal : subtreeGoals) {
-                            if (!subGoal.equals(goal)
-                                    && !subGoal.isLinked()
-                                    && (subGoal.node().getNodeInfo()
-                                            .getBranchLabel() == null || !subGoal
-                                            .node().getNodeInfo()
-                                            .getBranchLabel()
-                                            .equals("Joined node is weakening"))
-                                    && hasBreakPoint(subGoal.sequent().succedent(), goal.proof().getServices())) {
+                            if (!subGoal.isLinked()
+                                    && hasBreakPoint(subGoal.sequent().succedent(), goal.proof().getServices(), breakpoint)) {
                                 allStopped = allStopped
                                         && stoppedGoals.contains(subGoal);
+                                nrCandidates++;
                             }
                         }
 
-                        if (allStopped) {
+                        if (allStopped && nrCandidates > 0) {
                             // We stopped all Goals potentially participating in
                             // the join; now we collect the information about
                             // the join. After a successful join app
@@ -450,9 +446,16 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             breakpoints.remove(breakpoint);
                             commonParents.remove(breakpoint);
 
-                            joinInformation = new Pair<Goal, JoinRuleBuiltInRuleApp>(
-                                    goal, joinApp);
-                            enforceJoin = true;
+                            if (joinApp.getJoinPartners().isEmpty()) {
+                                // This is obviously not a real join point: May happen
+                                // in certain more complicated scenarios. Stop trying to
+                                // join at this point.
+                                return super.isApprovedApp(app, pio, goal);
+                            } else {
+                                joinInformation = new Pair<Goal, JoinRuleBuiltInRuleApp>(
+                                        goal, joinApp);
+                                enforceJoin = true;
+                            }
                         }
                         else {
                             stoppedGoals.add(goal);
@@ -500,10 +503,6 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             Semisequent succedent = sequent.succedent();
 
             for (SequentFormula formula : succedent) {
-                // Statement firstStmt =
-                // getFirstStatementOfMethodFrameBlock((StatementBlock)
-                // getJavaBlockRecursive(
-                // formula.formula()).program());
                 SourceElement activeStmt = JavaTools
                         .getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(formula
                                 .formula()));
@@ -596,8 +595,8 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          * @param succedent
          *            Succedent of a sequent.
          * @return A Statement (the registered breakpoint) iff the given
-         *         succedent has one formula with a break point statement, else
-         *         null;
+         *         succedent has one formula starting with a break point
+         *         statement, else null;
          */
         private Statement getBreakPoint(Semisequent succedent) {
             for (SequentFormula formula : succedent.asList()) {
@@ -620,17 +619,32 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
             return null;
         }
-
+        
         /**
-         * TODO
-         * 
          * @param succedent
          *            Succedent of a sequent.
-         * @return A Statement (the registered breakpoint) iff the given
-         *         succedent has one formula with a break point statement, else
-         *         null;
+         * @return True iff the given succedent has one formula with a break
+         *         point statement, else null;
          */
-        private boolean hasBreakPoint(Semisequent succedent, Services services) {
+        private boolean hasBreakPoint(final Semisequent succedent, final Services services, final Statement breakpoint) {
+            return hasStmtForWhichPredicateHolds(succedent, services, new Predicate<Statement>() {
+                @Override
+                public boolean holdsFor(Statement arg) {
+                    // Alternative for checking for the existence of any breakpoint:
+                    // -> breakpoints.contains(arg)
+                    return arg.equals(breakpoint);
+                }
+            });
+        }
+
+        /**
+         * @param succedent
+         *            Succedent of a sequent.
+         * @param pred
+         *            A decision predicate.
+         * @return True iff the given succedent has one formula for which pred holds.
+         */
+        private boolean hasStmtForWhichPredicateHolds(final Semisequent succedent, final Services services, final Predicate<Statement> pred) {
             for (SequentFormula formula : succedent.asList()) {
                 JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
                         formula.formula());
@@ -648,13 +662,18 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             .getActiveStatement(javaBlock);
                     
                     if (oldActiveStatement != null && oldActiveStatement.equals(activeStatement)) {
-                        break;
+                        continue;
                     }
                     
-                    javaBlock = JavaTools.removeActiveStatement(javaBlock, services);
+                    try {
+                        javaBlock = JavaTools.removeActiveStatement(javaBlock, services);
+                    } catch (IndexOutOfBoundsException e) {
+                        // No more statement to check
+                        continue;
+                    }
                     
                     if (activeStatement instanceof Statement
-                            && breakpoints.contains((Statement) activeStatement)) {
+                            && pred.holdsFor((Statement) activeStatement)) {
                         return true;
                     }
                 } while (true);
@@ -663,6 +682,10 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             return false;
         }
 
+    }
+    
+    private static interface Predicate<T> {
+        boolean holdsFor(T arg);
     }
 
 }
