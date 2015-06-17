@@ -20,6 +20,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.substConstantsByFreshV
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ForkJoinPool;
 
@@ -164,16 +165,35 @@ public class CloseAfterJoin implements BuiltInRule {
             }
             
             private boolean findJoinNode() {
+                LinkedList<Node> queue = new LinkedList<Node>();
+                queue.add(prunedNode);
+                
                 Node currNode = prunedNode;
                 while (currNode != null) {
                     if (currNode.equals(joinNodeF)) {
                         return true;
                     }
                     
+                    if (currNode.parent() != null && currNode.parent().childrenCount() > 1) {
+                        Iterator<Node> childrenIterator = currNode.parent().childrenIterator();
+                        while (childrenIterator.hasNext()) {
+                            Node child = childrenIterator.next();
+                            if (!child.equals(currNode)) {
+                                queue.add(child);
+                            }
+                        }
+                    }
+                    
                     currNode = currNode.parent();
                 }
                 
-                return prunedNode.find(joinNodeF);
+                for (Node toCheck : queue) {
+                    if (toCheck.find(joinNodeF)) {
+                        return true;
+                    }
+                }
+                
+                return false;
             }
 
         });
