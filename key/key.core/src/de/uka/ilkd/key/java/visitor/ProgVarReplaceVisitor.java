@@ -264,7 +264,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 services.getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
             services.getSpecificationRepository().addBlockContract(
-                    createNewBlockContract(oldContract, newBlock, oldBlock.equals(newBlock)));
+                    createNewBlockContract(oldContract, newBlock, !oldBlock.equals(newBlock)));
         }
     }
 
