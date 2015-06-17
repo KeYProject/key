@@ -11,6 +11,8 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import static org.junit.Assert.*;
+
 /**
  * Data structure for .key-files that will be tested during
  * {@link RunAllProofsTest} execution. It consists of a {@link #testProperty}
@@ -229,6 +231,7 @@ public class TestFile implements Serializable {
          proofLoadEnvironment = KeYEnvironment
                .load(proofFile);
          reloadedProof = proofLoadEnvironment.getLoadedProof();
+         assertTrue("Reloaded proof did not close", reloadedProof.closed());
       }
       catch (Throwable t) {
          throw new Exception(

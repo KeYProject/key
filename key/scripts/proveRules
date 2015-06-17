@@ -1,16 +1,15 @@
 #!/bin/sh
 
 #
-# RunAllProofs documentation can be found at: key/doc/README.runAllProofs
+# ProveRules documentation can be found at: key/doc/README.proveRules
 #
 
 LIST_TESTS_FLAG=--list-tests
-RELOAD_ENABLED_FLAG=--reload-enabled
 FORK_MODE_FLAG=--fork-mode
 
 list_help() {
     echo "Usage: runAllProofs [$LIST_TESTS_FLAG] | [ [$RELOAD_ENABLED_FLAG=<true|false>]"
-    echo "                                       [$FORK_MODE_FLAG=<perFile|perGroup|noFork>]"
+    echo "                                       [$FORK_MODE_FLAG=<perTaclet|noFork>]"
     echo "                                       <groupNames> ]"
     echo "Examples: runAllProofs $FORK_MODE_FLAG=perFile newBook comprehensions"
     echo "          runAllProofs $LIST_TESTS_FLAG"
@@ -71,5 +70,5 @@ if [ "$#" -ne 0 ]
     JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.testCases=$TEST_CASES"
 fi
 
-tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
+tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.proverules.ProveRulesTest
 
