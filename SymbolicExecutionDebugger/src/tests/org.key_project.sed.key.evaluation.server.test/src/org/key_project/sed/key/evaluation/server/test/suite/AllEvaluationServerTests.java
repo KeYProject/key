@@ -16,6 +16,7 @@ package org.key_project.sed.key.evaluation.server.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.sed.key.evaluation.server.test.testcase.PermutationIndexTest;
+import org.key_project.sed.key.evaluation.server.test.testcase.UnderstandingProofAttemptsRandomFormOrderComputerTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -23,7 +24,8 @@ import org.key_project.sed.key.evaluation.server.test.testcase.PermutationIndexT
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   PermutationIndexTest.class
+   PermutationIndexTest.class,
+   UnderstandingProofAttemptsRandomFormOrderComputerTest.class
 })
 public class AllEvaluationServerTests {
 }

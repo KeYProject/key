@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.util.ServerSettings;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
+import org.key_project.sed.key.evaluation.server.random.RandomCompletionManager;
+import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer;
 
 /**
  * The server which runs forever and listens for client connections.
@@ -18,8 +21,6 @@ public class SEDServer {
     */
    public static void main(String[] args) {
       try {
-         // Start server
-         System.out.println("Forms will be stored at " + FileStorage.FORM_STORAGE_LOCATION);
          start();
       }
       catch (Exception e) {
@@ -33,6 +34,13 @@ public class SEDServer {
     * @throws IOException Occurred Exception.
     */
    public static void start() throws IOException {
+      // Index random completions
+      System.out.println("Indexing random proof attempts completion.");
+      UnderstandingProofAttemptsRandomFormOrderComputer computer = new UnderstandingProofAttemptsRandomFormOrderComputer(FileStorage.FORM_STORAGE_LOCATION);
+      RandomCompletionManager.registerRandomCompletion(UnderstandingProofAttemptsEvaluation.RANDOM_COMPUTER_NAME, computer);
+      // Print information about storage location
+      System.out.println("Forms will be stored at " + FileStorage.FORM_STORAGE_LOCATION);
+      // Open socket
       ServerSocket ss = new ServerSocket(ServerSettings.PORT);
       try {
          System.out.println("Server running at port " + ss.getLocalPort() + ".");

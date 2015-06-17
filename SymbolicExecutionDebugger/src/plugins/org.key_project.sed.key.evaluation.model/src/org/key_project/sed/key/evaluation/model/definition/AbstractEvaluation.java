@@ -3,6 +3,7 @@ package org.key_project.sed.key.evaluation.model.definition;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
+import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -78,7 +79,6 @@ public abstract class AbstractEvaluation {
     * @return {@code true} user interface available, {@code false} user interface not available.
     */
    protected static boolean isUIAvailable() {
-      return Display.getDefault() != null && !Display.getDefault().isDisposed();
+      return Activator.getDefault() != null && Display.getDefault() != null && !Display.getDefault().isDisposed();
    }
-
 }

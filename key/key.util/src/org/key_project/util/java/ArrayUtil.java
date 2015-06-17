@@ -340,7 +340,7 @@ public final class ArrayUtil {
     * @param array The array to convert.
     * @return The array as {@link String}.
     */
-   public static <T> String toString(T[] array) {
+   public static <T> String toString(@SuppressWarnings("unchecked") T... array) {
        return toString(array, ", ");
    }
    

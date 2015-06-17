@@ -73,6 +73,16 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     */
    public static final String RANDOM_COMPUTER_NAME = "UnderstandingProofAttemptsRandomFormOrderComputer";
 
+   /**
+    * The name of the evaluation form.
+    */
+   public static final String EVALUATION_FORM_NAME = "evaluationForm";
+
+   /**
+    * The name of the introduction form.
+    */
+   public static final String INTRODUCTION_FORM_NAME = "introductionForm";
+
 
    /**
     * Forbid additional instances.
@@ -86,8 +96,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     */
    @Override
    protected List<Tool> computeTools() {
-      URL keyURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/KeY.html");
-      URL sedURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/SED.html");
+      URL keyURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/KeY.html") : null;
+      URL sedURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/SED.html") : null;
       Tool key = new Tool(KEY_TOOL_NAME, keyURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
       Tool sed = new Tool(SED_TOOL_NAME, sedURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
       return CollectionUtil.toList(key, sed);
@@ -99,7 +109,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    @Override
    protected List<AbstractForm> computeForms() {
       // Create introduction form
-      URL conditionsURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/conditions.html");
+      URL conditionsURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/conditions.html") : null;
       QuestionPage conditionsPage = new QuestionPage("conditionsPage", 
                                                      "Introduction", 
                                                      "Please read the information and conditions of the evaluation carefully.",
@@ -150,15 +160,15 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Confirm Sending Background Knowledge (used to order proof attempts)", 
                                                          "Optionally, inspect the answers to be send.", 
                                                          "Current date and time (nothing else!)");
-      FixedForm introductionForm = new FixedForm("introductionForm", 
+      FixedForm introductionForm = new FixedForm(INTRODUCTION_FORM_NAME, 
                                                  false,
                                                  RANDOM_COMPUTER_NAME,
                                                  conditionsPage, 
                                                  backgroundPage,
                                                  sendConditionsPage);
       // Create evaluation form
-      URL evaluationURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/EvaluationIntroduction.html");
-      URL jmlURL = Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/JML.html");
+      URL evaluationURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/EvaluationIntroduction.html") : null;
+      URL jmlURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/JML.html") : null;
       InstructionPage evaluationPage = new InstructionPage(EVALUATION_PAGE_NAME, "Evaluation Instructions", "Read the evaluation instructions carefully before continuing.", evaluationURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.EVALUATION) : null);
       InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO) : null);
       ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
@@ -172,7 +182,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                          "Confirm Sending Evaluation Answers", 
                                                          "Optionally, inspect the answers to be send.", 
                                                          "Current date and time (nothing else!)");
-      RandomForm evaluationForm = new RandomForm("evaluationForm", true, evaluationPage, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
+      RandomForm evaluationForm = new RandomForm(EVALUATION_FORM_NAME, true, evaluationPage, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
       // Create thanks form
       QuestionPage thanksPage = new QuestionPage("thanksPage", 
                                                  "Evaluation sucessfully completed", 

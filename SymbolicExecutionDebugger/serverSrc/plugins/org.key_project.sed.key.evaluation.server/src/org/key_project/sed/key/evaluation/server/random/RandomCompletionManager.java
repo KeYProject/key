@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.server.random;
 
-import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages the available {@link IRandomCompletion} implementations.
@@ -8,9 +9,25 @@ import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAtt
  */
 public final class RandomCompletionManager {
    /**
+    * Contains all available {@link IRandomCompletion}s.
+    */
+   private final static Map<String, IRandomCompletion> randomCompletions = new HashMap<String, IRandomCompletion>();
+   
+   /**
     * Forbid instances.
     */
    private RandomCompletionManager() {
+   }
+
+   /**
+    * Register an {@link IRandomCompletion} under the given name.
+    * @param name The name of the random completion.
+    * @param completion The {@link IRandomCompletion} instance.
+    */
+   public static void registerRandomCompletion(String name, IRandomCompletion completion) {
+      if (name != null && completion != null) {
+         randomCompletions.put(name, completion);
+      }
    }
    
    /**
@@ -19,8 +36,8 @@ public final class RandomCompletionManager {
     * @return The created {@link IRandomCompletion} or {@code null} if the name is unknown.
     */
    public static IRandomCompletion createRandomCompletion(String name) {
-      if (UnderstandingProofAttemptsEvaluation.RANDOM_COMPUTER_NAME.equals(name)) {
-         return new UnderstandingProofAttemptsRandomFormOrderComputer();
+      if (name != null) {
+         return randomCompletions.get(name);
       }
       else {
          return null;

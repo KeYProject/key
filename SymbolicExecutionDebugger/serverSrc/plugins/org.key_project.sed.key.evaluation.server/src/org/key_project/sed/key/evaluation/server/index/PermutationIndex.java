@@ -98,6 +98,16 @@ public class PermutationIndex<E, D> {
          CollectionUtil.binaryInsert(index, entry, entryComparator);
       }
    }
+
+   /**
+    * Print the index into the console.
+    */
+   public void print() {
+      System.out.println("Size: " + size());
+      for (Entry<E, D> entry : index) {
+         System.out.println(entry);
+      }
+   }
    
    /**
     * Modifies a given {@link Entry}.
