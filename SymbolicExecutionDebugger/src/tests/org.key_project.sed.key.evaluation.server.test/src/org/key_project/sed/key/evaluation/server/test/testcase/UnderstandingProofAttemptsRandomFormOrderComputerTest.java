@@ -23,6 +23,7 @@ import org.key_project.sed.key.evaluation.server.index.PermutationIndex;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex.Entry;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer;
+import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.BalancingEntry;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.IndexData;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.IndexDataComparator;
 import org.key_project.util.java.ArrayUtil;
@@ -308,16 +309,21 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
          AbstractForm introductionForm = UnderstandingProofAttemptsEvaluation.INSTANCE.getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME);
          QuestionPage backgroundPage = (QuestionPage) introductionForm.getPage(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
          RadioButtonsQuestion keyQuestion = (RadioButtonsQuestion) backgroundPage.getQuestion(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
-         assertEquals(keyQuestion.countChoices(), computer.getIndexMap().size());
+         assertEquals(keyQuestion.countChoices(), computer.getBalancingMap().size());
          for (Choice choice : keyQuestion.getChoices()) {
-            assertTrue(computer.getIndexMap().containsKey(choice.getValue()));
+            assertTrue(computer.getBalancingMap().containsKey(choice.getValue()));
             // Ensure right index content
             Map<String, IndexData> expectedIndexData = expectedData.get(choice.getValue());
-            for (Entry<String, IndexData> entry : computer.getIndex(choice.getValue()).getIndex()) {
+            BalancingEntry balancingEntry = computer.getBalancingEntry(choice.getValue());
+            int keyCountTotal = 0;
+            int sedCountTotal = 0;
+            for (Entry<String, IndexData> entry : balancingEntry.getPermutationIndex().getIndex()) {
                if (expectedIndexData != null) {
                   String permuationKey = ArrayUtil.toString(entry.getPermutation());
                   IndexData expected = expectedIndexData.get(permuationKey);
                   if (expected != null) {
+                     keyCountTotal += expected.getKeyCount();
+                     sedCountTotal += expected.getSedCount();
                      assertIndexData(expected, entry.getData());
                   }
                   else {
@@ -328,6 +334,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
                   assertIndexData(new IndexData(), entry.getData());
                }
             }
+            // Ensure right balancing content
+            assertEquals(keyCountTotal, balancingEntry.getKeyCountTotal());
+            assertEquals(sedCountTotal, balancingEntry.getSedCountTotal());
          }
       }
       finally {

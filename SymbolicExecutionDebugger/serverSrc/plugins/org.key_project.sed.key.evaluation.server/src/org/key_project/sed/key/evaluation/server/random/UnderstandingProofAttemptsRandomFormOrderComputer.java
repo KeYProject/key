@@ -2,6 +2,7 @@ package org.key_project.sed.key.evaluation.server.random;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex;
+import org.key_project.sed.key.evaluation.server.index.PermutationIndex.Entry;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex.IDataFactory;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.util.java.ArrayUtil;
@@ -36,9 +38,9 @@ import org.key_project.util.java.ObjectUtil;
  */
 public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRandomCompletion {
    /**
-    * The used {@link PermutationIndex} instances for balancing purpose.
+    * The used {@link BalancingEntry} instances for balancing purpose.
     */
-   private final Map<String, PermutationIndex<String, IndexData>> indexMap = new HashMap<String, PermutationIndex<String,IndexData>>();
+   private final Map<String, BalancingEntry> balancingMap = new HashMap<String, BalancingEntry>();
 
    /**
     * Constructor.
@@ -135,8 +137,15 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
             }
          };
          IndexDataComparator dataComparator = new IndexDataComparator();
-         PermutationIndex<String, IndexData> index = new PermutationIndex<String, IndexData>(elements, dataFactory, dataComparator);
-         indexMap.put(choice.getValue(), index);
+         PermutationIndex<String, IndexData> permutationIndex = new PermutationIndex<String, IndexData>(elements, dataFactory, dataComparator);
+         int keyCountTotal = 0;
+         int sedCountTotal = 0;
+         for (Entry<String, IndexData> indexEntry : permutationIndex.getIndex()) {
+            IndexData indexData = indexEntry.getData();
+            keyCountTotal += indexData.getKeyCount();
+            sedCountTotal += indexData.getSedCount();
+         }
+         balancingMap.put(choice.getValue(), new BalancingEntry(permutationIndex, keyCountTotal, sedCountTotal));
       }
    }
 
@@ -164,19 +173,19 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
    }
 
    /**
-    * Returns the used {@link PermutationIndex}.
-    * @return The used {@link PermutationIndex}.
+    * Returns the used {@link BalancingEntry} for the given KeY experience.
+    * @return The used {@link BalancingEntry}.
     */
-   public PermutationIndex<String, IndexData> getIndex(String keyExperience) {
-      return indexMap.get(keyExperience);
+   public BalancingEntry getBalancingEntry(String keyExperience) {
+      return balancingMap.get(keyExperience);
    }
 
    /**
-    * Returns the available {@link PermutationIndex} instances for balancing.
-    * @return The available {@link PermutationIndex} instances for balancing.
+    * Returns the available {@link BalancingEntry} instances for balancing.
+    * @return The available {@link BalancingEntry} instances for balancing.
     */
-   public Map<String, PermutationIndex<String, IndexData>> getIndexMap() {
-      return indexMap;
+   public Map<String, BalancingEntry> getBalancingMap() {
+      return Collections.unmodifiableMap(balancingMap);
    }
 
    /**
@@ -444,6 +453,63 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
                  ", KeY Completed Count = " + keyCompletedCount +
                  ", SED Count = " + sedCount +
                  ", SED Completed Count = " + sedCompletedCount;
+      }
+   }
+   
+   /**
+    * Provides all information relevant for balancing.
+    * @author Martin Hentschel
+    */
+   public static class BalancingEntry {
+      /**
+       * The used {@link PermutationIndex}.
+       */
+      private final PermutationIndex<String, IndexData> permutationIndex;
+      
+      /**
+       * The total amount of KeY count.
+       */
+      private int keyCountTotal;
+      
+      /**
+       * The total amount of SED count.
+       */
+      private int sedCountTotal;
+
+      /**
+       * Constructor.
+       * @param permutationIndex The used {@link PermutationIndex}.
+       * @param keyCountTotal The total amount of KeY count.
+       * @param sedCountTotal The total amount of SED count.
+       */
+      public BalancingEntry(PermutationIndex<String, IndexData> permutationIndex, int keyCountTotal, int sedCountTotal) {
+         this.permutationIndex = permutationIndex;
+         this.keyCountTotal = keyCountTotal;
+         this.sedCountTotal = sedCountTotal;
+      }
+
+      /**
+       * Returns the used {@link PermutationIndex}.
+       * @return The used {@link PermutationIndex}.
+       */
+      public PermutationIndex<String, IndexData> getPermutationIndex() {
+         return permutationIndex;
+      }
+
+      /**
+       * Returns the total amount of KeY count.
+       * @return The total amount of KeY count.
+       */
+      public int getKeyCountTotal() {
+         return keyCountTotal;
+      }
+
+      /**
+       * Returns the total amount of SED count.
+       * @return The total amount of SED count.
+       */
+      public int getSedCountTotal() {
+         return sedCountTotal;
       }
    }
 }
