@@ -39,33 +39,125 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     */
    @Test
    public void testIndexDataComparator() {
-      IndexDataComparator c = new IndexDataComparator();
       // Test equal instances
-      assertEquals(c.compare(new IndexData(0, 0, 0, 0), new IndexData(0, 0, 0, 0)), 0);
-      assertEquals(c.compare(new IndexData(1, 0, 0, 0), new IndexData(1, 0, 0, 0)), 0);
-      assertEquals(c.compare(new IndexData(0, 2, 0, 0), new IndexData(0, 2, 0, 0)), 0);
-      assertEquals(c.compare(new IndexData(0, 0, 3, 0), new IndexData(0, 0, 3, 0)), 0);
-      assertEquals(c.compare(new IndexData(0, 0, 0, 4), new IndexData(0, 0, 0, 4)), 0);
-      // Test same completion, but different first counts
-      assertEquals(c.compare(new IndexData(0, 0, 0, 0), new IndexData(1, 0, 0, 0)), -1);
-      assertEquals(c.compare(new IndexData(0, 0, 0, 0), new IndexData(0, 1, 0, 0)), -1);
-      assertEquals(c.compare(new IndexData(0, 2, 0, 0), new IndexData(1, 2, 0, 0)), -1);
-      assertEquals(c.compare(new IndexData(2, 0, 0, 0), new IndexData(2, 1, 0, 0)), -1);
-      // Test same completion, but different first counts
-      assertEquals(c.compare(new IndexData(1, 0, 0, 0), new IndexData(0, 0, 0, 0)), 1);
-      assertEquals(c.compare(new IndexData(0, 1, 0, 0), new IndexData(0, 0, 0, 0)), 1);
-      assertEquals(c.compare(new IndexData(1, 2, 0, 0), new IndexData(0, 2, 0, 0)), 1);
-      assertEquals(c.compare(new IndexData(2, 1, 0, 0), new IndexData(2, 0, 0, 0)), 1);
-      // Test different completion, but different first counts
-      assertEquals(c.compare(new IndexData(9, 9, 0, 0), new IndexData(1, 0, 0, 1)), -1);
-      assertEquals(c.compare(new IndexData(9, 9, 0, 0), new IndexData(0, 1, 1, 0)), -1);
-      assertEquals(c.compare(new IndexData(9, 9, 0, 0), new IndexData(1, 2, 0, 1)), -1);
-      assertEquals(c.compare(new IndexData(9, 9, 0, 0), new IndexData(2, 1, 1, 0)), -1);
-      // Test different completion, but different first counts
-      assertEquals(c.compare(new IndexData(1, 0, 1, 0), new IndexData(9, 9, 0, 0)), 1);
-      assertEquals(c.compare(new IndexData(0, 1, 0, 1), new IndexData(9, 9, 0, 0)), 1);
-      assertEquals(c.compare(new IndexData(1, 2, 1, 0), new IndexData(9, 9, 0, 0)), 1);
-      assertEquals(c.compare(new IndexData(2, 1, 0, 1), new IndexData(9, 9, 0, 0)), 1);
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(0, 0, 0, 0), 0);
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(1, 0, 0, 0), 0);
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(0, 2, 0, 0), 0);
+      doComparisionTest(new IndexData(0, 0, 3, 0), new IndexData(0, 0, 3, 0), 0);
+      doComparisionTest(new IndexData(0, 0, 0, 4), new IndexData(0, 0, 0, 4), 0);
+      // Test random examples
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(1, 0, 0, 0), 1); // Second smaller, because other tool is missing
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(0, 1, 0, 0), 1); // Second smaller, because other tool is missing
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(1, 1, 0, 0), -1); // First smaller, because less used
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(0, 2, 0, 0), -1); // First smaller, because less used
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(0, 2, 0, 0), -1); // First smaller, because less used
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(2, 2, 0, 0), -1); // First smaller, because less used
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(2, 1, 0, 0), 1); // Second smaller, because other tool is missing
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(3, 1, 0, 0), 1); // Second smaller, because other tool is missing
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(3, 1, 0, 0), -1); // First smaller, because less used
+      // Test different counts systematically
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(0, 0, 0, 0), 0); // Equal
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(0, 1, 0, 0), 1); // Bigger as unbalanced
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(0, 2, 0, 0), 1); // Bigger as unbalanced
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(1, 0, 0, 0), 1); // Bigger as unbalanced
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(1, 1, 0, 0), -1); // Smaller
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(1, 2, 0, 0), 1); // Bigger as unbalanced
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(2, 0, 0, 0), 1); // Bigger as unbalanced
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(2, 1, 0, 0), 1); // Bigger as unbalanced
+      doComparisionTest(new IndexData(0, 0, 0, 0), new IndexData(2, 2, 0, 0), -1); // Smaller
+
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(0, 0, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(0, 1, 0, 0), 0); // Equal
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(0, 2, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(1, 0, 0, 0), 0); // Equally unbalanced
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(1, 1, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(1, 2, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(2, 0, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(2, 1, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(0, 1, 0, 0), new IndexData(2, 2, 0, 0), -1); // Smaller as unbalanced
+
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(0, 0, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(0, 1, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(0, 2, 0, 0), 0); // Equal
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(1, 0, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(1, 1, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(1, 2, 0, 0), -1); // Smaller unbalanced
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(2, 0, 0, 0), 0); // Equally unbalanced
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(2, 1, 0, 0), -1); // Smaller unbalanced
+      doComparisionTest(new IndexData(0, 2, 0, 0), new IndexData(2, 2, 0, 0), -1); // Smaller as unbalanced
+
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(0, 0, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(0, 1, 0, 0), 0); // Equally unbalanced
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(0, 2, 0, 0), -1); // Smaller unbalanced
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(1, 0, 0, 0), 0); // Equal
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(1, 1, 0, 0), -1); // Smaller
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(1, 2, 0, 0), -1); // Smaller unbalanced
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(2, 0, 0, 0), -1); // Smaller unbalanced
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(2, 1, 0, 0), -1); // Smaller unbalanced
+      doComparisionTest(new IndexData(1, 0, 0, 0), new IndexData(2, 2, 0, 0), -1); // Smaller as unbalanced
+
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(0, 0, 0, 0), 1); // Bigger
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(0, 1, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(0, 2, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(1, 0, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(1, 1, 0, 0), 0); // Equal
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(1, 2, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(2, 0, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(2, 1, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(1, 1, 0, 0), new IndexData(2, 2, 0, 0), -1); // Smaller
+
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(0, 0, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(0, 1, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(0, 2, 0, 0), 1); // Bigger as less unbalanced
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(1, 0, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(1, 1, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(1, 2, 0, 0), 0); // Equal
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(2, 0, 0, 0), 1); // Bigger as less unbalanced
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(2, 1, 0, 0), 0); // Equally unbalanced
+      doComparisionTest(new IndexData(1, 2, 0, 0), new IndexData(2, 2, 0, 0), -1); // Smaller as unbalanced
+
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(0, 0, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(0, 1, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(0, 2, 0, 0), 0); // Equally unbalanced
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(1, 0, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(1, 1, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(1, 2, 0, 0), -1); // Smaller unbalanced
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(2, 0, 0, 0), 0); // Equal
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(2, 1, 0, 0), -1); // Smaller unbalanced
+      doComparisionTest(new IndexData(2, 0, 0, 0), new IndexData(2, 2, 0, 0), -1); // Smaller as unbalanced
+
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(0, 0, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(0, 1, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(0, 2, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(1, 0, 0, 0), 1); // Bigger unbalanced
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(1, 1, 0, 0), -1); // Smaller as unbalanced
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(1, 2, 0, 0), 0); // Equally unbalanced
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(2, 0, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(2, 1, 0, 0), 0); // Equal
+      doComparisionTest(new IndexData(2, 1, 0, 0), new IndexData(2, 2, 0, 0), -1); // Smaller as unbalanced
+
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(0, 0, 0, 0), 1); // Bigger
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(0, 1, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(0, 2, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(1, 0, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(1, 1, 0, 0), 1); // Bigger balanced
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(1, 2, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(2, 0, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(2, 1, 0, 0), 1); // Bigger as balanced
+      doComparisionTest(new IndexData(2, 2, 0, 0), new IndexData(2, 2, 0, 0), 0); // Equal
+   }
+   
+   /**
+    * Compares the given {@link IndexData} using an {@link IndexDataComparator}.
+    * The comparison is also performed in reverse order.
+    * @param first The first {@link IndexData}.
+    * @param second The second {@link IndexData}.
+    * @param expectedOutcome The expected outcome.
+    */
+   protected void doComparisionTest(IndexData first, IndexData second, int expectedOutcome) {
+      IndexDataComparator c = new IndexDataComparator();
+//      assertEquals(expectedOutcome, c.compare(first, second));
+      assertEquals(expectedOutcome * -1, c.compare(second, first)); // Test reverse order
    }
    
    /**

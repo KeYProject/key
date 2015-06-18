@@ -273,23 +273,57 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
        */
       @Override
       public int compare(IndexData o1, IndexData o2) {
-         // Compare first completed count
-         if (o1.getKeyCompletedCount() < o2.getKeyCompletedCount() || o1.getSedCompletedCount() < o2.getSedCompletedCount()) {
+         // Compare balanced state (key use equal to sed use), completed count is ignored for simplicity
+         boolean o1balanced = o1.getKeyCount() == o1.getSedCount();
+         boolean o2balanced = o2.getKeyCount() == o2.getSedCount();
+         if (o1balanced && o2balanced) {
+            return compareCounts(o1, o2); 
+         }
+         else if (!o1balanced && o2balanced) {
             return -1;
          }
-         else if (o1.getKeyCompletedCount() > o2.getKeyCompletedCount() || o1.getSedCompletedCount() > o2.getSedCompletedCount()) {
+         else if (o1balanced && !o2balanced) {
             return 1;
          }
          else {
-            // Compare second first use count
-            if (o1.getKeyCount() < o2.getKeyCount() || o1.getSedCount() < o2.getSedCount()) {
+            return compareCounts(o1, o2); 
+         }
+      }
+      
+      /**
+       * Compares KeY and SED count.
+       * @param o1 The first {@link IndexData}.
+       * @param o2 The second {@link IndexData}.
+       * @return The comparison result.
+       */
+      protected int compareCounts(IndexData o1, IndexData o2) {
+         if (o1.getKeyCount() < o2.getKeyCount() && o1.getSedCount() < o2.getSedCount()) {
+            return -1;
+         }
+         else if (o1.getKeyCount() > o2.getKeyCount() && o1.getSedCount() > o2.getSedCount()) {
+            return 1;
+         }
+         else {
+            int o1max = Math.max(o1.getKeyCount(), o1.getSedCount());
+            int o2max = Math.max(o2.getKeyCount(), o2.getSedCount());
+            if (o1max < o2max) {
                return -1;
             }
-            else if (o1.getKeyCount() > o2.getKeyCount() || o1.getSedCount() > o2.getSedCount()) {
+            else if (o1max > o2max) {
                return 1;
             }
             else {
-               return 0;
+               int o1min = Math.min(o1.getKeyCount(), o1.getSedCount());
+               int o2min = Math.min(o2.getKeyCount(), o2.getSedCount());
+               if (o1min < o2min) {
+                  return -1;
+               }
+               else if (o1min > o2min) {
+                  return 1;
+               }
+               else {
+                  return 0;
+               }
             }
          }
       }
@@ -407,9 +441,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
       @Override
       public String toString() {
          return "KeY Count = " + keyCount + 
-                 ", KeY Completed Count" + keyCompletedCount +
-                 ", SED Count" + sedCount +
-                 ", SED Completed Count" + sedCompletedCount;
+                 ", KeY Completed Count = " + keyCompletedCount +
+                 ", SED Count = " + sedCount +
+                 ", SED Completed Count = " + sedCompletedCount;
       }
    }
 }
