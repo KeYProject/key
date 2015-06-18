@@ -9,12 +9,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
+import org.key_project.sed.key.evaluation.model.definition.Choice;
+import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
+import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
+import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex;
@@ -30,9 +36,9 @@ import org.key_project.util.java.ObjectUtil;
  */
 public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRandomCompletion {
    /**
-    * The used {@link PermutationIndex}.
+    * The used {@link PermutationIndex} instances for balancing purpose.
     */
-   private PermutationIndex<String, IndexData> index;
+   private final Map<String, PermutationIndex<String, IndexData>> indexMap = new HashMap<String, PermutationIndex<String,IndexData>>();
 
    /**
     * Constructor.
@@ -44,21 +50,24 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
                            UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME, 
                            UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME};
       // Analyze existing documents
-      final Map<String, IndexData> existingDataMap = new HashMap<String, IndexData>();
+      final Map<String, Map<String, IndexData>> existingDataMap = new HashMap<String, Map<String, IndexData>>();
       File[] instructionFiles = FileStorage.listFormFiles(storageLocation, UnderstandingProofAttemptsEvaluation.INSTANCE.getName(), UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME);
       if (!ArrayUtil.isEmpty(instructionFiles)) {
          for (File file : instructionFiles) {
             try {
                EvaluationInput evaluationInput = EvaluationInputReader.parse(new FileInputStream(file));
-               RandomFormInput formInput = (RandomFormInput)evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.EVALUATION_FORM_NAME));
+               AbstractFormInput<?> introductionFormInput = evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME));
+               QuestionPageInput backgroundPageInput = (QuestionPageInput)introductionFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
+               QuestionInput keyInput = backgroundPageInput.getQuestionInput(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
+               RandomFormInput evaluationFormInput = (RandomFormInput)evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.EVALUATION_FORM_NAME));
                String permutationKeY = null;
                List<Tool> toolOrder = new LinkedList<Tool>();
-               if (formInput.getPageOrder() != null) {
+               if (evaluationFormInput.getPageOrder() != null) {
                   // Analyze page order
-                  for (AbstractPageInput<?> pageInput : formInput.getPageOrder()) {
+                  for (AbstractPageInput<?> pageInput : evaluationFormInput.getPageOrder()) {
                      String pageName = pageInput.getPage().getName();
                      if (ArrayUtil.contains(elements, pageName)) {
-                        toolOrder.add(formInput.getTool(pageInput));
+                        toolOrder.add(evaluationFormInput.getTool(pageInput));
                         if (permutationKeY == null) {
                            permutationKeY = pageName;
                         }
@@ -67,11 +76,18 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
                         }
                      }
                   }
+                  // Get keyExperience
+                  String keyExperience = keyInput.getValue();
                   // Get or create PermutationData
-                  IndexData data = existingDataMap.get(permutationKeY);
+                  Map<String, IndexData> existingMap = existingDataMap.get(keyExperience);
+                  if (existingMap == null) {
+                     existingMap = new HashMap<String, IndexData>();
+                     existingDataMap.put(keyExperience, existingMap);
+                  }
+                  IndexData data = existingMap.get(permutationKeY);
                   if (data == null) {
                      data = new IndexData();
-                     existingDataMap.put(permutationKeY, data);
+                     existingMap.put(permutationKeY, data);
                   }
                   // Update PermutationData
                   if (isToolUsedFirst(toolOrder, UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME, UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME)) {
@@ -93,22 +109,35 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
             }
          }
       }
-      // Create index
-      IDataFactory<String, IndexData> dataFactory = new IDataFactory<String, IndexData>() {
-         @Override
-         public IndexData createData(String[] permutation) {
-            String key = ArrayUtil.toString(permutation, ",");
-            IndexData existingData =  existingDataMap.remove(key);
-            if (existingData != null) {
-               return existingData;
+      // Get possible experience values
+      AbstractForm introductionForm = UnderstandingProofAttemptsEvaluation.INSTANCE.getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME);
+      QuestionPage backgroundPage = (QuestionPage) introductionForm.getPage(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
+      RadioButtonsQuestion keyQuestion = (RadioButtonsQuestion) backgroundPage.getQuestion(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
+      // Create balancing index instances
+      for (Choice choice : keyQuestion.getChoices()) {
+         final Map<String, IndexData> existingMap = existingDataMap.get(choice.getValue());
+         IDataFactory<String, IndexData> dataFactory = new IDataFactory<String, IndexData>() {
+            @Override
+            public IndexData createData(String[] permutation) {
+               if (existingMap != null) {
+                  String key = ArrayUtil.toString(permutation, ",");
+                  IndexData existingData =  existingMap.remove(key);
+                  if (existingData != null) {
+                     return existingData;
+                  }
+                  else {
+                     return new IndexData();
+                  }
+               }
+               else {
+                  return new IndexData();
+               }
             }
-            else {
-               return new IndexData();
-            }
-         }
-      };
-      IndexDataComparator dataComparator = new IndexDataComparator();
-      index = new PermutationIndex<String, IndexData>(elements, dataFactory, dataComparator);
+         };
+         IndexDataComparator dataComparator = new IndexDataComparator();
+         PermutationIndex<String, IndexData> index = new PermutationIndex<String, IndexData>(elements, dataFactory, dataComparator);
+         indexMap.put(choice.getValue(), index);
+      }
    }
 
    /**
@@ -138,8 +167,16 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
     * Returns the used {@link PermutationIndex}.
     * @return The used {@link PermutationIndex}.
     */
-   public PermutationIndex<String, IndexData> getIndex() {
-      return index;
+   public PermutationIndex<String, IndexData> getIndex(String keyExperience) {
+      return indexMap.get(keyExperience);
+   }
+
+   /**
+    * Returns the available {@link PermutationIndex} instances for balancing.
+    * @return The available {@link PermutationIndex} instances for balancing.
+    */
+   public Map<String, PermutationIndex<String, IndexData>> getIndexMap() {
+      return indexMap;
    }
 
    /**

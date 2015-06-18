@@ -83,6 +83,30 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     */
    public static final String INTRODUCTION_FORM_NAME = "introductionForm";
 
+   /**
+    * The name of the page with the background knowledge.
+    */
+   public static final String BACKGROUND_PAGE_NAME = "backgroundPage";
+
+   /**
+    * The name of the question defining the background knowledge with KeY.
+    */
+   public static final String EXPERIENCE_WITH_KEY_QUESTION_NAME = "experienceWithKeY";
+
+   /**
+    * The value of no KeY experience.
+    */
+   public static final String KEY_EXPERIENCE_NON_VALUE = "None";
+
+   /**
+    * The value for less than 2 years of KeY experience.
+    */
+   public static final String KEY_EXPERIENCE_LESS_THAN_2_YEARS_VALUE = "Less than 2 years";
+
+   /**
+    * The value for more than 2 years of KeY experience.
+    */
+   public static final String KEY_EXPERIENCE_MORE_THAN_2_YEARS_VALUE = "More than 2 years";
 
    /**
     * Forbid additional instances.
@@ -124,7 +148,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               false,
                                                                               new Choice("I &accept the conditions", "yes"), 
                                                                               new Choice("I do &not accept the conditions", "no")));
-      QuestionPage backgroundPage = new QuestionPage("backgroundPage", 
+      QuestionPage backgroundPage = new QuestionPage(BACKGROUND_PAGE_NAME, 
                                                      "Background Knowledge", 
                                                      "Please fill out the form with your background knowledge.",
                                                      true,
@@ -138,15 +162,15 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               new Choice("None", "None"), 
                                                                               new Choice("< 2 years", "Less than 2 years"), 
                                                                               new Choice(">= 2 years", "More than 2 years")),
-                                                     new RadioButtonsQuestion("experienceWithKeY",
+                                                     new RadioButtonsQuestion(EXPERIENCE_WITH_KEY_QUESTION_NAME,
                                                                               "Experience with KeY", 
                                                                               true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with KeY not defined."), 
                                                                               false,
-                                                                              new Choice("None", "None"), 
-                                                                              new Choice("< 2 years", "Less than 2 years"), 
-                                                                              new Choice(">= 2 years", "More than 2 years")),
+                                                                              new Choice("None", KEY_EXPERIENCE_NON_VALUE), 
+                                                                              new Choice("< 2 years", KEY_EXPERIENCE_LESS_THAN_2_YEARS_VALUE), 
+                                                                              new Choice(">= 2 years", KEY_EXPERIENCE_MORE_THAN_2_YEARS_VALUE)),
                                                      new RadioButtonsQuestion("experienceWithSED",
                                                                               "Experience with SED", 
                                                                               true,

@@ -8,10 +8,16 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
+import org.key_project.sed.key.evaluation.model.definition.Choice;
+import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
+import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
+import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex.Entry;
@@ -68,7 +74,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     */
    @Test
    public void testInitialIndex_NoData() throws Exception {
-      Map<String, IndexData> expectedData = new HashMap<String, IndexData>();
+      Map<String, Map<String, IndexData>> expectedData = new HashMap<String, Map<String,IndexData>>();
       doInitialIndexTest(expectedData);
    }
    
@@ -78,14 +84,16 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     */
    @Test
    public void testInitialIndex_SingleIncompleteKeY() throws Exception {
-      Map<String, IndexData> expectedData = new HashMap<String, IndexData>();
-      expectedData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
-                       new IndexData(1, 0, 0, 0));
+      Map<String, IndexData> noneData = new HashMap<String, IndexData>();
+      noneData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
+                   new IndexData(1, 0, 0, 0));
+      Map<String, Map<String, IndexData>> expectedData = new HashMap<String, Map<String,IndexData>>();
+      expectedData.put(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE, noneData);
       doInitialIndexTest(expectedData,
-                         new IntroductionFormInputFileCreator(true, false, false));
+                         new IntroductionFormInputFileCreator(true, false, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE));
    }
    
    /**
@@ -94,14 +102,16 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     */
    @Test
    public void testInitialIndex_SingleIncompleteSED() throws Exception {
-      Map<String, IndexData> expectedData = new HashMap<String, IndexData>();
-      expectedData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
-                       new IndexData(0, 1, 0, 0));
+      Map<String, IndexData> noneData = new HashMap<String, IndexData>();
+      noneData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
+                   new IndexData(0, 1, 0, 0));
+      Map<String, Map<String, IndexData>> expectedData = new HashMap<String, Map<String,IndexData>>();
+      expectedData.put(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE, noneData);
       doInitialIndexTest(expectedData,
-                         new IntroductionFormInputFileCreator(false, false, false));
+                         new IntroductionFormInputFileCreator(false, false, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE));
    }
    
    /**
@@ -110,14 +120,16 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     */
    @Test
    public void testInitialIndex_SingleKeY() throws Exception {
-      Map<String, IndexData> expectedData = new HashMap<String, IndexData>();
-      expectedData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
-                       new IndexData(1, 0, 1, 0));
+      Map<String, IndexData> noneData = new HashMap<String, IndexData>();
+      noneData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
+                   new IndexData(1, 0, 1, 0));
+      Map<String, Map<String, IndexData>> expectedData = new HashMap<String, Map<String,IndexData>>();
+      expectedData.put(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE, noneData);
       doInitialIndexTest(expectedData,
-                         new IntroductionFormInputFileCreator(true, false, true));
+                         new IntroductionFormInputFileCreator(true, false, true, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE));
    }
    
    /**
@@ -126,14 +138,16 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     */
    @Test
    public void testInitialIndex_SingleSED() throws Exception {
-      Map<String, IndexData> expectedData = new HashMap<String, IndexData>();
-      expectedData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
-                       new IndexData(0, 1, 0, 1));
+      Map<String, IndexData> noneData = new HashMap<String, IndexData>();
+      noneData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
+                   new IndexData(0, 1, 0, 1));
+      Map<String, Map<String, IndexData>> expectedData = new HashMap<String, Map<String,IndexData>>();
+      expectedData.put(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE, noneData);
       doInitialIndexTest(expectedData,
-                         new IntroductionFormInputFileCreator(false, false, true));
+                         new IntroductionFormInputFileCreator(false, false, true, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE));
    }
    
    /**
@@ -142,26 +156,45 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     */
    @Test
    public void testInitialIndex_Multile() throws Exception {
-      Map<String, IndexData> expectedData = new HashMap<String, IndexData>();
-      expectedData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
-                       new IndexData(2, 2, 1, 1));
-      expectedData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
-                                          UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME), 
-                       new IndexData(2, 2, 1, 1));
+      Map<String, IndexData> noneData = new HashMap<String, IndexData>();
+      noneData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
+                   new IndexData(2, 2, 1, 1));
+      noneData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME), 
+                   new IndexData(2, 2, 1, 1));
+      Map<String, IndexData> lessData = new HashMap<String, IndexData>();
+      lessData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
+                   new IndexData(1, 0, 0, 0));
+      Map<String, IndexData> moreData = new HashMap<String, IndexData>();
+      moreData.put(ArrayUtil.toString(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, 
+                                      UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME), 
+                   new IndexData(1, 1, 0, 0));
+      Map<String, Map<String, IndexData>> expectedData = new HashMap<String, Map<String,IndexData>>();
+      expectedData.put(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE, noneData);
+      expectedData.put(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_LESS_THAN_2_YEARS_VALUE, lessData);
+      expectedData.put(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_MORE_THAN_2_YEARS_VALUE, moreData);
       doInitialIndexTest(expectedData,
-                         new IntroductionFormInputFileCreator(false, false, false),
-                         new IntroductionFormInputFileCreator(false, false, true),
-                         new IntroductionFormInputFileCreator(false, true, false),
-                         new IntroductionFormInputFileCreator(false, true, true),
-                         new IntroductionFormInputFileCreator(true, false, false),
-                         new IntroductionFormInputFileCreator(true, false, true),
-                         new IntroductionFormInputFileCreator(true, true, false),
-                         new IntroductionFormInputFileCreator(true, true, true));
+                         new IntroductionFormInputFileCreator(false, false, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE),
+                         new IntroductionFormInputFileCreator(false, false, true, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE),
+                         new IntroductionFormInputFileCreator(false, true, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE),
+                         new IntroductionFormInputFileCreator(false, true, true, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE),
+                         new IntroductionFormInputFileCreator(true, false, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE),
+                         new IntroductionFormInputFileCreator(true, false, true, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE),
+                         new IntroductionFormInputFileCreator(true, true, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE),
+                         new IntroductionFormInputFileCreator(true, true, true, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE),
+                         new IntroductionFormInputFileCreator(true, false, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_LESS_THAN_2_YEARS_VALUE),
+                         new IntroductionFormInputFileCreator(true, false, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_MORE_THAN_2_YEARS_VALUE),
+                         new IntroductionFormInputFileCreator(false, false, false, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_MORE_THAN_2_YEARS_VALUE));
    }
    
    /**
@@ -170,7 +203,8 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     * @param creators {@link IFormInputFileCreator} to execute.
     * @throws Exception Occurred Exception.
     */
-   protected void doInitialIndexTest(final Map<String, IndexData> expectedData, IFormInputFileCreator... creators) throws Exception {
+   protected void doInitialIndexTest(final Map<String, Map<String, IndexData>> expectedData, 
+                                     IFormInputFileCreator... creators) throws Exception {
       assertNotNull(expectedData);
       File storageLocation = IOUtil.createTempDirectory("UnderstandingProofAttemptsRandomFormOrderComputer", "Test");
       try {
@@ -178,14 +212,29 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
             creator.createFormInputFile(storageLocation);
          }
          UnderstandingProofAttemptsRandomFormOrderComputer computer = new UnderstandingProofAttemptsRandomFormOrderComputer(storageLocation);
-         for (Entry<String, IndexData> entry : computer.getIndex().getIndex()) {
-            String permuationKey = ArrayUtil.toString(entry.getPermutation());
-            IndexData expected = expectedData.get(permuationKey);
-            if (expected != null) {
-               assertIndexData(expected, entry.getData());
-            }
-            else {
-               assertIndexData(new IndexData(), entry.getData());
+         // Ensure that all expected indices exist
+         AbstractForm introductionForm = UnderstandingProofAttemptsEvaluation.INSTANCE.getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME);
+         QuestionPage backgroundPage = (QuestionPage) introductionForm.getPage(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
+         RadioButtonsQuestion keyQuestion = (RadioButtonsQuestion) backgroundPage.getQuestion(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
+         assertEquals(keyQuestion.countChoices(), computer.getIndexMap().size());
+         for (Choice choice : keyQuestion.getChoices()) {
+            assertTrue(computer.getIndexMap().containsKey(choice.getValue()));
+            // Ensure right index content
+            Map<String, IndexData> expectedIndexData = expectedData.get(choice.getValue());
+            for (Entry<String, IndexData> entry : computer.getIndex(choice.getValue()).getIndex()) {
+               if (expectedIndexData != null) {
+                  String permuationKey = ArrayUtil.toString(entry.getPermutation());
+                  IndexData expected = expectedIndexData.get(permuationKey);
+                  if (expected != null) {
+                     assertIndexData(expected, entry.getData());
+                  }
+                  else {
+                     assertIndexData(new IndexData(), entry.getData());
+                  }
+               }
+               else {
+                  assertIndexData(new IndexData(), entry.getData());
+               }
             }
          }
       }
@@ -215,15 +264,21 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
       private final boolean completed;
       
       /**
+       * The experience with KeY.
+       */
+      private final String keyExperience;
+      
+      /**
        * Constructor.
        * @param keyFirst KeY first?
        * @param reverseOrder Reverse order?
        * @param completed Is the evaluation input completed?
        */
-      public IntroductionFormInputFileCreator(boolean keyFirst, boolean reverseOrder, boolean completed) {
+      public IntroductionFormInputFileCreator(boolean keyFirst, boolean reverseOrder, boolean completed, String keyExperience) {
          this.keyFirst = keyFirst;
          this.reverseOrder = reverseOrder;
          this.completed = completed;
+         this.keyExperience = keyExperience;
       }
 
       /**
@@ -233,6 +288,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
       public void createFormInputFile(File storageLocation) throws Exception {
          EvaluationInput evaluationInput = new EvaluationInput(UnderstandingProofAttemptsEvaluation.INSTANCE);
          AbstractFormInput<?> introductionFormInput = evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME));
+         QuestionPageInput backgroundPageInput = (QuestionPageInput)introductionFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
+         QuestionInput keyInput = backgroundPageInput.getQuestionInput(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
+         keyInput.setValue(keyExperience);
          List<RandomFormInput> updatedOrders = UnderstandingProofAttemptsRandomFormOrderComputer.computeFixedOrder(evaluationInput, introductionFormInput, keyFirst, reverseOrder);
          FileStorage.store(storageLocation, introductionFormInput, updatedOrders);
          if (completed) {

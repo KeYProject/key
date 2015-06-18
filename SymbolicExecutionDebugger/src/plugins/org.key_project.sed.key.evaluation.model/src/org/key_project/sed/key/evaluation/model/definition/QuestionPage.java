@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 public class QuestionPage extends AbstractPage {
    private final List<AbstractQuestion> questions;
@@ -37,6 +39,15 @@ public class QuestionPage extends AbstractPage {
 
    public AbstractQuestion[] getQuestions() {
       return questions.toArray(new AbstractQuestion[questions.size()]);
+   }
+
+   public AbstractQuestion getQuestion(final String name) {
+      return CollectionUtil.search(questions, new IFilter<AbstractQuestion>() {
+         @Override
+         public boolean select(AbstractQuestion element) {
+            return ObjectUtil.equals(element.getName(), name);
+         }
+      });
    }
 
    public int countQuestions() {
