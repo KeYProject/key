@@ -38,10 +38,10 @@ public class ResetTest extends AbstractEvaluationModelTest {
       // Perform reset
       input.reset();
       // Perform test
-      assertEvaluationInput(new EvaluationInput(evaluation), input, true, true);
+      assertEvaluationInput(new EvaluationInput(evaluation), input, true, true, ValueComparison.EQUAL);
       // Perform a second reset
       input.reset();
       // Test model again
-      assertEvaluationInput(new EvaluationInput(evaluation), input, true, true);
+      assertEvaluationInput(new EvaluationInput(evaluation), input, true, true, ValueComparison.EQUAL);
    }
 }

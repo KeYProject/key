@@ -146,7 +146,7 @@ public class SEDServerTest extends AbstractEvaluationModelTest {
       assertNotNull(savedFile);
       assertTrue(savedFile.isFile());
       EvaluationInput readEvaluationInput = EvaluationInputReader.parse(new FileInputStream(savedFile));
-      assertEvaluationInput(evaluationInput, readEvaluationInput, true, true);
+      assertEvaluationInput(evaluationInput, readEvaluationInput, true, true, ValueComparison.SET);
       return evaluationInput;
    }
    
@@ -178,7 +178,7 @@ public class SEDServerTest extends AbstractEvaluationModelTest {
       assertNotNull(savedFile);
       assertTrue(savedFile.isFile());
       EvaluationInput readEvaluationInput = EvaluationInputReader.parse(new FileInputStream(savedFile));
-      assertEvaluationInput(answerEvaluationInput, readEvaluationInput, true, true);
+      assertEvaluationInput(answerEvaluationInput, readEvaluationInput, true, true, ValueComparison.SET);
    }
    
    /**
@@ -207,7 +207,7 @@ public class SEDServerTest extends AbstractEvaluationModelTest {
       }
       assertNotNull(thread.getAnswer());
       assertNotNull(thread.getAnswerInput());
-      assertEvaluationInput(EvaluationInputReader.parse(thread.getAnswer()), thread.getAnswerInput(), true, true);
+      assertEvaluationInput(EvaluationInputReader.parse(thread.getAnswer()), thread.getAnswerInput(), true, true, ValueComparison.EQUAL);
       return thread.getAnswerInput();
    }
    

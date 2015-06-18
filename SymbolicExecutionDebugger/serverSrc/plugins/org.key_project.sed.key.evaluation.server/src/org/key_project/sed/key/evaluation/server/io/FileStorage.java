@@ -71,6 +71,7 @@ public class FileStorage {
       File evaluationFolder = new File(storageLocation, formInput.getForm().getEvaluation().getName());
       File formFolder = new File(evaluationFolder, formInput.getForm().getName());
       formFolder.mkdirs();
+      formInput.getEvaluationInput().setTimestamp(System.currentTimeMillis());
       if (StringUtil.isTrimmedEmpty(formInput.getEvaluationInput().getUUID())) {
          // Create a new UUID.
          String uuid = UUID.randomUUID().toString();

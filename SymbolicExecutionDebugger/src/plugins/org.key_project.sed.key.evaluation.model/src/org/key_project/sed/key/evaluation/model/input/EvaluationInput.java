@@ -17,6 +17,8 @@ public class EvaluationInput extends Bean {
    public static final String PROP_CURRENT_FORM_INPUT = "currentFormInput";
 
    public static final String PROP_UUID = "uuid";
+
+   public static final String PROP_TIMESTAMP = "timestamp";
    
    private final AbstractEvaluation evaluation;
    
@@ -30,6 +32,8 @@ public class EvaluationInput extends Bean {
    
    private final String keyInternalVersion;
 
+   private long timestamp;
+   
    public EvaluationInput(AbstractEvaluation evaluation) {
       this(evaluation, KeYResourceManager.getManager().getVersion(), KeYResourceManager.getManager().getSHA1());
    }
@@ -113,6 +117,16 @@ public class EvaluationInput extends Bean {
       return formInputs.get(index);
    }
 
+   public long getTimestamp() {
+      return timestamp;
+   }
+
+   public void setTimestamp(long timestamp) {
+      long oldValue = getTimestamp();
+      this.timestamp = timestamp;
+      firePropertyChange(PROP_TIMESTAMP, oldValue, getTimestamp());
+   }
+
    public void reset() {
       if (!formInputs.isEmpty()) {
          setCurrentFormInput(formInputs.get(0));
@@ -121,6 +135,7 @@ public class EvaluationInput extends Bean {
          setCurrentFormInput(null);
       }
       setUUID(null);
+      setTimestamp(0);
       for (AbstractFormInput<?> formInput : formInputs) {
          formInput.reset();
       }

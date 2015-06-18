@@ -44,6 +44,11 @@ public class EvaluationInputWriter {
     * Attribute name to store {@link EvaluationInput#getUUID()}.
     */
    public static final String ATTRIBUTE_EVALUATION_UUID = "uuid";
+
+   /**
+    * Attribute name to store {@link EvaluationInput#getTimestamp()}.
+    */
+   public static final String ATTRIBUTE_EVALUATION_TIMESTAMP = "timestamp";
    
    /**
     * Tag name to store {@link AbstractFormInput}s.
@@ -156,6 +161,9 @@ public class EvaluationInputWriter {
       if (!StringUtil.isTrimmedEmpty(evaluationInput.getUUID())) {
          evaluationAttributes.put(ATTRIBUTE_EVALUATION_UUID, evaluationInput.getUUID());
       }
+      if (evaluationInput.getTimestamp() != 0) {
+         evaluationAttributes.put(ATTRIBUTE_EVALUATION_TIMESTAMP, evaluationInput.getTimestamp() + "");
+      }
       XMLUtil.appendStartTag(0, TAG_EVALUATION, evaluationAttributes, sb);
       if (!CollectionUtil.isEmpty(updatedOrders)) {
          for (RandomFormInput randomFormInput : updatedOrders) {
@@ -182,6 +190,9 @@ public class EvaluationInputWriter {
       evaluationAttributes.put(ATTRIBUTE_EVALUATION_INTERNAL_VERSION, evaluationInput.getKeyInternalVersion());
       if (!StringUtil.isTrimmedEmpty(evaluationInput.getUUID())) {
          evaluationAttributes.put(ATTRIBUTE_EVALUATION_UUID, evaluationInput.getUUID());
+      }
+      if (evaluationInput.getTimestamp() != 0) {
+         evaluationAttributes.put(ATTRIBUTE_EVALUATION_TIMESTAMP, evaluationInput.getTimestamp() + "");
       }
       XMLUtil.appendStartTag(0, TAG_EVALUATION, evaluationAttributes, sb);
       // Append answers
@@ -264,6 +275,9 @@ public class EvaluationInputWriter {
       formAttributes.put(ATTRIBUTE_EVALUATION_INTERNAL_VERSION, formInput.getEvaluationInput().getKeyInternalVersion());
       if (!StringUtil.isTrimmedEmpty(formInput.getEvaluationInput().getUUID())) {
          formAttributes.put(ATTRIBUTE_EVALUATION_UUID, formInput.getEvaluationInput().getUUID());
+      }
+      if (formInput.getEvaluationInput().getTimestamp() != 0) {
+         formAttributes.put(ATTRIBUTE_EVALUATION_TIMESTAMP, formInput.getEvaluationInput().getTimestamp() + "");
       }
       XMLUtil.appendStartTag(0, TAG_FORM, formAttributes, sb);
       for (AbstractPageInput<?> pageInput : formInput.getPageInputs()) {
@@ -368,6 +382,9 @@ public class EvaluationInputWriter {
       Map<String, String> evaluationAttributes = new LinkedHashMap<String, String>();
       evaluationAttributes.put(ATTRIBUTE_EVALUATION_NAME, evaluationInput.getEvaluation().getName());
       evaluationAttributes.put(ATTRIBUTE_EVALUATION_UUID, evaluationInput.getUUID());
+      if (evaluationInput.getTimestamp() != 0) {
+         evaluationAttributes.put(ATTRIBUTE_EVALUATION_TIMESTAMP, evaluationInput.getTimestamp() + "");
+      }
       evaluationAttributes.put(ATTRIBUTE_EVALUATION_CURRENT_FORM, evaluationInput.getCurrentFormInput().getForm().getName());
       XMLUtil.appendStartTag(0, TAG_EVALUATION, evaluationAttributes, sb);
       for (AbstractFormInput<?> formInput : evaluationInput.getFormInputs()) {

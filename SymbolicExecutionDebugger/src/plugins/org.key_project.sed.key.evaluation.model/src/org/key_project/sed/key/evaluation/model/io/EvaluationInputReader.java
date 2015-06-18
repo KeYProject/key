@@ -127,6 +127,15 @@ public class EvaluationInputReader {
                else {
                   evaluationInput = new EvaluationInput(evaluation);
                }
+               String timestamp = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_TIMESTAMP);
+               if (!StringUtil.isEmpty(timestamp)) {
+                  try {
+                     evaluationInput.setTimestamp(Long.parseLong(timestamp));
+                  }
+                  catch (NumberFormatException e) {
+                     throw new SAXException("Timestamp '" + timestamp + "' is no valid long value.");
+                  }
+               }
                String uuid = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_UUID);
                evaluationInput.setUUID(uuid);
                String currentForm = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_EVALUATION_CURRENT_FORM);

@@ -68,7 +68,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
       EvaluationInput completeInput = EvaluationInputReader.parse(completeXml);
       // Compare complete inputs
       assertNotSame(evaluationInput, completeInput);
-      assertEvaluationInput(evaluationInput, completeInput, false, true);
+      assertEvaluationInput(evaluationInput, completeInput, false, true, ValueComparison.EQUAL);
    }
    
    /**
@@ -95,6 +95,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
       // Create inputs
       EvaluationInput evaluationInput = new EvaluationInput(evaluation, "keyVersion123", "keyInternalVersionABC");
       evaluationInput.setUUID("MyUUID");
+      evaluationInput.setTimestamp(System.currentTimeMillis());
       AbstractFormInput<?> fixedFormInput = evaluationInput.getFormInput(fixedForm);
       evaluationInput.setCurrentFormInput(fixedFormInput);
       if (changer != null) {
@@ -111,7 +112,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
       // Compare inputs
       assertNotNull(parsedInput);
       assertNotSame(evaluationInput, parsedInput);
-      assertEvaluationInput(evaluationInput, parsedInput, true, false);
+      assertEvaluationInput(evaluationInput, parsedInput, true, false, ValueComparison.EQUAL);
       // Test complete xml
       doCompleteXmlTest(evaluationInput);
    }
@@ -181,6 +182,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
       // Create inputs
       EvaluationInput evaluationInput = new EvaluationInput(evaluation, "keyVersion123", "keyInternalVersionABC");
       evaluationInput.setUUID("MyUUID");
+      evaluationInput.setTimestamp(System.currentTimeMillis());
       AbstractFormInput<?> randomFormInput = evaluationInput.getFormInput(randomForm);
       // Convert to xml
       List<RandomFormInput> updatedOrders = computer != null ? 
@@ -192,7 +194,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
       // Compare inputs
       assertNotNull(parsedInput);
       assertNotSame(evaluationInput, parsedInput);
-      assertEvaluationInput(evaluationInput, parsedInput, true, false);
+      assertEvaluationInput(evaluationInput, parsedInput, true, false, ValueComparison.EQUAL);
    }
    
    /**
@@ -306,7 +308,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
       // Compare inputs
       assertNotNull(parsedInput);
       assertNotSame(evaluationInput, parsedInput);
-      assertEvaluationInput(evaluationInput, parsedInput, true, false);
+      assertEvaluationInput(evaluationInput, parsedInput, true, false, ValueComparison.EQUAL);
       // Test complete xml
       doCompleteXmlTest(evaluationInput);
    }

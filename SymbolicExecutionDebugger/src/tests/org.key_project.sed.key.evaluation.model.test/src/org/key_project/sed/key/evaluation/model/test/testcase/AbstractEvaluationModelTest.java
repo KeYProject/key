@@ -25,18 +25,55 @@ import org.key_project.util.java.CollectionUtil;
  */
 public class AbstractEvaluationModelTest extends TestCase {
    /**
+    * Possible options to compare values.
+    * @author Martin Hentschel
+    */
+   public static enum ValueComparison {
+      /**
+       * Values should be equal.
+       */
+      EQUAL,
+      
+      /**
+       * Value should not be set.
+       */
+      NOT_SET,
+      
+      /**
+       * Value should be set.
+       */
+      SET,
+      
+      /**
+       * Do not compare values.
+       */
+      IGNORE
+   }
+   
+   /**
     * Ensures that the given {@link EvaluationInput}s are equal.
     * @param expected The expected {@link EvaluationInput}.
     * @param actual The actual {@link EvaluationInput}.
     * @param assertKeYVersions Check KeY versions?
     * @param assertCurrentPage Check current page?
     */
-   public void assertEvaluationInput(EvaluationInput expected, EvaluationInput actual, boolean assertKeYVersions, boolean assertCurrentPage) {
+   public void assertEvaluationInput(EvaluationInput expected, EvaluationInput actual, boolean assertKeYVersions, boolean assertCurrentPage, ValueComparison timestampComparison) {
       if (expected != null) {
          assertNotNull(actual);
          assertNotSame(expected, actual);
          assertEquals(expected.getEvaluation().getName(), actual.getEvaluation().getName());
          assertEquals(expected.getUUID(), actual.getUUID());
+         if (ValueComparison.EQUAL.equals(timestampComparison)) {
+            assertEquals(expected.getTimestamp(), actual.getTimestamp());
+         }
+         else if (ValueComparison.NOT_SET.equals(timestampComparison)) {
+            assertSame(0, expected.getTimestamp());
+            assertSame(0, actual.getTimestamp());
+         }
+         else if (ValueComparison.SET.equals(timestampComparison)) {
+            assertNotSame(0, expected.getTimestamp());
+            assertNotSame(0, actual.getTimestamp());
+         }
          if (assertKeYVersions) {
             assertEquals(expected.getKeyVersion(), actual.getKeyVersion());
             assertEquals(expected.getKeyInternalVersion(), actual.getKeyInternalVersion());
@@ -254,6 +291,7 @@ public class AbstractEvaluationModelTest extends TestCase {
    public void fillEvaluationInput(EvaluationInput input) {
       input.setCurrentFormInput(input.getFormInput(input.countFormInputs() - 1));
       input.setUUID("A new UUID set by fillEvaluationInput");
+      input.setTimestamp(System.currentTimeMillis());
       for (AbstractFormInput<?> formInput : input.getFormInputs()) {
          fillFormInput(formInput);
       }
