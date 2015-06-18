@@ -182,11 +182,12 @@ public class PermutationIndexTest extends TestCase {
        * {@inheritDoc}
        */
       @Override
-      public void updateFirstEntry(Entry<E, Counter> firstEntry) {
+      public boolean updateFirstEntry(Entry<E, Counter> firstEntry) {
          assertNull(this.modifiedEntry);
          assertNotNull(firstEntry);
          firstEntry.getData().increase();
          this.modifiedEntry = firstEntry;
+         return true;
       }
 
       /**

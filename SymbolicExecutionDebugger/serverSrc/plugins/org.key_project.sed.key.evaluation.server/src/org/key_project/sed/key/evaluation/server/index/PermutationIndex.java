@@ -90,12 +90,13 @@ public class PermutationIndex<E, D> {
     */
    public void updateFirstEntry(IEntryUpdater<E, D> updater) {
       synchronized (index) {
-         Entry<E, D> entry = index.remove(0);
-         if (entry == null) {
-            throw new IllegalStateException("First entry is not available.");
+         Entry<E, D> entry = index.get(0);
+         if (updater.updateFirstEntry(entry)) {
+            if (!index.remove(entry)) {
+               throw new IllegalStateException("First entry is not available.");
+            }
+            CollectionUtil.binaryInsert(index, entry, entryComparator);
          }
-         updater.updateFirstEntry(entry);
-         CollectionUtil.binaryInsert(index, entry, entryComparator);
       }
    }
 
@@ -117,8 +118,9 @@ public class PermutationIndex<E, D> {
       /**
        * Modifies the given {@link Entry}.
        * @param firstEntry The given {@link Entry} to modify.
+       * @return {@code true} index needs to be updated, {@code false} index should stay as it is.
        */
-      public void updateFirstEntry(Entry<E, D> firstEntry);
+      public boolean updateFirstEntry(Entry<E, D> firstEntry);
    }
 
    /**

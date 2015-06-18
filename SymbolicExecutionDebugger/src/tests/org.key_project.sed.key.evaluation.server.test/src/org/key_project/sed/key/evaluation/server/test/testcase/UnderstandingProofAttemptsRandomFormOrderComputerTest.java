@@ -15,6 +15,7 @@ import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
+import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
@@ -29,12 +30,242 @@ import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemp
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IntegerUtil;
 
 /**
  * Tests for {@link UnderstandingProofAttemptsRandomFormOrderComputer}.
  * @author Martin Hentschel
  */
 public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestCase {
+   /**
+    * If {@code true} intermediate states are printed into the console.
+    */
+   private static final boolean VERBOSE = false;
+   
+   /**
+    * Tests the computed orders
+    */
+   @Test
+   public void testComputeRandomValues() throws Exception{
+      doComputeRandomValuesTest(IntegerUtil.factorial(4) * 10 + 1); // 10 iterations plus one additional iteration to trigger complete test
+   }
+   
+   /**
+    * Performs the test steps to test {@link UnderstandingProofAttemptsRandomFormOrderComputer#computeRandomValues(EvaluationInput, AbstractFormInput)}
+    * by applying multiple requests.
+    * @param numberOfRequests The number of requests.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doComputeRandomValuesTest(int numberOfRequests) throws Exception{
+      File storageLocation = IOUtil.createTempDirectory("UnderstandingProofAttemptsRandomFormOrderComputer", "Test");
+      try {
+         UnderstandingProofAttemptsRandomFormOrderComputer computer = new UnderstandingProofAttemptsRandomFormOrderComputer(storageLocation);
+         // Ensure that all expected indices exist
+         AbstractForm introductionForm = UnderstandingProofAttemptsEvaluation.INSTANCE.getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME);
+         QuestionPage backgroundPage = (QuestionPage) introductionForm.getPage(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
+         RadioButtonsQuestion keyQuestion = (RadioButtonsQuestion) backgroundPage.getQuestion(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
+         assertEquals(keyQuestion.countChoices(), computer.getBalancingMap().size());
+         for (Choice choice : keyQuestion.getChoices()) {
+            assertTrue(computer.getBalancingMap().containsKey(choice.getValue()));
+            // Ensure right index content
+            BalancingEntry balancingEntry = computer.getBalancingEntry(choice.getValue());
+            for (Entry<String, IndexData> entry : balancingEntry.getPermutationIndex().getIndex()) {
+               assertIndexData(new IndexData(), entry.getData());
+            }
+            // Ensure right balancing content
+            assertEquals(0, balancingEntry.getKeyCountTotal());
+            assertEquals(0, balancingEntry.getSedCountTotal());
+         }
+         // Compute order
+         BalancingEntry nonBalancingEntry = computer.getBalancingMap().get(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE);
+         assertNotNull(nonBalancingEntry);
+         boolean expectedKeYFirst = false;
+         int expectedKeYTotalCount = 0;
+         int expectedSedTotolCount = 0;
+         assertEquals(expectedKeYTotalCount, nonBalancingEntry.getKeyCountTotal());
+         assertEquals(expectedSedTotolCount, nonBalancingEntry.getSedCountTotal());
+         Entry<String, IndexData> firstEntry = nonBalancingEntry.getPermutationIndex().getIndex().get(0);
+         EntryBackup firstEntryBackup = new EntryBackup(firstEntry);
+         for (int i = 0; i < numberOfRequests; i++) {
+            // Ensure that each permutation was updated twice once with KeY and once with KeY after enough requests
+            if (i % (nonBalancingEntry.getPermutationIndex().size() * 2) == 0) {
+               int numOfCompleteIterations = i / (nonBalancingEntry.getPermutationIndex().size() * 2);
+               for (Entry<String, IndexData> entry : nonBalancingEntry.getPermutationIndex().getIndex()) {
+                  assertIndexData(new IndexData(numOfCompleteIterations, numOfCompleteIterations, 0, 0), entry.getData());
+               }
+               // Ensure right balancing content
+               assertEquals(i / 2, nonBalancingEntry.getKeyCountTotal());
+               assertEquals(i / 2, nonBalancingEntry.getSedCountTotal());
+            }
+            // Compute order
+            EvaluationInput evaluationInput = createDummyEvaluationInput(UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE);
+            List<RandomFormInput> order = computer.computeRandomValues(evaluationInput, evaluationInput.getCurrentFormInput());
+            if (VERBOSE) {
+               System.out.println(firstEntryBackup + " changed to " + new EntryBackup(firstEntry));
+            }
+            assertRandomOrder(order, expectedKeYFirst, firstEntryBackup.getPermutation());
+            // Test counts
+            if (expectedKeYFirst) {
+               expectedKeYTotalCount++;
+               assertEquals(firstEntryBackup.getKeyCount() + 1, firstEntry.getData().getKeyCount());
+               assertEquals(firstEntryBackup.getSedCount(), firstEntry.getData().getSedCount());
+            }
+            else {
+               expectedSedTotolCount++;
+               assertEquals(firstEntryBackup.getKeyCount(), firstEntry.getData().getKeyCount());
+               assertEquals(firstEntryBackup.getSedCount() + 1, firstEntry.getData().getSedCount());
+            }
+            assertEquals(0, firstEntry.getData().getKeyCompletedCount());
+            assertEquals(0, firstEntry.getData().getSedCompletedCount());
+            assertEquals(expectedKeYTotalCount, nonBalancingEntry.getKeyCountTotal());
+            assertEquals(expectedSedTotolCount, nonBalancingEntry.getSedCountTotal());
+            // Ensure that other indicies have still the initial state
+            for (Choice choice : keyQuestion.getChoices()) {
+               // Ensure right index content
+               BalancingEntry balancingEntry = computer.getBalancingEntry(choice.getValue());
+               if (balancingEntry != nonBalancingEntry) {
+                  for (Entry<String, IndexData> entry : balancingEntry.getPermutationIndex().getIndex()) {
+                     assertIndexData(new IndexData(), entry.getData());
+                  }
+                  // Ensure right balancing content
+                  assertEquals(0, balancingEntry.getKeyCountTotal());
+                  assertEquals(0, balancingEntry.getSedCountTotal());
+               }
+            }
+            // Compute new expected values for next loop iteration.
+            expectedKeYFirst = !expectedKeYFirst;
+            if (i % 2 == 1) { // The expected first entry changes only each 2 iterations
+               firstEntry = nonBalancingEntry.getPermutationIndex().getIndex().get(0);
+            }
+            firstEntryBackup = new EntryBackup(firstEntry);
+         }
+         if (VERBOSE) {
+            System.out.println();
+            nonBalancingEntry.getPermutationIndex().print();
+         }
+      }
+      finally {
+         IOUtil.delete(storageLocation);
+      }
+   }
+   
+   /**
+    * Helper class to store the content of an {@link Entry}.
+    * @author Martin Hentschel
+    */
+   protected static class EntryBackup {
+      /**
+       * The permutation.
+       */
+      private final String[] permutation;
+      
+      /**
+       * The KeY count value.
+       */
+      private final int keyCount;
+      
+      /**
+       * The SED count value.
+       */
+      private final int sedCount;
+
+      /**
+       * Constructor.
+       * @param entry The {@link Entry} to backup.
+       */
+      public EntryBackup(Entry<String, IndexData> entry) {
+         permutation = entry.getPermutation();
+         keyCount = entry.getData().getKeyCount();
+         sedCount = entry.getData().getSedCount();
+      }
+
+      /**
+       * Returns the permutation.
+       * @return The permutation.
+       */
+      public String[] getPermutation() {
+         return permutation;
+      }
+
+      /**
+       * Returns the KeY count value.
+       * @return The KeY count value.
+       */
+      public int getKeyCount() {
+         return keyCount;
+      }
+
+      /**
+       * Returns the SED count value.
+       * @return The SED count value.
+       */
+      public int getSedCount() {
+         return sedCount;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return "(" + ArrayUtil.toString(permutation) + ": KeY = " + keyCount + ", SED = " + sedCount + ")";
+      }
+   }
+   
+   /**
+    * Ensures that the given {@link RandomFormInput}s have the right order.
+    * @param actualRandomOrders The actual {@link RandomFormInput}s.
+    * @param expectedKeYFirst {@code true} KeY first, {@code false} SED first.
+    * @param expectedCroofOrder The expected proof order.
+    */
+   protected void assertRandomOrder(List<RandomFormInput> actualRandomOrders, boolean expectedKeYFirst, String... expectedCroofOrder) {
+      assertNotNull(actualRandomOrders);
+      assertEquals(1, actualRandomOrders.size());
+      RandomFormInput actualFormInput = actualRandomOrders.get(0);
+      // Ensure right form
+      assertEquals(UnderstandingProofAttemptsEvaluation.EVALUATION_FORM_NAME, actualFormInput.getForm().getName());
+      int expectedIndex = 0;
+      // Ensure right order
+      for (AbstractPageInput<?> actualPageInput : actualFormInput.getPageOrder()) {
+         if (isProofPage(actualPageInput)) {
+            assertEquals(expectedCroofOrder[expectedIndex], actualPageInput.getPage().getName());
+            // Ensure right tools
+            Tool tool = actualFormInput.getTool(actualPageInput);
+            assertNotNull(tool);
+            if (expectedKeYFirst) {
+               if (expectedIndex < 2) {
+                  assertEquals(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME, tool.getName());
+               }
+               else {
+                  assertEquals(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME, tool.getName());
+               }
+            }
+            else {
+               if (expectedIndex < 2) {
+                  assertEquals(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME, tool.getName());
+               }
+               else {
+                  assertEquals(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME, tool.getName());
+               }
+            }
+            expectedIndex++;
+         }
+      }
+   }
+   
+   /**
+    * Checks if the given {@link AbstractPageInput} is a proof page.
+    * @param input The {@link AbstractFormInput} to check.
+    * @return {@code true} is proof page, {@code false} is somethig else.
+    */
+   protected boolean isProofPage(AbstractPageInput<?> input) {
+      String name = input.getPage().getName();
+      return UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME.equals(name) ||
+             UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME.equals(name) ||
+             UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME.equals(name) ||
+             UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME.equals(name);
+   }
+   
    /**
     * Tests {@link IndexDataComparator}.
     */
@@ -157,7 +388,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
     */
    protected void doComparisionTest(IndexData first, IndexData second, int expectedOutcome) {
       IndexDataComparator c = new IndexDataComparator();
-//      assertEquals(expectedOutcome, c.compare(first, second));
+      assertEquals(expectedOutcome, c.compare(first, second));
       assertEquals(expectedOutcome * -1, c.compare(second, first)); // Test reverse order
    }
    
@@ -387,11 +618,8 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
        */
       @Override
       public void createFormInputFile(File storageLocation) throws Exception {
-         EvaluationInput evaluationInput = new EvaluationInput(UnderstandingProofAttemptsEvaluation.INSTANCE);
-         AbstractFormInput<?> introductionFormInput = evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME));
-         QuestionPageInput backgroundPageInput = (QuestionPageInput)introductionFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
-         QuestionInput keyInput = backgroundPageInput.getQuestionInput(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
-         keyInput.setValue(keyExperience);
+         EvaluationInput evaluationInput = createDummyEvaluationInput(keyExperience);
+         AbstractFormInput<?> introductionFormInput = evaluationInput.getCurrentFormInput();
          List<RandomFormInput> updatedOrders = UnderstandingProofAttemptsRandomFormOrderComputer.computeFixedOrder(evaluationInput, introductionFormInput, keyFirst, reverseOrder);
          FileStorage.store(storageLocation, introductionFormInput, updatedOrders);
          if (completed) {
@@ -400,6 +628,22 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
             FileStorage.store(storageLocation, evaluationFormInput, null);
          }
       }
+   }
+   
+   /**
+    * Creates a dummy {@link EvaluationInput} on which the current form is the introduction form.
+    * @param keyExperience The key experience to set.
+    * @return The created {@link EvaluationInput}.
+    */
+   protected static EvaluationInput createDummyEvaluationInput(String keyExperience) {
+      EvaluationInput evaluationInput = new EvaluationInput(UnderstandingProofAttemptsEvaluation.INSTANCE);
+      AbstractFormInput<?> introductionFormInput = evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME));
+      evaluationInput.setCurrentFormInput(introductionFormInput);
+      QuestionPageInput backgroundPageInput = (QuestionPageInput)introductionFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
+      introductionFormInput.setCurrentPageInput(backgroundPageInput);
+      QuestionInput keyInput = backgroundPageInput.getQuestionInput(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
+      keyInput.setValue(keyExperience);
+      return evaluationInput;
    }
    
    /**

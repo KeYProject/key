@@ -27,6 +27,7 @@ import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex.Entry;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex.IDataFactory;
+import org.key_project.sed.key.evaluation.server.index.PermutationIndex.IEntryUpdater;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -226,15 +227,131 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
     */
    @Override
    public List<RandomFormInput> computeRandomValues(EvaluationInput evaluationInput, AbstractFormInput<?> currentForm) {
-      // TODO: Compute a real random order!
-      return computeFixedOrder(evaluationInput, currentForm, true, false);
+      try {
+         // Get KeY experience
+         QuestionPageInput backgroundPage = (QuestionPageInput) currentForm.getPageInput(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
+         QuestionInput keyExperienceInput = backgroundPage.getQuestionInput(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
+         BalancingEntry balancingEntry = balancingMap.get(keyExperienceInput.getValue());
+         // Update index and compute which order should be returned.
+         BalancingEntryUpdater updater = new BalancingEntryUpdater(balancingEntry);
+         balancingEntry.getPermutationIndex().updateFirstEntry(updater);
+         // Create order
+         return computeOrder(evaluationInput, currentForm, updater.getPermutation(), updater.isKeyFirst());
+      }
+      catch (Exception e) { // In case of an exception return a fixed order as fallback.
+         e.printStackTrace();
+         return computeFixedOrder(evaluationInput, currentForm, true, false);
+      }
    }
    
-   @SuppressWarnings("unchecked")
+   /**
+    * An {@link IEntryUpdater} used to update a {@link BalancingEntry}.
+    * @author Martin Hentschel
+    */
+   protected static class BalancingEntryUpdater implements IEntryUpdater<String, IndexData> {
+      /**
+       * The {@link BalancingEntry} to modify.
+       */
+      private final BalancingEntry balancingEntry;
+      
+      /**
+       * The permutation to use.
+       */
+      private String[] permutation;
+
+      /**
+       * Use KeY first?
+       */
+      private boolean keyFirst;
+      
+      /**
+       * Constructor.
+       * @param balancingEntry The {@link BalancingEntry} to modify.
+       */
+      public BalancingEntryUpdater(BalancingEntry balancingEntry) {
+         this.balancingEntry = balancingEntry;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean updateFirstEntry(Entry<String, IndexData> firstEntry) {
+         permutation = firstEntry.getPermutation();
+         IndexData indexData = firstEntry.getData();
+         boolean indexUpdateRequired = false;
+         // Completed count is ignored for simplicity.
+         if (indexData.getKeyCount() < indexData.getSedCount()) {
+            keyFirst = true;
+            indexUpdateRequired = true;
+         }
+         else if (indexData.getKeyCount() > indexData.getSedCount()) {
+            keyFirst = false;
+            indexUpdateRequired = true;
+         }
+         else {
+            keyFirst = balancingEntry.keyCountTotal < balancingEntry.sedCountTotal;
+         }
+         // Update balancing entry
+         if (keyFirst) {
+            indexData.increaseKeYCount();
+            balancingEntry.keyCountTotal++;
+         }
+         else {
+            indexData.increaseSedCount();
+            balancingEntry.sedCountTotal++;
+         }
+         return indexUpdateRequired;
+      }
+
+      /**
+       * Returns the permutation to use.
+       * @return The permutation to use.
+       */
+      public String[] getPermutation() {
+         return permutation;
+      }
+
+      /**
+       * Checks if KeY should be used first.
+       * @return {@code true} KeY first, {@code false} SED first.
+       */
+      public boolean isKeyFirst() {
+         return keyFirst;
+      }
+   }
+   
+   /**
+    * Computes a single fixed order.
+    * @param evaluationInput The {@link EvaluationInput}.
+    * @param currentForm The current {@link AbstractFormInput}.
+    * @param keyFirst Use KeY as first tool?
+    * @param reverseOrder Reverse fixed order?
+    * @return The fixed order.
+    */
    public static List<RandomFormInput> computeFixedOrder(EvaluationInput evaluationInput, 
                                                          AbstractFormInput<?> currentForm,
                                                          boolean keyFirst,
                                                          boolean reverseOrder) {
+      String[] order = reverseOrder ?
+                       new String[] {UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME} :
+                       new String[] {UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME};
+      return computeOrder(evaluationInput, currentForm, order, keyFirst);
+   }
+   
+   /**
+    * Computes the order.
+    * @param evaluationInput The {@link EvaluationInput}.
+    * @param currentForm The current {@link AbstractFormInput}.
+    * @param proofOrder The order of the proofs.
+    * @param keyFirst Use KeY as first tool?
+    * @return The computed order.
+    */
+   @SuppressWarnings("unchecked")
+   public static List<RandomFormInput> computeOrder(EvaluationInput evaluationInput, 
+                                                    AbstractFormInput<?> currentForm,
+                                                    String[] proofOrder,
+                                                    boolean keyFirst) {
       // Get needed objects
       RandomForm evaluationForm = ((UnderstandingProofAttemptsEvaluation) evaluationInput.getEvaluation()).getEvaluationForm();
       RandomFormInput evaluationFormInput = (RandomFormInput) evaluationInput.getFormInput(evaluationForm);
@@ -242,19 +359,14 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
       AbstractPageInput<?> jmlPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.JML_PAGE_NAME);
       AbstractPageInput<?> keyPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
       AbstractPageInput<?> sedPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
-      AbstractPageInput<?> proof1Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME);
-      AbstractPageInput<?> proof2Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME);
-      AbstractPageInput<?> proof3Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME);
-      AbstractPageInput<?> proof4Page = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME);
+      AbstractPageInput<?> proof1Page = evaluationFormInput.getPageInput(proofOrder[0]);
+      AbstractPageInput<?> proof2Page = evaluationFormInput.getPageInput(proofOrder[1]);
+      AbstractPageInput<?> proof3Page = evaluationFormInput.getPageInput(proofOrder[2]);
+      AbstractPageInput<?> proof4Page = evaluationFormInput.getPageInput(proofOrder[3]);
       AbstractPageInput<?> feedbackPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.FEEDBACK_PAGE);
       AbstractPageInput<?> sendPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SEND_EVALUATION_PAGE_NAME);
       // Set order and tools
-      if (reverseOrder) {
-         evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, jmlPage, keyPage, proof3Page, proof4Page, sedPage, proof1Page, proof2Page, feedbackPage, sendPage));
-      }
-      else {
-         evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, jmlPage, keyPage, proof2Page, proof1Page, sedPage, proof4Page, proof3Page, feedbackPage, sendPage));
-      }
+      evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, jmlPage, keyPage, proof1Page, proof2Page, sedPage, proof3Page, proof4Page, feedbackPage, sendPage));
       Tool keyTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
       Tool sedTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
       if (keyFirst) {
