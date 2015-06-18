@@ -26,8 +26,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -263,8 +261,8 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      * @return The second element within the Java block inside the method frame
      *         of the given block, or null if no such element exists.
      */
-    private Statement getSecondStatementOfMethodFrameBlock(StatementBlock block) {
-        return getNthStatementOfMethodFrameBlock(block, 1);
+    private Statement getSecondStatementOfMethodFrameBlock(StatementBlock block, Services services) {
+        return getNthStatementOfMethodFrameBlock(block, 1, services);
     }
 
     /**
@@ -277,8 +275,8 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      *         the given block, or null if no such element exists.
      */
     private Statement getNthStatementOfMethodFrameBlock(StatementBlock block,
-            int n) {
-        StatementBlock blockWithoutMethodFrame = stripMethodFrame(block);
+            int n, Services services) {
+        StatementBlock blockWithoutMethodFrame = stripMethodFrame(block, services);
 
         if (blockWithoutMethodFrame.getBody().size() < n + 1) {
             return null;
@@ -297,18 +295,19 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
      * @return The stripped inner statement block or the original argument, if
      *         the removal was not applicable.
      */
-    private StatementBlock stripMethodFrame(final StatementBlock sb) {
-        try {
-            if (sb.getBody().get(0) instanceof Try) {
-                Try theTry = (Try) sb.getBody().get(0);
-                if (theTry.getBody().getBody().get(0) instanceof MethodFrame) {
-                    MethodFrame theMethodFrame = (MethodFrame) theTry.getBody()
-                            .getBody().get(0);
-                    return theMethodFrame.getBody();
-                }
-            }
+    private StatementBlock stripMethodFrame(final StatementBlock sb,
+            final Services services) {
+        if (sb.isEmpty()) {
+            return sb;
         }
-        catch (ArrayIndexOutOfBoundsException e) {
+
+        try {
+            return JavaTools.getInnermostMethodFrame(
+                    JavaBlock.createJavaBlock(sb), services).getBody();
+        }
+        catch (NullPointerException e) {
+            // This may happen if the statement has not method frame.
+            // TODO: Should probably replace this by an explicit check.
         }
 
         return sb;
@@ -392,7 +391,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             (StatementBlock) theJavaBlock.program(), goal));
 
                     Statement breakpoint;
-                    if ((breakpoint = getBreakPoint(goal.sequent().succedent())) != null) {
+                    if ((breakpoint = getBreakPoint(goal.sequent().succedent(), goal.proof().getServices())) != null) {
                         final ImmutableList<Goal> subtreeGoals = goal.proof()
                                 .getSubtreeEnabledGoals(
                                         commonParents.get(breakpoint)).removeFirst(goal);
@@ -537,7 +536,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             }
 
             final Pair<BlockContract, Statement> contractAndBreakpoint = getBlockContractFor(
-                    stripMethodFrame(toSearch), services);
+                    stripMethodFrame(toSearch, services), services);
             if (contractAndBreakpoint != null) {
                 final Statement breakpoint = contractAndBreakpoint.second;
                 if (breakpoint != null) {
@@ -578,7 +577,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                             contracts.iterator().next(), breakpoint) : null;
                 }
 
-                breakpoint = getSecondStatementOfMethodFrameBlock((StatementBlock) stmt);
+                breakpoint = getSecondStatementOfMethodFrameBlock((StatementBlock) stmt, services);
                 if (breakpoint instanceof StatementBlock) {
                     breakpoint = (Statement) JavaTools
                             .getActiveStatement(JavaBlock
@@ -598,12 +597,12 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
          *         succedent has one formula starting with a break point
          *         statement, else null;
          */
-        private Statement getBreakPoint(Semisequent succedent) {
+        private Statement getBreakPoint(Semisequent succedent, Services services) {
             for (SequentFormula formula : succedent.asList()) {
                 JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
                         formula.formula());
                 
-                StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program());
+                StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program(), services);
 
                 if (blockWithoutMethodFrame.isEmpty()) {
                     continue;
@@ -649,7 +648,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                 JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
                         formula.formula());
                 
-                StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program());
+                StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program(), services);
                 
                 if (blockWithoutMethodFrame.isEmpty()) {
                     continue;
