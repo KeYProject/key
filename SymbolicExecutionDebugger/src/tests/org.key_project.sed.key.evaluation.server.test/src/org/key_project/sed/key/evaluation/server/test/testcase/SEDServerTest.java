@@ -34,6 +34,36 @@ public class SEDServerTest extends AbstractEvaluationModelTest {
    private static final int TEST_PORT = 1234;
    
    /**
+    * Tests the {@link SEDServer} pinging.
+    */
+   @Test
+   public void testPing() throws Exception {
+      File storageLocation = IOUtil.createTempDirectory("SEDServer", "Test");
+      ServerThread serverThread = null;
+      try {
+         // Start server
+         serverThread = new ServerThread(storageLocation);
+         serverThread.start();
+         // Ensure that no storage content exists yet
+         assertEquals(0, storageLocation.listFiles().length);
+         // Ping server
+         long time = SendThread.ping("localhost", TEST_PORT);
+         assertTrue(time >= 0);
+         serverThread.assertStorageContent();
+         // Simulate valid client requests
+         serverThread.assertStorageContent();
+         sendUnderstandingProofAttemptsIntroductionForm(storageLocation, UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE);
+         serverThread.assertStorageContent();
+      }
+      finally {
+         IOUtil.delete(storageLocation);
+         if (serverThread != null) {
+            serverThread.stopServer();
+         }
+      }
+   }
+   
+   /**
     * Tests the {@link SEDServer} with incoming invalid content.
     */
    @Test

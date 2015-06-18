@@ -23,6 +23,8 @@ public class SendThread extends Thread {
    
    private final int port;
    
+   private final boolean parseAnser;
+   
    private String answer;
    
    private EvaluationInput answerInput;
@@ -35,18 +37,26 @@ public class SendThread extends Thread {
    
    private ObjectInputStream in;
    
+   private long time;
+   
    public SendThread(String message) {
       this(message, ServerSettings.HOST, ServerSettings.PORT);
    }
-   
+
    public SendThread(String message, String host, int port) {
+      this(message, host, port, true);
+   }
+
+   public SendThread(String message, String host, int port, boolean parseAnser) {
       this.message = message;
       this.host = host;
       this.port = port;
+      this.parseAnser = parseAnser;
    }
 
    @Override
    public void run() {
+      long start = System.currentTimeMillis();
       try {
          socket = new Socket(host, port);
          out = null;
@@ -60,7 +70,9 @@ public class SendThread extends Thread {
             // Read answer
             answer = ObjectUtil.toString(in.readObject());
             // Parse answer
-            answerInput = EvaluationInputReader.parse(answer);
+            if (parseAnser) {
+               answerInput = EvaluationInputReader.parse(answer);
+            }
          }
          catch (ClassNotFoundException e) {
             throw new IOException("Can't handle answer.", e);
@@ -71,6 +83,9 @@ public class SendThread extends Thread {
       }
       catch (Exception e) {
          exception = e;
+      }
+      finally {
+         time = System.currentTimeMillis() - start;
       }
    }
    
@@ -107,6 +122,35 @@ public class SendThread extends Thread {
 
    public Exception getException() {
       return exception;
+   }
+
+   public long getTime() {
+      return time;
+   }
+
+   /**
+    * Pings the default server specified by the {@link ServerSettings}.
+    * @return The elapsed time.
+    * @throws Exception Occurred Exception.
+    */
+   public static long ping() throws Exception {
+      return ping(ServerSettings.HOST, ServerSettings.PORT);
+   }
+
+   /**
+    * Pings the specified server.
+    * @param host The host.
+    * @param port The port.
+    * @return The elapsed time.
+    * @throws Exception Occurred Exception.
+    */
+   public static long ping(String host, int port) throws Exception {
+      SendThread thread = new SendThread("Ping", host, port, false);
+      thread.run();
+      if (thread.getException() != null) {
+         throw thread.getException();
+      }
+      return thread.getTime();
    }
 
    /**

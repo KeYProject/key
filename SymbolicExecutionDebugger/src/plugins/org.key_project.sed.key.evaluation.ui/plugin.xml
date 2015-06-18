@@ -52,4 +52,13 @@
          </menu>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.key_project.sed.key.ui.preference.page.key_symbolic_debug"
+            class="org.key_project.sed.key.evaluation.preference.page.SEDEvaluationServerPreferencePage"
+            id="org.key_project.sed.key.evaluation.preference.page.SEDEvaluationServerPreferencePage"
+            name="Evaluation">
+      </page>
+   </extension>
 </plugin>
