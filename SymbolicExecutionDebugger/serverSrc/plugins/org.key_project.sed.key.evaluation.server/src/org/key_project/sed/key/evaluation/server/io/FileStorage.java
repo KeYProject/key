@@ -61,17 +61,6 @@ public class FileStorage {
 
    /**
     * Stores the given {@link AbstractFormInput}.
-    * @param formInput The {@link AbstractFormInput} to store.
-    * @param updatedOrders The {@link RandomFormInput}s with updated orders.
-    * @return The new {@link UUID} under which the form input has been stored or {@code null} if {@link AbstractFormInput#getUUID()} was already defined.
-    * @throws IOException Occurred Exception.
-    */
-   public static String store(AbstractFormInput<?> formInput, List<RandomFormInput> updatedOrders) throws IOException {
-      return store(FORM_STORAGE_LOCATION, formInput, updatedOrders);
-   }
-
-   /**
-    * Stores the given {@link AbstractFormInput}.
     * @param storageLocation The storage location.
     * @param formInput The {@link AbstractFormInput} to store.
     * @param updatedOrders The {@link RandomFormInput}s with updated orders.

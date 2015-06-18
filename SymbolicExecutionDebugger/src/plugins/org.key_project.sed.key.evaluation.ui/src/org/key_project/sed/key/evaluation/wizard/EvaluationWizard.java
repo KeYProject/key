@@ -12,7 +12,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.key.evaluation.io.SendThread;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
-import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
@@ -309,28 +308,9 @@ public class EvaluationWizard extends Wizard {
                         throw new InvocationTargetException(null, "Received answer does not fit with current evaluation.");
                      }
                      // Set or check UUID
-                     if (evaluationInput.getUUID() == null) {
-                        evaluationInput.setUUID(answerInput.getUUID());
-                     }
-                     else {
-                        if (!evaluationInput.getUUID().equals(answerInput.getUUID())) {
-                           throw new InvocationTargetException(null, "Received answer does not fit with current evaluation results.");
-                        }
-                     }
+                     SendThread.updateUUID(evaluationInput, answerInput);
                      // Update page orders
-                     for (AbstractFormInput<?> answerFormInput : answerInput.getFormInputs()) {
-                        if (answerFormInput instanceof RandomFormInput) {
-                           RandomFormInput randomAnswer = (RandomFormInput) answerFormInput;
-                           if (!CollectionUtil.isEmpty(randomAnswer.getPageOrder())) {
-                              RandomFormInput form = (RandomFormInput) evaluationInput.getFormInput(randomAnswer.getForm());
-                              form.setPageOrder(randomAnswer.getPageOrder());
-                              for (AbstractPageInput<?> pageInput : form.getPageInputs()) {
-                                 Tool tool = randomAnswer.getTool(randomAnswer.getPageInput(pageInput.getPage()));
-                                 form.setTool(pageInput, tool);
-                              }
-                           }
-                        }
-                     }
+                     SendThread.updatePageOrder(evaluationInput, answerInput);
                      setResult(Boolean.TRUE);
                   }
                }

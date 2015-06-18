@@ -3,21 +3,31 @@ package org.key_project.sed.key.evaluation.io;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 
+import org.key_project.sed.key.evaluation.model.definition.Tool;
+import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
+import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
+import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.model.util.ServerSettings;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
 public class SendThread extends Thread {
    private final String message;
    
+   private final String host;
+   
+   private final int port;
+   
    private String answer;
    
    private EvaluationInput answerInput;
    
-   private Throwable exception;
+   private Exception exception;
    
    private Socket socket;
    
@@ -26,13 +36,19 @@ public class SendThread extends Thread {
    private ObjectInputStream in;
    
    public SendThread(String message) {
+      this(message, ServerSettings.HOST, ServerSettings.PORT);
+   }
+   
+   public SendThread(String message, String host, int port) {
       this.message = message;
+      this.host = host;
+      this.port = port;
    }
 
    @Override
    public void run() {
       try {
-         socket = new Socket(ServerSettings.HOST, ServerSettings.PORT);
+         socket = new Socket(host, port);
          out = null;
          in = null;
          try {
@@ -53,8 +69,8 @@ public class SendThread extends Thread {
             closeConnection();
          }
       }
-      catch (Throwable t) {
-         exception = t;
+      catch (Exception e) {
+         exception = e;
       }
    }
    
@@ -89,7 +105,45 @@ public class SendThread extends Thread {
       return answerInput;
    }
 
-   public Throwable getException() {
+   public Exception getException() {
       return exception;
+   }
+
+   /**
+    * Updates the page order on the target {@link EvaluationInput} with the values from the source {@link EvaluationInput}.
+    * @param target The target {@link EvaluationInput} to modify.
+    * @param source The source {@link EvaluationInput} to read from.
+    */
+   public static void updatePageOrder(EvaluationInput target, EvaluationInput source) {
+      for (AbstractFormInput<?> answerFormInput : source.getFormInputs()) {
+         if (answerFormInput instanceof RandomFormInput) {
+            RandomFormInput randomAnswer = (RandomFormInput) answerFormInput;
+            if (!CollectionUtil.isEmpty(randomAnswer.getPageOrder())) {
+               RandomFormInput form = (RandomFormInput) target.getFormInput(randomAnswer.getForm());
+               form.setPageOrder(randomAnswer.getPageOrder());
+               for (AbstractPageInput<?> pageInput : form.getPageInputs()) {
+                  Tool tool = randomAnswer.getTool(randomAnswer.getPageInput(pageInput.getPage()));
+                  form.setTool(pageInput, tool);
+               }
+            }
+         }
+      }
+   }
+
+   /**
+    * Copies the UUID from the source {@link EvaluationInput} to the target {@link EvaluationInput}.
+    * @param target The target {@link EvaluationInput} to modify.
+    * @param source The source {@link EvaluationInput} to read from.
+    * @throws InvocationTargetException Occurred Exception.
+    */
+   public static void updateUUID(EvaluationInput target, EvaluationInput source) throws InvocationTargetException {
+      if (target.getUUID() == null) {
+         target.setUUID(source.getUUID());
+      }
+      else {
+         if (!target.getUUID().equals(source.getUUID())) {
+            throw new InvocationTargetException(null, "Received answer does not fit with current evaluation results.");
+         }
+      }
    }
 }

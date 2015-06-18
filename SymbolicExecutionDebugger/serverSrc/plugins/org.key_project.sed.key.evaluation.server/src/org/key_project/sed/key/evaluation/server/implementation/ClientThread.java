@@ -1,5 +1,6 @@
 package org.key_project.sed.key.evaluation.server.implementation;
 
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -21,15 +22,22 @@ import org.key_project.util.java.ObjectUtil;
  */
 public class ClientThread extends Thread {
    /**
+    * The storage location.
+    */
+   private final File storageLocation;
+   
+   /**
     * The {@link Socket} to use.
     */
    private final Socket socket;
 
    /**
     * Constructor.
+    * @param storageLocation The storage location.
     * @param socket The {@link Socket} to use.
     */
-   public ClientThread(Socket socket) {
+   public ClientThread(File storageLocation, Socket socket) {
+      this.storageLocation = storageLocation;
       this.socket = socket;
    }
 
@@ -57,7 +65,7 @@ public class ClientThread extends Thread {
                                                   computer.computeRandomValues(evaluationInput, formInput) : 
                                                   null;
             // Store evaluation
-            FileStorage.store(formInput, updatedOrders);
+            FileStorage.store(storageLocation, formInput, updatedOrders);
             // Send answer
             out.writeObject(EvaluationInputWriter.toRandomOrderXML(evaluationInput, updatedOrders));
          }

@@ -12,3 +12,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
+Export-Package: org.key_project.sed.key.evaluation.model.test.suite,
+ org.key_project.sed.key.evaluation.model.test.testcase

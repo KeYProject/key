@@ -10,7 +10,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.util.test;bundle-version="1.0.0",
  org.key_project.sed.key.evaluation.model;bundle-version="1.0.0",
- org.key_project.sed.key.evaluation.server;bundle-version="1.0.0"
+ org.key_project.sed.key.evaluation.model.test;bundle-version="1.0.0",
+ org.key_project.sed.key.evaluation.server;bundle-version="1.0.0",
+ org.key_project.sed.key.evaluation.ui;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
