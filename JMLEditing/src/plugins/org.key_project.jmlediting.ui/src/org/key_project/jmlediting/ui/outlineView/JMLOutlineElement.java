@@ -19,13 +19,12 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 public class JMLOutlineElement implements IJavaElement, ISourceReference {
    private IJavaElement parent;
    private final int type = 100;
-   private String elementName;
    private IASTNode jmlNode;
-   private int endoffset = 0;
    
    public JMLOutlineElement(IJavaElement parent, IASTNode node) {
       this.parent = parent;
       this.jmlNode = node;
+      
       //TODO: ober nodes itereiren bis länge von
    }
 
@@ -158,7 +157,6 @@ public class JMLOutlineElement implements IJavaElement, ISourceReference {
          
          @Override
          public int getLength() {
-            System.out.println();
             return jmlNode.getEndOffset()-jmlNode.getStartOffset();
          }
       };

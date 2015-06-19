@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.xml.soap.Node;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Comment;
@@ -26,136 +30,78 @@ import org.key_project.util.jdt.JDTUtil;
 
 public class TestOutlineExtension extends DefaultOutlineModifiyer {
 
-
-public static int count = 0;
-
    
    public static HashMap<String, Object> inOutlie = new HashMap<String, Object>();
-  
+   public static JMLASTCommentLocator comments = null;
+   
+   
    @Override
    public Object[] modify(Object parent, Object[] currentChildren) {
-
-      System.out.println(count++);
       
       
       final IJavaElement javaParent = (IJavaElement)parent;
-      final List<IASTNode> iASTList = new ArrayList<IASTNode>();
       
-      
-      
+//first call with i compilation unit initialize everything
       if(javaParent.getElementType() == IJavaElement.COMPILATION_UNIT) {
-         String source = null;
-         try {
-            source = ((ICompilationUnit)javaParent).getSource();
-         }
-         catch (JavaModelException e1) {
-            LogUtil.getLogger().logError(e1);
-         }
-         IProject project = javaParent.getJavaProject().getProject();
+         comments = new JMLASTCommentLocator((ICompilationUnit)javaParent);  
+      }
+      
+      if (comments != null) {
+   // add invariants to class
+         if (javaParent.getElementType() == IJavaElement.TYPE){
          
-         final IJMLParser parser;
+         Object[] newArray = new Object[currentChildren.length+comments.getClassInvariants().size()];
          
-         if (JMLPreferencesHelper.getProjectJMLProfile(project) != null) {
-                  
-          parser = JMLPreferencesHelper.getProjectJMLProfile(project).createParser();
+        //add old elements
+         for (int i =  comments.getClassInvariants().size(); i < currentChildren.length+comments.getClassInvariants().size(); i++){
+            newArray[i] = currentChildren[i-comments.getClassInvariants().size()];
          }
-         else parser = JMLPreferencesHelper.getDefaultDefaultJMLProfile().createParser();
-        
-         /*
-         ICompilationUnit compilationUnit = (ICompilationUnit)javaParent;
-         ASTNode node = JDTUtil.parse(compilationUnit);
-         CompilationUnit cu = (CompilationUnit) node;
-         List comments = cu.getCommentList();
-         for (Object obj : comments) {
-            if (obj instanceof Comment) {
-               Comment bc = (Comment) obj;
-               System.out.println(bc.getStartPosition());
-               System.out.println(bc.getLength());
-               System.out.println(bc.getAlternateRoot());
-            }
-            System.out.println(obj);
+         int i = 0;
+         //add JML elements
+         for(JMLComents node : comments.getClassInvariants()) {
+            newArray[i++] = new JMLOutlineElement((IJavaElement)parent, node);
          }
-         */
-         CommentLocator locator = new CommentLocator(source);
-         for(final CommentRange range : locator.findCommentRanges()) {
+         return newArray;
+         }
+         
+   // add JML #Spezifications to methods   
+         if (javaParent.getElementType() == IJavaElement.METHOD){
+            IMethod method = (IMethod) javaParent;
+            List<JMLComents> invariants = new ArrayList<JMLComents>();
+            int offset = -1;
+            int length = -1;
+            int arrayoffset = 0;
+            
+            JMLComents com = null;
             try {
-               iASTList.add(parser.parse(source, range));
+            offset = method.getNameRange().getOffset();
+            length = method.getNameRange().getLength();
+            }catch (JavaModelException e) {
+               LogUtil.getLogger().logError(e);;
             }
-            catch (ParserException e) {
-               LogUtil.getLogger().logError(e);
+            
+            com  = comments.getmethodJMLComm(offset);
+            if (com != null) invariants.add(com);
+            invariants.addAll(comments.getLoopInvaForMethod(offset, length));
+            
+            //add all loop invs and methods Spezifications
+            Object[] newArray = new Object[currentChildren.length+invariants.size()];
+            
+            
+            
+            for (int i =0; i < invariants.size(); i++){
+               newArray[i] = new JMLOutlineElement((IJavaElement) parent, invariants.get(i));   
             }
-         }
-      }
-      
-      
-      
-      
-      
-      Object[] newArray = new Object[currentChildren.length+iASTList.size()];
-      
-      for (int i =  0; i < currentChildren.length; i++){
-         newArray[i] = currentChildren[i];
-      }
-      
-      
-      int i = 0;
-      final List<String> keywordList = new ArrayList<String>();
-      keywordList.add("normal_behavior");
-      keywordList.add("invariant");
-      final List<IASTNode> keywords = new ArrayList<IASTNode>();
-      
-      for(IASTNode node : iASTList) {
-         node.traverse(new INodeTraverser<List<IASTNode>>() {
-
-            @Override
-            public List<IASTNode> traverse(IASTNode node, List<IASTNode> existing) {
+            for (int i = invariants.size(); i < newArray.length; i++){
+               newArray[i] = currentChildren[i-invariants.size()];
+            }
+            return newArray;
                
-               if(node.getType() == NodeTypes.KEYWORD) {
-                  for(String key : keywordList) {
-                     if(((IKeywordNode)node).getKeywordInstance().equals(key)) {
-                        keywords.add(node);
-                        return keywords;
-                     }
-                  }
-               }               
-               return keywords;
-            }
-         }, keywords);
-      }
-      
-      for(IASTNode node : keywords) {
-         newArray[currentChildren.length+i++] = new JMLOutlineElement((IJavaElement)parent, node);
-      }
-      
-      return newArray;
-  }
-      
-      
-      
-  /*    if (currentChildren.length >= 1 && currentChildren[0] instanceof IJavaElement) {
-         Object[] newChildren = new Object[currentChildren.length];
-         System.arraycopy(currentChildren, 0, newChildren, 0, currentChildren.length);
-         IJavaElement firstChild = (IJavaElement) currentChildren[0];
-         System.out.println("Parent: Type:  "+(((IJavaElement)parent).getElementType()));
-         System.out.println("Parent: Name:  "+ ((IJavaElement)parent).getElementName());
-         
-        
-         //newChildren[currentChildren.length] = new NoRealJavaElement(firstChild.getJavaProject(), "Hello World");
-         //newChildren[currentChildren.length + 1] = new NoRealJavaElement(firstChild.getJavaProject(), "Achtung");
-         for (int i = 0; i < newChildren.length; i++) {
-            if(newChildren[i] != null) {
-               if (newChildren[i] instanceof IJavaElement) {
-                  System.out.println(i+" :: ElementType :: "+((IJavaElement)newChildren[i]).getElementType());
-                  System.out.println(i+" :: ElementName :: "+((IJavaElement)newChildren[i]).getElementName());
-               }
-            }
+            
+              
          }
          
-         
-         return newChildren;
       }
-      else {
-         return currentChildren;
-      }
-   }*/
+      return currentChildren;
+  }
 }
