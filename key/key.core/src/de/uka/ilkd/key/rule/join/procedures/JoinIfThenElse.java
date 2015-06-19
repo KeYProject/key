@@ -206,6 +206,10 @@ public class JoinIfThenElse extends JoinProcedure {
         Term distinguishingFormula2 = distinguishingAndEqualFormula2.isSome() ? distinguishingAndEqualFormula2
                 .getValue().first : null;
 
+        // NOTE (DS): This assertion does not prevent the joining of states with equal
+        // Symbolic State. This is intended behavior: In some proofs we have two identical
+        // nodes which we want to join (possibly after a hide right / hide left); this
+        // should be allowed (although they are of course indistinguishable).
         assert distinguishingFormula != null || distinguishingFormula2 != null : String
                 .format("\nA computed distinguishing formula is trivial (\"true\"); "
                         + "please verify that everything is OK. Symbolic execution states were:\n\n"
