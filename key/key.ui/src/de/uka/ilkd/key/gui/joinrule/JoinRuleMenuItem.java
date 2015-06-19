@@ -62,7 +62,7 @@ public class JoinRuleMenuItem extends JMenuItem {
      * Creates a new menu item for the join rule.
      *
      * @param goal
-     *            The selected goal..
+     *            The selected goal.
      * @param pio
      *            The position the join shall be applied to (symbolic state /
      *            program counter formula).
