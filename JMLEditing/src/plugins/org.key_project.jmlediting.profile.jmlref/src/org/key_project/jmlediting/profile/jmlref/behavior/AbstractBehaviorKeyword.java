@@ -8,7 +8,6 @@ import java.util.Set;
 import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
-import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordValidator;
@@ -82,10 +81,4 @@ public abstract class AbstractBehaviorKeyword implements IKeyword {
     public IKeywordValidator getKeywordValidator() {
         return null;
     }
-
-    @Override
-    public IKeywordContentRefactorer createRefactorer() {
-        return null;
-    }
-
 }
