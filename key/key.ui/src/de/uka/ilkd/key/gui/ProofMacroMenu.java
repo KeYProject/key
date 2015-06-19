@@ -23,6 +23,7 @@ import javax.swing.KeyStroke;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -93,7 +94,14 @@ public class ProofMacroMenu extends JMenu {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
                 
                 if (macro.getName().contains("join")) {
-                    joinMacros.add(menuItem);
+                    // NOTE (DS): At the moment, JoinRule is an experimental
+                    // feature. We therefore only add join-related macros
+                    // if the feature is currently active.
+                    // TODO (DS): Remove below check related to the exp. \\
+                    // feature one JoinRule is considered stable.
+                    if (JoinRuleMenuItem.FEATURE.active()) {
+                        joinMacros.add(menuItem);
+                    }
                 } else {
                     add(menuItem);
                 }
