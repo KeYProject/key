@@ -216,14 +216,14 @@ public class TacletMenu extends JMenu {
 	}
 
 	createBuiltInRuleMenu(builtInList, control);
+    createDelayedCutJoinMenu(control);
+    createDefocusingJoinMenu();
 
 	if(pos!= null && pos.isSequent()){
 	    createSMTMenu(control);
 	}
 	createFocussedAutoModeMenu ( control );
     addMacroMenu();
-	createDelayedCutJoinMenu(control);
-	createDefocusingJoinMenu();
 
 	//        addPopFrameItem(control);
 
