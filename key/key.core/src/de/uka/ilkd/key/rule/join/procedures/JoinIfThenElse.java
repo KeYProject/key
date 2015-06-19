@@ -211,8 +211,11 @@ public class JoinIfThenElse extends JoinProcedure {
             getDistinguishingFormula(state2.second, state1.second, services);
       Term distinguishingFormula2 = distinguishingAndEqualFormula2.isSome() ? distinguishingAndEqualFormula2.getValue().first : null;
 
-      assert distinguishingFormula != null || distinguishingFormula2 != null :
-          "Something went wrong in computing the distinguishing formula for a join";
+        assert distinguishingFormula != null || distinguishingFormula2 != null : String
+                .format("\nA computed distinguishing formula is trivial (\"true\"); "
+                        + "please verify that everything is OK. Symbolic execution states were:\n\n"
+                        + "--- State 1 ---\n%s\n\n---State 2---\n%s\n", state1,
+                        state2);
       
       boolean commuteSides = false;
       if (distinguishingFormula == null) {
