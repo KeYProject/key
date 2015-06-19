@@ -19,6 +19,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -90,11 +91,17 @@ public class JoinRuleMenuItem extends JMenuItem {
 
                 if (completedApp.complete()) {
                     Thread thread = new Thread(new Runnable() {
-
                         @Override
                         public void run() {
-                            goal.apply(completedApp);
-                            mediator.startInterface(true);
+                            try {
+                                goal.apply(completedApp);
+                            }
+                            catch (Exception e) {
+                                mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
+                            }
+                            finally {
+                                mediator.startInterface(true);
+                            }
                         }
                     }, "DefocusingJoinRule");
 
