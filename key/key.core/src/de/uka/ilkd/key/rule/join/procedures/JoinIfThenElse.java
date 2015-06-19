@@ -203,19 +203,28 @@ public class JoinIfThenElse extends JoinProcedure {
       // formula is implied by the original path condition; for completeness,
       // we add the common subformula in the new path condition, if it
       // is not already implied by that.
-      Pair<Term, Term> distinguishingAndEqualFormula1 =
+      Option<Pair<Term, Term>> distinguishingAndEqualFormula1 =
             getDistinguishingFormula(state1.second, state2.second, services);
-      Term distinguishingFormula = distinguishingAndEqualFormula1.first;
+      Term distinguishingFormula = distinguishingAndEqualFormula1.isSome() ? distinguishingAndEqualFormula1.getValue().first : null;
       
-      Pair<Term, Term> distinguishingAndEqualFormula2 =
+      Option<Pair<Term, Term>> distinguishingAndEqualFormula2 =
             getDistinguishingFormula(state2.second, state1.second, services);
-      Term distinguishingFormula2 = distinguishingAndEqualFormula2.first;
+      Term distinguishingFormula2 = distinguishingAndEqualFormula2.isSome() ? distinguishingAndEqualFormula2.getValue().first : null;
+
+      assert distinguishingFormula != null || distinguishingFormula2 != null :
+          "Something went wrong in computing the distinguishing formula for a join";
       
-      // Choose the shorter distinguishing formula
       boolean commuteSides = false;
-      if (countAtoms(distinguishingFormula2) < countAtoms(distinguishingFormula)) {
-         distinguishingFormula = distinguishingFormula2;
-         commuteSides = true;
+      if (distinguishingFormula == null) {
+          distinguishingFormula = distinguishingFormula2;
+          commuteSides = true;
+      }
+      else if (distinguishingFormula2 != null) {
+          // Choose the shorter distinguishing formula
+          if (countAtoms(distinguishingFormula2) < countAtoms(distinguishingFormula)) {
+             distinguishingFormula = distinguishingFormula2;
+             commuteSides = true;
+          }
       }
       
       // Try an automatic simplification

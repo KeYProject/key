@@ -857,9 +857,18 @@ public class JoinRuleUtils {
             result = result1;
         }
         else {
-            Pair<Term, Term> distinguishingAndEqual = getDistinguishingFormula(
+            Option<Pair<Term, Term>> distinguishingAndEqual = getDistinguishingFormula(
                     result1, result2, services);
-            ArrayList<Term> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.second);
+            
+            if (!distinguishingAndEqual.isSome()) {
+                //TODO (DS) Check if correct.
+                distinguishingAndEqual = getDistinguishingFormula(
+                        result2, result1, services);
+            }
+            
+            assert distinguishingAndEqual instanceof Option.Some : "Possibly, this join is not sound!";
+            
+            ArrayList<Term> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.getValue().second);
 
             // Apply distributivity to simplify the formula
             cond1ConjElems.removeAll(equalConjunctiveElems);
@@ -904,7 +913,7 @@ public class JoinRuleUtils {
      *         pathCondition2, and (2) the "rest" of pathCondition1 that is
      *         common with pathCondition2.
      */
-    public static Pair<Term, Term> getDistinguishingFormula(
+    public static Option<Pair<Term, Term>> getDistinguishingFormula(
             Term pathCondition1, Term pathCondition2, Services services) {
 
         ArrayList<Term> cond1ConjElems = getConjunctiveElementsFor(pathCondition1);
@@ -922,10 +931,14 @@ public class JoinRuleUtils {
         }
 
         cond1ConjElems.removeAll(distinguishingElements); // This is the rest
+        
+        if (distinguishingElements.isEmpty() && !cond1ConjElems.isEmpty()) {
+            return new Option.None<Pair<Term, Term>>();
+        }
 
-        return new Pair<Term, Term>(joinConjuctiveElements(
+        return new Option.Some<Pair<Term, Term>>(new Pair<Term, Term>(joinConjuctiveElements(
                 distinguishingElements, services), joinConjuctiveElements(
-                cond1ConjElems, services));
+                cond1ConjElems, services)));
 
     }
 
@@ -1399,6 +1412,49 @@ public class JoinRuleUtils {
     private static LocationVariable lookupVarInNS(String name, Services services) {
         return (LocationVariable) services.getNamespaces().programVariables()
                 .lookup(new Name(name));
+    }
+    
+    /**
+     * A simple Scala-like option type: Either Some(value) or None.
+     *
+     * @author Dominic Scheurer
+     *
+     * @param <T> Type for the content of the option.
+     */
+    public static abstract class Option<T> {
+        static class Some<T> extends Option<T> {
+            private T value;
+            
+            public Some(T value) {
+                this.value = value;
+            }
+            
+            public T getValue() {
+                return value;
+            }
+        }
+        
+        static class None<T> extends Option<T> {}
+        
+        public boolean isSome() {
+            return this instanceof Some;
+        }
+        
+        /**
+         * Returns the value of this object if is a Some; otherwise,
+         * an exception is thrown.
+         *
+         * @return The value of this object.
+         * @throws IllegalAccessError If this object is a None.
+         */
+        public T getValue() {
+            if (isSome()) {
+                return ((Some<T>) this).getValue();
+            }
+            else {
+                throw new IllegalAccessError("Cannot otain a value from a None object.");
+            }
+        }
     }
 
     /**
