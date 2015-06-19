@@ -472,6 +472,9 @@ public class IntermediateProofReplayer {
                     new SequentFormula(parseTerm(ifFormulaStr, proof))));
         }
 
+        //TODO: In certain cases, the below method call returns null and
+        // induces follow-up NullPointerExceptions. This was encountered
+        // in a proof of the TimSort method binarySort with several joins.
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
 
         if (!ourApp.complete()) {

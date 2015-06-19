@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -302,8 +303,16 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
         try {
-            return JavaTools.getInnermostMethodFrame(
-                    JavaBlock.createJavaBlock(sb), services).getBody();
+            final StatementBlock innerMostMethodFrameBody =
+                    JavaTools.getInnermostMethodFrame(
+                            JavaBlock.createJavaBlock(sb), services).getBody();
+            
+            if (innerMostMethodFrameBody.getBody().size() > 0 &&
+                    innerMostMethodFrameBody.getBody().get(0) instanceof Try) {
+                return ((Try) innerMostMethodFrameBody.getBody().get(0)).getBody();
+            } else {
+                return innerMostMethodFrameBody;
+            }
         }
         catch (NullPointerException e) {
             // This may happen if the statement has not method frame.
