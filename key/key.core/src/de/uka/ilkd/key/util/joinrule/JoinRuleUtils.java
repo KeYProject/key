@@ -1470,8 +1470,8 @@ public class JoinRuleUtils {
         
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Term &&
-                    term.equalsModRenaming((Term) obj);
+            return obj instanceof TermWrapper &&
+                    term.equalsModRenaming(((TermWrapper) obj).getTerm());
         }
         
         @Override
