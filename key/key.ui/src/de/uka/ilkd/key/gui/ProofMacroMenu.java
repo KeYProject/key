@@ -80,13 +80,30 @@ public class ProofMacroMenu extends JMenu {
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy macros");
 
+        // NOTE (DS): For better clarity, we add all macros addressing proof
+        // node joins, currently identified by containing the keyword "join"
+        // in their description, in a dedicated sub menu. This procedure only
+        // works properly if all join macros, and only those, contain the
+        // keyword in their description.
+        JMenu joinMacros = new JMenu("Join macros");
+        
         int count = 0;
         for (ProofMacro macro : loader) {
             if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
-                add(menuItem);
+                
+                if (macro.getName().contains("join")) {
+                    joinMacros.add(menuItem);
+                } else {
+                    add(menuItem);
+                }
+                
                 count++;
             }
+        }
+        
+        if (joinMacros.getMenuComponentCount() > 0) {
+            add(joinMacros);
         }
 
         mediator.enableWhenProofLoaded(this);

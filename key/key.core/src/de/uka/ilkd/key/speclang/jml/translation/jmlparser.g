@@ -365,6 +365,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
+    |   result = joinprocclause
     |   result = requiresfreeclause
     |   result = decreasesclause
     |   result = separatesclause  // old information flow syntax
@@ -431,6 +432,11 @@ requiresfreeclause returns [Term result = null] throws SLTranslationException
             { result = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
+joinprocclause returns [Term result = null] throws SLTranslationException
+:
+    jpr:JOIN_PROC result=predornot
+            { result = translator.translate(jpr.getText(), Term.class, result, services); }
+    ;
 
 ensuresclause returns [Term result = null] throws SLTranslationException
 :
