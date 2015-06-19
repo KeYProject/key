@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -905,27 +907,34 @@ public class JoinRuleUtils {
      *         common with pathCondition2.
      */
     public static Pair<Term, Term> getDistinguishingFormula(
-            Term pathCondition1, Term pathCondition2, Services services) {
+            final Term pathCondition1, final Term pathCondition2, final Services services) {
 
-        ArrayList<Term> cond1ConjElems = getConjunctiveElementsFor(pathCondition1);
-        ArrayList<Term> cond2ConjElems = getConjunctiveElementsFor(pathCondition2);
-
-        ArrayList<Term> distinguishingElements = new ArrayList<Term>(
-                cond1ConjElems);
-
-        for (int i = 0; i < cond1ConjElems.size(); i++) {
-            Term elem1 = cond1ConjElems.get(i);
-
-            if (cond2ConjElems.contains(elem1)) {
-                distinguishingElements.remove(elem1);
-            }
+        final TermWrapperFactory factory = new TermWrapperFactory();
+        
+        final LinkedHashSet<TermWrapper> cond1ConjElems = new LinkedHashSet<JoinRuleUtils.TermWrapper>();
+        final LinkedHashSet<TermWrapper> cond2ConjElems = new LinkedHashSet<JoinRuleUtils.TermWrapper>();
+        
+        for (final Term term : getConjunctiveElementsFor(pathCondition1)) {
+            cond1ConjElems.add(factory.wrapTerm(term));
         }
 
-        cond1ConjElems.removeAll(distinguishingElements); // This is the rest
-
+        for (final Term term : getConjunctiveElementsFor(pathCondition2)) {
+            cond2ConjElems.add(factory.wrapTerm(term));
+        }
+        
+        // The intersection of cond1ConjElems and cond2ConjElems
+        final LinkedHashSet<TermWrapper> commonElements = new LinkedHashSet<JoinRuleUtils.TermWrapper>(
+                cond1ConjElems);
+        commonElements.retainAll(cond2ConjElems);
+        
+        // The remaining rest
+        final LinkedHashSet<TermWrapper> differentElements = new LinkedHashSet<JoinRuleUtils.TermWrapper>(cond1ConjElems);
+        differentElements.removeAll(commonElements);
+        
         return new Pair<Term, Term>(joinConjuctiveElements(
-                distinguishingElements, services), joinConjuctiveElements(
-                cond1ConjElems, services));
+                TermWrapper.toTermList(new ArrayList<Term>(), differentElements), services),
+                joinConjuctiveElements(
+                        TermWrapper.toTermList(new ArrayList<Term>(), commonElements), services));
 
     }
 
@@ -1399,6 +1408,84 @@ public class JoinRuleUtils {
     private static LocationVariable lookupVarInNS(String name, Services services) {
         return (LocationVariable) services.getNamespaces().programVariables()
                 .lookup(new Name(name));
+    }
+    
+    /**
+     * Creates {@link TermWrapper} objects, thereby ensuring
+     * that equal term wrappers also have equal hash codes.
+     *
+     * @author Dominic Scheurer
+     */
+    static class TermWrapperFactory {
+        private ArrayList<Term> wrappedTerms = new ArrayList<Term>();
+        
+        public TermWrapper wrapTerm(Term term) {
+            for (Term existingTerm : wrappedTerms) {
+                if (existingTerm.equalsModRenaming(term)) {
+                    return new TermWrapper(term, existingTerm.hashCode());
+                }
+            }
+            
+            wrappedTerms.add(term);
+            return new TermWrapper(term, term.hashCode());
+        }
+    }
+    
+    /**
+     * Simple term wrapper for comparing terms modulo renaming.
+     *
+     * @author Dominic Scheurer
+     * @see TermWrapperFactory
+     */
+    static class TermWrapper {
+        private Term term;
+        private int hashcode;
+        
+        public TermWrapper(Term term, int hashcode) {
+            this.term = term;
+            this.hashcode = hashcode;
+        }
+        
+        public Term getTerm() {
+            return term;
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Term &&
+                    term.equalsModRenaming((Term) obj);
+        }
+        
+        @Override
+        public int hashCode() {
+            return hashcode;
+        }
+        
+        @Override
+        public String toString() {
+            return term.toString();
+        }
+        
+        /**
+         * Adds the wrapped content of the Iterable object into the given target
+         * collection.
+         *
+         * @param target
+         *            The collection to insert the wrapped terms into.
+         * @param wrappedCollection
+         *            Iterable to transform.
+         * @return The target collection with inserted terms.
+         */
+        public static <T extends Collection<Term>> T toTermList(T target,
+                Iterable<TermWrapper> wrappedCollection) {
+            Iterator<TermWrapper> it = wrappedCollection.iterator();
+
+            while (it.hasNext()) {
+                target.add(it.next().getTerm());
+            }
+            
+            return target;
+        }
     }
 
     /**
