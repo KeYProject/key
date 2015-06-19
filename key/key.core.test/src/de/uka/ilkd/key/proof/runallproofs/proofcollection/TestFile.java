@@ -149,7 +149,7 @@ public class TestFile implements Serializable {
       boolean success;
       try {
          // Initialize KeY environment and load proof.
-         env = KeYEnvironment.load(keyFile, null, null, null);
+         env = KeYEnvironment.load(keyFile);
          loadedProof = env.getLoadedProof();
 
          // For a reload test we are done at this point. Loading was successful.
@@ -227,7 +227,7 @@ public class TestFile implements Serializable {
       Proof reloadedProof = null;
       try {
          proofLoadEnvironment = KeYEnvironment
-               .load(proofFile, null, null, null);
+               .load(proofFile);
          reloadedProof = proofLoadEnvironment.getLoadedProof();
       }
       catch (Throwable t) {

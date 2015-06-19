@@ -240,7 +240,16 @@ public class FormulaTagManager {
      * are immutable
      */
     private static class FormulaInfo {
-    	public final PosInOccurrence         pio;
+    	/* (non-Javadoc)
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "FormulaInfo [pio=" + pio + ", modifications="
+                    + modifications + ", age=" + age + "]";
+        }
+
+        public final PosInOccurrence         pio;
 	/** All modifications that have been applied to the formula
 	 * since the creation of the tag. The most recent modification
 	 * is the first element of the list */

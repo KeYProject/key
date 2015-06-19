@@ -58,6 +58,7 @@ import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule
@@ -234,42 +235,13 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
         for (SequentFormula formula : succedent.asList()) {
             if (blockElems
                     .contains(JavaTools
-                            .getActiveStatement(getJavaBlockRecursive(formula
+                            .getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(formula
                                     .formula())))) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    /**
-     * Returns the first Java block in the given term that can be found by
-     * recursive search, or the empty block if there is no non-empty Java block
-     * in the term.
-     * 
-     * @param term
-     *            The term to extract Java blocks for.
-     * @return The first Java block in the given term or the empty block if
-     *         there is no non-empty Java block.
-     */
-    private static JavaBlock getJavaBlockRecursive(Term term) {
-        if (!term.isContainsJavaBlockRecursive()) {
-            return JavaBlock.EMPTY_JAVABLOCK;
-        }
-
-        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
-            return term.javaBlock();
-        }
-        else {
-            for (Term sub : term.subs()) {
-                JavaBlock subJavaBlock = getJavaBlockRecursive(sub);
-                if (!subJavaBlock.isEmpty()) {
-                    return subJavaBlock;
-                }
-            }
-            return JavaBlock.EMPTY_JAVABLOCK;
-        }
     }
 
     /**
@@ -302,7 +274,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
             }
 
             if (pio != null) {
-                JavaBlock theJavaBlock = getJavaBlockRecursive(pio.subTerm());
+                JavaBlock theJavaBlock = JoinRuleUtils.getJavaBlockRecursive(pio.subTerm());
                 SourceElement activeStmt = JavaTools
                         .getActiveStatement(theJavaBlock);
 

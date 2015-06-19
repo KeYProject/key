@@ -23,6 +23,7 @@ import javax.swing.KeyStroke;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -80,13 +81,37 @@ public class ProofMacroMenu extends JMenu {
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy macros");
 
+        // NOTE (DS): For better clarity, we add all macros addressing proof
+        // node joins, currently identified by containing the keyword "join"
+        // in their description, in a dedicated sub menu. This procedure only
+        // works properly if all join macros, and only those, contain the
+        // keyword in their description.
+        JMenu joinMacros = new JMenu("Join macros");
+        
         int count = 0;
         for (ProofMacro macro : loader) {
             if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
-                add(menuItem);
+                
+                if (macro.getName().contains("join")) {
+                    // NOTE (DS): At the moment, JoinRule is an experimental
+                    // feature. We therefore only add join-related macros
+                    // if the feature is currently active.
+                    // TODO (DS): Remove below check related to the exp. \\
+                    // feature one JoinRule is considered stable.
+                    if (JoinRuleMenuItem.FEATURE.active()) {
+                        joinMacros.add(menuItem);
+                    }
+                } else {
+                    add(menuItem);
+                }
+                
                 count++;
             }
+        }
+        
+        if (joinMacros.getMenuComponentCount() > 0) {
+            add(joinMacros);
         }
 
         mediator.enableWhenProofLoaded(this);

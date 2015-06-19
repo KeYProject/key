@@ -400,6 +400,9 @@ public class ProofSaver {
         if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
         	CloseAfterJoinRuleBuiltInRuleApp closeApp = (CloseAfterJoinRuleBuiltInRuleApp) appliedRuleApp;
         	
+        	//TODO (DS): There may be problems here if the join node is
+        	// pruned away. Need to test some cases and either check for
+        	// null pointers at this place or find a better solution.
         	tree.append(" (joinNode \"");
         	tree.append(closeApp.getCorrespondingJoinNode().parent().serialNr());
             tree.append("\")");

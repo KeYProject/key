@@ -639,6 +639,9 @@ public class JoinRule implements BuiltInRule {
                   Term partnerPostCond = partnerSEState.third.op() instanceof Modality ? partnerSEState.third.sub(0) : partnerSEState.third;
                   
                   // Requirement: Same post condition, matching program parts
+                  // NOTE: If we have a modality in the post condition, the equality
+                  // of post conditions may be too strict, so some legal cases will
+                  // be excluded from the join partners list.
                   if (ownPostCond.equals(partnerPostCond) &&
                         equalsModBranchUniqueRenaming(
                            ownProgramElem,

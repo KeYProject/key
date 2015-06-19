@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -580,6 +582,35 @@ public class JoinRuleUtils {
 
     }
 
+    /**
+     * Returns the first Java block in the given term that can be found by
+     * recursive search, or the empty block if there is no non-empty Java block
+     * in the term.
+     * 
+     * @param term
+     *            The term to extract Java blocks for.
+     * @return The first Java block in the given term or the empty block if
+     *         there is no non-empty Java block.
+     */
+    public static JavaBlock getJavaBlockRecursive(Term term) {
+        if (!term.isContainsJavaBlockRecursive()) {
+            return JavaBlock.EMPTY_JAVABLOCK;
+        }
+
+        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
+            return term.javaBlock();
+        }
+        else {
+            for (Term sub : term.subs()) {
+                JavaBlock subJavaBlock = getJavaBlockRecursive(sub);
+                if (!subJavaBlock.isEmpty()) {
+                    return subJavaBlock;
+                }
+            }
+            return JavaBlock.EMPTY_JAVABLOCK;
+        }
+    }
+
     // /////////////////////////////////////////////////
     // //////////////// GENERAL LOGIC //////////////////
     // //////////////// (Provability) //////////////////
@@ -828,9 +859,18 @@ public class JoinRuleUtils {
             result = result1;
         }
         else {
-            Pair<Term, Term> distinguishingAndEqual = getDistinguishingFormula(
+            Option<Pair<Term, Term>> distinguishingAndEqual = getDistinguishingFormula(
                     result1, result2, services);
-            ArrayList<Term> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.second);
+            
+            if (!distinguishingAndEqual.isSome()) {
+                //TODO (DS) Check if correct.
+                distinguishingAndEqual = getDistinguishingFormula(
+                        result2, result1, services);
+            }
+            
+            assert distinguishingAndEqual instanceof Option.Some : "Possibly, this join is not sound!";
+            
+            ArrayList<Term> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.getValue().second);
 
             // Apply distributivity to simplify the formula
             cond1ConjElems.removeAll(equalConjunctiveElems);
@@ -875,28 +915,44 @@ public class JoinRuleUtils {
      *         pathCondition2, and (2) the "rest" of pathCondition1 that is
      *         common with pathCondition2.
      */
-    public static Pair<Term, Term> getDistinguishingFormula(
+    public static Option<Pair<Term, Term>> getDistinguishingFormula(
             Term pathCondition1, Term pathCondition2, Services services) {
 
-        ArrayList<Term> cond1ConjElems = getConjunctiveElementsFor(pathCondition1);
-        ArrayList<Term> cond2ConjElems = getConjunctiveElementsFor(pathCondition2);
+        final TermWrapperFactory factory = new TermWrapperFactory();
 
-        ArrayList<Term> distinguishingElements = new ArrayList<Term>(
-                cond1ConjElems);
+        final LinkedHashSet<TermWrapper> cond1ConjElems = new LinkedHashSet<JoinRuleUtils.TermWrapper>();
+        final LinkedHashSet<TermWrapper> cond2ConjElems = new LinkedHashSet<JoinRuleUtils.TermWrapper>();
 
-        for (int i = 0; i < cond1ConjElems.size(); i++) {
-            Term elem1 = cond1ConjElems.get(i);
-
-            if (cond2ConjElems.contains(elem1)) {
-                distinguishingElements.remove(elem1);
-            }
+        for (final Term term : getConjunctiveElementsFor(pathCondition1)) {
+            cond1ConjElems.add(factory.wrapTerm(term));
         }
 
-        cond1ConjElems.removeAll(distinguishingElements); // This is the rest
+        for (final Term term : getConjunctiveElementsFor(pathCondition2)) {
+            cond2ConjElems.add(factory.wrapTerm(term));
+        }
 
-        return new Pair<Term, Term>(joinConjuctiveElements(
-                distinguishingElements, services), joinConjuctiveElements(
-                cond1ConjElems, services));
+        // The intersection of cond1ConjElems and cond2ConjElems
+        final LinkedHashSet<TermWrapper> commonElements = new LinkedHashSet<JoinRuleUtils.TermWrapper>(
+                cond1ConjElems);
+        commonElements.retainAll(cond2ConjElems);
+
+        // The remaining rest
+        final LinkedHashSet<TermWrapper> distinguishingElements = new LinkedHashSet<JoinRuleUtils.TermWrapper>(
+                cond1ConjElems);
+        distinguishingElements.removeAll(commonElements);
+
+        if (distinguishingElements.isEmpty() && !cond1ConjElems.isEmpty()) {
+            return new Option.None<Pair<Term, Term>>();
+        }
+
+        return new Option.Some<Pair<Term, Term>>(
+                new Pair<Term, Term>(
+                        joinConjuctiveElements(TermWrapper.toTermList(
+                                new ArrayList<Term>(), distinguishingElements),
+                                services),
+                        joinConjuctiveElements( TermWrapper.toTermList(
+                                new ArrayList<Term>(), commonElements),
+                                services)));
 
     }
 
@@ -1302,7 +1358,7 @@ public class JoinRuleUtils {
             for (Goal goal : openGoals) {
                 Term goalImplication = sequentToFormula(goal.sequent(),
                         services);
-                goalImplications = goalImplications.prepend(goalImplication);
+                goalImplications = goalImplications.append(goalImplication);
             }
 
             return tb.and(goalImplications);
@@ -1371,6 +1427,127 @@ public class JoinRuleUtils {
         return (LocationVariable) services.getNamespaces().programVariables()
                 .lookup(new Name(name));
     }
+    
+    /**
+     * Creates {@link TermWrapper} objects, thereby ensuring
+     * that equal term wrappers also have equal hash codes.
+     *
+     * @author Dominic Scheurer
+     */
+    static class TermWrapperFactory {
+        private ArrayList<Term> wrappedTerms = new ArrayList<Term>();
+        
+        public TermWrapper wrapTerm(Term term) {
+            for (Term existingTerm : wrappedTerms) {
+                if (existingTerm.equalsModRenaming(term)) {
+                    return new TermWrapper(term, existingTerm.hashCode());
+                }
+            }
+            
+            wrappedTerms.add(term);
+            return new TermWrapper(term, term.hashCode());
+        }
+    }
+    
+    /**
+     * Simple term wrapper for comparing terms modulo renaming.
+     *
+     * @author Dominic Scheurer
+     * @see TermWrapperFactory
+     */
+    static class TermWrapper {
+        private Term term;
+        private int hashcode;
+        
+        public TermWrapper(Term term, int hashcode) {
+            this.term = term;
+            this.hashcode = hashcode;
+        }
+        
+        public Term getTerm() {
+            return term;
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof TermWrapper &&
+                    term.equalsModRenaming(((TermWrapper) obj).getTerm());
+        }
+        
+        @Override
+        public int hashCode() {
+            return hashcode;
+        }
+        
+        @Override
+        public String toString() {
+            return term.toString();
+        }
+        
+        /**
+         * Adds the wrapped content of the Iterable object into the given target
+         * collection.
+         *
+         * @param target
+         *            The collection to insert the wrapped terms into.
+         * @param wrappedCollection
+         *            Iterable to transform.
+         * @return The target collection with inserted terms.
+         */
+        public static <T extends Collection<Term>> T toTermList(T target,
+                Iterable<TermWrapper> wrappedCollection) {
+            Iterator<TermWrapper> it = wrappedCollection.iterator();
+
+            while (it.hasNext()) {
+                target.add(it.next().getTerm());
+            }
+            
+            return target;
+        }
+    }
+    
+    /**
+     * A simple Scala-like option type: Either Some(value) or None.
+     *
+     * @author Dominic Scheurer
+     *
+     * @param <T> Type for the content of the option.
+     */
+    public static abstract class Option<T> {
+        static class Some<T> extends Option<T> {
+            private T value;
+            
+            public Some(T value) {
+                this.value = value;
+            }
+            
+            public T getValue() {
+                return value;
+            }
+        }
+        
+        static class None<T> extends Option<T> {}
+        
+        public boolean isSome() {
+            return this instanceof Some;
+        }
+        
+        /**
+         * Returns the value of this object if is a Some; otherwise,
+         * an exception is thrown.
+         *
+         * @return The value of this object.
+         * @throws IllegalAccessError If this object is a None.
+         */
+        public T getValue() {
+            if (isSome()) {
+                return ((Some<T>) this).getValue();
+            }
+            else {
+                throw new IllegalAccessError("Cannot otain a value from a None object.");
+            }
+        }
+    }
 
     /**
      * Visitor for collecting program locations in a Java block.
@@ -1416,17 +1593,12 @@ public class JoinRuleUtils {
         private static final long serialVersionUID = 2305410114265133879L;
 
         private Node node = null;
-        private HashSet<LocationVariable> doNotRename =
-                new HashSet<LocationVariable>();
+        private ImmutableSet<LocationVariable> doNotRename = null;
 
         public LocVarReplBranchUniqueMap(Node goal,
                 ImmutableSet<LocationVariable> doNotRename) {
             this.node = goal;
-            
-            // Use a HashSet for constant time lookup
-            for (LocationVariable locVar : doNotRename) {
-                this.doNotRename.add(locVar);
-            }
+            this.doNotRename = doNotRename;
         }
 
         @Override
