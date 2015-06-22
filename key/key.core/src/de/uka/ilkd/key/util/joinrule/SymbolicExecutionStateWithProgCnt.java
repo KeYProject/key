@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.util.joinrule;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Triple;
 
@@ -85,10 +87,20 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     
     @Override
     public String toString() {
-        return "SymbolicExecutionStateWithProgCnt [Symbolic State="
-                + getSymbolicState() + ", Path Condition="
-                + getPathCondition() + ", Program Counter="
-                + getProgramCounter() + "]";
+        final Services services = getCorrespondingNode().proof().getServices();
+        
+        return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
+                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
+                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + "), Program Counter=("
+                + rmN(LogicPrinter.quickPrintTerm(getProgramCounter(), services)) + ")]";
+    }
+    
+    private String rmN(String str) {
+        if (str.endsWith("\n") && str.length() > 1) {
+            return str.substring(0, str.length() - 1);
+        }
+        
+        return str;
     }
 
 }
