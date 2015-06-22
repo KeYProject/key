@@ -35,6 +35,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
@@ -53,6 +54,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
@@ -60,6 +62,8 @@ import org.key_project.sed.core.slicing.ISEDSlicer;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
+import org.key_project.sed.key.core.launch.KeYSourceLookupDirector;
+import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequest;
 import org.key_project.sed.key.core.slicing.KeYThinBackwardSlicer;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
@@ -268,6 +272,28 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
          IKeYSEDDebugNode<?> oldNode = executionToDebugMapping.put(node.getExecutionNode(), node);
          Assert.isTrue(oldNode == null);
          addToSourceModel(node);
+         if (node instanceof KeYMethodContract) {
+            registerContractSourceLocation((KeYMethodContract) node);
+         }
+      }
+   }
+   
+   protected void registerContractSourceLocation(KeYMethodContract node) throws DebugException {
+      String path = node.getContractSourcePath();
+      if (path != null) {
+         SourceLocation contractLocation = node.getContractSourceLocation();
+         if (contractLocation != null) {
+            ISourceLocator locator = getLaunch().getSourceLocator();
+            if (locator instanceof KeYSourceLookupDirector) {
+               KeYSourceLookupDirector keyLocator = (KeYSourceLookupDirector) locator;
+               Object source = keyLocator.getSourceElement(new SourceRequest(this, path));
+               addToSourceModel(node, 
+                                source, 
+                                contractLocation.getLineNumber(), 
+                                contractLocation.getCharStart(), 
+                                contractLocation.getCharEnd());
+            }
+         }
       }
    }
    

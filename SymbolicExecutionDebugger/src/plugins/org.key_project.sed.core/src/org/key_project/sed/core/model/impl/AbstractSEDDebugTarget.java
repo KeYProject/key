@@ -780,27 +780,41 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    protected void addToSourceModel(ISEDDebugNode node) throws DebugException {
       if (sourceModel != null && 
           node instanceof IStackFrame && getLaunch() != null) {
-         IStackFrame stackFrame = (IStackFrame)node;
+         IStackFrame stackFrame = (IStackFrame) node;
          ISourceLocator locator = getLaunch().getSourceLocator();
          if (locator != null) {
             Object source = locator.getSourceElement(stackFrame);
             if (source != null) {
-               SEDMemorySourceSummary summary = sourceModel.getSourceSummary(source);
-               if (summary == null) {
-                  summary = new SEDMemorySourceSummary(source);
-                  sourceModel.addSourceSummary(summary);
-               }
                int lineNumber = stackFrame.getLineNumber();
                int charStart = stackFrame.getCharStart();
                int charEnd = stackFrame.getCharEnd();
-               SEDMemorySourceRange range = summary.getSourceRange(lineNumber, charStart, charEnd);
-               if (range == null) {
-                  range = new SEDMemorySourceRange(lineNumber, charStart, charEnd);
-                  summary.addSourceRange(range);
-               }
-               range.addDebugNode(node);
+               addToSourceModel(node, source, lineNumber, charStart, charEnd);
             }
          }
+      }
+   }
+   
+   /**
+    * This method has to be called to register a specific range in the {@link ISEDSourceModel}.
+    * @param node The {@link ISEDDebugNode} to register.
+    * @param source The source.
+    * @param lineNumber The line number.
+    * @param charStart The start character.
+    * @param charEnd The end character.
+    */
+   protected void addToSourceModel(ISEDDebugNode node, Object source, int lineNumber, int charStart, int charEnd) {
+      if (sourceModel != null && node != null && source != null) {
+         SEDMemorySourceSummary summary = sourceModel.getSourceSummary(source);
+         if (summary == null) {
+            summary = new SEDMemorySourceSummary(source);
+            sourceModel.addSourceSummary(summary);
+         }
+         SEDMemorySourceRange range = summary.getSourceRange(lineNumber, charStart, charEnd);
+         if (range == null) {
+            range = new SEDMemorySourceRange(lineNumber, charStart, charEnd);
+            summary.addSourceRange(range);
+         }
+         range.addDebugNode(node);
       }
    }
 

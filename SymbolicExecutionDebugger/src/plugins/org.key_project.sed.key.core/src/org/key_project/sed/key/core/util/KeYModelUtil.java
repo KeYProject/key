@@ -21,6 +21,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -32,6 +33,8 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.key.core.launch.KeYSourceLookupDirector;
+import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequest;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchStatement;
@@ -404,6 +407,28 @@ public final class KeYModelUtil {
          }
       }
       return statementNode;
+   }
+
+   /**
+    * Tries to find an {@link ICompilationUnit} for the given {@link SourceRequest}.
+    * @param request The given {@link SourceRequest} for that is an {@link ICompilationUnit} required.
+    * @return The found {@link ICompilationUnit}.
+    */
+   public static ICompilationUnit findCompilationUnit(SourceRequest request) {
+      ICompilationUnit result = null;
+      if (request != null) {
+         ISourceLocator locator = request.getDebugTarget().getLaunch().getSourceLocator();
+         if (locator instanceof KeYSourceLookupDirector) {
+            Object source = ((KeYSourceLookupDirector) locator).getSourceElement(request);
+            if (source instanceof IFile) {
+               IJavaElement element = JavaCore.create((IFile)source);
+               if (element instanceof ICompilationUnit) {
+                  result = (ICompilationUnit)element;
+               }
+            }
+         }
+      }
+      return result;
    }
 
    /**

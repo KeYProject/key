@@ -25,10 +25,16 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodContract;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequest;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
@@ -80,6 +86,11 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * The conditions under which a group ending in this node starts.
     */
    private SEDMemoryBranchCondition[] groupStartConditions;
+
+   /**
+    * The {@link SourceLocation} of the applied contract.
+    */
+   private SourceLocation contractSourceLocation;
 
    /**
     * Constructor.
@@ -167,7 +178,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    @Override
    public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getContractProgramMethod().getPositionInfo());
+         sourceName = SymbolicExecutionUtil.getSourcePath(computePositionInfo());
       }
       return sourceName;
    }
@@ -212,11 +223,61 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
+      SourceLocation location = KeYUtil.convertToSourceLocation(computePositionInfo());
+      return KeYModelUtil.updateLocationFromAST(this, location);
+   }
+   
+   /**
+    * Computes the current {@link PositionInfo}.
+    * @return The current {@link PositionInfo}.
+    */
+   protected PositionInfo computePositionInfo() {
+      Term term = executionNode.getProofNode().getAppliedRuleApp().posInOccurrence().subTerm();
+      term = TermBuilder.goBelowUpdates(term);
+      SourceElement firstElement = term.javaBlock().program().getFirstElement();
+      if (firstElement != null) {
+         firstElement = NodeInfo.computeActiveStatement(firstElement);
+         return firstElement != null ? 
+                firstElement.getPositionInfo() : 
+                PositionInfo.UNDEFINED;
+      }
+      else {
+         return PositionInfo.UNDEFINED;
+      }
+   }
+   
+   /**
+    * Returns the path to the contract source.
+    * @return The path to the contract source or {@code null} if not available.
+    */
+   public String getContractSourcePath() {
+      return SymbolicExecutionUtil.getSourcePath(executionNode.getContractProgramMethod().getPositionInfo());
+   }
+   
+   /**
+    * Computes the source location of the applied contract.
+    * @return The source location of the applied contract or {@code null} if not available.
+    * @throws DebugException Occurred Exception.
+    */
+   public SourceLocation getContractSourceLocation() throws DebugException {
+      if (contractSourceLocation == null) {
+         contractSourceLocation = computeContractSourceLocation();
+      }
+      return contractSourceLocation;
+   }
+
+   /**
+    * Computes the source location of the applied contract lazily
+    * when {@link #getContractSourceLocation()} is called the first time.
+    * @return The computed {@link SourceLocation}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected SourceLocation computeContractSourceLocation() throws DebugException {
       SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getContractProgramMethod().getPositionInfo());
       // Try to update the position info with the position of the method name provided by JDT.
       try {
          if (location.getCharEnd() >= 0) {
-            ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(this);
+            ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(new SourceRequest(getDebugTarget(), getContractSourcePath()));
             if (compilationUnit != null) {
                IMethod method = JDTUtil.findJDTMethod(compilationUnit, location.getCharEnd());
                if (method != null) {
