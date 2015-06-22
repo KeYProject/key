@@ -540,9 +540,34 @@ public class BuilderTests extends AbstractResourceTest {
       project.close(null);
    }
    
-   
-   
-   
+   //Test Suite Generation Tests
+   //The Z3 solver path ({@code z3SolverPath}) needs to be set
+   @Test
+   public void testFullBuildSingleThreadGenerateTestSuite() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildSingleThreadGenerateTestSuite", true, false, false, false, 1, false, true);
+      testTestSuiteGeneration(project);
+      project.close(null);
+   }
+   @Test
+   public void testFullBuildMultipleThreadsGenerateTestSuite() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestSuite", true, false, false, true, 2, false, true);
+      testTestSuiteGeneration(project);
+      project.close(null);
+   }
+   @Test
+   public void testEfficientBuildSingleThreadGenerateTestSuite() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestSuite", true, false, true, false, 1, false, true);
+      testTestSuiteGeneration(project);
+      project.close(null);
+   }
+   @Test
+   public void testEfficientBuildMultipleThreadsGenerateTestSuite() throws CoreException, InterruptedException, IOException{
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestSuite", true, false, true, true, 2, false, true);
+      testTestSuiteGeneration(project);
+      project.close(null);
+   }
+
+
    private void testBuildDisabled(IProject project) throws CoreException{
       IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
@@ -1774,5 +1799,70 @@ public class BuilderTests extends AbstractResourceTest {
       assertFalse(StringUtil.isTrimmedEmpty(ResourceUtil.readFrom(sourceFile0)));
       IFile sourceFile1 = srcFolder.getFile(JDTUtil.ensureValidJavaTypeName("B_B__id_int___JML_operation_contract_0", javaSourceProject) + ".java");
       assertFalse(StringUtil.isTrimmedEmpty(ResourceUtil.readFrom(sourceFile1)));
+   }
+
+   
+   private void testTestSuiteGeneration(IProject project) throws CoreException, IOException {
+      IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
+      IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("IntegerUtil.java"));
+      IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("src").append("testpackage").append("IntegerUtil2.java"));
+      IFile proofFile0 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("IntegerUtil.java").append("IntegerUtil[IntegerUtil__identity(int)]_JML_operation_contract_0.proof"));
+      IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
+            project.getFullPath().append("proofs").append("testpackage").append("IntegerUtil2.java").append("testpackage_IntegerUtil2[testpackage_IntegerUtil2__identity(int)]_JML_operation_contract_0.proof"));
+      IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      
+      SolverType type = SolverType.Z3_CE_SOLVER;
+      String solverPathProperty = System.getProperty(TestZ3.SYSTEM_PROPERTY_SOLVER_PATH);
+      if (!StringUtil.isTrimmedEmpty(solverPathProperty)) {
+         type.setSolverCommand(solverPathProperty);
+      }
+      assertTrue(SolverType.Z3_CE_SOLVER.isInstalled(true));
+
+      assertTrue(!javaFile0.exists() && !javaFile1.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
+      assertTrue(!proofFile0.exists() && !metaFile0.exists());
+      assertTrue(!proofFile1.exists() && !metaFile1.exists());
+
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testTestSuiteGeneration/src/", project.getFolder("src"));
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists());
+      
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      assertTrue(javaFile0.exists() && javaFile1.exists());
+      assertTrue(proofFolder.exists());
+      assertTrue(proofFile0.exists() && metaFile0.exists());
+      assertTrue(proofFile1.exists() && metaFile1.exists());
+
+      //Get Test Project
+      IProject testProject = ResourcesPlugin.getWorkspace().getRoot().getProject(project.getName() + EclipseTestGenerator.TEST_PROJECT_SUFFIX);
+      assertTrue(testProject.exists());
+      assertTrue(testProject.isOpen());
+      
+      IFolder srcFolder = testProject.getFolder("src");
+      assertTrue(srcFolder.exists());
+      
+      IFile testSuite = srcFolder.getFile("_AllTests.java");
+      assertTrue(testSuite.exists());
+      
+      //Compare test suite
+      InputStream in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testTestSuiteGeneration/Suite0");
+      assertEquals(IOUtil.readFrom(in), ResourceUtil.readFrom(testSuite));
+      in.close();
+      
+      //Change test file
+      in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testTestSuiteGeneration/IntegerUtilChange");
+      javaFile0.setContents(in, IResource.FORCE, null);
+
+      KeY4EclipseResourcesTestUtil.build(project);
+      
+      //Compare test suite
+      in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testTestSuiteGeneration/Suite1");
+      assertEquals(IOUtil.readFrom(in), ResourceUtil.readFrom(testSuite));
+      in.close();
    }
 }

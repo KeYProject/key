@@ -16,8 +16,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
@@ -75,6 +77,11 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
     * The name of the test file to generate without file extension.
     */
    private final String testFileName;
+   
+   /**
+    * Determines whether the created test file should be opened.
+    */
+   private final boolean openTestFile;
 
    /**
     * Constructor.
@@ -90,6 +97,18 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       super(ui, originalProof);
       this.sourceProject = sourceProject;
       this.testFileName = testFileName;
+      this.openTestFile = true;
+   }
+   
+   public EclipseTestGenerator(IProject sourceProject, 
+                              String testFileName,
+                              UserInterfaceControl ui, 
+                              Proof originalProof,
+                              boolean openTestFile) {
+      super(ui, originalProof);
+      this.sourceProject = sourceProject;
+      this.testFileName = testFileName;
+      this.openTestFile = openTestFile;
    }
 
    /**
@@ -156,6 +175,18 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof, true);
       tg.setLogger(log);
       tg.setFileName(JDTUtil.ensureValidJavaTypeName(testFileName, testProject));
+      //Add JUnit 4
+      IClasspathEntry[] entries = testProject.getRawClasspath();
+      Path junitPath = new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/4");
+      IClasspathEntry junitEntry = JavaCore.newContainerEntry(junitPath);
+      if(!hasJUnit4(entries, junitEntry)){
+         IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
+   
+         System.arraycopy(entries, 0, newEntries, 0, entries.length);
+   
+         newEntries[entries.length] = JavaCore.newContainerEntry(junitEntry.getPath());
+         testProject.setRawClasspath(newEntries, null);
+      }
       // Create library folder
       IFolder libFolder = ResourceUtil.createFolder(testProject.getProject(), LIB_FOLDER_NAME);
       IFile readmeFile = libFolder.getFile(LIB_FOLDER_README_NAME);
@@ -175,18 +206,29 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       IFile logFile = logFolder.getFile(tg.getFileName() + LOG_FILE_EXTENSION_WITH_DOT);
       ResourceUtil.createFile(logFile, new ByteArrayInputStream(log.toString().getBytes()), null);
       // Select and open generated test file
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               WorkbenchUtil.selectAndReveal(testFile);
-               WorkbenchUtil.openEditor(testFile);
+      if(openTestFile) {
+         Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               try {
+                  WorkbenchUtil.selectAndReveal(testFile);
+                  WorkbenchUtil.openEditor(testFile);
+               }
+               catch (PartInitException e) {
+                  LogUtil.getLogger().openErrorDialog(null, e);
+               }
             }
-            catch (PartInitException e) {
-               LogUtil.getLogger().openErrorDialog(null, e);
-            }
+         });
+      }
+   }
+
+   private boolean hasJUnit4(IClasspathEntry[] entries, IClasspathEntry entry) {
+      for(IClasspathEntry e : entries) {
+         if(e.getPath() != null && e.getPath().equals(entry.getPath())) {
+            return true;
          }
-      });
+      }
+      return false;
    }
 
    /**

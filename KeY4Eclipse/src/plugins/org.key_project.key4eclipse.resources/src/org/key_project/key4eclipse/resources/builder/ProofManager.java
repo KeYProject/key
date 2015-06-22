@@ -190,6 +190,11 @@ public class ProofManager {
       monitor.beginTask("Building proofs for " + project.getName(), proofElements.size());
       initThreads(monitor);
       checkContractRecursion();
+      if(KeYProjectProperties.isGenerateTestCases(project)) {
+         TestSuiteGenerator testSuiteGenerator = new TestSuiteGenerator(project, proofElements);
+         testSuiteGenerator.cleanUpTestProject();
+         testSuiteGenerator.generateTestSuit();
+      }
       if(!monitor.isCanceled()){
          synchronized (keyDelta.lock) {
             LastChangesFileWriter.updateBuildState(project, false);

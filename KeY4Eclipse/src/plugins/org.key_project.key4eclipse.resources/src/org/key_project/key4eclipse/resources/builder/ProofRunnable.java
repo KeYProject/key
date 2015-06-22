@@ -116,7 +116,8 @@ public class ProofRunnable implements Runnable {
          testGenerator = new EclipseTestGenerator(project, 
                                                   proof.name().toString(), 
                                                   environment.getUi(), 
-                                                  proof);
+                                                  proof, 
+                                                  false);
          testGenerator.generateTestCases(new StopRequest() {
             @Override
             public boolean shouldStop() {
