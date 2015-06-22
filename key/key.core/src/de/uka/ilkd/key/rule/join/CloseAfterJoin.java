@@ -57,24 +57,29 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * goal to close; if the join rule is sound, the such manipulated goal should be
  * closable by KeY. This particular way for closing partner goals should ensure
  * that proofs can only be closed for sound join rules, i.e. rules producing
- * join states that are weakenings of the parent states.<p>
+ * join states that are weakenings of the parent states.
+ * <p>
  * 
  * TODO: If a user attempts to prune away a "closed" partner node, he/she should
- * also be asked whether the corresponding join node should also be pruned. Otherwise,
- * the user might accidentally make it harder to close the whole proof (Add this
- * to the bug tracker after merging the join branch into master).
+ * also be asked whether the corresponding join node should also be pruned.
+ * Otherwise, the user might accidentally make it harder to close the whole
+ * proof (Add this to the bug tracker after merging the join branch into
+ * master).
  * 
  * @author Dominic Scheurer
  */
 public class CloseAfterJoin implements BuiltInRule {
 
+    private static final String JOIN_GENERATE_IS_WEAKENING_GOAL_CFG = "joinGenerateIsWeakeningGoal";
+    private static final String JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON =
+            JOIN_GENERATE_IS_WEAKENING_GOAL_CFG + ":on";
     private static final String JOINED_NODE_IS_WEAKENING_TITLE = "Joined node is weakening";
+
     private static final String DISPLAY_NAME = "CloseAfterJoin";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
-    private static final boolean GENERATE_IS_WEAKENING_GOAL = true;
 
     public static final CloseAfterJoin INSTANCE = new CloseAfterJoin();
-    
+
     private static final ForkJoinPool FORK_JOIN_POOL = new ForkJoinPool(2);
 
     private CloseAfterJoin() {
@@ -99,7 +104,16 @@ public class CloseAfterJoin implements BuiltInRule {
 
         CloseAfterJoinRuleBuiltInRuleApp closeApp = (CloseAfterJoinRuleBuiltInRuleApp) ruleApp;
 
-        ImmutableList<Goal> jpNewGoals = goal.split(GENERATE_IS_WEAKENING_GOAL ? 2 : 1);
+        final boolean generateIsWeakeningGoal = goal.proof().getSettings()
+                .getChoiceSettings().getDefaultChoices()
+                .containsKey(JOIN_GENERATE_IS_WEAKENING_GOAL_CFG)
+                && goal.proof().getSettings().getChoiceSettings()
+                        .getDefaultChoices()
+                        .get(JOIN_GENERATE_IS_WEAKENING_GOAL_CFG)
+                        .equals(JOIN_GENERATE_IS_WEAKENING_GOAL_CFG_ON);
+
+        ImmutableList<Goal> jpNewGoals = goal.split(generateIsWeakeningGoal ? 2
+                : 1);
 
         final Goal linkedGoal = jpNewGoals.head();
         linkedGoal.setBranchLabel("Joined with node "
@@ -111,29 +125,29 @@ public class CloseAfterJoin implements BuiltInRule {
         // node if the join node has been pruned.
         final Node joinNodeF = closeApp.getCorrespondingJoinNode();
         services.getProof().addProofTreeListener(new ProofTreeAdapter() {
-            
-            //TODO: It could (possibly) be sensible to add this functionality
-            //      to ProofPruner, such that everything is in one place.
-            
+
+            // TODO: It could (possibly) be sensible to add this functionality
+            // to ProofPruner, such that everything is in one place.
+
             private Node prunedNode = null;
-            
+
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
                 // Note: The method proofGoalsChanged(...) is only called when
-                //       a proof is pruned or when the GUI is updated. Therefore,
-                //       we have to exploit an already existing hack which calls
-                //       proofGoalsAdded with an empty list of arguments if a
-                //       goal is closed. Otherwise, we would not be notified about
-                //       a closed goal when loading a proof without the GUI (e.g.
-                //       in a JUnit test).
-                
+                // a proof is pruned or when the GUI is updated. Therefore,
+                // we have to exploit an already existing hack which calls
+                // proofGoalsAdded with an empty list of arguments if a
+                // goal is closed. Otherwise, we would not be notified about
+                // a closed goal when loading a proof without the GUI (e.g.
+                // in a JUnit test).
+
                 if (e.getGoals().size() == 0 && joinNodeF.isClosed()) {
                     // The joined node was closed; now also close this node.
-                    
+
                     e.getSource().closeGoal(linkedGoal);
                     linkedGoal.clearAndDetachRuleAppIndex();
                 }
-                
+
             }
 
             @Override
@@ -151,11 +165,11 @@ public class CloseAfterJoin implements BuiltInRule {
                         e.getSource().add(linkedGoal);
                         e.getSource().reOpenGoal(linkedGoal);
                     }
-                    
+
                     // The joined node has been pruned; now mark this node
                     // as not linked and set it to automatic again.
                     linkedGoal.setLinkedGoal(null);
-                    
+
                     final ProofTreeAdapter thisCaptured = this;
                     FORK_JOIN_POOL.submit(new Runnable() {
                         public void run() {
@@ -164,28 +178,31 @@ public class CloseAfterJoin implements BuiltInRule {
                     });
                 }
             }
-            
+
             /**
              * Returns true iff the join node is still contained in the proof.
-             * The method is optimized for the optimistic case that the join node
-             * is either a parent of the prune node or a child in the near neighborhood.
-             * This could be better than proof.root().find(joinNodeF) in many cases, and
-             * should not be worse in average.
+             * The method is optimized for the optimistic case that the join
+             * node is either a parent of the prune node or a child in the near
+             * neighborhood. This could be better than
+             * proof.root().find(joinNodeF) in many cases, and should not be
+             * worse in average.
              *
              * @return True iff the join node is still contained in the proof.
              */
             private boolean findJoinNode() {
                 LinkedList<Node> queue = new LinkedList<Node>();
                 queue.add(prunedNode);
-                
+
                 Node currNode = prunedNode;
                 while (currNode != null) {
                     if (currNode.equals(joinNodeF)) {
                         return true;
                     }
-                    
-                    if (currNode.parent() != null && currNode.parent().childrenCount() > 1) {
-                        Iterator<Node> childrenIterator = currNode.parent().childrenIterator();
+
+                    if (currNode.parent() != null
+                            && currNode.parent().childrenCount() > 1) {
+                        Iterator<Node> childrenIterator = currNode.parent()
+                                .childrenIterator();
                         while (childrenIterator.hasNext()) {
                             Node child = childrenIterator.next();
                             if (!child.equals(currNode)) {
@@ -193,26 +210,27 @@ public class CloseAfterJoin implements BuiltInRule {
                             }
                         }
                     }
-                    
+
                     currNode = currNode.parent();
                 }
-                
+
                 for (Node toCheck : queue) {
                     if (toCheck.find(joinNodeF)) {
                         return true;
                     }
                 }
-                
+
                 return false;
             }
 
         });
 
-        if (GENERATE_IS_WEAKENING_GOAL) {
+        if (generateIsWeakeningGoal) {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(JOINED_NODE_IS_WEAKENING_TITLE);
-    
-            final Term isWeakeningForm = getSyntacticWeakeningFormula(services, closeApp);
+
+            final Term isWeakeningForm = getSyntacticWeakeningFormula(services,
+                    closeApp);
             // Delete previous sequents
             clearSemisequent(ruleIsWeakeningGoal, true);
             clearSemisequent(ruleIsWeakeningGoal, false);
