@@ -83,6 +83,7 @@ public class NotificationManager {
         addNotificationTask(pcn);
         addNotificationTask(gfn);
         addNotificationTask(gin);
+        addNotificationTask(efn);
         addNotificationTask(an);
         addNotificationTask(en);       
     }
