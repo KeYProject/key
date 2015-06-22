@@ -84,22 +84,33 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;
     }
-    
+
     @Override
     public String toString() {
         final Services services = getCorrespondingNode().proof().getServices();
-        
+
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
-                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
-                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + "), Program Counter=("
-                + rmN(LogicPrinter.quickPrintTerm(getProgramCounter(), services)) + ")]";
+                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services))
+                + "), Path Condition=("
+                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services))
+                + "), Program Counter=("
+                + rmN(LogicPrinter
+                        .quickPrintTerm(getProgramCounter(), services)) + ")]";
     }
-    
+
+    /**
+     * Removes a trailing newline (\n) char from the given string.
+     *
+     * @param str
+     *            The string to remove the newline char from.
+     * @return The given string with the removed trailing \n char, or the
+     *         original string if it does not end with an \n.
+     */
     private String rmN(String str) {
         if (str.endsWith("\n") && str.length() > 1) {
             return str.substring(0, str.length() - 1);
         }
-        
+
         return str;
     }
 
