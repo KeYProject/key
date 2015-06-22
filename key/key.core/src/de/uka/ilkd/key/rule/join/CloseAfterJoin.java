@@ -71,6 +71,7 @@ public class CloseAfterJoin implements BuiltInRule {
     private static final String JOINED_NODE_IS_WEAKENING_TITLE = "Joined node is weakening";
     private static final String DISPLAY_NAME = "CloseAfterJoin";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
+    private static final boolean GENERATE_IS_WEAKENING_GOAL = true;
 
     public static final CloseAfterJoin INSTANCE = new CloseAfterJoin();
     
@@ -98,7 +99,7 @@ public class CloseAfterJoin implements BuiltInRule {
 
         CloseAfterJoinRuleBuiltInRuleApp closeApp = (CloseAfterJoinRuleBuiltInRuleApp) ruleApp;
 
-        ImmutableList<Goal> jpNewGoals = goal.split(2);
+        ImmutableList<Goal> jpNewGoals = goal.split(GENERATE_IS_WEAKENING_GOAL ? 2 : 1);
 
         final Goal linkedGoal = jpNewGoals.head();
         linkedGoal.setBranchLabel("Joined with node "
@@ -207,15 +208,17 @@ public class CloseAfterJoin implements BuiltInRule {
 
         });
 
-        final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
-        ruleIsWeakeningGoal.setBranchLabel(JOINED_NODE_IS_WEAKENING_TITLE);
-
-        final Term isWeakeningForm = getSyntacticWeakeningFormula(services, closeApp);
-        // Delete previous sequents
-        clearSemisequent(ruleIsWeakeningGoal, true);
-        clearSemisequent(ruleIsWeakeningGoal, false);
-        ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm),
-                false, true);
+        if (GENERATE_IS_WEAKENING_GOAL) {
+            final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
+            ruleIsWeakeningGoal.setBranchLabel(JOINED_NODE_IS_WEAKENING_TITLE);
+    
+            final Term isWeakeningForm = getSyntacticWeakeningFormula(services, closeApp);
+            // Delete previous sequents
+            clearSemisequent(ruleIsWeakeningGoal, true);
+            clearSemisequent(ruleIsWeakeningGoal, false);
+            ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm),
+                    false, true);
+        }
 
         return jpNewGoals;
     }
