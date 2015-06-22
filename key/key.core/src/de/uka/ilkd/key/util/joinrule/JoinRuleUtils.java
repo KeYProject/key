@@ -863,7 +863,6 @@ public class JoinRuleUtils {
                     result1, result2, services);
             
             if (!distinguishingAndEqual.isSome()) {
-                //TODO (DS) Check if correct.
                 distinguishingAndEqual = getDistinguishingFormula(
                         result2, result1, services);
             }
