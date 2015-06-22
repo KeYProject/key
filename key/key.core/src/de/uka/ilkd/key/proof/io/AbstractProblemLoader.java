@@ -485,23 +485,39 @@ public abstract class AbstractProblemLoader {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
-
-        DefaultProofFileParser parser = null;
+        
+        IProofFileParser parser = null;
+        IntermediateProofReplayer replayer = null;
+        IntermediatePresentationProofFileParser.Result parserResult = null;
+        IntermediateProofReplayer.Result replayResult = null;
+        
         try {
         	if (envInput instanceof KeYUserProblemFile) {
-        		parser = new DefaultProofFileParser(this, proof);
-        		problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-
-        		lastTouchedNode = parser.getLastSelectedGoal() != null ? parser.getLastSelectedGoal().node() : proof.root();       
+        	    
+                parser = new IntermediatePresentationProofFileParser(proof);
+                problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+                parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
+                
+                replayer = new IntermediateProofReplayer(this, proof, parserResult);
+                replayResult = replayer.replay();
+                
+                lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
         	}
         } catch (Exception e) {
-        	if (parser == null || parser.getErrors() == null || parser.getErrors().isEmpty()) {
+        	if (parser == null || parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
+        	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
         		// this exception was something unexpected
         		errors.add(e);
         	}
         } finally {
-    		status = parser.getStatus();
-    		errors.addAll(parser.getErrors());
+            if (parserResult != null) {
+                status = parserResult.getStatus();
+                errors.addAll(parserResult.getErrors());
+            }
+            status += (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus() : "Error while loading proof.");
+            if (replayResult != null) {
+                errors.addAll(replayResult.getErrors());
+            }
         }
         	
         ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);

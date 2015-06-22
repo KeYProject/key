@@ -84,6 +84,9 @@ public final class Goal  {
 
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;
+    
+    /** Marks this goal as linked (-> join rules) */
+    private Goal linkedGoal   = null;
 
     /**
      * If an application of a rule added some information for the strategy,
@@ -330,6 +333,38 @@ public final class Goal  {
         node().clearNameCache();
     }
 
+    /**
+     * Checks if is this node is linked to another
+     * node (for example due to a join operation).
+     *
+     * @return true iff this goal is linked to another node.
+     */
+    public boolean isLinked() {
+        return this.linkedGoal != null;
+    }
+
+    /**
+     * Returns the goal that this goal is linked to.
+     *
+     * @return The goal that this goal is linked to (or null if there is no such one).
+     */
+    public Goal getLinkedGoal() {
+        return this.linkedGoal;
+    }
+
+    /**
+     * Sets the node that this goal is linked to; also sets this for
+     * all parents.
+     * 
+     * TODO: Check whether it is problematic when multiple child nodes
+     * of a node are linked; in this case, the linkedNode field would
+     * be overwritten.
+     * 
+     * @param linkedGoal The goal that this goal is linked to.
+     */
+    public void setLinkedGoal(final Goal linkedGoal) {
+        this.linkedGoal = linkedGoal;
+    }
 
     /**
      * sets the sequent of the node
@@ -438,7 +473,7 @@ public final class Goal  {
     }
 
     public void addProgramVariable(ProgramVariable pv) {
-        proof().getNamespaces().programVariables().addSafely(pv);
+       proof().getNamespaces().programVariables().addSafely(pv);
 	node.setGlobalProgVars(getGlobalProgVars().add(pv));
     }
 
