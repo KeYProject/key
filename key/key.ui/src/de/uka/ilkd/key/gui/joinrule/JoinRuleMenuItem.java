@@ -89,7 +89,10 @@ public class JoinRuleMenuItem extends JMenuItem {
                 final JoinRuleBuiltInRuleApp completedApp = (JoinRuleBuiltInRuleApp) completion
                         .complete(app, goal, false);
 
-                if (completedApp.complete()) {
+                // The completedApp may be null if the completion was not
+                // possible (e.g., if no candidates were selected by the
+                // user in the displayed dialog).
+                if (completedApp != null && completedApp.complete()) {
                     Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
