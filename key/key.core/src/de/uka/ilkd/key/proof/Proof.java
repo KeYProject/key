@@ -626,6 +626,12 @@ public class Proof implements Named {
 
             final Goal firstGoal = getGoal(firstLeaf);
             assert firstGoal != null;
+            
+            // Cutting a linked goal (linked by a "defocusing" join
+            // operation, see {@link JoinRule}) unlinks this goal again.
+            if (firstGoal.isLinked()) {
+                firstGoal.setLinkedGoal(null);
+            }
 
             // Go from the first leaf that has been found to the cutting point. For each node on the path,
             // remove the local rules from firstGoal that have been added by the considered node.
