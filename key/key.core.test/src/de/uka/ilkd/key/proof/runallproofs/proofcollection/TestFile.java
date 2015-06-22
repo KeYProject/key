@@ -231,7 +231,7 @@ public class TestFile implements Serializable {
          proofLoadEnvironment = KeYEnvironment
                .load(proofFile);
          reloadedProof = proofLoadEnvironment.getLoadedProof();
-         assertTrue("Reloaded proof did not close", reloadedProof.closed());
+         assertTrue("Reloaded proof did not close: " + proofFile, reloadedProof.closed());
       }
       catch (Throwable t) {
          throw new Exception(

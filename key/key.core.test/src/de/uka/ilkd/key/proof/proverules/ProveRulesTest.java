@@ -87,7 +87,6 @@ public class ProveRulesTest {
       KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment
             .load(proofFile);
       Proof proof = env.getLoadedProof();
-      // env.getProofControl().startAndWaitForAutoMode(proof);
       assertTrue("Taclet proof of taclet " + tacletName + " did not close.",
             proof.closed());
       proof.dispose();
