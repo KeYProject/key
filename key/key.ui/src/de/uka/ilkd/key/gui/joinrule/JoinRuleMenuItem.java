@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -100,7 +101,10 @@ public class JoinRuleMenuItem extends JMenuItem {
                                 goal.apply(completedApp);
                             }
                             catch (Exception e) {
-                                mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
+                                signalError(e, mediator);
+                            }
+                            catch (final AssertionError e) {
+                                signalError(e, mediator);
                             }
                             finally {
                                 mediator.startInterface(true);
@@ -113,6 +117,15 @@ public class JoinRuleMenuItem extends JMenuItem {
                 else {
                     mediator.startInterface(true);
                 }
+            }
+        });
+    }
+    
+    private void signalError(final Throwable e, final KeYMediator mediator) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
             }
         });
     }
