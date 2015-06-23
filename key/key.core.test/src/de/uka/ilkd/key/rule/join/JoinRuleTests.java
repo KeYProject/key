@@ -96,6 +96,23 @@ public class JoinRuleTests extends TestCase {
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
+    
+    /**
+     * Joins for SE states with different symbolic states are
+     * only allowed if the path conditions are distinguishable.
+     * This test case tries to join two states with equal path
+     * condition but different symbolic states -- therefore, the
+     * join should fail with an assertion.
+     */
+    @Test
+    public void testJoinIndistinguishablePathConditions() {
+        final Proof proof = loadProof("IndistinguishablePathConditions.key.proof");
+        
+        try {
+            joinFirstGoal(proof);
+            fail("The join operation should throw an AssertionError");
+        } catch (AssertionError e) {}
+    }
 
     /**
      * Runs the automatic JavaDL strategy on the given proof.
