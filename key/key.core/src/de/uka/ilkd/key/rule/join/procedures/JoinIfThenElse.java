@@ -68,6 +68,10 @@ public class JoinIfThenElse extends JoinProcedure {
                 DefaultImmutableSet.<Name> nil());
 
     }
+    @Override
+    public boolean requiresDistinguishablePathConditions() {
+        return true;
+    }
 
     /**
      * Creates an if-then-else term for the variable v. If t1 is the right side

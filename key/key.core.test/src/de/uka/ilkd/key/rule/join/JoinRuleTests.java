@@ -104,7 +104,7 @@ public class JoinRuleTests extends TestCase {
      * for the case that if-then-else conditions are employed.
      * This test case tries to join two states with equal path
      * condition but different symbolic states -- therefore, the
-     * join should fail with an assertion.
+     * join should fail due to an incomplete rule application.
      */
     @Test
     public void testJoinIndistinguishablePathConditionsWithITE() {
@@ -112,8 +112,8 @@ public class JoinRuleTests extends TestCase {
         
         try {
             joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
-            fail("The join operation should throw an AssertionError");
-        } catch (AssertionError e) {}
+            fail("The join operation should not be applicable.");
+        } catch (IncompleteRuleAppException e) {}
     }
     
     /**
@@ -169,7 +169,10 @@ public class JoinRuleTests extends TestCase {
             joinApp.setJoinNode(joinNode);
         }
 
-        assertTrue(joinApp.complete());
+        if (!joinApp.complete()) {
+            throw new IncompleteRuleAppException();
+        }
+        
         joinGoal.apply(joinApp);
     }
 
@@ -225,6 +228,10 @@ public class JoinRuleTests extends TestCase {
             fail("Proof could not be loaded.");
             return null;
         }
+    }
+    
+    private class IncompleteRuleAppException extends RuntimeException {
+        private static final long serialVersionUID = 774109478701810300L;
     }
 
 }

@@ -86,6 +86,11 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
       
    }
    
+    @Override
+    public boolean requiresDistinguishablePathConditions() {
+        return true;
+    }
+   
    /**
     * Returns a list of if-then-else constraints for the given constrained
     * term, states and if/else terms.

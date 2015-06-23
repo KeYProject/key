@@ -103,6 +103,11 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
       }
       
    }
+
+    @Override
+    public boolean requiresDistinguishablePathConditions() {
+        return false;
+    }
    
    /**
     * Determines the abstract element suitable for the given term.

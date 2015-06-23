@@ -126,32 +126,22 @@ public class JoinRule implements BuiltInRule {
          RuleApp ruleApp) throws RuleAbortException {
       
       final JoinRuleBuiltInRuleApp joinRuleApp = (JoinRuleBuiltInRuleApp) ruleApp;
-      final TermBuilder tb = services.getTermBuilder();
-      final PosInOccurrence pio = ruleApp.posInOccurrence();
-      final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
-      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = joinRuleApp.getJoinPartners();
-      final Node currentNode = goal.node();
       
-      if (joinPartners == null) {
-         return null;
+      if (!joinRuleApp.complete()) {
+          return null;
       }
+      
+      final TermBuilder tb = services.getTermBuilder();
+      final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
+      final Node currentNode = goal.node();
+      final ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = joinRuleApp.getJoinPartners();
+      
+      final ImmutableList<SymbolicExecutionState> joinPartnerStates = joinRuleApp.getJoinPartnerStates();
+      final SymbolicExecutionStateWithProgCnt thisSEState = joinRuleApp.getJoinSEState();
       
       ImmutableList<Goal> newGoals = goal.split(1);
       
       final Goal newGoal = newGoals.head();
-      
-      // Convert sequents to SE states
-      ImmutableList<SymbolicExecutionState> joinPartnerStates = ImmutableSLList.nil();      
-      for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
-         Triple<Term, Term, Term> partnerSEState =
-               sequentToSETriple(joinPartner.first, joinPartner.second, services);
-         
-         joinPartnerStates = joinPartnerStates.prepend(
-               new SymbolicExecutionState(partnerSEState.first, partnerSEState.second, joinPartner.first.node()));
-      }
-      
-      SymbolicExecutionStateWithProgCnt thisSEState =
-            sequentToSETriple(newGoal, pio, services);
       
       // The join loop
       SymbolicExecutionState joinedState =
@@ -202,7 +192,7 @@ public class JoinRule implements BuiltInRule {
                joinPartner.first,
                joinPartner.second,
                joinedState,
-               sequentToSEPair(joinPartner.first, joinPartner.second, services),
+               sequentToSEPair(joinPartner.first.node(), joinPartner.second, services),
                thisSEState.third);
       }
       
@@ -620,9 +610,9 @@ public class JoinRule implements BuiltInRule {
                PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                if (isOfAdmissibleForm(g, gPio, false)) {
                   Triple<Term, Term, Term> ownSEState = sequentToSETriple(
-                        goal, pio, services);
+                        goal.node(), pio, services);
                   Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
-                        g, gPio, services);
+                        g.node(), gPio, services);
 
                   //NOTE: The equality check for the Java blocks can be problematic,
                   //  since KeY instantiates declared program variables with different

@@ -954,6 +954,25 @@ public class JoinRuleUtils {
                                 services)));
 
     }
+    
+    /**
+     * Checks if two given path conditions are distinguishable.
+     *
+     * @param pathCondition1 First path condition to check.
+     * @param pathCondition2 Second path condition to check.
+     * @param services The services object.
+     * @return True iff the two given path conditions are distinguishable.
+     */
+    public static boolean pathConditionsAreDistinguishable(Term pathCondition1,
+            Term pathCondition2, Services services) {
+        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 = getDistinguishingFormula(
+                pathCondition1, pathCondition2, services);
+        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 = getDistinguishingFormula(
+                pathCondition2, pathCondition1, services);
+
+        return distinguishingAndEqualFormula1.isSome()
+                || distinguishingAndEqualFormula2.isSome();
+    }
 
     /**
      * Closes the given partner goal, using the CloseAfterJoin rule.
@@ -1001,14 +1020,13 @@ public class JoinRuleUtils {
      * @return An SE state (U,C).
      * @see #sequentToSETriple(Goal, PosInOccurrence, Services)
      */
-    public static SymbolicExecutionState sequentToSEPair(Goal goal,
+    public static SymbolicExecutionState sequentToSEPair(Node node,
             PosInOccurrence pio, Services services) {
 
-        SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(goal, pio,
+        SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio,
                 services);
 
-        return new SymbolicExecutionState(triple.first, triple.second,
-                goal.node());
+        return new SymbolicExecutionState(triple.first, triple.second, node);
     }
 
     /**
@@ -1036,17 +1054,17 @@ public class JoinRuleUtils {
      * @return An SE state (U,C,p).
      */
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(
-            Goal goal, PosInOccurrence pio, Services services) {
+            Node node, PosInOccurrence pio, Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
         ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
-        pathConditionSet = pathConditionSet.prepend(goal.sequent().antecedent()
+        pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent()
                 .asList());
 
         Term selected = pio.subTerm();
 
-        for (SequentFormula sf : goal.sequent().succedent()) {
+        for (SequentFormula sf : node.sequent().succedent()) {
             if (!sf.formula().equals(selected)) {
                 pathConditionSet = pathConditionSet.prepend(new SequentFormula(
                         services.getTermBuilder().not(sf.formula())));
@@ -1082,7 +1100,7 @@ public class JoinRuleUtils {
         // unprovable.
 
         LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
-                goal.node(), getLocationVariables(postCondition, services));
+                node, getLocationVariables(postCondition, services));
 
         // Replace location variables in program counter by their
         // branch-unique versions
@@ -1121,7 +1139,7 @@ public class JoinRuleUtils {
                 tb.parallel(newElementaries), // Update
                 joinListToAndTerm(pathConditionSet, services), // Path Condition
                 progCntAndPostCond, // Program Counter and Post Condition
-                goal.node()); // CorrespondingGoal
+                node); // CorrespondingNode
     }
 
     // /////////////////////////////////////////////////
