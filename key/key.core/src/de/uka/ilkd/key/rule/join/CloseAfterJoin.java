@@ -20,9 +20,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.substConstantsByFreshV
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.concurrent.ForkJoinPool;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -80,8 +78,6 @@ public class CloseAfterJoin implements BuiltInRule {
 
     public static final CloseAfterJoin INSTANCE = new CloseAfterJoin();
 
-    private static final ForkJoinPool FORK_JOIN_POOL = new ForkJoinPool(2);
-
     private CloseAfterJoin() {
         /* Singleton class */
     }
@@ -126,11 +122,6 @@ public class CloseAfterJoin implements BuiltInRule {
         final Node joinNodeF = closeApp.getCorrespondingJoinNode();
         services.getProof().addProofTreeListener(new ProofTreeAdapter() {
 
-            // TODO: It could (possibly) be sensible to add this functionality
-            // to ProofPruner, such that everything is in one place.
-
-            private Node prunedNode = null;
-
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
                 // Note: The method proofGoalsChanged(...) is only called when
@@ -148,79 +139,6 @@ public class CloseAfterJoin implements BuiltInRule {
                     linkedGoal.clearAndDetachRuleAppIndex();
                 }
 
-            }
-
-            @Override
-            public void proofIsBeingPruned(ProofTreeEvent e) {
-                super.proofIsBeingPruned(e);
-                prunedNode = e.getNode();
-            }
-
-            @Override
-            public void proofPruned(final ProofTreeEvent e) {
-                if (!findJoinNode()) {
-                    if (linkedGoal.node().isClosed()) {
-                        // The partner node has already been closed; we have to
-                        // add the goal again.
-                        e.getSource().add(linkedGoal);
-                        e.getSource().reOpenGoal(linkedGoal);
-                    }
-
-                    // The joined node has been pruned; now mark this node
-                    // as not linked and set it to automatic again.
-                    linkedGoal.setLinkedGoal(null);
-
-                    final ProofTreeAdapter thisCaptured = this;
-                    FORK_JOIN_POOL.submit(new Runnable() {
-                        public void run() {
-                            e.getSource().removeProofTreeListener(thisCaptured);
-                        }
-                    });
-                }
-            }
-
-            /**
-             * Returns true iff the join node is still contained in the proof.
-             * The method is optimized for the optimistic case that the join
-             * node is either a parent of the prune node or a child in the near
-             * neighborhood. This could be better than
-             * proof.root().find(joinNodeF) in many cases, and should not be
-             * worse in average.
-             *
-             * @return True iff the join node is still contained in the proof.
-             */
-            private boolean findJoinNode() {
-                LinkedList<Node> queue = new LinkedList<Node>();
-                queue.add(prunedNode);
-
-                Node currNode = prunedNode;
-                while (currNode != null) {
-                    if (currNode.equals(joinNodeF)) {
-                        return true;
-                    }
-
-                    if (currNode.parent() != null
-                            && currNode.parent().childrenCount() > 1) {
-                        Iterator<Node> childrenIterator = currNode.parent()
-                                .childrenIterator();
-                        while (childrenIterator.hasNext()) {
-                            Node child = childrenIterator.next();
-                            if (!child.equals(currNode)) {
-                                queue.add(child);
-                            }
-                        }
-                    }
-
-                    currNode = currNode.parent();
-                }
-
-                for (Node toCheck : queue) {
-                    if (toCheck.find(joinNodeF)) {
-                        return true;
-                    }
-                }
-
-                return false;
             }
 
         });
