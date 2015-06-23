@@ -32,7 +32,6 @@ import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -311,13 +310,17 @@ public class HelperClassForTests {
        Assert.assertNotNull(pm);
        return pm;
     }
-    
-   public static Services createServices() {
-      JavaInfo javaInfo = new HelperClassForTests().parse(DUMMY_KEY_FILE)
+
+   public static Services createServices(File keyFile) {
+      JavaInfo javaInfo = new HelperClassForTests().parse(keyFile)
             .getFirstProof().getJavaInfo();
       return javaInfo.getServices();
    }
-   
+
+   public static Services createServices() {
+      return createServices(DUMMY_KEY_FILE);
+   }
+
    public static KeYEnvironment<DefaultUserInterfaceControl> createKeYEnvironment() throws ProblemLoaderException {
       return KeYEnvironment.load(DUMMY_KEY_FILE);
    }

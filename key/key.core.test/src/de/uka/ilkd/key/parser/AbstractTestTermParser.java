@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -208,8 +209,10 @@ public class AbstractTestTermParser extends TestCase {
         }
     }
 
-    protected Services getServices() {
-        return HelperClassForTests.createServices();
-    }
+   protected Services getServices() {
+      File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
+            + File.separator + "termParser" + File.separator + "parserTest.key");
+      return HelperClassForTests.createServices(keyFile);
+   }
 
 }
