@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 
@@ -25,10 +26,10 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
     public ConstraintAwareSyntacticalReplaceVisitor(
             TermLabelState termLabelState, Services services,
             Constraint metavariableInst,
-            PosInOccurrence applicationPosInOccurrence, Rule rule,
+            PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, services,
-                applicationPosInOccurrence, rule, labelHint, goal);
+                applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
         this.metavariableInst = metavariableInst;
     }
     
@@ -38,7 +39,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =
                     new ConstraintAwareSyntacticalReplaceVisitor (termLabelState, services, metavariableInst, 
-                            applicationPosInOccurrence, rule, labelHint, goal);
+                            applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
             t.execPostOrder ( srv );
             return srv.getTerm ();
         } else {

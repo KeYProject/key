@@ -66,6 +66,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     protected final PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
+    protected final RuleApp ruleApp;
 
     protected final TermLabelState termLabelState;
     protected final TacletLabelHint labelHint;
@@ -89,12 +90,14 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             SVInstantiations svInst,
             Goal goal,                                     
             Rule rule,
+            RuleApp ruleApp,
             Services services) {
         this.termLabelState   = termLabelState;
         this.services         = services;
         this.svInst           = svInst;
         this.applicationPosInOccurrence = applicationPosInOccurrence;
         this.rule = rule;
+        this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = goal;
         subStack = new Stack<Object>(); // of Term
@@ -107,6 +110,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Services services,
             PosInOccurrence applicationPosInOccurrence,
             Rule rule,
+            RuleApp ruleApp,
             TacletLabelHint labelHint, 
             Goal goal) {
         this(termLabelState,
@@ -115,6 +119,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 SVInstantiations.EMPTY_SVINSTANTIATIONS,
                 goal,          
                 rule,
+                ruleApp,
                 services);
     }
 
@@ -343,7 +348,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     newTermBoundVars,
     JavaBlock newTermJavaBlock,
     ImmutableArray<TermLabel> newTermOriginalLabels) {
-        return TermLabelManager.instantiateLabels(termLabelState, services, applicationPosInOccurrence, rule, goal,
+        return TermLabelManager.instantiateLabels(termLabelState, services, applicationPosInOccurrence, rule, ruleApp, goal,
                 labelHint, tacletTerm, newTermOp, newTermSubs,
                 newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
     }

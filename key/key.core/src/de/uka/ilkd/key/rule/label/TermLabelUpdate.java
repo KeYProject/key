@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * <p>
@@ -54,6 +55,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param modalityTerm The optional modality {@link Term}.
     * @param rule The {@link Rule} which is applied.
+    * @param ruleApp The {@link RuleApp} which is currently performed.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
@@ -71,6 +73,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
                             Term applicationTerm,
                             Term modalityTerm,
                             Rule rule,
+                            RuleApp ruleApp,
                             Goal goal,
                             Object hint,
                             Term tacletTerm,

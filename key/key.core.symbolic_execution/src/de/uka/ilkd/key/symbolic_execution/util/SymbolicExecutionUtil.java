@@ -2510,7 +2510,7 @@ public final class SymbolicExecutionUtil {
                                       TacletApp tacletApp, 
                                       Services services) {
       if (term != null) {
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(new TermLabelState(), null, tacletApp.posInOccurrence(), tacletApp.instantiations(), null, tacletApp.taclet(), services);
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(new TermLabelState(), null, tacletApp.posInOccurrence(), tacletApp.instantiations(), null, tacletApp.taclet(), tacletApp, services);
          term.execPostOrder(visitor);
          return visitor.getTerm();
       }

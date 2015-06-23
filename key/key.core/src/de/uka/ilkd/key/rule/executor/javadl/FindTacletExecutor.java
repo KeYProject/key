@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -70,7 +71,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param services the Services encapsulating all java information
      * @param ruleApp the taclet application that is executed.
      */
-    public ImmutableList<Goal> apply(Goal     goal,
+    public final ImmutableList<Goal> apply(Goal     goal,
                 Services services,
                 RuleApp  ruleApp) {
    final TermLabelState termLabelState = new TermLabelState();
@@ -132,6 +133,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
        currentGoal.setSequent(currentSequent);              
         
        currentGoal.setBranchLabel(gt.name());
+       
+       TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), currentGoal, null, null);
     }
     
     // in case the assumes sequent of the taclet did not
@@ -139,7 +142,9 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
     // in this loop we make sure to assign the cut goal its correct
     // sequent
     while (newSequentsIt.hasNext()) {
-       goalIt.next().setSequent(newSequentsIt.next());
+       Goal nextGoal = goalIt.next();
+       nextGoal.setSequent(newSequentsIt.next());
+       TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), nextGoal, null, null);
     }
     
     assert !goalIt.hasNext();

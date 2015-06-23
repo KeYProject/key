@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.checkAndWithdraw(_amount)&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (canWithdraw(_amount))" pathCondition="true" pathConditionChanged="false" blockOpened="false">
+         <operationContract name="result_0 = self.canWithdraw(_amount) catch(exc_0)
+pre: _amount &gt;  0 &amp; self.&lt;inv&gt;
+post: self.&lt;inv&gt; &amp; exc_0 = null
+mod: {}
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="_amount" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (canWithdraw)">
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <branchCondition name="equals(result_0,TRUE)" pathCondition="equals(result_0,TRUE)" pathConditionChanged="true" branchCondition="equals(result_0,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <operationContract name="self.withdraw(_amount) catch(exc_1)
+pre: _amount &gt;  0 &amp; self.&lt;inv&gt;
+post: self.balance
+  = javaSubInt(self.balance@heapBefore_withdraw_0,
+               _amount)
+&amp; self.&lt;inv&gt;
+&amp; exc_1 = null
+mod: {(self, Account::$balance)}
+termination: diamond" pathCondition="equals(result_0,TRUE)" pathConditionChanged="false" exceptionTerm="exc_1" selfTerm="self" contractParameters="_amount" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                        <branchCondition name="true" pathCondition="equals(result_0,TRUE)" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (withdraw)">
+                           <branchCondition name="true" pathCondition="equals(result_0,TRUE)" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <statement name="return _amount;" pathCondition="equals(result_0,TRUE)" pathConditionChanged="false">
+                                 <methodReturn name="&lt;return of checkAndWithdraw&gt;" signature="&lt;return of self.checkAndWithdraw(_amount)&gt;" pathCondition="equals(result_0,TRUE)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(result_0,TRUE)">
+                                    <termination name="&lt;end&gt;" pathCondition="equals(result_0,TRUE)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                    </termination>
+                                 </methodReturn>
+                              </statement>
+                           </branchCondition>
+                        </branchCondition>
+                     </operationContract>
+                  </branchCondition>
+                  <branchCondition name="not(equals(result_0,TRUE))" pathCondition="not(equals(result_0,TRUE))" pathConditionChanged="true" branchCondition="not(equals(result_0,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return 0;" pathCondition="not(equals(result_0,TRUE))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of checkAndWithdraw&gt;" signature="&lt;return of self.checkAndWithdraw(_amount)&gt;" pathCondition="not(equals(result_0,TRUE))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(result_0,TRUE))">
+                           <termination name="&lt;end&gt;" pathCondition="not(equals(result_0,TRUE))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="false">
+                           </termination>
+                        </methodReturn>
+                     </statement>
+                  </branchCondition>
+               </branchCondition>
+            </branchCondition>
+         </operationContract>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0"/>
+</start>

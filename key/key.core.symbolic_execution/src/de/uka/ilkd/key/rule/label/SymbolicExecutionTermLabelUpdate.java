@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 /**
@@ -59,6 +60,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             Term applicationTerm,
                             Term modalityTerm,
                             Rule rule,
+                            RuleApp ruleApp,
                             Goal goal,
                             Object hint,
                             Term tacletTerm,

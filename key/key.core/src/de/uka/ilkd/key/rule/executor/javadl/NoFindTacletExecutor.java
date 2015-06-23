@@ -7,6 +7,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -103,6 +104,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             currentGoal.setSequent(currentSequent);
 
             currentGoal.setBranchLabel(gt.name());
+            TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), currentGoal, null, null);
         }
 
         return newGoals;

@@ -8,11 +8,13 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -85,6 +87,22 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * </ul>
     */
    private static final String PARENT_REFACTORING_REQUIRED = "parentRefactoringRequired";
+
+   /**
+    * Key used in {@link TermLabelState} by the {@link FormulaTermLabelUpdate}
+    * to indicate that a refactoring of specified {@link SequentFormula}s
+    * ({@link RefactoringScope#SEQUENT})
+    * is required performed by
+    * {@link #refactorSequentFormulas(TermLabelState, Services, Term, List)}.
+    * <p>
+    * This is for instance required if the assumes clause of a rule has
+    * a {@link FormulaTermLabel} but the application does not have it.
+    * Example rules are:
+    * <ul>
+    *    <li>{@code inEqSimp_contradInEq1}</li>
+    * </ul>
+    */
+   private static final String SEQUENT_FORMULA_REFACTORING_REQUIRED = "sequentFormulaRefactoringRequired";
    
    /**
     * {@inheritDoc}
@@ -114,6 +132,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
       }
       else if (isUpdateRefactroingRequired(state)) {
          return RefactoringScope.APPLICATION_BELOW_UPDATES;
+      }
+      else if (containsSequentFormulasToRefactor(state)) {
+         return RefactoringScope.SEQUENT;
       }
       else {
          return RefactoringScope.NONE;
@@ -172,8 +193,11 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
       else if (isUpdateRefactroingRequired(state)) {
          refactorBewlowUpdates(applicationPosInOccurrence, term, labels);
       }
+      else if (containsSequentFormulasToRefactor(state)) {
+         refactorSequentFormulas(state, services, term, labels);
+      }
    }
-   
+
    /**
     * Refactors a specification application.
     * @param term The {@link Term} which is now refactored.
@@ -247,6 +271,35 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    }
    
    /**
+    * Refactors the specified {@link SequentFormula}s.
+    * @param state The {@link TermLabelState} of the current rule application.
+    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+    * @param term The {@link Term} which is now refactored.
+    * @param labels The new labels the {@link Term} will have after the refactoring.
+    */
+   protected void refactorSequentFormulas(TermLabelState state,
+                                          Services services, 
+                                          final Term term, 
+                                          List<TermLabel> labels) {
+      Set<SequentFormula> sequentFormulas = getSequentFormulasToRefactor(state);
+      if (CollectionUtil.search(sequentFormulas, new IFilter<SequentFormula>() {
+         @Override
+         public boolean select(SequentFormula element) {
+            return element.formula() == term;
+         }
+      }) != null) {
+         FormulaTermLabel termLabel = (FormulaTermLabel)term.getLabel(FormulaTermLabel.NAME);
+         if (termLabel != null) {
+            labels.remove(termLabel);
+            Set<String> beforeIds = new LinkedHashSet<String>();
+            beforeIds.add(termLabel.getId());
+            int labelSubID = FormulaTermLabel.newLabelSubID(services, termLabel);
+            labels.add(new FormulaTermLabel(termLabel.getMajorId(), labelSubID, beforeIds));
+         }
+      }
+   }
+   
+   /**
     * Checks if the inner most parent was already refactored on the given {@link Goal}.
     * @param state The {@link TermLabelState} to read from.
     * @param goal The {@link Goal} to check.
@@ -308,5 +361,45 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    public static void setParentRefactroingRequired(TermLabelState state, boolean required) {
       Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       labelState.put(PARENT_REFACTORING_REQUIRED, Boolean.valueOf(required));
+   }
+   
+   /**
+    * Checks if {@link SequentFormula}s to refactor are specified.
+    * @param state The {@link TermLabelState} to read from.
+    * @return {@code true} at least one {@link SequentFormula} needs to be refactored, {@code false} refactoring is not required.
+    */
+   public static boolean containsSequentFormulasToRefactor(TermLabelState state) {
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
+      @SuppressWarnings("unchecked")
+      Set<SequentFormula> sfSet = (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      return !CollectionUtil.isEmpty(sfSet);
+   }
+   
+   /**
+    * Returns the {@link SequentFormula}s to refactor.
+    * @param state The {@link TermLabelState} to read from.
+    * @return The {@link SequentFormula}s to refactor.
+    */
+   public static Set<SequentFormula> getSequentFormulasToRefactor(TermLabelState state) {
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
+      @SuppressWarnings("unchecked")
+      Set<SequentFormula> sfSet = (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      return sfSet;
+   }
+   
+   /**
+    * Adds the given {@link SequentFormula} for refactoring purpose.
+    * @param state The {@link TermLabelState} to modify.
+    * @param sf The {@link SequentFormula} to add.
+    */
+   public static void addSequentFormulaToRefactor(TermLabelState state, SequentFormula sf) {
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
+      @SuppressWarnings("unchecked")
+      Set<SequentFormula> sfSet = (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+      if (sfSet == null) {
+         sfSet = new LinkedHashSet<SequentFormula>();
+         labelState.put(SEQUENT_FORMULA_REFACTORING_REQUIRED, sfSet);
+      }
+      sfSet.add(sf);
    }
 }

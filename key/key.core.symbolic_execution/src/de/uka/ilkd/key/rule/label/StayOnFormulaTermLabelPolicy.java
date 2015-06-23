@@ -53,7 +53,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
           TruthValueEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)) {
          assert label instanceof FormulaTermLabel;
          FormulaTermLabel formulaLabel = (FormulaTermLabel) label;
-         FormulaTermLabel originalLabel = searchPredicateTermLabel(newTermOriginalLabels);
+         FormulaTermLabel originalLabel = searchFormulaTermLabel(newTermOriginalLabels);
          FormulaTermLabel mostImportantLabel = originalLabel != null ? originalLabel : formulaLabel;
          // May change sub ID if logical operators like junctors are used
          boolean newLabelIdRequired = false;
@@ -152,7 +152,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
     * @param labels The {@link TermLabel}s to search in.
     * @return The found {@link FormulaTermLabel} or {@code null} if not available.
     */
-   protected FormulaTermLabel searchPredicateTermLabel(ImmutableArray<TermLabel> labels) {
+   public static FormulaTermLabel searchFormulaTermLabel(ImmutableArray<TermLabel> labels) {
       TermLabel result = CollectionUtil.search(labels, new IFilter<TermLabel>() {
          @Override
          public boolean select(TermLabel element) {

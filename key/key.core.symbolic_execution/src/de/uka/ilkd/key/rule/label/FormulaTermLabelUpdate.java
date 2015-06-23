@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -12,6 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -20,9 +24,12 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
 
 /**
@@ -49,6 +56,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                             Term applicationTerm, 
                             Term modalityTerm, 
                             Rule rule, 
+                            RuleApp ruleApp,
                             Goal goal, 
                             Object hint, 
                             Term tacletTerm, 
@@ -72,6 +80,31 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                   labels.add(newLabel);
                   // Let the PredicateTermLabelRefactoring perform the refactoring, see also PredicateTermLabelRefactoring#PARENT_REFACTORING_REQUIRED
                   FormulaTermLabelRefactoring.setParentRefactroingRequired(state, true);
+               }
+            }
+         }
+      }
+      if (ruleApp instanceof TacletApp) {
+         TacletApp ta = (TacletApp) ruleApp;
+         if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
+            Map<SequentFormula, FormulaTermLabel> ifLabels = new LinkedHashMap<SequentFormula, FormulaTermLabel>();
+            for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
+               FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(ifInst.getConstrainedFormula().formula().getLabels());
+               if (ifLabel != null) {
+                  ifLabels.put(ifInst.getConstrainedFormula(), ifLabel);
+               }
+            }
+            if (!ifLabels.isEmpty()) {
+               if (TruthValueEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)
+//                   || TruthValueEvaluationUtil.isPredicate(newTermOp)
+                   ) {
+                  for (Entry<SequentFormula, FormulaTermLabel> ifEntry : ifLabels.entrySet()) {
+                     FormulaTermLabel ifLabel = ifEntry.getValue();
+                     int labelSubID = FormulaTermLabel.newLabelSubID(services, ifLabel);
+                     FormulaTermLabel newLabel = new FormulaTermLabel(ifLabel.getMajorId(), labelSubID, Collections.singletonList(ifLabel.getId()));
+                     labels.add(newLabel);
+                     FormulaTermLabelRefactoring.addSequentFormulaToRefactor(state, ifEntry.getKey());
+                  }
                }
             }
          }
