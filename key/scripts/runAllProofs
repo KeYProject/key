@@ -5,16 +5,36 @@
 #
 
 LIST_TESTS_FLAG=--list-tests
+HELP_FLAG=--help
 RELOAD_ENABLED_FLAG=--reload-enabled
 FORK_MODE_FLAG=--fork-mode
 
 list_help() {
-    echo "Usage: runAllProofs [$LIST_TESTS_FLAG] | [ [$RELOAD_ENABLED_FLAG=<true|false>]"
+    echo "Usage: runAllProofs [$HELP_FLAG] | [$LIST_TESTS_FLAG] | [ [$RELOAD_ENABLED_FLAG=<true|false>]"
     echo "                                       [$FORK_MODE_FLAG=<perFile|perGroup|noFork>]"
-    echo "                                       <groupNames> ]"
+    echo "                                       [<groupNames>] ]"
     echo "Examples: runAllProofs $FORK_MODE_FLAG=perFile newBook comprehensions"
     echo "          runAllProofs $LIST_TESTS_FLAG"
 }
+
+resolve_symlink() {
+   TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
+
+   if [ -n "$TARGET" ] ; then
+      RESULT="$TARGET"
+      case "$RESULT" in
+         /*) break ;;				# absolute symlink
+         *)  RESULT=`dirname "$0"`/"$RESULT" ;;	# relative symlink
+      esac
+   else
+      RESULT=$1
+   fi
+
+   echo "$RESULT"
+}
+
+SCRIPTLOCATION=`resolve_symlink "$0"`
+SCRIPTFOLDER=`dirname $SCRIPTLOCATION`
 
 #
 # Parse command line parameters
@@ -38,10 +58,10 @@ while [ "$#" -ne 0 ]
         continue
         ;;
         $LIST_TESTS_FLAG)
-        tools/testRunner.sh de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
+        $SCRIPTFOLDER/tools/testRunner.sh de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
         exit
         ;;
-        -h|--help|-?)
+        -h|-?|$HELP_FLAG)
         list_help
         exit
         ;;
@@ -54,7 +74,7 @@ while [ "$#" -ne 0 ]
         ;;
     esac
     done
-   
+
 #
 # Optionally, retrieve names of selected test cases
 #
@@ -71,5 +91,9 @@ if [ "$#" -ne 0 ]
     JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.testCases=$TEST_CASES"
 fi
 
-tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
+#
+# Run JUnit
+#
+
+$SCRIPTFOLDER/tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
 
