@@ -29,6 +29,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * {@link AbstractSourceLookupParticipant} implementation for the
@@ -134,8 +135,9 @@ public class KeYSourceLookupParticipant extends AbstractSourceLookupParticipant 
       }
       if (target instanceof KeYDebugTarget) {
          KeYDebugTarget keyTarget = (KeYDebugTarget) target;
-         if (!keyTarget.getProof().isDisposed()) {
-            JavaModel javaModel = keyTarget.getProof().getServices().getJavaModel();
+         Proof proof = keyTarget.getProof();
+         if (proof != null && !proof.isDisposed()) {
+            JavaModel javaModel = proof.getServices().getJavaModel();
             if (javaModel.getModelDir() != null) {
                result.add(new File(javaModel.getModelDir()));
             }
