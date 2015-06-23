@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
@@ -90,7 +91,7 @@ public class JoinRuleTests extends TestCase {
         for (int i = 0; i < 2; i++) {
             runMacro(new FinishSymbolicExecutionUntilJoinPointMacro(), proof
                     .openGoals().head().node());
-            joinFirstGoal(proof);
+            joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
         }
 
         startAutomaticStrategy(proof);
@@ -99,19 +100,37 @@ public class JoinRuleTests extends TestCase {
     
     /**
      * Joins for SE states with different symbolic states are
-     * only allowed if the path conditions are distinguishable.
+     * only allowed if the path conditions are distinguishable --
+     * for the case that if-then-else conditions are employed.
      * This test case tries to join two states with equal path
      * condition but different symbolic states -- therefore, the
      * join should fail with an assertion.
      */
     @Test
-    public void testJoinIndistinguishablePathConditions() {
+    public void testJoinIndistinguishablePathConditionsWithITE() {
         final Proof proof = loadProof("IndistinguishablePathConditions.key.proof");
         
         try {
-            joinFirstGoal(proof);
+            joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
             fail("The join operation should throw an AssertionError");
         } catch (AssertionError e) {}
+    }
+    
+    /**
+     * Joins two SE states with different symbolic states and
+     * equal path condition, but uses the "Full Anonymization"
+     * join method for which this is irrelevant. The join should
+     * succeed and the proof should be closable.
+     */
+    @Test
+    public void testJoinIndistinguishablePathConditionsWithFullAnonymization() {
+        final Proof proof = loadProof("IndistinguishablePathConditions.key.proof");
+        
+        joinFirstGoal(proof, JoinWeaken.instance());
+        startAutomaticStrategy(proof);
+        
+        assertTrue(proof.closed());
+        assertEquals(1, proof.getStatistics().joinRuleApps);
     }
 
     /**
@@ -133,7 +152,7 @@ public class JoinRuleTests extends TestCase {
      *            The proof the first goal of which to join with suitable
      *            partner(s).
      */
-    private void joinFirstGoal(final Proof proof) {
+    private void joinFirstGoal(final Proof proof, JoinProcedure joinProc) {
         final Services services = proof.getServices();
         final JoinRule joinRule = JoinRule.INSTANCE;
 
@@ -146,7 +165,7 @@ public class JoinRuleTests extends TestCase {
         {
             joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(proof
                     .openGoals().head(), joinPio));
-            joinApp.setConcreteRule(JoinIfThenElseAntecedent.instance());
+            joinApp.setConcreteRule(joinProc);
             joinApp.setJoinNode(joinNode);
         }
 
