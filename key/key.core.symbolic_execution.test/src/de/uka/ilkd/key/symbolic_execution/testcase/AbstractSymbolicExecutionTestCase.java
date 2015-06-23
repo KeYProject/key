@@ -120,7 +120,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * has changed so that they are outdated.
     * </p>
     */
-   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = true;
+   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
    
    /**
     * If the fast mode is enabled the step wise creation of models is disabled.

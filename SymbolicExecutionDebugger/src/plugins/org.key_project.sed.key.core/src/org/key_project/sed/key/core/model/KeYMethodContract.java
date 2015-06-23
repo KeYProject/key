@@ -32,6 +32,7 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -237,6 +238,9 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
       SourceElement firstElement = term.javaBlock().program().getFirstElement();
       if (firstElement != null) {
          firstElement = NodeInfo.computeActiveStatement(firstElement);
+         if (firstElement instanceof CopyAssignment) {
+            firstElement = ((CopyAssignment) firstElement).getLastElement();
+         }
          return firstElement != null ? 
                 firstElement.getPositionInfo() : 
                 PositionInfo.UNDEFINED;
