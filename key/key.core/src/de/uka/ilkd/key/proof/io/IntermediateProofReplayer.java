@@ -279,12 +279,18 @@ public class IntermediateProofReplayer {
                                 }
                             }
                             catch (SkipSMTRuleException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
+                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                        + appInterm.getLineNr() + ", goal "
+                                        + currGoal.node().serialNr() + ", rule "
+                                        + appInterm.getRuleName() + NOT_APPLICABLE,
+                                        e);
                             }
                             catch (BuiltInConstructionException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
+                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                        + appInterm.getLineNr() + ", goal "
+                                        + currGoal.node().serialNr() + ", rule "
+                                        + appInterm.getRuleName() + NOT_APPLICABLE,
+                                        e);
                             }
                         }
                     }
