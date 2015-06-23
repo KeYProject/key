@@ -1,69 +1,35 @@
 
-Regression tests for proved rules
-=================================
+Usage of ProveRules JUnit implementation
+==========================================
 
-Jan 2014 Mattias Ulbrich
+June 2015 Kai Wallisch
 
-The taclet base for KeY grows constantly and it is difficult to
-oversee that all these rules are sound. It is possible to prove
-(certain) taclets sound within KeY but these proofs are only valid for
-the KeY version they have been conducted in.
+ProveRules is a JUnit test suite that verifies derivability of certain
+taclets by re-loading proofs, that are saved in KeY git repository at 
+location: key/key.core.test/tacletProofs
 
-We have implemented a small script which reruns checked in taclet
-proofs along with the regression tests and thereby ensures that these
-taclets are sound in every (master) version of KeY.
+In order to add a taclet proof to ProveRules, the following two steps are
+necessary:
 
-How it works
-------------
+1) Add the annotation "\lemma" to the taclet declaration.
+For example, the declaration of taclet bsum_empty looks as follows:
+\lemma
+bsum_empty { ... };
 
-The script scans all .proof-files under "examples/taclets" in "key/key.ui" and
-runs them. If any of them fails, a failed test case points to that problem.
+2) Save a taclet proof in folder key/key.core.test/tacletProofs or an
+arbitrary subfolder. The name of the proof file has to match the pattern:
+Taclet_$TACLETNAME.proof
+For example, path for proof of taclet bsum_empty is:
+key/key.core.test/tacletProofs/bsum/Taclet_bsum_empty.proof
 
-Additionally it checks that for every taclet which is labelled as
-proved, there exists a loadable proof file. If a labelled taclet has no
-proof, a failed test case is raised, too.
+Corresponding JUnit test case will only be successful if both conditions
+1) and 2) are satisfied. If one of them is missing, the test case will fail.
 
-If a proved taclet has not been labelled, only a warning is emitted to
-the command line.
+See class de.uka.ilkd.key.proof.proverules.ProveRulesTest for implementation
+details.
 
-To label a rule you need to add the line "// proved" directly above
-the rule definition. There must not be empty lines between the label
-and the rule name.
+In order to run taclet proofs manually, the following two options are available:
 
-Spurious labels are also reported by the script.
+1) Use ProveRules command line interface, which is located at: key/scripts/proveRules
+2) Execute ant task "proveRules" in component key.core.test.
 
-The script is located at "key/scripts/proveRules.pl". Use "-help" to get more
-infos. It is invoked by Mr. Marvin Jenkins when the regression tests
-on the master branch are performed. Consider adding it to your side
-project in Jenkins.
-
-
-Adding a taclet proof
----------------------
-
-If you have proved a taclet sound, you can store (and check in) the
-according proof file into the directory "examples/taclets" and add an
-annotation to the key file.
-
-
-1. Store the proof file under the name 
-
-     examples/taclets/<keyFile>/Taclet_<tacletName>.proof
-
-   where keyFile stands for the file in which the rule has been
-   defined without extension (for instance "seqRules" if defined in
-   "seqRules.key").
-
-
-2. Add the line
-
-     // proved
-
-   DIRECTLY above the  rule definition like in
-
-     // proved
-     lenOfSingleton { ....
-
-Now, regression tests will ensure that the rule "lenOfSingleton" has a
-valid proof. If the proof file is corrupted or removed, a failed
-regression test will be raised.
