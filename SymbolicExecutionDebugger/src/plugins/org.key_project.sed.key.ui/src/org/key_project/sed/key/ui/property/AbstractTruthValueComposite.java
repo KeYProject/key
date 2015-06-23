@@ -288,6 +288,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
                                 IExecutionNode<?> executionNode) {
       removeOldContent();
       BranchResult[] branchResults = result.getBranchResults();
+      Color notConsideredColor = null;
       for (BranchResult branchResult : branchResults) {
          if (shouldShowBranchResult(branchResult, uninterpretedPredicate)) {
             // Create group
@@ -298,6 +299,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Create viewer
             SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
             viewer.setEditable(false);
+            notConsideredColor = viewer.getTextWidget().getForeground();
             TruthValueEvaluationViewerDecorator viewerDecorator = new TruthValueEvaluationViewerDecorator(viewer);
             decorators.add(viewerDecorator);
             // Show term and results
@@ -310,7 +312,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          }
       }
       // Add legend
-      addLegend();
+      addLegend(notConsideredColor);
       // Layout root
       updateLayout();
    }
@@ -453,10 +455,10 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
     * Adds the legend.
     */
-   protected void addLegend() {
+   protected void addLegend(Color notConsideredColor) {
       Composite legendComposite = factory.createFlatFormComposite(root);
       legendComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      GridLayout legendLayout = new GridLayout(4, false);
+      GridLayout legendLayout = new GridLayout(5, false);
       legendLayout.marginBottom = 0;
       legendLayout.marginHeight = 0;
       legendLayout.marginLeft = 0;
@@ -468,9 +470,15 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       factory.createLabel(legendComposite, "Legend: ");
       Label trueLabel = factory.createLabel(legendComposite, "true");
       trueLabel.setForeground(trueColor);
+      trueLabel.setToolTipText("The term evaluates to true.");
       Label falseLabel = factory.createLabel(legendComposite, "false");
       falseLabel.setForeground(falseColor);
+      falseLabel.setToolTipText("The term evaluates to false.");
       Label unknownLabel = factory.createLabel(legendComposite, "unknown");
       unknownLabel.setForeground(unknownColor);
+      unknownLabel.setToolTipText("The term is not (yet) completely evaluated into true or false.");
+      Label notConsideredLabel = factory.createLabel(legendComposite, "not considered");
+      notConsideredLabel.setForeground(notConsideredColor);
+      notConsideredLabel.setToolTipText("The term is not part of the truth value evaluation.");
    }
 }
