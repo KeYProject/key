@@ -14,7 +14,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilJoinPointMacro;
+import de.uka.ilkd.key.macros.FullAutoPilotWithJMLSpecJoinsProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -44,6 +46,23 @@ public class JoinRuleTests extends TestCase {
         Proof proof = loadProof("gcd.closed.proof");
         assertTrue(proof.closed());
     }
+    
+    /**
+     * Runs the FullAutoPilotWithJMLSpecJoinsProofMacro on the problem with
+     * join blocks specified in JML, following by an automatic strategy finish.
+     * At the end, there should be two join applications, and the proof should
+     * be closed.
+     */
+    @Test
+    public void testDoAutomaticGcdProofWithJoins() {
+        final Proof proof = loadProof("gcd.joinBlocks.key");
+        runMacro(new FullAutoPilotWithJMLSpecJoinsProofMacro(), proof.root());
+        startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
+        assertEquals("There should be two join applications in the proof.",
+                proof.getStatistics().joinRuleApps, 2);
+    }
 
     /**
      * This test case semi-automatically proves the Gcd problem with two joins
@@ -69,7 +88,8 @@ public class JoinRuleTests extends TestCase {
         final Proof proof = loadProof("gcd.key");
 
         for (int i = 0; i < 2; i++) {
-            runSymbExMacro(proof.openGoals().head().node());
+            runMacro(new FinishSymbolicExecutionUntilJoinPointMacro(), proof
+                    .openGoals().head().node());
             joinFirstGoal(proof);
         }
 
@@ -128,16 +148,16 @@ public class JoinRuleTests extends TestCase {
     }
 
     /**
-     * Runs the {@link FinishSymbolicExecutionUntilJoinPointMacro} on the given
-     * proof node.
+     * Runs the given macro on the given proof node.
      *
+     * @param macro
+     *            The macro to execute.
      * @param node
      *            The node to execute the macro on.
      */
-    private void runSymbExMacro(Node node) {
+    private void runMacro(AbstractProofMacro macro, Node node) {
         try {
-            new FinishSymbolicExecutionUntilJoinPointMacro().applyTo(null,
-                    node, null, null);
+            macro.applyTo(null, node, null, null);
         }
         catch (Exception e) {
             fail("Could not apply macro.");

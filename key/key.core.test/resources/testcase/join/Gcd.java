@@ -22,10 +22,8 @@ public class Gcd {
       @                            \result % x == 0));
       @*/
     public static int gcd(int a, int b) {
-        if (a < 0)
-            a = -a;
-        if (b < 0)
-            b = -b;
+        if (a < 0) a = -a;
+        if (b < 0) b = -b;
 
         int big, small;
         if (a > b) {
@@ -36,6 +34,8 @@ public class Gcd {
             big = b;
             small = a;
         }
+
+        return gcdHelp(big, small);
     }
     
     /*@
