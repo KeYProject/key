@@ -23,6 +23,7 @@ import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
+import org.key_project.sed.key.evaluation.model.input.ToolPageInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex;
 import org.key_project.sed.key.evaluation.server.index.PermutationIndex.Entry;
@@ -357,8 +358,16 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
       RandomFormInput evaluationFormInput = (RandomFormInput) evaluationInput.getFormInput(evaluationForm);
       AbstractPageInput<?> evaluationPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.EVALUATION_PAGE_NAME);
       AbstractPageInput<?> jmlPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.JML_PAGE_NAME);
-      AbstractPageInput<?> keyPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
-      AbstractPageInput<?> sedPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
+      ToolPageInput tool1Page;
+      ToolPageInput tool2Page;
+      if (keyFirst) {
+         tool1Page = (ToolPageInput) evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
+         tool2Page = (ToolPageInput) evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
+      }
+      else {
+         tool1Page = (ToolPageInput) evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
+         tool2Page = (ToolPageInput) evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
+      }
       AbstractPageInput<?> proof1Page = evaluationFormInput.getPageInput(proofOrder[0]);
       AbstractPageInput<?> proof2Page = evaluationFormInput.getPageInput(proofOrder[1]);
       AbstractPageInput<?> proof3Page = evaluationFormInput.getPageInput(proofOrder[2]);
@@ -366,21 +375,20 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer implements IRando
       AbstractPageInput<?> feedbackPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.FEEDBACK_PAGE);
       AbstractPageInput<?> sendPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SEND_EVALUATION_PAGE_NAME);
       // Set order and tools
-      evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, jmlPage, keyPage, proof1Page, proof2Page, sedPage, proof3Page, proof4Page, feedbackPage, sendPage));
-      Tool keyTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
-      Tool sedTool = evaluationForm.getEvaluation().getTool(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
-      if (keyFirst) {
-         evaluationFormInput.setTool(proof2Page, keyTool);
-         evaluationFormInput.setTool(proof1Page, keyTool);
-         evaluationFormInput.setTool(proof4Page, sedTool);
-         evaluationFormInput.setTool(proof3Page, sedTool);
-      }
-      else {
-         evaluationFormInput.setTool(proof2Page, sedTool);
-         evaluationFormInput.setTool(proof1Page, sedTool);
-         evaluationFormInput.setTool(proof4Page, keyTool);
-         evaluationFormInput.setTool(proof3Page, keyTool);
-      }
+      evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, 
+                                                             jmlPage, 
+                                                             tool1Page, 
+                                                             proof1Page, 
+                                                             proof2Page, 
+                                                             tool2Page, 
+                                                             proof3Page, 
+                                                             proof4Page, 
+                                                             feedbackPage, 
+                                                             sendPage));
+      evaluationFormInput.setTool(proof1Page, tool1Page.getPage().getTool());
+      evaluationFormInput.setTool(proof2Page, tool1Page.getPage().getTool());
+      evaluationFormInput.setTool(proof3Page, tool2Page.getPage().getTool());
+      evaluationFormInput.setTool(proof4Page, tool2Page.getPage().getTool());
       return CollectionUtil.toList(evaluationFormInput);
    }
    
