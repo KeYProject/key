@@ -71,6 +71,10 @@ public class JDTUtilTest extends TestCase {
       assertEquals("_M_y_C_lass__", JDTUtil.ensureValidJavaTypeName("(M)y[C]lass{}", null));
       assertEquals("_M_y_C_lass__", JDTUtil.ensureValidJavaTypeName("(M)y[C]lass{}", javaProject));
       assertTrue(JavaConventionsUtil.validateJavaTypeName("_M_y_C_lass__", javaProject).isOK());
+      // Validate names causing a warning
+      assertEquals("a", JDTUtil.ensureValidJavaTypeName("a", null));
+      assertEquals("A", JDTUtil.ensureValidJavaTypeName("A", null));
+      assertEquals("_", JDTUtil.ensureValidJavaTypeName("?", null));
    }
    
    /**
