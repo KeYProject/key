@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -62,6 +63,7 @@ public final class SimpleBlockContract implements BlockContract {
     private final Map<LocationVariable, Term> postconditions;
     private final Map<LocationVariable, Term> modifiesClauses;
     private ImmutableList<InfFlowSpec> infFlowSpecs;
+    private JoinProcedure joinProcedure;
 
 
     private final Variables variables;
@@ -78,6 +80,7 @@ public final class SimpleBlockContract implements BlockContract {
                                final Map<LocationVariable, Term> postconditions,
                                final Map<LocationVariable, Term> modifiesClauses,
                                final ImmutableList<InfFlowSpec> infFlowSpecs,
+                               final JoinProcedure joinProcedure,
                                final Variables variables,
                                final boolean transactionApplicable,
                                final Map<LocationVariable,Boolean> hasMod)
@@ -102,6 +105,7 @@ public final class SimpleBlockContract implements BlockContract {
         this.postconditions = postconditions;
         this.modifiesClauses = modifiesClauses;        
         this.infFlowSpecs = infFlowSpecs;
+        this.joinProcedure = joinProcedure;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
@@ -323,6 +327,10 @@ public final class SimpleBlockContract implements BlockContract {
     public Term getAssignable(LocationVariable heap) {
         return modifiesClauses.get(heap);
     }
+    
+    public JoinProcedure getJoinProcedure() {
+        return joinProcedure;
+    }
 
     @Override
     public void visit(final Visitor visitor)
@@ -430,10 +438,12 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newPostconditions,
                                 final Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newinfFlowSpecs,
+                                final JoinProcedure newJoinProcedure,
                                 final Variables newVariables) {
         return new SimpleBlockContract(newBlock, labels, method, modality,
                                        newPreconditions, newPostconditions,
                                        newModifiesClauses, newinfFlowSpecs,
+                                       newJoinProcedure,
                                        newVariables, transactionApplicable,
                                        hasMod);
     }
@@ -441,7 +451,7 @@ public final class SimpleBlockContract implements BlockContract {
     @Override 
     public BlockContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, postconditions, modifiesClauses,
-                      infFlowSpecs, variables);
+                      infFlowSpecs, joinProcedure, variables);
     }
 
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
@@ -449,7 +459,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert newKJT.equals(newPM.getContainerType());
         return new SimpleBlockContract(block, labels, (IProgramMethod)newPM, modality,
                                        preconditions, postconditions, modifiesClauses,
-                                       infFlowSpecs, variables, transactionApplicable,
+                                       infFlowSpecs, joinProcedure, variables, transactionApplicable,
                                        hasMod);
     }
 
@@ -464,28 +474,143 @@ public final class SimpleBlockContract implements BlockContract {
                                      ImmutableSLList.<ProgramVariable>nil());
     }
 
-    // TODO Implement equals and hashCode properly.
-    /* @Override
-    public boolean equals(final Object object)
-    {
-        if (object == null) {
-            return false;
-        }
-        if (object == this) {
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        }
-        if (object.getClass() != getClass()) {
+        if (obj == null)
             return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SimpleBlockContract other = (SimpleBlockContract) obj;
+        if (block == null) {
+            if (other.block != null)
+                return false;
         }
-        final SimpleBlockContract contract = (SimpleBlockContract) object;
-        return ...
+        else if (!block.equals(other.block))
+            return false;
+        if (hasMod == null) {
+            if (other.hasMod != null)
+                return false;
+        }
+        else if (!hasMod.equals(other.hasMod))
+            return false;
+        if (infFlowSpecs == null) {
+            if (other.infFlowSpecs != null)
+                return false;
+        }
+        else if (!infFlowSpecs.equals(other.infFlowSpecs))
+            return false;
+        if (instantiationSelf == null) {
+            if (other.instantiationSelf != null)
+                return false;
+        }
+        else if (!instantiationSelf.equals(other.instantiationSelf))
+            return false;
+        if (joinProcedure == null) {
+            if (other.joinProcedure != null)
+                return false;
+        }
+        else if (!joinProcedure.equals(other.joinProcedure))
+            return false;
+        if (labels == null) {
+            if (other.labels != null)
+                return false;
+        }
+        else if (!labels.equals(other.labels))
+            return false;
+        if (method == null) {
+            if (other.method != null)
+                return false;
+        }
+        else if (!method.equals(other.method))
+            return false;
+        if (modality == null) {
+            if (other.modality != null)
+                return false;
+        }
+        else if (!modality.equals(other.modality))
+            return false;
+        if (modifiesClauses == null) {
+            if (other.modifiesClauses != null)
+                return false;
+        }
+        else if (!modifiesClauses.equals(other.modifiesClauses))
+            return false;
+        if (postconditions == null) {
+            if (other.postconditions != null)
+                return false;
+        }
+        else if (!postconditions.equals(other.postconditions))
+            return false;
+        if (preconditions == null) {
+            if (other.preconditions != null)
+                return false;
+        }
+        else if (!preconditions.equals(other.preconditions))
+            return false;
+        if (transactionApplicable != other.transactionApplicable)
+            return false;
+        if (variables == null) {
+            if (other.variables != null)
+                return false;
+        }
+        else if (!variables.equals(other.variables))
+            return false;
+        return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
-    public int hashCode()
-    {
-        return super.hashCode();
-    }*/
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((block == null) ? 0 : block.hashCode());
+        result = prime * result + ((hasMod == null) ? 0 : hasMod.hashCode());
+        result = prime * result
+                + ((infFlowSpecs == null) ? 0 : infFlowSpecs.hashCode());
+        result = prime
+                * result
+                + ((instantiationSelf == null) ? 0 : instantiationSelf
+                        .hashCode());
+        result = prime * result
+                + ((joinProcedure == null) ? 0 : joinProcedure.hashCode());
+        result = prime * result + ((labels == null) ? 0 : labels.hashCode());
+        result = prime * result + ((method == null) ? 0 : method.hashCode());
+        result = prime * result
+                + ((modality == null) ? 0 : modality.hashCode());
+        result = prime * result
+                + ((modifiesClauses == null) ? 0 : modifiesClauses.hashCode());
+        result = prime * result
+                + ((postconditions == null) ? 0 : postconditions.hashCode());
+        result = prime * result
+                + ((preconditions == null) ? 0 : preconditions.hashCode());
+        result = prime * result + (transactionApplicable ? 1231 : 1237);
+        result = prime * result
+                + ((variables == null) ? 0 : variables.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "SimpleBlockContract [block=" + block + ", labels=" + labels
+                + ", method=" + method + ", modality=" + modality
+                + ", instantiationSelf=" + instantiationSelf
+                + ", preconditions=" + preconditions + ", postconditions="
+                + postconditions + ", modifiesClauses=" + modifiesClauses
+                + ", infFlowSpecs=" + infFlowSpecs + ", joinProcedure="
+                + joinProcedure + ", variables=" + variables
+                + ", transactionApplicable=" + transactionApplicable
+                + ", hasMod=" + hasMod + "]";
+    }
 
     private Map<ProgramVariable, ProgramVariable>
                 createReplacementMap(final Variables newVariables,
@@ -535,6 +660,11 @@ public final class SimpleBlockContract implements BlockContract {
     @Override
     public boolean hasInfFlowSpecs() {
         return infFlowSpecs != null;
+    }
+
+    @Override
+    public boolean hasJoinProcedure() {
+        return joinProcedure != null;
     }
 
     @Override
@@ -672,6 +802,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final Map<LocationVariable, Term> requires;
         private final Map<LocationVariable, Term> ensures;
         private final ImmutableList<InfFlowSpec> infFlowSpecs;
+        private final JoinProcedure joinProcedure;
         private final Map<Label, Term> breaks;
         private final Map<Label, Term> continues;
         private final Term returns;
@@ -690,6 +821,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Map<LocationVariable, Term> requires,
                        final Map<LocationVariable, Term> ensures,
                        final ImmutableList<InfFlowSpec> infFlowSpecs,
+                       final JoinProcedure joinProcedure,
                        final Map<Label, Term> breaks,
                        final Map<Label, Term> continues,
                        final Term returns,
@@ -708,6 +840,7 @@ public final class SimpleBlockContract implements BlockContract {
             this.requires = requires;
             this.ensures = ensures;
             this.infFlowSpecs = infFlowSpecs;
+            this.joinProcedure = joinProcedure;
             this.breaks = breaks;
             this.continues = continues;
             this.returns = returns;
@@ -721,7 +854,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         public ImmutableSet<BlockContract> create() {
             return create(buildPreconditions(), buildPostconditions(),
-                          buildModifiesClauses(), infFlowSpecs);
+                          buildModifiesClauses(), infFlowSpecs, joinProcedure);
         }
 
         private Map<LocationVariable, Term> buildPreconditions() {
@@ -914,7 +1047,8 @@ public final class SimpleBlockContract implements BlockContract {
                     create(final Map<LocationVariable, Term> preconditions,
                            final Map<LocationVariable, Term> postconditions,
                            final Map<LocationVariable, Term> modifiesClauses,
-                           final ImmutableList<InfFlowSpec> infFlowSpecs) {
+                           final ImmutableList<InfFlowSpec> infFlowSpecs,
+                           final JoinProcedure joinProcedure) {
             ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable =
                     modifiesClauses.get(
@@ -923,14 +1057,14 @@ public final class SimpleBlockContract implements BlockContract {
                 new SimpleBlockContract(
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, postconditions, modifiesClauses,
-                    infFlowSpecs, variables, transactionApplicable, hasMod)
+                    infFlowSpecs, joinProcedure, variables, transactionApplicable, hasMod)
                 );
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
                     new SimpleBlockContract(
                         block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions),
-                        postconditions, modifiesClauses, infFlowSpecs,
+                        postconditions, modifiesClauses, infFlowSpecs, joinProcedure,
                         variables, transactionApplicable, hasMod)
                     );
             }
@@ -1012,6 +1146,7 @@ public final class SimpleBlockContract implements BlockContract {
             return new SimpleBlockContract(head.getBlock(), head.getLabels(),
                                            head.getMethod(), head.getModality(), preconditions,
                                            postconditions, modifiesClauses, head.getInfFlowSpecs(),
+                                           head.getJoinProcedure(),
                                            placeholderVariables, head.isTransactionApplicable(),
                                            hasMod);
         }

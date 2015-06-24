@@ -1,0 +1,114 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
+package de.uka.ilkd.key.gui.joinrule;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.util.ExperimentalFeature;
+
+/**
+ * The menu item for the "defocusing" join rule.
+ *
+ * @author Dominic Scheurer
+ * @see JoinRule
+ */
+public class JoinRuleMenuItem extends JMenuItem {
+    private static final long serialVersionUID = -8509570987542243690L;
+
+    /**
+     * Controls whether joining is available to the user. WARNING: You may
+     * refresh your GUI elements after (de-)activation.
+     */
+    public static final ExperimentalFeature FEATURE = new ExperimentalFeature() {
+        private boolean active = true;
+
+        @Override
+        public void deactivate() {
+            active = false;
+        }
+
+        @Override
+        public void activate() {
+            active = true;
+        }
+
+        @Override
+        public boolean active() {
+            return active;
+        }
+    };
+
+    /**
+     * Creates a new menu item for the join rule.
+     *
+     * @param goal
+     *            The selected goal.
+     * @param pio
+     *            The position the join shall be applied to (symbolic state /
+     *            program counter formula).
+     * @param mediator
+     *            The KeY mediator.
+     */
+    public JoinRuleMenuItem(final Goal goal, final PosInOccurrence pio,
+            final KeYMediator mediator) {
+        final Services services = goal.proof().getServices();
+
+        this.setText(toString());
+        this.setAction(new AbstractAction(toString()) {
+            private static final long serialVersionUID = 7695435228507302440L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mediator.stopInterface(true);
+
+                final JoinRule joinRule = JoinRule.INSTANCE;
+                final JoinRuleBuiltInRuleApp app = (JoinRuleBuiltInRuleApp) joinRule
+                        .createApp(pio, services);
+                final JoinRuleCompletion completion = new JoinRuleCompletion();
+                final JoinRuleBuiltInRuleApp completedApp = (JoinRuleBuiltInRuleApp) completion
+                        .complete(app, goal, false);
+
+                if (completedApp.complete()) {
+                    Thread thread = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            goal.apply(completedApp);
+                            mediator.startInterface(true);
+                        }
+                    }, "DefocusingJoinRule");
+
+                    thread.start();
+                }
+                else {
+                    mediator.startInterface(true);
+                }
+            }
+        });
+    }
+
+    @Override
+    public String toString() {
+        return "(Defocusing) Join Rule";
+    }
+}

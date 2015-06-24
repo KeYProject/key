@@ -118,6 +118,6 @@ public class JoinMenuItem extends JMenuItem {
 
     @Override
     public String toString() {
-        return "Join goal with...";
+        return "Delayed Cut Join Rule";
     }
 }

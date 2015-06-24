@@ -64,6 +64,8 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -377,6 +379,32 @@ public class ProofSaver {
             RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
             tree.append(" (contract \"");
             tree.append(ruleJustiBySpec.getSpec().getName());
+            tree.append("\")");
+        }
+        
+        if (appliedRuleApp instanceof JoinRuleBuiltInRuleApp) {
+        	JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) appliedRuleApp;
+        	tree.append(" (joinProc \"");
+        	tree.append(joinApp.getConcreteRule().toString());
+            tree.append("\")");
+        	
+        	tree.append(" (nrJoinPartners \"");
+        	tree.append(joinApp.getJoinPartners().size());
+            tree.append("\")");
+        	
+        	tree.append(" (joinId \"");
+        	tree.append(joinApp.getJoinNode().serialNr());
+            tree.append("\")");
+        }
+        
+        if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
+        	CloseAfterJoinRuleBuiltInRuleApp closeApp = (CloseAfterJoinRuleBuiltInRuleApp) appliedRuleApp;
+        	
+        	//TODO (DS): There may be problems here if the join node is
+        	// pruned away. Need to test some cases and either check for
+        	// null pointers at this place or find a better solution.
+        	tree.append(" (joinNode \"");
+        	tree.append(closeApp.getCorrespondingJoinNode().parent().serialNr());
             tree.append("\")");
         }
 

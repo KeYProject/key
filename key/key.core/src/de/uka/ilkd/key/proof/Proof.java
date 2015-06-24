@@ -453,7 +453,7 @@ public class Proof implements Named {
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
         ImmutableList<Goal> enabledGoals = ImmutableSLList.<Goal>nil();
         for(Goal g : goals) {
-            if(g.isAutomatic()) {
+            if(g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
             }
         }
@@ -503,6 +503,22 @@ public class Proof implements Named {
             // For the moment it is necessary to fire the message ALWAYS
             // in order to detect branch closing.
             fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );
+    }
+    
+    /**
+     * Opens a previously closed node (the one corresponding to p_goal)
+     * and all its closed parents.<p>
+     * 
+     * This is, for instance, needed for the join rule: In
+     * a situation where a join node and its associated partners
+     * have been closed and the join node is then pruned away,
+     * the partners have to be reopened again. Otherwise, we
+     * have a soundness issue.
+     *
+     * @param p_goal The goal to be opened again.
+     */
+    public void reOpenGoal(Goal p_goal) {
+        p_goal.node().reopen();
     }
 
     /** removes the given goal from the list of open goals. Take care
@@ -744,24 +760,30 @@ public class Proof implements Named {
     /** fires the event that the proof has been expanded at the given node */
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofExpanded(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofExpanded(e);
+            }
         }
     }
 
     /** fires the event that the proof is being pruned at the given node */
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofIsBeingPruned(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofIsBeingPruned(e);
+            }
         }
     }
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofPruned(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofPruned(e);
+            }
         }
     }
 
@@ -769,8 +791,10 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofStructureChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofStructureChanged(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofStructureChanged(e);
+            }
         }
     }
 
@@ -778,8 +802,10 @@ public class Proof implements Named {
     /** fires the event that a goal has been removed from the list of goals */
     protected void fireProofGoalRemoved(Goal goal) {
         ProofTreeEvent e = new ProofTreeEvent(this, goal);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalRemoved(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalRemoved(e);
+            }
         }
     }
 
@@ -789,8 +815,10 @@ public class Proof implements Named {
      */
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
         ProofTreeEvent e = new ProofTreeEvent(this, goals);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalsAdded(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalsAdded(e);
+            }
         }
     }
 
@@ -806,8 +834,10 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofGoalsChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalsChanged(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalsChanged(e);
+            }
         }
     }
 
@@ -818,8 +848,10 @@ public class Proof implements Named {
      */
     protected void fireProofClosed() {
         ProofTreeEvent e = new ProofTreeEvent(this);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofClosed(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofClosed(e);
+            }
         }
     }
 
@@ -842,7 +874,7 @@ public class Proof implements Named {
      */
     public synchronized void removeProofTreeListener
     (ProofTreeListener listener) {
-        if (listenerList != null) {
+        if (listenerList != null) { // TODO: check if necessary
             synchronized(listenerList) {
                 listenerList.remove(listener);
             }
