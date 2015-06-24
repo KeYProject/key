@@ -1,11 +1,18 @@
 package org.key_project.sed.key.evaluation.model.definition;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swt.widgets.Display;
+import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.evaluation.model.Activator;
+import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 
 public abstract class AbstractEvaluation {
@@ -14,13 +21,88 @@ public abstract class AbstractEvaluation {
    private final List<Tool> tools;
    
    private final List<AbstractForm> forms;
-
-   public AbstractEvaluation(String name) {
+   
+   private final String bundlePathsNeededToBeLocal;
+   
+   private final File stateEvaluationFolder;
+   
+   public AbstractEvaluation(String name, String bundlePathsNeededToBeLocal) {
       this.name = name;
+      this.bundlePathsNeededToBeLocal = bundlePathsNeededToBeLocal;
+      this.stateEvaluationFolder = createLocalEvaluationFolder(bundlePathsNeededToBeLocal);
       this.tools = computeTools();
       this.forms = (List<AbstractForm>)computeForms();
       for (AbstractForm form : forms) {
          form.setEvaluation(this);
+      }
+   }
+   
+   /**
+    * Creates a local folder in the state location of this plug-in
+    * filled with the content specified by the given path.
+    * @param bundlePathsNeededToBeLocal The path to make its content local.
+    * @return The created folder or {@code null} if nothing needs to be done.
+    */
+   protected File createLocalEvaluationFolder(String bundlePathsNeededToBeLocal) {
+      try {
+         if (bundlePathsNeededToBeLocal != null && !isBundlePathLocalDirectory(bundlePathsNeededToBeLocal)) {
+            String statePath = Activator.getDefault().getStateLocation().toString();
+            File stateEvaluationFolder = new File(statePath, name);
+            IOUtil.delete(stateEvaluationFolder);
+            stateEvaluationFolder.mkdirs();
+            BundleUtil.extractFromBundleToFilesystem(Activator.PLUGIN_ID, bundlePathsNeededToBeLocal, stateEvaluationFolder);
+            return stateEvaluationFolder;
+         }
+         else {
+            return null;
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError("Can't make path '" + bundlePathsNeededToBeLocal + "' local.", e);
+         return null;
+      }
+   }
+   
+   /**
+    * Checks if the given path is local.
+    * @param bundlePath The bundle path to check.
+    * @return {@code true} bundle path is a local directory, {@code false} otherwise.
+    */
+   protected boolean isBundlePathLocalDirectory(String bundlePath) {
+      try {
+         URL url = Activator.getDefault().getBundle().getEntry(bundlePath);
+         URL fileUrl = FileLocator.resolve(url);
+         File file = IOUtil.toFile(fileUrl);
+         return file != null && file.isDirectory();
+      }
+      catch (Exception e) {
+         return false;
+      }
+   }
+
+   /**
+    * Converts the given bundle path into a local {@link URL}.
+    * @param bundlePath The bundle path.
+    * @return The local {@link URL} or {@code null} if something went wrong.
+    */
+   protected URL toLocalURL(String bundlePath) {
+      try {
+         if (bundlePath != null) {
+            if (stateEvaluationFolder != null && bundlePath.startsWith(bundlePathsNeededToBeLocal)) {
+               String subPath = bundlePath.substring(bundlePathsNeededToBeLocal.length());
+               return new File (stateEvaluationFolder, subPath).toURI().toURL();
+            }
+            else {
+               return Activator.getDefault().getBundle().getEntry(bundlePath);
+            }
+         }
+         else {
+            return null;
+         }
+      }
+      catch (MalformedURLException e) {
+         LogUtil.getLogger().logError("Can't make path '" + bundlePath + "' local.", e);
+         return null;
       }
    }
 

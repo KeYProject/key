@@ -24,7 +24,7 @@ public class TestEvaluation extends AbstractEvaluation {
    public static final String TOOL_2_NAME = "tool2";
    
    private TestEvaluation() {
-      super("Test Evaluation");
+      super("Test Evaluation", null);
    }
 
    @Override

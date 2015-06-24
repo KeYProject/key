@@ -2,8 +2,6 @@ package org.key_project.ui;
 
 import java.io.File;
 
-import javax.swing.SwingUtilities;
-
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.ui.util.EclipseKeYDesktop;
 import org.key_project.ui.util.KeYExampleUtil;

@@ -63,7 +63,7 @@ public class KeYExampleUtil {
         File home = IOUtil.getProjectRoot(KeYExampleUtil.class); // Should be KeY4Eclipse\src\plugins
         if (home != null) {
            home = home.getParentFile().getParentFile().getParentFile();
-           return home.getAbsolutePath() +  File.separator + "key" + File.separator + "key.ui" + File.separator + ExampleChooser.EXAMPLES_PATH;
+           return home.getAbsolutePath() + File.separator + "key" + File.separator + "key.ui" + File.separator + ExampleChooser.EXAMPLES_PATH;
         }
         else {
            return null;

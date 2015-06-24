@@ -3,7 +3,6 @@ package org.key_project.sed.key.evaluation.model.definition;
 import java.net.URL;
 import java.util.List;
 
-import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier;
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier.FileDefinition;
 import org.key_project.sed.key.evaluation.model.tooling.ProofAttemptJavaProjectModifier;
@@ -112,7 +111,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     * Forbid additional instances.
     */
    private UnderstandingProofAttemptsEvaluation() {
-      super("Understanding Proof Attempts");
+      super("Understanding Proof Attempts", isUIAvailable() ? "data/understandingProofAttempts/instructions/" : null);
    }
 
    /**
@@ -120,8 +119,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     */
    @Override
    protected List<Tool> computeTools() {
-      URL keyURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/KeY.html") : null;
-      URL sedURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/SED.html") : null;
+      URL keyURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/KeY.html") : null;
+      URL sedURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/SED.html") : null;
       Tool key = new Tool(KEY_TOOL_NAME, keyURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
       Tool sed = new Tool(SED_TOOL_NAME, sedURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
       return CollectionUtil.toList(key, sed);
@@ -133,7 +132,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    @Override
    protected List<AbstractForm> computeForms() {
       // Create introduction form
-      URL conditionsURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/conditions.html") : null;
+      URL conditionsURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/conditions.html") : null;
       QuestionPage conditionsPage = new QuestionPage("conditionsPage", 
                                                      "Introduction", 
                                                      "Please read the information and conditions of the evaluation carefully.",
@@ -200,8 +199,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                  backgroundPage,
                                                  sendConditionsPage);
       // Create evaluation form
-      URL evaluationURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/EvaluationIntroduction.html") : null;
-      URL jmlURL = isUIAvailable() ? Activator.getDefault().getBundle().getEntry("data/understandingProofAttempts/JML.html") : null;
+      URL evaluationURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/EvaluationIntroduction.html") : null;
+      URL jmlURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/JML.html") : null;
       InstructionPage evaluationPage = new InstructionPage(EVALUATION_PAGE_NAME, "Evaluation Instructions", "Read the evaluation instructions carefully before continuing.", evaluationURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.EVALUATION) : null);
       InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO) : null);
       ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));

@@ -14,6 +14,7 @@ import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.IOUtil;
 
 /**
@@ -60,6 +61,9 @@ public class UnderstandingProofAttemptsHandler extends AbstractHandler {
     */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+	   // Close welcome view
+	   WorkbenchUtil.closeWelcomeView();
+      // Open wizard
 	   EvaluationWizard.openWizard(HandlerUtil.getActiveShell(event), true, INPUT_INSTANCE);
 //	   new EvaluationWizardDialog(HandlerUtil.getActiveShell(event), true, BrowserExampleEvaluation.INSTANCE_INPUT).open();
 		return null;

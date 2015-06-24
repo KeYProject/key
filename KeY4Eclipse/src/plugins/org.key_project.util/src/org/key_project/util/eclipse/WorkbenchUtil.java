@@ -44,6 +44,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.services.IEvaluationService;
@@ -537,5 +538,13 @@ public final class WorkbenchUtil {
          return resource.getProject();
       }
       return null;
+   }
+
+   /**
+    * Closes the welcome view.
+    */
+   public static void closeWelcomeView() {
+      IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager();
+      introManager.closeIntro(introManager.getIntro());
    }
 }

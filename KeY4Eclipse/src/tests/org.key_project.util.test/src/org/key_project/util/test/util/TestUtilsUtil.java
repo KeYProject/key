@@ -104,7 +104,6 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.intro.IIntroManager;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.setup.SetupStartup;
@@ -141,8 +140,7 @@ public class TestUtilsUtil {
       Display.getDefault().syncExec(new Runnable() {
          @Override
          public void run() {
-            IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager();
-            introManager.closeIntro(introManager.getIntro());
+            WorkbenchUtil.closeWelcomeView();
          }
       });
    }

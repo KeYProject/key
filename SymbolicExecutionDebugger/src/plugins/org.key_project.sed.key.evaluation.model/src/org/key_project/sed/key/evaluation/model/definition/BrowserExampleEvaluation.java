@@ -43,7 +43,7 @@ public class BrowserExampleEvaluation extends AbstractEvaluation {
    }
    
    private BrowserExampleEvaluation() {
-      super("Browser Evaluation");
+      super("Browser Evaluation", null);
    }
 
    @Override
