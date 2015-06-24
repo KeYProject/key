@@ -63,6 +63,13 @@ public class EvaluationWizardDialog extends WizardDialog {
 
    private final EvaluationInput evaluationInput;
    
+   private final PropertyChangeListener currentFormListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+         handleCurrentFormChanged(evt);
+      }
+   };
+   
    private final PropertyChangeListener currentPageListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
@@ -149,7 +156,10 @@ public class EvaluationWizardDialog extends WizardDialog {
       if (originalParentShell != null) {
          originalParentShell.addShellListener(parentShellListener);
       }
-      evaluationInput.getCurrentFormInput().addPropertyChangeListener(AbstractFormInput.PROP_CURRENT_PAGE_INPUT, currentPageListener);
+      evaluationInput.addPropertyChangeListener(EvaluationInput.PROP_CURRENT_FORM_INPUT, currentFormListener);
+      for (AbstractFormInput<?> formInput : evaluationInput.getFormInputs()) {
+         formInput.addPropertyChangeListener(AbstractFormInput.PROP_CURRENT_PAGE_INPUT, currentPageListener);
+      }
       setHelpAvailable(false);
    }
 
@@ -346,7 +356,7 @@ public class EvaluationWizardDialog extends WizardDialog {
    @Override
    protected void finishPressed() {
       super.finishPressed();
-      if (getReturnCode() == OK) {
+      if (getShell() == null || getShell().isDisposed()) {
          removeListener();
       }
    }
@@ -356,9 +366,18 @@ public class EvaluationWizardDialog extends WizardDialog {
       return (AbstractEvaluationWizardPage<?>) super.getCurrentPage();
    }
 
+   protected void handleCurrentFormChanged(PropertyChangeEvent evt) {
+      showNewCurrentPage();
+   }
+
    protected void handleCurrentPageChanged(PropertyChangeEvent evt) {
-      if (evt.getNewValue() != getCurrentPage().getPageInput()) {
-         IWizardPage newPage = getWizard().getPage((AbstractPageInput<?>)evt.getNewValue());
+      showNewCurrentPage();
+   }
+   
+   protected void showNewCurrentPage() {
+      AbstractPageInput<?> newCurrentPage = evaluationInput.getCurrentFormInput().getCurrentPageInput();
+      if (newCurrentPage != getCurrentPage().getPageInput()) {
+         IWizardPage newPage = getWizard().getPage(newCurrentPage);
          assert newPage != null;
          showPage(newPage);
       }
@@ -499,7 +518,10 @@ public class EvaluationWizardDialog extends WizardDialog {
       if (getCurrentPage() instanceof SendFormWizardPage) {
          ((SendFormWizardPage) getCurrentPage()).getPageInput().removePropertyChangeListener(SendFormPageInput.PROP_SENDING_IN_PROGRESS, sendingListener);
       }
-      evaluationInput.getCurrentFormInput().removePropertyChangeListener(AbstractFormInput.PROP_CURRENT_PAGE_INPUT, currentPageListener);
+      evaluationInput.removePropertyChangeListener(EvaluationInput.PROP_CURRENT_FORM_INPUT, currentFormListener);
+      for (AbstractFormInput<?> formInput : evaluationInput.getFormInputs()) {
+         formInput.removePropertyChangeListener(AbstractFormInput.PROP_CURRENT_PAGE_INPUT, currentPageListener);
+      }
    }
 
    public static void registerDialog(EvaluationWizardDialog dialog) {
