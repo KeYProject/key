@@ -660,9 +660,17 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                             new NotUndefinedValueValidator("Question '" + searchSequentTitle + "' not answered."), 
                                                                             false,
                                                                             choices);
-      SectionQuestion keySection = new SectionQuestion("KeY", "KeY", false, proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, searchProofTreeQuestion, searchSequentQuestion);
+      String listContractsTitle = "List of applied contracts";
+      RadioButtonsQuestion listContractsQuestion = new RadioButtonsQuestion("listContracts", 
+                                                                            listContractsTitle, 
+                                                                            false,
+                                                                            null, 
+                                                                            new NotUndefinedValueValidator("Question '" + listContractsTitle + "' not answered."), 
+                                                                            false,
+                                                                            choices);
+      SectionQuestion keySection = new SectionQuestion("KeY", "KeY", false, proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, searchProofTreeQuestion, searchSequentQuestion, listContractsQuestion);
       // SED
-      String setTitle = "Show symbolic execution tree";
+      String setTitle = "Shown symbolic execution tree";
       RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
                                                                   setTitle, 
                                                                   false,
@@ -686,7 +694,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                      new NotUndefinedValueValidator("Question '" + layoutTitle + "' not answered."), 
                                                                      false,
                                                                      choices);
-      String truthTitle = "Truth value evaluation";
+      String truthTitle = "Truth value evaluation of postconditions, preconditions and loop invariants";
       RadioButtonsQuestion truthQuestion = new RadioButtonsQuestion("truth", 
                                                                     truthTitle, 
                                                                     false,
