@@ -9,13 +9,13 @@ import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
 
 
-public class JMLComents implements IASTNode{
+public class JMLComments implements IASTNode {
 
    Comment node;
    String text;
    String type;
    
-   public JMLComents(String commenttext,Comment node,String type) {
+   public JMLComments(String commenttext,Comment node,String type) {
       text= commenttext;
       this.node = node;
       this.type = type;

@@ -31,7 +31,6 @@ import org.key_project.util.jdt.JDTUtil;
 public class TestOutlineExtension extends DefaultOutlineModifiyer {
 
    
-   public static HashMap<String, Object> inOutlie = new HashMap<String, Object>();
    public static JMLASTCommentLocator comments = null;
    
    
@@ -58,7 +57,7 @@ public class TestOutlineExtension extends DefaultOutlineModifiyer {
          }
          int i = 0;
          //add JML elements
-         for(JMLComents node : comments.getClassInvariants()) {
+         for(JMLComments node : comments.getClassInvariants()) {
             newArray[i++] = new JMLOutlineElement((IJavaElement)parent, node);
          }
          return newArray;
@@ -66,35 +65,30 @@ public class TestOutlineExtension extends DefaultOutlineModifiyer {
          
    // add JML #Spezifications to methods   
          if (javaParent.getElementType() == IJavaElement.METHOD){
-            IMethod method = (IMethod) javaParent;
-            List<JMLComents> invariants = new ArrayList<JMLComents>();
+            IMethod method = (IMethod)javaParent;
             int offset = -1;
-            int length = -1;
-            int arrayoffset = 0;
+            int arroffset = 0;
+            JMLComments com = null;
+            Object[] newArray;
             
-            JMLComents com = null;
             try {
             offset = method.getNameRange().getOffset();
-            length = method.getNameRange().getLength();
             }catch (JavaModelException e) {
                LogUtil.getLogger().logError(e);;
             }
             
-            com  = comments.getmethodJMLComm(offset);
-            if (com != null) invariants.add(com);
-            invariants.addAll(comments.getLoopInvaForMethod(offset, length));
+            com  = comments.getMethodJMLComm(offset);
             
-            //add all loop invs and methods Spezifications
-            Object[] newArray = new Object[currentChildren.length+invariants.size()];
+            if (com != null)  {
+               
+               arroffset = 1;
+               newArray = new Object[currentChildren.length+arroffset];
+               newArray[0] = new JMLOutlineElement((IJavaElement) parent, com);
+               for (int i = offset; i < newArray.length; i++){
+                  newArray[i] = currentChildren[i-1];
+               }
+            } else newArray = currentChildren;
             
-            
-            
-            for (int i =0; i < invariants.size(); i++){
-               newArray[i] = new JMLOutlineElement((IJavaElement) parent, invariants.get(i));   
-            }
-            for (int i = invariants.size(); i < newArray.length; i++){
-               newArray[i] = currentChildren[i-invariants.size()];
-            }
             return newArray;
                
             
