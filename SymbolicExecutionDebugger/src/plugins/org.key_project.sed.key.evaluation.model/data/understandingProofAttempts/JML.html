@@ -11,13 +11,15 @@
       <p>
          The relevant knowledge for this evaluation about JML is explained in the following sections.
          <b>Please read them carefully before you continue.</b>
+         If you are familiar with JML, you can skip sections you know well.
          <ul>
             <li><a href="#comments">1 JML comments</a></li>
             <li><a href="#mc">2 Method Contracts</a></li>
             <li><a href="#invariants">3 Invariants</a></li>
             <li><a href="#loop">4 Loop Invariants</a></li>
+            <li><a href="#aliasing">5 Aliasing and Assignable</a></li>
          </ul>
-      </p>      
+      </p>
       
       <h2><a name="comments">1 JML comments</a></h2>
       <p>
@@ -49,7 +51,7 @@
          The method contract of <code>addCredits</code> says that the method should be called in a state in which <code>credits</code> is greater than zero (<code>requires</code>).
          Then the method will guarantee, that no exception is thrown (<code>normal_behavior</code>) and that the value of <code>acquiredCredits</code> is increased by <code>credits</code> (first <code>ensures</code>).
          It also guarantees that the returned value is the new value of <code>acquiredCredits</code> (second <code>ensures</code>).
-         Finally, the method can only change <code>acquiredCredits</code> and not other locations like <code>firstname</code> or <code>surname</code> (<code>assignable</code>).
+         At last, the <code>assignable</code> clause says that only <code>acquiredCredits</code> and no other locations like <code>firstname</code> or <code>surname</code> are allowed to be changed by the method.
          <code>
          <pre>
 public class Student {
@@ -110,9 +112,9 @@ private int acquiredCredits = 0;</pre></code>
       </p>
       <p>
          The following example restricts with the first loop invariant the range of index variable <code>i</code>.
-         The second loop invariant ensures that all already visisted array elements are assigned with the array index.
+         The second loop invariant ensures that all already visited array elements are assigned with the array index.
          Termination can be proven with help of the array length and the index variable (<code>decreasing</code> term).
-         Finally, the loop can change all fields of <code>array</code> and <code>i</code>.
+         Finally, the loop can change all fields of <code>array</code> (but not <code>array</code> itself) and <code>i</code>.
          <code>
          <pre>
 public static void fillArray(int[] array) {
@@ -126,6 +128,24 @@ public static void fillArray(int[] array) {
    }
 }</pre></code>
       </p>
-      
+
+      <h2><a name="aliasing">5 Aliasing and Assignable</a></h2>
+      <p>
+         Listed instance fields in the assignable clause give the right to change its values independent from the way how the object is accessed.
+      </p>
+      <p>
+         Consider for instance the following example. The parameters <code>a</code> and <code>b</code> are aliased (they point to the same object)
+         as expressed by the precondition <code>a == b</code>. The implementation fulfills the specification, 
+         although the specification allows only to change instance field <code>acquiredCredits</code> on <code>b</code> while the implementation
+         changes it on <code>a</code>.
+      </p>
+          <pre>
+/*@ normal_behavior
+  @ requires a == b;
+  @ assignable b.acquiredCredits;
+  @*/
+public static void doNothing(Student a, Student b) {
+   a.acquiredCredits = b.acquiredCredits;
+}</pre></code>     
    </body>
 </html>

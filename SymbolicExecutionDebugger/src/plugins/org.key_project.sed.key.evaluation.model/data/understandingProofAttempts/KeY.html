@@ -11,6 +11,7 @@
       <p>
          The relevant knowledge for this evaluation about KeY is explained in the following sections.
          <b>Please read them carefully before you continue.</b>
+         If you are familiar with KeY, you can skip sections you know well.
          <ul>
             <li><a href="#proving">1 Proving with KeY</a></li>
             <li>
@@ -49,7 +50,10 @@
          In many cases is the strategy powerful enough to close a proof automatically.
          A remaining open proof can be caused by the following reasons:
          <ul>
-           <li>The analyzed source code is buggy which caused a state in which the Java program does not fulfill its specification.</li>
+           <li>
+              The analyzed program is buggy which caused a state in which the Java program does not fulfill its specification.
+              In this case implementation or specification needs to be corrected.
+           </li>
            <li>
               The strategy was stopped to early or is not powerful enough to close the proof automatically. 
               In this case it is possible to close the proof interactively.
@@ -100,8 +104,8 @@ formula_m</pre></code>
             <pre>
 {heapAtPre:=heap || heap:=heap[create(newObj)] 
                               [newObj.intField := 42]}</pre></code>
-         The update creates a new object <code>newObj</code> in the right part on the heap and sets then its instance field <code>intField</code> to <code>42</code>.
-         The left side stores the initial state of the heap (before <code>newObj</code> is created) in variable <code>heapAtPre</code>.
+         The right part of the update creates a new object <code>newObj</code> on the heap and sets then its instance field <code>intField</code> to <code>42</code>.
+         The left part of the update stores the initial state of the heap (before <code>newObj</code> is created) in variable <code>heapAtPre</code>.
       </p>
       <p>
          The meaning of the <code>anon(locations, anotherHeap)</code> function is that fresh symbolic values nothing is known about are assigned to all specified locations.
@@ -124,8 +128,8 @@ formula_m</pre></code>
             <pre>
 ==>
    assumptionsAboutJava & precondition;
--> {updateToStoreCallState} \<{javaProgramToExecut}\> (postcondition)</pre></code>
-         It can be read as: "Assuming a valid Java state and the specified preconditions, after termination of the Java program to execute the postcondition has to hold."
+-> {updateToStoreCallState} \<{javaProgramToExecut}\> (exceptionalTerminationCheck & postcondition & assignable)</pre></code>
+         It can be read as: "Assuming a valid Java state and the specified preconditions, after expected termination of the Java program to execute the postcondition and the assignable clause have to hold."
          The update is used to store the initial state before execution started.
       </p>
       

@@ -6,7 +6,7 @@
    <body>
       <h1>Evaluation Instructions</h1>
       <p>
-         The following sections explain how questions are asked and the functionality of the evaluation wizard.
+         The following sections explain the functionality of the evaluation wizard and how questions are asked.
          <b>Please read them carefully before you continue.</b>
          <ul>
             <li><a href="#target">1 Target of Questions</a></li>
@@ -15,12 +15,13 @@
             <li><a href="#jumpTo">4 Jump to a not completely answered Question</a></li>
             <li><a href="#trust">5 Trust into Correctness of a given Answer</a></li>
             <li><a href="#toolbar">6 Toolbar</a></li>
+            <li><a href="#closing">7 Closing the Wizard</a></li>
          </ul>
       </p>
       
       <h2><a name="target">1 Target of Questions</a></h2>
       <p>
-         The evaluation wizard asks questions related to the content currently shown in Eclipse.
+         The non blocking evaluation wizard asks questions related to the currently shown content in Eclipse (full functional). 
          The target in the screenshot below is the currently opened web browser.
          <b>During this evaluation, the target will be a proof attempt opened in KeY (external window) or the Symbolic Execution Debugger.</b>
       </p>
@@ -40,6 +41,7 @@
             <li><i>Radio Buttons</i> represent a <i>single choice question</i>. Exactly one of the possible answers is correct and should be selected.</li>
             <li><i>Checkboxes</i> represent a <i>multiple choice question</i>. One or more of the given answers might be correct and should be selected.</li>
          </ul>
+         By selecting an answer, related sub questions might become visible.
       </p>
       <img src="EvaluationIntroduction/Answers.png" />
       
@@ -69,5 +71,10 @@
       </p>
       <img src="EvaluationIntroduction/Toolbar.png" />
 
+      <h2><a name="closing">7 Closing the Wizard</a></h2>
+      <p>
+         Closing the wizard does not cancel the evaluation. 
+         The evaluation can be continued at any time just by opening the wizard again (main menu item <i>Evaluation, Understanding Proof Attempts</i>).
+      </p>
    </body>
 </html>
