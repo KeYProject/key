@@ -84,7 +84,7 @@ public class JoinRuleMenuItem extends JMenuItem {
                 final JoinRule joinRule = JoinRule.INSTANCE;
                 final JoinRuleBuiltInRuleApp app = (JoinRuleBuiltInRuleApp) joinRule
                         .createApp(pio, services);
-                final JoinRuleCompletion completion = new JoinRuleCompletion();
+                final JoinRuleCompletion completion = JoinRuleCompletion.INSTANCE;
                 final JoinRuleBuiltInRuleApp completedApp = (JoinRuleBuiltInRuleApp) completion
                         .complete(app, goal, false);
 
