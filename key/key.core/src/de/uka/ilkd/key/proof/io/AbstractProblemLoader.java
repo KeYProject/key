@@ -44,6 +44,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -498,8 +499,19 @@ public abstract class AbstractProblemLoader {
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
                 parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
                 
+                // For loading, we generally turn on one step simplification to be
+                // able to load proofs that used it even if the user has currently
+                // turned OSS off.
+                final boolean isOSSActivated =
+                        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+                OneStepSimplifier.refreshOSS(proof);
+                
                 replayer = new IntermediateProofReplayer(this, proof, parserResult);
                 replayResult = replayer.replay();
+                
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
+                OneStepSimplifier.refreshOSS(proof);
                 
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
         	}
