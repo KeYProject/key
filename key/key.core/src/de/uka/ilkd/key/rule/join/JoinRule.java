@@ -131,21 +131,20 @@ public class JoinRule implements BuiltInRule {
           return null;
       }
       
+      final ImmutableList<Goal> newGoals = goal.split(1);
+      final Goal newGoal = newGoals.head();
+      
       final TermBuilder tb = services.getTermBuilder();
       final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
-      final Node currentNode = goal.node();
+      final Node currentNode = newGoal.node();
       final ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = joinRuleApp.getJoinPartners();
       
       final ImmutableList<SymbolicExecutionState> joinPartnerStates = joinRuleApp.getJoinPartnerStates();
       final SymbolicExecutionStateWithProgCnt thisSEState = joinRuleApp.getJoinSEState();
       
-      ImmutableList<Goal> newGoals = goal.split(1);
-      
-      final Goal newGoal = newGoals.head();
-      
       // The join loop
       SymbolicExecutionState joinedState =
-            new SymbolicExecutionState(thisSEState.first, thisSEState.second, goal.node());    
+            new SymbolicExecutionState(thisSEState.first, thisSEState.second, newGoal.node());    
       ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       
       for (SymbolicExecutionState state : joinPartnerStates) {
@@ -153,7 +152,7 @@ public class JoinRule implements BuiltInRule {
          newNames = newNames.union(joinResult.second);
          
          joinedState = joinResult.first;         
-         joinedState.setCorrespondingNode(goal.node());
+         joinedState.setCorrespondingNode(newGoal.node());
       }
       
       Term resultPathCondition = joinedState.second;
