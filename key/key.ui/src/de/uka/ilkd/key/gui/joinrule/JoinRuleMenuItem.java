@@ -81,8 +81,6 @@ public class JoinRuleMenuItem extends JMenuItem {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediator.stopInterface(true);
-
                 final JoinRule joinRule = JoinRule.INSTANCE;
                 final JoinRuleBuiltInRuleApp app = (JoinRuleBuiltInRuleApp) joinRule
                         .createApp(pio, services);
@@ -106,14 +104,8 @@ public class JoinRuleMenuItem extends JMenuItem {
                             catch (final AssertionError e) {
                                 signalError(e, mediator);
                             }
-                            finally {
-                                mediator.startInterface(true);
-                            }
                         }
                     });
-                }
-                else {
-                    mediator.startInterface(true);
                 }
             }
         });
