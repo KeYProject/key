@@ -94,7 +94,7 @@ public class JoinRuleMenuItem extends JMenuItem {
                 // possible (e.g., if no candidates were selected by the
                 // user in the displayed dialog).
                 if (completedApp != null && completedApp.complete()) {
-                    Thread thread = new Thread(new Runnable() {
+                    SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             try {
@@ -110,9 +110,7 @@ public class JoinRuleMenuItem extends JMenuItem {
                                 mediator.startInterface(true);
                             }
                         }
-                    }, "DefocusingJoinRule");
-
-                    thread.start();
+                    });
                 }
                 else {
                     mediator.startInterface(true);
