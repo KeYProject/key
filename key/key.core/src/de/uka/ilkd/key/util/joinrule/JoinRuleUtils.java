@@ -1294,7 +1294,7 @@ public class JoinRuleUtils {
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Term toProve,
-            Services services, boolean doSplit) {
+            Services services, boolean doSplit, String sideProofName) {
         final ProofEnvironment sideProofEnv = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
                         services.getProof(), // Parent Proof
@@ -1302,7 +1302,6 @@ public class JoinRuleUtils {
 
         ApplyStrategyInfo proofResult = null;
         try {
-            // TODO: Find a sensible name for the side proof
             ProofStarter proofStarter = SideProofUtil
                     .createSideProof(
                             sideProofEnv, // Proof environment
@@ -1310,7 +1309,7 @@ public class JoinRuleUtils {
                                     // Sequent to prove
                                     Semisequent.EMPTY_SEMISEQUENT,
                                     new Semisequent(new SequentFormula(toProve))),
-                            "Side proof"); // Proof name
+                                    sideProofName); // Proof name
 
             proofResult = proofStarter.start();
         }
@@ -1335,7 +1334,7 @@ public class JoinRuleUtils {
     private static boolean isProvable(Term toProve, Services services,
             boolean doSplit) {
 
-        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit);
+        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check");
         boolean result = proofResult.getProof().closed();
 
         return result;
@@ -1362,7 +1361,7 @@ public class JoinRuleUtils {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo info = tryToProve(term, services, true);
+        final ApplyStrategyInfo info = tryToProve(term, services, true, "Term simplification");
 
         // The simplified formula is the conjunction of all open goals
         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
