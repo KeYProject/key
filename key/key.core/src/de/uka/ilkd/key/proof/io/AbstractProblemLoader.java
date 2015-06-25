@@ -491,6 +491,9 @@ public abstract class AbstractProblemLoader {
         IntermediateProofReplayer replayer = null;
         IntermediatePresentationProofFileParser.Result parserResult = null;
         IntermediateProofReplayer.Result replayResult = null;
+
+        final boolean isOSSActivated =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
         
         try {
         	if (envInput instanceof KeYUserProblemFile) {
@@ -502,16 +505,11 @@ public abstract class AbstractProblemLoader {
                 // For loading, we generally turn on one step simplification to be
                 // able to load proofs that used it even if the user has currently
                 // turned OSS off.
-                final boolean isOSSActivated =
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
                 OneStepSimplifier.refreshOSS(proof);
                 
                 replayer = new IntermediateProofReplayer(this, proof, parserResult);
                 replayResult = replayer.replay();
-                
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
-                OneStepSimplifier.refreshOSS(proof);
                 
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
         	}
@@ -530,6 +528,9 @@ public abstract class AbstractProblemLoader {
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
+            
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
+            OneStepSimplifier.refreshOSS(proof);
         }
         	
         ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);
