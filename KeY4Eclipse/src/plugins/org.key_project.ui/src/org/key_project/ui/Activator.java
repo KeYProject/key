@@ -2,8 +2,6 @@ package org.key_project.ui;
 
 import java.io.File;
 
-import javax.swing.SwingUtilities;
-
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.ui.util.EclipseKeYDesktop;
 import org.key_project.ui.util.KeYExampleUtil;
@@ -42,6 +40,8 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		// Deactivate experimental features
+		Main.deactivateExperimentalFeatures();
 	   // Make sure that the system is not exited when the KeY main window is closed.
       Main.setKeyDesktop(new EclipseKeYDesktop());
 	   ExitMainAction.exitSystem = false;
