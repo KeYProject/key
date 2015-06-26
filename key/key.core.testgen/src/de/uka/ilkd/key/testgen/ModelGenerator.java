@@ -9,7 +9,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -35,6 +34,8 @@ public class ModelGenerator implements SolverLauncherListener{
    private final Services services;
 
 	private Goal goal;
+	
+	private int count;
 
 
 	//models that have been found until now
@@ -48,6 +49,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		this.services = services;
 		this.target = target;
 		models = new LinkedList<Model>();
+		this.count = 0;
 	}
 
 
@@ -55,7 +57,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	 * Try finding a model for the term with z3.
 	 */
 	public void launch(){
-		System.out.println("Launch");
+		System.out.println("Launch "+count++);
 		SolverLauncher launcher = prepareLauncher();
 		SolverType solver = SolverType.Z3_CE_SOLVER;
 		SMTProblem problem = new SMTProblem(goal);
@@ -84,12 +86,7 @@ public class ModelGenerator implements SolverLauncherListener{
     public void launcherStopped(SolverLauncher launcher,
             Collection<SMTSolver> finishedSolvers) {
 		
-		for(SMTSolver solver : finishedSolvers){
-			
-			System.out.println("Translation: ");
-			System.out.println(solver.getTranslation());
-			//solver.getTranslation();
-			
+		for(SMTSolver solver : finishedSolvers){			
 			SMTSolverResult result = solver.getFinalResult();
 			if(result.isValid().equals(SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) && models.size() < target){
 				Model model = solver.getSocket().getQuery().getModel();
@@ -150,12 +147,8 @@ public class ModelGenerator implements SolverLauncherListener{
 		if(!tmodel.equals(tb.tt())){
 			//System.out.println(tmodel);
 			Term notTerm = tb.not(tmodel);
-			SequentFormula sf = new SequentFormula(notTerm);
-			
-			goal.addFormula(sf, true, true);
-			
-//			Semisequent antecedent = goal.antecedent().insertFirst(sf).semisequent();
-//			goal = Sequent.createSequent(antecedent, goal.succedent());			
+			SequentFormula sf = new SequentFormula(notTerm);			
+			goal.addFormula(sf, true, true);		
 			return true;
 		}
 		return false;
@@ -164,18 +157,18 @@ public class ModelGenerator implements SolverLauncherListener{
 
 	private void finish(){
 		System.out.println("\n\nFinished: found "+models.size()+"\n");
-//		for(Model m :  models){
-//			System.out.println(m.toString());
-//		}
+		for(Model m :  models){
+			System.out.println(m.toString());
+		}
 	}
 
 	@Override
 	public void launcherStarted(Collection<SMTProblem> problems,
 			Collection<SolverType> solverTypes, SolverLauncher launcher) {
-		System.out.println("\nStarted: ");
-		for(SMTProblem p : problems){
-			System.out.println(p.getTerm());
-		}
+//		System.out.println("\nStarted: "+count);
+//		for(SMTProblem p : problems){
+//			System.out.println(p.getTerm());
+//		}
 
 	}
 

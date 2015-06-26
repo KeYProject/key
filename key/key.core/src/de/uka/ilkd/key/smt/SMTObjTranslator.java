@@ -1328,7 +1328,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			long num = NumberTranslation.translate(term.sub(0)).longValue();
 			System.out.println(term.sub(0)+" = "+num);
 			long size = sorts.get(BINT_SORT).getBitSize();
-			long bound = sorts.get(BINT_SORT).getBound();
+			//long bound = sorts.get(BINT_SORT).getBound();
 			// modulo max int
 			SMTTerm n;
 			if(num < 0){
