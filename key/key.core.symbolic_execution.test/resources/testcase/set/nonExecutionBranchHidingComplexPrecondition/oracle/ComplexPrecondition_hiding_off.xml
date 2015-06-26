@@ -10,7 +10,7 @@ post: (   x &gt;= 0 &amp; y &lt; 0
 &amp; (   !(x &gt;= 0 &amp; y &lt; 0)
    -&gt;   result_0 = ComplexPrecondition.subSecond(x, y)
       &amp; exc_0 = null)
-mod: \if (true)  \then ({})  \else (allLocs)
+mod: \if (x &gt;= 0 &amp; y &lt; 0)  \then ({})  \else (allLocs)
 \cap \if (!(x &gt;= 0 &amp; y &lt; 0))
          \then ({})
          \else (allLocs)

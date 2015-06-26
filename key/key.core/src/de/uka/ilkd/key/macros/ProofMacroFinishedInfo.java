@@ -55,11 +55,11 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof) {
-        this(macro, goals, proof, proof == null ? null : proof.statistics());
+        this(macro, goals, proof, proof == null ? null : proof.getStatistics());
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof) {
-        this(macro, goal, proof, proof == null ? null : proof.statistics());
+        this(macro, goal, proof, proof == null ? null : proof.getStatistics());
     }
 
     public ProofMacroFinishedInfo(ProofMacro macro, Goal goal) {

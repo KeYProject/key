@@ -35,7 +35,7 @@ public class ProofPropertySection extends AbstractKeyValueNodePropertySection {
       // Show new values
       if (node != null) {
          Proof proof = node.proof();
-         List<Pair<String, String>> summary = proof.statistics().getSummary();
+         List<Pair<String, String>> summary = proof.getStatistics().getSummary();
          for (Pair<String, String> pair : summary) {
             showText(pair.first, pair.second, null);
          }

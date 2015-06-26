@@ -68,7 +68,7 @@ public class SWTBotProofPropertySectionTest extends AbstractSWTBotKeYEditorPrope
             SWTBotTabbedPropertyList tabs = getPropertiesTabs(propertiesView);
             assertTrue(tabs.hasTabItem("Proof"));
             assertTrue(tabs.selectTabItem("Proof"));
-            List<Pair<String, String>> summary = node.proof().statistics().getSummary();
+            List<Pair<String, String>> summary = node.proof().getStatistics().getSummary();
             int i = 0;
             for (Pair<String, String> pair : summary) {
                assertEquals(validate(pair.first), propertiesView.bot().clabel(i).getText());

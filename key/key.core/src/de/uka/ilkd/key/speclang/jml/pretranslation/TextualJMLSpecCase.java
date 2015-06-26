@@ -49,6 +49,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> returns =
             ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> joinProcs =
+            ImmutableSLList.<PositionedString>nil();
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
             ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
@@ -126,6 +128,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.addInfFlowSpecs(tsc.getInfFlowSpecs());
         res.addDiverges(tsc.getDiverges());
         res.addMeasuredBy(tsc.getMeasuredBy());
+        res.addJoinProcs(tsc.getJoinProcs());
         return res;
     }
     
@@ -149,6 +152,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.breaks = breaks;
         res.continues = continues;
         res.returns = returns;
+        res.joinProcs = joinProcs;
         res.measuredBy = measuredBy;
         res.name = name;
         res.workingSpace = workingSpace;
@@ -311,6 +315,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         returns = returns.append(l);
     }
 
+    public void addJoinProcs(PositionedString ps) {
+        joinProcs = joinProcs.append(ps);
+        setPosition(ps);
+    }
+
+    public void addJoinProcs(ImmutableList<PositionedString> l) {
+        joinProcs = joinProcs.append(l);
+    }
+
     public void addAbbreviation(PositionedString[] pss) {
         assert pss.length == 3;
         final Triple<PositionedString, PositionedString, PositionedString> abbr = new Triple<PositionedString, PositionedString, PositionedString>(pss[0],pss[1],pss[2]);
@@ -447,6 +460,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getReturns() {
         return returns;
     }
+    
+    public ImmutableList<PositionedString> getJoinProcs() {
+        return joinProcs;
+    }
 
     public ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> getAbbreviations() {
         return abbreviations;
@@ -553,6 +570,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("determines: ").append(it.next()).append("\n");
         }
+        it = joinProcs.iterator();
+        while (it.hasNext()) {
+            sb.append("join procedure: ").append(it.next()).append("\n");
+        }
         return sb.toString();
     }
 
@@ -580,6 +601,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && breaks.equals(sc.breaks)
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
+               && joinProcs.equals(sc.joinProcs)
                && infFlowSpecs.equals(sc.infFlowSpecs);
     }
 
@@ -603,6 +625,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + breaks.hashCode()
                + continues.hashCode()
                + returns.hashCode()
+               + joinProcs.hashCode()
                + infFlowSpecs.hashCode();
     }
 }

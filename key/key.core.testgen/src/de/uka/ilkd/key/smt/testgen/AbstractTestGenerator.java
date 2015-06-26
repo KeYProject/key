@@ -71,6 +71,8 @@ public abstract class AbstractTestGenerator {
 
    public void generateTestCases(final StopRequest stopRequest,
                                  final TestGenerationLog log) {
+	   
+	         
       TestGenerationSettings settings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
 
@@ -122,8 +124,7 @@ public abstract class AbstractTestGenerator {
              ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
              synchronized(macro) {
                           info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
-             }
-             
+             }           
            //  System.out.println("Proof after:"+proof.toString());
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {

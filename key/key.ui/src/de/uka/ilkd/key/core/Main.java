@@ -27,6 +27,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -67,7 +68,6 @@ public final class Main {
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     private static final String TACLET_DIR = "--tacletDir";
     public static final String JUSTIFY_RULES ="--justify-rules";
-    private static final String PRINT_STATISTICS ="--print-statistics";
     private static final String SAVE_ALL_CONTRACTS = "--save-all";
     private static final String TIMEOUT ="--timeout";
     private static final String EXAMPLES = "--examples";
@@ -108,8 +108,6 @@ public final class Main {
     /** Level of verbosity for command line outputs. */
     private static byte verbosity = Verbosity.NORMAL;
 
-    private static String statisticsFile = null;
-
     private static String examplesDir = null;
 
     /**
@@ -143,12 +141,12 @@ public final class Main {
      */
     private static List<File> fileArguments;
 
-    /** Lists all features currently marked as experimental.
-     * Unless invoked with command line option --experimental ,
-     * those will be deactivated.
+    /**
+     * Lists all features currently marked as experimental. Unless invoked with
+     * command line option --experimental , those will be deactivated.
      */
-    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
-        {JoinMenuItem.FEATURE};
+    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES = {
+            JoinMenuItem.FEATURE, JoinRuleMenuItem.FEATURE };
 
     /**
      * Save all contracts in selected location to automate the creation
@@ -243,7 +241,6 @@ public final class Main {
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
         cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
-        cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
         cl.addOption(SAVE_ALL_CONTRACTS, null, "save all selected contracts for automatic execution");
         cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
@@ -323,10 +320,6 @@ public final class Main {
 
         if(cl.isSet(NO_JMLSPECS)){
             GeneralSettings.disableSpecs = true;
-        }
-
-        if(cl.isSet(PRINT_STATISTICS)){
-            statisticsFile = cl.getString(PRINT_STATISTICS, null);
         }
 
         if(cl.isSet(TIMEOUT)){
@@ -423,7 +416,7 @@ public final class Main {
     }
 
     /** Deactivate experimental features. */
-    private static void deactivateExperimentalFeatures () {
+    public static void deactivateExperimentalFeatures () {
         for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
             feature.deactivate();
     }
@@ -582,13 +575,6 @@ public final class Main {
      */
     public static void setExamplesDir(String newExamplesDir) {
         examplesDir = newExamplesDir;
-    }
-
-    /**
-     * @return the statisticsFile
-     */
-    public static String getStatisticsFile() {
-        return statisticsFile;
     }
 
     /**

@@ -323,7 +323,7 @@ public abstract class SMTTerm {
 	case NOT:
 	    return this.not();
 	default:
-	    throw new RuntimeException("Unexpected: unaryOp: " + op);
+		return new SMTTermUnaryOp(op, this);	    
 	}
     }
 

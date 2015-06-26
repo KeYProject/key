@@ -27,7 +27,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -54,7 +53,6 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractPO implements IPersistablePO {
 
-    protected final TermBuilder tb; 
     protected final InitConfig environmentConfig;
     protected Services environmentServices;
     protected final JavaInfo javaInfo;
@@ -75,7 +73,6 @@ public abstract class AbstractPO implements IPersistablePO {
                       String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
-        this.tb = environmentServices.getTermBuilder();
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
