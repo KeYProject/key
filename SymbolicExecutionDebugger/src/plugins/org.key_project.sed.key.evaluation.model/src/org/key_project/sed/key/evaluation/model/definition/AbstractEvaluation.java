@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Display;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
@@ -35,6 +36,21 @@ public abstract class AbstractEvaluation {
       for (AbstractForm form : forms) {
          form.setEvaluation(this);
       }
+   }
+
+   public static AbstractEvaluation[] getEvaluations() {
+      return new AbstractEvaluation[] {UnderstandingProofAttemptsEvaluation.INSTANCE, 
+                                       TestEvaluation.INSTANCE,
+                                       BrowserExampleEvaluation.INSTANCE};
+   }
+   
+   public static AbstractEvaluation getEvaluationForName(final String name) {
+      return ArrayUtil.search(getEvaluations(), new IFilter<AbstractEvaluation>() {
+         @Override
+         public boolean select(AbstractEvaluation element) {
+            return ObjectUtil.equals(element.getName(), name);
+         }
+      });
    }
    
    /**
@@ -124,18 +140,6 @@ public abstract class AbstractEvaluation {
 
    public int countForms() {
       return forms.size();
-   }
-   
-   public static AbstractEvaluation getEvaluationForName(String name) {
-      if (UnderstandingProofAttemptsEvaluation.INSTANCE.getName().equals(name)) {
-         return UnderstandingProofAttemptsEvaluation.INSTANCE;
-      }
-      else if (TestEvaluation.INSTANCE.getName().equals(name)) {
-         return TestEvaluation.INSTANCE;
-      }
-      else {
-         return null;
-      }
    }
 
    public AbstractForm getForm(final String formName) {

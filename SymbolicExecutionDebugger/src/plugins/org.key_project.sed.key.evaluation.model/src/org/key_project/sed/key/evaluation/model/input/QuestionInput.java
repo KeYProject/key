@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.model.input;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuesti
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
+import org.key_project.sed.key.evaluation.model.definition.TextQuestion;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -293,6 +295,59 @@ public class QuestionInput extends Bean {
          for (QuestionInput childInput : childInputs) {
             childInput.reset();
          }
+      }
+   }
+   
+   public Boolean checkCorrectness() {
+      if (question.isEditable()) {
+         if (question instanceof TextQuestion) {
+            return null; // Correctness not supported
+         }
+         else if (question instanceof AbstractChoicesQuestion) {
+            AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+            Set<Choice> remainingCorrectChoices = new HashSet<Choice>();
+            for (Choice choice : choiceQuestion.getChoices()) {
+               if (choice.isExpectedChecked()) {
+                  remainingCorrectChoices.add(choice);
+               }
+            }
+            if (!remainingCorrectChoices.isEmpty()) {
+               Choice[] selectedChoices = getSelectedChoices();
+               boolean correct = true;
+               int i = 0;
+               while (correct && i < selectedChoices.length) {
+                  if (!remainingCorrectChoices.remove(selectedChoices[i])) {
+                     correct = false;
+                  }
+                  i++;
+               }
+               return correct && remainingCorrectChoices.isEmpty();
+            }
+            else {
+               return null; // Correctness not supported
+            }
+         }
+         else {
+            throw new IllegalStateException("Unsupported question: " + question);
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   public Boolean checkTrust() {
+      if (trust != null) {
+         Boolean correct = checkCorrectness();
+         if (correct != null) {
+            return correct.equals(getTrust());
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
       }
    }
 }

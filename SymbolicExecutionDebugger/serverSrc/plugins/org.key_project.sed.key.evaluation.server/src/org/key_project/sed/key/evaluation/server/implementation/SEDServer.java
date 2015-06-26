@@ -5,17 +5,26 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.util.ServerSettings;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.sed.key.evaluation.server.random.RandomCompletionManager;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer;
+import org.key_project.sed.key.evaluation.server.report.HTMLReportEngine;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * The server which runs forever and listens for client connections.
  * @author Martin Hentschel
  */
 public class SEDServer {
+   /**
+    * The start argument of {@link #main(String[])} to create a report
+    * for all available {@link AbstractEvaluation}s instead of starting the server.
+    */
+   public static final String REPORT_START_ARGUMENT = "-reports";
+   
    /**
     * The storage location to use.
     */
@@ -54,14 +63,34 @@ public class SEDServer {
     */
    public static void main(String[] args) {
       try {
-         SEDServer server = new SEDServer(FileStorage.FORM_STORAGE_LOCATION, ServerSettings.PORT);
-         server.start();
+         if (ArrayUtil.contains(args, REPORT_START_ARGUMENT)) {
+            createReports();
+         }
+         else {
+            SEDServer server = new SEDServer(FileStorage.FORM_STORAGE_LOCATION, ServerSettings.PORT);
+            server.start();
+         }
       }
       catch (Exception e) {
          e.printStackTrace();
       }
    }
    
+   /**
+    * Creates HTML reports for all available {@link AbstractEvaluation}s.
+    * @throws Exception Occurred Exception.
+    */
+   public static void createReports() throws Exception {
+      System.out.println("Creating reports...");
+      for (AbstractEvaluation evaluation: AbstractEvaluation.getEvaluations()) {
+         File target = new File(FileStorage.FORM_STORAGE_LOCATION, evaluation.getName() + ".html");
+         HTMLReportEngine engine = new HTMLReportEngine(FileStorage.FORM_STORAGE_LOCATION);
+         if (engine.saveReport(evaluation, target)) {
+            System.out.println("Report created: " + target.getAbsolutePath());
+         }
+      }
+   }
+
    /**
     * Starts listening for client requests.
     * This method only terminates if the {@link ServerSocket} can't be opened.
