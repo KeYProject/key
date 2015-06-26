@@ -20,6 +20,7 @@ import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -55,7 +56,8 @@ public class HTMLReportEngine extends AbstractReportEngine {
          sb.append("</title>");
          sb.append("</head>");
          sb.append("<body>");
-         appendResults(evaluation, result, sb);
+         appendStatistics(evaluation, result, sb);
+         appendReceivedAnswers(evaluation, result, sb);
          sb.append("</body>");
          sb.append("</html>");
          return sb.toString();
@@ -66,15 +68,27 @@ public class HTMLReportEngine extends AbstractReportEngine {
    }
 
    /**
-    * Appends the found results to the HTML report.
+    * Appends the computed statistics to the HTML report.
     * @param evaluation The analyzed {@link AbstractEvaluation}.
     * @param result The found {@link EvaluationResult}s.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendResults(AbstractEvaluation evaluation, 
-                                EvaluationResult result, 
-                                StringBuffer sb) {
+   protected void appendStatistics(AbstractEvaluation evaluation, EvaluationResult result, StringBuffer sb) {
+      Statistics statiscs = computeStatistics(evaluation, result);
+      System.out.println(statiscs); // TODO: Append statistics to HTML report
+   }
+
+   /**
+    * Appends the received answers to the HTML report.
+    * @param evaluation The analyzed {@link AbstractEvaluation}.
+    * @param result The found {@link EvaluationResult}s.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendReceivedAnswers(AbstractEvaluation evaluation, 
+                                        EvaluationResult result, 
+                                        StringBuffer sb) {
       // Append table header
+      sb.append("<h1>Received Answers</h1>");
       sb.append("<table border=\"1\">");
       // Append header
       List<Object> questionOrder = new LinkedList<Object>();

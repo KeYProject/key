@@ -5,30 +5,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
-import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
-import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
-import org.key_project.sed.key.evaluation.model.definition.Choice;
-import org.key_project.sed.key.evaluation.model.definition.Tool;
-import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
-import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
-import org.key_project.sed.key.evaluation.model.input.QuestionInput;
-import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
-import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
+import org.key_project.sed.key.evaluation.server.report.filter.AllStatisticsFilter;
+import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
+import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
 
 /**
  * Provides the basic functionality to generate reports.
@@ -112,168 +102,23 @@ public abstract class AbstractReportEngine {
    }
    
    /**
-    * Provides the results of an evaluation.
-    * @author Martin Hentschel
+    * Computes {@link Statistics} based on the given {@link EvaluationResult}.
+    * @param evaluation The {@link AbstractEvaluation} for which the report is created.
+    * @param result The available {@link EvaluationResult}s.
+    * @return The computed {@link Statistics}.
     */
-   public static class EvaluationResult {
-      /**
-       * The available {@link EvaluationAnswers}.
-       */
-      private final Map<String, EvaluationAnswers> idInputMap = new HashMap<String, EvaluationAnswers>();
-
-      /**
-       * Analyzes the given {@link EvaluationInput}.
-       * @param form The {@link AbstractFormInput} to analyze.
-       * @param input The {@link EvaluationInput} to anaylze.
-       */
-      protected void addEvaluationInput(AbstractForm form, EvaluationInput input) {
-         assert !StringUtil.isTrimmedEmpty(input.getUUID());
-         EvaluationAnswers answers = idInputMap.get(input.getUUID());
-         if (answers == null) {
-            answers = new EvaluationAnswers();
-            idInputMap.put(input.getUUID(), answers);
-         }
-         answers.addFormInput(input.getFormInput(form));
-      }
-
-      /**
-       * Returns the available {@link EvaluationAnswers}.
-       * @return The available {@link EvaluationAnswers}.
-       */
-      public Map<String, EvaluationAnswers> getIdInputMap() {
-         return idInputMap;
-      }
+   protected Statistics computeStatistics(AbstractEvaluation evaluation, 
+                                          EvaluationResult result) {
+      IStatisticsFilter[] filters = getFilters(evaluation);
+      return new Statistics(filters, result);
    }
    
    /**
-    * The {@link EvaluationAnswers} grouping related {@link EvaluationInput}s.
-    * @author Martin Hentschel
+    * Returns all available {@link IStatisticsFilter} for the given {@link AbstractEvaluation}.
+    * @param evaluation The {@link AbstractEvaluation} for which {@link IStatisticsFilter} are requested.
+    * @return The available {@link IStatisticsFilter}s.
     */
-   public static class EvaluationAnswers {
-      /**
-       * The available {@link QuestionInput}s.
-       */
-      private final Map<AbstractQuestion, List<QuestionInput>> questionMap = new HashMap<AbstractQuestion, List<QuestionInput>>();
-
-      /**
-       * The available {@link AbstractPageInput}s.
-       */
-      private final Map<AbstractPage, List<AbstractPageInput<?>>> pageMap = new HashMap<AbstractPage, List<AbstractPageInput<?>>>();
-
-      /**
-       * The used {@link Tool}s per {@link AbstractPage}.
-       */
-      private final Map<AbstractPage, List<Tool>> pageToolMap = new HashMap<AbstractPage, List<Tool>>();
-      
-      /**
-       * Analyzes the given {@link AbstractFormInput}.
-       * @param formInput The {@link AbstractFormInput} to analyze.
-       */
-      protected void addFormInput(AbstractFormInput<?> formInput) {
-         for (AbstractPageInput<?> pageInput : formInput.getPageInputs()) {
-            if (!pageInput.getPage().isReadonly()) {
-               List<AbstractPageInput<?>> pages = pageMap.get(pageInput.getPage());
-               if (pages == null) {
-                  pages = new LinkedList<AbstractPageInput<?>>();
-                  pageMap.put(pageInput.getPage(), pages);
-               }
-               pages.add(pageInput);
-               if (pageInput instanceof QuestionPageInput) {
-                  QuestionPageInput qpi = (QuestionPageInput) pageInput;
-                  for (QuestionInput questionInput : qpi.getQuestionInputs()) {
-                     addQuestionInput(questionInput);
-                  }
-               }
-               else {
-                  throw new IllegalStateException("Unsupported page input:" + pageInput);
-               }
-            }
-         }
-         // Analyze defined tools
-         for (AbstractFormInput<?> afi : formInput.getEvaluationInput().getFormInputs()) {
-            if (afi instanceof RandomFormInput) {
-               RandomFormInput rfi = (RandomFormInput) afi;
-               for (AbstractPageInput<?> toolPage : rfi.getToolPages()) {
-                  Tool tool = rfi.getTool(toolPage);
-                  if (tool != null) {
-                     List<Tool> toolList = pageToolMap.get(toolPage.getPage());
-                     if (toolList == null) {
-                        toolList = new LinkedList<Tool>();
-                        pageToolMap.put(toolPage.getPage(), toolList);
-                     }
-                     toolList.add(tool);
-                  }
-               }
-            }
-         }
-      }
-
-      /**
-       * Analyzes the given {@link QuestionInput}.
-       * @param questionInput The {@link QuestionInput} to analyze.
-       */
-      protected void addQuestionInput(QuestionInput questionInput) {
-         if (questionInput.getQuestion().isEditable()) {
-            List<QuestionInput> answers = questionMap.get(questionInput.getQuestion());
-            if (answers == null) {
-               answers = new LinkedList<QuestionInput>();
-               questionMap.put(questionInput.getQuestion(), answers);
-            }
-            answers.add(questionInput);
-         }
-         if (questionInput.hasChoiceInputs()) {
-            for (Choice choice : questionInput.getChoices()) {
-               QuestionInput[] choiceInputs = questionInput.getChoiceInputs(choice);
-               for (QuestionInput choiceInput : choiceInputs) {
-                  addQuestionInput(choiceInput);
-               }
-            }
-         }
-         if (questionInput.countChildInputs() > 0) {
-            for (QuestionInput childInput : questionInput.getChildInputs()) {
-               addQuestionInput(childInput);
-            }
-         }
-      }
-
-      /**
-       * Returns the available {@link QuestionInput} of the given {@link AbstractQuestion}.
-       * @param question The requested {@link AbstractQuestion}.
-       * @return The available {@link QuestionInput}s or {@code null} if none are available.
-       */
-      public List<QuestionInput> getQuestionInputs(AbstractQuestion question) {
-         return questionMap.get(question);
-      }
-
-      /**
-       * Returns the available {@link AbstractPageInput} of the given {@link AbstractPage}.
-       * @param page The requested {@link AbstractPage}.
-       * @return The available {@link AbstractPageInput}s or {@code null} if none are available.
-       */
-      public List<AbstractPageInput<?>> getPageInputs(AbstractPage page) {
-         return pageMap.get(page);
-      }
-
-      /**
-       * Returns the available {@link Tool} of the given {@link AbstractPage}.
-       * @param page The requested {@link AbstractPage}.
-       * @return The available {@link Tool}s or {@code null} if none are available.
-       */
-      public List<Tool> getTools(AbstractPage page) {
-         return pageToolMap.get(page);
-      }
-      
-      /**
-       * Checks if multiple values occur.
-       * @return {@code true} multiple values occur, {@code false} otherwise.
-       */
-      public boolean hasMultipleValues() {
-         return CollectionUtil.search(pageMap.values(), new IFilter<List<AbstractPageInput<?>>>() {
-            @Override
-            public boolean select(List<AbstractPageInput<?>> element) {
-               return element != null && element.size() > 1;
-            }
-         }) != null;
-      }
+   protected IStatisticsFilter[] getFilters(AbstractEvaluation evaluation) {
+      return new IStatisticsFilter[] {new AllStatisticsFilter()};
    }
 }
