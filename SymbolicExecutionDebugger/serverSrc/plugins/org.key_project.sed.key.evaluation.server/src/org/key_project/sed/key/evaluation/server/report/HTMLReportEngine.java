@@ -14,7 +14,9 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
+import org.key_project.sed.key.evaluation.model.definition.RandomForm;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -132,23 +134,46 @@ public class HTMLReportEngine extends AbstractReportEngine {
                }
             }
             else if (object instanceof AbstractPage) {
-               List<AbstractPageInput<?>> pages = entry.getValue().getPageInputs((AbstractPage) object);
-               if (!CollectionUtil.isEmpty(pages)) {
-                  sb.append("<td>");
-                  boolean afterFirst = false;
-                  for (AbstractPageInput<?> pageInput : pages) {
-                     if (afterFirst) {
-                        sb.append("<br>");
+               AbstractPage page = (AbstractPage) object;
+               if (page.getForm().isCollectTimes()) {
+                  List<AbstractPageInput<?>> pages = entry.getValue().getPageInputs(page);
+                  if (!CollectionUtil.isEmpty(pages)) {
+                     sb.append("<td>");
+                     boolean afterFirst = false;
+                     for (AbstractPageInput<?> pageInput : pages) {
+                        if (afterFirst) {
+                           sb.append("<br>");
+                        }
+                        else {
+                           afterFirst = true;
+                        }
+                        sb.append(pageInput.getShownTime());
                      }
-                     else {
-                        afterFirst = true;
-                     }
-                     sb.append(pageInput.getShownTime());
+                     sb.append("</td>");
                   }
-                  sb.append("</td>");
+                  else {
+                     sb.append("<td>&nbsp;</td>");
+                  }
                }
-               else {
-                  sb.append("<td>&nbsp;</td>");
+               if (page.isToolBased()) {
+                  List<Tool> tools = entry.getValue().getTools(page);
+                  if (!CollectionUtil.isEmpty(tools)) {
+                     sb.append("<td>");
+                     boolean afterFirst = false;
+                     for (Tool tool : tools) {
+                        if (afterFirst) {
+                           sb.append("<br>");
+                        }
+                        else {
+                           afterFirst = true;
+                        }
+                        sb.append(tool != null ? tool.getName() : "&nbsp;");
+                     }
+                     sb.append("</td>");
+                  }
+                  else {
+                     sb.append("<td>&nbsp;</td>");
+                  }
                }
             }
          }
@@ -253,10 +278,21 @@ public class HTMLReportEngine extends AbstractReportEngine {
                else {
                   throw new IllegalStateException("Unsupported page: " + page);
                }
+               boolean addPageToOrder = false;
                if (form.isCollectTimes()) {
                   sb.append("<td>Shown Time</td>");
-                  questionOrder.add(page);
+                  addPageToOrder = true;
                   pageSpan++;
+               }
+               if (form instanceof RandomForm) {
+                  if (page.isToolBased()) {
+                     sb.append("<td>Tool</td>");
+                     addPageToOrder = true;
+                     pageSpan++;
+                  }
+               }
+               if (addPageToOrder) {
+                  questionOrder.add(page);
                }
             }
             formSpan += pageSpan;

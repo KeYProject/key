@@ -35,6 +35,7 @@ public class TestEvaluation extends AbstractEvaluation {
                                                       "questionPageTitle", 
                                                       "questionPageMessage",
                                                       false,
+                                                      false,
                                                       null,
                                                       new BrowserQuestion("browserQuestion", new URL("http://key-project.org/")),
                                                       new RadioButtonsQuestion("radioQuestions", "radioQuestionsLabel", false, "no", new FixedValueValidator("yes", "errorMessage"), true, new Choice("Yes", "yes", yesSubQuestion), new Choice("No", "no")),
@@ -46,9 +47,9 @@ public class TestEvaluation extends AbstractEvaluation {
          FixedForm fixedForm = new FixedForm("fixedForm", false, questionPage, sendFixedPage);
          InstructionPage instructionPage = new InstructionPage("instructionPage", "instructionPageTitle", "instructionPageMessage", new URL("http://key-project.org/"), null);
          ToolPage tool1Page = new ToolPage(getTool(TOOL_1_NAME));
-         QuestionPage random1Page = new QuestionPage("random1Page", "random1PageTitle", "random1PageMessage", false, null);
-         QuestionPage random2Page = new QuestionPage("random2Page", "random2PageTitle", "random2PageMessage", false, null);
-         QuestionPage random3Page = new QuestionPage("random3Page", "random3PageTitle", "random3PageMessage", false, null);
+         QuestionPage random1Page = new QuestionPage("random1Page", "random1PageTitle", "random1PageMessage", false, false, null);
+         QuestionPage random2Page = new QuestionPage("random2Page", "random2PageTitle", "random2PageMessage", false, false, null);
+         QuestionPage random3Page = new QuestionPage("random3Page", "random3PageTitle", "random3PageMessage", false, false, null);
          SendFormPage sendRandomPage = new SendFormPage("sendRandomPage", "sendRandomPageTitle", "sendRandomPageMessage", "additionalDataCollectedByServer");
          RandomForm randomForm = new RandomForm("randomForm", true, instructionPage, tool1Page, random1Page, random2Page, random3Page, sendRandomPage);
          return CollectionUtil.toList(fixedForm, randomForm);

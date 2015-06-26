@@ -15,7 +15,7 @@ public class SendFormPage extends AbstractPage {
                                                                                 new Choice("I do n&ot accept", "no"));
 
    public SendFormPage(String name, String title, String message, String additionalDataCollectedByServer) {
-      super(name, title, message, false);
+      super(name, title, message, false, false);
       this.additionalDataCollectedByServer = additionalDataCollectedByServer;
    }
    

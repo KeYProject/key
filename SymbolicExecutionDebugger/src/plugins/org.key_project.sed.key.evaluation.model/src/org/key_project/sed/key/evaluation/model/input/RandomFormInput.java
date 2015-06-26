@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.model.input;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,10 @@ public class RandomFormInput extends AbstractFormInput<RandomForm> {
       List<AbstractPageInput<?>> oldValue = getPageOrder();
       this.pageOrder = newPageOrder;
       firePropertyChange(PROP_PAGE_ORDER, oldValue, getPageOrder());
+   }
+   
+   public Collection<AbstractPageInput<?>> getToolPages() {
+      return pageToolMap.keySet();
    }
    
    public Tool getTool(AbstractPageInput<?> page) {

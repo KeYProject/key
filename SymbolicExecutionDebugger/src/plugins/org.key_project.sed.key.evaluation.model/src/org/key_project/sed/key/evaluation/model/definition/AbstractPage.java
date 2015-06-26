@@ -12,12 +12,19 @@ public abstract class AbstractPage {
    
    private final boolean wrapLayout;
    
-   public AbstractPage(String name, String title, String message, boolean wrapLayout) {
+   private final boolean toolBased;
+   
+   public AbstractPage(String name, String title, String message, boolean wrapLayout, boolean toolBased) {
       assert name != null;
       this.name = name;
       this.title = title;
       this.message = message;
       this.wrapLayout = wrapLayout;
+      this.toolBased = toolBased;
+   }
+
+   public boolean isToolBased() {
+      return toolBased;
    }
    
    public boolean isReadonly() {

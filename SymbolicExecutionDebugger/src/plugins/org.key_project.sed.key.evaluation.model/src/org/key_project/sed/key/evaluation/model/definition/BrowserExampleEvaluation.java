@@ -56,6 +56,7 @@ public class BrowserExampleEvaluation extends AbstractEvaluation {
                                                    "Browser", 
                                                    "Please answer the questions to the best of your knowledge.",
                                                    false,
+                                                   false,
                                                    new AbstractWorkbenchModifier() {
                                                       private IWebBrowser browser;
         

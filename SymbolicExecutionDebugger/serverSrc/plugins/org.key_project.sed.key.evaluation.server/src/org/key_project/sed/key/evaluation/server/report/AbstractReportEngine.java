@@ -15,11 +15,13 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
+import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.util.java.ArrayUtil;
@@ -159,6 +161,11 @@ public abstract class AbstractReportEngine {
       private final Map<AbstractPage, List<AbstractPageInput<?>>> pageMap = new HashMap<AbstractPage, List<AbstractPageInput<?>>>();
 
       /**
+       * The used {@link Tool}s per {@link AbstractPage}.
+       */
+      private final Map<AbstractPage, List<Tool>> pageToolMap = new HashMap<AbstractPage, List<Tool>>();
+      
+      /**
        * Analyzes the given {@link AbstractFormInput}.
        * @param formInput The {@link AbstractFormInput} to analyze.
        */
@@ -179,6 +186,23 @@ public abstract class AbstractReportEngine {
                }
                else {
                   throw new IllegalStateException("Unsupported page input:" + pageInput);
+               }
+            }
+         }
+         // Analyze defined tools
+         for (AbstractFormInput<?> afi : formInput.getEvaluationInput().getFormInputs()) {
+            if (afi instanceof RandomFormInput) {
+               RandomFormInput rfi = (RandomFormInput) afi;
+               for (AbstractPageInput<?> toolPage : rfi.getToolPages()) {
+                  Tool tool = rfi.getTool(toolPage);
+                  if (tool != null) {
+                     List<Tool> toolList = pageToolMap.get(toolPage.getPage());
+                     if (toolList == null) {
+                        toolList = new LinkedList<Tool>();
+                        pageToolMap.put(toolPage.getPage(), toolList);
+                     }
+                     toolList.add(tool);
+                  }
                }
             }
          }
@@ -223,11 +247,20 @@ public abstract class AbstractReportEngine {
 
       /**
        * Returns the available {@link AbstractPageInput} of the given {@link AbstractPage}.
-       * @param question The requested {@link AbstractQuestion}.
+       * @param page The requested {@link AbstractPage}.
        * @return The available {@link AbstractPageInput}s or {@code null} if none are available.
        */
       public List<AbstractPageInput<?>> getPageInputs(AbstractPage page) {
          return pageMap.get(page);
+      }
+
+      /**
+       * Returns the available {@link Tool} of the given {@link AbstractPage}.
+       * @param page The requested {@link AbstractPage}.
+       * @return The available {@link Tool}s or {@code null} if none are available.
+       */
+      public List<Tool> getTools(AbstractPage page) {
+         return pageToolMap.get(page);
       }
       
       /**
