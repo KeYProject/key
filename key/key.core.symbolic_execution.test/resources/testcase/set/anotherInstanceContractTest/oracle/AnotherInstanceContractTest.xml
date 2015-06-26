@@ -13,7 +13,9 @@ post: (   x &gt;= 10 &amp; obj.&lt;inv&gt;@heapBefore_magic_0
    -&gt;   result_0 = javaUnaryMinusInt(22)
       &amp; obj.&lt;inv&gt;
       &amp; exc_0 = null)
-mod: \if (true)  \then (allLocs)  \else (allLocs)
+mod: \if (x &gt;= 10 &amp; obj.&lt;inv&gt;)
+         \then (allLocs)
+         \else (allLocs)
 \cap \if (x &lt; javaUnaryMinusInt(22) &amp; obj.&lt;inv&gt;)
          \then (allLocs)
          \else (allLocs)

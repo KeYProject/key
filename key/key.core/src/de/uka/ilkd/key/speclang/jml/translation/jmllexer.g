@@ -63,6 +63,7 @@ tokens {
     REQUIRES        = "requires";
     REQUIRES_FREE   = "requires_free";
     RETURNS         = "returns";  //KeY extension, not official JML
+    JOIN_PROC       = "join_proc";  //KeY extension, not official JML
     SEPARATES       = "separates";  //KeY extension, not official JML
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
@@ -212,7 +213,7 @@ options {
 
 LT_IMPLICIT_GT_DISPATCH
     :
-      LT (LETTER)+ GT {$setType(IDENT);}
+      (LT (LETTER)+ GT) => LT (LETTER)+ GT {$setType(IDENT);}
     |
       LT {$setType(LT);}
     |

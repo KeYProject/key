@@ -22,16 +22,6 @@ lexer grammar KeYJMLPreLexer;
 
 @annotateclass{ @SuppressWarnings("all") } 
 
-@members {
-    private void newline() {
-      Debug.out("newline() was called but ANTLRv3 does not implement it anymore.");
-    }
-
-    private void append(final String text) {
-      setText(getText() + text);
-    }
-}
-
     ABSTRACT 			: 'abstract';
     ACCESSIBLE                  : 'accessible';
     ACCESSIBLE_REDUNDANTLY      : 'accessible_redundantly';
@@ -89,6 +79,7 @@ lexer grammar KeYJMLPreLexer;
     INSTANCE 			: 'instance';
     INVARIANT 			: 'invariant';
     INVARIANT_RED 		: 'invariant_redundantly';
+    JOIN_PROC           : 'join_proc';
     LOOP_INVARIANT  		: 'loop_invariant';
     LOOP_INVARIANT_RED  	: 'loop_invariant_redundantly';
     MAINTAINING  		: 'maintaining';
@@ -182,13 +173,13 @@ fragment ML_COMMENT
     (
         (~('*').|'*'~'/')
         =>
-        (	'\n'         { newline(); }
+        (	'\n'         { /*newline();*/ }
             | 	~('@' | '\n')
         )
 	(
 	    options { greedy = false; }
             :
-                '\n'     { newline(); }
+                '\n'     { /*newline();*/ }
             |	~'\n'
 	)*
     )?
@@ -219,7 +210,7 @@ WS
     (
 	    ' '
 	|   '\t'
-	|   '\n'  { newline(); acceptAt = true; }
+	|   '\n'  { /*newline();*/ acceptAt = true; }
 	|   '\r'
 	|   {acceptAt}? '@'
 	|   ('//@') => '//@'
@@ -254,23 +245,23 @@ fragment BODY
 @init {
     int braceCounter = 0;
     boolean ignoreAt = false;
-    String s = null;
+    StringBuilder sb = new StringBuilder("{");
 }
 :
-   '{'
-      (
-	   '{'                    { braceCounter++; ignoreAt = false; }
-    	|  {braceCounter > 0}?=> '}'  { braceCounter--; ignoreAt = false; }
-    	|  '\n'                     { newline(); ignoreAt = true; }
-    	|  ' '
-    	|  '\u000C'
-    	|  '\t'
-    	|  '\r'
-    	|  {!ignoreAt}? '@'
-    	|  {ignoreAt}? { s = getText(); } '@'	    { setText(s); ignoreAt = false; }
-    	|  ~('{' | '}' | '\n' | ' ' | '\u000C' | '\t' | '\r' | '@' )    { ignoreAt = false; }
-    )* {braceCounter == 0}?=> '}'
+  '{'
+  (
+    '{'                          { braceCounter++; ignoreAt = false; sb.append("{"); }
+  | {braceCounter > 0}? => '}'   { braceCounter--; ignoreAt = false; sb.append("}");}
+  | '\n'                         { ignoreAt = true; sb.append("\n"); }
+  | '@'                          { sb.append(ignoreAt ? " " : "@"); ignoreAt = false; }
+  | c = (' '|'\t'|'\r'|'\u000c') { sb.append((char)c); }
+  | c = ~(' '|'\t'|'\r'|'\u000c' | '{' | '}' | '\n' | '@')
+                                 { ignoreAt = false; sb.append((char)c); }
+  )* 
+  {braceCounter == 0}? => '}' 
+     { sb.append("}"); setText(sb.toString()); }
 ;
+
 
 BRACE_DISPATCH :
    ( '{' ~ '|') => BODY { $type = BODY; }

@@ -135,7 +135,7 @@ public class InfFlowProof extends Proof {
         	}
         	proof.sideProofStatistics = null;
         }
-        addSideProofStatistics(proof.statistics());
+        addSideProofStatistics(proof.getStatistics());
     }
 
     private void addSideProofStatistics(Statistics stat) {

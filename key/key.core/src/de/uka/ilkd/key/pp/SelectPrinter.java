@@ -55,15 +55,16 @@ class SelectPrinter extends FieldPrinter {
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (isGenericFieldConstant(fieldTerm)) {
+            } else if (isBuiltinObjectProperty(fieldTerm)) {
                 // object properties denoted like o.<created>
-                printGenericObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (isFieldConstant(fieldTerm) && getFieldSort(fieldTerm).equals(t.sort())) {
-                if (isStaticFieldConstant(objectTerm, fieldTerm)) {
-                    // static field access
+                printBuiltinObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
+            } else if (isStaticFieldConstant(objectTerm, fieldTerm)
+                       && getFieldSort(fieldTerm).equals(t.sort())) {
+                // static field access
                     printStaticJavaFieldConstant(fieldTerm, heapTerm, tacitHeap);
-                } else if (isJavaFieldConstant(fieldTerm)) {
-                    // non-static field access
+            } else if (isJavaFieldConstant(fieldTerm)
+                       && getFieldSort(fieldTerm).equals(t.sort())) {
+                // non-static field access
                     printNonStaticJavaFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
                 } else {
                     lp.printFunctionTerm(t);
@@ -71,9 +72,6 @@ class SelectPrinter extends FieldPrinter {
             } else {
                 lp.printFunctionTerm(t);
             }
-        } else {
-            lp.printFunctionTerm(t);
-        }
     }
 
     /*
@@ -214,7 +212,7 @@ class SelectPrinter extends FieldPrinter {
      * For example:
      *      boolean::select(heap, object, java.lang.Object::<created>)
      */
-    private void printGenericObjectProperty(Term t, Term heapTerm, Term objectTerm, Term fieldTerm, Term tacitHeap) throws IOException {
+    private void printBuiltinObjectProperty(Term t, Term heapTerm, Term objectTerm, Term fieldTerm, Term tacitHeap) throws IOException {
 
         JavaInfo javaInfo = lp.services.getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());

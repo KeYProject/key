@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -48,7 +49,8 @@ public final class DependencyContractPO extends AbstractPO
     
     private DependencyContract contract;
 
-   private InitConfig proofConfig;
+    private InitConfig proofConfig;
+    private TermBuilder tb;
            
     
     //-------------------------------------------------------------------------
@@ -153,9 +155,9 @@ public final class DependencyContractPO extends AbstractPO
           // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
           if (target == null) target = contract.getTarget();
        }
-       proofConfig = environmentConfig.deepCopy();
-       final Services proofServices = proofConfig.getServices();
-
+       
+       final Services proofServices = postInit();
+       
        //prepare variables
        final ProgramVariable selfVar
        = !contract.getTarget().isStatic() 
@@ -271,6 +273,15 @@ public final class DependencyContractPO extends AbstractPO
 
        //add axioms
        collectClassAxioms(contract.getKJT(), proofConfig);
+    }
+
+
+
+    private Services postInit() {
+        proofConfig = environmentConfig.deepCopy();
+        final Services proofServices = proofConfig.getServices();
+        tb = proofServices.getTermBuilder();
+        return proofServices;
     }
 
 

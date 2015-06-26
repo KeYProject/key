@@ -192,6 +192,16 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(termContains(result, selfVar));
     }
 
+    // There is a problem with spaces here.
+    // Adding spaces around "j < i" solves the problem.
+    // see bug #1548
+    public void testSumParsing() throws SLTranslationException {
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        JMLTranslator.translate(new PositionedString(
+                "0 == ((\\sum int j; 0<=j && j<i; j))"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+    }
+
 
     public void testPrimitiveField() {
         Term result = null;
