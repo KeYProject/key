@@ -201,6 +201,8 @@ public class SMTObjTranslator implements SMTTranslator {
 	private Sort locsetSort;
 	private Sort boolSort;
 	private Sort seqSort;
+	private Sort objectSort;
+	
 	/**
 	 * The elementOf predicate.
 	 */
@@ -409,7 +411,8 @@ public class SMTObjTranslator implements SMTTranslator {
 		heapSort = services.getTypeConverter().getHeapLDT().targetSort();
 		fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
 		locsetSort = services.getTypeConverter().getLocSetLDT().targetSort();
-		boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
+		boolSort = services.getTypeConverter().getBooleanLDT().targetSort();		
+		objectSort = services.getJavaInfo().getJavaLangObject().getSort();		
 		cc = new ConstantCounter();
 	}
 
@@ -706,8 +709,9 @@ public class SMTObjTranslator implements SMTTranslator {
 
 	/**
 	 * Creates the wellformed function definition.
+	 * @throws IllegalFormulaException 
 	 */
-	private void generateWellFormedAssertions() {
+	private void generateWellFormedAssertions() throws IllegalFormulaException {
 		// Assertion 1:
 		SMTTermVariable h = new SMTTermVariable("h", sorts.get(HEAP_SORT));
 		SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
@@ -845,8 +849,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * 
 	 * @param fieldName
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTTerm addAssertionForField(String fieldName) {
+	private SMTTerm addAssertionForField(String fieldName) throws IllegalFormulaException {
 		SMTTerm f = SMTTerm.call(functions.get(fieldName));
 		Sort type = fieldSorts.get(fieldName);
 		SMTSort target = translateSort(type);
@@ -1117,8 +1122,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param problem
 	 *            The KeY proof obligation.
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	public SMTFile translateProblem(Term problem) {
+	public SMTFile translateProblem(Term problem) throws IllegalFormulaException {
 		SMTFile file = new SMTFile();
 		// initialize smt sorts
 		cc.countConstants(problem);
@@ -1210,8 +1216,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param term
 	 *            the KeY term.
 	 * @return the SMT term.
+	 * @throws IllegalFormulaException 
 	 */
-	public SMTTerm translateTerm(Term term) {
+	public SMTTerm translateTerm(Term term) throws IllegalFormulaException {
 		// System.err.println("Translate: "+term);
 		Operator op = term.op();
 		if (opTable.containsKey(op)) {
@@ -1266,11 +1273,12 @@ public class SMTObjTranslator implements SMTTranslator {
 			List<SMTTermVariable> variables = new LinkedList<SMTTermVariable>();
 			quantifiedVariables.add(var);
 			variables.add(var);
-			String sortName = vars.get(0).sort().name().toString();
+			Sort sort = vars.get(0).sort();
+			String sortName = sort.name().toString();
 			String id = getTypePredicateName(sortName);
 			SMTTerm sub = translateTerm(term.sub(0));
 			if (typePredicates.containsKey(id)
-			        && !sortName.equals("java.lang.Object")) {
+			        && !sort.equals(objectSort)) {
 				SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
 				sub = call.implies(sub);
 			}
@@ -1284,11 +1292,12 @@ public class SMTObjTranslator implements SMTTranslator {
 			List<SMTTermVariable> variables = new LinkedList<SMTTermVariable>();
 			quantifiedVariables.add(var);
 			variables.add(var);
-			String sortName = vars.get(0).sort().name().toString();
+			Sort sort = vars.get(0).sort();
+			String sortName = sort.name().toString();
 			String id = getTypePredicateName(sortName);
 			SMTTerm sub = translateTerm(term.sub(0));
 			if (typePredicates.containsKey(id)
-			        && !sortName.equals("java.lang.Object")) {
+			        && !sort.equals(objectSort)) {
 				SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
 				sub = call.and(sub);
 			}
@@ -1359,8 +1368,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * 
 	 * @param q
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTTermVariable translateVariable(QuantifiableVariable q) {
+	private SMTTermVariable translateVariable(QuantifiableVariable q) throws IllegalFormulaException {
 		SMTSort s = translateSort(q.sort());
 		SMTTermVariable var = new SMTTermVariable(q.name().toString(), s);
 		return var;
@@ -1390,8 +1400,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * 
 	 * @param s
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTSort translateSort(Sort s) {
+	private SMTSort translateSort(Sort s) throws IllegalFormulaException {
 		if (s.equals(boolSort)) {
 			return SMTSort.BOOL;
 		} else if (s.equals(Sort.FORMULA)) {
@@ -1409,9 +1420,9 @@ public class SMTObjTranslator implements SMTTranslator {
 		} else if (s.equals(seqSort)) {
 			return sorts.get(SEQ_SORT);
 		} else {
-			Sort obj = services.getJavaInfo().getJavaLangObject().getSort();
-			if (!(s.equals(obj) || s.extendsTrans(obj))) {
-				throw new RuntimeException(
+			
+			if (!(s.equals(objectSort) || s.extendsTrans(objectSort))) {
+				throw new IllegalFormulaException(
 				        "Translation Failed: Unsupported Sort: " + s.name());
 			}
 			// System.out.println("Found sort in PO: "+s);
@@ -1424,8 +1435,9 @@ public class SMTObjTranslator implements SMTTranslator {
 
 	/**
 	 * Generates the necessary assertions for specifying the type hierarchy.
+	 * @throws IllegalFormulaException 
 	 */
-	private void generateTypeConstraints() {
+	private void generateTypeConstraints() throws IllegalFormulaException {
 		// create type hierarchy assertions
 		Set<Sort> tempsorts = new HashSet<Sort>();
 		tempsorts.addAll(javaSorts);
@@ -1454,14 +1466,15 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * Generates the type assertions for the java reference type s.
 	 * 
 	 * @param s
+	 * @throws IllegalFormulaException 
 	 */
-	private void addTypeConstarints(Sort s) {
+	private void addTypeConstarints(Sort s) throws IllegalFormulaException {
 		// Did we already specify the constraints?
 		if (typeAssertions.containsKey(s.toString())) {
 			return;
 		}
 		// Do not specify constraint for these sorts:
-		if (s == Sort.ANY || s.name().toString().equals("java.lang.Object")
+		if (s == Sort.ANY || s.equals(objectSort)
 		        || s.name().toString().equalsIgnoreCase("Null")) {
 			return;
 		}
@@ -1519,7 +1532,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			for (SortNode n : concreteParents) {
 				addTypePredicate(n.getSort());
 				if (concreteParent == null
-				        || concreteParent.toString().equals("java.lang.Object")) {
+				        || concreteParent.equals(objectSort)) {
 					concreteParent = n.getSort();
 				}
 			}
@@ -1651,7 +1664,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			List<SMTSort> domainSorts = new LinkedList<SMTSort>();
 			domainSorts.add(domainSort);
 			SMTFunction fun = new SMTFunction(name, domainSorts, imageSort);
-			if (id.equals("java.lang.Object")) {
+			if (s.equals(objectSort)) {
 				fun = new SMTFunctionDef(fun, new SMTTermVariable("o",
 				        sorts.get(OBJECT_SORT)), SMTTerm.TRUE);
 			} else {
@@ -1667,8 +1680,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param id
 	 * @param s
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTFunction translateConstant(String id, Sort s) {
+	private SMTFunction translateConstant(String id, Sort s) throws IllegalFormulaException {
 		if (functions.containsKey(id)) {
 			return functions.get(id);
 		}
@@ -1691,8 +1705,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param fun
 	 * @param subs
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTTerm translateCall(Function fun, ImmutableArray<Term> subs) {
+	private SMTTerm translateCall(Function fun, ImmutableArray<Term> subs) throws IllegalFormulaException {
 		String name = fun.name().toString();
 		// handle sort constants
 		if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
@@ -1712,7 +1727,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			SMTTerm selectCall = call(selectFunction, subs);
 			SMTTerm result = castTermIfNecessary(selectCall, target);
 			if (target.getId().equals(OBJECT_SORT)
-			        && !fun.sort().name().toString().equals("java.lang.Object")) {
+			        && !fun.sort().equals(objectSort)) {
 				Sort castTarget = fun.sort();
 				SMTFunction f = getCastFunction(castTarget);
 				result = SMTTerm.call(f, result);
@@ -1725,7 +1740,7 @@ public class SMTObjTranslator implements SMTTranslator {
 			SMTTerm seqGetCall = call(functions.get(SEQ_GET), subs);
 			SMTTerm result = castTermIfNecessary(seqGetCall, target);
 			if (target.getId().equals(OBJECT_SORT)
-			        && !fun.sort().name().toString().equals("java.lang.Object")) {
+			        && !fun.sort().equals(objectSort)) {
 				Sort castTarget = fun.sort();
 				SMTFunction f = getCastFunction(castTarget);
 				result = SMTTerm.call(f, result);
@@ -1813,8 +1828,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * 
 	 * @param castTarget
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTFunction getCastFunction(Sort castTarget) {
+	private SMTFunction getCastFunction(Sort castTarget) throws IllegalFormulaException {
 		SMTSort sort = translateSort(castTarget);
 		if (sort.getId().equals(OBJECT_SORT)) {
 			SMTFunction f;
@@ -1870,8 +1886,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * 
 	 * @param s
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTFunction getExactInstanceFunction(Sort s) {
+	private SMTFunction getExactInstanceFunction(Sort s) throws IllegalFormulaException {
 		SMTSort smtSort = translateSort(s);
 		if (!smtSort.getId().equals(OBJECT_SORT)) {
 			System.err.println(s.name() + "is not an object");
@@ -2033,8 +2050,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param function
 	 * @param subs
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTTerm call(SMTFunction function, ImmutableArray<Term> subs) {
+	private SMTTerm call(SMTFunction function, ImmutableArray<Term> subs) throws IllegalFormulaException {
 		List<SMTTerm> subTerms = new LinkedList<SMTTerm>();
 		int i = 0;
 		for (Term t : subs) {
@@ -2068,6 +2086,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * 
 	 */
 	public class ConstantCounter {
+		
+		
+		
 		Set<String> locsets;
 		Set<String> heaps;
 		Set<String> fields;
@@ -2079,6 +2100,9 @@ public class SMTObjTranslator implements SMTTranslator {
 		}
 
 		public void countConstants(Term t) {
+			
+			
+			
 			if (t.arity() == 0) {
 				Sort s = t.sort();
 				String str = t.toString();
