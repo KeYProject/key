@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
@@ -20,6 +21,10 @@ import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
+import org.key_project.sed.key.evaluation.server.report.statiscs.FilteredStatistics;
+import org.key_project.sed.key.evaluation.server.report.statiscs.PageStatistics;
+import org.key_project.sed.key.evaluation.server.report.statiscs.QuestionStatistics;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
@@ -56,7 +61,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
          sb.append("</title>");
          sb.append("</head>");
          sb.append("<body>");
-         appendStatistics(evaluation, result, sb);
+         appendToolStatistics(evaluation, result, sb);
          appendReceivedAnswers(evaluation, result, sb);
          sb.append("</body>");
          sb.append("</html>");
@@ -73,9 +78,287 @@ public class HTMLReportEngine extends AbstractReportEngine {
     * @param result The found {@link EvaluationResult}s.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendStatistics(AbstractEvaluation evaluation, EvaluationResult result, StringBuffer sb) {
-      Statistics statiscs = computeStatistics(evaluation, result);
-      System.out.println(statiscs); // TODO: Append statistics to HTML report
+   protected void appendToolStatistics(AbstractEvaluation evaluation, EvaluationResult result, StringBuffer sb) {
+      Statistics statistics = computeStatistics(evaluation, result);
+      sb.append("<h1><a name=\"statistics\">Tool Comparison</a></h1>");
+      sb.append("<table border=\"1\">");
+      // Append header
+      sb.append("<tr>");
+      sb.append("<td rowspan=\"3\" colspan=\"3\">&nbsp;</td>");
+      for (IStatisticsFilter filter : statistics.getFilters()) {
+         sb.append("<td colspan=\"" + ((evaluation.getTools().length) * 6) + "\" align=\"center\"><b>");
+         sb.append(filter.getName());
+         sb.append("</b></td>");
+      }
+      sb.append("</tr>");
+      sb.append("<tr>");
+      for (@SuppressWarnings("unused") IStatisticsFilter filter : statistics.getFilters()) {
+         for (Tool tool : evaluation.getTools()) {
+            sb.append("<td colspan=\"6\" align=\"center\"><b>");
+            sb.append(tool.getName());
+            sb.append("</b></td>");
+         }
+      }
+      sb.append("</tr>");
+      sb.append("<tr>");
+      for (@SuppressWarnings("unused") IStatisticsFilter filter : statistics.getFilters()) {
+         for (@SuppressWarnings("unused") Tool tool : evaluation.getTools()) {
+            appendToolStatisticsQuestionHeaders(sb);
+         }
+      }
+      sb.append("</tr>");
+      // Append content
+      for (AbstractForm form : evaluation.getForms()) {
+         Map<AbstractPage, Integer> questionCount = countQuestionStatistics(statistics, form);
+         int formSpan = 0;
+         for (Integer value : questionCount.values()) {
+            formSpan += value;
+         }
+         if (formSpan > 0) {
+            sb.append("<tr>");
+            sb.append("<td rowspan=\"" + (formSpan + questionCount.size()) + "\" valign=\"top\"><b>");
+            sb.append(form.getName());
+            sb.append("</b></td>");
+            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 6)) + "\">&nbsp;</td>");
+            sb.append("</tr>");
+            for (AbstractPage page : form.getPages()) {
+               int pageSpan = questionCount.get(page);
+               if (pageSpan > 0) {
+                  sb.append("<tr>");
+                  sb.append("<td rowspan=\"" + (pageSpan + 1) + "\" valign=\"top\"><b>");
+                  sb.append(page.getName());
+                  sb.append("</b></td>");
+                  sb.append("<td>&nbsp;</td>");
+                  for (IStatisticsFilter filter : statistics.getFilters()) {
+                     FilteredStatistics fs = statistics.getFilteredStatistics(filter);
+                     Set<Tool> winningTimesTools = fs.computeWinningPageTimeTools(page);
+                     for (Tool tool : evaluation.getTools()) {
+                        PageStatistics ps = fs.getPageStatistics(tool, page);
+                        sb.append("<td colspan=\"2\">&nbsp;</td>");
+                        if (ps != null) {
+                           if (winningTimesTools != null && winningTimesTools.contains(tool)) {
+                              String color = winningTimesTools.size() == 1 ?
+                                             "blue" :
+                                             "#FF00FF";
+                              sb.append("<td align=\"right\"><font color=\"" + color + "\">");
+                              sb.append(ps.computeAverageTime());
+                              sb.append("&nbsp;ms</font></td>");
+                           }
+                           else {
+                              sb.append("<td align=\"right\">");
+                              sb.append(ps.computeAverageTime());
+                              sb.append("&nbsp;ms</td>");
+                           }
+                        }
+                        else {
+                           sb.append("<td>&nbsp;</td>");
+                        }
+                        sb.append("<td colspan=\"3\">&nbsp;</td>");
+                     }
+                  }
+                  sb.append("</tr>");
+                  if (page instanceof QuestionPage) {
+                     QuestionPage questionPage = (QuestionPage) page;
+                     for (AbstractQuestion question : questionPage.getQuestions()) {
+                        appendToolStatisticsQuestion(evaluation, statistics, question, sb);
+                     }
+                  }
+                  else {
+                     throw new IllegalStateException("Unsupported page: " + page);
+                  }
+               }
+            }
+         }
+      }
+      sb.append("</table>");
+      if (statistics.isMultipleValuedAnswersIgnored()) {
+         sb.append("<p><a href=\"#answers\">Answers with multiple values (gray colored) are ignored.</a></p>");
+      }
+   }
+   
+   /**
+    * Appends the tool static question headers.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendToolStatisticsQuestionHeaders(StringBuffer sb) {
+      sb.append("<td align=\"center\"><b>Average Correct</b></td>");
+      sb.append("<td align=\"center\"><b>Average Wrong</b></td>");
+      sb.append("<td align=\"center\"><b>Average Time</b></td>");
+      sb.append("<td align=\"center\"><b>Average Trust Correct</b></td>");
+      sb.append("<td align=\"center\"><b>Average Trust Wrong</b></td>");
+      sb.append("<td align=\"center\"><b>Average Trust Time</b></td>");
+   }
+
+   /**
+    * Appends the tool statistics of the given {@link AbstractQuestion}.
+    * @param evaluation The analyzed {@link AbstractEvaluation}.
+    * @param statistics The computed {@link Statistics}.
+    * @param question The {@link AbstractQuestion} to append.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendToolStatisticsQuestion(AbstractEvaluation evaluation, Statistics statistics, AbstractQuestion question, StringBuffer sb) {
+      if (statistics.containsToolQuestionStatistics(question)) {
+         sb.append("<tr>");
+         sb.append("<td><b>");
+         sb.append(question.getName());
+         sb.append("</b></td>");
+         for (IStatisticsFilter filter : statistics.getFilters()) {
+            FilteredStatistics fs = statistics.getFilteredStatistics(filter);
+            Set<Tool> winningCorrectTools = fs.computeWinningCorrectTools(question);
+            Set<Tool> winningCorrectTrustTools = fs.computeWinningCorrectTrustTools(question);
+            Set<Tool> winningTimesTools = fs.computeWinningTimeTools(question);
+            Set<Tool> winningTrustTimesTools = fs.computeWinningTrustTimeTools(question);
+            for (Tool tool : evaluation.getTools()) {
+               QuestionStatistics toolQs = fs.getQuestionStatistics(tool, question);
+               appendToolStatisticsQuestionValues(toolQs, winningCorrectTools, winningCorrectTrustTools, winningTimesTools, winningTrustTimesTools, tool, sb);
+            }
+         }
+         sb.append("</tr>");
+      }
+      if (question instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+         if (choiceQuestion.hasChildQuestions()) {
+            for (Choice choice : choiceQuestion.getChoices()) {
+               if (choice.countChildQuestions() > 0) {
+                  for (AbstractQuestion cildQuestion : choice.getChildQuestions()) {
+                     appendToolStatisticsQuestion(evaluation, statistics, cildQuestion, sb);
+                  }
+               }
+            }
+         }
+      }
+      else if (question instanceof SectionQuestion) {
+         SectionQuestion sectionQuestion = (SectionQuestion) question;
+         if (sectionQuestion.countChildQuestions() > 0) {
+            for (AbstractQuestion cildQuestion : sectionQuestion.getChildQuestions()) {
+               appendToolStatisticsQuestion(evaluation, statistics, cildQuestion, sb);
+            }
+         }
+      }
+   }
+   
+   /**
+    * Appends the values.
+    * @param qs The {@link QuestionStatistics} to append.
+    * @param winningCorrectTools The winning {@link Tool}s.
+    * @param winningCorrectTrustTools The winning {@link Tool}s.
+    * @param winningTimesTools The winning {@link Tool}s.
+    * @param winningTrustTimesTools The winning {@link Tool}s.
+    * @param currentTool The current {@link Tool}.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendToolStatisticsQuestionValues(QuestionStatistics qs, 
+                                                     Set<Tool> winningCorrectTools, 
+                                                     Set<Tool> winningCorrectTrustTools, 
+                                                     Set<Tool> winningTimesTools, 
+                                                     Set<Tool> winningTrustTimesTools,
+                                                     Tool currentTool, 
+                                                     StringBuffer sb) {
+      if (qs != null) {
+         if (winningCorrectTools != null && winningCorrectTools.contains(currentTool)) {
+            String color = winningCorrectTools.size() == 1 ?
+                           "blue" :
+                           "#FF00FF";
+            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageCorrect() + "&nbsp;%</font></td>");
+            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageWrong() + "&nbsp;%</font></td>");
+         }
+         else {
+            sb.append("<td align=\"right\">" + qs.computeAverageCorrect() + "&nbsp;%</td>");
+            sb.append("<td align=\"right\">" + qs.computeAverageWrong() + "&nbsp;%</td>");
+         }
+         if (winningTimesTools != null && winningTimesTools.contains(currentTool)) {
+            String color = winningTimesTools.size() == 1 ?
+                           "blue" :
+                           "#FF00FF";
+            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageTime() + "&nbsp;ms</font></td>");
+         }
+         else {
+            sb.append("<td align=\"right\">" + qs.computeAverageTime() + "&nbsp;ms</td>");
+         }
+         if (winningCorrectTrustTools != null && winningCorrectTrustTools.contains(currentTool)) {
+            String color = winningCorrectTrustTools.size() == 1 ?
+                           "blue" :
+                           "#FF00FF";
+            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageTrustCorrect() + "&nbsp;%</font></td>");
+            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageTrustWrong() + "&nbsp;%</font></td>");
+         }
+         else {
+            sb.append("<td align=\"right\">" + qs.computeAverageTrustCorrect() + "&nbsp;%</td>");
+            sb.append("<td align=\"right\">" + qs.computeAverageTrustWrong() + "&nbsp;%</td>");
+         }
+         if (winningTrustTimesTools != null && winningTrustTimesTools.contains(currentTool)) {
+            String color = winningTrustTimesTools.size() == 1 ?
+                           "blue" :
+                           "#FF00FF";
+            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageTrustTime() + "&nbsp;ms</font></td>");
+         }
+         else {
+            sb.append("<td align=\"right\">" + qs.computeAverageTrustTime() + "&nbsp;ms</td>");
+         }
+      }
+      else {
+         sb.append("<td colspan=\"6\">&nbsp;</td>");
+      }
+   }
+   
+   /**
+    * Counts the {@link QuestionStatistics}.
+    * @param statistics The {@link Statistics} to count in.
+    * @param form The {@link AbstractForm} to count.
+    * @return The results.
+    */
+   protected Map<AbstractPage, Integer> countQuestionStatistics(Statistics statistics, AbstractForm form) {
+      Map<AbstractPage, Integer> result = new HashMap<AbstractPage, Integer>();
+      for (AbstractPage page : form.getPages()) {
+         int pageCount = 0;
+         if (statistics.containsToolPageStatistics(page)) {
+            if (page instanceof QuestionPage) {
+               QuestionPage questionPage = (QuestionPage) page;
+               for (AbstractQuestion question : questionPage.getQuestions()) {
+                  pageCount += countQuestionStatistics(statistics, question);
+               }
+            }
+            else {
+               throw new IllegalStateException("Unsupported page: " + page);
+            }
+         }
+         result.put(page, pageCount);
+      }
+      return result;
+   }
+   
+   /**
+    * Counts the {@link QuestionStatistics}.
+    * @param statistics The {@link Statistics} to count in.
+    * @param question The current {@link AbstractQuestion}.
+    * @return The number of entries.
+    */
+   protected int countQuestionStatistics(Statistics statistics, AbstractQuestion question) {
+      int questionCount = 0;
+      if (statistics.containsToolQuestionStatistics(question)) {
+         questionCount++;
+      }
+      if (question instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+         if (choiceQuestion.hasChildQuestions()) {
+            for (Choice choice : choiceQuestion.getChoices()) {
+               if (choice.countChildQuestions() > 0) {
+                  for (AbstractQuestion cildQuestion : choice.getChildQuestions()) {
+                     questionCount += countQuestionStatistics(statistics, cildQuestion);
+                  }
+               }
+            }
+         }
+      }
+      else if (question instanceof SectionQuestion) {
+         SectionQuestion sectionQuestion = (SectionQuestion) question;
+         if (sectionQuestion.countChildQuestions() > 0) {
+            for (AbstractQuestion cildQuestion : sectionQuestion.getChildQuestions()) {
+               questionCount += countQuestionStatistics(statistics, cildQuestion);
+            }
+         }
+      }
+      return questionCount;
    }
 
    /**
@@ -88,11 +371,11 @@ public class HTMLReportEngine extends AbstractReportEngine {
                                         EvaluationResult result, 
                                         StringBuffer sb) {
       // Append table header
-      sb.append("<h1>Received Answers</h1>");
+      sb.append("<h1><a name=\"answers\">Received Answers</a></h1>");
       sb.append("<table border=\"1\">");
       // Append header
       List<Object> questionOrder = new LinkedList<Object>();
-      appendResultsHeader(evaluation, sb, questionOrder);
+      appendReceivedAnswersResultsHeader(evaluation, sb, questionOrder);
       // Append answers
       for (Entry<String, EvaluationAnswers> entry : result.getIdInputMap().entrySet()) {
          if (entry.getValue().hasMultipleValues()) {
@@ -119,20 +402,20 @@ public class HTMLReportEngine extends AbstractReportEngine {
                      }
                      if (!StringUtil.isTrimmedEmpty(questionInput.getValue())) {
                         Boolean correct = questionInput.checkCorrectness();
-                        appendTableCellValue(questionInput.getValue(), correct, questionInput.getValueSetAt(), sb);
+                        appendReceivedAnswersTableCellValue(questionInput.getValue(), correct, questionInput.getValueSetAt(), sb);
                         if (questionInput.getQuestion().isAskForTrust()) {
                            sb.append(" (");
                            Boolean trust = questionInput.getTrust();
                            if (trust != null) {
                               if (trust) {
-                                 appendTableCellValue("trusted", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
+                                 appendReceivedAnswersTableCellValue("trusted", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
                               }
                               else {
-                                 appendTableCellValue("untrusted", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
+                                 appendReceivedAnswersTableCellValue("untrusted", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
                               }
                            }
                            else {
-                              appendTableCellValue("trust&nbsp;missing", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
+                              appendReceivedAnswersTableCellValue("trust&nbsp;missing", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
                            }
                            sb.append(")");
                         }
@@ -204,7 +487,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
     * @param time The optional time.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendTableCellValue(String value, Boolean correct, long time, StringBuffer sb) {
+   protected void appendReceivedAnswersTableCellValue(String value, Boolean correct, long time, StringBuffer sb) {
       if (correct != null) {
          if (correct) {
             sb.append("<font color=\"green\">");
@@ -235,18 +518,18 @@ public class HTMLReportEngine extends AbstractReportEngine {
     * @param sb The {@link StringBuffer} to append to.
     * @param questionOrder The {@link List} with the order of the {@link AbstractQuestion} to fill.
     */
-   protected void appendResultsHeader(AbstractEvaluation evaluation, StringBuffer sb, List<Object> questionOrder) {
+   protected void appendReceivedAnswersResultsHeader(AbstractEvaluation evaluation, StringBuffer sb, List<Object> questionOrder) {
       // Create question header
       Map<Object, Integer> spanMap = new HashMap<Object, Integer>();
-      StringBuffer questionHeader = createQuestionHeader(evaluation, spanMap, questionOrder);
+      StringBuffer questionHeader = createReceivedAnswersQuestionHeader(evaluation, spanMap, questionOrder);
       sb.append("<tr>");
       sb.append("<td>&nbsp;</td>"); // UUID
       for (AbstractForm form : evaluation.getForms()) {
          int colspan = spanMap.get(form);
          if (colspan > 0) {
-            sb.append("<td colspan=\"" + colspan + "\">");
+            sb.append("<td colspan=\"" + colspan + "\"><b>");
             sb.append(form.getName());
-            sb.append("</td>");
+            sb.append("</b></td>");
          }
       }
       sb.append("</tr>");
@@ -256,9 +539,9 @@ public class HTMLReportEngine extends AbstractReportEngine {
          for (AbstractPage page : form.getPages()) {
             int colspan = spanMap.get(page);
             if (colspan > 0) {
-               sb.append("<td colspan=\"" + colspan + "\">");
+               sb.append("<td colspan=\"" + colspan + "\"><b>");
                sb.append(page.getName());
-               sb.append("</td>");
+               sb.append("</b></td>");
             }
          }
       }
@@ -275,9 +558,9 @@ public class HTMLReportEngine extends AbstractReportEngine {
     * @param questionOrder The {@link List} with the order of the {@link AbstractQuestion} to fill.
     * @return The computed question header row.
     */
-   protected StringBuffer createQuestionHeader(AbstractEvaluation evaluation, Map<Object, Integer> spanMap, List<Object> questionOrder) {
+   protected StringBuffer createReceivedAnswersQuestionHeader(AbstractEvaluation evaluation, Map<Object, Integer> spanMap, List<Object> questionOrder) {
       StringBuffer sb = new StringBuffer();
-      sb.append("<td>UUID</td>");
+      sb.append("<td><b>UUID</b></td>");
       for (AbstractForm form : evaluation.getForms()) {
          int formSpan = 0;
          for (AbstractPage page : form.getPages()) {
@@ -286,7 +569,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
                if (page instanceof QuestionPage) {
                   QuestionPage questionPage = (QuestionPage) page;
                   for (AbstractQuestion question : questionPage.getQuestions()) {
-                     pageSpan += appendQuestionHeader(question, sb, questionOrder);
+                     pageSpan += appendReceivedAnswersQuestionHeader(question, sb, questionOrder);
                   }
                }
                else {
@@ -294,13 +577,13 @@ public class HTMLReportEngine extends AbstractReportEngine {
                }
                boolean addPageToOrder = false;
                if (form.isCollectTimes()) {
-                  sb.append("<td>Shown Time</td>");
+                  sb.append("<td><b>Shown Time</b></td>");
                   addPageToOrder = true;
                   pageSpan++;
                }
                if (form instanceof RandomForm) {
                   if (page.isToolBased()) {
-                     sb.append("<td>Tool</td>");
+                     sb.append("<td><b>Tool</b></td>");
                      addPageToOrder = true;
                      pageSpan++;
                   }
@@ -324,13 +607,13 @@ public class HTMLReportEngine extends AbstractReportEngine {
     * @param questionOrder The {@link List} with the order of the {@link AbstractQuestion} to fill.
     * @return The number of appended questions.
     */
-   protected int appendQuestionHeader(AbstractQuestion question, StringBuffer sb, List<Object> questionOrder) {
+   protected int appendReceivedAnswersQuestionHeader(AbstractQuestion question, StringBuffer sb, List<Object> questionOrder) {
       int questionCount = 0;
       if (question.isEditable()) {
          questionOrder.add(question);
-         sb.append("<td>");
+         sb.append("<td><b>");
          sb.append(question.getName());
-         sb.append("</td>");
+         sb.append("</b></td>");
          questionCount++;
       }
       if (question instanceof AbstractChoicesQuestion) {
@@ -339,7 +622,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
             for (Choice choice : choiceQuestion.getChoices()) {
                if (choice.countChildQuestions() > 0) {
                   for (AbstractQuestion cildQuestion : choice.getChildQuestions()) {
-                     questionCount += appendQuestionHeader(cildQuestion, sb, questionOrder);
+                     questionCount += appendReceivedAnswersQuestionHeader(cildQuestion, sb, questionOrder);
                   }
                }
             }
@@ -349,7 +632,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
          SectionQuestion sectionQuestion = (SectionQuestion) question;
          if (sectionQuestion.countChildQuestions() > 0) {
             for (AbstractQuestion cildQuestion : sectionQuestion.getChildQuestions()) {
-               questionCount += appendQuestionHeader(cildQuestion, sb, questionOrder);
+               questionCount += appendReceivedAnswersQuestionHeader(cildQuestion, sb, questionOrder);
             }
          }
       }

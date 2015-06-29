@@ -52,6 +52,11 @@ public class PageStatistics {
     * @return The average time.
     */
    public BigInteger computeAverageTime() {
-      return timesSum.divide(timesCount);
+      if (!BigInteger.ZERO.equals(timesCount)) {
+         return timesSum.divide(timesCount);
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
 }

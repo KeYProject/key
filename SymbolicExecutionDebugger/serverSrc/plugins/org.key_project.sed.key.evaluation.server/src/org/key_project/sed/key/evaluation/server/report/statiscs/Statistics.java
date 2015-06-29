@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.server.report.statiscs;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 
 /**
  * The statistics computed by {@link AbstractReportEngine#computeStatistics(AbstractEvaluation, EvaluationResult)}.
@@ -77,7 +79,19 @@ public class Statistics {
                            throw new IllegalStateException("Multiple page inputs found.");
                         }
                         AbstractPageInput<?> pageInput = pageInputs.get(0);
-                        filteredStatistics.update(pageInput);
+                        if (pageInput.getPage().isToolBased()) {
+                           List<Tool> tools = answer.getTools(pageInput.getPage());
+                           if (tools == null) {
+                              throw new IllegalStateException("Tools are missing.");
+                           }
+                           if (tools.size() > 1) {
+                              throw new IllegalStateException("Multiple tools found.");
+                           }
+                           filteredStatistics.update(pageInput, tools.get(0));
+                        }
+                        else {
+                           filteredStatistics.update(pageInput, null);
+                        }
                      }
                   }
                }
@@ -112,5 +126,53 @@ public class Statistics {
     */
    public boolean isMultipleValuedAnswersIgnored() {
       return multipleValuedAnswersIgnored;
+   }
+   
+   /**
+    * Checks if at least one of the {@link FilteredStatistics} contains
+    * {@link PageStatistics} for the given {@link AbstractPage}.
+    * @param page The {@link AbstractPage} to check.
+    * @return {@code true} {@link PageStatistics} available, {@code false} {@link PageStatistics} not available.
+    */
+   public boolean containsToolPageStatistics(final AbstractPage page) {
+      return CollectionUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
+         @Override
+         public boolean select(IStatisticsFilter element) {
+            FilteredStatistics fs = filteredStatiscs.get(element);
+            boolean toolQuestion = false;
+            Iterator<Tool> toolsIter = fs.getTools().iterator();
+            while (!toolQuestion && toolsIter.hasNext()) {
+               Tool tool = toolsIter.next();
+               if (fs.getPageStatistics(tool).containsKey(page)) {
+                  toolQuestion = true;
+               }
+            }
+            return toolQuestion;
+         }
+      }) != null;
+   }
+
+   /**
+    * Checks if at least one of the {@link FilteredStatistics} contains
+    * {@link QuestionStatistics} for the given {@link AbstractQuestion}.
+    * @param question The {@link AbstractQuestion} to check.
+    * @return {@code true} {@link QuestionStatistics} available, {@code false} {@link QuestionStatistics} not available.
+    */
+   public boolean containsToolQuestionStatistics(final AbstractQuestion question) {
+      return CollectionUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
+         @Override
+         public boolean select(IStatisticsFilter element) {
+            FilteredStatistics fs = filteredStatiscs.get(element);
+            boolean toolQuestion = false;
+            Iterator<Tool> toolsIter = fs.getTools().iterator();
+            while (!toolQuestion && toolsIter.hasNext()) {
+               Tool tool = toolsIter.next();
+               if (fs.getQuestionStatistics(tool).containsKey(question)) {
+                  toolQuestion = true;
+               }
+            }
+            return toolQuestion;
+         }
+      }) != null;
    }
 }

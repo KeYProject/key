@@ -153,7 +153,12 @@ public class QuestionStatistics {
     * @return The average value time.
     */
    public BigInteger computeAverageTime() {
-      return timesSum.divide(timesCount);
+      if (!BigInteger.ZERO.equals(timesCount)) {
+         return timesSum.divide(timesCount);
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
    
    /**
@@ -161,7 +166,12 @@ public class QuestionStatistics {
     * @return The average trust time.
     */
    public BigInteger computeAverageTrustTime() {
-      return trustTimesSum.divide(trustTimesCount);
+      if (!BigInteger.ZERO.equals(trustTimesCount)) {
+         return trustTimesSum.divide(trustTimesCount);
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
    
    /**
@@ -169,7 +179,12 @@ public class QuestionStatistics {
     * @return The average correct value.
     */
    public BigInteger computeAverageCorrect() {
-      return (correctCount.add(wrongCount)).divide(correctCount);
+      if (!BigInteger.ZERO.equals(correctCount.add(wrongCount))) {
+         return correctCount.multiply(BigInteger.valueOf(100)).divide(correctCount.add(wrongCount));
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
    
    /**
@@ -177,7 +192,12 @@ public class QuestionStatistics {
     * @return The average correct value.
     */
    public BigInteger computeAverageTrustCorrect() {
-      return (correctTrustCount.add(wrongTrustCount)).divide(correctTrustCount);
+      if (!BigInteger.ZERO.equals(correctTrustCount.add(wrongTrustCount))) {
+         return correctTrustCount.multiply(BigInteger.valueOf(100)).divide(correctTrustCount.add(wrongTrustCount));
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
    
    /**
@@ -185,7 +205,12 @@ public class QuestionStatistics {
     * @return The average correct value.
     */
    public BigInteger computeAverageWrong() {
-      return (correctCount.add(wrongCount)).divide(wrongCount);
+      if (!BigInteger.ZERO.equals(correctCount.add(wrongCount))) {
+         return wrongCount.multiply(BigInteger.valueOf(100)).divide(correctCount.add(wrongCount));
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
    
    /**
@@ -193,6 +218,11 @@ public class QuestionStatistics {
     * @return The average correct value.
     */
    public BigInteger computeAverageTrustWrong() {
-      return (correctTrustCount.add(wrongTrustCount)).divide(wrongTrustCount);
+      if (!BigInteger.ZERO.equals(correctTrustCount.add(wrongTrustCount))) {
+         return wrongTrustCount.multiply(BigInteger.valueOf(100)).divide(correctTrustCount.add(wrongTrustCount));
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
 }
