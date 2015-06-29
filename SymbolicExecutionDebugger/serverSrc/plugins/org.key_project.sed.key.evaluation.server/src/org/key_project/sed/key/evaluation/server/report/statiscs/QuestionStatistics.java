@@ -51,6 +51,41 @@ public class QuestionStatistics {
    private BigInteger trustTimesSum = BigInteger.ZERO;
 
    /**
+    * Default constructor.
+    */
+   public QuestionStatistics() {
+   }
+   
+   /**
+    * Constructor with specified values.
+    * @param correctCount The initial value to set.
+    * @param wrongCount The initial value to set.
+    * @param correctTrustCount The initial value to set.
+    * @param wrongTrustCount The initial value to set.
+    * @param timesCount The initial value to set.
+    * @param timesSum The initial value to set.
+    * @param trustTimesCount The initial value to set.
+    * @param trustTimesSum The initial value to set.
+    */
+   public QuestionStatistics(BigInteger correctCount, 
+                             BigInteger wrongCount, 
+                             BigInteger correctTrustCount, 
+                             BigInteger wrongTrustCount, 
+                             BigInteger timesCount, 
+                             BigInteger timesSum, 
+                             BigInteger trustTimesCount, 
+                             BigInteger trustTimesSum) {
+      this.correctCount = correctCount;
+      this.wrongCount = wrongCount;
+      this.correctTrustCount = correctTrustCount;
+      this.wrongTrustCount = wrongTrustCount;
+      this.timesCount = timesCount;
+      this.timesSum = timesSum;
+      this.trustTimesCount = trustTimesCount;
+      this.trustTimesSum = trustTimesSum;
+   }
+
+   /**
     * Updates the statics.
     * @param correct
     * @param correctTrust
@@ -178,7 +213,7 @@ public class QuestionStatistics {
     * Computes how often the answer was correct in average.
     * @return The average correct value.
     */
-   public BigInteger computeAverageCorrect() {
+   public BigInteger computeCorrect() {
       if (!BigInteger.ZERO.equals(correctCount.add(wrongCount))) {
          return correctCount.multiply(BigInteger.valueOf(100)).divide(correctCount.add(wrongCount));
       }
@@ -191,7 +226,7 @@ public class QuestionStatistics {
     * Computes how often the trust in the answer was correct in average.
     * @return The average correct value.
     */
-   public BigInteger computeAverageTrustCorrect() {
+   public BigInteger computeTrustCorrect() {
       if (!BigInteger.ZERO.equals(correctTrustCount.add(wrongTrustCount))) {
          return correctTrustCount.multiply(BigInteger.valueOf(100)).divide(correctTrustCount.add(wrongTrustCount));
       }
@@ -204,7 +239,7 @@ public class QuestionStatistics {
     * Computes how often the answer was wrong in average.
     * @return The average correct value.
     */
-   public BigInteger computeAverageWrong() {
+   public BigInteger computeWrong() {
       if (!BigInteger.ZERO.equals(correctCount.add(wrongCount))) {
          return wrongCount.multiply(BigInteger.valueOf(100)).divide(correctCount.add(wrongCount));
       }
@@ -217,7 +252,7 @@ public class QuestionStatistics {
     * Computes how often the trust in the answer was wrong in average.
     * @return The average correct value.
     */
-   public BigInteger computeAverageTrustWrong() {
+   public BigInteger computeTrustWrong() {
       if (!BigInteger.ZERO.equals(correctTrustCount.add(wrongTrustCount))) {
          return wrongTrustCount.multiply(BigInteger.valueOf(100)).divide(correctTrustCount.add(wrongTrustCount));
       }

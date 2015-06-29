@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.server.report;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -118,12 +119,16 @@ public class HTMLReportEngine extends AbstractReportEngine {
       for (AbstractForm form : evaluation.getForms()) {
          Map<AbstractPage, Integer> questionCount = countQuestionStatistics(statistics, form);
          int formSpan = 0;
+         int formPagesSpan = 0;
          for (Integer value : questionCount.values()) {
+            if (value > 0) {
+               formPagesSpan++;
+            }
             formSpan += value;
          }
          if (formSpan > 0) {
             sb.append("<tr>");
-            sb.append("<td rowspan=\"" + (formSpan + questionCount.size()) + "\" valign=\"top\"><b>");
+            sb.append("<td rowspan=\"" + (2 + formSpan + formPagesSpan) + "\" valign=\"top\"><b>");
             sb.append(form.getName());
             sb.append("</b></td>");
             sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 6 * statistics.getFilters().size())) + "\">&nbsp;</td>");
@@ -175,6 +180,27 @@ public class HTMLReportEngine extends AbstractReportEngine {
                   }
                }
             }
+            // Append all together
+            sb.append("<tr>");
+            sb.append("<td colspan=\"2\"><b>All Together</b></td>");
+            for (IStatisticsFilter filter : statistics.getFilters()) {
+               FilteredStatistics fs = statistics.getFilteredStatistics(filter);
+               Map<Tool, QuestionStatistics> questionStatistics = new HashMap<Tool, QuestionStatistics>();
+               for (Tool tool : evaluation.getTools()) {
+                  questionStatistics.put(tool, fs.computeAllTogetherQuestionStatistics(tool));
+               }
+               for (Tool tool : evaluation.getTools()) {
+                  appendToolStatisticsQuestionValues(questionStatistics.get(tool), 
+                                                     FilteredStatistics.computeWinningCorrectTools(questionStatistics), 
+                                                     FilteredStatistics.computeWinningCorrectTrustTools(questionStatistics), 
+                                                     FilteredStatistics.computeWinningTimeTools(questionStatistics), 
+                                                     FilteredStatistics.computeWinningTrustTimeTools(questionStatistics), 
+                                                     tool, 
+                                                     true, 
+                                                     sb);
+               }
+            }
+            sb.append("</tr>");
          }
       }
       sb.append("</table>");
@@ -188,11 +214,11 @@ public class HTMLReportEngine extends AbstractReportEngine {
     * @param sb The {@link StringBuffer} to append to.
     */
    protected void appendToolStatisticsQuestionHeaders(StringBuffer sb) {
-      sb.append("<td align=\"center\"><b>Average Correct</b></td>");
-      sb.append("<td align=\"center\"><b>Average Wrong</b></td>");
+      sb.append("<td align=\"center\"><b>Correct</b></td>");
+      sb.append("<td align=\"center\"><b>Wrong</b></td>");
       sb.append("<td align=\"center\"><b>Average Time</b></td>");
-      sb.append("<td align=\"center\"><b>Average Trust Correct</b></td>");
-      sb.append("<td align=\"center\"><b>Average Trust Wrong</b></td>");
+      sb.append("<td align=\"center\"><b>Trust Correct</b></td>");
+      sb.append("<td align=\"center\"><b>Trust Wrong</b></td>");
       sb.append("<td align=\"center\"><b>Average Trust Time</b></td>");
    }
 
@@ -217,7 +243,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
             Set<Tool> winningTrustTimesTools = fs.computeWinningTrustTimeTools(question);
             for (Tool tool : evaluation.getTools()) {
                QuestionStatistics toolQs = fs.getQuestionStatistics(tool, question);
-               appendToolStatisticsQuestionValues(toolQs, winningCorrectTools, winningCorrectTrustTools, winningTimesTools, winningTrustTimesTools, tool, sb);
+               appendToolStatisticsQuestionValues(toolQs, winningCorrectTools, winningCorrectTrustTools, winningTimesTools, winningTrustTimesTools, tool, false, sb);
             }
          }
          sb.append("</tr>");
@@ -252,6 +278,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
     * @param winningTimesTools The winning {@link Tool}s.
     * @param winningTrustTimesTools The winning {@link Tool}s.
     * @param currentTool The current {@link Tool}.
+    * @param bold {@code true} values are bold, {@code false} values are normla,
     * @param sb The {@link StringBuffer} to append to.
     */
    protected void appendToolStatisticsQuestionValues(QuestionStatistics qs, 
@@ -260,52 +287,115 @@ public class HTMLReportEngine extends AbstractReportEngine {
                                                      Set<Tool> winningTimesTools, 
                                                      Set<Tool> winningTrustTimesTools,
                                                      Tool currentTool, 
+                                                     boolean bold,
                                                      StringBuffer sb) {
       if (qs != null) {
-         if (winningCorrectTools != null && winningCorrectTools.contains(currentTool)) {
-            String color = winningCorrectTools.size() == 1 ?
-                           "blue" :
-                           "#FF00FF";
-            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageCorrect() + "&nbsp;%</font></td>");
-            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageWrong() + "&nbsp;%</font></td>");
-         }
-         else {
-            sb.append("<td align=\"right\">" + qs.computeAverageCorrect() + "&nbsp;%</td>");
-            sb.append("<td align=\"right\">" + qs.computeAverageWrong() + "&nbsp;%</td>");
-         }
-         if (winningTimesTools != null && winningTimesTools.contains(currentTool)) {
-            String color = winningTimesTools.size() == 1 ?
-                           "blue" :
-                           "#FF00FF";
-            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageTime() + "&nbsp;ms</font></td>");
-         }
-         else {
-            sb.append("<td align=\"right\">" + qs.computeAverageTime() + "&nbsp;ms</td>");
-         }
-         if (winningCorrectTrustTools != null && winningCorrectTrustTools.contains(currentTool)) {
-            String color = winningCorrectTrustTools.size() == 1 ?
-                           "blue" :
-                           "#FF00FF";
-            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageTrustCorrect() + "&nbsp;%</font></td>");
-            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageTrustWrong() + "&nbsp;%</font></td>");
-         }
-         else {
-            sb.append("<td align=\"right\">" + qs.computeAverageTrustCorrect() + "&nbsp;%</td>");
-            sb.append("<td align=\"right\">" + qs.computeAverageTrustWrong() + "&nbsp;%</td>");
-         }
-         if (winningTrustTimesTools != null && winningTrustTimesTools.contains(currentTool)) {
-            String color = winningTrustTimesTools.size() == 1 ?
-                           "blue" :
-                           "#FF00FF";
-            sb.append("<td align=\"right\"><font color=\"" + color + "\">" + qs.computeAverageTrustTime() + "&nbsp;ms</font></td>");
-         }
-         else {
-            sb.append("<td align=\"right\">" + qs.computeAverageTrustTime() + "&nbsp;ms</td>");
-         }
+         appendToolStatisticsQuestionValues(qs.computeCorrect(), 
+                                            qs.computeWrong(), 
+                                            qs.computeAverageTime(), 
+                                            qs.computeTrustCorrect(),
+                                            qs.computeTrustWrong(),
+                                            qs.computeAverageTrustTime(),
+                                            winningCorrectTools, 
+                                            winningCorrectTrustTools, 
+                                            winningTimesTools, 
+                                            winningTrustTimesTools, 
+                                            currentTool, 
+                                            bold,
+                                            sb);
       }
       else {
          sb.append("<td colspan=\"6\">&nbsp;</td>");
       }
+   }
+   
+   /**
+    * Appends the values.
+    * @param correct The computed value to append.
+    * @param wrong The computed value to append.
+    * @param averageTime The computed value to append.
+    * @param trustCorrect The computed value to append.
+    * @param trustWrong The computed value to append.
+    * @param averageTrustTime The computed value to append.
+    * @param winningCorrectTools The winning {@link Tool}s.
+    * @param winningCorrectTrustTools The winning {@link Tool}s.
+    * @param winningTimesTools The winning {@link Tool}s.
+    * @param winningTrustTimesTools The winning {@link Tool}s.
+    * @param currentTool The current {@link Tool}.
+    * @param bold {@code true} values are bold, {@code false} values are normla,
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendToolStatisticsQuestionValues(BigInteger correct,
+                                                     BigInteger wrong,
+                                                     BigInteger averageTime,
+                                                     BigInteger trustCorrect,
+                                                     BigInteger trustWrong,
+                                                     BigInteger averageTrustTime,
+                                                     Set<Tool> winningCorrectTools, 
+                                                     Set<Tool> winningCorrectTrustTools, 
+                                                     Set<Tool> winningTimesTools, 
+                                                     Set<Tool> winningTrustTimesTools,
+                                                     Tool currentTool, 
+                                                     boolean bold,
+                                                     StringBuffer sb) {
+      if (winningCorrectTools != null && winningCorrectTools.contains(currentTool)) {
+         String color = winningCorrectTools.size() == 1 ?
+                        "blue" :
+                        "#FF00FF";
+         appendToolStatisticsQuestionValue(bold, color, correct + "&nbsp;%", sb);
+         appendToolStatisticsQuestionValue(bold, color, wrong + "&nbsp;%", sb);
+      }
+      else {
+         appendToolStatisticsQuestionValue(bold, null, correct + "&nbsp;%", sb);
+         appendToolStatisticsQuestionValue(bold, null, wrong + "&nbsp;%", sb);
+      }
+      if (winningTimesTools != null && winningTimesTools.contains(currentTool)) {
+         String color = winningTimesTools.size() == 1 ?
+                        "blue" :
+                        "#FF00FF";
+         appendToolStatisticsQuestionValue(bold, color, averageTime + "&nbsp;ms", sb);
+      }
+      else {
+         appendToolStatisticsQuestionValue(bold, null, averageTime + "&nbsp;ms", sb);
+      }
+      if (winningCorrectTrustTools != null && winningCorrectTrustTools.contains(currentTool)) {
+         String color = winningCorrectTrustTools.size() == 1 ?
+                        "blue" :
+                        "#FF00FF";
+         appendToolStatisticsQuestionValue(bold, color, trustCorrect + "&nbsp;%", sb);
+         appendToolStatisticsQuestionValue(bold, color, trustWrong + "&nbsp;%", sb);
+      }
+      else {
+         appendToolStatisticsQuestionValue(bold, null, trustCorrect + "&nbsp;%", sb);
+         appendToolStatisticsQuestionValue(bold, null, trustWrong + "&nbsp;%", sb);
+      }
+      if (winningTrustTimesTools != null && winningTrustTimesTools.contains(currentTool)) {
+         String color = winningTrustTimesTools.size() == 1 ?
+                        "blue" :
+                        "#FF00FF";
+         appendToolStatisticsQuestionValue(bold, color, averageTrustTime + "&nbsp;ms", sb);
+      }
+      else {
+         appendToolStatisticsQuestionValue(bold, null, averageTrustTime + "&nbsp;ms", sb);
+      }
+   }
+   
+   protected void appendToolStatisticsQuestionValue(boolean bold, String fontColor, Object value, StringBuffer sb) {
+      sb.append("<td align=\"right\">");
+      if (bold) {
+         sb.append("<b>");
+      }
+      if (fontColor != null) {
+         sb.append("<font color=\"" + fontColor + "\">");
+      }
+      sb.append(value);
+      if (fontColor != null) {
+         sb.append("</font>");
+      }
+      if (bold) {
+         sb.append("</b>");
+      }
+      sb.append("</td>");
    }
    
    /**

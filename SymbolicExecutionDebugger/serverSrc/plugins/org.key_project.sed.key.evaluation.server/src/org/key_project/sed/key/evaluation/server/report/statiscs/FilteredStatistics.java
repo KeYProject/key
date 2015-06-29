@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
@@ -175,19 +176,41 @@ public class FilteredStatistics {
     * @return The {@link Set} of winning {@link Tool}s.
     */
    public Set<Tool> computeWinningCorrectTools(AbstractQuestion question) {
+      return computeWinningCorrectTools(createToolQuestionMap(question));
+   }
+   
+   /**
+    * Creates a {@link Map} containing all {@link Tool} specific {@link QuestionStatistics}.
+    * @param question The {@link AbstractQuestion} of interest.
+    * @return The created {@link Map}.
+    */
+   protected Map<Tool, QuestionStatistics> createToolQuestionMap(AbstractQuestion question) {
+      Map<Tool, QuestionStatistics> questionStatistics = new HashMap<Tool, QuestionStatistics>();
+      for (Tool tool : getTools()) {
+         questionStatistics.put(tool, getQuestionStatistics(tool, question));
+      }
+      return questionStatistics;
+   }
+   
+   /**
+    * Computes the winning {@link Tool}s in terms of correctness.
+    * @param questionStatistics The {@link QuestionStatistics} to analyze.
+    * @return The {@link Set} of winning {@link Tool}s.
+    */
+   public static Set<Tool> computeWinningCorrectTools(Map<Tool, QuestionStatistics> questionStatistics) {
       BigInteger max = BigInteger.valueOf(-1);
       Set<Tool> maxTools = null;
-      for (Tool tool : getTools()) {
-         QuestionStatistics qs = getQuestionStatistics(tool, question);
+      for (Entry<Tool, QuestionStatistics> entry : questionStatistics.entrySet()) {
+         QuestionStatistics qs = entry.getValue();
          if (qs != null) {
-            BigInteger current = qs.computeAverageCorrect();
+            BigInteger current = qs.computeCorrect();
             if (current.compareTo(max) > 0) {
                max = current;
                maxTools = new HashSet<Tool>();
-               maxTools.add(tool);
+               maxTools.add(entry.getKey());
             }
             else if (current.compareTo(max) == 0) {
-               maxTools.add(tool);
+               maxTools.add(entry.getKey());
             }
          }
       }
@@ -200,24 +223,35 @@ public class FilteredStatistics {
     * @return The {@link Set} of winning {@link Tool}s.
     */
    public Set<Tool> computeWinningCorrectTrustTools(AbstractQuestion question) {
+      return computeWinningCorrectTrustTools(createToolQuestionMap(question));
+   }
+
+   
+   /**
+    * Computes the winning {@link Tool}s in terms of trust.
+    * @param questionStatistics The {@link QuestionStatistics} to analyze.
+    * @return The {@link Set} of winning {@link Tool}s.
+    */
+   public static Set<Tool> computeWinningCorrectTrustTools(Map<Tool, QuestionStatistics> questionStatistics) {
       BigInteger max = BigInteger.valueOf(-1);
       Set<Tool> maxTools = null;
-      for (Tool tool : getTools()) {
-         QuestionStatistics qs = getQuestionStatistics(tool, question);
+      for (Entry<Tool, QuestionStatistics> entry : questionStatistics.entrySet()) {
+         QuestionStatistics qs = entry.getValue();
          if (qs != null) {
-            BigInteger current = qs.computeAverageTrustCorrect();
+            BigInteger current = qs.computeTrustCorrect();
             if (current.compareTo(max) > 0) {
                max = current;
                maxTools = new HashSet<Tool>();
-               maxTools.add(tool);
+               maxTools.add(entry.getKey());
             }
             else if (current.compareTo(max) == 0) {
-               maxTools.add(tool);
+               maxTools.add(entry.getKey());
             }
          }
       }
       return maxTools;
    }
+   
 
    /**
     * Computes the winning {@link Tool}s in terms of time.
@@ -225,19 +259,28 @@ public class FilteredStatistics {
     * @return The {@link Set} of winning {@link Tool}s.
     */
    public Set<Tool> computeWinningTimeTools(AbstractQuestion question) {
+      return computeWinningTimeTools(createToolQuestionMap(question));
+   }
+   
+   /**
+    * Computes the winning {@link Tool}s in terms of time.
+    * @param questionStatistics The {@link QuestionStatistics} to analyze.
+    * @return The {@link Set} of winning {@link Tool}s.
+    */
+   public static Set<Tool> computeWinningTimeTools(Map<Tool, QuestionStatistics> questionStatistics) {
       BigInteger min = null;
       Set<Tool> minTools = null;
-      for (Tool tool : getTools()) {
-         QuestionStatistics qs = getQuestionStatistics(tool, question);
+      for (Entry<Tool, QuestionStatistics> entry : questionStatistics.entrySet()) {
+         QuestionStatistics qs = entry.getValue();
          if (qs != null) {
             BigInteger current = qs.computeAverageTime();
             if (min == null || current.compareTo(min) < 0) {
                min = current;
                minTools = new HashSet<Tool>();
-               minTools.add(tool);
+               minTools.add(entry.getKey());
             }
             else if (current.compareTo(min) == 0) {
-               minTools.add(tool);
+               minTools.add(entry.getKey());
             }
          }
       }
@@ -250,19 +293,28 @@ public class FilteredStatistics {
     * @return The {@link Set} of winning {@link Tool}s.
     */
    public Set<Tool> computeWinningTrustTimeTools(AbstractQuestion question) {
+      return computeWinningTrustTimeTools(createToolQuestionMap(question));
+   }
+   
+   /**
+    * Computes the winning {@link Tool}s in terms of trust time.
+    * @param questionStatistics The {@link QuestionStatistics} to analyze.
+    * @return The {@link Set} of winning {@link Tool}s.
+    */
+   public static Set<Tool> computeWinningTrustTimeTools(Map<Tool, QuestionStatistics> questionStatistics) {
       BigInteger min = null;
       Set<Tool> minTools = null;
-      for (Tool tool : getTools()) {
-         QuestionStatistics qs = getQuestionStatistics(tool, question);
+      for (Entry<Tool, QuestionStatistics> entry : questionStatistics.entrySet()) {
+         QuestionStatistics qs = entry.getValue();
          if (qs != null) {
             BigInteger current = qs.computeAverageTrustTime();
             if (min == null || current.compareTo(min) < 0) {
                min = current;
                minTools = new HashSet<Tool>();
-               minTools.add(tool);
+               minTools.add(entry.getKey());
             }
             else if (current.compareTo(min) == 0) {
-               minTools.add(tool);
+               minTools.add(entry.getKey());
             }
          }
       }
@@ -307,5 +359,36 @@ public class FilteredStatistics {
     */
    protected void updateAnswersCount() {
       answersCount = answersCount.add(BigInteger.ONE);
+   }
+
+   /**
+    * Computes a {@link QuestionStatistics} based on all available
+    * {@link Tool} specific {@link QuestionStatistics}.
+    * @param tool The {@link Tool} of interest.
+    * @return The computed {@link QuestionStatistics}.
+    */
+   public QuestionStatistics computeAllTogetherQuestionStatistics(Tool tool) {
+      BigInteger correctCount = BigInteger.ZERO;
+      BigInteger wrongCount = BigInteger.ZERO;
+      BigInteger correctTrustCount = BigInteger.ZERO;
+      BigInteger wrongTrustCount = BigInteger.ZERO;
+      BigInteger timesCount = BigInteger.ZERO;
+      BigInteger timesSum = BigInteger.ZERO;
+      BigInteger trustTimesCount = BigInteger.ZERO;
+      BigInteger trustTimesSum = BigInteger.ZERO;
+      Map<AbstractQuestion, QuestionStatistics> toolQuestions = getQuestionStatistics(tool);
+      if (toolQuestions != null) {
+         for (QuestionStatistics qs : toolQuestions.values()) {
+            correctCount = correctCount.add(qs.getCorrectCount());
+            wrongCount = wrongCount.add(qs.getWrongCount());
+            correctTrustCount = correctTrustCount.add(qs.getCorrectTrustCount());
+            wrongTrustCount = wrongTrustCount.add(qs.getWrongTrustCount());
+            timesCount = timesCount.add(qs.getTimesCount());
+            timesSum = timesSum.add(qs.getTimesSum());
+            trustTimesCount = trustTimesCount.add(qs.getTrustTimesCount());
+            trustTimesSum = trustTimesSum.add(qs.getTrustTimesSum());
+         }
+      }
+      return new QuestionStatistics(correctCount, wrongCount, correctTrustCount, wrongTrustCount, timesCount, timesSum, trustTimesCount, trustTimesSum);
    }
 }
