@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Choice;
+import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -50,28 +53,7 @@ public class Statistics {
                   FilteredStatistics filteredStatistics = filteredStatiscs.get(filter);
                   filteredStatistics.updateAnswersCount();
                   for (AbstractQuestion question : answer.getQuestions()) {
-                     if (question.isEditable()) {
-                        List<QuestionInput> questionInputs = answer.getQuestionInputs(question);
-                        if (!CollectionUtil.isEmpty(questionInputs)) {
-                           if (questionInputs.size() > 1) {
-                              throw new IllegalStateException("Multiple question inputs found.");
-                           }
-                           QuestionInput questionInput = questionInputs.get(0);
-                           if (questionInput.getPageInput().getPage().isToolBased()) {
-                              List<Tool> tools = answer.getTools(questionInput.getPageInput().getPage());
-                              if (tools == null) {
-                                 throw new IllegalStateException("Tools are missing.");
-                              }
-                              if (tools.size() > 1) {
-                                 throw new IllegalStateException("Multiple tools found.");
-                              }
-                              filteredStatistics.update(questionInput, tools.get(0));
-                           }
-                           else {
-                              filteredStatistics.update(questionInput, null);
-                           }
-                        }
-                     }
+                     initQuestion(filteredStatistics, answer, question);
                   }
                   for (AbstractPage page : answer.getPages()) {
                      List<AbstractPageInput<?>> pageInputs = answer.getPageInputs(page);
@@ -100,6 +82,58 @@ public class Statistics {
          }
          else {
             multipleValuedAnswersIgnored = true;
+         }
+      }
+   }
+  
+   /**
+    * Initializes the statistics of the given {@link AbstractQuestion}.
+    * @param filteredStatistics The current {@link FilteredStatistics}.
+    * @param answer The current {@link EvaluationAnswers}.
+    * @param question The current {@link AbstractQuestion}.
+    */
+   private void initQuestion(FilteredStatistics filteredStatistics, EvaluationAnswers answer, AbstractQuestion question) {
+      if (question.isEditable()) {
+         List<QuestionInput> questionInputs = answer.getQuestionInputs(question);
+         if (!CollectionUtil.isEmpty(questionInputs)) {
+            if (questionInputs.size() > 1) {
+               throw new IllegalStateException("Multiple question inputs found.");
+            }
+            QuestionInput questionInput = questionInputs.get(0);
+            if (questionInput.getPageInput().getPage().isToolBased()) {
+               List<Tool> tools = answer.getTools(questionInput.getPageInput().getPage());
+               if (tools == null) {
+                  throw new IllegalStateException("Tools are missing.");
+               }
+               if (tools.size() > 1) {
+                  throw new IllegalStateException("Multiple tools found.");
+               }
+               filteredStatistics.update(questionInput, tools.get(0));
+            }
+            else {
+               filteredStatistics.update(questionInput, null);
+            }
+         }
+      }
+      // Child questions
+      if (question instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+         if (choiceQuestion.hasChildQuestions()) {
+            for (Choice choice : choiceQuestion.getChoices()) {
+               if (choice.countChildQuestions() > 0) {
+                  for (AbstractQuestion cildQuestion : choice.getChildQuestions()) {
+                     initQuestion(filteredStatistics, answer, cildQuestion);
+                  }
+               }
+            }
+         }
+      }
+      else if (question instanceof SectionQuestion) {
+         SectionQuestion sectionQuestion = (SectionQuestion) question;
+         if (sectionQuestion.countChildQuestions() > 0) {
+            for (AbstractQuestion cildQuestion : sectionQuestion.getChildQuestions()) {
+               initQuestion(filteredStatistics, answer, cildQuestion);
+            }
          }
       }
    }
@@ -175,5 +209,26 @@ public class Statistics {
             return toolQuestion;
          }
       }) != null;
+   }
+
+   /**
+    * Checks if at least one {@link ChoiceStatistics} is available.
+    * @param question The {@link AbstractQuestion} to check.
+    * @return {@code true} {@link ChoiceStatistics} available, {@code false} {@link ChoiceStatistics} not available.
+    */
+   public boolean containsChoiceStatistics(final AbstractQuestion question) {
+      if (question instanceof AbstractChoicesQuestion) {
+         return CollectionUtil.search(getFilters(), new IFilter<IStatisticsFilter>() {
+            @Override
+            public boolean select(IStatisticsFilter element) {
+               FilteredStatistics fs = filteredStatiscs.get(element);
+               Map<Choice, ChoiceStatistics> choiceMap = fs.getChoiceStatistics((AbstractChoicesQuestion) question);
+               return !CollectionUtil.isEmpty(choiceMap);
+            }
+         }) != null;
+      }
+      else {
+         return false;
+      }
    }
 }

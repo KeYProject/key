@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -45,6 +47,11 @@ public class FilteredStatistics {
    private BigInteger answersCount = BigInteger.ZERO;
 
    /**
+    * The choice specific answers.
+    */
+   private final Map<AbstractChoicesQuestion, Map<Choice, ChoiceStatistics>> choiceStatistics = new HashMap<AbstractChoicesQuestion, Map<Choice, ChoiceStatistics>>();
+
+   /**
     * Updates the statics.
     * @param questionInput The {@link QuestionInput} to analyze.
     * @param tool The optional {@link Tool}.
@@ -73,6 +80,24 @@ public class FilteredStatistics {
          }
          qs.update(correct, correctTrust, time, trustTime);
       }
+      if (questionInput.getQuestion() instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) questionInput.getQuestion();
+         Map<Choice, ChoiceStatistics> statistcsMap = choiceStatistics.get(choiceQuestion);
+         if (statistcsMap == null) {
+            statistcsMap = new HashMap<Choice, ChoiceStatistics>();
+            choiceStatistics.put(choiceQuestion, statistcsMap);
+         }
+         for (Choice choice : choiceQuestion.getChoices()) {
+            if (questionInput.isChoiceSelected(choice)) {
+               ChoiceStatistics cs = statistcsMap.get(choice);
+               if (cs == null) {
+                  cs = new ChoiceStatistics();
+                  statistcsMap.put(choice, cs);
+               }
+               cs.update();
+            }
+         }
+      }
    }
    
    /**
@@ -98,6 +123,52 @@ public class FilteredStatistics {
          toolMap.put(pageInput.getPage(), qp);
       }
       qp.update(pageInput.getShownTime());
+   }
+   
+   /**
+    * Returns the choice specific statistics of an {@link AbstractChoicesQuestion}. 
+    * @param question The {@link AbstractChoicesQuestion} of interest.
+    * @return The choice specific statistics of an {@link AbstractChoicesQuestion}.
+    */
+   public Map<Choice, ChoiceStatistics> getChoiceStatistics(AbstractChoicesQuestion question) {
+      Map<Choice, ChoiceStatistics> choiceMap = choiceStatistics.get(question);
+      return choiceMap != null ?
+             Collections.unmodifiableMap(choiceMap) :
+             null;
+   }
+
+   /**
+    * Returns the {@link ChoiceStatistics} of the given {@link Choice}.
+    * @param question The requested {@link AbstractChoicesQuestion}.
+    * @param choice The requested {@link Choice}.
+    * @return The {@link ChoiceStatistics} if available or {@code null} otherwise.
+    */
+   public ChoiceStatistics getChoiceStatistics(AbstractChoicesQuestion question, Choice choice) {
+      Map<Choice, ChoiceStatistics> choiceMap = choiceStatistics.get(question);
+      return choiceMap != null ? choiceMap.get(choice) : null;
+   }
+   
+   /**
+    * Computes the percent use of the given {@link Choice}.
+    * @param question The requested {@link AbstractChoicesQuestion}.
+    * @param choice The requested {@link Choice}.
+    * @return The computed percent usage.
+    */
+   public BigInteger computeChoicePercent(AbstractChoicesQuestion question, Choice choice) {
+      ChoiceStatistics cs = getChoiceStatistics(question, choice);
+      if (cs != null) {
+         BigInteger sum = BigInteger.ZERO;
+         for (Choice currentChoice : question.getChoices()) {
+            ChoiceStatistics currentCs = getChoiceStatistics(question, currentChoice);
+            if (currentCs != null) {
+               sum = sum.add(currentCs.getSelectedCount());
+            }
+         }
+         return cs.getSelectedCount().multiply(BigInteger.valueOf(100)).divide(sum);
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
 
    /**

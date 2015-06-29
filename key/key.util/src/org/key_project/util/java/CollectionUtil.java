@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -113,6 +114,15 @@ public class CollectionUtil {
     */
    public static boolean isEmpty(Collection<?> collection) {
       return collection == null || collection.isEmpty();
+   }
+
+   /**
+    * Nullpointersave execution of {@link Map#isEmpty()}.
+    * @param map The given {@link Map}.
+    * @return {@code true} = is empty or {@code null}, {@code false} = is not empty.
+    */
+   public static boolean isEmpty(Map<?, ?> map) {
+      return map == null || map.isEmpty();
    }
 
    /**
