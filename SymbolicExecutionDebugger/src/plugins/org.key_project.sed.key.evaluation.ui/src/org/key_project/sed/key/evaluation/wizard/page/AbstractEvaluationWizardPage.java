@@ -14,6 +14,7 @@ import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
+import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
 import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?>> extends WizardPage {
@@ -84,7 +85,6 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    public void setVisible(final boolean visible) {
       super.setVisible(visible);
       if (visible) {
-         shownAt = System.currentTimeMillis();
          getWizard().setCurrentPageRunnable(computeRunnable(visible));
       }
       if (!visible) { // The new page is set first to visible before the old page is set to hidden
@@ -98,9 +98,15 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
             @Override
             public void run() {
                perfomRunnables(hiddenRunnable, visibleRunnable);
+               // Update the shown at time after the runnables are executed (loading times are ignored)
+               ((EvaluationWizardDialog) getContainer()).getCurrentPage().updateShownAt();
             }
          });
       }
+   }
+   
+   public void updateShownAt() {
+      shownAt = System.currentTimeMillis();
    }
    
    public IRunnableWithProgressAndResult<String> computeRunnable(boolean visible) {
