@@ -1,7 +1,7 @@
 package org.key_project.sed.key.evaluation.server.report.statiscs;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +27,7 @@ public class Statistics {
    /**
     * The contained {@link FilteredStatistics}.
     */
-   private final Map<IStatisticsFilter, FilteredStatistics> filteredStatiscs = new HashMap<IStatisticsFilter, FilteredStatistics>();
+   private final Map<IStatisticsFilter, FilteredStatistics> filteredStatiscs = new LinkedHashMap<IStatisticsFilter, FilteredStatistics>();
 
    /**
     * Checks if multiple answers were ignored.
@@ -48,6 +48,7 @@ public class Statistics {
             for (IStatisticsFilter filter : filters) {
                if (filter.accept(answer)) {
                   FilteredStatistics filteredStatistics = filteredStatiscs.get(filter);
+                  filteredStatistics.updateAnswersCount();
                   for (AbstractQuestion question : answer.getQuestions()) {
                      if (question.isEditable()) {
                         List<QuestionInput> questionInputs = answer.getQuestionInputs(question);

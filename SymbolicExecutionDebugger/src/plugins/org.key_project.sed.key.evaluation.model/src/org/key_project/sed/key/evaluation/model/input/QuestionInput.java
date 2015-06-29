@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
+import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.sed.key.evaluation.model.definition.TextQuestion;
@@ -238,6 +239,16 @@ public class QuestionInput extends Bean {
       }
       else {
          return null;
+      }
+   }
+   
+   public boolean isChoiceSelected(Choice choice) {
+      if (value != null && choice != null) {
+         String[] values = value.split(CheckboxQuestion.VALUE_SEPARATOR);
+         return ArrayUtil.contains(values, choice.getValue());
+      }
+      else {
+         return false;
       }
    }
 

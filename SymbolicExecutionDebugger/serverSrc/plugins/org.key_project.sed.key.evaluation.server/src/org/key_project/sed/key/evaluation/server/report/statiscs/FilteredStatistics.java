@@ -37,7 +37,12 @@ public class FilteredStatistics {
     * The tool specific statistics of an {@link AbstractQuestion}.
     */
    private final Map<Tool, Map<AbstractPage, PageStatistics>> toolPageStatistics = new HashMap<Tool, Map<AbstractPage, PageStatistics>>();
-   
+
+   /**
+    * The number of included answers.
+    */
+   private BigInteger answersCount = BigInteger.ZERO;
+
    /**
     * Updates the statics.
     * @param questionInput The {@link QuestionInput} to analyze.
@@ -116,7 +121,10 @@ public class FilteredStatistics {
     * @return The tool specific statistics of an {@link AbstractQuestion}.
     */
    public Map<AbstractQuestion, QuestionStatistics> getQuestionStatistics(Tool tool) {
-      return Collections.unmodifiableMap(toolQuestionStatistics.get(tool));
+      Map<AbstractQuestion, QuestionStatistics> toolMap = toolQuestionStatistics.get(tool);
+      return toolMap != null ?
+             Collections.unmodifiableMap(toolMap) :
+             null;
    }
 
    /**
@@ -144,7 +152,10 @@ public class FilteredStatistics {
     * @return The tool specific statistics of an {@link AbstractPage}.
     */
    public Map<AbstractPage, PageStatistics> getPageStatistics(Tool tool) {
-      return Collections.unmodifiableMap(toolPageStatistics.get(tool));
+      Map<AbstractPage, PageStatistics> toolMap = toolPageStatistics.get(tool);
+      return toolMap != null ? 
+             Collections.unmodifiableMap(toolMap) : 
+             null;
    }
 
    /**
@@ -168,14 +179,16 @@ public class FilteredStatistics {
       Set<Tool> maxTools = null;
       for (Tool tool : getTools()) {
          QuestionStatistics qs = getQuestionStatistics(tool, question);
-         BigInteger current = qs.computeAverageCorrect();
-         if (current.compareTo(max) > 0) {
-            max = current;
-            maxTools = new HashSet<Tool>();
-            maxTools.add(tool);
-         }
-         else if (current.compareTo(max) == 0) {
-            maxTools.add(tool);
+         if (qs != null) {
+            BigInteger current = qs.computeAverageCorrect();
+            if (current.compareTo(max) > 0) {
+               max = current;
+               maxTools = new HashSet<Tool>();
+               maxTools.add(tool);
+            }
+            else if (current.compareTo(max) == 0) {
+               maxTools.add(tool);
+            }
          }
       }
       return maxTools;
@@ -191,14 +204,16 @@ public class FilteredStatistics {
       Set<Tool> maxTools = null;
       for (Tool tool : getTools()) {
          QuestionStatistics qs = getQuestionStatistics(tool, question);
-         BigInteger current = qs.computeAverageTrustCorrect();
-         if (current.compareTo(max) > 0) {
-            max = current;
-            maxTools = new HashSet<Tool>();
-            maxTools.add(tool);
-         }
-         else if (current.compareTo(max) == 0) {
-            maxTools.add(tool);
+         if (qs != null) {
+            BigInteger current = qs.computeAverageTrustCorrect();
+            if (current.compareTo(max) > 0) {
+               max = current;
+               maxTools = new HashSet<Tool>();
+               maxTools.add(tool);
+            }
+            else if (current.compareTo(max) == 0) {
+               maxTools.add(tool);
+            }
          }
       }
       return maxTools;
@@ -214,14 +229,16 @@ public class FilteredStatistics {
       Set<Tool> minTools = null;
       for (Tool tool : getTools()) {
          QuestionStatistics qs = getQuestionStatistics(tool, question);
-         BigInteger current = qs.computeAverageTime();
-         if (min == null || current.compareTo(min) < 0) {
-            min = current;
-            minTools = new HashSet<Tool>();
-            minTools.add(tool);
-         }
-         else if (current.compareTo(min) == 0) {
-            minTools.add(tool);
+         if (qs != null) {
+            BigInteger current = qs.computeAverageTime();
+            if (min == null || current.compareTo(min) < 0) {
+               min = current;
+               minTools = new HashSet<Tool>();
+               minTools.add(tool);
+            }
+            else if (current.compareTo(min) == 0) {
+               minTools.add(tool);
+            }
          }
       }
       return minTools;
@@ -237,14 +254,16 @@ public class FilteredStatistics {
       Set<Tool> minTools = null;
       for (Tool tool : getTools()) {
          QuestionStatistics qs = getQuestionStatistics(tool, question);
-         BigInteger current = qs.computeAverageTrustTime();
-         if (min == null || current.compareTo(min) < 0) {
-            min = current;
-            minTools = new HashSet<Tool>();
-            minTools.add(tool);
-         }
-         else if (current.compareTo(min) == 0) {
-            minTools.add(tool);
+         if (qs != null) {
+            BigInteger current = qs.computeAverageTrustTime();
+            if (min == null || current.compareTo(min) < 0) {
+               min = current;
+               minTools = new HashSet<Tool>();
+               minTools.add(tool);
+            }
+            else if (current.compareTo(min) == 0) {
+               minTools.add(tool);
+            }
          }
       }
       return minTools;
@@ -260,16 +279,33 @@ public class FilteredStatistics {
       Set<Tool> minTools = null;
       for (Tool tool : getTools()) {
          PageStatistics qs = getPageStatistics(tool, page);
-         BigInteger current = qs.computeAverageTime();
-         if (min == null || current.compareTo(min) < 0) {
-            min = current;
-            minTools = new HashSet<Tool>();
-            minTools.add(tool);
-         }
-         else if (current.compareTo(min) == 0) {
-            minTools.add(tool);
+         if (qs != null) {
+            BigInteger current = qs.computeAverageTime();
+            if (min == null || current.compareTo(min) < 0) {
+               min = current;
+               minTools = new HashSet<Tool>();
+               minTools.add(tool);
+            }
+            else if (current.compareTo(min) == 0) {
+               minTools.add(tool);
+            }
          }
       }
       return minTools;
+   }
+
+   /**
+    * Returns the number of included answers.
+    * @return The number of included answers.
+    */
+   public BigInteger getAnswersCount() {
+      return answersCount;
+   }
+
+   /**
+    * Increases the number of included answers by one.
+    */
+   protected void updateAnswersCount() {
+      answersCount = answersCount.add(BigInteger.ONE);
    }
 }

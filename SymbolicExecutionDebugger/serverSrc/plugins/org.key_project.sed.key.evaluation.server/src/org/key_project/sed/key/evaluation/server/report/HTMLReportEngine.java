@@ -91,6 +91,10 @@ public class HTMLReportEngine extends AbstractReportEngine {
       for (IStatisticsFilter filter : statistics.getFilters()) {
          sb.append("<td colspan=\"" + ((evaluation.getTools().length) * 6) + "\" align=\"center\"><b>");
          sb.append(filter.getName());
+         FilteredStatistics fs = statistics.getFilteredStatistics(filter);
+         sb.append(" (");
+         sb.append(fs.getAnswersCount());
+         sb.append(" answers)");
          sb.append("</b></td>");
       }
       sb.append("</tr>");
@@ -122,7 +126,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
             sb.append("<td rowspan=\"" + (formSpan + questionCount.size()) + "\" valign=\"top\"><b>");
             sb.append(form.getName());
             sb.append("</b></td>");
-            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 6)) + "\">&nbsp;</td>");
+            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 6 * statistics.getFilters().size())) + "\">&nbsp;</td>");
             sb.append("</tr>");
             for (AbstractPage page : form.getPages()) {
                int pageSpan = questionCount.get(page);
