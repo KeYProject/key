@@ -1,12 +1,14 @@
 package org.key_project.sed.key.evaluation.server.report;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
@@ -18,6 +20,7 @@ import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
+import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -473,6 +476,27 @@ public class HTMLReportEngine extends AbstractReportEngine {
                   }
                }
             }
+            else if (object instanceof AbstractForm) {
+               AbstractForm form = (AbstractForm) object;
+               List<AbstractFormInput<?>> forms = entry.getValue().getFormInputs(form);
+               if (!CollectionUtil.isEmpty(forms)) {
+                  sb.append("<td>");
+                  boolean afterFirst = false;
+                  for (AbstractFormInput<?> formInput : forms) {
+                     if (afterFirst) {
+                        sb.append("<br>");
+                     }
+                     else {
+                        afterFirst = true;
+                     }
+                     sb.append(DateFormat.getDateTimeInstance().format(new Date(formInput.getEvaluationInput().getTimestamp())));
+                  }
+                  sb.append("</td>");
+               }
+               else {
+                  sb.append("<td>&nbsp;</td>");
+               }
+            }
          }
          sb.append("</tr>");
       }
@@ -544,6 +568,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
                sb.append("</b></td>");
             }
          }
+         sb.append("<td>&nbsp;</td>"); // Date
       }
       sb.append("</tr>");
       sb.append("<tr>");
@@ -595,6 +620,9 @@ public class HTMLReportEngine extends AbstractReportEngine {
             formSpan += pageSpan;
             spanMap.put(page, pageSpan);
          }
+         sb.append("<td><b>Date</b></td>");
+         questionOrder.add(form);
+         formSpan++;
          spanMap.put(form, formSpan);
       }
       return sb;

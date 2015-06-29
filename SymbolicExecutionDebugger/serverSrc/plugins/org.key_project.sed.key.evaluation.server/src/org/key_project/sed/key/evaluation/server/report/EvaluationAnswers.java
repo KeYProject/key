@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
@@ -35,6 +36,11 @@ public class EvaluationAnswers {
    private final Map<AbstractPage, List<AbstractPageInput<?>>> pageMap = new HashMap<AbstractPage, List<AbstractPageInput<?>>>();
 
    /**
+    * The available {@link AbstractFormInput}s.
+    */
+   private final Map<AbstractForm, List<AbstractFormInput<?>>> formMap = new HashMap<AbstractForm, List<AbstractFormInput<?>>>();
+
+   /**
     * The used {@link Tool}s per {@link AbstractPage}.
     */
    private final Map<AbstractPage, List<Tool>> pageToolMap = new HashMap<AbstractPage, List<Tool>>();
@@ -44,6 +50,13 @@ public class EvaluationAnswers {
     * @param formInput The {@link AbstractFormInput} to analyze.
     */
    protected void addFormInput(AbstractFormInput<?> formInput) {
+      List<AbstractFormInput<?>> forms = formMap.get(formInput.getForm());
+      if (forms == null) {
+         forms = new LinkedList<AbstractFormInput<?>>();
+         formMap.put(formInput.getForm(), forms);
+      }
+      forms.add(formInput);      
+      // Analyze pages
       for (AbstractPageInput<?> pageInput : formInput.getPageInputs()) {
          if (!pageInput.getPage().isReadonly()) {
             List<AbstractPageInput<?>> pages = pageMap.get(pageInput.getPage());
@@ -108,6 +121,23 @@ public class EvaluationAnswers {
             addQuestionInput(childInput);
          }
       }
+   }
+   
+   /**
+    * Returns all available {@link AbstractForm}s.
+    * @return The available {@link AbstractForm}s.
+    */
+   public Set<AbstractForm> getForms() {
+      return formMap.keySet();
+   }
+
+   /**
+    * Returns the available {@link AbstractFormInput} of the given {@link AbstractForm}.
+    * @param form The requested {@link AbstractForm}.
+    * @return The available {@link AbstractFormInput}s or {@code null} if none are available.
+    */
+   public List<AbstractFormInput<?>> getFormInputs(AbstractForm form) {
+      return formMap.get(form);
    }
    
    /**
