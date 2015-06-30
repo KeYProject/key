@@ -160,7 +160,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       // Create execution test model
-      TreeSettings settings = new TreeSettings(false, false, false, false);
+      TreeSettings settings = new TreeSettings(false, false, false, false, false);
       ExecutionStart executionRoot = new ExecutionStart(settings, root);
       // Test tree
       assertRoot(executionRoot, createExpectedNodes("<start>"));

@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Comment;
@@ -27,7 +26,6 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.ScopeDefiningElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -36,7 +34,6 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -171,30 +168,6 @@ public abstract class VariableNamer implements InstantiationProposer {
     	} else {
     	    return new EmptyStatement();
     	}
-    }
-
-
-    /**
-     * returns a NameCreationInfo representing the method stack of a
-     * PosInOccurrence
-     */
-    protected NameCreationInfo getMethodStack(PosInOccurrence posOfFind) {
-        ImmutableList<IProgramMethod> list = ImmutableSLList.<IProgramMethod>nil();
-
-        SourceElement element = getProgramFromPIO(posOfFind);
-        while(element != element.getFirstElement()) {
-            element = element.getFirstElement();
-
-            if(element instanceof MethodFrame) {
-                MethodFrame frame = (MethodFrame)element;
-                IProgramMethod method = frame.getProgramMethod();
-                if(method != null) {
-                    list = list.append(method);
-                }
-            }
-        }
-
-        return new MethodStackInfo(list);
     }
 
 

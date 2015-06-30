@@ -722,7 +722,8 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory());
         final Term goal = services.getTermBuilder().orSC(goal1, or.replace(goal2));
-        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tb =
+                new RewriteTacletBuilder<RewriteTaclet>();
         tb.setFind(find1);
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));
@@ -748,7 +749,8 @@ public abstract class WellDefinednessCheck implements Contract {
                                             boolean isStatic,
                                             TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
-        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tb =
+                new RewriteTacletBuilder<RewriteTaclet>();
         final Term notNull = isStatic ? TB.tt() : TB.not(TB.equals(callee, TB.NULL()));
         final Term created = isStatic ? TB.tt() : TB.created(callee);
         tb.setFind(TB.wd(callTerm));
@@ -770,7 +772,8 @@ public abstract class WellDefinednessCheck implements Contract {
                                                Term callTerm,
                                                TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
-        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        final RewriteTacletBuilder<RewriteTaclet> tb =
+                new RewriteTacletBuilder<RewriteTaclet>();
         tb.setFind(TB.wd(callTerm));
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));

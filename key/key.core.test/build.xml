@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project name="key.core.test" default="compile" basedir=".">
 	<property name="src.dir"   value="${basedir}/src" />
+	<property name="gen.dir"  value="${basedir}/genSrc" />
 	<property name="build.dir" value="${basedir}/bin" />
 	<property name="dist.dir"  value="${basedir}/../deployment/components" />
 	<property name="lib.dir"  value="${basedir}/../key.core/lib/" />
@@ -9,10 +10,10 @@
 	<target name="test-deploy" depends="compile">
 	  	<mkdir dir="${test.reports}" />
 		<junit printsummary="withOutAndErr"
-		       haltonfailure="yes"
+		       haltonfailure="no"
 		       failureproperty="test.failedOrError"
 		       errorproperty="test.failedOrError"
-		       fork="yes" forkMode="once" haltonerror="yes"
+		       fork="yes" forkMode="once" haltonerror="no"
 		       enableTestListenerEvents="false"
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
@@ -28,13 +29,30 @@
 			</classpath>
 			<formatter type="xml"/>
 			<test name="de.uka.ilkd.key.suite.TestKey" todir="${test.reports}" />
+			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest" todir="${test.reports}" />
 		</junit>
 		<fail message="Test failure detected, check test results." if="test.failedOrError" />
 	</target>
+	
+   <uptodate property="generateproofcollectionparser.required"
+      targetFile="${gen.dir}/de/uka/ilkd/key/proof/runallproofs/proofcollection/ProofCollectionParser.java"
+      srcFile="${src.dir}/de/uka/ilkd/key/proof/runallproofs/proofcollection/ProofCollection.g"/>
+	
+   <target name="generateproofcollectionparser" unless="generateproofcollectionparser.required">
+   	<echo message="Generating proof collection parser."/>
+      <java jar="${lib.dir}/antlr.jar" fork="true" failonerror="true">
+         <arg value="-o" />
+		   <arg value="${gen.dir}/de/uka/ilkd/key/proof/runallproofs/proofcollection/" />
+         <arg value="${src.dir}/de/uka/ilkd/key/proof/runallproofs/proofcollection/ProofCollection.g" />
+      </java>
+   </target>
+   
+   <target name="runTests" depends="runJavaTests, runAllProofs">
+   </target>
 
-	<target name="runTests" depends="compile">
-		<junit printsummary="withOutAndErr" haltonfailure="yes"
-		       fork="yes" forkMode="once" haltonerror="yes"
+	<target name="runJavaTests" depends="compile">
+		<junit printsummary="withOutAndErr" haltonfailure="no"
+		       fork="yes" forkMode="once" haltonerror="no"
 		       enableTestListenerEvents="false"
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
@@ -54,6 +72,30 @@
 			<test name="de.uka.ilkd.key.suite.TestKey" />
 		</junit>
 	</target>
+	
+	<target name="runAllProofs" depends="compile">
+	<!-- RunAllProofs documentation can be found at: key/doc/README.runAllProofs -->
+		<junit printsummary="withOutAndErr" haltonfailure="no"
+		       fork="yes" forkMode="once" haltonerror="no"
+		       enableTestListenerEvents="false"
+		       showoutput="yes" dir="${basedir}">
+			<jvmarg value="-Xmx2048m"/>
+			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-ea"/>
+			<classpath>
+				<pathelement path="${basedir}/../key.core/bin"/>
+				<pathelement path="${basedir}/../key.util/bin"/>
+				<pathelement location="${lib.dir}/recoderKey.jar"/>
+				<pathelement location="${lib.dir}/antlr.jar"/>
+				<pathelement location="${basedir}/../key.util.test/lib/junit-4.12.jar"/>
+				<pathelement location="${basedir}/../key.util.test/lib/hamcrest-core-1.3.jar"/>
+				<pathelement path="${basedir}/../key.util.test/bin"/>
+				<pathelement path="${build.dir}"/>
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest" />
+		</junit>
+	</target>
 
 	  <target name="copy" 
 		  description="Copy all resources into the binary directory.">
@@ -62,9 +104,9 @@
 	    </copy>
 	  </target>
 
-	<target name="compile" depends="copy" description="Compile all source files into the build directory.">
+	<target name="compile" depends="copy, generateproofcollectionparser" description="Compile all source files into the build directory.">
 		<mkdir dir="${build.dir}"/>
-		<javac srcdir= "${src.dir}" 
+		<javac srcdir= "${src.dir}:${gen.dir}" 
 		       destdir="${build.dir}" 
 		       sourcepath="${src.dir}" 
 		       includeantruntime="false" 
@@ -88,6 +130,7 @@
 	<target name="clean" description="Deletes all generated files and folders.">
 		<delete failonerror="false" includeemptydirs="true"> 
 		  <fileset dir="${build.dir}" includes="**/*" />
+		  <fileset dir="${gen.dir}"/>
    		  <fileset dir="${test.reports}" includes="**/*" />
 		</delete>
 	</target>

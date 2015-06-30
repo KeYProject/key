@@ -40,6 +40,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
@@ -69,6 +70,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -214,13 +216,14 @@ public class TacletMenu extends JMenu {
 	}
 
 	createBuiltInRuleMenu(builtInList, control);
+    createDelayedCutJoinMenu(control);
+    createDefocusingJoinMenu();
 
 	if(pos!= null && pos.isSequent()){
 	    createSMTMenu(control);
 	}
 	createFocussedAutoModeMenu ( control );
     addMacroMenu();
-	ceateJoinMenu(control);
 
 	//        addPopFrameItem(control);
 
@@ -279,43 +282,84 @@ public class TacletMenu extends JMenu {
 
         }
 
-        private void ceateJoinMenu(MenuControl control){
-
-               List<ProspectivePartner> partner =
-                       JoinIsApplicable.INSTANCE.isApplicable(mediator.getSelectedGoal(),pos.getPosInOccurrence());
-               if(!partner.isEmpty()){
-                   JMenuItem item = new JoinMenuItem(partner,mediator.getSelectedProof(),mediator);
-                   if (JoinMenuItem.FEATURE.active()) add(item);
-               }
+    private void createDelayedCutJoinMenu(MenuControl control) {
+        if (JoinMenuItem.FEATURE.active()) {
+            List<ProspectivePartner> partner = JoinIsApplicable.INSTANCE
+                    .isApplicable(mediator.getSelectedGoal(),
+                            pos.getPosInOccurrence());
+            if (!partner.isEmpty()) {
+                JMenuItem item = new JoinMenuItem(partner,
+                        mediator.getSelectedProof(), mediator);
+                add(item);
+            }
         }
+    }
+    
+    /**
+     * Creates the menu item for the "defocusing" join rule which links partner
+     * nodes to join nodes.
+     */
+    private void createDefocusingJoinMenu() {
+        if (JoinRuleMenuItem.FEATURE.active()) {
+            if (JoinRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
+                    pos.getPosInOccurrence(), false)) {
+                JMenuItem item = new JoinRuleMenuItem(
+                        mediator.getSelectedGoal(), pos.getPosInOccurrence(),
+                        mediator);
+                add(item);
+            }
+        }
+    }
+    
 
     /**
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
      */
-    private void addBuiltInRuleItem(BuiltInRule builtInRule,
-				    MenuControl control) {
+    private void addBuiltInRuleItem(BuiltInRule builtInRule, MenuControl control) {
         JMenuItem item;
         if (builtInRule == WhileInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
-            item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    APPLY_RULE, "Applies a known and complete loop specification immediately.",
-                    ENTER_LOOP_SPECIFICATION, "Allows to modify an existing or to enter a new loop specification.", builtInRule);
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "Applies a known and complete loop specification immediately.",
+                    ENTER_LOOP_SPECIFICATION,
+                    "Allows to modify an existing or to enter a new loop specification.",
+                    builtInRule);
             item.addActionListener(control);
             add(item);
-        } else if (builtInRule == BlockContractRule.INSTANCE) {
+        }
+        else if (builtInRule == BlockContractRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
-            item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    APPLY_RULE, "Applies a known and complete block specification immediately.",
-                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.", builtInRule);
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "Applies a known and complete block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
             add(item);
-        } else if (builtInRule == UseOperationContractRule.INSTANCE) {
-            item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    APPLY_CONTRACT, "All available contracts of the method are combined and applied.",
-                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.", builtInRule);
+        }
+        else if (builtInRule == UseOperationContractRule.INSTANCE) {
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_CONTRACT,
+                    "All available contracts of the method are combined and applied.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
             add(item);
-        } else {
+        }
+        else if (builtInRule == JoinRule.INSTANCE) {
+            // (DS) At the moment, we want to use the join rule as an
+            // experimental feature only. However, it may not be removed
+            // from JavaProfile. Therefore, it is just not added as a menu item
+            // at this place.
+            // TODO (DS): Remove this if-branch and the registration of \\
+            // JoinRule as an experimental feature if it survived some \\
+            // serious case studies.
+        }
+        else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);
             item.addActionListener(control);
             add(item);

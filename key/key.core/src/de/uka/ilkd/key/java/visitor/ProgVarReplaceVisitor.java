@@ -187,9 +187,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 return t;
             }
         } else {
+            boolean changed = false;
             Term subTerms[] = new Term[t.arity()];
             for(int i = 0, n = t.arity(); i < n; i++) {
                 subTerms[i] = replaceVariablesInTerm(t.sub(i));
+                changed = changed || subTerms[i] != t.sub(i);
             }
             Operator op = t.op();
             if(op instanceof ElementaryUpdate) {
@@ -198,22 +200,26 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     UpdateableOperator replacedLhs
                     = (UpdateableOperator) replaceMap.get(uop.lhs());
                     op = ElementaryUpdate.getInstance(replacedLhs);
+                    changed = changed || uop != op;
                 }
             }
-            return services.getTermFactory().createTerm(op,
+            return changed ? services.getTermFactory().createTerm(op,
                                                         subTerms,
                                                         t.boundVars(),
                                                         t.javaBlock(),
-                                                        t.getLabels());
+                                                        t.getLabels()) : t;
         }
     }
 
     private ImmutableList<Term> replaceVariablesInTerms(ImmutableList<Term> terms) {
         ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        boolean changed = false;
         for (final Term term : terms) {
-            res = res.append(replaceVariablesInTerm(term));
+            final Term newTerm = replaceVariablesInTerm(term);
+            changed |= newTerm != term;
+            res = res.append(newTerm);
         }
-        return res;
+        return changed ? res : terms;
     }
 
 
@@ -221,6 +227,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     replaceVariablesInTermListTriples(ImmutableList<InfFlowSpec> terms) {
         ImmutableList<InfFlowSpec>
                     res = ImmutableSLList.<InfFlowSpec>nil();
+        boolean changed = false;
         for (final InfFlowSpec innerTerms : terms) {
             final ImmutableList<Term> renamedPreExpressions =
                     replaceVariablesInTerms(innerTerms.preExpressions);
@@ -228,12 +235,17 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     replaceVariablesInTerms(innerTerms.postExpressions);
             final ImmutableList<Term> renamedNewObjects =
                     replaceVariablesInTerms(innerTerms.newObjects);
+            
             res = res.append(
                     new InfFlowSpec(renamedPreExpressions,
                                     renamedPostExpressions,
                                     renamedNewObjects));
+            
+            changed |= (renamedPreExpressions == innerTerms.preExpressions &&
+                    renamedPostExpressions == innerTerms.postExpressions &&
+                    renamedNewObjects == innerTerms.newObjects);
         }
-        return res;
+        return changed ? res : terms;
     }
 
 
@@ -252,12 +264,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 services.getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
             services.getSpecificationRepository().addBlockContract(
-                    createNewBlockContract(oldContract, newBlock));
+                    createNewBlockContract(oldContract, newBlock, !oldBlock.equals(newBlock)));
         }
     }
 
     private BlockContract createNewBlockContract(final BlockContract oldContract,
-                                                 final StatementBlock newBlock) {
+                                                 final StatementBlock newBlock,
+                                                 final boolean blockChanged) {
         final BlockContract.Variables newVariables =
                 replaceBlockContractVariables(oldContract.getPlaceholderVariables());
         final Map<LocationVariable, Term> newPreconditions =
@@ -266,21 +279,31 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newModifiesClauses =
                 new LinkedHashMap<LocationVariable, Term>();
+        boolean changed = blockChanged;
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            final Term oldPrecondition = oldContract.getPrecondition(heap, services);
+            final Term oldPostcondition = oldContract.getPostcondition(heap, services);
+            final Term oldModifies = oldContract.getModifiesClause(heap, services);
+            
+            final Term newPrecondition = replaceVariablesInTerm(oldPrecondition);
+            final Term newPostcondition = replaceVariablesInTerm(oldPostcondition);
+            final Term newModifies = replaceVariablesInTerm(oldModifies);
+            
             newPreconditions.put(heap,
-                                 replaceVariablesInTerm(
-                                         oldContract.getPrecondition(heap, services)));
+                    (newPrecondition != oldPrecondition) ? newPrecondition : oldPrecondition);
             newPostconditions.put(heap,
-                                  replaceVariablesInTerm(
-                                          oldContract.getPostcondition(heap, services)));
+                    (newPostcondition != oldPostcondition) ? newPostcondition : oldPostcondition);
             newModifiesClauses.put(heap,
-                                   replaceVariablesInTerm(
-                                           oldContract.getModifiesClause(heap, services)));
+                    (newModifies != oldModifies) ? newModifies : oldModifies);
+            
+            changed |= ((newPrecondition != oldPrecondition) ||
+                    (newPostcondition != oldPostcondition) ||
+                    (newModifies != oldModifies));
         }
         final ImmutableList<InfFlowSpec> newInfFlowSpecs =
                 replaceVariablesInTermListTriples(oldContract.getInfFlowSpecs());
-        return oldContract.update(newBlock, newPreconditions, newPostconditions,
-                                  newModifiesClauses, newInfFlowSpecs, newVariables);
+        return changed ? oldContract.update(newBlock, newPreconditions, newPostconditions,
+                                  newModifiesClauses, newInfFlowSpecs, oldContract.getJoinProcedure(), newVariables): oldContract;
     }
 
     private BlockContract.Variables replaceBlockContractVariables(

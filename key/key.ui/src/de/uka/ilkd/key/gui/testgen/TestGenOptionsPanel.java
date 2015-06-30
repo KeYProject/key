@@ -24,6 +24,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private JTextField maxUnwinds;
 	private JCheckBox useJUnit;
 	private JCheckBox invariantForAll;
+	private JCheckBox removePostCondition;
 	private JCheckBox removeDuplicates;
 	private JCheckBox checkboxRFL;
 
@@ -40,6 +41,7 @@ class TestGenOptionsPanel extends TablePanel{
 			                                       "This functionality is enabled by RFL.java which is generated along the test suite.";
 	private static final String infoOpenJMLPath = "Set location of openjml.jar";
 	private static final String infoObjenesisPath = "Set location of objenesis.jar";
+	private static final String infoRemovePostcondition = "Disregard the post condition when generating test data.";
 	
 	public TestGenOptionsPanel(TestGenerationSettings settings){
 		super();
@@ -63,7 +65,8 @@ class TestGenOptionsPanel extends TablePanel{
 	   getInvariantForall();
 	   //getRemoveDuplicatesPanel();
 	   getRFLSelectionPanel();
-	   getJUnitPanel();	   
+	   getJUnitPanel();	  
+	   getRemovePostCondition();
 	    
     }
 	
@@ -199,25 +202,33 @@ class TestGenOptionsPanel extends TablePanel{
 		return checkboxRFL;
 	}
 
-	public JCheckBox getInvariantForall(){
-		
-		if(invariantForAll == null){
-			
+	public JCheckBox getInvariantForall(){		
+		if(invariantForAll == null){			
 			invariantForAll = addCheckBox("Require invariant for all objects", infoInvariantForAll, settings.invaraiantForAll(), new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					settings.setInvariantForAll(invariantForAll.isSelected());
 					settings.fireSettingsChanged();
 				}
-			});
-			
-			
-		}
-		
-		return invariantForAll;
-		
-		
+			});			
+		}		
+		return invariantForAll;		
 	}
+	
+	public JCheckBox getRemovePostCondition(){		
+		if(removePostCondition == null){			
+			removePostCondition = addCheckBox("Remove PostCondition", infoRemovePostcondition, settings.removePostCondition(), new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setInvariantForAll(removePostCondition.isSelected());
+					settings.fireSettingsChanged();
+				}
+			});			
+		}		
+		return removePostCondition;		
+	}
+	
+	
 	
 	
 	

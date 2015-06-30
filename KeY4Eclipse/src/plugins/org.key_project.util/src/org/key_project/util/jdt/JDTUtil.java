@@ -1028,8 +1028,8 @@ public class JDTUtil {
             String nameToValidate = sb.toString() + characters[i];
             IStatus status = project != null ?
                              JavaConventionsUtil.validateJavaTypeName(nameToValidate, project) :
-                             JavaConventions.validateJavaTypeName(nameToValidate, JavaCore.VERSION_1_3, JavaCore.VERSION_1_3);;
-            if (status.isOK()) {
+                             JavaConventions.validateJavaTypeName(nameToValidate, JavaModelUtil.VERSION_LATEST, JavaModelUtil.VERSION_LATEST);
+            if (status.isOK() || status.getSeverity() == IStatus.WARNING) {
                sb.append(characters[i]);
             }
             else {

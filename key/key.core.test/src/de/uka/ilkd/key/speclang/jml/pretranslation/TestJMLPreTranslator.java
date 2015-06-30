@@ -114,6 +114,35 @@ public class TestJMLPreTranslator extends TestCase {
         assertTrue(specCase2.getSignalsOnly().size() == 0);
     }
 
+    public void testAtInModelmethod() throws SLTranslationException {
+        parseMethodSpec(
+                "/*@ model_behaviour\n" +
+                "  @   requires true;\n" +
+                "  @ model int f(int x) {\n" +
+                "  @   return x+1;\n" +
+                "  @ }\n" +
+                "  @*/");
+    }
+
+    // used to be accepted
+    public void disabled_testMLCommentEndInSLComment() throws Exception {
+        try {
+            parseMethodSpec(
+                "//@ requires @*/ true;");
+            fail("Characters '@*/' should not be parsed");
+        } catch(SLTranslationException ex) {
+            // anticipated
+        }
+
+        try {
+            parseMethodSpec(
+                "//@ requires */ true;");
+            fail("Characters '*/' should not be parsed");
+        } catch(SLTranslationException ex) {
+            // anticipated
+        }
+
+    }
     
     public void testFailure() {
         try {

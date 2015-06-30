@@ -17,9 +17,18 @@ post: (   value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
 &amp; (   value &gt;= 0 &amp; value &lt; 10
    -&gt; result_0 = 42 &amp; exc_0 = null)
 &amp; (value &gt;= 10 -&gt; result_0 = 84 &amp; exc_0 = null)
-mod: \if (true)
-         \then (     \if (true)
-                         \then (     \if (true)
+mod: \if (  value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
+          | value &lt; javaUnaryMinusInt(10)
+          | value &gt;= 0
+          &amp; value &lt; 10)
+         \then (     \if (    value &lt; 0
+                            &amp;    value
+                              &gt;= javaUnaryMinusInt(10)
+                          |   value
+                            &lt; javaUnaryMinusInt(10))
+                         \then (     \if (  value &lt; 0
+                                          &amp;    value
+                                            &gt;= javaUnaryMinusInt(10))
                                          \then (allLocs)
                                          \else (allLocs)
                                 \cap \if (  value

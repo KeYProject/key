@@ -47,6 +47,88 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
  * @author Martin Hentschel
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
+   
+   /**
+    * Tests the launch where branch conditions are simplified.
+    */
+   @Test
+   public void testSimplifyConditions() throws Exception {
+      doSimplifyConditionsTest("SWTBotLaunchDefaultPreferencesTest_testSimplifyConditions", true);
+   }
+
+   /**
+    * Tests the launch where branch conditions are not simplified.
+    */
+   @Test
+   public void testDoNotSimplifyConditions() throws Exception {
+      doSimplifyConditionsTest("SWTBotLaunchDefaultPreferencesTest_testDoNotSimplifyConditions", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testSimplifyConditions()}
+    * and {@link #testDoNotSimplifyConditions()}.
+    * @param projectName The project name to use.
+    * @param simplifyConditions Simplify branch conditions?
+    * @throws Exception Occurred Exception
+    */
+   protected void doSimplifyConditionsTest(String projectName, 
+                                           final boolean simplifyConditions) throws Exception {
+      boolean originalSimplifyConditions = KeYSEDPreferences.isSimplifyConditions();
+      try {
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (simplifyConditions) {
+            preferenceShell.bot().checkBox("Simplify conditions (recommended)").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Simplify conditions (recommended)").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(simplifyConditions, KeYSEDPreferences.isSimplifyConditions());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
+               // Do run
+               resume(bot, item, target);
+               if (simplifyConditions) {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/simpleIf/oracle/SimpleIf_BranchConditionsSimplified.xml", false, false, false);
+               }
+               else {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/simpleIf/oracle/SimpleIf_BranchConditionsNotSimplified.xml", false, false, false);
+               }
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/simpleIf/test",
+                              true,
+                              true,
+                              createMethodSelector("SimpleIf", "min", "I", "I"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              8, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setSimplifyConditions(originalSimplifyConditions);
+         assertEquals(originalSimplifyConditions, KeYSEDPreferences.isSimplifyConditions());
+      }
+   }
+   
    /**
     * Tests the launch with highlighting of reached source code.
     */
@@ -126,6 +208,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -203,6 +286,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.TRUE,
                               Boolean.FALSE,
                               null,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -284,6 +368,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.TRUE,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -364,6 +449,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.TRUE,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -444,6 +530,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.TRUE,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -533,6 +620,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.TRUE,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -618,6 +706,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.TRUE,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -727,6 +816,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -809,6 +899,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }

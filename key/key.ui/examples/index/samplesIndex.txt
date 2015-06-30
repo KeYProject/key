@@ -39,6 +39,10 @@ heap/vstte10_05_Queue/README.txt
 heap/fm12_01_LRS/README.txt
 heap/permutedSum/README.txt
 
+heap/verifyThis15_1_RelaxedPrefix/README.txt
+heap/verifyThis15_2_ParallelGcd/README.txt
+heap/verifyThis15_3_DLL/README.txt
+
 heap/vacid0_01_SparseArray/README.txt
 # Red-Black-Trees cannot be parsed currently
 # heap/vacid0_05_RedBlackTrees/README.txt

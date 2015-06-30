@@ -302,11 +302,13 @@ public class ExecutionVariable extends AbstractExecutionVariable {
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
          for (Goal valueGoal : valueGoals) {
-            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false));
+            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), getSettings().isSimplifyConditions(), false));
             proof = valueGoal.node().proof();
          }
          Term comboundPathCondition = tb.or(pathConditions);
-         comboundPathCondition = SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
+         if (getSettings().isSimplifyConditions()) {
+            comboundPathCondition = SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
+         }
          comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, initConfig.getServices());
          return comboundPathCondition;
       }

@@ -163,6 +163,14 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         }
     }
 
+    // this was a bug in the pretty printing
+    public void testUnknownConstant() throws Exception {
+        parseDecls("\\functions { \\unique Field unkonwn.Clazz::$unknownField; }");
+
+        String string = "int::select(heap,a,unkonwn.Clazz::$unknownField)";
+        comparePrettyPrintAgainstToString(string, string);
+    }
+
     public void testQuantifiedSelect() throws Exception {
         String quantification = "\\forall java.lang.Object o; \\forall Field f; o.f = 1";
         String expectedToString = "all{o:java.lang.Object}(all{f:Field}(equals(any::select(heap,o,f),Z(1(#)))))";

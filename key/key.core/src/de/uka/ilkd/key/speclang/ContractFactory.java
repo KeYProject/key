@@ -484,6 +484,29 @@ public class ContractFactory {
                         mby = tb.ife(otherPre, otherMby, mby);
                     }
                 }
+                
+                // the modifies clause must be computed before the preconditions
+                if (hasMod.get(h) || other.hasModifiesClause(h)) {
+                    hasMod.put(h, true);
+                    Term m1 = mods.get(h);
+                    Term m2 = other.getMod(h, t.originalSelfVar,
+                            t.originalParamVars,
+                            services);
+                    if (m1 != null || m2 != null) {
+                        Term nm;
+                        if (m1 == null) {
+                            nm = m2;
+                        } else if (m2 == null) {
+                            nm = m1;
+                        } else {
+                            Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
+                            nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
+                                    tb.ife(otherPre, m2, tb.allLocs()));
+                        }
+                        mods.put(h, nm);
+                    }
+                }
+                
                 if(otherPre != null) {
                     pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
                 }
@@ -500,26 +523,7 @@ public class ContractFactory {
                     axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
                 }
 
-                if (hasMod.get(h) || other.hasModifiesClause(h)) {
-                    hasMod.put(h, true);
-                    Term m1 = mods.get(h);
-                    Term m2 = other.getMod(h, t.originalSelfVar,
-                            t.originalParamVars,
-                            services);
-                    if (m1 != null || m2 != null) {
-                        Term nm;
-                        if (m1 == null) {
-                            nm = m2;
-                        } else if (m2 == null) {
-                            nm = m1;
-                        } else {
-                            Term ownPre = pres.get(h) == null ? pres.get(h) : tb.tt();
-                            nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
-                                    tb.ife(otherPre, m2, tb.allLocs()));
-                        }
-                        mods.put(h, nm);
-                    }
-                }
+                
             }
 
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {

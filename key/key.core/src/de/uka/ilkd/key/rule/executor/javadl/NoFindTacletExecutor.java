@@ -39,9 +39,9 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      */   
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
             SequentChangeInfo currentSequent, Services services,
-            MatchConditions matchCond, Goal goal, TacletApp tacletApp) {
-        addToAntec(termLabelState, add.antecedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
-        addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
+            MatchConditions matchCond, Goal goal, RuleApp ruleApp) {
+        addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, null, matchCond, goal, ruleApp, services);
+        addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, null, matchCond, goal, ruleApp, services);
     }    
 
     /**
@@ -51,9 +51,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param services the Services encapsulating all java information
      * @param ruleApp the taclet application that is executed
      */
-    public ImmutableList<Goal> apply(Goal     goal,
-            Services services, 
-            RuleApp  ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
 
         // Number without the if-goal eventually needed
@@ -88,7 +86,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
                     services,
                     mc,
                     goal,
-                    (TacletApp) ruleApp);
+                    ruleApp);
 
             applyAddrule(     gt.rules(),
                     currentGoal,
