@@ -37,7 +37,7 @@ import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethod;
-import de.uka.ilkd.key.testgen.oracle.OracleTermCall;
+import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
 
 /**
@@ -543,7 +543,7 @@ public class TestCaseGenerator {
 
 
 
-		OracleTermCall oracleCall = new OracleTermCall(oracle, oracle.getArgs());
+		OracleMethodCall oracleCall = new OracleMethodCall(oracle, oracle.getArgs());
 
 		oracleMethods.add(oracle);
 		oracleMethods.addAll(oracleGenerator.getOracleMethods());
