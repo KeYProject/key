@@ -140,4 +140,12 @@ public abstract class AbstractReportEngine {
          return new IStatisticsFilter[] {new AllStatisticsFilter()};
       }
    }
+
+   /**
+    * Returns the analyzed storage location.
+    * @return The analyzed storage location.
+    */
+   public File getStorageLocation() {
+      return storageLocation;
+   }
 }

@@ -16,10 +16,12 @@ package org.key_project.util.testcase.java;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -914,8 +916,8 @@ public class CollectionUtilTest extends TestCase {
     * Test for {@link CollectionUtil#isEmpty(java.util.Collection)}
     */
    @Test
-   public void testIsEmpty() {
-      assertTrue(CollectionUtil.isEmpty(null));
+   public void testIsEmpty_Collection() {
+      assertTrue(CollectionUtil.isEmpty((Collection<?>) null));
       List<String> collection = new LinkedList<String>();
       assertTrue(CollectionUtil.isEmpty(collection));
       collection.add("A");
@@ -924,6 +926,22 @@ public class CollectionUtilTest extends TestCase {
       assertFalse(CollectionUtil.isEmpty(collection));
       collection.add("C");
       assertFalse(CollectionUtil.isEmpty(collection));
+   }
+   
+   /**
+    * Test for {@link CollectionUtil#isEmpty(java.util.Map)}
+    */
+   @Test
+   public void testIsEmpty_Map() {
+      assertTrue(CollectionUtil.isEmpty((Map<?, ?>) null));
+      Map<String, String> map = new HashMap<String, String>();
+      assertTrue(CollectionUtil.isEmpty(map));
+      map.put("A", "A");
+      assertFalse(CollectionUtil.isEmpty(map));
+      map.put("B", "B");
+      assertFalse(CollectionUtil.isEmpty(map));
+      map.put("C", "C");
+      assertFalse(CollectionUtil.isEmpty(map));
    }
    
    /**
