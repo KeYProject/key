@@ -8,10 +8,6 @@
             application="org.eclipse.ui.ide.workbench" 
             name="Symbolic Execution Debugger (SED)">
          <property
-               name="preferenceCustomization"
-               value="plugin_customization.ini">
-         </property>
-         <property
                name="appName"
                value="Symbolic Execution Debugger (SED)">
          </property>
@@ -54,6 +50,10 @@
          <property
                name="startupProgressRect"
                value="30,275,445,15">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
          </property>
       </product>
    </extension>

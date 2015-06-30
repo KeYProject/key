@@ -33,6 +33,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>key.genSrc</name>
+			<type>2</type>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.test/genSrc</locationURI>
+		</link>
+		<link>
 			<name>key.resources</name>
 			<type>2</type>
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.test/resources</locationURI>
