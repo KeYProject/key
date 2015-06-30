@@ -21,48 +21,49 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * Rule that joins two sequents based on a sign lattice
- * for integers. Boolean variables are joined with a simple
- * lattice for booleans. Program variables of other types
- * than int and boolean are unchanged if they are equal in
- * both states and set to fresh variables if they have different
- * values.
+ * Rule that joins two sequents based on a sign lattice for integers. Boolean
+ * variables are joined with a simple lattice for booleans. Program variables of
+ * other types than int and boolean are unchanged if they are equal in both
+ * states and set to fresh variables if they have different values.
  * 
  * TODO: Could also add a null / non-null lattice for objects.
  * 
  * @author Dominic Scheurer
  */
 public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
-   
+
     private static JoinWithSignLattice INSTANCE = null;
-    
+
     public static JoinWithSignLattice instance() {
         if (INSTANCE == null) {
             INSTANCE = new JoinWithSignLattice();
         }
         return INSTANCE;
     }
-    
-   private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
 
-   @Override
-   protected AbstractDomainLattice<?> getAbstractDomainForSort(Sort s, Services services) {
-      final Sort intSort =
-            (Sort) services.getNamespaces().sorts().lookup(new Name("int"));
-      final Sort booleanSort =
-            (Sort) services.getNamespaces().sorts().lookup(new Name("boolean"));
-      
-      if (s.equals(intSort)) {
-         return SignAnalysisLattice.getInstance();
-      } else if (s.equals(booleanSort)) {
-         return BooleanLattice.getInstance();
-      } else {
-         return null;
-      }
-   }
-   
-   @Override
-   public String toString() {
-      return DISPLAY_NAME;
-   }
+    private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
+
+    @Override
+    protected AbstractDomainLattice<?> getAbstractDomainForSort(Sort s,
+            Services services) {
+        final Sort intSort = (Sort) services.getNamespaces().sorts()
+                .lookup(new Name("int"));
+        final Sort booleanSort = (Sort) services.getNamespaces().sorts()
+                .lookup(new Name("boolean"));
+
+        if (s.equals(intSort)) {
+            return SignAnalysisLattice.getInstance();
+        }
+        else if (s.equals(booleanSort)) {
+            return BooleanLattice.getInstance();
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return DISPLAY_NAME;
+    }
 }

@@ -6,12 +6,21 @@ public class OracleTermCall implements OracleTerm {
 	
 	private OracleMethod method;
 	private List<? extends OracleTerm> args;
+	private OracleTerm caller;
 	
 	public OracleTermCall(OracleMethod method, List<? extends OracleTerm> args) {
 	    super();
 	    this.method = method;
 	    this.args = args;
+	    caller = null;
     }
+	
+	public OracleTermCall(OracleMethod method, List<? extends OracleTerm> args, OracleTerm caller) {
+	    super();
+	    this.method = method;
+	    this.args = args;
+	    caller = null;
+    } 
 	
 	public String toString(){
 		String methodName = method.getMethodName();
@@ -22,7 +31,12 @@ public class OracleTermCall implements OracleTerm {
 		if(!args.isEmpty()){
 			aString = aString.substring(0, aString.length()-1);
 		}
-		return methodName+"("+aString+")";		
+		if(caller!=null){
+			return caller+"."+methodName+"("+aString+")";		
+		}
+		else{
+			return methodName+"("+aString+")";
+		}
 	}
 	
 }

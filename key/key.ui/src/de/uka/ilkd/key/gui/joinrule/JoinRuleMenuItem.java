@@ -17,8 +17,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -88,13 +90,25 @@ public class JoinRuleMenuItem extends JMenuItem {
                 final JoinRuleBuiltInRuleApp completedApp = (JoinRuleBuiltInRuleApp) completion
                         .complete(app, goal, false);
 
-                if (completedApp.complete()) {
+                // The completedApp may be null if the completion was not
+                // possible (e.g., if no candidates were selected by the
+                // user in the displayed dialog).
+                if (completedApp != null && completedApp.complete()) {
                     Thread thread = new Thread(new Runnable() {
-
                         @Override
                         public void run() {
-                            goal.apply(completedApp);
-                            mediator.startInterface(true);
+                            try {
+                                goal.apply(completedApp);
+                            }
+                            catch (Exception e) {
+                                signalError(e, mediator);
+                            }
+                            catch (final AssertionError e) {
+                                signalError(e, mediator);
+                            }
+                            finally {
+                                mediator.startInterface(true);
+                            }
                         }
                     }, "DefocusingJoinRule");
 
@@ -103,6 +117,15 @@ public class JoinRuleMenuItem extends JMenuItem {
                 else {
                     mediator.startInterface(true);
                 }
+            }
+        });
+    }
+    
+    private void signalError(final Throwable e, final KeYMediator mediator) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
             }
         });
     }

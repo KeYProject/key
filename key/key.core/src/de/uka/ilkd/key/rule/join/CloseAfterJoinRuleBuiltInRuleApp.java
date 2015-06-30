@@ -63,7 +63,7 @@ public class CloseAfterJoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 && joinNodeState != null && partnerState != null && pc != null;
     }
 
-    // // GETTERS AND SETTERS ////
+    // // GETTERS AND SETTERS // //
 
     public Node getThePartnerNode() {
         return partnerNode;

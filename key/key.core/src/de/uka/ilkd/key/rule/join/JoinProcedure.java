@@ -73,6 +73,14 @@ public abstract class JoinProcedure {
             Term valueInState2, Services services);
 
     /**
+     * @return true iff the join procedure requires distinguishable path
+     *         conditions. This is usually the case for procedures working with
+     *         concrete values of input states, and can be false for abstraction
+     *         methods.
+     */
+    public abstract boolean requiresDistinguishablePathConditions();
+    
+    /**
      * Returns the join procedure for the given name.
      *
      * @param procName

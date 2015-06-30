@@ -22,19 +22,54 @@ public class Gcd {
       @                            \result % x == 0));
       @*/
     public static int gcd(int a, int b) {
-	if (a < 0) a = -a;
-	if (b < 0) b = -b;
+        if (a < 0) a = -a;
+        if (b < 0) b = -b;
 
-	int big, small;
-	if (a > b) {
-	    big = a;
-	    small = b;
-	} else {
-	    big = b;
-	    small = a;
-	}
-	
-	return gcdHelp(big, small);
+        int big, small;
+        if (a > b) {
+            big = a;
+            small = b;
+        }
+        else {
+            big = b;
+            small = a;
+        }
+
+        return gcdHelp(big, small);
+    }
+    
+    /*@
+      @ public normal_behavior
+      @   ensures (a != 0 || b != 0) ==>
+      @           (a % \result == 0 && b % \result == 0 &&
+      @            (\forall int x; x > 0 && a % x == 0 && b % x == 0;
+      @                            \result % x == 0));
+      @*/
+    public static int gcdJoinBlocks(int a, int b) {
+
+        /*@ join_proc "JoinByIfThenElseAntecedent"; @*/
+        {
+            if (a < 0)
+                a = -a;
+        }
+        
+        /*@ join_proc "JoinByIfThenElseAntecedent"; @*/
+        {
+            if (b < 0)
+                b = -b;
+        }
+
+        int big, small;
+        if (a > b) {
+            big = a;
+            small = b;
+        }
+        else {
+            big = b;
+            small = a;
+        }
+
+        return gcdHelp(big, small);
     }
 
     /*@
@@ -47,25 +82,25 @@ public class Gcd {
       @ assignable \nothing;
       @*/
     private static int gcdHelp(int _big, int _small) {
-	int big = _big;
-	int small = _small;
+        int big = _big;
+        int small = _small;
 
-	/*@
-	  @ loop_invariant small >= 0 && big >= small &&
-	  @   (big == 0 ==> _big == 0) &&
-	  @   (\forall int x; x > 0; (_big % x == 0 && _small % x == 0)
-	  @                          <==>
-	  @                          (big % x == 0 && small % x == 0));
-	  @ decreases small;
-	  @ assignable \nothing;
-	  @*/
-	while (small != 0) {
-	    final int t = big % small;
-	    big = small;
-	    small = t;
-	}
+    	/*@
+    	  @ loop_invariant small >= 0 && big >= small &&
+    	  @   (big == 0 ==> _big == 0) &&
+    	  @   (\forall int x; x > 0; (_big % x == 0 && _small % x == 0)
+    	  @                          <==>
+    	  @                          (big % x == 0 && small % x == 0));
+    	  @ decreases small;
+    	  @ assignable \nothing;
+    	  @*/
+        while (small != 0) {
+            final int t = big % small;
+            big = small;
+            small = t;
+        }
 
-	return big;
+        return big;
     }
     
 }

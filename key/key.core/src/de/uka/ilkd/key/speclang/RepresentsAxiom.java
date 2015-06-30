@@ -163,7 +163,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 
     public ImmutableSet<Taclet> getTaclets(
           ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-          Services services) {
+          final Services services) {
        List<LocationVariable> heaps = new ArrayList<LocationVariable>();
        int hc = 0;
        for(LocationVariable h : HeapContext.getModHeaps(services, false)) {

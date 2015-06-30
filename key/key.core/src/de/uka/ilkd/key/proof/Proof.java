@@ -36,6 +36,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -49,11 +50,13 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -618,7 +621,26 @@ public class Proof implements Named {
                         for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()) {
                             initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                         }
+                    }
+                    
+                    // Join rule applications: Unlink all join partners.
+                    if (visitedNode.getAppliedRuleApp() instanceof JoinRuleBuiltInRuleApp) {
+                        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) visitedNode
+                                .getAppliedRuleApp();
 
+                        for (Pair<Goal, PosInOccurrence> joinPartner : joinApp
+                                .getJoinPartners()) {
+                            final Goal linkedGoal = joinPartner.first;
+
+                            if (linkedGoal.node().isClosed()) {
+                                // The partner node has already been closed; we
+                                // have to add the goal again.
+                                proof.add(linkedGoal);
+                                proof.reOpenGoal(linkedGoal);
+                            }
+
+                            linkedGoal.setLinkedGoal(null);
+                        }
                     }
 
                 }
@@ -626,6 +648,12 @@ public class Proof implements Named {
 
             final Goal firstGoal = getGoal(firstLeaf);
             assert firstGoal != null;
+            
+            // Cutting a linked goal (linked by a "defocusing" join
+            // operation, see {@link JoinRule}) unlinks this goal again.
+            if (firstGoal.isLinked()) {
+                firstGoal.setLinkedGoal(null);
+            }
 
             // Go from the first leaf that has been found to the cutting point. For each node on the path,
             // remove the local rules from firstGoal that have been added by the considered node.

@@ -44,6 +44,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -490,6 +491,9 @@ public abstract class AbstractProblemLoader {
         IntermediateProofReplayer replayer = null;
         IntermediatePresentationProofFileParser.Result parserResult = null;
         IntermediateProofReplayer.Result replayResult = null;
+
+        final boolean isOSSActivated =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
         
         try {
         	if (envInput instanceof KeYUserProblemFile) {
@@ -497,6 +501,12 @@ public abstract class AbstractProblemLoader {
                 parser = new IntermediatePresentationProofFileParser(proof);
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
                 parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
+                
+                // For loading, we generally turn on one step simplification to be
+                // able to load proofs that used it even if the user has currently
+                // turned OSS off.
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+                OneStepSimplifier.refreshOSS(proof);
                 
                 replayer = new IntermediateProofReplayer(this, proof, parserResult);
                 replayResult = replayer.replay();
@@ -518,6 +528,9 @@ public abstract class AbstractProblemLoader {
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
+            
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
+            OneStepSimplifier.refreshOSS(proof);
         }
         	
         ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);

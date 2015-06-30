@@ -14,13 +14,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilJoinPointMacro;
+import de.uka.ilkd.key.macros.FullAutoPilotWithJMLSpecJoinsProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
@@ -43,6 +46,23 @@ public class JoinRuleTests extends TestCase {
     public void testLoadGcdProof() {
         Proof proof = loadProof("gcd.closed.proof");
         assertTrue(proof.closed());
+    }
+    
+    /**
+     * Runs the FullAutoPilotWithJMLSpecJoinsProofMacro on the problem with
+     * join blocks specified in JML, following by an automatic strategy finish.
+     * At the end, there should be two join applications, and the proof should
+     * be closed.
+     */
+    @Test
+    public void testDoAutomaticGcdProofWithJoins() {
+        final Proof proof = loadProof("gcd.joinBlocks.key");
+        runMacro(new FullAutoPilotWithJMLSpecJoinsProofMacro(), proof.root());
+        startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
+        assertEquals("There should be two join applications in the proof.",
+                proof.getStatistics().joinRuleApps, 2);
     }
 
     /**
@@ -69,12 +89,48 @@ public class JoinRuleTests extends TestCase {
         final Proof proof = loadProof("gcd.key");
 
         for (int i = 0; i < 2; i++) {
-            runSymbExMacro(proof.openGoals().head().node());
-            joinFirstGoal(proof);
+            runMacro(new FinishSymbolicExecutionUntilJoinPointMacro(), proof
+                    .openGoals().head().node());
+            joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
         }
 
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
+    }
+    
+    /**
+     * Joins for SE states with different symbolic states are
+     * only allowed if the path conditions are distinguishable --
+     * for the case that if-then-else conditions are employed.
+     * This test case tries to join two states with equal path
+     * condition but different symbolic states -- therefore, the
+     * join should fail due to an incomplete rule application.
+     */
+    @Test
+    public void testJoinIndistinguishablePathConditionsWithITE() {
+        final Proof proof = loadProof("IndistinguishablePathConditions.key.proof");
+        
+        try {
+            joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
+            fail("The join operation should not be applicable.");
+        } catch (IncompleteRuleAppException e) {}
+    }
+    
+    /**
+     * Joins two SE states with different symbolic states and
+     * equal path condition, but uses the "Full Anonymization"
+     * join method for which this is irrelevant. The join should
+     * succeed and the proof should be closable.
+     */
+    @Test
+    public void testJoinIndistinguishablePathConditionsWithFullAnonymization() {
+        final Proof proof = loadProof("IndistinguishablePathConditions.key.proof");
+        
+        joinFirstGoal(proof, JoinWeaken.instance());
+        startAutomaticStrategy(proof);
+        
+        assertTrue(proof.closed());
+        assertEquals(1, proof.getStatistics().joinRuleApps);
     }
 
     /**
@@ -96,7 +152,7 @@ public class JoinRuleTests extends TestCase {
      *            The proof the first goal of which to join with suitable
      *            partner(s).
      */
-    private void joinFirstGoal(final Proof proof) {
+    private void joinFirstGoal(final Proof proof, JoinProcedure joinProc) {
         final Services services = proof.getServices();
         final JoinRule joinRule = JoinRule.INSTANCE;
 
@@ -109,11 +165,14 @@ public class JoinRuleTests extends TestCase {
         {
             joinApp.setJoinPartners(JoinRule.findPotentialJoinPartners(proof
                     .openGoals().head(), joinPio));
-            joinApp.setConcreteRule(JoinIfThenElseAntecedent.instance());
+            joinApp.setConcreteRule(joinProc);
             joinApp.setJoinNode(joinNode);
         }
 
-        assertTrue(joinApp.complete());
+        if (!joinApp.complete()) {
+            throw new IncompleteRuleAppException();
+        }
+        
         joinGoal.apply(joinApp);
     }
 
@@ -128,16 +187,16 @@ public class JoinRuleTests extends TestCase {
     }
 
     /**
-     * Runs the {@link FinishSymbolicExecutionUntilJoinPointMacro} on the given
-     * proof node.
+     * Runs the given macro on the given proof node.
      *
+     * @param macro
+     *            The macro to execute.
      * @param node
      *            The node to execute the macro on.
      */
-    private void runSymbExMacro(Node node) {
+    private void runMacro(AbstractProofMacro macro, Node node) {
         try {
-            new FinishSymbolicExecutionUntilJoinPointMacro().applyTo(null,
-                    node, null, null);
+            macro.applyTo(null, node, null, null);
         }
         catch (Exception e) {
             fail("Could not apply macro.");
@@ -169,6 +228,10 @@ public class JoinRuleTests extends TestCase {
             fail("Proof could not be loaded.");
             return null;
         }
+    }
+    
+    private class IncompleteRuleAppException extends RuntimeException {
+        private static final long serialVersionUID = 774109478701810300L;
     }
 
 }

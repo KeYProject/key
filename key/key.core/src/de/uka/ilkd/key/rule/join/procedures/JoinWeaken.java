@@ -28,53 +28,53 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
- * Rule that joins two sequents based on "total" weakening:
- * Replacement of symbolic state by an update setting every
- * program variable to a fresh Skolem constant, if the
- * respective program variable does not evaluate to the same
- * value in both states - in this case, the original value
- * is preserved (-> idempotency).
+ * Rule that joins two sequents based on "total" weakening: Replacement of
+ * symbolic state by an update setting every program variable to a fresh Skolem
+ * constant, if the respective program variable does not evaluate to the same
+ * value in both states - in this case, the original value is preserved (->
+ * idempotency).
  * 
  * @author Dominic Scheurer
  */
 public class JoinWeaken extends JoinProcedure {
-   
+
     private static JoinWeaken INSTANCE = null;
-    
+
     public static JoinWeaken instance() {
         if (INSTANCE == null) {
             INSTANCE = new JoinWeaken();
         }
         return INSTANCE;
     }
-    
-   private static final String DISPLAY_NAME = "JoinByFullAnonymization";
-   
-   @Override
-   public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-         LocationVariable v,
-         SymbolicExecutionState state1,
-         Term valueInState1,
-         SymbolicExecutionState state2,
-         Term valueInState2,
-         Services services) {
-      
-      final TermBuilder tb = services.getTermBuilder();
-      
-      final Function newSkolemConstant =
-            getNewSkolemConstantForPrefix(v.name().toString(), v.sort(), services);
-      ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
-      newNames = newNames.add(newSkolemConstant.name());
 
-      return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
-            DefaultImmutableSet.<Term>nil(),
-            tb.func(newSkolemConstant),
-            newNames);
-      
-   }
-   
-   @Override
-   public String toString() {
-      return DISPLAY_NAME;
-   }
+    private static final String DISPLAY_NAME = "JoinByFullAnonymization";
+
+    @Override
+    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
+            LocationVariable v, SymbolicExecutionState state1,
+            Term valueInState1, SymbolicExecutionState state2,
+            Term valueInState2, Services services) {
+
+        final TermBuilder tb = services.getTermBuilder();
+
+        final Function newSkolemConstant = getNewSkolemConstantForPrefix(v
+                .name().toString(), v.sort(), services);
+        ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
+        newNames = newNames.add(newSkolemConstant.name());
+
+        return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+                DefaultImmutableSet.<Term> nil(), tb.func(newSkolemConstant),
+                newNames);
+
+    }
+
+    @Override
+    public boolean requiresDistinguishablePathConditions() {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return DISPLAY_NAME;
+    }
 }

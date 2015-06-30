@@ -161,7 +161,11 @@ public class OverflowChecker {
 		List<SMTTerm> args = createGuards(terms);		
 		return SMTTerm.and(args);		
 	}
-
+	/**
+	 * Creates guards for the given terms
+	 * @param terms - the terms that must be guarded against integer overflows
+	 * @return a list of generated guards
+	 */
 	public List<SMTTerm> createGuards(Set<SMTTerm> terms) {
 		 List<SMTTerm> args = new LinkedList<SMTTerm>();
 
@@ -169,12 +173,20 @@ public class OverflowChecker {
 
 			 if(t instanceof SMTTermMultOp){
 				 SMTTermMultOp tm = (SMTTermMultOp) t;
+				 SMTTerm guard = null;
+				 //create guard for addition
 				 if(isAddOp(tm.getOperator())){
-
-					 args.add(createGuardForAdd(tm));					
+					 guard = createGuardForAdd(tm);
+					 					
 				 }
+				 //create guard for multiplication
 				 else if(isMulOp(tm.getOperator())){
-					 args.add(createGuardForMul(tm));
+					 guard = createGuardForMul(tm);
+				 }
+				 if(guard != null){
+					 //System.out.println("Guard for term: "+t);
+					 //System.out.println(guard);
+					 args.add(guard);
 				 }
 
 			 }

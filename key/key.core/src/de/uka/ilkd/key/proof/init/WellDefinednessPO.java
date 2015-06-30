@@ -29,6 +29,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
@@ -68,6 +69,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private final WellDefinednessCheck check;
     private Term mbyAtPre;
     private InitConfig proofConfig;
+    private TermBuilder tb;
 
     /**
      * Constructor
@@ -249,9 +251,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public void readProblem() throws ProofInputException {
         assert proofConfig == null;
         
-        proofConfig = environmentConfig.deepCopy();
-        final Services proofServices = proofConfig.getServices();
-       
+        final Services proofServices = postInit();
+        
         final Variables vars = buildVariables(check, proofServices);
 
         register(vars, proofServices);
@@ -278,6 +279,13 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         collectClassAxioms(getKJT(), proofConfig);
 
         generateWdTaclets(proofConfig);
+    }
+
+    private Services postInit() {
+        proofConfig = environmentConfig.deepCopy();
+        final Services proofServices = proofConfig.getServices();
+        tb = proofServices.getTermBuilder();
+        return proofServices;
     }
 
     @Override

@@ -416,7 +416,7 @@ public final class Main {
     }
 
     /** Deactivate experimental features. */
-    private static void deactivateExperimentalFeatures () {
+    public static void deactivateExperimentalFeatures () {
         for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
             feature.deactivate();
     }
