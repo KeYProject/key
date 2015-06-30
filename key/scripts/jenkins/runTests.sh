@@ -18,7 +18,7 @@ EXIT_UNIT_TESTS=$?
 #
 mkdir -p "$STATISTICS_DIR"
 # just for testing purposes  commented out
-if [ "$EXIT_UNIT_TESTS" -eq "0" -a "$EXIT_PROVE_RULES" -eq "0" ]
+if [ "$EXIT_UNIT_TESTS" -eq "0" ]
 then 
   cp ../key.core.test/testresults/runallproofs/runStatistics.csv "$STATISTICS_DIR/$BUILD_NUMBER.csv"
   exit 0
