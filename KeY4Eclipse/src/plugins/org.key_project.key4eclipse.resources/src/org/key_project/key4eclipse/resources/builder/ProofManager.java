@@ -192,7 +192,9 @@ public class ProofManager {
       checkContractRecursion();
       if(KeYProjectProperties.isGenerateTestCases(project)) {
          TestSuiteGenerator testSuiteGenerator = new TestSuiteGenerator(project, proofElements);
-         testSuiteGenerator.cleanUpTestProject();
+         if(KeYProjectProperties.isAutoDeleteTestCases(project)) {
+            testSuiteGenerator.cleanUpTestProject();
+         }
          testSuiteGenerator.generateTestSuit();
       }
       if(!monitor.isCanceled()){

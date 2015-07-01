@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.swt.widgets.Display;
@@ -47,6 +48,11 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
     * Suffix for the {@link IJavaProject} which contains the tests.
     */
    public static final String TEST_PROJECT_SUFFIX = "Tests";
+   
+   /**
+    * The name of the package which contains all tests.
+    */
+   public static final String TESTCASES_PACKAGE = "testcases";
 
    /**
     * The folder which provides required libraries.
@@ -165,7 +171,8 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       // Create test project
       IJavaProject testProject = JDTUtil.createJavaProject(sourceProject.getName() + TEST_PROJECT_SUFFIX, sourceProject);
       List<IPackageFragmentRoot> sourceResources = JDTUtil.getSourcePackageFragmentRoots(testProject);
-      IContainer sourceContainer = findFirstSourceContainer(sourceResources);
+      IPackageFragmentRoot sourceRoot = findFirstSourceRoot(sourceResources);
+      IContainer sourceContainer = (IContainer) sourceRoot.getResource();
       if (sourceContainer == null) {
          throw new IllegalStateException("The Java project '" + testProject.getProject().getName() + "' has no source folder.");
       }
@@ -175,6 +182,7 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof, true);
       tg.setLogger(log);
       tg.setFileName(JDTUtil.ensureValidJavaTypeName(testFileName, testProject));
+      tg.setPackageName(TESTCASES_PACKAGE); 
       //Add JUnit 4
       IClasspathEntry[] entries = testProject.getRawClasspath();
       Path junitPath = new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/4");
@@ -192,7 +200,13 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       IFile readmeFile = libFolder.getFile(LIB_FOLDER_README_NAME);
       ResourceUtil.createFile(readmeFile, createLibFolderReadmeContent(), null);
       // Create test file
-      final IFile testFile = sourceContainer.getFile(new Path(tg.getFileName() + TestCaseGenerator.JAVA_FILE_EXTENSION_WITH_DOT));
+      IContainer packageContainer = sourceContainer;
+      IPackageFragment packageFragment = sourceRoot.createPackageFragment(TESTCASES_PACKAGE, true, null);
+      IResource packageRes = packageFragment.getResource();
+      if(packageRes instanceof IContainer) {
+         packageContainer = (IContainer) packageRes;
+      }
+      final IFile testFile = packageContainer.getFile(new Path(tg.getFileName() + TestCaseGenerator.JAVA_FILE_EXTENSION_WITH_DOT));
       StringBuffer testSb = tg.createTestCaseCotent(problemSolvers);
       ResourceUtil.createFile(testFile, new ByteArrayInputStream(testSb.toString().getBytes()), null);
       // Create RFL file (needs to be done after the test file is created)
@@ -229,6 +243,24 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
          }
       }
       return false;
+   }
+
+   /**
+    * Returns the first fund {@link IContainer} of a source location.
+    * @param sourceResources The available source {@link IPackageFragmentRoot}s.
+    * @return The first found {@link IContainer} or {@code null} if no one was found.
+    */
+   protected IPackageFragmentRoot findFirstSourceRoot(List<IPackageFragmentRoot> sourceResources) {
+      IContainer result = null;
+      Iterator<IPackageFragmentRoot> iter = sourceResources.iterator();
+      while (result == null && iter.hasNext()) {
+         IPackageFragmentRoot root = iter.next();
+         IResource resource = root.getResource();
+         if (resource instanceof IContainer) {
+            return root;
+         }
+      }
+      return null;
    }
 
    /**

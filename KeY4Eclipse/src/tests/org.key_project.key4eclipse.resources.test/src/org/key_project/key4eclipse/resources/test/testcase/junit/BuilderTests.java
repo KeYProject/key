@@ -26,6 +26,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
+import org.key_project.key4eclipse.resources.builder.TestSuiteGenerator;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
@@ -1795,9 +1796,11 @@ public class BuilderTests extends AbstractResourceTest {
       // Test src folder
       IFolder srcFolder = testProject.getFolder(JDTUtil.getSourceFolderName());
       assertTrue(srcFolder.exists());
-      IFile sourceFile0 = srcFolder.getFile(JDTUtil.ensureValidJavaTypeName("A_A__id_int___JML_operation_contract_0", javaSourceProject) + ".java");
+      IFolder testPackageFolder = srcFolder.getFolder(EclipseTestGenerator.TESTCASES_PACKAGE);
+      assertTrue(testPackageFolder.exists());
+      IFile sourceFile0 = testPackageFolder.getFile(JDTUtil.ensureValidJavaTypeName("A_A__id_int___JML_operation_contract_0", javaSourceProject) + ".java");
       assertFalse(StringUtil.isTrimmedEmpty(ResourceUtil.readFrom(sourceFile0)));
-      IFile sourceFile1 = srcFolder.getFile(JDTUtil.ensureValidJavaTypeName("B_B__id_int___JML_operation_contract_0", javaSourceProject) + ".java");
+      IFile sourceFile1 = testPackageFolder.getFile(JDTUtil.ensureValidJavaTypeName("B_B__id_int___JML_operation_contract_0", javaSourceProject) + ".java");
       assertFalse(StringUtil.isTrimmedEmpty(ResourceUtil.readFrom(sourceFile1)));
    }
 
@@ -1842,16 +1845,22 @@ public class BuilderTests extends AbstractResourceTest {
       IProject testProject = ResourcesPlugin.getWorkspace().getRoot().getProject(project.getName() + EclipseTestGenerator.TEST_PROJECT_SUFFIX);
       assertTrue(testProject.exists());
       assertTrue(testProject.isOpen());
-      
-      IFolder srcFolder = testProject.getFolder("src");
+
+      IFolder srcFolder = testProject.getFolder(JDTUtil.getSourceFolderName());
       assertTrue(srcFolder.exists());
+      IFolder suitePackageFolder = srcFolder.getFolder(TestSuiteGenerator.TESTSUITE_PACKAGE);
+      assertTrue(suitePackageFolder.exists());
       
-      IFile testSuite = srcFolder.getFile("_AllTests.java");
+      IFile testSuite = suitePackageFolder.getFile(TestSuiteGenerator.TESTSUITE_TYPENAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
       assertTrue(testSuite.exists());
+
       
       //Compare test suite
       InputStream in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testTestSuiteGeneration/Suite0");
-      assertEquals(IOUtil.readFrom(in), ResourceUtil.readFrom(testSuite));
+      String expected = IOUtil.readFrom(in);
+      String actual = ResourceUtil.readFrom(testSuite);
+      actual = actual.replaceAll("(\r\n|\n\r)", "\n");
+      assertEquals(expected, actual);
       in.close();
       
       //Change test file
@@ -1861,8 +1870,11 @@ public class BuilderTests extends AbstractResourceTest {
       KeY4EclipseResourcesTestUtil.build(project);
       
       //Compare test suite
-      in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testTestSuiteGeneration/Suite1");
-      assertEquals(IOUtil.readFrom(in), ResourceUtil.readFrom(testSuite));
+      in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testTestSuiteGeneration/suite1");
+      expected = IOUtil.readFrom(in);
+      actual = ResourceUtil.readFrom(testSuite);
+      actual = actual.replaceAll("(\r\n|\n\r)", "\n");
+      assertEquals(expected, actual);
       in.close();
    }
 }

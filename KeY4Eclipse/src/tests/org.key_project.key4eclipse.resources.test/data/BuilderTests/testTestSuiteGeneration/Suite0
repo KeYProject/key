@@ -1,10 +1,14 @@
+package suite;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import testcases.*;
+
 @RunWith(Suite.class)
 @SuiteClasses({
 	IntegerUtil_IntegerUtil__identity_int___JML_operation_contract_0.class,
-	_estpackage_IntegerUtil2_testpackage_IntegerUtil2__identity_int___JML_operation_contract_0.class
+	testpackage_IntegerUtil2_testpackage_IntegerUtil2__identity_int___JML_operation_contract_0.class
 })
-public class _AllTests { }
+public class AllTests { }

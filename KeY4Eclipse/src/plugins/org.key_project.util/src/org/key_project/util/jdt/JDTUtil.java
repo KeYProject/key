@@ -1029,7 +1029,7 @@ public class JDTUtil {
             IStatus status = project != null ?
                              JavaConventionsUtil.validateJavaTypeName(nameToValidate, project) :
                              JavaConventions.validateJavaTypeName(nameToValidate, JavaModelUtil.VERSION_LATEST, JavaModelUtil.VERSION_LATEST);
-            if (status.isOK() || status.getSeverity() == IStatus.WARNING) {
+            if (status.isOK() || (status.getSeverity() == IStatus.WARNING && characters[i] != '.')) {
                sb.append(characters[i]);
             }
             else {
@@ -1042,6 +1042,7 @@ public class JDTUtil {
          return null;
       }
    }
+   
    
    /**
     * Returns all {@link IPackageFragmentRoot}s of the given {@link IJavaProject}.

@@ -49,8 +49,10 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    private Button enableMultiThreadingButton;
    
    private Button autoDeleteProofFilesButton;
-   
+
    private Button generateTestCasesButton;
+   
+   private Button autoDeleteTestCasesButton;
    
    private Text fillText;
    
@@ -67,6 +69,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          setEnabledForSetNumberOfThreads();
          setEnabledForAutoDeleteProofFilesButton();
          setEnabledForGenerateTestCasesButton();
+         setEnabledForAutoDeleteTestCasesButton(); 
       }
       
       @Override
@@ -81,6 +84,19 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
          setEnabledForSetNumberOfThreads(); 
+      }
+
+      @Override
+      public void widgetDefaultSelected(SelectionEvent e) {
+      }
+   };
+   
+   
+   private SelectionListener enableGenerateTestCasesButtonSelectionListener = new SelectionListener() {
+      
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+         setEnabledForAutoDeleteTestCasesButton(); 
       }
 
       @Override
@@ -120,6 +136,11 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       enableBuildRequiredProofsOnlyButton.setText("Build required proofs only");
       setSelectionForEnableBuildRequiredProofsOnlyButton();
       setEnabledForBuildReqiredProofsOnlyButton();
+
+      autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
+      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
+      setSelectionForAutoDeleteProofFilesButton();
+      setEnabledForAutoDeleteProofFilesButton();
       
       Group multiThreadingSettings = new Group(builderSettingsComposite, SWT.NONE);
       multiThreadingSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -152,16 +173,24 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       setSelectionForSetNumberOfThreads();
       setEnabledForSetNumberOfThreads();
       
-
-      autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
-      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
-      setSelectionForAutoDeleteProofFilesButton();
-      setEnabledForAutoDeleteProofFilesButton();
-
-      generateTestCasesButton = new Button(builderSettingsComposite, SWT.CHECK);
+      Group testCaseGenSettings = new Group(builderSettingsComposite, SWT.NONE);
+      testCaseGenSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      testCaseGenSettings.setLayout(new GridLayout(1, false));
+      testCaseGenSettings.setText("Test Case Generation");
+      Composite testCaseGenComposite = new Composite(testCaseGenSettings, SWT.NONE);
+      testCaseGenComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      testCaseGenComposite.setLayout(new GridLayout(1, false));
+      
+      generateTestCasesButton = new Button(testCaseGenComposite, SWT.CHECK);
       generateTestCasesButton.setText("Generate test cases");
+      generateTestCasesButton.addSelectionListener(enableGenerateTestCasesButtonSelectionListener);
       setSelectionForGenerateTestCasesButton();
       setEnabledForGenerateTestCasesButton();
+      
+      autoDeleteTestCasesButton = new Button(testCaseGenComposite, SWT.CHECK);
+      autoDeleteTestCasesButton.setText("Delete unnecessary test cases automatically");
+      setSelectionForAutoDeleteTestCasesButton();
+      setEnabledForAutoDeleteTestCasesButton();
             
       return root;
    }
@@ -266,6 +295,15 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       }
    }
    
+   private void setSelectionForAutoDeleteTestCasesButton(){
+      autoDeleteTestCasesButton.setSelection(KeYProjectProperties.isAutoDeleteTestCases(getProject()));
+   }
+   
+   private void setEnabledForAutoDeleteTestCasesButton(){
+      boolean enable = generateTestCasesButton.isEnabled() && generateTestCasesButton.getSelection();
+      autoDeleteTestCasesButton.setEnabled(enable);
+   }
+   
    
    /**
     * {@inheritDoc}
@@ -281,6 +319,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
          KeYProjectProperties.setGenerateTestCases(project, generateTestCasesButton.getSelection());
+         KeYProjectProperties.setAutoDeleteTestCases(project, autoDeleteTestCasesButton.getSelection());
          return super.performOk();
       }
       catch (CoreException e) {
@@ -309,6 +348,8 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       setEnabledForAutoDeleteProofFilesButton();
       generateTestCasesButton.setSelection(false);
       setEnabledForGenerateTestCasesButton();
+      autoDeleteTestCasesButton.setSelection(false);
+      setEnabledForAutoDeleteTestCasesButton();
       super.performDefaults();
    }
 }
