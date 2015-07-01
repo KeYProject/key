@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.evaluation.model.Activator;
@@ -165,6 +166,11 @@ public abstract class AbstractEvaluation {
     * @return {@code true} user interface available, {@code false} user interface not available.
     */
    protected static boolean isUIAvailable() {
-      return Activator.getDefault() != null && Display.getDefault() != null && !Display.getDefault().isDisposed();
+      try {
+         return Activator.getDefault() != null && Display.getDefault() != null && !Display.getDefault().isDisposed();
+      }
+      catch (SWTError e) { // Thrown if a graphical user interface is not available.
+         return false;
+      }
    }
 }
