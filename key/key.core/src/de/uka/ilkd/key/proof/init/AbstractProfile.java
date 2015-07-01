@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 public abstract class AbstractProfile implements Profile {
@@ -201,9 +202,15 @@ public abstract class AbstractProfile implements Profile {
       * justification
       * @return the justification for the standard rules
       */
-     public RuleJustification getJustification(Rule r) {
+   @Override
+   public RuleJustification getJustification(Rule r) {
+      if (r instanceof Taclet) {
+         return ((Taclet) r).getRuleJustification();
+      }
+      else {
          return AxiomJustification.INSTANCE;
-     }
+      }
+   }
      
      
      @Override

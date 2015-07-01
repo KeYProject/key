@@ -36,6 +36,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -49,11 +50,13 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -453,7 +456,7 @@ public class Proof implements Named {
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
         ImmutableList<Goal> enabledGoals = ImmutableSLList.<Goal>nil();
         for(Goal g : goals) {
-            if(g.isAutomatic()) {
+            if(g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
             }
         }
@@ -503,6 +506,22 @@ public class Proof implements Named {
             // For the moment it is necessary to fire the message ALWAYS
             // in order to detect branch closing.
             fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );
+    }
+    
+    /**
+     * Opens a previously closed node (the one corresponding to p_goal)
+     * and all its closed parents.<p>
+     * 
+     * This is, for instance, needed for the join rule: In
+     * a situation where a join node and its associated partners
+     * have been closed and the join node is then pruned away,
+     * the partners have to be reopened again. Otherwise, we
+     * have a soundness issue.
+     *
+     * @param p_goal The goal to be opened again.
+     */
+    public void reOpenGoal(Goal p_goal) {
+        p_goal.node().reopen();
     }
 
     /** removes the given goal from the list of open goals. Take care
@@ -602,7 +621,26 @@ public class Proof implements Named {
                         for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()) {
                             initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                         }
+                    }
+                    
+                    // Join rule applications: Unlink all join partners.
+                    if (visitedNode.getAppliedRuleApp() instanceof JoinRuleBuiltInRuleApp) {
+                        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) visitedNode
+                                .getAppliedRuleApp();
 
+                        for (Pair<Goal, PosInOccurrence> joinPartner : joinApp
+                                .getJoinPartners()) {
+                            final Goal linkedGoal = joinPartner.first;
+
+                            if (linkedGoal.node().isClosed()) {
+                                // The partner node has already been closed; we
+                                // have to add the goal again.
+                                proof.add(linkedGoal);
+                                proof.reOpenGoal(linkedGoal);
+                            }
+
+                            linkedGoal.setLinkedGoal(null);
+                        }
                     }
 
                 }
@@ -610,6 +648,12 @@ public class Proof implements Named {
 
             final Goal firstGoal = getGoal(firstLeaf);
             assert firstGoal != null;
+            
+            // Cutting a linked goal (linked by a "defocusing" join
+            // operation, see {@link JoinRule}) unlinks this goal again.
+            if (firstGoal.isLinked()) {
+                firstGoal.setLinkedGoal(null);
+            }
 
             // Go from the first leaf that has been found to the cutting point. For each node on the path,
             // remove the local rules from firstGoal that have been added by the considered node.
@@ -744,24 +788,30 @@ public class Proof implements Named {
     /** fires the event that the proof has been expanded at the given node */
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofExpanded(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofExpanded(e);
+            }
         }
     }
 
     /** fires the event that the proof is being pruned at the given node */
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofIsBeingPruned(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofIsBeingPruned(e);
+            }
         }
     }
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofPruned(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofPruned(e);
+            }
         }
     }
 
@@ -769,8 +819,10 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofStructureChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofStructureChanged(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofStructureChanged(e);
+            }
         }
     }
 
@@ -778,8 +830,10 @@ public class Proof implements Named {
     /** fires the event that a goal has been removed from the list of goals */
     protected void fireProofGoalRemoved(Goal goal) {
         ProofTreeEvent e = new ProofTreeEvent(this, goal);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalRemoved(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalRemoved(e);
+            }
         }
     }
 
@@ -789,8 +843,10 @@ public class Proof implements Named {
      */
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
         ProofTreeEvent e = new ProofTreeEvent(this, goals);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalsAdded(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalsAdded(e);
+            }
         }
     }
 
@@ -806,8 +862,10 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     public void fireProofGoalsChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofGoalsChanged(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalsChanged(e);
+            }
         }
     }
 
@@ -818,8 +876,10 @@ public class Proof implements Named {
      */
     protected void fireProofClosed() {
         ProofTreeEvent e = new ProofTreeEvent(this);
-        for (ProofTreeListener listener : listenerList) {
-            listener.proofClosed(e);
+        synchronized(listenerList) {
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofClosed(e);
+            }
         }
     }
 
@@ -842,7 +902,7 @@ public class Proof implements Named {
      */
     public synchronized void removeProofTreeListener
     (ProofTreeListener listener) {
-        if (listenerList != null) {
+        if (listenerList != null) { // TODO: check if necessary
             synchronized(listenerList) {
                 listenerList.remove(listener);
             }

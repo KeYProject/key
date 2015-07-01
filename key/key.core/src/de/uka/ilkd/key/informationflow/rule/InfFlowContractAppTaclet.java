@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.TacletAnnotation;
 import de.uka.ilkd.key.rule.TacletApplPart;
 import de.uka.ilkd.key.rule.TacletAttributes;
 import de.uka.ilkd.key.rule.TacletPrefix;
@@ -72,8 +73,9 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
                          Term find,
                          ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
                          int p_applicationRestriction,
-                         ImmutableSet<Choice> choices) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, p_applicationRestriction, choices);
+                         ImmutableSet<Choice> choices,
+                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, p_applicationRestriction, choices, tacletAnnotations);
     }
 
 
@@ -86,8 +88,9 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
                          ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
                          int p_applicationRestriction,
                          ImmutableSet<Choice> choices,
-                         boolean surviveSymbExec) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, p_applicationRestriction, choices, surviveSymbExec);
+                         boolean surviveSymbExec,
+                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, p_applicationRestriction, choices, surviveSymbExec, tacletAnnotations);
     }
 
     @Override
@@ -105,7 +108,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
         
         return new InfFlowContractAppTaclet(new Name(s), 
                 applPart, goalTemplates(), getRuleSets(), attrs, find, prefixMap, 
-                getApplicationRestriction(), choices, getSurviveSymbExec());
+                getApplicationRestriction(), choices, getSurviveSymbExec(), tacletAnnotations);
     }
   
 }

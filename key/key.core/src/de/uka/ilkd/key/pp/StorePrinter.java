@@ -70,7 +70,7 @@ class StorePrinter extends FieldPrinter {
 
             if (isStaticFieldConstant(objectTerm, fieldTerm)) {
                 printStoreOnStaticField(heapTerm, fieldTerm, valueTerm, closingBrace);
-            } else if (isGenericFieldConstant(fieldTerm)) {
+            } else if (isBuiltinObjectProperty(fieldTerm)) {
                 printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else if (isJavaFieldConstant(fieldTerm)) {
                 printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);

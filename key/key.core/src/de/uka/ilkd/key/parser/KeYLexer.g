@@ -328,6 +328,9 @@ lexer grammar KeYLexer;
         CONTRACTS : '\\contracts';
         INVARIANTS : '\\invariants';
 
+   // Taclet annotations (see TacletAnnotations.java for more details)
+   LEMMA : '\\lemma';
+
         // The first two guys are not really meta operators, treated separately
 	IN_TYPE : '\\inType';
         IS_ABSTRACT_OR_INTERFACE : '\\isAbstractOrInterface';

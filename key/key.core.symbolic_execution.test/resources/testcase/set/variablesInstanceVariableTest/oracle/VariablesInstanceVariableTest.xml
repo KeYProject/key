@@ -21,7 +21,7 @@
                   </value>
                </variable>
                <variable name="wrapper" isArrayIndex="false">
-                  <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                  <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -52,7 +52,7 @@
                      </value>
                   </variable>
                   <variable name="wrapper" isArrayIndex="false">
-                     <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                     <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -87,7 +87,7 @@
                         </value>
                      </variable>
                      <variable name="wrapper" isArrayIndex="false">
-                        <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                        <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -122,7 +122,7 @@
                            </value>
                         </variable>
                         <variable name="wrapper" isArrayIndex="false">
-                           <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                           <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -157,7 +157,7 @@
                               </value>
                            </variable>
                            <variable name="wrapper" isArrayIndex="false">
-                              <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                              <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -217,7 +217,7 @@
                                     </value>
                                  </variable>
                                  <variable name="wrapper" isArrayIndex="false">
-                                    <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                                    <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
@@ -250,7 +250,7 @@
                                        </value>
                                     </variable>
                                     <variable name="wrapper" isArrayIndex="false">
-                                       <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                                       <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
@@ -283,7 +283,7 @@
                                           </value>
                                        </variable>
                                        <variable name="wrapper" isArrayIndex="false">
-                                          <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                                          <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
@@ -469,7 +469,7 @@
                                                       </value>
                                                    </variable>
                                                    <variable name="wrapper" isArrayIndex="false">
-                                                      <value name="wrapper {or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                                                      <value name="wrapper {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                                                       </value>
                                                    </variable>
                                                 </value>

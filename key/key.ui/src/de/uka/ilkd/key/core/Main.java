@@ -27,6 +27,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
+import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -140,12 +141,12 @@ public final class Main {
      */
     private static List<File> fileArguments;
 
-    /** Lists all features currently marked as experimental.
-     * Unless invoked with command line option --experimental ,
-     * those will be deactivated.
+    /**
+     * Lists all features currently marked as experimental. Unless invoked with
+     * command line option --experimental , those will be deactivated.
      */
-    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
-        {JoinMenuItem.FEATURE};
+    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES = {
+            JoinMenuItem.FEATURE, JoinRuleMenuItem.FEATURE };
 
     /**
      * Save all contracts in selected location to automate the creation
@@ -415,7 +416,7 @@ public final class Main {
     }
 
     /** Deactivate experimental features. */
-    private static void deactivateExperimentalFeatures () {
+    public static void deactivateExperimentalFeatures () {
         for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
             feature.deactivate();
     }

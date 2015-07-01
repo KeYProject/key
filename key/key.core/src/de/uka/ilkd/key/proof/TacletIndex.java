@@ -246,7 +246,7 @@ public abstract class TacletIndex  {
      * removes the given NoPosTacletApps from this index
      * @param tacletAppList the NoPosTacletApps to be removed
      */
-    public void removeTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
+    public void removeTaclets(Iterable<NoPosTacletApp> tacletAppList) {
 	for(final NoPosTacletApp tacletApp : tacletAppList) {
 	    remove(tacletApp);
 	}

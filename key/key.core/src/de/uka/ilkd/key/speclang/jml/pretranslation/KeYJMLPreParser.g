@@ -712,6 +712,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
+   |   ps=joinproc_clause        { sc.addJoinProcs(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
@@ -1574,6 +1575,21 @@ returns_clause
 returns_keyword
 :
 	RETURNS
+;
+
+joinproc_clause
+   returns [PositionedString r = null]
+   throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+   joinproc_keyword result=expression { result = result.prepend("join_proc "); }
+;
+
+
+joinproc_keyword
+:
+   JOIN_PROC
 ;
 
 

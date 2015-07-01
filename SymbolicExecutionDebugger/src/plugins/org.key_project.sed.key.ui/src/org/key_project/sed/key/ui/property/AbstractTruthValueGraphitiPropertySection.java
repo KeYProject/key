@@ -14,11 +14,8 @@
 package org.key_project.sed.key.ui.property;
 
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -84,27 +81,4 @@ public abstract class AbstractTruthValueGraphitiPropertySection extends GFProper
     * @return The {@link IKeYSEDDebugNode} to show or {@code null} if no one should be shown.
     */
    public abstract IKeYSEDDebugNode<?> getDebugNode(PictogramElement pe);
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public IDiagramEditor getDiagramEditor() {
-      IDiagramEditor editor = super.getDiagramEditor();
-      if (editor == null) {
-         IWorkbenchPart part = getPart();
-         if (part != null) {
-            IEditorPart editPart = (IEditorPart)part.getAdapter(IEditorPart.class);
-            if (editPart instanceof IDiagramEditor) {
-               editor = (IDiagramEditor)editPart;
-            }
-         }
-      }
-      return editor;
-   }
 }

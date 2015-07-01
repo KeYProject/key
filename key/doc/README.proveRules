@@ -3,67 +3,58 @@ Regression tests for proved rules
 =================================
 
 Jan 2014 Mattias Ulbrich
+June 2015 Kai Wallisch
 
 The taclet base for KeY grows constantly and it is difficult to
 oversee that all these rules are sound. It is possible to prove
-(certain) taclets sound within KeY but these proofs are only valid for
-the KeY version they have been conducted in.
+taclets sound within KeY. Such proofs may become invalidated by
+changes in the taclet database.
 
-We have implemented a small script which reruns checked in taclet
-proofs along with the regression tests and thereby ensures that these
-taclets are sound in every (master) version of KeY.
+We have implemented a test suite which reruns taclet proofs along with
+the regression tests regularly and thereby ensures that these taclets
+are sound in every (master) version of KeY.
 
-How it works
-------------
+ProveRules is a JUnit test suite that verifies correctness of taclets
+by replaying their saved correctness proofs.
 
-The script scans all .proof-files under "examples/taclets" in "key/key.ui" and
-runs them. If any of them fails, a failed test case points to that problem.
+In order to add a taclet proof to ProveRules, the following steps are
+necessary:
 
-Additionally it checks that for every taclet which is labelled as
-proved, there exists a loadable proof file. If a labelled taclet has no
-proof, a failed test case is raised, too.
+1) Annotate the taclet to be a lemma by adding "\lemma" in front of
+   the taclet's name. For example, the declaration of taclet
+   bsum_empty looks as follows:
+      \lemma bsum_empty { ... };
 
-If a proved taclet has not been labelled, only a warning is emitted to
-the command line.
+2) Conduct a proof of the taclet by selecting the same taclet from
+      File -> Prove -> KeY's Taclets.
+   (Better to select one at a time).
 
-To label a rule you need to add the line "// proved" directly above
-the rule definition. There must not be empty lines between the label
-and the rule name.
+3) Save a proof of the taclet in the folder
 
-Spurious labels are also reported by the script.
+      key/key.core.test/tacletProofs
 
-The script is located at "key/scripts/proveRules.pl". Use "-help" to get more
-infos. It is invoked by Mr. Marvin Jenkins when the regression tests
-on the master branch are performed. Consider adding it to your side
-project in Jenkins.
+   or an arbitrary subfolder. It is recommended to use the name of the
+   key-file in which the taclet has been defined as name of the
+   subdirectory. The name of the proof file has to match the pattern:
 
+      Taclet_$TACLETNAME.proof
 
-Adding a taclet proof
----------------------
+   For example, the proof of the taclet bsum_empty can be found under
 
-If you have proved a taclet sound, you can store (and check in) the
-according proof file into the directory "examples/taclets" and add an
-annotation to the key file.
+      key/key.core.test/tacletProofs/bsum/Taclet_bsum_empty.proof
 
-
-1. Store the proof file under the name 
-
-     examples/taclets/<keyFile>/Taclet_<tacletName>.proof
-
-   where keyFile stands for the file in which the rule has been
-   defined without extension (for instance "seqRules" if defined in
-   "seqRules.key").
+The JUnit test case will fail
+    1) if there is a proof for a taclet that is not marked "\lemma".
+       (Just add the \lemma anntoation to the taclet)
+or 2a) if there is no proof for a taclet which is annotated lemma.
+or 2b) if there is a proof, but that cannot be replayed in KeY.
 
 
-2. Add the line
+See class de.uka.ilkd.key.proof.proverules.ProveRulesTest for
+implementation details.
 
-     // proved
-
-   DIRECTLY above the  rule definition like in
-
-     // proved
-     lenOfSingleton { ....
-
-Now, regression tests will ensure that the rule "lenOfSingleton" has a
-valid proof. If the proof file is corrupted or removed, a failed
-regression test will be raised.
+In order to run taclet proofs manually, the following two options are
+available:
+1) Use ProveRules command line interface, which is located at:
+   key/scripts/proveRules
+2) Execute ant task "proveRules" in component key.core.test.

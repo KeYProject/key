@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -117,20 +119,30 @@ class FieldPrinter {
      * @return Returns true iff the given parameter represents a field constant.
      * @param fieldTerm The target field.
      */
-    protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT) {
-        return fieldTerm.op().name().toString().contains("::$")
-                && isFieldConstant(fieldTerm, heapLDT);
+    protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT, Services services) {
+        String name = fieldTerm.op().name().toString();
+        if(name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
+            String pvName = name.replace("::$", "::");
+            try {
+                return services.getJavaInfo().getAttribute(pvName) != null;
+            } catch (UnknownJavaTypeException e) {
+                // If there exists a constant of the form x::$y and there is no type
+                // x, this exception is thrown.
+                return false;
+            }
+        }
+        return false;
     }
 
     protected boolean isJavaFieldConstant(Term fieldTerm) {
-        return isJavaFieldConstant(fieldTerm, lp.getHeapLDT());
+        return isJavaFieldConstant(fieldTerm, lp.getHeapLDT(), lp.services);
     }
 
     /*
      * Determine whether the field constant is a generic object property.
      * Those are surrounded by angle brackets, e.g. o.<created>
      */
-    protected boolean isGenericFieldConstant(Term fieldTerm) {
+    protected boolean isBuiltinObjectProperty(Term fieldTerm) {
         return fieldTerm.op().name().toString().contains("::<")
                 && isFieldConstant(fieldTerm, lp.getHeapLDT());
     }

@@ -68,6 +68,7 @@ options {
 
   import de.uka.ilkd.key.proof.init.*;
   import de.uka.ilkd.key.proof.io.*;
+  import static de.uka.ilkd.key.proof.io.IProofFileParser.*;
   
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.tacletbuilder.*;
@@ -93,9 +94,10 @@ options {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
-
+  
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
+  
   
 }
 
@@ -109,26 +111,31 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
-    static HashMap<String, Character> prooflabel2tag = new LinkedHashMap<String, Character>(15);
+    static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(15);
     static {
-      prooflabel2tag.put("branch", new Character('b'));
-      prooflabel2tag.put("rule", new Character('r'));
-      prooflabel2tag.put("term", new Character('t'));
-      prooflabel2tag.put("formula", new Character('f'));
-      prooflabel2tag.put("inst", new Character('i'));
-      prooflabel2tag.put("ifseqformula", new Character('q'));
-      prooflabel2tag.put("ifdirectformula", new Character('d'));
-      prooflabel2tag.put("heur", new Character('h'));
-      prooflabel2tag.put("builtin", new Character('n'));
-      prooflabel2tag.put("keyLog", new Character('l'));
-      prooflabel2tag.put("keyUser", new Character('u'));
-      prooflabel2tag.put("keyVersion", new Character('v'));
-      prooflabel2tag.put("keySettings", new Character('s'));
-      prooflabel2tag.put("contract", new Character('c'));
-      prooflabel2tag.put("ifInst", new Character('x'));		
-      prooflabel2tag.put("userinteraction", new Character('a'));
-      prooflabel2tag.put("newnames", new Character('w'));
-      prooflabel2tag.put("autoModeTime", new Character('e'));
+         prooflabel2tag.put("branch", ProofElementID.BRANCH);
+         prooflabel2tag.put("rule", ProofElementID.RULE);
+         prooflabel2tag.put("term", ProofElementID.TERM);
+         prooflabel2tag.put("formula", ProofElementID.FORMULA);
+         prooflabel2tag.put("inst", ProofElementID.INSTANTIATION);
+         prooflabel2tag.put("ifseqformula", ProofElementID.ASSUMES_FORMULA_IN_SEQUENT);
+         prooflabel2tag.put("ifdirectformula", ProofElementID.ASSUMES_FORMULA_DIRECT);
+         prooflabel2tag.put("heur", ProofElementID.RULESET);
+         prooflabel2tag.put("builtin", ProofElementID.BUILT_IN_RULE);
+         prooflabel2tag.put("keyLog", ProofElementID.KeY_LOG);
+         prooflabel2tag.put("keyUser", ProofElementID.KeY_USER);
+         prooflabel2tag.put("keyVersion", ProofElementID.KeY_VERSION);
+         prooflabel2tag.put("keySettings", ProofElementID.KeY_SETTINGS);
+         prooflabel2tag.put("contract", ProofElementID.CONTRACT);
+         prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
+         prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
+         prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
+         prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
+         prooflabel2tag.put("joinProc", ProofElementID.JOIN_PROCEDURE);
+         prooflabel2tag.put("nrJoinPartners", ProofElementID.NUMBER_JOIN_PARTNERS);
+         prooflabel2tag.put("joinNode", ProofElementID.JOIN_NODE);
+         prooflabel2tag.put("joinId", ProofElementID.JOIN_ID);
+         prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
    }
 
    private NamespaceSet nss;
@@ -3619,8 +3626,10 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
     int applicationRestriction = RewriteTaclet.NONE;
     choices_ = choices;
     switchToNormalMode();
+    ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
 }
     : 
+      (LEMMA {tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);})?
       name=IDENT (choices_=option_list[choices_])? 
       LBRACE 
       ( (formula RBRACE) => /* check for rbrace needed to distinguish from "label" : goalspec*/ 
@@ -3635,6 +3644,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
            addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null);
            b.setName(new Name(name.getText()));
            b.setChoices(choices_);
+           b.setAnnotations(tacletAnnotations);
            r = b.getTaclet(); 
            taclet2Builder.put(r,b);
          }
@@ -3664,6 +3674,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         modifiers[b]
         { 
             b.setChoices(choices_);
+            b.setAnnotations(tacletAnnotations);
             r = b.getTaclet(); 
             taclet2Builder.put(r,b);
 	  // dump local schema var decls
@@ -4609,20 +4620,18 @@ proofBody [IProofFileParser prl] :
     ;
 
 
-pseudosexpr [IProofFileParser prl] @init{ eid='0'; str = ""; } :
-        LPAREN (eid=expreid
+pseudosexpr [IProofFileParser prl] @init{ str = ""; } :
+        LPAREN (proofElementId=expreid
             (str = string_literal )? 
-               { prl.beginExpr(eid,str); } 
+               { prl.beginExpr(proofElementId,str); } 
             ( pseudosexpr[prl] )* ) ?
-               { prl.endExpr(eid, stringLiteralLine); }
+               { prl.endExpr(proofElementId, stringLiteralLine); }
         RPAREN   
     ;
 
-expreid returns [ char eid = '0' ]
+expreid returns [ IProofFileParser.ProofElementID proofElementId = null ]
 :
    id = simple_ident {
-      Character c = prooflabel2tag.get(id);
-      if(c != null)
-         eid = c.charValue();
+      proofElementId = prooflabel2tag.get(id);
    }
 ;

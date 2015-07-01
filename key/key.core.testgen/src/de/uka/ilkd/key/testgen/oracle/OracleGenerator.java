@@ -10,6 +10,7 @@ import java.util.Set;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -447,9 +449,55 @@ public class OracleGenerator {
 	    	
 	    	
 	    }
+	    else if(op instanceof ProgramMethod){
+	    	
+	    	return translateQuery(term, initialSelect, op); 
+	    	
+	    	
+	    }
 	    
 	    throw new RuntimeException("Unsupported function found: "+name+ " of type "+fun.getClass().getName());
     }
+
+	private OracleTerm translateQuery(Term term, boolean initialSelect,
+			Operator op) {
+		
+		ProgramMethod pm = (ProgramMethod) op;		
+		OracleMethod m = createDummyOracleMethod(pm);
+		
+		
+		List<OracleTerm> params = new LinkedList<OracleTerm>();
+		
+		for(int i = 2; i < term.subs().size(); i++){
+			OracleTerm param = generateOracle(term.subs().get(i), initialSelect);
+			params.add(param);
+		}		
+		
+		return new OracleTermCall(m,params);
+	}
+
+	private OracleMethod createDummyOracleMethod(ProgramMethod pm) {
+		String body = "";
+		String methodame = pm.getName();
+		Sort returnType = pm.getReturnType().getSort();
+		
+		List<OracleVariable> args = new LinkedList<OracleVariable>();
+		
+		
+		for(int i = 2; i < pm.argSorts().size(); i++){
+			OracleVariable var = new OracleVariable("a"+i, pm.argSorts().get(i));
+			args.add(var);
+		}
+			
+			
+		
+		
+		OracleMethod m = new OracleMethod(methodame, args, body, returnType);
+		return m;
+	}
+	
+	
+	
 
 	private OracleTerm translateSelect(Term term, boolean initialSelect) {
 		Term heap = term.sub(0);	    	

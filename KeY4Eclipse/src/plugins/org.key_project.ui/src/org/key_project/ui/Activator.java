@@ -40,6 +40,8 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		// Deactivate experimental features
+		Main.deactivateExperimentalFeatures();
 	   // Make sure that the system is not exited when the KeY main window is closed.
       Main.setKeyDesktop(new EclipseKeYDesktop());
 	   ExitMainAction.exitSystem = false;

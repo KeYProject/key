@@ -96,7 +96,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
 				 prefixBuilder.getPrefixMap(),
 				 applicationRestriction,
 				 choices,
-                 surviveSmbExec);
+                 surviveSmbExec, tacletAnnotations);
     }
 
     /**

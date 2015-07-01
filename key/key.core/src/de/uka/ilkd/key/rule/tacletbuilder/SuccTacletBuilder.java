@@ -86,7 +86,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
 			      find,
                               ignoreTopLevelUpdates,
 			      prefixBuilder.getPrefixMap(),
-			      choices);
+			      choices, tacletAnnotations);
     }
     
     /** builds and returns the Taclet that is specified by
