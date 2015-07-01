@@ -1,0 +1,1 @@
+Inspired by the integer overflow bug in java.util.Arrays#binarySearch(...).
