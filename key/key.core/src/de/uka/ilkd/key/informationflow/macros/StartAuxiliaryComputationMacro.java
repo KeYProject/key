@@ -11,6 +11,11 @@ public class StartAuxiliaryComputationMacro extends AlternativeMacro {
     }
 
     @Override
+    public String getCategory() {
+        return "Auxiliary Computation";
+    }
+
+    @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition " +
                 "proofs, this macro starts a side calculation which does " +

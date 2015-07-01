@@ -11,6 +11,11 @@ public class FinishAuxiliaryComputationMacro extends AlternativeMacro {
     }
 
     @Override
+    public String getCategory() {
+        return "Auxiliary Computation";
+    }
+
+    @Override
     public String getDescription() {
         return "Finish auxiliary computation";
     }
