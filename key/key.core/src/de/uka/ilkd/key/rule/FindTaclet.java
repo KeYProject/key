@@ -74,9 +74,10 @@ public abstract class FindTaclet extends Taclet {
                       Term find,
                       ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
                       ImmutableSet<Choice> choices,
-                      boolean surviveSymbExec) {
+                      boolean surviveSymbExec,
+                      ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
-              choices, surviveSymbExec);
+              choices, surviveSymbExec, tacletAnnotations);
         this.find = find;
     }
     
@@ -101,9 +102,10 @@ public abstract class FindTaclet extends Taclet {
 		      ImmutableList<RuleSet> ruleSets,
 		      TacletAttributes attrs, Term find,
 		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-		      ImmutableSet<Choice> choices){
+		      ImmutableSet<Choice> choices,
+		      ImmutableSet<TacletAnnotation> tacletAnnotations){
 	this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
-             choices, false);
+             choices, false, tacletAnnotations);
     }
     
     /** returns the find term of the taclet to be matched */

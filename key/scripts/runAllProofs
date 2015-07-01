@@ -1,13 +1,20 @@
 #!/bin/sh
 
+#
 # RunAllProofs documentation can be found at: key/doc/README.runAllProofs
+#
+
+LIST_TESTS_FLAG=--list-tests
+HELP_FLAG=--help
+RELOAD_ENABLED_FLAG=--reload-enabled
+FORK_MODE_FLAG=--fork-mode
 
 list_help() {
-    echo "Usage: runAllProofs [--list-tests] | [ [--enable-reload=<true|false>]"
-    echo "                                       [--fork-mode=<perFile|perGroup|noFork>]"
-    echo "                                       <groupNames> ]"
-    echo "Examples: runAllProofs --fork-mode=perFile newBook comprehensions"
-    echo "          runAllProofs --list-tests"
+    echo "Usage: runAllProofs [$HELP_FLAG] | [$LIST_TESTS_FLAG] | [ [$RELOAD_ENABLED_FLAG=<true|false>]"
+    echo "                                       [$FORK_MODE_FLAG=<perFile|perGroup|noFork>]"
+    echo "                                       [<groupNames>] ]"
+    echo "Examples: runAllProofs $FORK_MODE_FLAG=perFile newBook comprehensions"
+    echo "          runAllProofs $LIST_TESTS_FLAG"
 }
 
 resolve_symlink() {
@@ -26,128 +33,35 @@ resolve_symlink() {
    echo "$RESULT"
 }
 
-#
-# Method for initialisation of environment variables.
-#
-init_env() {
+SCRIPTLOCATION=`resolve_symlink "$0"`
+SCRIPTFOLDER=`dirname $SCRIPTLOCATION`
 
 #
-# Determine JAVA_HOME
+# Parse command line parameters
 #
 
-UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
-ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
-
-if [ -z "$JAVA_HOME" ] ; then
-    JAVA=`which java`
-    if [ -z "$JAVA" ] ; then
-	echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
-	exit 1
-    fi
-else
-    echo "Using JDK installation from:      $JAVA_HOME"
-    if [ "$UNAME" = "darwin" ] ; then
-	JRE=$JAVA_HOME/Home
-	JAVA=$JRE/bin/java
-    # other OS
-    else
-	JRE=$JAVA_HOME/jre
-	JAVA=$JRE/bin/java
-    fi
-fi
-
-#
-# Determining KEY_HOME
-#
-
-if [ -z "$KEY_HOME" ] ; then
-   KEY_HOME=`resolve_symlink "$0"`	# resolve symlink name
-   KEY_HOME=`dirname "$KEY_HOME"`		# strip executable filename
-   KEY_HOME=`cd "$KEY_HOME";pwd`	# and now expand the path to full
-   KEY_HOME=`dirname "$KEY_HOME"`		# strip bin/ sirectory
-fi
-echo "Using KeY installation from:      $KEY_HOME"
-
-KEY_LIB="$KEY_HOME/key.core/lib"
-
-#
-# KeY CLASSPATH
-#
-
-key_ext_jars="antlr.jar recoderKey.jar"
-
-keyclasspath="$KEY_HOME/key.core/bin:$KEY_HOME/key.ui/bin:$KEY_HOME/key.util/bin:$KEY_HOME/key.core.proof_reference/bin:$KEY_HOME/key.core.symbolic_execution/bin:$KEY_HOME/key.core.testgen/bin:$KEY_HOME/key.core.test/bin"
-
-for i in $key_ext_jars ; do
-    current_jar="$KEY_LIB/$i"
-    if [ ! -f "$current_jar" ]
-    then
-       echo Cannot find $current_jar.
-       echo Copy or link the file into the
-       echo $KEY_LIB directory.
-       exit 1
-    else
-       keyclasspath="${keyclasspath}:$current_jar"
-    fi
-done
-
-KEY_LIB_JUNIT="$KEY_HOME/key.util.test/lib"
-
-key_junit_jars="hamcrest-core-1.3.jar  junit-4.12.jar"
-
-for i in $key_junit_jars ; do
-    current_jar="$KEY_LIB_JUNIT/$i"
-    if [ ! -f "$current_jar" ]
-    then
-       echo Cannot find $current_jar.
-       echo Copy or link the file into the
-       echo $KEY_LIB_JUNIT directory.
-       exit 1
-    else
-       keyclasspath="${keyclasspath}:$current_jar"
-    fi
-done
-
-}
-
-call_java(){
-init_env
-
-$JAVA -ea:de.uka.ilkd.key...\
--noverify\
--Djvm.dir=$JVM_DIR\
--Xms64m -Xmx2048m \
--Dkey.home="$KEY_HOME" \
--classpath "$keyclasspath" \
-"$@"
-}
-
-#
-# Parse command line arguments
-#
-
-JAVAARGS=""
+JAVA_ARGS=""
 
 while [ "$#" -ne 0 ]
     do
     case $1 in
         --fork-mode=*)
-        FORKMODE=$(echo $1 | cut -d'=' -f 2)
-        JAVAARGS="$JAVAARGS -Dkey.runallproofs.forkMode=$FORKMODE"
+        FORK_MODE=$(echo $1 | cut -d'=' -f 2)
+        JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.forkMode=$FORK_MODE"
         shift
         continue
         ;;
-        --reload-enabled=*)
-        RELOADENABLED=$(echo $1 | cut -d'=' -f 2)
-        JAVAARGS="$JAVAARGS -Dkey.runallproofs.reloadEnabled=$RELOADENABLED"
+        $RELOAD_ENABLED_FLAG=*)
+        RELOAD_ENABLED=$(echo $1 | cut -d'=' -f 2)
+        JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.reloadEnabled=$RELOAD_ENABLED"
         shift
         continue
         ;;
-        --list-tests)
-        call_java de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
+        $LIST_TESTS_FLAG)
+        $SCRIPTFOLDER/tools/testRunner.sh de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
         exit
         ;;
-        -h|--help|-?)
+        -h|-?|$HELP_FLAG)
         list_help
         exit
         ;;
@@ -161,17 +75,25 @@ while [ "$#" -ne 0 ]
     esac
     done
 
+#
+# Optionally, retrieve names of selected test cases
+#
+
 if [ "$#" -ne 0 ]
     then
-    TESTCASES=$1
+    TEST_CASES=$1
     shift
     while [ "$#" -ne 0 ]
         do
-        TESTCASES="$TESTCASES,$1"
+        TEST_CASES="$TEST_CASES,$1"
         shift
         done
-    JAVAARGS="$JAVAARGS -Dkey.runallproofs.testCases=$TESTCASES"
+    JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.testCases=$TEST_CASES"
 fi
 
-call_java $JAVAARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
+#
+# Run JUnit
+#
+
+$SCRIPTFOLDER/tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
 

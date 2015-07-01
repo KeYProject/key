@@ -37,6 +37,9 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.proof.mgt.LemmaJustification;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.executor.javadl.TacletExecutor;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
@@ -86,15 +89,23 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  * {@link de.uka.ilkd.key.rule.TacletApp TacletApp} </p>
  */
 public abstract class Taclet implements Rule, Named {
+   
+   protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
+
+   public RuleJustification getRuleJustification() {
+      if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
+         return LemmaJustification.INSTANCE;
+      }
+      else {
+         return AxiomJustification.INSTANCE;
+      }
+   }
     
     /** name of the taclet */
     private final Name name;
     
     /** name displayed by the pretty printer */
     private final String displayName;
-    
-    /** contains useful text explaining the taclet */
-    private final String helpText = null;
     
     /** the set of taclet options for this taclet */
     protected final ImmutableSet<Choice> choices;
@@ -204,8 +215,9 @@ public abstract class Taclet implements Rule, Named {
            TacletAttributes attrs,
            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
            ImmutableSet<Choice> choices,
-           boolean surviveSmbExec) {
-
+           boolean surviveSmbExec,
+           ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        this.tacletAnnotations = tacletAnnotations;
         this.name          = name;
         ifSequent          = applPart.ifSequent();
         varsNew            = applPart.varsNew();
@@ -253,8 +265,9 @@ public abstract class Taclet implements Rule, Named {
            ImmutableList<RuleSet> ruleSets,
            TacletAttributes attrs,
            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-           ImmutableSet<Choice> choices) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false);
+           ImmutableSet<Choice> choices,
+           ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false, tacletAnnotations);
     }
       
     /**
@@ -349,11 +362,6 @@ public abstract class Taclet implements Rule, Named {
      */
     public String displayName() {
 	return displayName;
-    }
-    
-    
-    public String helpText() {
-       return helpText;
     }
  
    /** 

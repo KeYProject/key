@@ -272,7 +272,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                                      prefixBuilder.getPrefixMap(),
                                      applicationRestriction,
                                      choices,
-                                     surviveSmbExec);
+                                     surviveSmbExec, tacletAnnotations);
 
         }
     }

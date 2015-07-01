@@ -3626,8 +3626,10 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
     int applicationRestriction = RewriteTaclet.NONE;
     choices_ = choices;
     switchToNormalMode();
+    ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
 }
     : 
+      (LEMMA {tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);})?
       name=IDENT (choices_=option_list[choices_])? 
       LBRACE 
       ( (formula RBRACE) => /* check for rbrace needed to distinguish from "label" : goalspec*/ 
@@ -3642,6 +3644,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
            addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null);
            b.setName(new Name(name.getText()));
            b.setChoices(choices_);
+           b.setAnnotations(tacletAnnotations);
            r = b.getTaclet(); 
            taclet2Builder.put(r,b);
          }
@@ -3671,6 +3674,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         modifiers[b]
         { 
             b.setChoices(choices_);
+            b.setAnnotations(tacletAnnotations);
             r = b.getTaclet(); 
             taclet2Builder.put(r,b);
 	  // dump local schema var decls
