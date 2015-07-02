@@ -43,12 +43,6 @@ public class NotificationManager {
 
    // Dummy task to avoid null pointer checks
    private static final NotificationTask DUMMY_TASK = new NotificationTask() {
-
-      @Override
-      protected void executeActions(NotificationEvent event,
-            NotificationManager manager) {
-      }
-
       @Override
       public NotificationEventID getEventID() {
          return NotificationEventID.RESERVED;
