@@ -36,7 +36,7 @@ public class ExceptionFailureNotification extends NotificationTask {
     }
 
 	@Override
-	public int getEventID() {
+	public NotificationEventID getEventID() {
 		return NotificationEventID.EXCEPTION_CAUSED_FAILURE;
 	}
 

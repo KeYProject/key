@@ -46,7 +46,7 @@ public class GeneralFailureNotification extends NotificationTask {
      * @return the event id of a general failure event
      * @see NotificationEventID
      */
-    public int getEventID() {
+    public NotificationEventID getEventID() {
         return NotificationEventID.GENERAL_FAILURE;
     }
 

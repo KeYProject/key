@@ -78,7 +78,7 @@ public class ExitKeYNotification extends NotificationTask {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.notification.NotificationTask#getEventID()
      */
-    public int getEventID() {
+    public NotificationEventID getEventID() {
         return NotificationEventID.EXIT_KEY;
     }
 

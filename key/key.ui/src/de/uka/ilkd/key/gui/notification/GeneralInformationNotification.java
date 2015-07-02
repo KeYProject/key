@@ -40,7 +40,7 @@ public class GeneralInformationNotification extends NotificationTask {
      * @return the event id of a general information event
      * @see NotificationEventID
      */
-    public int getEventID() {
+    public NotificationEventID getEventID() {
         return NotificationEventID.GENERAL_INFORMATION;
     }
 

@@ -37,7 +37,7 @@ public class AbandonNotification extends NotificationTask {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.notification.NotificationTask#getEventID()
      */
-    public int getEventID() {
+    public NotificationEventID getEventID() {
         return NotificationEventID.TASK_ABANDONED;
     }
 

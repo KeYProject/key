@@ -95,7 +95,7 @@ public abstract class NotificationTask {
     /**
      * @return the event if of this task
      */
-    public abstract int getEventID(); 
+    public abstract NotificationEventID getEventID(); 
 
     /**
      * returns if this task should be executed in auto mode

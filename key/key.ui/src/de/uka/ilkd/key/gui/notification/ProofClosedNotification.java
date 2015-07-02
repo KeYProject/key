@@ -43,7 +43,7 @@ public class ProofClosedNotification extends NotificationTask {
     /**
      * @return the event if of this task
      */
-    public int getEventID() {       
+    public NotificationEventID getEventID() {       
         return NotificationEventID.PROOF_CLOSED;
     }     
     
