@@ -43,7 +43,7 @@ public class NotificationManager {
    private Map<NotificationEventID, NotificationTask> notificationTasks = new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
     
     /** true if we are currently in automode */
-    private boolean automode;
+    private boolean autoMode = false;
         
     // Dummy task to avoid null pointer checks
     private static final NotificationTask DUMMY_TASK = 
@@ -132,7 +132,7 @@ public class NotificationManager {
      * @return true if the prover is currently in automode
      */
     public boolean inAutoMode() {       
-        return automode;
+        return autoMode;
     }
     
     // Listener section with inner classes used to receive 
@@ -143,14 +143,14 @@ public class NotificationManager {
          * auto mode started
          */
         public void autoModeStarted(ProofEvent e) {
-            automode = true;          
+            autoMode = true;          
         }
 
         /**
          * auto mode stopped
          */
         public void autoModeStopped(ProofEvent e) {                        
-            automode = false;
+            autoMode = false;
         }
                         
     }
