@@ -7,7 +7,7 @@ public class MathUtil {
     * @return The median value of the array between start and end index.
     */
    public static int median(int[] array, int start, int end) {
-      int middle = (start + end) / 2;
+      int middle = (start + end) / 2; // TODO: Integer overflow causing later ArrayIndexOutOfBoundsException
       if ((start + end) % 2 == 0) {
          return array[middle];
       }

@@ -1,3 +1,6 @@
+/**
+ * This class provides utility methods for a banking application.
+ */
 public class BankUtil {
    /**
     * Computes the insurance rate based on the given age.
@@ -12,7 +15,7 @@ public class BankUtil {
     * <ul>
     */
    public static long computeInsuranceRate(int age) {
-      int[] ageLimits = {18, 19, 21, 35, 65};
+      int[] ageLimits = {18, 19, 21, 35, 65}; // TODO: 65 unused
       long[] insuranceRates = {200, 250, 300, 450};
       int ageLevel = 0;
       long insuranceRate = 575;
