@@ -1608,8 +1608,10 @@ public class JoinRuleUtils {
             HashMap<ProgramVariable, ProgramVariable> {
         private static final long serialVersionUID = 2305410114265133879L;
 
-        private Node node = null;
-        private ImmutableSet<LocationVariable> doNotRename = null;
+        private final Node node;
+        private final ImmutableSet<LocationVariable> doNotRename;
+        private final HashMap<LocationVariable, ProgramVariable> cache =
+                new HashMap<LocationVariable, ProgramVariable>();
 
         public LocVarReplBranchUniqueMap(Node goal,
                 ImmutableSet<LocationVariable> doNotRename) {
@@ -1640,8 +1642,15 @@ public class JoinRuleUtils {
                 if (doNotRename.contains(var)) {
                     return var;
                 }
-
-                return getBranchUniqueLocVar(var, node);
+                
+                if (cache.containsKey(var)) {
+                    return cache.get(var);
+                }
+                
+                final ProgramVariable result = getBranchUniqueLocVar(var, node); 
+                cache.put(var, result);
+                
+                return result;
             }
             else {
                 return null;
