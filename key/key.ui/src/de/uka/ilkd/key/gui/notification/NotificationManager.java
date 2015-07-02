@@ -16,9 +16,8 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 
@@ -41,7 +40,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 public class NotificationManager {
 
     /** list of notification tasks */
-    private List<NotificationTask> notificationTasks = new ArrayList<NotificationTask>();
+   private Map<NotificationEventID, NotificationTask> notificationTasks = new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
     
     /** true if we are currently in automode */
     private boolean automode;
@@ -107,7 +106,7 @@ public class NotificationManager {
      * @param task the NotificationTask to be added
      */
     public void addNotificationTask(NotificationTask task) {	
-        notificationTasks.add(task);
+        notificationTasks.put(task.getEventID(), task);
     }
     
     /**
@@ -116,15 +115,7 @@ public class NotificationManager {
      * @param task the task to be removed 
      */
     public void removeNotificationTask(NotificationTask task) {
-        notificationTasks.remove(task);
-    }
-    
-    /**
-     * returns the registered notifications
-     * @return the registered notifications
-     */
-    public Iterator<NotificationTask> getNotificationTasks() {
-        return notificationTasks.iterator();
+        notificationTasks.remove(task.getEventID());
     }
 
     /**
@@ -133,14 +124,8 @@ public class NotificationManager {
      * @return the notification task associated with the given event id
      */
     public NotificationTask getNotificationTask(NotificationEventID eventId) {
-        final Iterator<NotificationTask> it = getNotificationTasks();
-        while (it.hasNext()) {
-            final NotificationTask task = it.next();
-            if (task.getEventID() == eventId) {
-                return task;
-            }
-        }
-        return DUMMY_TASK;
+        NotificationTask taskFromId = notificationTasks.get(eventId);
+        return taskFromId != null ? taskFromId: DUMMY_TASK;
     }
     
     /**
