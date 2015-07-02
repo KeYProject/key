@@ -166,7 +166,7 @@ public class JoinRuleUtils {
         ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
 
         if (term.op() instanceof LocationVariable) {
-            result.add((LocationVariable) term.op());
+            result = result.add((LocationVariable) term.op());
         }
         else {
             if (!term.javaBlock().isEmpty()) {
