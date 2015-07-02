@@ -23,10 +23,6 @@ import javax.swing.JFrame;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.notification.actions.ExceptionFailureNotificationDialog;
-import de.uka.ilkd.key.gui.notification.actions.GeneralFailureJTextPaneDisplay;
-import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;
-import de.uka.ilkd.key.gui.notification.actions.ProofClosedJTextPaneDisplay;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
 
@@ -63,49 +59,35 @@ public class NotificationManager {
     
 
     public void setDefaultNotification(JFrame comp) {
-       
         notificationTasks.clear();
-        
-        final ProofClosedNotification pcn = new ProofClosedNotification();
-        final ExceptionFailureNotification efn = new ExceptionFailureNotification();
-        final GeneralFailureNotification gfn = new GeneralFailureNotification();
-        final GeneralInformationNotification gin = 
-            new GeneralInformationNotification();
-        final AbandonNotification an = new AbandonNotification();
-        final ExitKeYNotification en = new ExitKeYNotification();
-        
-        gfn.addNotificationAction(new GeneralFailureJTextPaneDisplay(comp));
-        gin.addNotificationAction(new GeneralInformationJTextPaneDisplay(comp));
-        pcn.addNotificationAction(new ProofClosedJTextPaneDisplay(comp));
-        efn.addNotificationAction(new ExceptionFailureNotificationDialog(comp));
-        
-        addNotificationTask(pcn);
-        addNotificationTask(gfn);
-        addNotificationTask(gin);
-        addNotificationTask(efn);
-        addNotificationTask(an);
-        addNotificationTask(en);       
+        addNotificationTask(new ProofClosedNotification(comp));
+        addNotificationTask(new GeneralFailureNotification(comp));
+        addNotificationTask(new GeneralInformationNotification(comp));
+        addNotificationTask(new ExceptionFailureNotification(comp));
+        addNotificationTask(new AbandonNotification());
+        addNotificationTask(new ExitKeYNotification());       
     }
     
     
     /**
      * creates an instance of the notification manager    
      */
-    public NotificationManager(KeYMediator mediator, JFrame comp) {        
-        
-        notificationListener = new NotificationListener();
-        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+   public NotificationManager(KeYMediator mediator, JFrame comp) {
+      notificationListener = new NotificationListener();
+      // This method delegates the request only to the UserInterfaceControl
+      // which implements the functionality.
       // No functionality is allowed in this method body!
-      mediator.getUI().getProofControl().addAutoModeListener(notificationListener);
-        setDefaultNotification(comp);
-    }
+      mediator.getUI().getProofControl()
+            .addAutoModeListener(notificationListener);
+      setDefaultNotification(comp);
+   }
     
             
     /**
      * adds a notification task to this manager     
      * @param task the NotificationTask to be added
      */
-    public void addNotificationTask(NotificationTask task) {	
+    public void addNotificationTask(NotificationTask task) {
         notificationTasks.put(task.getEventID(), task);
     }
     

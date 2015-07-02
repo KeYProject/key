@@ -16,6 +16,9 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
+import javax.swing.JFrame;
+
+import de.uka.ilkd.key.gui.notification.actions.GeneralFailureJTextPaneDisplay;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
@@ -24,7 +27,11 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
  */
 public class GeneralFailureNotification extends NotificationTask {
 
-    /**
+    public GeneralFailureNotification(JFrame comp) {
+       addNotificationAction(new GeneralFailureJTextPaneDisplay(comp));
+   }
+
+   /**
      * returns if this task should be executed in auto mode
      * @return if true execute task even if in automode
      */

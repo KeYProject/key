@@ -13,9 +13,16 @@
 
 package de.uka.ilkd.key.gui.notification;
 
+import java.awt.Frame;
+
+import de.uka.ilkd.key.gui.notification.actions.ExceptionFailureNotificationDialog;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 public class ExceptionFailureNotification extends NotificationTask {
+   
+   public ExceptionFailureNotification(Frame parentComponent) {
+      addNotificationAction(new ExceptionFailureNotificationDialog(parentComponent));
+   }
 
     /**
      * returns if this task should be executed in auto mode

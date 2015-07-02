@@ -16,6 +16,9 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
+import javax.swing.JFrame;
+
+import de.uka.ilkd.key.gui.notification.actions.ProofClosedJTextPaneDisplay;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
@@ -32,7 +35,11 @@ public class ProofClosedNotification extends NotificationTask {
     public ProofClosedNotification() {       
     }
 
-    /**
+    public ProofClosedNotification(JFrame comp) {
+       addNotificationAction(new ProofClosedJTextPaneDisplay(comp));
+   }
+
+   /**
      * returns if this task should be executed in auto mode
      * @return if true execute task even if in automode
      */

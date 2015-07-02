@@ -16,6 +16,9 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
+import javax.swing.JFrame;
+
+import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
@@ -26,7 +29,11 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 public class GeneralInformationNotification extends NotificationTask {
 
      
-    /**
+    public GeneralInformationNotification(JFrame comp) {
+       addNotificationAction(new GeneralInformationJTextPaneDisplay(comp));
+   }
+
+   /**
      * @see NotificationTask#executeImpl(NotificationEvent, NotificationManager)      
      */
     protected void executeImpl(NotificationEvent event,
