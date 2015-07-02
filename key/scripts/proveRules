@@ -1,0 +1,64 @@
+#!/bin/sh
+
+#
+# ProveRules documentation can be found at: key/doc/README.proveRules
+#
+
+LIST_TESTS_FLAG=--list-tests
+HELP_FLAG=--help
+
+list_help() {
+    echo "Usage: proveRules  [$HELP_FLAG] | [$LIST_TESTS_FLAG]"
+}
+
+resolve_symlink() {
+   TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
+
+   if [ -n "$TARGET" ] ; then
+      RESULT="$TARGET"
+      case "$RESULT" in
+         /*) break ;;				# absolute symlink
+         *)  RESULT=`dirname "$0"`/"$RESULT" ;;	# relative symlink
+      esac
+   else
+      RESULT=$1
+   fi
+
+   echo "$RESULT"
+}
+
+SCRIPTLOCATION=`resolve_symlink "$0"`
+SCRIPTFOLDER=`dirname $SCRIPTLOCATION`
+
+#
+# Parse command line parameters
+#
+
+JAVA_ARGS=""
+
+while [ "$#" -ne 0 ]
+    do
+    case $1 in
+        $LIST_TESTS_FLAG)
+        $SCRIPTFOLDER/tools/testRunner.sh de.uka.ilkd.key.proof.proverules.ListProveRulesTestCases
+        exit
+        ;;
+        -h|--help|-?)
+        list_help
+        exit
+        ;;
+        -*)
+        echo Unrecognised option: $1
+        exit
+        ;;
+        *)
+        break
+        ;;
+    esac
+    done
+
+#
+# Run JUnit
+#
+
+$SCRIPTFOLDER/tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.proverules.ProveRulesTest

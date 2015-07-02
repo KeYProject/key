@@ -30,6 +30,10 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
         return "Auxiliary Computation Auto Pilot";
     }
 
+    @Override
+    public String getCategory() {
+        return "Information Flow";
+    }
 
     @Override
     public String getDescription() {
@@ -53,6 +57,8 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
             @Override
             public String getName() { return ""; }
             @Override
+            public String getCategory() { return null; }
+            @Override
             public String getDescription() { return "Anonymous Macro"; }
 
             @Override
@@ -69,6 +75,8 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     }
                     @Override
                     public String getName() { return ""; }
+                    @Override
+                    public String getCategory() { return null; }
                     @Override
                     public String getDescription() { return "Anonymous Macro"; }
                 };

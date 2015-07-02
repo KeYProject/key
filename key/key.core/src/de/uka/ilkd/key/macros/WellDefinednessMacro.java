@@ -51,6 +51,11 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     }
 
     @Override
+    public String getCategory() {
+        return null;
+    }
+
+    @Override
     public String getDescription() {
         return "Apply only rules to resolve the Well-Definedness transformer.";
     }

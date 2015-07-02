@@ -45,6 +45,11 @@ public class FullAutoPilotWithJMLSpecJoinsProofMacro extends SequentialProofMacr
     }
 
     @Override
+    public String getCategory() {
+        return "Join";
+    }
+
+    @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution (with joins specified by JML annotations)" +
                 "<li>Try to close all proof obligations</ol>";

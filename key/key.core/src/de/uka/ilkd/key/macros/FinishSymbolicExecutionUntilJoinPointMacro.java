@@ -95,6 +95,11 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends
     }
 
     @Override
+    public String getCategory() {
+        return "Join";
+    }
+
+    @Override
     public String getDescription() {
         return "Continue automatic strategy application until a "
                 + "join point is reached or there is no more modality in the sequent.";

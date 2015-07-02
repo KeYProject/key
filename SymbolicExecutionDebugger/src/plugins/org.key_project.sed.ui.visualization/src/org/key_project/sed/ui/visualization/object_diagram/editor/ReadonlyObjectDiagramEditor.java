@@ -48,7 +48,7 @@ public class ReadonlyObjectDiagramEditor extends ObjectDiagramEditor {
     * {@inheritDoc}
     */
    @Override
-   protected void configureGraphicalViewer() {
+   public void configureGraphicalViewer() {
       super.configureGraphicalViewer();
       setGridVisible(false);
    }

@@ -362,12 +362,13 @@ public final class Main {
         }
         }
 
-        if(cl.isSet(EXPERIMENTAL)){
+        if (cl.isSet(EXPERIMENTAL)) {
             if (verbosity > Verbosity.SILENT) {
             System.out.println("Running in experimental mode ...");
             }
+            setEnabledExperimentalFeatures(true);
         } else {
-            deactivateExperimentalFeatures();
+            setEnabledExperimentalFeatures(false);
         }
 
         if(cl.isSet(LAST)){
@@ -416,9 +417,15 @@ public final class Main {
     }
 
     /** Deactivate experimental features. */
-    public static void deactivateExperimentalFeatures () {
+    public static void setEnabledExperimentalFeatures (boolean state) {
+        if(state) {
+            for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
+                feature.activate();
+            }
+        } else {
         for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
             feature.deactivate();
+    }
     }
     }
 

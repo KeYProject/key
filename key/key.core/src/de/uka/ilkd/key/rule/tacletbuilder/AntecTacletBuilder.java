@@ -102,7 +102,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
 			     find,
                              ignoreTopLevelUpdates,
 			     prefixBuilder.getPrefixMap(),
-			     choices);
+			     choices, tacletAnnotations);
     }
 
     public void setIgnoreTopLevelUpdates(boolean ignore) {

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletAnnotation;
 import de.uka.ilkd.key.rule.TacletAttributes;
 import de.uka.ilkd.key.rule.Trigger;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -66,8 +67,11 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ImmutableList<VariableCondition> variableConditions       = ImmutableSLList.<VariableCondition>nil(); 
     protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices          = null;
     protected ImmutableSet<Choice> choices           = DefaultImmutableSet.<Choice>nil();
+    protected ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
 
-    
+    public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
+       this.tacletAnnotations = tacletAnnotations;
+    }
 
     private static boolean containsFreeVarSV(Term t) {
 	for (final QuantifiableVariable var : t.freeVars()) {

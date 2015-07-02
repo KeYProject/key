@@ -41,9 +41,13 @@ import org.eclipse.graphiti.tb.IContextButtonEntry;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 import org.eclipse.graphiti.tb.IContextMenuEntry;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
+import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.graphiti.ui.internal.platform.ExtensionManager;
 import org.eclipse.graphiti.ui.platform.IImageProvider;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.util.NodeUtil;
@@ -303,11 +307,30 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       for (IImageProvider imageProvider : imageProviders) {
          if (imageProvider instanceof ExecutionTreeImageProvider) {
             Bundle bundle = Platform.getBundle(configElement.getContributor().getName());
-            URL url = bundle.getResource(configElement.getAttribute("icon"));
+            String pathInBundle = configElement.getAttribute("icon");
+            URL url = bundle.getResource(pathInBundle);
             if (url != null) {
                ((ExecutionTreeImageProvider)imageProvider).addImageFilePathIfNotAvailable(imageKey, url.toString());
+               // Special handling for Eclipse 4.5 Mars
+               makeSureThatImageIdExistEclipse4_5_Mars(imageKey, bundle, pathInBundle);
             }
          }
+      }
+   }
+   
+   /**
+    * Ensures that the image is available in Eclipse 4.5 (Mars) which requests
+    * an image by ID of diagram type provider instead of the image provider ID.
+    * @param imageKey The key of the image.
+    * @param bundle The {@link Bundle} which provides the image.
+    * @param pathInBundle The path in the {@link Bundle} to the image.
+    */
+   protected void makeSureThatImageIdExistEclipse4_5_Mars(String imageKey, Bundle bundle, String pathInBundle) {
+      ImageRegistry imageRegistry = GraphitiUIPlugin.getDefault().getImageRegistry();
+      String fullImageKey = getDiagramTypeProvider().getProviderId() + "||" + imageKey; // Behavior of org.eclipse.graphiti.ui.internal.services.impl.ImageService#makeKey(String, String)
+      if (imageRegistry.getDescriptor(fullImageKey) == null) {
+         ImageDescriptor id = AbstractUIPlugin.imageDescriptorFromPlugin(bundle.getSymbolicName(), pathInBundle);
+         imageRegistry.put(fullImageKey, id);
       }
    }
 
