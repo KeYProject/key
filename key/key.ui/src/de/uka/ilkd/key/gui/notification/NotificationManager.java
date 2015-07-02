@@ -26,52 +26,50 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
 
-
 /**
- * The notificatin manager controls the list of active 
- * notification tasks. It receives KeY System events and looks 
- * for an appropriate task   
+ * The notificatin manager controls the list of active notification tasks. It
+ * receives KeY System events and looks for an appropriate task
+ * 
  * @author bubel
  */
 public class NotificationManager {
 
-    /** list of notification tasks */
-   private Map<NotificationEventID, NotificationTask> notificationTasks = new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
-    
-    /** true if we are currently in automode */
-    private boolean autoMode = false;
-        
-    // Dummy task to avoid null pointer checks
-    private static final NotificationTask DUMMY_TASK = 
-        new NotificationTask() {
-        
-        protected void executeImpl(NotificationEvent event, 
-                NotificationManager manager) {                     
-        }
+   /** list of notification tasks */
+   private Map<NotificationEventID, NotificationTask> notificationTasks = new EnumMap<NotificationEventID, NotificationTask>(
+         NotificationEventID.class);
 
-        public NotificationEventID getEventID() {           
-            return NotificationEventID.RESERVED;
-        }
-    };
+   /** true if we are currently in automode */
+   private boolean autoMode = false;
 
-    private NotificationListener notificationListener;
-    
-    
+   // Dummy task to avoid null pointer checks
+   private static final NotificationTask DUMMY_TASK = new NotificationTask() {
 
-    public void setDefaultNotification(JFrame comp) {
-        notificationTasks.clear();
-        addNotificationTask(new ProofClosedNotification(comp));
-        addNotificationTask(new GeneralFailureNotification(comp));
-        addNotificationTask(new GeneralInformationNotification(comp));
-        addNotificationTask(new ExceptionFailureNotification(comp));
-        addNotificationTask(new AbandonNotification());
-        addNotificationTask(new ExitKeYNotification());       
-    }
-    
-    
-    /**
-     * creates an instance of the notification manager    
-     */
+      @Override
+      protected void executeActions(NotificationEvent event,
+            NotificationManager manager) {
+      }
+
+      @Override
+      public NotificationEventID getEventID() {
+         return NotificationEventID.RESERVED;
+      }
+   };
+
+   private NotificationListener notificationListener;
+
+   public void setDefaultNotification(JFrame comp) {
+      notificationTasks.clear();
+      addNotificationTask(new ProofClosedNotification(comp));
+      addNotificationTask(new GeneralFailureNotification(comp));
+      addNotificationTask(new GeneralInformationNotification(comp));
+      addNotificationTask(new ExceptionFailureNotification(comp));
+      addNotificationTask(new AbandonNotification());
+      addNotificationTask(new ExitKeYNotification());
+   }
+
+   /**
+    * creates an instance of the notification manager
+    */
    public NotificationManager(KeYMediator mediator, JFrame comp) {
       notificationListener = new NotificationListener();
       // This method delegates the request only to the UserInterfaceControl
@@ -81,70 +79,77 @@ public class NotificationManager {
             .addAutoModeListener(notificationListener);
       setDefaultNotification(comp);
    }
-    
-            
-    /**
-     * adds a notification task to this manager     
-     * @param task the NotificationTask to be added
-     */
-    public void addNotificationTask(NotificationTask task) {
-        notificationTasks.put(task.getEventID(), task);
-    }
-    
-    /**
-     * removes the given notification task from the list of active
-     * tasks
-     * @param task the task to be removed 
-     */
-    public void removeNotificationTask(NotificationTask task) {
-        notificationTasks.remove(task.getEventID());
-    }
 
-    /**
-     * find the notification task associated with the given event id
-     * @param eventId int identifying the event
-     * @return the notification task associated with the given event id
-     */
-    public NotificationTask getNotificationTask(NotificationEventID eventId) {
-        NotificationTask taskFromId = notificationTasks.get(eventId);
-        return taskFromId != null ? taskFromId: DUMMY_TASK;
-    }
-    
-    /**
-     * @return true if the prover is currently in automode
-     */
-    public boolean inAutoMode() {       
-        return autoMode;
-    }
-    
-    // Listener section with inner classes used to receive 
-    // KeY system events
-    private class NotificationListener implements AutoModeListener {
-         
-        /**
-         * auto mode started
-         */
-        public void autoModeStarted(ProofEvent e) {
-            autoMode = true;          
-        }
+   /**
+    * adds a notification task to this manager
+    * 
+    * @param task
+    *           the NotificationTask to be added
+    */
+   public void addNotificationTask(NotificationTask task) {
+      notificationTasks.put(task.getEventID(), task);
+   }
 
-        /**
-         * auto mode stopped
-         */
-        public void autoModeStopped(ProofEvent e) {                        
-            autoMode = false;
-        }
-                        
-    }
+   /**
+    * removes the given notification task from the list of active tasks
+    * 
+    * @param task
+    *           the task to be removed
+    */
+   public void removeNotificationTask(NotificationTask task) {
+      notificationTasks.remove(task.getEventID());
+   }
 
-    /**
-     * dispatches the received notification event and triggers
-     * the corresponding task
-     * @param event
-     */
-    public void notify(NotificationEvent event) {
-        getNotificationTask(event.getEventID()).
-        execute(event, NotificationManager.this);        
-    }
-    
+   /**
+    * find the notification task associated with the given event id
+    * 
+    * @param eventId
+    *           int identifying the event
+    * @return the notification task associated with the given event id
+    */
+   public NotificationTask getNotificationTask(NotificationEventID eventId) {
+      NotificationTask taskFromId = notificationTasks.get(eventId);
+      return taskFromId != null ? taskFromId : DUMMY_TASK;
+   }
+
+   /**
+    * @return true if the prover is currently in automode
+    */
+   public boolean inAutoMode() {
+      return autoMode;
+   }
+
+   // Listener section with inner classes used to receive
+   // KeY system events
+   private class NotificationListener implements AutoModeListener {
+
+      /**
+       * auto mode started
+       */
+      @Override
+      public void autoModeStarted(ProofEvent e) {
+         autoMode = true;
+      }
+
+      /**
+       * auto mode stopped
+       */
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         autoMode = false;
+      }
+
+   }
+
+   /**
+    * dispatches the received notification event and triggers the corresponding
+    * task
+    * 
+    * @param event
+    */
+   public void notify(NotificationEvent event) {
+      getNotificationTask(event.getEventID()).execute(event,
+            NotificationManager.this);
+   }
+
 }

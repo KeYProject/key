@@ -19,7 +19,6 @@ package de.uka.ilkd.key.gui.notification;
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.ProofClosedJTextPaneDisplay;
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
  * The proof closed notification notifies the user about a successful attempt 
@@ -43,23 +42,16 @@ public class ProofClosedNotification extends NotificationTask {
      * returns if this task should be executed in auto mode
      * @return if true execute task even if in automode
      */
-    protected boolean automodeEnabledTask() {   
+    @Override
+   protected boolean automodeEnabledTask() {   
         return true;
     }
     
     /**
      * @return the event if of this task
      */
-    public NotificationEventID getEventID() {       
+    @Override
+   public NotificationEventID getEventID() {       
         return NotificationEventID.PROOF_CLOSED;
-    }     
-    
-    /**
-     * executes the proof closed notification task
-     */
-    public void executeImpl (NotificationEvent event, NotificationManager manager) {
-        for (final NotificationAction action : getNotificationActions()) {         
-            action.execute(event);
-        }
-   }
+    }
 }
