@@ -83,7 +83,13 @@ public class NotificationManager {
         addNotificationTask(pcn);
         addNotificationTask(gfn);
         addNotificationTask(gin);
-        addNotificationTask(efn);
+        //FIXME (DS): Obviously, adding ExceptionFailureNotification at this\\
+        // place leads to a double appearance of Dialogs in case of a parser\\
+        // error. However, the user is not notified in case of an ExceptionFailure\\
+        // occurring *after* the parsing procedure, so for instance at an\\
+        // erroneous BuiltInRule application. This is not desirable, since\\
+        // then there might be a strange GUI behavior without even a notification.
+//        addNotificationTask(efn);
         addNotificationTask(an);
         addNotificationTask(en);       
     }
