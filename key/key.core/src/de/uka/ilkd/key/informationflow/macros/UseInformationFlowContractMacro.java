@@ -37,6 +37,10 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     public String getName() {
         return "Use information flow contracts";
     }
+    @Override
+    public String getCategory() {
+        return "Information Flow";
+    }
 
     @Override
     public String getDescription() {

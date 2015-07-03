@@ -50,6 +50,7 @@ import de.uka.ilkd.key.smt.lang.SMTTermCall;
 import de.uka.ilkd.key.smt.lang.SMTTermITE;
 import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
+import de.uka.ilkd.key.smt.lang.SMTTermUnaryOp;
 import de.uka.ilkd.key.smt.lang.SMTTermVariable;
 import de.uka.ilkd.key.smt.lang.Util;
 import de.uka.ilkd.key.util.Debug;
@@ -1127,8 +1128,10 @@ public class SMTObjTranslator implements SMTTranslator {
 		// create special functions and constants
 		createSpecialFunctions();
 		// Translate the proof obligation
+		//System.out.println("Problem: "+problem);
 		SMTTerm po = translateTerm(problem);
 		po = po.not();
+		//System.out.println("Translation: "+po);
 		po.setComment("The negated proof obligation");
 		generateTypeConstraints();
 		generateFieldFunctionDefinitions();
@@ -1321,17 +1324,21 @@ public class SMTObjTranslator implements SMTTranslator {
 		} else if (op == services.getTypeConverter().getIntegerLDT()
 		        .getNumberSymbol()) {
 			Debug.assertTrue(term.arity() == 1);
+			
 			long num = NumberTranslation.translate(term.sub(0)).longValue();
+			System.out.println(term.sub(0)+" = "+num);
 			long size = sorts.get(BINT_SORT).getBitSize();
-			long bound = sorts.get(BINT_SORT).getBound();
+			//long bound = sorts.get(BINT_SORT).getBound();
 			// modulo max int
-			num = num % bound;
-			if (num < 0) {
-				SMTTerm zero = new SMTTermNumber(0, size, sorts.get(BINT_SORT));
-				SMTTerm n = new SMTTermNumber(-num, size, sorts.get(BINT_SORT));
-				return zero.minus(n);
+			SMTTerm n;
+			if(num < 0){
+				n = new SMTTermNumber(-num, size, sorts.get(BINT_SORT));
+				return n.unaryOp(SMTTermUnaryOp.Op.BVNEG);
 			}
-			return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
+			else{
+				return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
+			}
+			
 		} else if (op instanceof Function) {
 			Function fun = (Function) op;
 			if (isTrueConstant(fun, services)) {

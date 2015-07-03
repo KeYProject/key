@@ -45,6 +45,11 @@ public class UpdateSimplificationMacro extends
 	}
 
 	@Override
+	public String getCategory() {
+	    return "Simplification";
+	}
+
+	@Override
 	public String getDescription() {
 		return "Applies only update simplification rules";
 	}

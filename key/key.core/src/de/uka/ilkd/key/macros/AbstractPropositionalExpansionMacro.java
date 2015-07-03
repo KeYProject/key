@@ -51,6 +51,11 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
     }
 
+    @Override
+    public String getCategory() {
+        return "Propositional";
+    }
+
     /**
      * Gets the set of admitted rule names.
      *

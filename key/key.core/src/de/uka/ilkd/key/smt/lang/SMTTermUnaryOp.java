@@ -105,7 +105,7 @@ public class SMTTermUnaryOp extends SMTTerm{
 	/** {@inheritDoc} */
 	@Override
 	public SMTSort sort () {
-		return SMTSort.BOOL;
+		return sub.sort();
 	}
 	
 	/** {@inheritDoc} */

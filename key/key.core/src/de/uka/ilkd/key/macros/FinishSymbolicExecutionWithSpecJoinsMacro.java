@@ -69,6 +69,11 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
     }
 
     @Override
+    public String getCategory() {
+        return "Join";
+    }
+
+    @Override
     public String getDescription() {
         return "Continue automatic strategy application and take join procedures "
                 + "specified in block contracts into account.";

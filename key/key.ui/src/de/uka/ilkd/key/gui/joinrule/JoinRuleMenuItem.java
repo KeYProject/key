@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.util.DefaultExperimentalFeature;
 import de.uka.ilkd.key.util.ExperimentalFeature;
 
 /**
@@ -41,24 +42,7 @@ public class JoinRuleMenuItem extends JMenuItem {
      * Controls whether joining is available to the user. WARNING: You may
      * refresh your GUI elements after (de-)activation.
      */
-    public static final ExperimentalFeature FEATURE = new ExperimentalFeature() {
-        private boolean active = true;
-
-        @Override
-        public void deactivate() {
-            active = false;
-        }
-
-        @Override
-        public void activate() {
-            active = true;
-        }
-
-        @Override
-        public boolean active() {
-            return active;
-        }
-    };
+    public static final ExperimentalFeature FEATURE = new DefaultExperimentalFeature();
 
     /**
      * Creates a new menu item for the join rule.

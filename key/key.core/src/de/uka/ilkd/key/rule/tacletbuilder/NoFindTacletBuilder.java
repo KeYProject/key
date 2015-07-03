@@ -51,7 +51,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
 				goals, ruleSets,
 				attrs,
 				prefixBuilder.getPrefixMap(),
-				choices);
+				choices, tacletAnnotations);
     }
 
 

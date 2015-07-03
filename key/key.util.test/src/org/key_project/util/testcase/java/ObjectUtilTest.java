@@ -18,12 +18,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.model.ClassA;
 import org.key_project.util.model.ClassB;
+
+import junit.framework.TestCase;
 
 /**
  * Tests for {@link ObjectUtil}
@@ -153,14 +153,14 @@ public class ObjectUtilTest extends TestCase {
       
       try {
          // Test returned values in A
-         assertEquals(1, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
-         assertEquals(2, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
-         assertEquals(3, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
-         assertEquals(4, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
+         assertEquals(Integer.valueOf(1), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
+         assertEquals(Integer.valueOf(2), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
+         assertEquals(Integer.valueOf(3), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
+         assertEquals(Integer.valueOf(4), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
          assertEquals("A", ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "onlyInA")));
-         assertEquals(true, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
-         assertEquals(-4711, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "staticField")));
-         assertEquals(true, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "staticBooleanField")));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
+         assertEquals(Integer.valueOf(-4711), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "staticField")));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "staticBooleanField")));
          // Change values in A
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "privateField"), 42);
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "protectedField"), 43);
@@ -169,12 +169,12 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "onlyInA"), "Changed");
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "booleanField"), false);
          // Test returned values in A again
-         assertEquals(42, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
-         assertEquals(43, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
-         assertEquals(44, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
-         assertEquals(45, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
+         assertEquals(Integer.valueOf(42), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
+         assertEquals(Integer.valueOf(43), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
+         assertEquals(Integer.valueOf(44), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
+         assertEquals(Integer.valueOf(45), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
          assertEquals("Changed", ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "onlyInA")));
-         assertEquals(false, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
+         assertEquals(Boolean.valueOf(false), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
          // Change values in A second time
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "privateField"), -42);
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "protectedField"), -43);
@@ -183,23 +183,23 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "onlyInA"), "ChangedAgain");
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "booleanField"), true);
          // Test returned values in A again
-         assertEquals(-42, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
-         assertEquals(-43, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
-         assertEquals(-44, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
-         assertEquals(-45, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
+         assertEquals(Integer.valueOf(-42), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
+         assertEquals(Integer.valueOf(-43), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
+         assertEquals(Integer.valueOf(-44), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
+         assertEquals(Integer.valueOf(-45), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
          assertEquals("ChangedAgain", ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "onlyInA")));
-         assertEquals(true, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
          // Test returned values in B
-         assertEquals(1, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "privateField")));
-         assertEquals(2, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "protectedField")));
-         assertEquals(3, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "publicField")));
-         assertEquals(4, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "defaultField")));
+         assertEquals(Integer.valueOf(1), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "privateField")));
+         assertEquals(Integer.valueOf(2), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "protectedField")));
+         assertEquals(Integer.valueOf(3), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "publicField")));
+         assertEquals(Integer.valueOf(4), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "defaultField")));
          assertEquals("A", ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "onlyInA")));
-         assertEquals(true, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "booleanField")));
-         assertEquals(42, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "privateField")));
-         assertEquals(43, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "protectedField")));
-         assertEquals(44, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "publicField")));
-         assertEquals(45, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "defaultField")));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "booleanField")));
+         assertEquals(Integer.valueOf(42), ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "privateField")));
+         assertEquals(Integer.valueOf(43), ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "protectedField")));
+         assertEquals(Integer.valueOf(44), ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "publicField")));
+         assertEquals(Integer.valueOf(45), ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "defaultField")));
          assertEquals("B", ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "onlyInB")));
          // Change values in B
          ObjectUtil.set(b, ObjectUtil.findField(ClassA.class, "privateField"), 42);
@@ -214,16 +214,16 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "defaultField"), 49);
          ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "onlyInB"), "ChangedB");
          // Test returned values in B again
-         assertEquals(42, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "privateField")));
-         assertEquals(43, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "protectedField")));
-         assertEquals(44, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "publicField")));
-         assertEquals(45, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "defaultField")));
+         assertEquals(Integer.valueOf(42), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "privateField")));
+         assertEquals(Integer.valueOf(43), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "protectedField")));
+         assertEquals(Integer.valueOf(44), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "publicField")));
+         assertEquals(Integer.valueOf(45), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "defaultField")));
          assertEquals("ChangedA", ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "onlyInA")));
-         assertEquals(false, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "booleanField")));
-         assertEquals(46, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "privateField")));
-         assertEquals(47, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "protectedField")));
-         assertEquals(48, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "publicField")));
-         assertEquals(49, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "defaultField")));
+         assertEquals(Boolean.valueOf(false), ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "booleanField")));
+         assertEquals(Integer.valueOf(46), ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "privateField")));
+         assertEquals(Integer.valueOf(47), ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "protectedField")));
+         assertEquals(Integer.valueOf(48), ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "publicField")));
+         assertEquals(Integer.valueOf(49), ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "defaultField")));
          assertEquals("ChangedB", ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "onlyInB")));
       }
       catch (Exception e) {
@@ -373,12 +373,12 @@ public class ObjectUtilTest extends TestCase {
       
       try {
          // Test returned values in A
-         assertEquals(1, ObjectUtil.get(a, "privateField"));
-         assertEquals(2, ObjectUtil.get(a, "protectedField"));
-         assertEquals(3, ObjectUtil.get(a, "publicField"));
-         assertEquals(4, ObjectUtil.get(a, "defaultField"));
+         assertEquals(Integer.valueOf(1), ObjectUtil.get(a, "privateField"));
+         assertEquals(Integer.valueOf(2), ObjectUtil.get(a, "protectedField"));
+         assertEquals(Integer.valueOf(3), ObjectUtil.get(a, "publicField"));
+         assertEquals(Integer.valueOf(4), ObjectUtil.get(a, "defaultField"));
          assertEquals("A", ObjectUtil.get(a, "onlyInA"));
-         assertEquals(true, ObjectUtil.get(a, "booleanField"));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(a, "booleanField"));
          // Change values in A
          ObjectUtil.set(a, "privateField", 42);
          ObjectUtil.set(a, "protectedField", 43);
@@ -387,12 +387,12 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(a, "onlyInA", "Changed");
          ObjectUtil.set(a, "booleanField", false);
          // Test returned values in A again
-         assertEquals(42, ObjectUtil.get(a, "privateField"));
-         assertEquals(43, ObjectUtil.get(a, "protectedField"));
-         assertEquals(44, ObjectUtil.get(a, "publicField"));
-         assertEquals(45, ObjectUtil.get(a, "defaultField"));
+         assertEquals(Integer.valueOf(42), ObjectUtil.get(a, "privateField"));
+         assertEquals(Integer.valueOf(43), ObjectUtil.get(a, "protectedField"));
+         assertEquals(Integer.valueOf(44), ObjectUtil.get(a, "publicField"));
+         assertEquals(Integer.valueOf(45), ObjectUtil.get(a, "defaultField"));
          assertEquals("Changed", ObjectUtil.get(a, "onlyInA"));
-         assertEquals(false, ObjectUtil.get(a, "booleanField"));
+         assertEquals(Boolean.valueOf(false), ObjectUtil.get(a, "booleanField"));
          // Change values in A again
          ObjectUtil.set(a, "privateField", -42);
          ObjectUtil.set(a, "protectedField", -43);
@@ -401,18 +401,18 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(a, "onlyInA", "ChangedAgain");
          ObjectUtil.set(a, "booleanField", true);
          // Test returned values in A again
-         assertEquals(-42, ObjectUtil.get(a, "privateField"));
-         assertEquals(-43, ObjectUtil.get(a, "protectedField"));
-         assertEquals(-44, ObjectUtil.get(a, "publicField"));
-         assertEquals(-45, ObjectUtil.get(a, "defaultField"));
+         assertEquals(Integer.valueOf(-42), ObjectUtil.get(a, "privateField"));
+         assertEquals(Integer.valueOf(-43), ObjectUtil.get(a, "protectedField"));
+         assertEquals(Integer.valueOf(-44), ObjectUtil.get(a, "publicField"));
+         assertEquals(Integer.valueOf(-45), ObjectUtil.get(a, "defaultField"));
          assertEquals("ChangedAgain", ObjectUtil.get(a, "onlyInA"));
-         assertEquals(true, ObjectUtil.get(a, "booleanField"));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(a, "booleanField"));
          // Test returned values in B
          assertEquals("A", ObjectUtil.get(b, "onlyInA"));
-         assertEquals(42, ObjectUtil.get(b, "privateField"));
-         assertEquals(43, ObjectUtil.get(b, "protectedField"));
-         assertEquals(44, ObjectUtil.get(b, "publicField"));
-         assertEquals(45, ObjectUtil.get(b, "defaultField"));
+         assertEquals(Integer.valueOf(42), ObjectUtil.get(b, "privateField"));
+         assertEquals(Integer.valueOf(43), ObjectUtil.get(b, "protectedField"));
+         assertEquals(Integer.valueOf(44), ObjectUtil.get(b, "publicField"));
+         assertEquals(Integer.valueOf(45), ObjectUtil.get(b, "defaultField"));
          assertEquals("B", ObjectUtil.get(b, "onlyInB"));
          // Change values in B
          ObjectUtil.set(b, "onlyInA", "ChangedInA");
@@ -423,10 +423,10 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(b, "onlyInB", "ChangedInB");
          // Test returned values in B again
          assertEquals("ChangedInA", ObjectUtil.get(b, "onlyInA"));
-         assertEquals(-43, ObjectUtil.get(b, "privateField"));
-         assertEquals(-44, ObjectUtil.get(b, "protectedField"));
-         assertEquals(-45, ObjectUtil.get(b, "publicField"));
-         assertEquals(-46, ObjectUtil.get(b, "defaultField"));
+         assertEquals(Integer.valueOf(-43), ObjectUtil.get(b, "privateField"));
+         assertEquals(Integer.valueOf(-44), ObjectUtil.get(b, "protectedField"));
+         assertEquals(Integer.valueOf(-45), ObjectUtil.get(b, "publicField"));
+         assertEquals(Integer.valueOf(-46), ObjectUtil.get(b, "defaultField"));
          assertEquals("ChangedInB", ObjectUtil.get(b, "onlyInB"));
       }
       catch (Exception e) {
@@ -613,14 +613,14 @@ public class ObjectUtilTest extends TestCase {
       
       try {
          // Test returned values in A
-         assertEquals(1, ObjectUtil.get(a, ClassA.class, "privateField"));
-         assertEquals(2, ObjectUtil.get(a, ClassA.class, "protectedField"));
-         assertEquals(3, ObjectUtil.get(a, ClassA.class, "publicField"));
-         assertEquals(4, ObjectUtil.get(a, ClassA.class, "defaultField"));
+         assertEquals(Integer.valueOf(1), ObjectUtil.get(a, ClassA.class, "privateField"));
+         assertEquals(Integer.valueOf(2), ObjectUtil.get(a, ClassA.class, "protectedField"));
+         assertEquals(Integer.valueOf(3), ObjectUtil.get(a, ClassA.class, "publicField"));
+         assertEquals(Integer.valueOf(4), ObjectUtil.get(a, ClassA.class, "defaultField"));
          assertEquals("A", ObjectUtil.get(a, ClassA.class, "onlyInA"));
-         assertEquals(true, ObjectUtil.get(a, ClassA.class, "booleanField"));
-         assertEquals(-4711, ObjectUtil.get(a, ClassA.class, "staticField"));
-         assertEquals(true, ObjectUtil.get(a, ClassA.class, "staticBooleanField"));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(a, ClassA.class, "booleanField"));
+         assertEquals(Integer.valueOf(-4711), ObjectUtil.get(a, ClassA.class, "staticField"));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(a, ClassA.class, "staticBooleanField"));
          assertEquals("Hello", ObjectUtil.get(a, ClassA.class, "staticStringField"));
          // Change values in A
          ObjectUtil.set(a, ClassA.class, "privateField", 42);
@@ -630,12 +630,12 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(a, ClassA.class, "onlyInA", "Changed");
          ObjectUtil.set(a, ClassA.class, "booleanField", false);
          // Test returned values in A again
-         assertEquals(42, ObjectUtil.get(a, ClassA.class, "privateField"));
-         assertEquals(43, ObjectUtil.get(a, ClassA.class, "protectedField"));
-         assertEquals(44, ObjectUtil.get(a, ClassA.class, "publicField"));
-         assertEquals(45, ObjectUtil.get(a, ClassA.class, "defaultField"));
+         assertEquals(Integer.valueOf(42), ObjectUtil.get(a, ClassA.class, "privateField"));
+         assertEquals(Integer.valueOf(43), ObjectUtil.get(a, ClassA.class, "protectedField"));
+         assertEquals(Integer.valueOf(44), ObjectUtil.get(a, ClassA.class, "publicField"));
+         assertEquals(Integer.valueOf(45), ObjectUtil.get(a, ClassA.class, "defaultField"));
          assertEquals("Changed", ObjectUtil.get(a, ClassA.class, "onlyInA"));
-         assertEquals(false, ObjectUtil.get(a, ClassA.class, "booleanField"));
+         assertEquals(Boolean.valueOf(false), ObjectUtil.get(a, ClassA.class, "booleanField"));
          // Change values in A again
          ObjectUtil.set(a, ClassA.class, "privateField", -42);
          ObjectUtil.set(a, ClassA.class, "protectedField", -43);
@@ -644,23 +644,23 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(a, ClassA.class, "onlyInA", "ChangedAgain");
          ObjectUtil.set(a, ClassA.class, "booleanField", true);
          // Test returned values in A again
-         assertEquals(-42, ObjectUtil.get(a, ClassA.class, "privateField"));
-         assertEquals(-43, ObjectUtil.get(a, ClassA.class, "protectedField"));
-         assertEquals(-44, ObjectUtil.get(a, ClassA.class, "publicField"));
-         assertEquals(-45, ObjectUtil.get(a, ClassA.class, "defaultField"));
+         assertEquals(Integer.valueOf(-42), ObjectUtil.get(a, ClassA.class, "privateField"));
+         assertEquals(Integer.valueOf(-43), ObjectUtil.get(a, ClassA.class, "protectedField"));
+         assertEquals(Integer.valueOf(-44), ObjectUtil.get(a, ClassA.class, "publicField"));
+         assertEquals(Integer.valueOf(-45), ObjectUtil.get(a, ClassA.class, "defaultField"));
          assertEquals("ChangedAgain", ObjectUtil.get(a, ClassA.class, "onlyInA"));
-         assertEquals(true, ObjectUtil.get(a, ClassA.class, "booleanField"));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(a, ClassA.class, "booleanField"));
          // Test returned values in B
-         assertEquals(1, ObjectUtil.get(b, ClassA.class, "privateField"));
-         assertEquals(2, ObjectUtil.get(b, ClassA.class, "protectedField"));
-         assertEquals(3, ObjectUtil.get(b, ClassA.class, "publicField"));
-         assertEquals(4, ObjectUtil.get(b, ClassA.class, "defaultField"));
+         assertEquals(Integer.valueOf(1), ObjectUtil.get(b, ClassA.class, "privateField"));
+         assertEquals(Integer.valueOf(2), ObjectUtil.get(b, ClassA.class, "protectedField"));
+         assertEquals(Integer.valueOf(3), ObjectUtil.get(b, ClassA.class, "publicField"));
+         assertEquals(Integer.valueOf(4), ObjectUtil.get(b, ClassA.class, "defaultField"));
          assertEquals("A", ObjectUtil.get(b, ClassA.class, "onlyInA"));
-         assertEquals(true, ObjectUtil.get(b, ClassA.class, "booleanField"));
-         assertEquals(42, ObjectUtil.get(b, ClassB.class, "privateField"));
-         assertEquals(43, ObjectUtil.get(b, ClassB.class, "protectedField"));
-         assertEquals(44, ObjectUtil.get(b, ClassB.class, "publicField"));
-         assertEquals(45, ObjectUtil.get(b, ClassB.class, "defaultField"));
+         assertEquals(Boolean.valueOf(true), ObjectUtil.get(b, ClassA.class, "booleanField"));
+         assertEquals(Integer.valueOf(42), ObjectUtil.get(b, ClassB.class, "privateField"));
+         assertEquals(Integer.valueOf(43), ObjectUtil.get(b, ClassB.class, "protectedField"));
+         assertEquals(Integer.valueOf(44), ObjectUtil.get(b, ClassB.class, "publicField"));
+         assertEquals(Integer.valueOf(45), ObjectUtil.get(b, ClassB.class, "defaultField"));
          assertEquals("B", ObjectUtil.get(b, ClassB.class, "onlyInB"));
          // Change values in B
          ObjectUtil.set(b, ClassA.class, "privateField", 42);
@@ -675,16 +675,16 @@ public class ObjectUtilTest extends TestCase {
          ObjectUtil.set(b, ClassB.class, "defaultField", 49);
          ObjectUtil.set(b, ClassB.class, "onlyInB", "ChangedInB");
          // Test returned values in B again
-         assertEquals(42, ObjectUtil.get(b, ClassA.class, "privateField"));
-         assertEquals(43, ObjectUtil.get(b, ClassA.class, "protectedField"));
-         assertEquals(44, ObjectUtil.get(b, ClassA.class, "publicField"));
-         assertEquals(45, ObjectUtil.get(b, ClassA.class, "defaultField"));
+         assertEquals(Integer.valueOf(42), ObjectUtil.get(b, ClassA.class, "privateField"));
+         assertEquals(Integer.valueOf(43), ObjectUtil.get(b, ClassA.class, "protectedField"));
+         assertEquals(Integer.valueOf(44), ObjectUtil.get(b, ClassA.class, "publicField"));
+         assertEquals(Integer.valueOf(45), ObjectUtil.get(b, ClassA.class, "defaultField"));
          assertEquals("ChangedInA", ObjectUtil.get(b, ClassA.class, "onlyInA"));
-         assertEquals(false, ObjectUtil.get(b, ClassA.class, "booleanField"));
-         assertEquals(46, ObjectUtil.get(b, ClassB.class, "privateField"));
-         assertEquals(47, ObjectUtil.get(b, ClassB.class, "protectedField"));
-         assertEquals(48, ObjectUtil.get(b, ClassB.class, "publicField"));
-         assertEquals(49, ObjectUtil.get(b, ClassB.class, "defaultField"));
+         assertEquals(Boolean.valueOf(false), ObjectUtil.get(b, ClassA.class, "booleanField"));
+         assertEquals(Integer.valueOf(46), ObjectUtil.get(b, ClassB.class, "privateField"));
+         assertEquals(Integer.valueOf(47), ObjectUtil.get(b, ClassB.class, "protectedField"));
+         assertEquals(Integer.valueOf(48), ObjectUtil.get(b, ClassB.class, "publicField"));
+         assertEquals(Integer.valueOf(49), ObjectUtil.get(b, ClassB.class, "defaultField"));
          assertEquals("ChangedInB", ObjectUtil.get(b, ClassB.class, "onlyInB"));
       }
       catch (Exception e) {
@@ -842,22 +842,22 @@ public class ObjectUtilTest extends TestCase {
       }            
       // Test valid calls
       try {
-         assertEquals(45, ObjectUtil.invoke(a, "getDefault"));
-         assertEquals(42, ObjectUtil.invoke(a, "getPrivate"));
-         assertEquals(43, ObjectUtil.invoke(a, "getPublic"));
-         assertEquals(44, ObjectUtil.invoke(a, "getProtected"));
-         assertEquals(11, ObjectUtil.invoke(a, "getValue", 11));
-         assertEquals(7, ObjectUtil.invoke(a, "getValue", 3, 4));
+         assertEquals(Integer.valueOf(45), ObjectUtil.invoke(a, "getDefault"));
+         assertEquals(Integer.valueOf(42), ObjectUtil.invoke(a, "getPrivate"));
+         assertEquals(Integer.valueOf(43), ObjectUtil.invoke(a, "getPublic"));
+         assertEquals(Integer.valueOf(44), ObjectUtil.invoke(a, "getProtected"));
+         assertEquals(Integer.valueOf(11), ObjectUtil.invoke(a, "getValue", 11));
+         assertEquals(Integer.valueOf(7), ObjectUtil.invoke(a, "getValue", 3, 4));
          assertEquals("A", ObjectUtil.invoke(a, "onlyInA"));
-         assertEquals(42, ObjectUtil.invoke(a, "getPrivate"));
-         assertEquals(665, ObjectUtil.invoke(b, "getDefault"));
-         assertEquals(662, ObjectUtil.invoke(b, "getPrivate"));
-         assertEquals(663, ObjectUtil.invoke(b, "getPublic"));
-         assertEquals(664, ObjectUtil.invoke(b, "getProtected"));
-         assertEquals(11, ObjectUtil.invoke(b, "getValue", 11));
-         assertEquals(7, ObjectUtil.invoke(b, "getValue", 3, 4));
+         assertEquals(Integer.valueOf(42), ObjectUtil.invoke(a, "getPrivate"));
+         assertEquals(Integer.valueOf(665), ObjectUtil.invoke(b, "getDefault"));
+         assertEquals(Integer.valueOf(662), ObjectUtil.invoke(b, "getPrivate"));
+         assertEquals(Integer.valueOf(663), ObjectUtil.invoke(b, "getPublic"));
+         assertEquals(Integer.valueOf(664), ObjectUtil.invoke(b, "getProtected"));
+         assertEquals(Integer.valueOf(11), ObjectUtil.invoke(b, "getValue", 11));
+         assertEquals(Integer.valueOf(7), ObjectUtil.invoke(b, "getValue", 3, 4));
          assertEquals("A", ObjectUtil.invoke(b, "onlyInA"));
-         assertEquals(662, ObjectUtil.invoke(b, "getPrivate"));
+         assertEquals(Integer.valueOf(662), ObjectUtil.invoke(b, "getPrivate"));
          assertEquals("B", ObjectUtil.invoke(b, "onlyInB"));
       }
       catch (IllegalArgumentException e) {
