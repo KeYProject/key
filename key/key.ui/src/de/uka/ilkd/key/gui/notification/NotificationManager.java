@@ -41,14 +41,6 @@ public class NotificationManager {
    /** true if we are currently in automode */
    private boolean autoMode = false;
 
-   // Dummy task to avoid null pointer checks
-   private static final NotificationTask DUMMY_TASK = new NotificationTask() {
-      @Override
-      public NotificationEventID getEventID() {
-         return NotificationEventID.RESERVED;
-      }
-   };
-
    private NotificationListener notificationListener;
 
    public void setDefaultNotification(JFrame comp) {
@@ -95,18 +87,6 @@ public class NotificationManager {
    }
 
    /**
-    * find the notification task associated with the given event id
-    * 
-    * @param eventId
-    *           int identifying the event
-    * @return the notification task associated with the given event id
-    */
-   public NotificationTask getNotificationTask(NotificationEventID eventId) {
-      NotificationTask taskFromId = notificationTasks.get(eventId);
-      return taskFromId != null ? taskFromId : DUMMY_TASK;
-   }
-
-   /**
     * @return true if the prover is currently in automode
     */
    public boolean inAutoMode() {
@@ -141,9 +121,12 @@ public class NotificationManager {
     * 
     * @param event
     */
-   public void notify(NotificationEvent event) {
-      getNotificationTask(event.getEventID()).execute(event,
-            NotificationManager.this);
+   public void handleNotificationEvent(NotificationEvent event) {
+      NotificationTask notificationTask = notificationTasks.get(event
+            .getEventID());
+      if (notificationTask != null) {
+         notificationTask.execute(event, this);
+      }
    }
 
 }

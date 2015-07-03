@@ -25,8 +25,6 @@ package de.uka.ilkd.key.gui.notification;
  */
 public enum NotificationEventID {
 
-   /** reserved for dummy implementations */
-   RESERVED, // used by dummy implementation
    /** tasks notifying about proof closed events have this ID */
    PROOF_CLOSED,
    /** tasks notifying about abandoned tasks have this ID */

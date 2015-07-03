@@ -98,7 +98,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new JoinRuleCompletion());
     }
 
-    protected MediatorProofControl createProofControl() {
+    @Override
+   protected MediatorProofControl createProofControl() {
        return new MediatorProofControl(this) {
           /**
            * {@inheritDoc}
@@ -107,7 +108,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
           public boolean isAutoModeSupported(Proof proof) {
              return super.isAutoModeSupported(proof) &&
                     mainWindow.getProofList().containsProof(proof);
-          }          
+          }
        };
     }
     
@@ -553,6 +554,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      //ok button
      final JButton button = new JButton("OK");
      button.addActionListener(new ActionListener() {
+         @Override
          public void actionPerformed(ActionEvent e) {
              dialog.setVisible(false);
          }
@@ -567,7 +569,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      
      button.registerKeyboardAction(
          new ActionListener() {
-             public void actionPerformed(ActionEvent event) {
+             @Override
+            public void actionPerformed(ActionEvent event) {
                  if(event.getActionCommand().equals("ESC")) {
                      button.doClick();
                  }
