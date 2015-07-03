@@ -7,20 +7,28 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class ResolveResult {
     
-    private ASTNode jdtNode = null;
-    private ResolveResultType type = ResolveResultType.UNSPECIFIED;
-    private IBinding binding = null;
+    private final ASTNode jdtNode;
+    private final ResolveResultType type;
+    private final IBinding binding;
     
-    public ResolveResult(ASTNode jdtNode, ResolveResultType type, IBinding binding) {
+    public ResolveResult(final ASTNode jdtNode, final ResolveResultType type, final IBinding binding) {
         this.jdtNode = jdtNode;
         this.type = type;
         this.binding = binding;
     }
 
+    /**
+     * Get the binding of the result.
+     * @return the {@link IBinding} for the stored result
+     */
     public IBinding getBinding() {
         return binding;
     }
     
+    /**
+     * Get the {@link ASTNode} of the result.
+     * @return the {@link ASTNode} for the stored result
+     */
     public ASTNode getJDTNode() {
         return jdtNode;
     }

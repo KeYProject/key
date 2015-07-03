@@ -1,11 +1,15 @@
 package resolver.test;
 
+import java.io.*;
+import java.util.HashMap;
+
 public class ResolverTestMain {
     private static int staticField1 = 0;
     private /*@ spec_public @*/ int field1 = 0;
     private /*@ spec_public @*/ String field2 = "field2content";
     private /*@ spec_public @*/ ResolverTestClass1 field3 = null;
     private /*@ spec_public @*/ long fieldMultiple1, fieldMultiple2;
+    private /*@ spec_public @*/ HashMap<Integer, String> field4 = new HashMap<Integer, String>();
     private int[] arrayfield;
     
     public ResolverTestMain(int field1, String field2, ResolverTestClass1 field3) {
@@ -29,6 +33,7 @@ public class ResolverTestMain {
       @ ensures field1 == parameter1;
       @*/
     public boolean method1Parameter1(int parameter1) {
+        Integer i = 1;
         field1 = parameter1;
         return true;
     }
@@ -111,7 +116,7 @@ public class ResolverTestMain {
     
     /*@ normal_behavior
       @ assignable \nothing;
-      @ ensures true == methodComplexParameter1(field1 * field1);
+      @ ensures true == methodComplexParameter1((int)field1 * (Integer)field1);
       @*/
     public int doSomething4() {
         return 5;
@@ -167,8 +172,32 @@ public class ResolverTestMain {
     
     /*@ normal_behavior
       @ assignable \nothing;
-      @ ensures field3.getThis(field3).getThis(field3).getThis(field3) == field3 == field3 == field3;
+      @ ensures field3.getThis(field3).getThis(field3).getThis(field3) == field3 == \old(field3) == field3;
      */
     public void doSomething11() {}
+
+    /*@ normal_behavior
+      @ assignable this.field2;
+      @ ensures String.valueOf(field2).equals(methodNoParameters3().getThis(field2).field10);
+      @*/
+    public int doSomething12(int field2) {
+        int i = 0;
+        
+        /*@ maintaining i == arrayfield[x];
+          @ decreasing arrayfield.length - x;
+          @*/
+        for(int x = 0; x < arrayfield.length; x++) {
+            i = arrayfield[x];
+        }
+        return i;
+    }
     
+    /*@ normal_behavior
+      @ assignable field4;
+      @ ensures field4.containsKey(1);
+      @*/
+    public HashMap<Integer,String> doSomething13() {
+        field4.containsKey(1);
+        return new HashMap<Integer, String>();
+    }    
 }

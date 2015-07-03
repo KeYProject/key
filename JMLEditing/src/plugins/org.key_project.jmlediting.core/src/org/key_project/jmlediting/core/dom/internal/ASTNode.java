@@ -63,17 +63,17 @@ public class ASTNode extends AbstractASTNode {
 
    @Override
    public int getType() {
-      return this.type;
+      return type;
    }
 
    @Override
    public List<IASTNode> getChildren() {
       // We need to return a non null list in any case
-      if (this.children == null) {
+      if (children == null) {
          return Collections.emptyList();
       }
       else {
-         return Collections.unmodifiableList(this.children);
+         return Collections.unmodifiableList(children);
       }
    }
 

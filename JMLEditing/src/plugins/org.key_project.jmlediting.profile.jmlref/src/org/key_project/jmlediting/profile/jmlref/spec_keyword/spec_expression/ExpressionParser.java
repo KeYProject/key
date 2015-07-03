@@ -16,8 +16,7 @@ import org.key_project.jmlediting.profile.jmlref.type.TypeKeywordSort;
 
 /**
  * The Expression Parser parses expressions as defined in the JML Reference
- * Manual. {@link http
- * ://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_12.html#SEC128}.
+ * Manual. {@link http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_12.html#SEC128}.
  * Currently the following is not implemented: inner classes in JML, set
  * comprehension and owner ship modifiers.
  *
@@ -54,7 +53,7 @@ public class ExpressionParser implements ParseFunction {
     * @return the parser for dims
     */
    public ParseFunction dims() {
-      return this.dimsParser;
+      return dimsParser;
    }
 
    /**
@@ -63,7 +62,7 @@ public class ExpressionParser implements ParseFunction {
     * @return the type spec parser
     */
    public ParseFunction typeSpec() {
-      return this.typeSpecParser;
+      return typeSpecParser;
    }
 
    /**
@@ -72,25 +71,25 @@ public class ExpressionParser implements ParseFunction {
     * @return
     */
    public ParseFunction referenceType() {
-      return this.referenceType;
+      return referenceType;
    }
 
    public ParseFunction assignmentExpr() {
-      return this.assignmentExprParser;
+      return assignmentExprParser;
    }
 
    public ParseFunction exprList() {
-      return this.exprListParser;
+      return exprListParser;
    }
 
    public ParseFunction equivalenceExpr() {
-      return this.equivalenceExpr;
+      return equivalenceExpr;
    }
 
    @Override
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
-      return this.mainParser.parse(text, start, end);
+      return mainParser.parse(text, start, end);
    }
 
    /**
@@ -439,12 +438,12 @@ public class ExpressionParser implements ParseFunction {
       expressionList.defineAs(separatedNonEmptyList(EXPRESSION_LIST, ',',
             expression, "Expected an expression"));
 
-      this.mainParser = expression;
-      this.dimsParser = dims;
-      this.typeSpecParser = typeSpec;
-      this.assignmentExprParser = assignmentExpr;
+      mainParser = expression;
+      dimsParser = dims;
+      typeSpecParser = typeSpec;
+      assignmentExprParser = assignmentExpr;
       this.referenceType = referenceType;
-      this.exprListParser = expressionList;
+      exprListParser = expressionList;
       this.equivalenceExpr = equivalenceExpr;
    }
 }
