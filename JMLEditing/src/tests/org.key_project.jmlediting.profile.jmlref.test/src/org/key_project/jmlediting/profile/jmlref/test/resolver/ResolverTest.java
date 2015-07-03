@@ -34,6 +34,7 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
 import org.key_project.jmlediting.core.resolver.ResolveResultType;
+import org.key_project.jmlediting.core.resolver.ResolverException;
 import org.key_project.jmlediting.profile.jmlref.test.Activator;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
@@ -55,18 +56,22 @@ public class ResolverTest {
     private static List<IASTNode> iASTList = new ArrayList<IASTNode>();
     private static ASTNode mainJDT;
     private static ASTNode class1JDT;
+    private final static String PATH = "src/resolver/test/";
+    private final static String FILE1 = "ResolverTestMain";
+    private final static String FILE2 = "ResolverTestClass1";
     
     @BeforeClass
     public static void initProject() throws CoreException, InterruptedException {
        javaProject = TestUtilsUtil.createJavaProject("MainResolverTest");
        srcFolder = javaProject.getProject().getFolder(JDTUtil.getSourceFolderName());
-       testFolder = TestUtilsUtil.createFolder(srcFolder, "mainResolverTest");
+       testFolder = TestUtilsUtil.createFolder(srcFolder, "resolver");
+       testFolder = TestUtilsUtil.createFolder(testFolder, "test");
        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data\\template\\mainResolverTest", testFolder);
        TestUtilsUtil.waitForBuild();
        JMLPreferencesHelper.setProjectJMLProfile(javaProject.getProject(), JMLPreferencesHelper.getDefaultJMLProfile());
        
        // Parse JDT
-       cu = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile("src/mainResolverTest/ResolverTestMain" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+       cu = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATH+FILE1+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
        mainJDT = JDTUtil.parse(cu);
        
        // Parse JML
@@ -81,13 +86,24 @@ public class ResolverTest {
            }
        }
        
-       cu2 = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile("src/mainResolverTest/ResolverTestClass1" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+       cu2 = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATH+FILE2+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
        class1JDT = JDTUtil.parse(cu2);
     }
     
     private void test(final String test, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type) {
-        final IResolver resolver = new Resolver();
-        final ResolveResult result = resolver.resolve(cu, getIASTNode(test, jmlSkip));
+        final IResolver resolver = new Resolver(); // JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject())
+        ResolveResult result = null;
+        try {
+            result = resolver.resolve(cu, getIASTNode(test, jmlSkip));
+            ResolveResult next = result;
+            while(next != null) {
+                result = next;
+                next = resolver.next();
+            }
+        }
+        catch (final ResolverException e) {
+            LogUtil.getLogger().logError(e);
+        }
         ASTNode jdt = null;
         switch(type) {
         case FIELD:
@@ -108,8 +124,8 @@ public class ResolverTest {
         assertNotEquals(result, null);
         
         assertTrue(result.getJDTNode().subtreeMatch(new ASTMatcher(), jdt));
-        assertEquals(result.getName(), test);
-        assertEquals(result.getResolveType(), type);
+        assertEquals(test, result.getName());
+        assertEquals(type, result.getResolveType());
         assertTrue(result.getBinding().isEqualTo(resolveBinding(jdt)));
     }
     
@@ -181,16 +197,11 @@ public class ResolverTest {
     public void resolveArrayFieldTest1() {
         test("arrayfield", 0, 0, 0, ResolveResultType.FIELD);
     }
-    //@Test
-    //public void resolveMethodSameName1ParameterTest2() {
-    //    test("methodSameName1Parameter1", 0, 0, 1, ResolveResultType.METHOD);
-    //}
-    
-    //TODO: write tests, that are meant to fail.
-    
-    
-    
-    /*@Test
+    @Test
+    public void resolveMethodSameName1ParameterTest2() {
+        test("methodSameName1Parameter1", 0, 0, 1, ResolveResultType.METHOD);
+    }
+    @Test
     public void resolveMethodComplexParameterTest1() {
         test("methodComplexParameter1", 0, 0, 0, ResolveResultType.METHOD);
     }
@@ -233,7 +244,9 @@ public class ResolverTest {
     @Test
     public void resolveMemberAccessTest9() {
         test("ResolverTestClass1", 1, 0, 0, ResolveResultType.CLASS);
-    }*/
+    }
+
+    //TODO: write tests, that are meant to fail.
 
     /**
      * Helper function for the tests.
@@ -355,13 +368,15 @@ public class ResolverTest {
         final List<IASTNode> list = new ArrayList<IASTNode>();
         
         for(final IASTNode jml : iASTList) {
-             list.addAll(Nodes.getAllNodesOfType(jml, NodeTypes.STRING));
+             list.addAll(Nodes.getAllNodesOfType(jml, ExpressionNodeTypes.PRIMARY_EXPR));
         }
         
         for(final IASTNode node : list) {
-            if(((IStringNode)node).getString().equals(identifier)) {
-                if(skip-- == 0) {
-                    return node;
+            if(node.getChildren().get(0).getChildren().get(0).getType() == NodeTypes.STRING) {
+                if(((IStringNode)node.getChildren().get(0).getChildren().get(0)).getString().equals(identifier)) {
+                    if(skip-- == 0) {
+                        return node;
+                    }
                 }
             }
         }

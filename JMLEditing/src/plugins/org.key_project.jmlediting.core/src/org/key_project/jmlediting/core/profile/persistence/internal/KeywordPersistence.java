@@ -92,12 +92,12 @@ public abstract class KeywordPersistence {
          throws ProfilePersistenceException {
       // UserDefinedKeywords are persisted differently
       if (keyword instanceof IUserDefinedKeyword) {
-         return this.persistUserDefinedKeyword((IUserDefinedKeyword) keyword,
+         return persistUserDefinedKeyword((IUserDefinedKeyword) keyword,
                doc);
       }
       else {
          // Check whether the coded keyword can be persisted
-         this.validateCodedKeywordToPersist(keyword);
+         validateCodedKeywordToPersist(keyword);
 
          // Then write a reference to the class of the keyword
          final Element codedKeywordElem = doc.createElement(CODED_KEYWORD);
@@ -124,7 +124,7 @@ public abstract class KeywordPersistence {
       final String name = elem.getNodeName();
       // User defined keywords are loaded differently
       if (USER_DEFINED_KEYWORD.equals(name)) {
-         return this.loadUserDefinedKeyword(elem);
+         return loadUserDefinedKeyword(elem);
       }
       else if (CODED_KEYWORD.equals(name)) {
          // Ensure that there is exaclty one class reference
@@ -138,7 +138,7 @@ public abstract class KeywordPersistence {
          // Load that class and then the keyword from the class
          final Class<? extends IKeyword> keywordClass = ClassReferencePersistence
                .loadClassReference(classElem, IKeyword.class);
-         return this.loadCodedKeywordFromClass(keywordClass);
+         return loadCodedKeywordFromClass(keywordClass);
       }
       else {
          throw new ProfilePersistenceException(
@@ -302,7 +302,7 @@ public abstract class KeywordPersistence {
 
       // Find the contentdescription by id
       final IUserDefinedKeywordContentDescription descr = JMLProfileHelper
-            .getDescriptionById(descriptionID, this.profile);
+            .getDescriptionById(descriptionID, profile);
       if (descr == null) {
          throw new ProfilePersistenceException(
                "Content for UserDefinedKeyword with id \"" + descriptionID

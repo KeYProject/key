@@ -27,8 +27,10 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
+import org.key_project.jmlediting.core.resolver.ResolverException;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
+import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -139,7 +141,7 @@ public final class JMLRenameParticipant extends RenameParticipant {
                 }
             }
         }
-        catch (JavaModelException e) {
+        catch (final JavaModelException e) {
             return null;
         }
         return null;
@@ -160,9 +162,9 @@ public final class JMLRenameParticipant extends RenameParticipant {
      *             ICompilationUnit or he JMLcomments could not be received
      */
     private LinkedList<ReplaceEdit> computeNeededChangesToJML(
-            ICompilationUnit unit, IJavaProject project)
+            final ICompilationUnit unit, final IJavaProject project)
             throws JavaModelException {
-        LinkedList<ReplaceEdit> changesToMake = new LinkedList<ReplaceEdit>();
+        final LinkedList<ReplaceEdit> changesToMake = new LinkedList<ReplaceEdit>();
 
         // Find the JML comments in the given source file
         final String source = unit.getSource();
@@ -216,7 +218,7 @@ public final class JMLRenameParticipant extends RenameParticipant {
      *             could not access source of given ICompilationUnit
      */
     private List<IASTNode> getJMLcomments(final ICompilationUnit unit,
-            final IJavaProject project, String source, CommentRange range)
+            final IJavaProject project, final String source, final CommentRange range)
             throws JavaModelException {
 
         List<IASTNode> nodesList = new LinkedList<IASTNode>();
@@ -236,7 +238,7 @@ public final class JMLRenameParticipant extends RenameParticipant {
                     + source.substring(range.getBeginOffset(),
                             range.getEndOffset() + 1));
         }
-        catch (ParserException e) {
+        catch (final ParserException e) {
             return new LinkedList<IASTNode>();
         }
         System.out.println("Returning: " + nodesList);
@@ -254,8 +256,8 @@ public final class JMLRenameParticipant extends RenameParticipant {
      * @return true if the given IASTNode references the element to be renamed
      *         else false
      */
-    private Boolean isReferenceToRefactoredElement(ICompilationUnit unit,
-            IASTNode node) {
+    private Boolean isReferenceToRefactoredElement(final ICompilationUnit unit,
+            final IASTNode node) {
         
         // correct name?
         if (!((IStringNode) node).getString().equals(fOldName)) {
@@ -265,7 +267,17 @@ public final class JMLRenameParticipant extends RenameParticipant {
         else {
 
             final IResolver resolver = new Resolver();
-            final ResolveResult result = resolver.resolve(unit, node);
+            ResolveResult result = null;
+            try {
+                result = resolver.resolve(unit, node);
+                while(resolver.hasNext()) {
+                    result = resolver.next();
+                }
+            }
+            catch (final ResolverException e) {
+                LogUtil.getLogger().logError(e);
+                return false;
+            }
 
             if (result == null) {
                 System.out.println("Resolver returned null");
@@ -282,7 +294,7 @@ public final class JMLRenameParticipant extends RenameParticipant {
                 System.out.println("Java Element == Element to be renamed is "
                         + jElement.equals(fJavaElementToRename));
 
-                return (jElement.equals(fJavaElementToRename));
+                return jElement.equals(fJavaElementToRename);
             }
         }
     }
