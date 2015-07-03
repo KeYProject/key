@@ -83,7 +83,7 @@
    <extension
          point="org.key_project.javaeditor.javaOutlineExtension">
       <modifyer
-            class="org.key_project.jmlediting.ui.outlineView.TestOutlineExtension">
+            class="org.key_project.jmlediting.ui.outlineView.JMLinJavaOutlineExtension">
       </modifyer>
    </extension>
 </plugin>

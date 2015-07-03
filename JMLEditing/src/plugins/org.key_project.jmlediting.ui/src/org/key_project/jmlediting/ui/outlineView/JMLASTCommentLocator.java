@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -23,14 +22,10 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
-import org.key_project.jmlediting.core.profile.syntax.AbstractToplevelKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.util.jdt.JDTUtil;
 
 /**
- * Locates JML Comments with JDT AST
+ * Locates JML Comments for the given JDT AST
  * 
  * @author Timm Lippert
  *
@@ -46,10 +41,11 @@ public class JMLASTCommentLocator {
    ArrayList<JMLComments> jmlClassList = new ArrayList<JMLComments>();
    final Map<Integer, Integer> sourceOffsetToCommentOffset;
    int Sourcelength = 0;
+   final List<int[]> methodStartEndoffsets = new ArrayList<int[]>();
 
    List<Comment> comments;
-   String[] methodKeyWords = { "normal_behavior", "normal_behaviour","behavior","behaviour" };
-   String[] invariantKeyWords = { "invariant", "maintaining" };
+   String[] methodKeyWords = { "normal_behavior", "normal_behaviour","behavior","behaviour","exceptional_behaviour","exceptional_behavior" };
+   String[] invariantKeyWords = { "invariant"};
 
    /**
     * Constructor for /{@link JMLASTCommentLocator} </br> gets all
@@ -85,7 +81,10 @@ public class JMLASTCommentLocator {
          public boolean visit(MethodDeclaration node) {
             // Cast missing to IMethod node.resolveBinding().getJavaElement();
             try {
+               if(node.resolveBinding() != null)
                sourceOffsetToCommentOffset.put(((IMethod) node.resolveBinding().getJavaElement()).getNameRange().getOffset(), jdtAST.firstLeadingCommentIndex(node));
+               int[] a = {node.getStartPosition(),node.getLength()};
+               methodStartEndoffsets.add(a);
             }
             catch (JavaModelException e) {
                LogUtil.getLogger().logError(e);
@@ -103,7 +102,9 @@ public class JMLASTCommentLocator {
       // iterate over comments and make different lists for comments
       String text, keyword = null;
       Comment currentcomment;
-
+      
+      
+      
       if (source != null) {
          Sourcelength = source.length();
          for (Object obj : comments) {
@@ -126,12 +127,12 @@ public class JMLASTCommentLocator {
                            keyword = getFirstKeyword(listofIAST.get(0));
                            if (keyword == null) keyword = getFirstKeyword(listofIAST.get(1));
                         
-                        text = outString(listofIAST);
+                        text = outString(listofIAST).trim();
                         if (formethod(keyword)) {
                            jmlForMethodList.add(new JMLComments(text, currentcomment, "method"));
                         }
-                        else if (forinvariant(keyword)) {
-                           jmlClassList.add(new JMLComments(text, currentcomment, "invariant"));
+                        else if (/*forinvariant(keyword)*/notinmethod(currentcomment.getStartPosition())) {
+                           jmlClassList.add(new JMLComments(text, currentcomment, "Class"));
                         }
                      }
                      catch (ParserException e) {
@@ -146,14 +147,34 @@ public class JMLASTCommentLocator {
       }
    }
 
+   
+   private boolean notinmethod(int start) {
+      boolean ret = false;
+      for (int[] a: methodStartEndoffsets) {
+         if(((start > a[0]) && (start < (a[1]+a[0])))){
+           return false;
+         }
+         else {
+            ret = true;
+         }
+      }return ret;
+   }
+
+
+   /**
+    * Makes a pretty string for the outline view
+    * @param listofIAST
+    * @return A readable String from a IASTNode for the outline
+    */
    private String outString(List<IASTNode> listofIAST) {
       String nicetext = "";
       for (IASTNode n : listofIAST) {
          if (n.getChildren().isEmpty()) {
             if (n.getType() == NodeTypes.KEYWORD) {
-               nicetext += ((IKeywordNode)n).getKeywordInstance()+" "; 
-            }else {
-            nicetext += n.prettyPrintAST().replaceAll("\"", "")+" ";  
+               nicetext += " "+((IKeywordNode)n).getKeywordInstance();
+               nicetext.trim();
+            }else if (n.getType() == NodeTypes.STRING || n.getType() == NodeTypes.SEQ) {
+               nicetext += " " + n.prettyPrintAST().replaceAll("^\"", "").replaceAll("\"$", "");
             }
          }else nicetext += outString(n.getChildren());
       }return nicetext;
@@ -161,33 +182,35 @@ public class JMLASTCommentLocator {
 
    private String getFirstKeyword(IASTNode iastNode) {
          if (iastNode.getType() == NodeTypes.KEYWORD) {
-            if (isrealkeyword(((IKeywordNode) iastNode).getKeywordInstance())){
+            if (isRealKeyword(((IKeywordNode) iastNode).getKeywordInstance())){
             return ((IKeywordNode) iastNode).getKeywordInstance();
             }
-         
          }
          else if (iastNode.getType() == NodeTypes.KEYWORD_APPL){
             return getFirstKeyword(iastNode.getChildren().get(0));
-         
       }
       return null;
    }
 
-   private boolean isrealkeyword(String keywordInstance) {
+   private boolean isRealKeyword(String keywordInstance) {
       if (keywordInstance.equals("public") || keywordInstance.equals("protected") || keywordInstance.equals("private") ){
         return false;
      }return true;
    }
 
-   private boolean forinvariant(String keyword) {
-      
-      for (String s : invariantKeyWords) {
-         if (keyword.equals(s)) {
-            return true;
-         }
-      }
-      return false;
-   }
+//   /**
+//    *  Checks if the given keyword is for an Class Invariant
+//    * @param keyword
+//    * @return true if keyword is for Class Invariant
+//    */
+//   private boolean forinvariant(String keyword) {      
+//      for (String s : invariantKeyWords) {
+//         if (keyword.equals(s)) {
+//            return true;
+//         }
+//      }
+//      return false;
+//   }
 
    /**
     * 
@@ -201,6 +224,11 @@ public class JMLASTCommentLocator {
       return (text.contains("/*@") || text.contains("//@"));
    }
 
+   /**
+    * Checks if given Keyword is for a method like all kinds of behaviors or behaviours
+    * @param keyword
+    * @return
+    */
    private boolean formethod(String keyword) {
       for (String s : methodKeyWords) {
          if (keyword.equals(s))

@@ -8,12 +8,25 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
 
+/**
+ * Contains {@link IASTNode} with a Read able string that should be shown in the Outline
+ * 
+ * @author Timm Lippert
+ *
+ */
 
 public class JMLComments implements IASTNode {
 
    Comment node;
    String text;
    String type;
+   
+   /**
+    * 
+    * @param commenttext </br>The Text That should be shown in the Outline
+    * @param node </br>The Comments {@link IASTNode}
+    * @param type </br>type of the Comment for example type
+    */
    
    public JMLComments(String commenttext,Comment node,String type) {
       text= commenttext;
@@ -22,58 +35,42 @@ public class JMLComments implements IASTNode {
    }
    @Override
    public String toString() {
-      // TODO Auto-generated method stub
       return text;
-   }
-   public ASTNode getASTNode() {
-      return node;
-   }
-   public ASTNode getParent() {
-      return node.getAlternateRoot();
    }
    @Override
    public int getStartOffset() {
-      // TODO Auto-generated method stub
       return node.getStartPosition();
    }
    @Override
    public int getEndOffset() {
-      // TODO Auto-generated method stub
       return node.getLength()+node.getStartPosition();
    }
    @Override
    public boolean containsOffset(int offset) {
-      // TODO Auto-generated method stub
       return false;
    }
    @Override
    public boolean containsCaret(int caretPosition) {
-      // TODO Auto-generated method stub
       return false;
    }
    @Override
    public int getType() {
-      // TODO Auto-generated method stub
       return 0;
    }
    @Override
    public List<IASTNode> getChildren() {
-      // TODO Auto-generated method stub
       return null;
    }
    @Override
    public <T> T search(INodeSearcher<T> searcher) {
-      // TODO Auto-generated method stub
       return null;
    }
    @Override
    public <T> T traverse(INodeTraverser<T> traverser, T init) {
-      // TODO Auto-generated method stub
       return null;
    }
    @Override
    public String prettyPrintAST() {
-      // TODO Auto-generated method stub
       return text;
    }
    
