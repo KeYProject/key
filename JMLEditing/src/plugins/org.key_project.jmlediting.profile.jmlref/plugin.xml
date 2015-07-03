@@ -13,5 +13,22 @@
             class="org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile">
       </profile>
    </extension>
-
+        <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+      <renameParticipant
+            class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLRenameParticipant"
+            id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipant"
+            name="%renameJMLParticipant">
+            <enablement>
+              <with variable="affectedNatures">
+                <iterate operator="or">
+                  <equals value="org.eclipse.jdt.core.javanature"/>
+                </iterate>
+              </with>
+              <with variable="element">
+                <instanceof value="org.eclipse.jdt.core.IField"/>
+              </with>
+            </enablement>
+      </renameParticipant>
+   </extension>
 </plugin>

@@ -3,7 +3,7 @@
 <schema targetNamespace="org.key_project.javaeditor" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.key_project.javaeditor" id="org.key_project.javaeditor.javaOutlineCompilationUnitWrapper" name="Java Compilation Unit Wrapper"/>
+         <meta.schema plugin="org.key_project.javaeditor" id="org.key_project.javaeditor.javaOutlineModifiyerExtension" name="Java Outline Modifyer"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="Wrapper" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="modifyer" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,7 +47,7 @@
       </complexType>
    </element>
 
-   <element name="Wrapper">
+   <element name="modifyer">
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
@@ -55,7 +55,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.key_project.javaeditor.outline.OutlineCompilationUnitWrapper:"/>
+                  <meta.attribute kind="java" basedOn=":org.key_project.javaeditor.outline.IOutlineModifiyer"/>
                </appinfo>
             </annotation>
          </attribute>

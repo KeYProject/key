@@ -60,11 +60,4 @@ public interface IKeyword {
      */
     IKeywordValidator getKeywordValidator();
 
-    /**
-     * Creates an IKeywordContentRefactorer with the given Input.
-     *
-     * @return an IKeywordContentRefactorer
-     */
-    IKeywordContentRefactorer createRefactorer();
-
 }
