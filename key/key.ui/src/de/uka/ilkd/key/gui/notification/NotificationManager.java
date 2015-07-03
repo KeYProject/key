@@ -23,7 +23,6 @@ import javax.swing.JFrame;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.notification.actions.ExceptionFailureNotificationDialog;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
 
@@ -54,9 +53,9 @@ public class NotificationManager {
       
       /* 
        * Commented out since WindowUserInterfaceControl already opens an
-       * exception dialog. The classes  ExceptionFailureNotification and 
+       * exception dialog. The classes ExceptionFailureNotification and 
        * ExceptionFailureNotificationDialog can potentially be deleted
-       * but I left it for now.
+       * but I left them for now.
        * 
        * Kai Wallisch 07/2015
        */

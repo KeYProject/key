@@ -207,7 +207,7 @@ public final class MainWindow extends JFrame  {
     private final AutoModeAction autoModeAction;
 
     /** action for opening a KeY file */
-    private MainWindowAction openFileAction;
+    private OpenFileAction openFileAction;
 
     /** action for opening an example */
     private OpenExampleAction openExampleAction;
