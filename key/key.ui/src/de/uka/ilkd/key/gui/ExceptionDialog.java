@@ -58,6 +58,10 @@ public class ExceptionDialog extends JDialog {
     private JScrollPane stScroll;
     private JTextArea stTextArea;
     
+    void close() {
+       setVisible(false);
+    }
+    
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
             dlg.setVisible(true);
@@ -73,7 +77,7 @@ public class ExceptionDialog extends JDialog {
         ActionListener closeListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setVisible(false);
+                close();
             }
         };
         
@@ -110,6 +114,7 @@ public class ExceptionDialog extends JDialog {
 //        bPanel.add(reloadButton); // XXX useful for debugging
         bPanel.add(closeButton);
         bPanel.add(new ReportErrorButton(this, exception));
+        bPanel.add(new EditSourceFileButton(this, exception));
         bPanel.add(detailsBox);
         
         return bPanel;

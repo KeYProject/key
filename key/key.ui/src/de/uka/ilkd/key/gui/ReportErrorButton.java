@@ -27,7 +27,6 @@ public class ReportErrorButton extends JButton {
    ReportErrorButton(final Window parent, final Throwable exception) {
       super("Report Bug");
       this.setName("Report error button");
-      setSelected(false);
       addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent arg0) {
