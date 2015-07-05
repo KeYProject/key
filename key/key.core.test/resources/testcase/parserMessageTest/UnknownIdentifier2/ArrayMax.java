@@ -1,3 +1,7 @@
+//MSG .*[Uu]nknown identifier.*loop_invariantmisspelled.*
+//LINE 19
+//COL 13
+
 class ArrayMax {
 
     int max;
@@ -12,14 +16,13 @@ class ArrayMax {
     public int m(int a[]) {
         max = a[0];
 
-        /*@ loop_invariant
-          @   0<=i && i<= a.length ;
-          @ loop_invariant
+        /*@ loop_invariantmisspelled
+          @   0<=i && i<= a.length &&
           @   (\forall int j; 0<= j && j < i; a[j] <= max) &&
           @   (i == 0 ? 
           @      max == a[0] :
           @      (\exists int j; 0<= j && j < i; a[j] == max));
-          @ assignable this.max,i ;
+          @ assignable this.max;
           @ decreases a.length - i;
           @*/
         for(int i = 0; i < a.length; i++) {

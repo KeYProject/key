@@ -133,7 +133,7 @@ public class ParserMessageTest {
                   + "that was specified in file " + javaFile
                   + "\nRequested regular expression: " + parserMessageRegExp
                   + "\nRetrieved exception message: " + pe.getMessage(), pe
-                  .getMessage().matches(".*" + parserMessageRegExp + ".*"));
+                  .getMessage().matches(parserMessageRegExp));
    }
 
    @Parameters(name = "{0}")

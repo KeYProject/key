@@ -35,12 +35,3 @@ class ArrayMax {
 
 }
 
-
-        /* @ loop_invariant
-          @   0<=i && i<= a.length &&
-          @   (\forall int j; 0<= j && j < i; a[j] <= max) &&
-          @   (i == 0 ? max == a[0] ||
-          @      (\exists int j; 0<= j && j < i; a[j] == max));
-          @ assignable this.max;
-          @ decreases a.length - i;
-          @*/
