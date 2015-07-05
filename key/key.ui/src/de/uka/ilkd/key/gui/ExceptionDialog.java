@@ -69,7 +69,7 @@ public class ExceptionDialog extends JDialog {
         init(exception);
     }
 
-    private JPanel createButtonPanel() {
+    private JPanel createButtonPanel(Throwable exception) {
         ActionListener closeListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,6 +109,7 @@ public class ExceptionDialog extends JDialog {
         JPanel bPanel = new JPanel();
 //        bPanel.add(reloadButton); // XXX useful for debugging
         bPanel.add(closeButton);
+        bPanel.add(new ReportErrorButton(this, exception));
         bPanel.add(detailsBox);
         
         return bPanel;
@@ -231,7 +232,7 @@ public class ExceptionDialog extends JDialog {
                             0, 0, 0, 0), 0, 0));
         }
             
-        JPanel buttonPanel = createButtonPanel();
+        JPanel buttonPanel = createButtonPanel(exception);
         cp.add(buttonPanel, new GridBagConstraints(0, 2, 1, 1, 1., 0.,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
                         0, 0, 0, 0), 0, 0));
