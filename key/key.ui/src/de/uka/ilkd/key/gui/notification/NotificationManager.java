@@ -51,14 +51,12 @@ public class NotificationManager {
       addNotificationTask(new AbandonNotification());
       addNotificationTask(new ExitKeYNotification());
       
-      /* 
-       * Commented out since WindowUserInterfaceControl already opens an
-       * exception dialog. The classes ExceptionFailureNotification and 
-       * ExceptionFailureNotificationDialog can potentially be deleted
-       * but I left them for now.
-       * 
-       * Kai Wallisch 07/2015
-       */
+      //FIXME (DS): Obviously, adding ExceptionFailureNotification at this\\
+      // place leads to a double appearance of Dialogs in case of a parser\\
+      // error. However, the user is not notified in case of an ExceptionFailure\\
+      // occurring *after* the parsing procedure, so for instance at an\\
+      // erroneous BuiltInRule application. This is not desirable, since\\
+      // then there might be a strange GUI behavior without even a notification.
       // addNotificationTask(new ExceptionFailureNotification(comp));
    }
 

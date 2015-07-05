@@ -166,7 +166,7 @@ public class JoinRuleUtils {
         ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
 
         if (term.op() instanceof LocationVariable) {
-            result.add((LocationVariable) term.op());
+            result = result.add((LocationVariable) term.op());
         }
         else {
             if (!term.javaBlock().isEmpty()) {
@@ -1294,7 +1294,7 @@ public class JoinRuleUtils {
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Term toProve,
-            Services services, boolean doSplit) {
+            Services services, boolean doSplit, String sideProofName) {
         final ProofEnvironment sideProofEnv = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
                         services.getProof(), // Parent Proof
@@ -1302,7 +1302,6 @@ public class JoinRuleUtils {
 
         ApplyStrategyInfo proofResult = null;
         try {
-            // TODO: Find a sensible name for the side proof
             ProofStarter proofStarter = SideProofUtil
                     .createSideProof(
                             sideProofEnv, // Proof environment
@@ -1310,7 +1309,7 @@ public class JoinRuleUtils {
                                     // Sequent to prove
                                     Semisequent.EMPTY_SEMISEQUENT,
                                     new Semisequent(new SequentFormula(toProve))),
-                            "Side proof"); // Proof name
+                                    sideProofName); // Proof name
 
             proofResult = proofStarter.start();
         }
@@ -1335,7 +1334,7 @@ public class JoinRuleUtils {
     private static boolean isProvable(Term toProve, Services services,
             boolean doSplit) {
 
-        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit);
+        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check");
         boolean result = proofResult.getProof().closed();
 
         return result;
@@ -1362,7 +1361,7 @@ public class JoinRuleUtils {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo info = tryToProve(term, services, true);
+        final ApplyStrategyInfo info = tryToProve(term, services, true, "Term simplification");
 
         // The simplified formula is the conjunction of all open goals
         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
@@ -1609,8 +1608,10 @@ public class JoinRuleUtils {
             HashMap<ProgramVariable, ProgramVariable> {
         private static final long serialVersionUID = 2305410114265133879L;
 
-        private Node node = null;
-        private ImmutableSet<LocationVariable> doNotRename = null;
+        private final Node node;
+        private final ImmutableSet<LocationVariable> doNotRename;
+        private final HashMap<LocationVariable, ProgramVariable> cache =
+                new HashMap<LocationVariable, ProgramVariable>();
 
         public LocVarReplBranchUniqueMap(Node goal,
                 ImmutableSet<LocationVariable> doNotRename) {
@@ -1641,8 +1642,15 @@ public class JoinRuleUtils {
                 if (doNotRename.contains(var)) {
                     return var;
                 }
-
-                return getBranchUniqueLocVar(var, node);
+                
+                if (cache.containsKey(var)) {
+                    return cache.get(var);
+                }
+                
+                final ProgramVariable result = getBranchUniqueLocVar(var, node); 
+                cache.put(var, result);
+                
+                return result;
             }
             else {
                 return null;

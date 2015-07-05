@@ -95,7 +95,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
-        completions.add(new JoinRuleCompletion());
+        completions.add(JoinRuleCompletion.INSTANCE);
     }
 
     @Override
@@ -448,6 +448,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             getMediator().getSelectionModel().setSelectedNode(result.getNode());
          } else {
             // should never happen as replay always returns a result object
+             //TODO (DS): Why is it then there? If this happens, we will get\\
+             // a NullPointerException just a line below...
             getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
          }
 

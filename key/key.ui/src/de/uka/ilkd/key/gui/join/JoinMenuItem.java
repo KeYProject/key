@@ -33,7 +33,12 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.util.DefaultExperimentalFeature;
 import de.uka.ilkd.key.util.ExperimentalFeature;
 
-
+/**
+ * The menu item for the "delayed-cut" join rule.
+ *
+ * @author Benjamin Niedermann
+ * @see JoinProcessor
+ */
 public class JoinMenuItem extends JMenuItem {
 
     private static final long serialVersionUID = -2602116358650063634L;

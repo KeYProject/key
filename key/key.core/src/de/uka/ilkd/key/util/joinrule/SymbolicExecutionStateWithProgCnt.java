@@ -84,6 +84,13 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;
     }
+    
+    /**
+     * @return The corresponding SE state (without the program counter).
+     */
+    public SymbolicExecutionState toSymbolicExecutionState() {
+        return new SymbolicExecutionState(first, second);
+    }
 
     @Override
     public String toString() {
