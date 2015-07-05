@@ -40,7 +40,8 @@ public class GeneralInformationJTextPaneDisplay extends ShowDisplayPane{
      * @see 
      * de.uka.ilkd.key.gui.notification.NotificationAction#execute(NotificationEvent)
      */
-    public boolean execute(NotificationEvent event) {       
+    @Override
+   public boolean execute(NotificationEvent event) {       
         final String title;
         if (event instanceof GeneralInformationEvent) {          
             setMessage(((GeneralInformationEvent)event).getMessage());            
