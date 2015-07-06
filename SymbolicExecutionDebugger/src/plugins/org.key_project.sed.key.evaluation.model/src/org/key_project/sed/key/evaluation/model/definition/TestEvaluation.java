@@ -11,7 +11,7 @@ public class TestEvaluation extends AbstractEvaluation {
    /**
     * The only instance of this class.
     */
-   public static TestEvaluation INSTANCE = new TestEvaluation();
+   public static final TestEvaluation INSTANCE = new TestEvaluation();
 
    /**
     * The name of the first tool.

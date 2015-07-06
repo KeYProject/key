@@ -12,12 +12,21 @@
             categoryId="org.key_project.sed.key.evaluation.commands.category"
             id="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand">
       </command>
+      <command
+            categoryId="org.key_project.sed.key.evaluation.commands.category"
+            id="org.key_project.sed.key.evaluation.commands.reviewingCodeCommand"
+            name="Reviewing Code">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
-            icon="icons/evaluation.png">
+            icon="icons/evaluation_KeY.png">
+      </image>
+      <image
+            commandId="org.key_project.sed.key.evaluation.commands.reviewingCodeCommand"
+            icon="icons/evaluation_Java.png">
       </image>
    </extension>   
    <extension
@@ -26,14 +35,24 @@
             commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
             class="org.key_project.sed.key.evaluation.handlers.UnderstandingProofAttemptsHandler">
       </handler>
+      <handler
+            class="org.key_project.sed.key.evaluation.handlers.ReviewingCodeHandler"
+            commandId="org.key_project.sed.key.evaluation.commands.reviewingCodeCommand">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
             commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+M2+9"
+            sequence="M1+M2+8"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+      <key
+            commandId="org.key_project.sed.key.evaluation.commands.reviewingCodeCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+9">
       </key>
    </extension>
    <extension
@@ -48,6 +67,11 @@
                   commandId="org.key_project.sed.key.evaluation.commands.debuggingProofsCommand"
                   mnemonic="U"
                   id="org.key_project.sed.key.evaluation.menus.sampleCommand">
+            </command>
+            <command
+                  commandId="org.key_project.sed.key.evaluation.commands.reviewingCodeCommand"
+                  id="org.key_project.sed.key.evaluation.menus.sampleCommand"
+                  mnemonic="R">
             </command>
          </menu>
       </menuContribution>

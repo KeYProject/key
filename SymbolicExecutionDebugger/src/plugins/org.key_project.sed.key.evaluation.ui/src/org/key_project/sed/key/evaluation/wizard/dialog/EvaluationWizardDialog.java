@@ -11,6 +11,7 @@ import java.util.WeakHashMap;
 
 import org.eclipse.jface.dialogs.DialogTray;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
@@ -136,13 +137,16 @@ public class EvaluationWizardDialog extends WizardDialog {
       public void shellActivated(ShellEvent e) {
       }
    };
+   
+   private final Image image;
 
-   public EvaluationWizardDialog(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput) {
-      this(parentShell, alwaysOnTop, evaluationInput, null);
+   public EvaluationWizardDialog(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput, ImageDescriptor imageDescriptor, Image image) {
+      this(parentShell, alwaysOnTop, evaluationInput, null, imageDescriptor, image);
    }
 
-   protected EvaluationWizardDialog(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput, EvaluationWizardDialog wizardDialogToClose) {
-      super(alwaysOnTop ? parentShell : null, new EvaluationWizard(evaluationInput));
+   protected EvaluationWizardDialog(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput, EvaluationWizardDialog wizardDialogToClose, ImageDescriptor imageDescriptor, Image image) {
+      super(alwaysOnTop ? parentShell : null, new EvaluationWizard(evaluationInput, imageDescriptor));
+      this.image = image;
       this.originalParentShell = parentShell;
       this.alwaysOnTop = alwaysOnTop;
       this.evaluationInput = evaluationInput;
@@ -263,7 +267,7 @@ public class EvaluationWizardDialog extends WizardDialog {
    }
 
    protected void togglePinnedState() {
-      EvaluationWizardDialog dialog = new EvaluationWizardDialog(originalParentShell, !alwaysOnTop, evaluationInput, this);
+      EvaluationWizardDialog dialog = new EvaluationWizardDialog(originalParentShell, !alwaysOnTop, evaluationInput, this, getWizard().getImageDescriptor(), image);
       dialog.open();
    }
 
@@ -415,7 +419,7 @@ public class EvaluationWizardDialog extends WizardDialog {
    public void create() {
       super.create();
       // Ensure that a button is selected, otherwise radio buttons might change values
-      if (!getButton(IDialogConstants.NEXT_ID).isEnabled()) {
+      if (getButton(IDialogConstants.NEXT_ID) == null || !getButton(IDialogConstants.NEXT_ID).isEnabled()) {
          getButton(IDialogConstants.CANCEL_ID).forceFocus();
       }
       // Perform runnable of current page if available
@@ -432,7 +436,7 @@ public class EvaluationWizardDialog extends WizardDialog {
    
    @Override
    protected Control createContents(Composite parent) {
-      getShell().setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EVALUATION));
+      getShell().setImage(image);
       handCursor = new Cursor(getShell().getDisplay(), SWT.CURSOR_HAND);
       Control control = super.createContents(parent);
       updateToolbar();

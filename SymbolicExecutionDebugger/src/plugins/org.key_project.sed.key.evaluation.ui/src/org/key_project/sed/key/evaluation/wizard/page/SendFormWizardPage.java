@@ -3,6 +3,7 @@ package org.key_project.sed.key.evaluation.wizard.page;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,8 +34,8 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
       }
    };
    
-   public SendFormWizardPage(SendFormPageInput pageInput, AbstractFormInput<?> formInput) {
-      super(pageInput);
+   public SendFormWizardPage(SendFormPageInput pageInput, AbstractFormInput<?> formInput, ImageDescriptor imageDescriptor) {
+      super(pageInput, imageDescriptor);
       this.formInput = formInput;
       pageInput.getAcceptInput().addPropertyChangeListener(QuestionInput.PROP_VALUE, acceptListener);
    }

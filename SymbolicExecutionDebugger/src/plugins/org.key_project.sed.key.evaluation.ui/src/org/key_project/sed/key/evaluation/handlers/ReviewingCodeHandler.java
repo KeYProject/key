@@ -8,7 +8,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.sed.key.evaluation.Activator;
-import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
+import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
@@ -20,10 +20,10 @@ import org.key_project.util.java.IOUtil;
 
 /**
  * Handler to open the {@link EvaluationWizard} 
- * performing the {@link UnderstandingProofAttemptsEvaluation}.
+ * performing the {@link ReviewingCodeEvaluation}.
  * @author Martin Hentschel
  */
-public class UnderstandingProofAttemptsHandler extends AbstractHandler {
+public class ReviewingCodeHandler extends AbstractHandler {
    public static final File STATE_LOCATION_FILE;
    
    /**
@@ -36,7 +36,7 @@ public class UnderstandingProofAttemptsHandler extends AbstractHandler {
     */
    static {
       String statePath = Activator.getDefault().getStateLocation().toString();
-      STATE_LOCATION_FILE = new File(statePath, "UnderstandingProofAttempts.xml");
+      STATE_LOCATION_FILE = new File(statePath, "ReviewingCode.xml");
       try {
          if (!STATE_LOCATION_FILE.isFile()) {
             throw new IllegalStateException("File " + STATE_LOCATION_FILE + " does not exist.");
@@ -44,7 +44,7 @@ public class UnderstandingProofAttemptsHandler extends AbstractHandler {
          else {
             String xml = IOUtil.readFrom(STATE_LOCATION_FILE);
             EvaluationInput readInput = EvaluationInputReader.parse(xml);
-            if (readInput.getEvaluation() instanceof UnderstandingProofAttemptsEvaluation) {
+            if (readInput.getEvaluation() instanceof ReviewingCodeEvaluation) {
                INPUT_INSTANCE = readInput;
             }
             else {
@@ -53,7 +53,7 @@ public class UnderstandingProofAttemptsHandler extends AbstractHandler {
          }
       }
       catch (Exception e) {
-         INPUT_INSTANCE = new EvaluationInput(UnderstandingProofAttemptsEvaluation.INSTANCE);
+         INPUT_INSTANCE = new EvaluationInput(ReviewingCodeEvaluation.INSTANCE);
       }
    }
    
@@ -65,8 +65,7 @@ public class UnderstandingProofAttemptsHandler extends AbstractHandler {
 	   // Close welcome view
 	   WorkbenchUtil.closeWelcomeView();
       // Open wizard
-	   EvaluationWizard.openWizard(HandlerUtil.getActiveShell(event), true, INPUT_INSTANCE, SEDEvaluationImages.getImageDescriptor(SEDEvaluationImages.EVALUATION_WIZARD_KEY), SEDEvaluationImages.getImage(SEDEvaluationImages.EVALUATION_KEY));
-//	   new EvaluationWizardDialog(HandlerUtil.getActiveShell(event), true, BrowserExampleEvaluation.INSTANCE_INPUT).open();
+	   EvaluationWizard.openWizard(HandlerUtil.getActiveShell(event), true, INPUT_INSTANCE, SEDEvaluationImages.getImageDescriptor(SEDEvaluationImages.EVALUATION_WIZARD_JAVA), SEDEvaluationImages.getImage(SEDEvaluationImages.EVALUATION_JAVA));
 		return null;
 	}
 

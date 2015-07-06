@@ -15,7 +15,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    /**
     * The only instance of this class.
     */
-   public static UnderstandingProofAttemptsEvaluation INSTANCE = new UnderstandingProofAttemptsEvaluation();
+   public static final UnderstandingProofAttemptsEvaluation INSTANCE = new UnderstandingProofAttemptsEvaluation();
    
    /**
     * The name of the {@link Tool} representing 'KeY'.

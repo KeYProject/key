@@ -22,7 +22,7 @@ public class BrowserExampleEvaluation extends AbstractEvaluation {
    /**
     * The only instance of this class.
     */
-   public static BrowserExampleEvaluation INSTANCE = new BrowserExampleEvaluation();
+   public static final BrowserExampleEvaluation INSTANCE = new BrowserExampleEvaluation();
 
    /**
     * The default {@link EvaluationInput} of {@link #INSTANCE}.

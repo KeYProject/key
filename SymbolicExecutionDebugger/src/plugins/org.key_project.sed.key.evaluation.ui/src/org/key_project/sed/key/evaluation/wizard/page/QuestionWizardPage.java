@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPage;
@@ -55,8 +56,8 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    
    private final Map<QuestionInput, IQuestionInputManager> input2managerMap = new HashMap<QuestionInput, IQuestionInputManager>();
 
-   public QuestionWizardPage(QuestionPageInput pageInput) {
-      super(pageInput);
+   public QuestionWizardPage(QuestionPageInput pageInput, ImageDescriptor imageDescriptor) {
+      super(pageInput, imageDescriptor);
    }
 
    @Override

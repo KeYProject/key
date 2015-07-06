@@ -41,11 +41,29 @@ public final class SEDEvaluationImages {
     * The key for the image that is used for the evaluation.
     */
    public static final String EVALUATION = "org.key_project.sed.key.evaluation.ui.evaluation";
+   /**
+    * The key for the image that is used for the evaluation.
+    */
+   public static final String EVALUATION_KEY = "org.key_project.sed.key.evaluation.ui.evaluationKeY";
+   /**
+    * The key for the image that is used for the evaluation.
+    */
+   public static final String EVALUATION_JAVA = "org.key_project.sed.key.evaluation.ui.evaluationJava";
    
     /**
      * The key for the image that is used for the evaluation wizard.
      */
     public static final String EVALUATION_WIZARD = "org.key_project.sed.key.evaluation.ui.evaluationWizard";
+   
+    /**
+     * The key for the image that is used for the evaluation wizard.
+     */
+    public static final String EVALUATION_WIZARD_KEY = "org.key_project.sed.key.evaluation.ui.evaluationWizardKeY";
+   
+    /**
+     * The key for the image that is used for the evaluation wizard.
+     */
+    public static final String EVALUATION_WIZARD_JAVA = "org.key_project.sed.key.evaluation.ui.evaluationWizardJava";
     
     /**
      * The key for the emoticon fantasy dreaming.
@@ -140,8 +158,20 @@ public final class SEDEvaluationImages {
         if (EVALUATION.equals(key)) {
            path = "icons/evaluation.png";
         }
+        else if (EVALUATION_KEY.equals(key)) {
+           path = "icons/evaluation_KeY.png";
+        }
+        else if (EVALUATION_JAVA.equals(key)) {
+           path = "icons/evaluation_Java.png";
+        }
         else if (EVALUATION_WIZARD.equals(key)) {
            path = "icons/evaluation_wizard.png";
+        }
+        else if (EVALUATION_WIZARD_KEY.equals(key)) {
+           path = "icons/evaluation_wizard_KeY.png";
+        }
+        else if (EVALUATION_WIZARD_JAVA.equals(key)) {
+           path = "icons/evaluation_wizard_Java.png";
         }
         else if (EMOTICON_FANTASY_DREAMING.equals(key)) {
            path = "icons/emoticons/fantasy_dreams.png";

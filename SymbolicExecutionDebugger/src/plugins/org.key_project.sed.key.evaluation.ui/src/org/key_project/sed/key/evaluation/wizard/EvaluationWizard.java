@@ -6,9 +6,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.key.evaluation.io.SendThread;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
@@ -22,7 +24,6 @@ import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
 import org.key_project.sed.key.evaluation.model.input.ToolPageInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.util.LogUtil;
-import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.InstructionWizardPage;
@@ -45,9 +46,12 @@ public class EvaluationWizard extends Wizard {
    
    private IRunnableWithProgressAndResult<String> currentPageRunnable;
    
-   public EvaluationWizard(EvaluationInput evaluationInput) {
+   private final ImageDescriptor imageDescriptor;
+   
+   public EvaluationWizard(EvaluationInput evaluationInput, ImageDescriptor imageDescriptor) {
       assert evaluationInput != null;
       this.evaluationInput = evaluationInput;
+      this.imageDescriptor = imageDescriptor;
       setNeedsProgressMonitor(true);
       setHelpAvailable(false);
       setWindowTitle(evaluationInput.getEvaluation().getName());
@@ -58,17 +62,17 @@ public class EvaluationWizard extends Wizard {
       for (AbstractFormInput<?> form : evaluationInput.getFormInputs()) {
          for (AbstractPageInput<?> page : form.getPageInputs()) {
             if (page instanceof QuestionPageInput) {
-               lastPage = new QuestionWizardPage((QuestionPageInput) page);
+               lastPage = new QuestionWizardPage((QuestionPageInput) page, imageDescriptor);
             }
             else if (page instanceof SendFormPageInput) {
                SendFormPageInput sendPage = (SendFormPageInput) page;
-               lastPage = new SendFormWizardPage(sendPage, evaluationInput.getFormInput(sendPage.getPage().getForm()));
+               lastPage = new SendFormWizardPage(sendPage, evaluationInput.getFormInput(sendPage.getPage().getForm()), imageDescriptor);
             }
             else if (page instanceof ToolPageInput) {
-               lastPage = new ToolWizardPage((ToolPageInput) page);
+               lastPage = new ToolWizardPage((ToolPageInput) page, imageDescriptor);
             }
             else if (page instanceof InstructionPageInput) {
-               lastPage = new InstructionWizardPage((InstructionPageInput) page);
+               lastPage = new InstructionWizardPage((InstructionPageInput) page, imageDescriptor);
             }
             else {
                throw new IllegalStateException("Unsupported page input: " + page);
@@ -344,13 +348,17 @@ public class EvaluationWizard extends Wizard {
       this.currentPageRunnable = currentPageRunnable;
    }
 
+   public ImageDescriptor getImageDescriptor() {
+      return imageDescriptor;
+   }
+
    /**
     * Opens the {@link EvaluationWizard} in a {@link WizardDialog}.
     * @param parentShell The parent {@link Shell}.
     * @param alwaysOnTop {@code true} The wizard is always on top, {@code false} the wizard is not always on top.
     * @param evaluationInput The {@link EvaluationInput} to perform.
     */
-   public static void openWizard(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput) {
+   public static void openWizard(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput, ImageDescriptor imageDescriptor, Image image) {
       EvaluationWizardDialog openedDialog = EvaluationWizardDialog.getFirstVisibleWizardDialog(evaluationInput);
       if (openedDialog != null) {
          openedDialog.getShell().setFocus();
@@ -366,14 +374,14 @@ public class EvaluationWizard extends Wizard {
             // Ask to restart evaluation
             int result = SWTUtil.openMessageDialog(parentShell, 
                                                    "Continue Evaluation?", 
-                                                   SEDEvaluationImages.getImage(SEDEvaluationImages.EVALUATION),
+                                                   image,
                                                    "Continue the already started evaluation? (Recommended)", 
                                                    MessageDialog.QUESTION, 
                                                    new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL});
             if (result == 1) {
                int secondResult = SWTUtil.openMessageDialog(parentShell, 
                                                             "Continue Evaluation?", 
-                                                            SEDEvaluationImages.getImage(SEDEvaluationImages.EVALUATION),
+                                                            image,
                                                             "Please do only restart the evaluation if you have not participated before and if you have not seen parts of the evaluation.\n\nContinue the already started evaluation? (Recommended)", 
                                                             MessageDialog.WARNING, 
                                                             new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL});
@@ -390,7 +398,7 @@ public class EvaluationWizard extends Wizard {
          }
          // Open wizard
          if (openWizard) {
-            EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput);
+            EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput, imageDescriptor, image);
             dialog.open();
          }
       }

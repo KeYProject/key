@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.wizard.page;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -12,7 +13,6 @@ import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.util.LogUtil;
-import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
 import org.key_project.util.thread.IRunnableWithProgressAndResult;
@@ -28,12 +28,12 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    
    private SharedScrolledComposite form;
    
-   public AbstractEvaluationWizardPage(P pageInput) {
+   public AbstractEvaluationWizardPage(P pageInput, ImageDescriptor imageDescriptor) {
       super(pageInput.getPage().getName());
       this.pageInput = pageInput;
       setTitle(pageInput.getPage().getTitle());
       setMessage(pageInput.getPage().getMessage());
-      setImageDescriptor(SEDEvaluationImages.getImageDescriptor(SEDEvaluationImages.EVALUATION_WIZARD));
+      setImageDescriptor(imageDescriptor);
    }
 
    @Override
