@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isProvableWithSplitting;
+
 import java.util.Iterator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -26,12 +29,10 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
  * Rule that joins two sequents based on a specified set of
@@ -56,7 +57,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
    
    @Override
    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-         LocationVariable v,
+         Term v,
          SymbolicExecutionState state1,
          Term valueInState1,
          SymbolicExecutionState state2,
