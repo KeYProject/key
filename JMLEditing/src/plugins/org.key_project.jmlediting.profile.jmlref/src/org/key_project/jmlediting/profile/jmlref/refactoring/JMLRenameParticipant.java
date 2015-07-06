@@ -32,25 +32,20 @@ import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 import org.key_project.util.jdt.JDTUtil;
 
 /**
- * Class to participate in the rename refactoring of java fields by replacing
- * the occurrences of that field in all the JML comments of the active file.
- *
- * @noextend
+ * Class to participate in the rename refactoring of java fields.
+ * 
+ * It uses the {@link CommentLocator} to get a list of all JML comments and 
+ * the {@link Resolver} to determine if the field to be renamed is referenced.
+ * The changes are added to the scheduled java changes as the JDT takes care of 
+ * moving offsets in the editor and preview when several changes are made to the same file.
+ * 
  * @author Robert Heimbach
- *
- *         Testing: No SWTBot Test implemented yet. Use
- *         /org.key_project.jmlediting
- *         .core.test/data/template/RefactoringRenameTestClass.java and replace
- *         the field balance with a word of same length
- *
- *         Current Status: Does not work when the new name, balance should
- *         change to, has a different length because the java changes invalidate
- *         the positions of the JML text file changes.
  */
-public final class JMLRenameParticipant extends RenameParticipant {
+public class JMLRenameParticipant extends RenameParticipant {
 
     private IJavaElement fJavaElementToRename;
     private String fNewName;
@@ -74,7 +69,6 @@ public final class JMLRenameParticipant extends RenameParticipant {
 
         if (element instanceof IJavaElement) {
             fJavaElementToRename = (IJavaElement) element;
-            System.out.println(fJavaElementToRename);
             fOldName = fJavaElementToRename.getElementName();
             return true;
         }
@@ -99,8 +93,8 @@ public final class JMLRenameParticipant extends RenameParticipant {
 
     /**
      * Computes the changes which need to be done to the JML code and
-     * add those to the changes to the java code which are already scheduled
-     * returns null to indicate that only shared text changes are made.
+     * add those to the changes to the java code which are already scheduled.
+     * Returns null to indicate that only shared text changes are made.
      * 
      *  {@inheritDoc}
      *
@@ -179,7 +173,7 @@ public final class JMLRenameParticipant extends RenameParticipant {
             // Step through the list of IASTNodes and ask the resolver if it
             // references the element to be renamed
             for (final IASTNode stringNode : nodesList) {
-                System.out.println("node = " + stringNode);
+                //System.out.println("node = " + stringNode);
 
                 if (isReferenceToRefactoredElement(unit, stringNode)) {
                     // Create the text change and add it to the list to be
@@ -192,7 +186,7 @@ public final class JMLRenameParticipant extends RenameParticipant {
                             length, fNewName);
 
                     changesToMake.add(edit);
-                    System.out.println("Adding Replace Edit to Validate");
+                    //System.out.println("Adding Replace Edit to Validate");
                 }
             }
         }
@@ -229,19 +223,19 @@ public final class JMLRenameParticipant extends RenameParticipant {
         IASTNode parseResult;
         try {
             parseResult = parser.parse(source, range);
-            nodesList = Nodes.getAllNodesOfType(parseResult, NodeTypes.STRING);
+            nodesList = Nodes.getAllNodesOfType(parseResult, ExpressionNodeTypes.PRIMARY_EXPR);
 
-            System.out.println();
-            System.out.println("found keywords "
-                    + nodesList
-                    + " in "
-                    + source.substring(range.getBeginOffset(),
-                            range.getEndOffset() + 1));
+//            System.out.println();
+//            System.out.println("found keywords "
+//                    + nodesList
+//                    + " in "
+//                    + source.substring(range.getBeginOffset(),
+//                            range.getEndOffset() + 1));
         }
         catch (final ParserException e) {
             return new LinkedList<IASTNode>();
         }
-        System.out.println("Returning: " + nodesList);
+        //System.out.println("Returning: " + nodesList);
         return nodesList;
     }
 
@@ -260,12 +254,10 @@ public final class JMLRenameParticipant extends RenameParticipant {
             final IASTNode node) {
         
         // correct name?
-        if (!((IStringNode) node).getString().equals(fOldName)) {
-            System.out.println("Wrong name");
-            return false;
-        }
-        else {
-
+        if (((node.getChildren().get(0).getType()) == ExpressionNodeTypes.IDENTIFIER) && 
+        ((node.getChildren().get(0).getChildren().get(0).getType()) == NodeTypes.STRING)) {
+            if (((IStringNode) node.getChildren().get(0).getChildren().get(0)).getString().equals(fOldName)) {
+                
             final IResolver resolver = new Resolver();
             ResolveResult result = null;
             try {
@@ -280,22 +272,27 @@ public final class JMLRenameParticipant extends RenameParticipant {
             }
 
             if (result == null) {
-                System.out.println("Resolver returned null");
+                //System.out.println("Resolver returned null");
                 return false;
             }
             else {
 
-                System.out.println("Resolve Type = " + result.getResolveType());
+                //System.out.println("Resolve Type = " + result.getResolveType());
 
                 final IJavaElement jElement = result.getBinding()
                         .getJavaElement();
 
                 // Some Java Element found but is it the same?
-                System.out.println("Java Element == Element to be renamed is "
-                        + jElement.equals(fJavaElementToRename));
+                //System.out.println("Java Element == Element to be renamed is "
+                //        + jElement.equals(fJavaElementToRename));
 
                 return jElement.equals(fJavaElementToRename);
-            }
+            }   
         }
+            else // wrong name 
+                return false;
+        }
+        else // not of correct type
+            return false;
     }
 }
