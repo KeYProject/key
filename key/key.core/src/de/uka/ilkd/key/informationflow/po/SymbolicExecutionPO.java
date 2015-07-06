@@ -83,6 +83,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     @Override
     public void readProblem() throws ProofInputException {
+        final Services proofServices = postInit();
+
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(contract, symbExecVars,
