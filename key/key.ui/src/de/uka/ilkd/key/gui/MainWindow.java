@@ -1382,7 +1382,7 @@ public final class MainWindow extends JFrame  {
      */
     public void notify(NotificationEvent event) {
         if (notificationManager != null) {
-            notificationManager.notify(event);
+            notificationManager.handleNotificationEvent(event);
         }
     }
 

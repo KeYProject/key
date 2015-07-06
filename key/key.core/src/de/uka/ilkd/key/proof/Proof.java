@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.swing.SwingUtilities;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -640,6 +642,12 @@ public class Proof implements Named {
                             }
 
                             linkedGoal.setLinkedGoal(null);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pruneProof(linkedGoal);
+                                }
+                            });
                         }
                     }
 
