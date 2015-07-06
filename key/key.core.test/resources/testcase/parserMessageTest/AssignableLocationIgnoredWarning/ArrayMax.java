@@ -1,3 +1,7 @@
+//MSG .*a.*ignored.*
+//LINE 26
+//COL 35
+
 class ArrayMax {
 
     int max;
@@ -19,7 +23,7 @@ class ArrayMax {
           @   (i == 0 ? 
           @      max == a[0] :
           @      (\exists int j; 0<= j && j < i; a[j] == max));
-          @ assignable this.max,i ;
+          @ assignable this.max,i,a;
           @ decreases a.length - i;
           @*/
         for(int i = 0; i < a.length; i++) {
@@ -32,3 +36,4 @@ class ArrayMax {
 
 }
 
+// Warning in assignable clause in line 27 that variable a is ignored.
