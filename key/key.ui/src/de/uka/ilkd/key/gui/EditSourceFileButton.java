@@ -30,6 +30,23 @@ import de.uka.ilkd.key.util.ExceptionTools;
  */
 public class EditSourceFileButton extends JButton {
 
+   /**
+    * Moves the caret in a {@link JTextArea} to the specified position. Assumes
+    * the first position in the textarea is in line 1 column 1.
+    */
+   private static void textAreaGoto(JTextArea textArea, int line, int col) {
+      String text = textArea.getText();
+      int i = 0;
+      while (i < text.length() && line > 1) {
+         if (text.charAt(i) == '\n') {
+            line--;
+         }
+         i++;
+      }
+      i += col - 1;
+      textArea.setCaretPosition(i);
+   }
+
    EditSourceFileButton(final ExceptionDialog parent, final Throwable exception) {
       super("Edit Source File");
       this.setName("Edit source file button");
@@ -53,7 +70,7 @@ public class EditSourceFileButton extends JButton {
                final JTextArea textArea = new JTextArea(30, 75);
                textArea.setText(source);
                textArea.setFont(ExceptionDialog.MESSAGE_FONT);
-               textArea.setCaretPosition(0);
+               textAreaGoto(textArea, location.getLine(), location.getColumn());
                textArea.setLineWrap(false);
                textArea.setBorder(new TitledBorder(sourceFile.getName()));
                JScrollPane top = new JScrollPane(textArea);
@@ -115,7 +132,7 @@ public class EditSourceFileButton extends JButton {
                      + (mainWindowBounds.width - bounds.width) / 2);
                int y = Math.max(0, mainWindowBounds.y
                      + (mainWindowBounds.height - bounds.height) / 2);
-               
+
                dialog.setBounds(x, y, bounds.width, bounds.height);
                dialog.setVisible(true);
             }
