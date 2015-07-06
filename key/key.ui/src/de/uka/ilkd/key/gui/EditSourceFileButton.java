@@ -67,15 +67,31 @@ public class EditSourceFileButton extends JButton {
                      + sourceFile.getName(), Dialog.ModalityType.DOCUMENT_MODAL);
                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-               final JTextArea textArea = new JTextArea(30, 75);
+               int columnNumber = 75;
+
+               JTextArea parserMessage = new JTextArea();
+               parserMessage.setText(exception.getMessage());
+               parserMessage.setEditable(false);
+               parserMessage.setColumns(columnNumber);
+               parserMessage.setBorder(new TitledBorder("Parser Message"));
+               JScrollPane parserMessageScrollPane = new JScrollPane(
+                     parserMessage);
+               parserMessageScrollPane
+                     .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+               parserMessageScrollPane
+                     .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+               final JTextArea textArea = new JTextArea(30, columnNumber);
                textArea.setText(source);
                textArea.setFont(ExceptionDialog.MESSAGE_FONT);
                textAreaGoto(textArea, location.getLine(), location.getColumn());
                textArea.setLineWrap(false);
                textArea.setBorder(new TitledBorder(sourceFile.getName()));
-               JScrollPane top = new JScrollPane(textArea);
-               top.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-               top.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+               JScrollPane textAreaScrollPane = new JScrollPane(textArea);
+               textAreaScrollPane
+                     .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+               textAreaScrollPane
+                     .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
                JPanel buttonPanel = new JPanel();
                buttonPanel.setLayout(new BoxLayout(buttonPanel,
@@ -121,7 +137,8 @@ public class EditSourceFileButton extends JButton {
 
                Container container = dialog.getContentPane();
                container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-               container.add(top);
+               container.add(parserMessageScrollPane);
+               container.add(textAreaScrollPane);
                container.add(buttonPanel);
 
                dialog.pack();
