@@ -132,9 +132,12 @@ public class Main {
       while (iterator.hasNext()) {
          IExecutionNode<?> next = iterator.next();
          System.out.println(next);
-//         next.getVariables(); // Access the symbolic state
-//         next.getCallStack(); // Access the call stack
-//         next... // Additional methods provide access to additional information
+//         next.getVariables(); // Access the symbolic state.
+//         next.getCallStack(); // Access the call stack.
+//         next.getPathCondition(); // Access the path condition.
+//         next.getFormatedPathCondition(); // Access the formated path condition.
+//         next... // Additional methods provide access to additional information.
+                   // Check also the specific sub types of IExecutionNode like IExecutionTermination.
       }
       System.out.println();
    }
