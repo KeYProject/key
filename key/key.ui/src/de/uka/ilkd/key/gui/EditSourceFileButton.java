@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -48,7 +49,6 @@ public class EditSourceFileButton extends JButton {
                final JDialog dialog = new JDialog(parent, "Edit "
                      + sourceFile.getName(), Dialog.ModalityType.DOCUMENT_MODAL);
                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-               dialog.setBounds(parent.getBounds());
 
                final JTextArea textArea = new JTextArea(30, 75);
                textArea.setText(source);
@@ -108,6 +108,15 @@ public class EditSourceFileButton extends JButton {
                container.add(buttonPanel);
 
                dialog.pack();
+               Rectangle bounds = dialog.getBounds();
+               Rectangle mainWindowBounds = MainWindow.getInstance()
+                     .getBounds();
+               int x = Math.max(0, mainWindowBounds.x
+                     + (mainWindowBounds.width - bounds.width) / 2);
+               int y = Math.max(0, mainWindowBounds.y
+                     + (mainWindowBounds.height - bounds.height) / 2);
+               
+               dialog.setBounds(x, y, bounds.width, bounds.height);
                dialog.setVisible(true);
             }
             catch (IOException ioe) {
