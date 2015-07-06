@@ -52,6 +52,7 @@ public class EditSourceFileButton extends JButton {
 
                final JTextArea textArea = new JTextArea(30, 75);
                textArea.setText(source);
+               textArea.setFont(ExceptionDialog.MESSAGE_FONT);
                textArea.setCaretPosition(0);
                textArea.setLineWrap(false);
                textArea.setBorder(new TitledBorder(sourceFile.getName()));

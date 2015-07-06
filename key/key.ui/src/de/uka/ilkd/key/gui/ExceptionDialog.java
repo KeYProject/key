@@ -53,6 +53,8 @@ import de.uka.ilkd.key.util.ExceptionTools;
  * @author refactored by mattias
  */
 public class ExceptionDialog extends JDialog {
+   
+   static Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
 
     private static final long serialVersionUID = -4532724315711726522L;
     private JScrollPane stScroll;
@@ -131,7 +133,7 @@ public class ExceptionDialog extends JDialog {
         JTextArea result = new JTextArea();
         result.setEditable(false);
         result.setTabSize(4);
-        result.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        result.setFont(MESSAGE_FONT);
         return result;
     }
     
