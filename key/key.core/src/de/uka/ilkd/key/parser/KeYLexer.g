@@ -258,6 +258,7 @@ lexer grammar KeYLexer;
 	EQUAL_UNIQUE : '\\equalUnique';
         NEW : '\\new';
         NEWLABEL : '\\newLabel';
+   CONTAINS_ASSIGNMENT : '\\containsAssignment';
 // label occurs again for character `!'
 	NOT_ : '\\not';
         NOTFREEIN : '\\notFreeIn';

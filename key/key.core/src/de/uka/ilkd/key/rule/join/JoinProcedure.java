@@ -7,7 +7,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
@@ -68,7 +67,7 @@ public abstract class JoinProcedure {
      *  consisting of new constraints, the actual value and new names introduced.
      */
     public abstract Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            LocationVariable v, SymbolicExecutionState state1,
+            Term v, SymbolicExecutionState state1,
             Term valueInState1, SymbolicExecutionState state2,
             Term valueInState2, Services services);
 

@@ -58,7 +58,7 @@ public class JoinIfThenElse extends JoinProcedure {
 
     @Override
     public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            LocationVariable v, SymbolicExecutionState state1,
+            Term v, SymbolicExecutionState state1,
             Term valueInState1, SymbolicExecutionState state2,
             Term valueInState2, Services services) {
 

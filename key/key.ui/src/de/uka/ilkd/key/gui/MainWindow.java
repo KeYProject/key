@@ -900,7 +900,7 @@ public final class MainWindow extends JFrame  {
                 updateSequentView();
             }
         };
-        ThreadUtilities.invokeAndWait(guiUpdater);
+        ThreadUtilities.invokeOnEventQueue(guiUpdater);
     }
 
     private Proof setUpNewProof(Proof proof) {
