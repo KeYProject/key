@@ -11,7 +11,7 @@ public class ResolverTestClass1 {
 	public int methodNoParameter1() {
 		return 1; 
 	}
-	public int method1Parameter10(int parameter1) {
+	public int method1Parameter4(int parameter1) {
 		return parameter1;
 	}
 	public static int staticMethodNoParameter10() {
@@ -20,7 +20,7 @@ public class ResolverTestClass1 {
 	public static int staticMethod1Parameter10(int parameter1) {
 		return parameter1;
 	}
-	public ResolverTestClass1 getThis(String parameter1) {
+	public ResolverTestClass1 getThis(ResolverTestClass1 parameter1) {
 	    return this;
 	}
 	

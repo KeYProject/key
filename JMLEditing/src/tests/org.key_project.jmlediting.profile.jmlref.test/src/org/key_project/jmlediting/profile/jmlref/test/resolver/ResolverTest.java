@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.INodeTraverser;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
@@ -46,6 +47,10 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.testcase.JDTUtilTest;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * The ResolverTest class that is used to test the Resolver class.
+ * @author Christopher Beckmann
+ */
 public class ResolverTest {
 
     private static IJavaProject javaProject;
@@ -90,160 +95,162 @@ public class ResolverTest {
        class1JDT = JDTUtil.parse(cu2);
     }
     
-    private void test(final String test, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type) {
+
+    private void test(final String string, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type) throws ResolverException {
+        test(string, string, file, jdtSkip, jmlSkip, type);
+    }
+    private void test(final String jmlString, final String jdtString, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type) throws ResolverException {
         final IResolver resolver = new Resolver(); // JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject())
         ResolveResult result = null;
-        try {
-            result = resolver.resolve(cu, getIASTNode(test, jmlSkip));
-            ResolveResult next = result;
-            while(next != null) {
-                result = next;
-                next = resolver.next();
-            }
+        
+        result = resolver.resolve(cu, getIASTNode(jmlString, jmlSkip));
+        while(resolver.hasNext()) {
+            result = resolver.next();
         }
-        catch (final ResolverException e) {
-            LogUtil.getLogger().logError(e);
-        }
+        
         ASTNode jdt = null;
         switch(type) {
         case FIELD:
-            jdt = getFieldDecleration(test, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getFieldDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
             break;
         case METHOD:
-            jdt = getMethodDecleration(test, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getMethodDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
             break;
         case PARAMETER:
-            jdt = getParameterDecleration(test, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getParameterDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
             break;
         case CLASS:
-            jdt = getTypeDecleration(test, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getTypeDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
             break;
         case UNSPECIFIED:
+            break;
+        default:
+            break;
         }
         
         assertNotEquals(result, null);
         
         assertTrue(result.getJDTNode().subtreeMatch(new ASTMatcher(), jdt));
-        assertEquals(test, result.getName());
+        assertEquals(jdtString, result.getName());
         assertEquals(type, result.getResolveType());
         assertTrue(result.getBinding().isEqualTo(resolveBinding(jdt)));
     }
     
     @Test
-    public void resolveFieldTest1() {
+    public void resolveFieldTest1() throws ResolverException {
         test("field1", 0, 0, 0, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveFieldTest2() {
+    public void resolveFieldTest2() throws ResolverException {
         test("field2", 0, 0, 0, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveFieldTest3() {
+    public void resolveFieldTest3() throws ResolverException {
         test("field3", 0, 0, 0, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveParameterTest1() {
+    public void resolveParameterTest1() throws ResolverException {
         test("parameter1", 0, 0, 0, ResolveResultType.PARAMETER);
     }
     @Test
-    public void resolveParameterTest2() {
+    public void resolveParameterTest2() throws ResolverException {
         test("parameter2", 0, 1, 0, ResolveResultType.PARAMETER);
     }
     @Test
-    public void resolveParameterTest3() {
+    public void resolveParameterTest3() throws ResolverException {
         test("parameter3", 0, 0, 0, ResolveResultType.PARAMETER);
     }
     @Test
-    public void resolveParameterTest4() {
+    public void resolveParameterTest4() throws ResolverException {
         test("parameter1", 0, 1, 1, ResolveResultType.PARAMETER);
     }
     @Test
-    public void resolveMethodNoParametersTest1() {
+    public void resolveMethodNoParametersTest1() throws ResolverException {
         test("methodNoParameters1", 0, 0, 0, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMethodNoParametersTest2() {
+    public void resolveMethodNoParametersTest2() throws ResolverException {
         test("methodNoParameters2", 0, 0, 0, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMethodNoParametersTest3() {
+    public void resolveMethodNoParametersTest3() throws ResolverException {
         test("methodNoParameters3", 0, 0, 0, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMethod1ParameterTest1() {
+    public void resolveMethod1ParameterTest1() throws ResolverException {
         test("method1Parameter1", 0, 0, 0, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMethod1ParameterTest2() {
+    public void resolveMethod1ParameterTest2() throws ResolverException {
         test("method1Parameter2", 0, 0, 0, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMethod2ParametersTest1() {
+    public void resolveMethod2ParametersTest1() throws ResolverException {
         test("method2Parameters1", 0, 0, 0, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMethodSameName1ParameterTest1() {
-        test("methodSameName1Parameter1", 0, 1, 0, ResolveResultType.METHOD);
-    }
-    @Test
-    public void resolveMultipleFieldDeclarationTest1() {
+    public void resolveMultipleFieldDeclarationTest1() throws ResolverException {
         test("fieldMultiple1", 0, 0, 0, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveMultipleFieldDeclarationTest2() {
+    public void resolveMultipleFieldDeclarationTest2() throws ResolverException {
         test("fieldMultiple2", 0, 0, 0, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveArrayFieldTest1() {
-        test("arrayfield", 0, 0, 0, ResolveResultType.FIELD);
+    public void resolveArrayFieldTest1() throws ResolverException {
+        test("arrayfield", "length" , 0, 0, 0, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveMethodSameName1ParameterTest2() {
+    public void resolveMethodSameName1ParameterTest1() throws ResolverException {
+        test("methodSameName1Parameter1",  0, 1, 0, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodSameName1ParameterTest2() throws ResolverException {
         test("methodSameName1Parameter1", 0, 0, 1, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMethodComplexParameterTest1() {
+    public void resolveMethodComplexParameterTest1() throws ResolverException {
         test("methodComplexParameter1", 0, 0, 0, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMethodComplexParameterTest2() {
-        test("methodComplexParameter1", 0, 1, 1, ResolveResultType.METHOD);
+    public void resolveMethodComplexParameterTest2() throws ResolverException {
+        test("methodComplexParameter1", 0, 0, 1, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMemberAccessTest1() {
-        test("methodNoParameter1", 1, 0, 1, ResolveResultType.METHOD);
+    public void resolveMemberAccessTest1() throws ResolverException {
+        test("field3", "methodNoParameter1" , 1, 0, 3, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMemberAccessTest2() {
-        test("method1Parameter4", 1, 0, 0, ResolveResultType.METHOD);
+    public void resolveMemberAccessTest2() throws ResolverException {
+        test("field3", "method1Parameter4", 1, 0, 4, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMemberAccessTest3() {
-        test("staticMethodNoParameter10", 1, 0, 0, ResolveResultType.METHOD);
+    public void resolveMemberAccessTest3() throws ResolverException {
+        test("ResolverTestClass1", "staticMethodNoParameter10", 1, 0, 0, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMemberAccessTest4() {
-        test("field11", 1, 0, 0, ResolveResultType.FIELD);
+    public void resolveMemberAccessTest4() throws ResolverException {
+        test("field3", "field11", 1, 0, 7, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveMemberAccessTest5() {
-        test("staticField10", 1, 0, 0, ResolveResultType.FIELD);
+    public void resolveMemberAccessTest5() throws ResolverException {
+        test("ResolverTestClass1", "staticField10", 1, 0, 2, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveMemberAccessTest6() {
-        test("staticMethod1Parameter10", 1, 0, 0, ResolveResultType.METHOD);
+    public void resolveMemberAccessTest6() throws ResolverException {
+        test("ResolverTestClass1", "staticMethod1Parameter10", 1, 0, 1, ResolveResultType.METHOD);
     }
     @Test
-    public void resolveMemberAccessTest7() {
-        test("field1", 1, 0, 5, ResolveResultType.FIELD);
+    public void resolveMemberAccessTest7() throws ResolverException {
+        test("field3", "field1", 1, 0, 5, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveMemberAccessTest8() {
-        test("field10", 1, 0, 0, ResolveResultType.FIELD);
+    public void resolveMemberAccessTest8() throws ResolverException {
+        test("field3", "field10", 1, 0, 6, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveMemberAccessTest9() {
-        test("ResolverTestClass1", 1, 0, 0, ResolveResultType.CLASS);
+    public void resolveMemberAccessTest9() throws ResolverException {
+        test("field3", "getThis", 1, 0, 11, ResolveResultType.METHOD);
     }
 
     //TODO: write tests, that are meant to fail.
@@ -371,8 +378,10 @@ public class ResolverTest {
              list.addAll(Nodes.getAllNodesOfType(jml, ExpressionNodeTypes.PRIMARY_EXPR));
         }
         
+        
         for(final IASTNode node : list) {
             if(node.getChildren().get(0).getChildren().get(0).getType() == NodeTypes.STRING) {
+                
                 if(((IStringNode)node.getChildren().get(0).getChildren().get(0)).getString().equals(identifier)) {
                     if(skip-- == 0) {
                         return node;

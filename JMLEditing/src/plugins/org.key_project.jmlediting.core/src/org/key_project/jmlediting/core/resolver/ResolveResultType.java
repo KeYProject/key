@@ -5,5 +5,5 @@ public enum ResolveResultType {
     PARAMETER,
     METHOD,
     FIELD,
-    CLASS
+    CLASS, ARRAY_ACCESS
 }

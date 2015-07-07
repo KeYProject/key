@@ -7,6 +7,12 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.parser.util.JavaBasicsNodeTypes;
+import org.key_project.jmlediting.core.resolver.IResolver;
+import org.key_project.jmlediting.core.resolver.ResolveResult;
+import org.key_project.jmlediting.core.resolver.ResolverException;
+import org.key_project.jmlediting.core.utilities.LogUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 public class DefaultTypeComputer implements ITypeComputer {
 
@@ -48,7 +54,7 @@ public class DefaultTypeComputer implements ITypeComputer {
         } else if(node.getType() == NodeTypes.NONE) {
             
         }
-        throw new TypeComputerException("Can not identify the node type.");
+        throw new TypeComputerException("Can not identify the node type.", node);
     }
     
     
@@ -71,4 +77,95 @@ public class DefaultTypeComputer implements ITypeComputer {
         
         return b1.isEqualTo(b2);
     }
+    
+    public boolean isPrimitive(final IASTNode node) {
+        final int type = node.getType();
+        return type == JavaBasicsNodeTypes.BOOLEAN_LITERAL ||
+            type == JavaBasicsNodeTypes.CHARACTER_LITERAL ||
+            type == JavaBasicsNodeTypes.FLOAT_LITERAL ||
+            type == JavaBasicsNodeTypes.INTEGER_LITERAL ||
+            type == JavaBasicsNodeTypes.NULL_LITERAL ||
+            type == JavaBasicsNodeTypes.STRING_LITERAL ||
+            type == JavaBasicsNodeTypes.NAME;
+    }
+    
+
+    public ITypeBinding getType(final IASTNode node) {
+        
+        final int type = node.getType();
+        if(type == JavaBasicsNodeTypes.BOOLEAN_LITERAL) {
+            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("boolean");
+        } else if(type == JavaBasicsNodeTypes.CHARACTER_LITERAL) {
+            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("char");
+        } else if(type == JavaBasicsNodeTypes.FLOAT_LITERAL) {
+            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("float");
+        } else if(type == JavaBasicsNodeTypes.INTEGER_LITERAL) {
+            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("int");
+        } else if(type == JavaBasicsNodeTypes.NULL_LITERAL) {
+            // TODO .. type of null?
+            //return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("");
+        } else if(type == JavaBasicsNodeTypes.STRING_LITERAL) {
+            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("java.lang.String");
+        } else if(type == JavaBasicsNodeTypes.NAME) {
+            // TODO .. what is name?
+            //return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("");
+        }
+        return null;
+    }
+    
+    /**
+     * Calls the specified {@link IResolver} and resolves the given {@link IASTNode} with it.
+     * @param node the {@link IASTNode} that will be resolved
+     * @param resolver the {@link IResolver} to be used when resolving.
+     * @return the resulting {@link ITypeBinding}
+     * @throws TypeComputerException if the {@link IResolver} can not resolve the {@link IASTNode} 
+     */
+    public ITypeBinding callResolver(final IASTNode node, final IResolver resolver) throws TypeComputerException {
+        ResolveResult result = null;
+        
+        try {
+            result = resolver.resolve(compilationUnit, node);
+            while(resolver.hasNext()) {
+                result = resolver.next();
+            }
+        } catch (final ResolverException e) {
+            LogUtil.getLogger().logError(e);
+            throw new TypeComputerException("Got ResolverException, when trying to resolve "+node.prettyPrintAST(), node , e);
+        } 
+        if(result != null) {
+            return getTypeFromBinding(result.getBinding());
+        }
+        throw new TypeComputerException("Given Resolver could not resolve the node.", node);
+    }
+
+    /* "boolean"
+    •"byte"
+    •"char"
+    •"double"
+    •"float"
+    •"int"
+    •"long"
+    •"short"
+    •"void"
+    •"java.lang.AssertionError" (since 3.7)
+    •"java.lang.Boolean" (since 3.1)
+    •"java.lang.Byte" (since 3.1)
+    •"java.lang.Character" (since 3.1)
+    •"java.lang.Class"
+    •"java.lang.Cloneable"
+    •"java.lang.Double" (since 3.1)
+    •"java.lang.Error"
+    •"java.lang.Exception"
+    •"java.lang.Float" (since 3.1)
+    •"java.lang.Integer" (since 3.1)
+    •"java.lang.Long" (since 3.1)
+    •"java.lang.Object"
+    •"java.lang.RuntimeException"
+    •"java.lang.Short" (since 3.1)
+    •"java.lang.String"
+    •"java.lang.StringBuffer"
+    •"java.lang.Throwable"
+    •"java.lang.Void" (since 3.1)
+    •"java.io.Serializable"
+    */
 }

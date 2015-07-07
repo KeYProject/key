@@ -1,6 +1,5 @@
 package org.key_project.jmlediting.profile.jmlref.resolver;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -22,11 +22,16 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.core.search.TypeNameMatch;
+import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
@@ -45,11 +50,12 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
 import org.key_project.util.jdt.JDTUtil;
 
 /**
- * The Resolver class, that only has two public methods.
- * <br>"resolve({@link ICompilationUnit}, {@link IASTNode}) -> {@link ResolveResult}" that will resolve the 
+ * The Resolver class, that only has three public methods.
+ * <br>"{@code resolve}({@link ICompilationUnit}, {@link IASTNode}) -> {@link ResolveResult}" that will resolve the 
  * {@link IASTNode} given and find the corresponding JavaElement or JML declaration and
- * <br>"next() -> {@link ResolveResult} that will resolve any member access that is appended to the 
+ * <br>"{@code next()} -> {@link ResolveResult}" that will resolve any member access that is appended to the 
  * original identifier.
+ * <br>"{@code hasNext()} -> boolean" that will return true, if the taskList is not empty and there is still something to resolve with the next() method.
  * 
  * @author Christopher Beckmann
  */
@@ -75,10 +81,10 @@ public class Resolver implements IResolver {
     private final List<ImportDeclaration> imports = new ArrayList<ImportDeclaration>();
     private final LinkedList<ResolverTask> tasks = new LinkedList<ResolverTask>();
     private ResolverTask currentTask = null;
+    private PackageDeclaration pack = null;
     
     /**
      * {@inheritDoc}
-     * @throws ResolverException 
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -89,13 +95,14 @@ public class Resolver implements IResolver {
             return null;
         }
         
-        // reset everything .. so we can resolve more than one identifier, with one instance.
+        // reset everything .. so we can resolve more than once, with one instance or a resolver
         context = null;
         this.compilationUnit = compilationUnit;
         commentToAST.clear();
         imports.clear();
         tasks.clear();
         currentTask = null;
+        pack = null;
         
         // First, we get all the information about, what we have to resolve by checking the given IASTNode.
         // this builds up the task list.
@@ -111,6 +118,7 @@ public class Resolver implements IResolver {
         final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(compilationUnit);
         
         imports.addAll(jdtAST.imports());
+        pack = jdtAST.getPackage();
         
         // Get all the JDT comments so we can find the correct one.
         final List<Comment> jdtCommentList = jdtAST.getCommentList();
@@ -171,13 +179,12 @@ public class Resolver implements IResolver {
         
         // now we have all the information we need
         context = commentToAST.get(jdtComment);
-
+        
         return next();
     }
     
     /**
      * {@inheritDoc}
-     * @throws ResolverException 
      */
     @Override
     public ResolveResult next() throws ResolverException {
@@ -188,20 +195,37 @@ public class Resolver implements IResolver {
         }
         
         ASTNode jdtNode = null;
-        if(!currentTask.isKeyword) {
-            jdtNode = findIdentifier();
-        } else {
-            jdtNode = processKeyword();
-        }
+        IBinding binding = null; 
+        ResolveResultType resultType;    
         
-        if(currentTask.isArrayAcess) {
-            // TODO: test if found jdtNode is an array... 
-            // else .. resolve failed.
+        if(!currentTask.isArrayAcess) {
+            
+            if(currentTask.isKeyword) {
+                jdtNode = processKeyword();
+            } else {
+                jdtNode = findIdentifier();
+            }
+            
+            if(jdtNode == null) {
+                return null;
+            }
+            
+            binding = resolveBinding(jdtNode);
+            resultType = getResolveType(jdtNode);
+            
+        } else {
+            
+            jdtNode = currentTask.lastResult.getJDTNode();
+            binding = DefaultTypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding()).getComponentType();
+            resultType = ResolveResultType.ARRAY_ACCESS;
+            
+            if(binding == null) {
+                throw new ResolverException("Tried to perform an array access on a non array.");
+            }
+            
         }
-        if(jdtNode == null) {
-            return null;
-        }
-        final ResolveResult finalResult = new ResolveResult(jdtNode, getResolveType(jdtNode), resolveBinding(jdtNode));
+            
+        final ResolveResult finalResult = new ResolveResult(jdtNode, resultType, binding);
         
         if(tasks.peek() != null) {
             tasks.peek().lastResult = finalResult;
@@ -242,30 +266,41 @@ public class Resolver implements IResolver {
     /**
      * Searches for the {@link ASTNode} specified by {@code currentTask}.
      * @return the {@link ASTNode} or null if it could not be found
+     * @throws ResolverException is thrown if the setNewContext method throws a ResolverException
      */
-    private ASTNode findIdentifier() {
+    private ASTNode findIdentifier() throws ResolverException {
         ASTNode jdtNode = null;
         
         if(currentTask.lastResult != null) {
             // set new context
-            context = JDTUtil.parse((ICompilationUnit) DefaultTypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding()).getJavaElement());
+            context = setNewContext();
+            
         } else if(!currentTask.isMethod) {
             // If we get in here, this is the first call of this function, means our context is set to
             // the method/code the comment is bound to.
             jdtNode = findParameters(context, currentTask.resolveString);
         }
         
-        if(jdtNode == null) {   
-            // TODO: go up step by step ?
-            context = context.getRoot();
-            
+        if(jdtNode == null && currentTask.lastResult == null) {
+            context = getDeclaringClass();
+        }
+        
+        if(jdtNode == null) {
             if(currentTask.isMethod) {
-                jdtNode = findMethod(context, currentTask.resolveString);
+                final List<ASTNode> resultList = new LinkedList<ASTNode>();
+                findMethod(context, currentTask.resolveString, resultList);
+                if(resultList.size() > 0) {
+                    // TODO pick the best one... change list to a hashmap maybe?
+                    jdtNode = resultList.get(0);
+                }
             } else {
                 jdtNode = findField(context, currentTask.resolveString);
             }
         }
         
+        if(jdtNode == null) {
+            jdtNode = findInPackage(currentTask.resolveString, pack.resolveBinding());
+        }
         if(jdtNode == null) {
             jdtNode = findFromImports(currentTask.resolveString);
         }
@@ -273,27 +308,124 @@ public class Resolver implements IResolver {
         // return what we found... either null or the jdtNode
         return jdtNode;
     }
+
+    /**
+     * Uses the {@link SearchEngine} to get the class specified by resolveString
+     * @param resolveString the class name you are searching for
+     * @param binding the {@link IPackageBinding} of the package that is used as a context to search in
+     * @return the {@link ASTNode} of the {@link TypeDeclaration} of the class we are searching for
+     */
+    private ASTNode findInPackage(final String resolveString, final IPackageBinding binding) {
+        final SearchEngine se = new SearchEngine();
+        final LinkedList<IType> result = new LinkedList<IType>();
+        
+        try {
+            se.searchAllTypeNames(pack.getName().getFullyQualifiedName().toCharArray(), 
+                    SearchPattern.R_EXACT_MATCH, 
+                    resolveString.toCharArray(), 
+                    SearchPattern.R_EXACT_MATCH, 
+                    IJavaSearchConstants.TYPE, 
+                    SearchEngine.createJavaSearchScope(new IJavaElement[] {binding.getJavaElement()}), 
+                    new TypeNameMatchRequestor() {
+                        @Override
+                        public void acceptTypeNameMatch(final TypeNameMatch match) {
+                            result.add(match.getType());
+                        }
+                    },
+                    IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, 
+                    null);
+        }
+        catch (final JavaModelException e) {
+            LogUtil.getLogger().logError(e);
+        }
+        
+        ASTNode node = null;
+        
+        if(result.size() > 0) {
+            final IType type = result.getFirst();
+            
+            if(type.getClassFile() != null) {
+                node = JDTUtil.parse(type.getClassFile());
+            } else if(type.getCompilationUnit() != null) {
+                node = JDTUtil.parse(type.getCompilationUnit());
+            }
+        } else {
+            return null;
+        }
+        
+        return getTypeInCompilationUnit(resolveString, node);
+    }
+
+    private ASTNode getTypeInCompilationUnit(final String resolveString, final ASTNode node) {
+        final LinkedList<ASTNode> endResult = new LinkedList<ASTNode>();
+        
+        if(node != null && resolveString != null) {
+            node.accept(new ASTVisitor() {
+                @Override
+                public boolean visit(final TypeDeclaration node) {
+                    if(node.getName().getIdentifier() != null && node.getName().getIdentifier().equals(resolveString)) {
+                        endResult.add(node);
+                        return false;
+                    }
+                    return true;
+                }
+            });
+        }
+        return endResult.poll();
+    }
+
+    private ASTNode setNewContext() throws ResolverException {
+        final ITypeBinding typeBinding = DefaultTypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding());
+        // START testing what the new context might be
+        if(typeBinding.isPrimitive()) {
+            throw new ResolverException("Can not resolve an access to a primite type.");
+        } else if(typeBinding.isArray()) {
+            // TODO: We found an array .. what to do? What is the context we set to?
+        } else {
+            IType type = null;
+            try {
+                type = compilationUnit.getJavaProject().findType(typeBinding.getQualifiedName());
+            }
+            catch (final JavaModelException e) {
+                LogUtil.getLogger().logError(e);
+            }
+            
+            if(type == null) {
+                return null;
+            }
+            ASTNode node = null;
+            if(type.getClassFile() != null) {
+                node = JDTUtil.parse(type.getClassFile());
+            } else if(type.getCompilationUnit() != null) {
+                 node = JDTUtil.parse(type.getCompilationUnit());
+            }
+            return getTypeInCompilationUnit(type.getElementName(), node);
+        }
+        return null;
+    }
     
-    private ASTNode findFromImports(final String resolveString) {
-        // TODO: search in import list
+    private ASTNode findFromImports(final String resolveString) throws ResolverException {
+        
         for(final ImportDeclaration imp : imports) {
             
-            final IBinding binding = imp.resolveBinding();
-            
-            // TODO : IJavaProject.find...(...) um Imports zu finden
-       
+            final IBinding binding = imp.resolveBinding();       
             
             if(binding instanceof IPackageBinding) {
-                // TODO ?
-                System.out.println("IPackageBinding");
+                final ASTNode result = findInPackage(resolveString, (IPackageBinding) binding);
+                if(result == null) {
+                    continue;
+                } else {
+                    return result;
+                }
                 
             // ***** TypeBinding 
             } else if(binding instanceof ITypeBinding) {
+                
                 IType type = null;
                 try {
                     type = compilationUnit.getJavaProject().findType(((ITypeBinding) binding).getQualifiedName());
-                    if(type == null) {
-                        return null;
+                    if(type == null || !type.getElementName().equals(resolveString)) {
+                        continue;
                     }
                     if(type.getClassFile() != null) {
                         return JDTUtil.parse(type.getClassFile());
@@ -303,7 +435,7 @@ public class Resolver implements IResolver {
                 }
                 catch (final JavaModelException e) {
                     LogUtil.getLogger().logError(e);
-                    return null;
+                    continue;
                 }
                 
             } else if(binding instanceof IMethodBinding) {
@@ -311,7 +443,7 @@ public class Resolver implements IResolver {
                 try {
                     type = compilationUnit.getJavaProject().findType(((IMethodBinding) binding).getDeclaringClass().getQualifiedName());
                     if(type == null) {
-                        return null;
+                        continue;
                     }
                     final IMethodBinding mb = (IMethodBinding) binding;
                     final LinkedList<MethodDeclaration> result = new LinkedList<MethodDeclaration>();
@@ -342,15 +474,13 @@ public class Resolver implements IResolver {
                 
                 
             } else if(binding instanceof IVariableBinding) {
-                // TODO ?
-                System.out.println("IVariableBinding");
+                // TODO 
                 
             } else {
-                
+                throw new ResolverException("ImportDeclaration returned an unrecognised IBinding.");
             }
-            System.out.println(binding.getName());
-            
-            System.out.println(binding.getJavaElement());
+            //System.out.println(binding.getName());
+            //System.out.println(binding.getJavaElement());
             
         }
         
@@ -444,36 +574,29 @@ public class Resolver implements IResolver {
      * @param name is the name of the identifier we are searching for
      * @return the {@link ASTNode} corresponding to the name in the given context
      */
-    private ASTNode findMethod(final ASTNode context, final String name) {
+    private void findMethod(final ASTNode context, final String name, final List<ASTNode> resultList) {
                
         if(context == null || name == null) {
-            return null;
+            return;
         }
         
         if(context instanceof CompilationUnit) {
             for(final Object types : ((CompilationUnit) context).types()) {
-                final ASTNode result = findMethod((ASTNode) types, name);
-                if(result != null) {
-                    return result;
-                }
+                findMethod((ASTNode) types, name, resultList);
             }
         // TYPE DECLARATION
         } else if(context instanceof TypeDeclaration) {            
             for(final MethodDeclaration method : ((TypeDeclaration) context).getMethods()) {
-                final ASTNode result = findMethod(method, name);
-                if(result != null) {
-                    return result;
-                }
+                findMethod(method, name, resultList);
             }
             
         // METHOD DECLARATION
         } else if(context instanceof MethodDeclaration) {
             if(((MethodDeclaration) context).getName().getIdentifier().equals(name)) {
-                // TODO: is this a declaration that matches?
-                return checkMethodDeclaration((MethodDeclaration) context);
+                checkMethodDeclaration((MethodDeclaration) context, resultList);
             }
         }
-        return null;
+        return;
     }
 
     /** Check the {@link MethodDeclaration} whether it matches the one we are searching for.
@@ -481,18 +604,20 @@ public class Resolver implements IResolver {
      * It uses the {@link JMLTypeComputer} to compute the types of the parameters, since they can be very complicated.
      * 
      * @param context is the {@link MethodDeclaration} we are checking
+     * @param resultList the list we add our result to, if it matches the specification
      * @return the {@link ASTNode} given as context, if all the parameter types match, else it returns null
      */
-    private ASTNode checkMethodDeclaration(final MethodDeclaration context) {
+    private void checkMethodDeclaration(final MethodDeclaration context, final List<ASTNode> resultList) {
         
         // if the parameter count differs.. this method can not be the one we are searching for.
         if(currentTask.parameters.size() != context.parameters().size()) {
-            return null;
+            return;
         }
         
         // if there are no parameters, it must be the correct one.
         if(currentTask.parameters.size() == 0) {
-            return context;
+            resultList.add(context);
+            return;
         }
         
         // we have to check the types of the parameters .. 
@@ -506,16 +631,17 @@ public class Resolver implements IResolver {
             }
             catch (final TypeComputerException e) {
                 // Parameter is not a valid type or has mismatches... 
-                return null;
+                return;
             }
             
             // if parameters are not matching or work together 
             // .. this is not the method we are looking for
             if(!DefaultTypeComputer.typeMatch(b1, b2)) {
-                return null;
+                return;
             }
         }
-        return context;
+        resultList.add(context);
+        return;
     }
     
     /**
@@ -568,12 +694,16 @@ public class Resolver implements IResolver {
      * @throws ResolverException is thrown, if the jmlNode isn't build correctly.
      */
     protected void buildResolverTask(final IASTNode jmlNode) throws ResolverException {
-    
+        
+        tasks.add(new ResolverTask());
+        
         try{
-            if(isPrimaryExpr(jmlNode)) {
-                
+            if(isString(jmlNode)) {
+                // for labels in assignable clause
+            } else if(isPrimaryExpr(jmlNode)) {
+                // for any expression in an ensures and so on
             } else if(isCast(jmlNode)) {
-                // TODO:                
+                // expression that is cast to another type
             } else {
                 throw new ResolverException("Given IASTNode is not resolvable.");
             }
@@ -584,32 +714,39 @@ public class Resolver implements IResolver {
         
     }
 
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code PRIMARY_EXPR}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isPrimaryExpr(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
             // PRIMARY
-            System.out.print("[Primary]");
-            
-            tasks.add(new ResolverTask());
+            //System.out.print("[Primary]");
 
             result = isIdentifier(node.getChildren().get(0)) 
                   || isJmlPrimary(node.getChildren().get(0))
                   || isJavaKeyword(node.getChildren().get(0));
             
             if(node.getChildren().size() > 1) {
-                System.out.println();
+                //System.out.println();
                 
                 result = isList(node.getChildren().get(1));
                 
-            } else {
-                result = true;
             }
-            
         }
-        System.out.println();
+        //System.out.println();
         return result;
     }
     
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code JAVA_KEYWORD}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isJavaKeyword(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.JAVA_KEYWORD) {
@@ -621,11 +758,17 @@ public class Resolver implements IResolver {
         return result;
     }
     
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code JML_PRIMARY}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isJmlPrimary(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.JML_PRIMARY) {                    
             // PRIMARY -> JML_PRIMARY
-            System.out.print("[JML Primary]");
+            //System.out.print("[JML Primary]");
             
             result = isKeyword(node.getChildren().get(0));
         }
@@ -636,10 +779,16 @@ public class Resolver implements IResolver {
         // TODO: Not sure yet.. if this should be here.
         boolean result = false;
         result = true;
-        System.out.println("[Cast]");
+        //System.out.println("[Cast]");
         return result;
     }
 
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link NodeTypes}.{@code KEYWORD}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isKeyword(final IASTNode node) {
         boolean result = false;
         if(node.getType() == NodeTypes.KEYWORD && ((IKeywordNode)node).getKeywordInstance().equals("\\result")) {                    
@@ -653,23 +802,35 @@ public class Resolver implements IResolver {
         return result;
     }
 
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code IDENTIFIER}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isIdentifier(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.IDENTIFIER) {                    
             // PRIMARY -> IDENTIFIER
             
-            System.out.print("[Identifier]");
+            //System.out.print("[Identifier]");
                           
             result = isString(node.getChildren().get(0));
         }
         return result;
     }
     
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link NodeTypes}.{@code STRING}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isString(final IASTNode node) {
         boolean result = false;
         if(node.getType() == NodeTypes.STRING) {
             // PRIMARY -> IDENTIFIER -> STRING
-            System.out.print("[String]->"+((IStringNode)node).getString());
+            //System.out.print("[String]->"+((IStringNode)node).getString());
             
             // set resolveString! :)
             tasks.getLast().resolveString = ((IStringNode)node).getString();
@@ -680,12 +841,18 @@ public class Resolver implements IResolver {
         return result;
     }
     
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link NodeTypes}.{@code LIST}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isList(final IASTNode node) {
         boolean result = false;
         if(node.getType() == NodeTypes.LIST) {
             // PRIMARY -> IDENTIFIER -> STRING
             //         -> LIST
-            System.out.print("[List]");
+            //System.out.print("[List]");
             
             for(final IASTNode child : node.getChildren()) {
                 result = isMethodCall(child) || isMemberAccess(child) || isArrayAccess(child);
@@ -694,12 +861,20 @@ public class Resolver implements IResolver {
         return result;
     }
     
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code ARRAY_ACCESS}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isArrayAccess(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.ARRAY_ACCESS) {
             // PRIMARY -> IDENTIFIER -> STRING
             //         -> LIST       -> ARRAY_ACCESS
-            System.out.print("[ARRAYACCESS]");
+            //System.out.print("[ARRAYACCESS]");
+            
+            tasks.add(new ResolverTask());
             
             //tasks.getLast().type = ResolverTaskTypes.ARRAY_ACCESS;
             tasks.getLast().isArrayAcess = true;
@@ -710,12 +885,18 @@ public class Resolver implements IResolver {
         return result;
     }
 
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code METHOD_CALL_PARAMETERS}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isMethodCall(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.METHOD_CALL_PARAMETERS) {
             // PRIMARY -> IDENTIFIER -> STRING
             //         -> LIST       -> METHOD_CALL
-            System.out.print("[Method Call]");
+            //System.out.print("[Method Call]");
             
             //tasks.getLast().type = ResolverTaskTypes.METHOD_CALL;
             tasks.getLast().isMethod = true;
@@ -725,24 +906,36 @@ public class Resolver implements IResolver {
         return result;
     }
     
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link NodeTypes}.{@code NONE}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isEmptyList(final IASTNode node) {
         boolean result = false;
         if(node.getType() == NodeTypes.NONE) {
             // PRIMARY -> IDENTIFIER -> STRING
             //         -> LIST       -> METHOD_CALL -> NONE
-            System.out.print("[EXPRESSION_LIST]");
+            //System.out.print("[NONE]");
            
             result = true;
         }
         return result;
     }
 
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code EXPRESSION_LIST}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isExpressionList(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.EXPRESSION_LIST) {
             // PRIMARY -> IDENTIFIER -> STRING
             //         -> LIST       -> METHOD_CALL -> EXPRESSION_LIST
-            System.out.print("[EXPRESSION_LIST]");
+            //System.out.print("[EXPRESSION_LIST]");
             
             for(final IASTNode child : node.getChildren()) {
                 tasks.getLast().parameters.add(child);
@@ -752,6 +945,12 @@ public class Resolver implements IResolver {
         return result;
     }
 
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code MEMBER_ACCESS}
+     * @param node - the {@link IASTNode} to get information from
+     * @return true, if the node and every child node is correct.
+     */
     protected boolean isMemberAccess(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.MEMBER_ACCESS) {
@@ -762,7 +961,7 @@ public class Resolver implements IResolver {
             tasks.getLast().node = (IStringNode) node.getChildren().get(1);
             tasks.getLast().resolveString = tasks.getLast().node.getString();
             
-            System.out.print("[Member Access: "+node.getChildren().get(0)+node.getChildren().get(1)+"]");
+            //System.out.print("[Member Access: "+node.getChildren().get(0)+node.getChildren().get(1)+"]");
                         
             result = true;
         }
@@ -780,118 +979,4 @@ public class Resolver implements IResolver {
         }
         return false;
     }
-    
-    /*private void debug() {
-                
-        
-        // get all the imports from the given compilationUnit        
-        
-        IJavaElement element = compilationUnit;
-        
-        while(element != null) {
-            if(element.getElementType() == IJavaElement.COMPILATION_UNIT) {
-                System.out.print("ICompilationUnit: ");
-                
-            } else if(element.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
-                System.out.print("IPackageFragment: ");
-                try {
-                    for(final IJavaElement child : ((IPackageFragment)element).getChildren()) {
-                        javaElementList.add(child);
-                    }
-                }
-                catch (final JavaModelException e) {
-                    e.printStackTrace();
-                }
-                
-                
-            } else if(element.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT) {
-                System.out.print("IPackageFragmentRoot: ");
-                
-            } else if(element.getElementType() == IJavaElement.JAVA_PROJECT) {
-                System.out.print("IJavaProject: ");
-                
-            } else if(element.getElementType() == IJavaElement.JAVA_MODEL) {
-                System.out.print("IJavaModel: ");
-                
-            }
-            System.out.println(element.getElementName());
-            element = element.getParent();
-        }
-        
-        try {
-            System.out.println("ICompilationUnits in all of this: ");
-            int i = 0;
-            for(final ICompilationUnit unit : JDTUtil.listCompilationUnit(javaElementList)) {
-                System.out.println(i++ + " - " + unit.getElementName());
-            }
-        }
-        catch (final JavaModelException e1) {
-            e1.printStackTrace();
-        }  
-        
-        
-        try {
-            for(final IImportDeclaration imp : compilationUnit.getImports()) {
-                System.out.println(imp.getElementName());
-            }
-        }
-        catch (final JavaModelException e1) {
-            LogUtil.getLogger().logError(e1);
-        }
-        
-
-        // ***************************************** This is for testing only.
-        /*final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(compilationUnit);
-        final AST ast = jdtAST.getAST();
-        
-        final ITypeBinding test = ast.resolveWellKnownType("java.lang.String");
-        //test.getQualifiedName();
-        IJavaElement element = test.getJavaElement();
-        while(element != null && !(element.getElementType() == IJavaElement.COMPILATION_UNIT || element.getElementType() == IJavaElement.CLASS_FILE)) {
-            element = element.getParent();
-        }
-        if(element != null && element.getElementType() == IJavaElement.COMPILATION_UNIT ) {
-            final CompilationUnit jdtAST2 = (CompilationUnit) JDTUtil.parse((ICompilationUnit)element);
-            jdtAST2.getAST();
-        }
-        if(element != null && element.getElementType() == IJavaElement.CLASS_FILE ) {
-            final CompilationUnit jdtAST2 = (CompilationUnit) JDTUtil.parse((IClassFile)element);
-            jdtAST2.getAST();
-        }*/
-                
-        /*
-         * ast.resolveWellKnownType(name);
-         * 
-         * "boolean"
-        •"byte"
-        •"char"
-        •"double"
-        •"float"
-        •"int"
-        •"long"
-        •"short"
-        •"void"
-        •"java.lang.AssertionError" (since 3.7)
-        •"java.lang.Boolean" (since 3.1)
-        •"java.lang.Byte" (since 3.1)
-        •"java.lang.Character" (since 3.1)
-        •"java.lang.Class"
-        •"java.lang.Cloneable"
-        •"java.lang.Double" (since 3.1)
-        •"java.lang.Error"
-        •"java.lang.Exception"
-        •"java.lang.Float" (since 3.1)
-        •"java.lang.Integer" (since 3.1)
-        •"java.lang.Long" (since 3.1)
-        •"java.lang.Object"
-        •"java.lang.RuntimeException"
-        •"java.lang.Short" (since 3.1)
-        •"java.lang.String"
-        •"java.lang.StringBuffer"
-        •"java.lang.Throwable"
-        •"java.lang.Void" (since 3.1)
-        •"java.io.Serializable"
-         */
-    //}
-    
 }

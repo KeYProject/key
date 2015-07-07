@@ -3,6 +3,8 @@ package org.key_project.jmlediting.profile.jmlref.resolver.typecomputer;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.parser.util.JavaBasicsNodeTypes;
 import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
 import org.key_project.jmlediting.core.resolver.ResolverException;
@@ -12,13 +14,14 @@ import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputerExcepti
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
+import org.key_project.util.jdt.JDTUtil;
 
-/**Computes the types of given IASTNodes
+/** Computes the types of given {@link IASTNodes}.
  * 
  * @author Christopher Beckmann
  *
  */
-public class JMLTypeComputer extends DefaultTypeComputer implements ITypeComputer{
+public class JMLTypeComputer extends DefaultTypeComputer implements ITypeComputer {
 
     public JMLTypeComputer(final ICompilationUnit compilationUnit) {
         super(compilationUnit);
@@ -29,8 +32,6 @@ public class JMLTypeComputer extends DefaultTypeComputer implements ITypeCompute
      */
     @Override
     public ITypeBinding computeType(final IASTNode node) throws TypeComputerException {
-                
-        System.out.println("JMLTypeComputer.computeStep");
         
         if(node == null) {
             return null;
@@ -53,14 +54,10 @@ public class JMLTypeComputer extends DefaultTypeComputer implements ITypeCompute
                || type == ExpressionNodeTypes.BINARY_EXCLUSIVE_OR) {
             
         } else if(type == ExpressionNodeTypes.CAST) {
-            try {
-                final ResolveResult result = new Resolver().resolve(compilationUnit, node);
-            }
-            catch (final ResolverException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            // TODO .. :D
+            
+            // TODO: call on child? .. give everything to resolver?
+            // compare afterwards?
+            return callResolver(node, new Resolver());
             
         } else if(type == ExpressionNodeTypes.CONDITIONAL_OP) {
             
@@ -111,21 +108,14 @@ public class JMLTypeComputer extends DefaultTypeComputer implements ITypeCompute
             // --int ++int
             
         } else if(type == ExpressionNodeTypes.PRIMARY_EXPR) {
-            final IResolver resolver = new Resolver();
-            ResolveResult result = null;
-            try {
-                result = resolver.resolve(compilationUnit, node);
-                while(resolver.hasNext()) {
-                    result = resolver.next();
+            // if it has exactly 1 child and that child is a java basic primitive
+            if(node.getChildren().size() == 1) {
+                if(isPrimitive(node.getChildren().get(0))) {
+                    return getType(node.getChildren().get(0));
                 }
-
-            } catch (final ResolverException e) {
-                LogUtil.getLogger().logError(e);
-                // TODO: could not be resolved.
-            } 
-            if(result != null) {
-                return getTypeFromBinding(result.getBinding());
             }
+            
+            return callResolver(node, new Resolver());
             
         } else if(type == ExpressionNodeTypes.PRIMITIVE_TYPE) {
             
@@ -144,7 +134,7 @@ public class JMLTypeComputer extends DefaultTypeComputer implements ITypeCompute
         } else {
             return super.computeType(node);
         }
-        throw new TypeComputerException("Can not identify node type.");
+        throw new TypeComputerException("Can not identify node type.", node);
     }
-        
+  
 }
