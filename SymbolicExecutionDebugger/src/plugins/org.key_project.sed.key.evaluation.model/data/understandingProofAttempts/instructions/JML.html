@@ -13,7 +13,7 @@
          <b>Please read them carefully before you continue.</b>
          If you are familiar with JML, you can skip sections you know well.
          <ul>
-            <li><a href="#comments">1 JML comments</a></li>
+            <li><a href="#comments">1 JML Comments</a></li>
             <li><a href="#mc">2 Method Contracts</a></li>
             <li><a href="#invariants">3 Invariants</a></li>
             <li><a href="#loop">4 Loop Invariants</a></li>
@@ -21,7 +21,7 @@
          </ul>
       </p>
       
-      <h2><a name="comments">1 JML comments</a></h2>
+      <h2><a name="comments">1 JML Comments</a></h2>
       <p>
          JML specifications are placed as special comments within the Java source code.
          Such comments have to start with the <code>@</code> character.
@@ -35,16 +35,22 @@
 
       <h2><a name="mc">2 Method Contracts</a></h2>
       <p>
-         A method contract specifies the expected behavior of a method in terms of pre and postconditions.
+         A method contract specifies the expected behavior of a method in terms of pre- and postconditions.
          Assuming that the precondition is fulfilled when the method is called, the method guarantees that the postcondition is established when it returns.
          In JML the keywords <code>normal_behavior</code> and <code>exceptional_behavior</code> are used to specify that a method should terminate normally without a thrown exception or exceptionally otherwise.
-         Keyword <code>requires</code> followed by an expression defines a precondition while <code>ensures</code> also followed by an expression defines a postcondition.
+         Keyword <code>requires</code> followed by a boolean expression defines a precondition while <code>ensures</code> also followed by a boolean expression defines a postcondition.
          An expression is basically a normal Java expression as used for instance in <code>if</code> statements.
-         But additionally the implication operator <code>==></code> and quantors (e.g. <code>\forall</code>) can be used.
-         The expression of the ensures clause is evaluated in the state when the method returns.
-         This forms the need to access the call state (keword <code>\old</code>) and the method return value (keyword <code>\result</code>) within expressions.
+         But additionally the implication operator <code>==></code> and quantifiers (e.g. <code>\forall</code>) can be used.
+      </p>
+      <p>
+         The ensures clause makes a statement about the final state after method execution.
+         To express changes relative to the prestate before method invocation, the keyword <code>\old</code> can be used.
+         Keyword <code>\result</code> is used to refer to the method return value.
+      </p>
+      <p>
          The last part of a method contract is the assignable clause.
-         It lists all locations the method is allowed to change. In case the method should change nothing keyword <code>\nothing</code> is used.
+         It lists all locations the method is allowed to change. 
+         Keyword <code>\nothing</code> expresses that the method is not allowed to change any location.
       </p>
       <p>
          Consider the following example. 
@@ -106,8 +112,8 @@ private int acquiredCredits = 0;</pre></code>
          A loop invariant in JML consists of three parts:
          <ul>
             <li>Keyword <code>loop_invariant</code> is used to specify a loop invariant.</li>
-            <li>Keyword <code>decreasing</code> specifies a value which is always positive and decreased in each loop iteration. It is used by verification tools to prove termination of the loop.</li>
-            <li>Keyword <code>assignable</code> is used as for method contracts to limit the locations may changed by the loop.</li>
+            <li>Keyword <code>decreasing</code> specifies a value which is always positive and strictly decreased in each loop iteration. It is used to prove termination of the loop.</li>
+            <li>Keyword <code>assignable</code> limits the locations may changed by the loop.</li>
          </ul> 
       </p>
       <p>
