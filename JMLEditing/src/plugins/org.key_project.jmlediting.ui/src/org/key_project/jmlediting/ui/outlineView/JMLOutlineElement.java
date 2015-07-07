@@ -5,7 +5,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
@@ -14,7 +13,13 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.parser.IJMLParser;
+
+/**
+ * JML Outline Element canbe used as a child to reaturn and get shown in the Outline
+ * 
+ * @author Timm Lippert
+ *
+ */
 
 public class JMLOutlineElement implements IJavaElement, ISourceReference {
    private IJavaElement parent;
@@ -24,8 +29,6 @@ public class JMLOutlineElement implements IJavaElement, ISourceReference {
    public JMLOutlineElement(IJavaElement parent, IASTNode node) {
       this.parent = parent;
       this.jmlNode = node;
-      
-      //TODO: ober nodes itereiren bis länge von
    }
 
    @SuppressWarnings("rawtypes")
@@ -136,12 +139,12 @@ public class JMLOutlineElement implements IJavaElement, ISourceReference {
          
          @Override
          public int getOffset() {
-            return 1;//jmlNode.getStartOffset();
+            return 1;
          }
          
          @Override
          public int getLength() {
-            return 1;//jmlNode.getChildren().get(0).getEndOffset();
+            return 1;
          }
       };
    }
