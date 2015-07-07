@@ -48,18 +48,17 @@ public class MatchTermLabelInstruction implements MatchInstruction {
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions, Services services) {
         final Term term = termPosition.getCurrentSubterm();
         MatchConditions result = matchConditions;
-        if (term.getLabels().size() == labels.size()) {
-            for (int i = 0; i < labels.size() && result != null; i++) {
-                final TermLabel templateLabel = labels.get(i);
-                // ignore all labels which are not schema variables
-                // if intended to match concrete label, match against schema label
-                // and use an appropriate variable condition
-                if (templateLabel instanceof TermLabelSV) {
-                    result = match((TermLabelSV) templateLabel, term, result, services);
-                }
+        // TODO: Define a sane version of taclet matching for term labels
+        // at the moment any termlabbel SV matches on all labels (or no label) (i.e., t<l1,l2> will match l1 and l2 against all labels and both will have
+        // all labels of the concret term as instantiation)
+        for (int i = 0; i < labels.size() && result != null; i++) {
+            final TermLabel templateLabel = labels.get(i);
+            // ignore all labels which are not schema variables
+            // if intended to match concrete label, match against schema label
+            // and use an appropriate variable condition
+            if (templateLabel instanceof TermLabelSV) {
+                result = match((TermLabelSV) templateLabel, term, result, services);
             }
-        } else {
-            result = null;
         }
         return result;
     }
