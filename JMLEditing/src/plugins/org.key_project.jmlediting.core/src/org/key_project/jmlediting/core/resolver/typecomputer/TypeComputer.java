@@ -14,11 +14,11 @@ import org.key_project.jmlediting.core.resolver.ResolverException;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.util.jdt.JDTUtil;
 
-public class DefaultTypeComputer implements ITypeComputer {
+public class TypeComputer implements ITypeComputer {
 
     protected ICompilationUnit compilationUnit;
 
-    public DefaultTypeComputer(final ICompilationUnit compilationUnit) {
+    public TypeComputer(final ICompilationUnit compilationUnit) {
         this.compilationUnit = compilationUnit;
     }
 
@@ -57,7 +57,14 @@ public class DefaultTypeComputer implements ITypeComputer {
         throw new TypeComputerException("Can not identify the node type.", node);
     }
     
-    
+    /**
+     * Returns the return Type of the given IBinding.
+     * <br>If it is an {@link IMethodBinding} then the return type of the method is returned.
+     * <br>If it is an {@link IVariableBinding} the type of the variable is returned.
+     * <br>If it is an {@link ITypeBinding} it will return the type itself.
+     * @param binding the {@link IBinding} to get the {@link ITypeBinding} from.
+     * @return the corresponding {@link ITypeBinding}
+     */
     public static ITypeBinding getTypeFromBinding(final IBinding binding) {
         if(binding instanceof IVariableBinding) {
             return ((IVariableBinding) binding).getType();
@@ -69,6 +76,7 @@ public class DefaultTypeComputer implements ITypeComputer {
         return null;
     }
 
+    
     public static boolean typeMatch(final ITypeBinding b1, final ITypeBinding b2) {
         // TODO: check if the first owns the second or something..
         //
@@ -78,6 +86,11 @@ public class DefaultTypeComputer implements ITypeComputer {
         return b1.isEqualTo(b2);
     }
     
+    /** 
+     * Tests if the given {@link IASTNode} is one of the types specified in {@link JavaBasicsNodeTypes}.
+     * @param node the {@link IASTNode} to test
+     * @return true, if the type of the {@link IASTNode} is specified in the {@link JavaBasicsNodeTypes} class.
+     */
     public boolean isPrimitive(final IASTNode node) {
         final int type = node.getType();
         return type == JavaBasicsNodeTypes.BOOLEAN_LITERAL ||
@@ -89,28 +102,36 @@ public class DefaultTypeComputer implements ITypeComputer {
             type == JavaBasicsNodeTypes.NAME;
     }
     
-
+    /** If the given {@link IASTNode} represents a primitive type, then this function will return the {@link ITypeBinding} for it.
+     * 
+     * @param node the {@link IASTNode} to check
+     * @return the corresponding {@link ITypeBinding} or null
+     */
     public ITypeBinding getType(final IASTNode node) {
         
         final int type = node.getType();
         if(type == JavaBasicsNodeTypes.BOOLEAN_LITERAL) {
-            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("boolean");
+            return createWellKnownType("boolean");
         } else if(type == JavaBasicsNodeTypes.CHARACTER_LITERAL) {
-            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("char");
+            return createWellKnownType("char");
         } else if(type == JavaBasicsNodeTypes.FLOAT_LITERAL) {
-            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("float");
+            return createWellKnownType("float");
         } else if(type == JavaBasicsNodeTypes.INTEGER_LITERAL) {
-            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("int");
+            return createWellKnownType("int");
         } else if(type == JavaBasicsNodeTypes.NULL_LITERAL) {
             // TODO .. type of null?
-            //return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("");
+            //return createWellKnownType("");
         } else if(type == JavaBasicsNodeTypes.STRING_LITERAL) {
-            return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("java.lang.String");
+            return createWellKnownType("java.lang.String");
         } else if(type == JavaBasicsNodeTypes.NAME) {
             // TODO .. what is name?
-            //return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType("");
+            //return createWellKnownType("");
         }
         return null;
+    }
+    
+    public ITypeBinding createWellKnownType(final String type) {
+        return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType(type);
     }
     
     /**

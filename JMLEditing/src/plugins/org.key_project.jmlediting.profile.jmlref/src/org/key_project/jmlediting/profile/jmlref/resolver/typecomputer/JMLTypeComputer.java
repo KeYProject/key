@@ -1,5 +1,8 @@
 package org.key_project.jmlediting.profile.jmlref.resolver.typecomputer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -8,7 +11,7 @@ import org.key_project.jmlediting.core.parser.util.JavaBasicsNodeTypes;
 import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
 import org.key_project.jmlediting.core.resolver.ResolverException;
-import org.key_project.jmlediting.core.resolver.typecomputer.DefaultTypeComputer;
+import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputer;
 import org.key_project.jmlediting.core.resolver.typecomputer.ITypeComputer;
 import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputerException;
 import org.key_project.jmlediting.core.utilities.LogUtil;
@@ -21,7 +24,7 @@ import org.key_project.util.jdt.JDTUtil;
  * @author Christopher Beckmann
  *
  */
-public class JMLTypeComputer extends DefaultTypeComputer implements ITypeComputer {
+public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
 
     public JMLTypeComputer(final ICompilationUnit compilationUnit) {
         super(compilationUnit);
@@ -81,6 +84,10 @@ public class JMLTypeComputer extends DefaultTypeComputer implements ITypeCompute
         } else if(type == ExpressionNodeTypes.LOGICAL_AND
                || type == ExpressionNodeTypes.LOGICAL_OR) {
             // & / | / ^ /             
+            // types should be boolean
+            if(node.getChildren().size() < 3) {
+                throw new TypeComputerException("Can not have a logical operator without two operands.", node);
+            }
             
         //}else if(type == ExpressionNodeTypes.MEMBER_ACCESS) {
             
@@ -92,14 +99,35 @@ public class JMLTypeComputer extends DefaultTypeComputer implements ITypeCompute
             if(node.getChildren().size() < 3) {
                 // TODO : Error!
             } 
+            final List<ITypeBinding> typeList = new LinkedList<ITypeBinding>();
+            
             for(final IASTNode child : node.getChildren()) {
-                // TODO
+                if(child.getType() != NodeTypes.STRING) {
+                    typeList.add(computeType(child));
+                }
             }
+            
+            //return computeTypeCompatibility(typeList);
+            // TODO: check if types match
+            
             
         } else if(type == ExpressionNodeTypes.NEW_EXPRESSION) {
             
         } else if(type == ExpressionNodeTypes.NOT) {
             // !boolean
+            if(node.getChildren().size() != 1) {
+                throw new TypeComputerException("This node's child count should be one.", node);
+            }
+            
+            final ITypeBinding expected = createWellKnownType("boolean");
+            final ITypeBinding actual = computeType(node.getChildren().get(0));
+            
+            if(typeMatch(actual, expected)) {
+                return expected;
+            } else {
+                throw new TypeComputerException("Type mismatch: The result should be boolean.", node);
+            }
+            
             
         } else if(type == ExpressionNodeTypes.POST_FIX_EXPR) {
             
@@ -108,7 +136,7 @@ public class JMLTypeComputer extends DefaultTypeComputer implements ITypeCompute
             // --int ++int
             
         } else if(type == ExpressionNodeTypes.PRIMARY_EXPR) {
-            // if it has exactly 1 child and that child is a java basic primitive
+            // if it has exactly 1 child and that child is a basic java primitive
             if(node.getChildren().size() == 1) {
                 if(isPrimitive(node.getChildren().get(0))) {
                     return getType(node.getChildren().get(0));

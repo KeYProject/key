@@ -40,7 +40,7 @@ import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
 import org.key_project.jmlediting.core.resolver.ResolveResultType;
 import org.key_project.jmlediting.core.resolver.ResolverException;
-import org.key_project.jmlediting.core.resolver.typecomputer.DefaultTypeComputer;
+import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputer;
 import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputerException;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
@@ -216,7 +216,7 @@ public class Resolver implements IResolver {
         } else {
             
             jdtNode = currentTask.lastResult.getJDTNode();
-            binding = DefaultTypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding()).getComponentType();
+            binding = TypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding()).getComponentType();
             resultType = ResolveResultType.ARRAY_ACCESS;
             
             if(binding == null) {
@@ -316,6 +316,7 @@ public class Resolver implements IResolver {
      * @return the {@link ASTNode} of the {@link TypeDeclaration} of the class we are searching for
      */
     private ASTNode findInPackage(final String resolveString, final IPackageBinding binding) {
+        // TODO: maybe more efficient way of doing this.
         final SearchEngine se = new SearchEngine();
         final LinkedList<IType> result = new LinkedList<IType>();
         
@@ -375,7 +376,7 @@ public class Resolver implements IResolver {
     }
 
     private ASTNode setNewContext() throws ResolverException {
-        final ITypeBinding typeBinding = DefaultTypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding());
+        final ITypeBinding typeBinding = TypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding());
         // START testing what the new context might be
         if(typeBinding.isPrimitive()) {
             throw new ResolverException("Can not resolve an access to a primite type.");
@@ -624,7 +625,7 @@ public class Resolver implements IResolver {
         for(int i = 0; i < currentTask.parameters.size() ; i++) {
             final JMLTypeComputer tc = new JMLTypeComputer(compilationUnit);
                         
-            final ITypeBinding b1 = DefaultTypeComputer.getTypeFromBinding(resolveBinding((ASTNode) context.parameters().get(i)));
+            final ITypeBinding b1 = TypeComputer.getTypeFromBinding(resolveBinding((ASTNode) context.parameters().get(i)));
             ITypeBinding b2 = null;
             try {
                 b2 = tc.computeType(currentTask.parameters.get(i));
@@ -636,7 +637,7 @@ public class Resolver implements IResolver {
             
             // if parameters are not matching or work together 
             // .. this is not the method we are looking for
-            if(!DefaultTypeComputer.typeMatch(b1, b2)) {
+            if(!TypeComputer.typeMatch(b1, b2)) {
                 return;
             }
         }
