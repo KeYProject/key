@@ -39,12 +39,11 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
 
         return proof;
     }
-    
+
     public InfFlowProof createProofObject(String proofName,
                                    String proofHeader,
                                    Term poTerm,
                                    InitConfig proofConfig) {
-        
         final InfFlowProof proof = new InfFlowProof(proofName,
                 poTerm,
                 proofHeader,

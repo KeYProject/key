@@ -103,6 +103,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
 
     @Override
     public void readProblem() throws ProofInputException {
+        final Services proofServices = postInit();
+
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars,
@@ -137,8 +139,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
         LoopInvExecutionPO lPO = (LoopInvExecutionPO) po;
         return loopInvariant.equals(lPO.loopInvariant);
     }
-    
-    public LoopInvariant getLoopInvariant() {        
+
+    public LoopInvariant getLoopInvariant() {
         return loopInvariant;
     }
 

@@ -398,12 +398,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
       generateWdTaclets(proofConfig);
    }
 
-private Services postInit() {
-    proofConfig = environmentConfig.deepCopy();
+   protected Services postInit() {
+      proofConfig = environmentConfig.deepCopy();
       final Services proofServices = proofConfig.getServices();
       tb = proofServices.getTermBuilder();
-    return proofServices;
-}
+      return proofServices;
+   }
 
    /**
     * Modifies the post condition with help of {@link POExtension#modifyPostTerm(InitConfig, Services, Term)}.

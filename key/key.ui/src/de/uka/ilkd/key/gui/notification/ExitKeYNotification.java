@@ -24,62 +24,62 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * This task takes care for a notification when exiting KeY. 
+ * This task takes care for a notification when exiting KeY.
+ * 
  * @author bubel
  */
 public class ExitKeYNotification extends NotificationTask {
 
-    
-    /**
-     * overwritten as invokeAndWait is taken 
-     * called to execute the notification task, but this method
-     * only takes care that we are in the even dispatcher thread
-     * @param manager the NotificationManager to which this 
-     * tasks belongs to
-     * @param event the NotificationEvent triggering this task
-     */
-    public void execute(NotificationEvent event, 
-            NotificationManager manager) {      
-        // if we are in automode execute task only if it is 
-        // automode enabled
-        if (manager.inAutoMode() && !automodeEnabledTask()) {
-            return;
-        }
-        // notify thread safe
-	
-	if (SwingUtilities.isEventDispatchThread()) {
-	    executeImpl(event, manager);
-	} else {
-           final NotificationEvent eventObject = event;
-           final NotificationManager notManager = manager;
-           try {
-            SwingUtilities.invokeAndWait(new Runnable() {                                    
-                public void run() {                
-                    executeImpl(eventObject, notManager);		   
-                }               
-               });
-           } catch (InterruptedException e) {
-               Debug.out("unexpected exception during notification");
-           } catch (InvocationTargetException e) {
-               Debug.out("unexpected exception during notification");
-           }
-	}
-    }
-    /**
-     * executes the actions of this task
-     */
-    protected void executeImpl(NotificationEvent event,
-            NotificationManager manager) {
-        for (final NotificationAction action : getNotificationActions()) {                    
-            action.execute(event);
-        }
-    }
+   /**
+    * overwritten as invokeAndWait is taken called to execute the notification
+    * task, but this method only takes care that we are in the even dispatcher
+    * thread
+    * 
+    * @param manager
+    *           the NotificationManager to which this tasks belongs to
+    * @param event
+    *           the NotificationEvent triggering this task
+    */
+   @Override
+   public void execute(NotificationEvent event, NotificationManager manager) {
+      // if we are in automode execute task only if it is
+      // automode enabled
+      if (manager.inAutoMode() && !automodeEnabledTask()) {
+         return;
+      }
+      // notify thread safe
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.gui.notification.NotificationTask#getEventID()
-     */
-    public int getEventID() {
-        return NotificationEventID.EXIT_KEY;
-    }
+      if (SwingUtilities.isEventDispatchThread()) {
+         executeActions(event, manager);
+      }
+      else {
+         final NotificationEvent eventObject = event;
+         final NotificationManager notManager = manager;
+         try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+               @Override
+               public void run() {
+                  executeActions(eventObject, notManager);
+               }
+            });
+         }
+         catch (InterruptedException e) {
+            Debug.out("unexpected exception during notification");
+         }
+         catch (InvocationTargetException e) {
+            Debug.out("unexpected exception during notification");
+         }
+      }
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see de.uka.ilkd.key.gui.notification.NotificationTask#getEventID()
+    */
+   @Override
+   public NotificationEventID getEventID() {
+      return NotificationEventID.EXIT_KEY;
+   }
 
 }

@@ -71,12 +71,14 @@ public class ExceptionDialog extends JDialog {
 
     private JPanel createButtonPanel() {
         ActionListener closeListener = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
             }
         };
         
         ItemListener detailsBoxListener = new ItemListener() {
+            @Override
             public void itemStateChanged(ItemEvent e) {
                 Container contentPane = getContentPane();
                 if (e.getStateChange() == ItemEvent.SELECTED){
