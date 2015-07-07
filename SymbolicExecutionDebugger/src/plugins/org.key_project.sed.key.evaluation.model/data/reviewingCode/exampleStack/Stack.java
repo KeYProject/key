@@ -10,14 +10,15 @@ public final class Stack {
    
    /**
     * The current size of the stack 
-    * which is always a valid array index in {@link #elements}.
+    * which is always a valid array index in {@link #elements}
+    * or the length of {@link #elements} if the stack is full.
     */
    /*@ invariant size >= 0 && size <= elements.length;
      @*/
    private int size = 0;
    
    /**
-    * Constructor.
+    * Constructor to create an empty stack with the specified maximal size.
     * @param maximalSize The maximal stack size.
     */
    public Stack(int maximalSize) {
@@ -25,23 +26,13 @@ public final class Stack {
    }
    
    /**
-    * Private constructor for cloning purpose.
-    * @param elements The elements on the stack.
-    * @param size The current size of the stack.
+    * Constructor for cloning purpose which creates an indepedent stack
+    * with the content of the given {@link Stack}.
+    * @param existingStack The existing {@link Stack} which provides the initial content.
     */
-   private Stack(Object[] elements, int size) {
-      assert elements != null;
-      assert size >= 0 && size <= elements.length;
-      this.elements = elements; // TODO: Aliasing problem
-      this.size = size;
-   }
-   
-   /**
-    * Creates an independent copy with the same content.
-    * @return The created copy.
-    */
-   public Stack clone() {
-      return new Stack(elements, size);
+   public Stack(Stack existingStack) {
+      this.elements = existingStack.elements; // TODO: Aliasing problem
+      this.size = existingStack.size;
    }
 
    /**

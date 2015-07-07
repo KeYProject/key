@@ -26,11 +26,13 @@ public class SectionManager extends AbstractQuestionInputManager {
                          SectionQuestion question,
                          ICreateControlCallback callback) {
       section = toolkit.createSection(parent, Section.TITLE_BAR | Section.EXPANDED);
-      if (question.isGrapVerticalSpace()) {
-         section.setLayoutData(new GridData(GridData.FILL_BOTH));
-      }
-      else {
-         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      if (parent.getLayout() instanceof GridLayout) {
+         if (question.isGrapVerticalSpace()) {
+            section.setLayoutData(new GridData(GridData.FILL_BOTH));
+         }
+         else {
+            section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+         }
       }
       section.setText(question.getLabel());
       Composite sectionClient = toolkit.createComposite(section);
