@@ -413,12 +413,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       ThreadUtilities.invokeAndWait(new Runnable() {
          @Override
          public void run() {
-            mainWindow.getProofList().removeProof(e.getSource());
+            mainWindow.getProofList().removeProof(e.getSource());            
          }
       });
-      // Run the garbage collector.
-      Runtime r = Runtime.getRuntime();
-      r.gc();
     }
 
    @Override
