@@ -115,7 +115,7 @@ public class ExceptionDialog extends JDialog {
         JPanel bPanel = new JPanel();
 //        bPanel.add(reloadButton); // XXX useful for debugging
         bPanel.add(closeButton);
-        bPanel.add(new ReportErrorButton(this, exception));
+        bPanel.add(new ReportBugButton(this, exception));
         bPanel.add(new EditSourceFileButton(this, exception));
         bPanel.add(detailsBox);
         
