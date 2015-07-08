@@ -1,7 +1,7 @@
 package org.key_project.sed.key.evaluation.model.input;
 
 /**
- * The different kinds of trust into the correctness of a given answer.
+ * The different kinds of trust in the correctness of a given answer.
  * @author Martin Hentschel
  */
 public enum Trust {

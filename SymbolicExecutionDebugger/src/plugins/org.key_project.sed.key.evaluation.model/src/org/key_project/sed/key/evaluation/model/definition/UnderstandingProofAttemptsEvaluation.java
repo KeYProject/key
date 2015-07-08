@@ -144,7 +144,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               null, 
                                                                               true,
                                                                               "no", 
-                                                                              new FixedValueValidator("yes", "Conditions are not accepted."), 
+                                                                              new FixedValueValidator("yes", "Please read and accept the information and conditions of the evaluation."), 
                                                                               false,
                                                                               new Choice("I &accept the conditions", "yes"), 
                                                                               new Choice("I do &not accept the conditions", "no")));
@@ -192,7 +192,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                               new Choice(">= 1 year", "More than 1 year")));
       SendFormPage sendConditionsPage = new SendFormPage("sendConditions", 
                                                          "Confirm Sending Background Knowledge (used to order proof attempts)", 
-                                                         "Optionally, inspect the answers to be send.", 
+                                                         "Optionally, inspect the answers to be sent.", 
                                                          "Current date and time (nothing else!)");
       FixedForm introductionForm = new FixedForm(INTRODUCTION_FORM_NAME, 
                                                  false,
@@ -214,7 +214,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       QuestionPage feedbackPage = createFeedbackPage();
       SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
                                                          "Confirm Sending Evaluation Answers", 
-                                                         "Optionally, inspect the answers to be send.", 
+                                                         "Optionally, inspect the answers to be sent.", 
                                                          "Current date and time (nothing else!)");
       RandomForm evaluationForm = new RandomForm(EVALUATION_FORM_NAME, true, evaluationPage, jmlPage, keyToolPage, sedToolPage, proof1Page, proof2Page, proof3Page, proof4Page, feedbackPage, sendEvaluationPage);
       // Create thanks form
@@ -245,7 +245,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("self", "self"),
                                                                new Choice("self.value", "self.value"),
                                                                new Choice("summand", "summand"),
-                                                               new Choice("summand.value", "summand.value"));
+                                                               new Choice("summand.value", "summand.value"),
+                                                               new Choice("none", "none"));
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
                                                               whyOpenTitle, 
@@ -393,7 +394,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("array[0]", "array[0]"),
                                   new Choice("array[*]", "array[*]"),
                                   new Choice("minIndex", "minIndex"),
-                                  new Choice("i", "i"));
+                                  new Choice("i", "i"),
+                                  new Choice("none", "none"));
    }
    
    private CheckboxQuestion createMinTerminationQuestion(String name, boolean termination2expected, boolean loop1expected) {
@@ -493,7 +495,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("i", "i"),
                                   new Choice("newEntries", "newEntries"),
                                   new Choice("newEntries.length", "newEntries.length"),
-                                  new Choice("newEntries[*]", "newEntries[*]"));
+                                  new Choice("newEntries[*]", "newEntries[*]"),
+                                  new Choice("none", "none"));
    }
    
    private CheckboxQuestion createCalendarTerminationQuestion(String name, boolean expectedAfterElse) {
@@ -592,7 +595,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
                                   new Choice("balance", "balance"),
-                                  new Choice("amount", "amount"));
+                                  new Choice("amount", "amount"),
+                                  new Choice("none", "none"));
    }
    
    private CheckboxQuestion createAccountTerminationQuestion(String name, boolean termination2expected) {

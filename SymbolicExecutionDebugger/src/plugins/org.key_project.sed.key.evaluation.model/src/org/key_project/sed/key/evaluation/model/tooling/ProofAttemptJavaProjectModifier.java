@@ -67,15 +67,15 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
    @Override
    protected String getCompletionMessage() {
       if (UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME.equals(getTool().getName())) {
-         return "The proof attempt of '" + typeName + "#" + methodSignature + "' is now shown in KeY (separte shell). " +
+         return "The proof attempt of '" + typeName + "#" + methodSignature + "' is shown in KeY (separate window). " +
                 "The corresponding source code is shown in Eclipse (active editor).\n\n" +
-                "Please answer now the questions shown in the evaluation wizard.\n" +
+                "Please answer the questions shown in the evaluation wizard.\n" +
                 "Do NOT open the proof attempt with SED!";
       }
       else if (UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME.equals(getTool().getName())) {
-         return "The symbolic execution tree of the proof attempt of '" + typeName + "#" + methodSignature + "' is now shown in Eclipse. " +
+         return "The symbolic execution tree of the proof attempt of '" + typeName + "#" + methodSignature + "' is shown in Eclipse. " +
                 "The corresponding source code is shown in the active editor.\n\n" +
-                "Please answer now the questions shown in the evaluation wizard.\n" +
+                "Please answer the questions shown in the evaluation wizard.\n" +
                 "Do NOT open the proof attempt with KeY!";
       }
       else {

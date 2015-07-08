@@ -233,7 +233,7 @@ public class QuestionInput extends Bean {
    
    public String validateTrust() {
       if (getTrust() == null) {
-         return "Emoticon defining trust into answer of question '" + question.getLabel() + "' not selected.";
+         return "Emoticon defining trust in answer of question '" + question.getLabel() + "' not selected.";
       }
       else {
          return null;

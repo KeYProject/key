@@ -255,14 +255,14 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                try {
                   if (visible) {
-                     monitor.beginTask("Modifying Workbench", IProgressMonitor.UNKNOWN);
+                     monitor.beginTask("Modifying Workbench, Please wait...", IProgressMonitor.UNKNOWN);
                      modifier.init(activePage, getShell(), getPageInput(), tool);
                      String completionMessage = modifier.modifyWorkbench();
                      monitor.done();
                      setResult(completionMessage);
                   }
                   else {
-                     monitor.beginTask("Cleaning Workbench", IProgressMonitor.UNKNOWN);
+                     monitor.beginTask("Cleaning Workbench, Please wait...", IProgressMonitor.UNKNOWN);
                      modifier.cleanWorkbench();
                      monitor.done();
                      setResult(null);

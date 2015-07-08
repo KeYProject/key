@@ -145,9 +145,9 @@ public class LoopExample {
 
       <h3><a name="verification">1.3 Proving by Symbolic Execution</a></h3>
       <p>
-         Termination (<img src="SED/icons/termination_not_verified.gif" />) and exceptional termination (<img src="SED/icons/exceptional_termination_not_verified.gif" />) nodes indicate by a red crossed icon if the postcondition (including assignable clause and uncaught exceptions) is not fulfilled. 
-         A method contract (<img src="SED/icons/method_contract_not_pre.gif" />) node is also marked by a red crossed icon if the precondition of the applied contract is not fulfilled.
-         Finally, a loop invariant (<img src="SED/icons/loop_invariant _initially_invalid.gif" />) node is crossed if the loop invariant is initially not fulfilled and the loop body termination (<img src="SED/icons/loop_body_termination_not_verified.gif" />) node is crossed if the loop invariant (including decreasing and assignable clause) is not preserved.
+         Termination (<img src="SED/icons/termination_not_verified.gif" />) and exceptional termination (<img src="SED/icons/exceptional_termination_not_verified.gif" />) nodes indicate by a red crossed icon if the postcondition (including assignable clause and uncaught exceptions) could not be proven to be correct. 
+         A method contract (<img src="SED/icons/method_contract_not_pre.gif" />) node is also marked by a red crossed icon if the precondition of the applied contract could not be proven to be correct.
+         Finally, a loop invariant (<img src="SED/icons/loop_invariant _initially_invalid.gif" />) node is crossed if the loop invariant could not be proven to hold initially and the loop body termination (<img src="SED/icons/loop_body_termination_not_verified.gif" />) node is crossed if the loop invariant (including decreasing and assignable clause) could not be proven to be preserved.
       </p>      
       <p>
          <b>A symbolically executed method is correct iff 
@@ -213,7 +213,7 @@ public class LoopExample {
       <p>
          KeY tries to evaluate postconditions within a proof after symbolic execution has finished. 
          Additionally, preconditions of applied method contracts and loop invariants are evaluated.
-         Nodes which might be marked as not verified by a red cross (see <a href="#verification">1.3 Proving by Symbolic Execution</a>) provides a tab 
+         Nodes which might be marked as unverified by a red cross (see <a href="#verification">1.3 Proving by Symbolic Execution</a>) provides a tab 
          in the <i>Properties</i> view in which the during proof computed truth values of the formula to show are highlighted. 
          The tab is named <i>Postcondition</i> on termination and exceptional termination nodes, <i>Precondition</i> on method call nodes and <i>Loop Invariant</i> on loop invariant and loop body termination nodes.
       </p>
@@ -241,7 +241,7 @@ public class LoopExample {
       <h2><a name="best">3 Best Practices to understand a Proof Attempt using SED</a></h3>
       <ol>
          <li>Check if all execution paths end with a termination, exceptional termination or loop body termination node. Otherwise symbolic execution has not finished.</li>
-         <li>Look for not verified nodes indicated by a red cross. For each of them:
+         <li>Look for unverified nodes indicated by a red cross. For each of them:
              <ol>
                 <li>Comprehend the truth values to identify what could not be shown.</li>
                 <li>Inspect the current state to identify bugs. If there is none, the proof can be closed interactively outside of SED.</li>
