@@ -70,8 +70,8 @@ public class ReportBugButton extends JButton {
    private final JCheckBox sendErrorMessage = new JCheckBox(
          "Send Error Message", true);
    private static final String ERROR_MESSAGE_FILENAME = "errorMessage.txt";
-   private final JCheckBox sendException = new JCheckBox("Send Exception", true);
-   private static final String EXCEPTION_FILENAME = "exception.txt";
+   private final JCheckBox sendStacktrace = new JCheckBox("Send Stacktrace", true);
+   private static final String STACKTRACE_FILENAME = "stacktrace.txt";
    private final JCheckBox sendLoadedProblem = new JCheckBox(
          "Send Loaded Problem", true);
    private static final String LOADED_PROBLEM_FILENAME = "loadedProblem.key";
@@ -103,17 +103,15 @@ public class ReportBugButton extends JButton {
                   }
                }
 
-            }, new BugMetaDataObject(EXCEPTION_FILENAME) {
+            }, new BugMetaDataObject(STACKTRACE_FILENAME) {
                @Override
                byte[] getData() {
-                  if (sendException.isEnabled() && sendException.isSelected()) {
-                     try {
-                        return serializableToByteArray(exception);
+                  if (sendStacktrace.isEnabled() && sendStacktrace.isSelected()) {
+                     String stackTrace = "";
+                     for (StackTraceElement e : exception.getStackTrace()) {
+                        stackTrace += e.toString() + "\n";
                      }
-                     catch (IOException e) {
-                        return ("Cannot serialize exception:\n" + e
-                              .getMessage()).getBytes();
-                     }
+                     return stackTrace.getBytes();
                   }
                   else {
                      return null;
@@ -182,7 +180,7 @@ public class ReportBugButton extends JButton {
             JPanel right = new JPanel();
             right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
             right.add(sendErrorMessage);
-            right.add(sendException);
+            right.add(sendStacktrace);
             right.add(sendLoadedProblem);
             right.add(sendKeYVersion);
             right.add(sendKeYSettings);
@@ -190,7 +188,7 @@ public class ReportBugButton extends JButton {
             sendErrorMessage.addActionListener(new ActionListener() {
                @Override
                public void actionPerformed(ActionEvent e) {
-                  sendException.setEnabled(sendErrorMessage.isSelected());
+                  sendStacktrace.setEnabled(sendErrorMessage.isSelected());
                }
             });
 
