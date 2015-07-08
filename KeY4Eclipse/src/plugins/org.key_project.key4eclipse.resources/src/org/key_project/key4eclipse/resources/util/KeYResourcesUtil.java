@@ -48,6 +48,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaCore;
@@ -1176,5 +1177,20 @@ public class KeYResourcesUtil {
          }
       }
       return assumptionList;
+   }
+
+   public static String getJavaFilePackage(IFile file){
+      IJavaElement je = JavaCore.create(file);
+      if(je != null) {
+         if(je instanceof ICompilationUnit) {
+            ICompilationUnit cu = (ICompilationUnit) je;
+            IJavaElement parent = cu.getParent();
+            if(parent instanceof IPackageFragment) {
+               IPackageFragment pf = (IPackageFragment) parent;
+               return pf.getElementName();
+            }
+         }
+      }
+      return null;
    }
 }

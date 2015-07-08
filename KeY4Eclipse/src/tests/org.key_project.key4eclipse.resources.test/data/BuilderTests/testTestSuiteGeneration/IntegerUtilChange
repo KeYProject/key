@@ -1,8 +1,0 @@
-
-public class IntegerUtil {
-
-	//@ ensures \result == x;
-	public int ident(int x) {
-		return x;
-	}
-}

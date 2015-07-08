@@ -48,11 +48,6 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
     * Suffix for the {@link IJavaProject} which contains the tests.
     */
    public static final String TEST_PROJECT_SUFFIX = "Tests";
-   
-   /**
-    * The name of the package which contains all tests.
-    */
-   public static final String TESTCASES_PACKAGE = "testcases";
 
    /**
     * The folder which provides required libraries.
@@ -85,6 +80,11 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
    private final String testFileName;
    
    /**
+    * The name of the files package.
+    */
+   private final String testFilePackageName;
+   
+   /**
     * Determines whether the created test file should be opened.
     */
    private final boolean openTestFile;
@@ -103,17 +103,20 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       super(ui, originalProof);
       this.sourceProject = sourceProject;
       this.testFileName = testFileName;
+      this.testFilePackageName = "";
       this.openTestFile = true;
    }
    
    public EclipseTestGenerator(IProject sourceProject, 
                               String testFileName,
+                              String testFilePackageName, 
                               UserInterfaceControl ui, 
                               Proof originalProof,
                               boolean openTestFile) {
       super(ui, originalProof);
       this.sourceProject = sourceProject;
       this.testFileName = testFileName;
+      this.testFilePackageName = testFilePackageName;
       this.openTestFile = openTestFile;
    }
 
@@ -182,7 +185,7 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof, true);
       tg.setLogger(log);
       tg.setFileName(JDTUtil.ensureValidJavaTypeName(testFileName, testProject));
-      tg.setPackageName(TESTCASES_PACKAGE); 
+      tg.setPackageName("".equals(testFilePackageName) ? null : testFilePackageName); 
       //Add JUnit 4
       IClasspathEntry[] entries = testProject.getRawClasspath();
       Path junitPath = new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/4");
@@ -201,7 +204,7 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       ResourceUtil.createFile(readmeFile, createLibFolderReadmeContent(), null);
       // Create test file
       IContainer packageContainer = sourceContainer;
-      IPackageFragment packageFragment = sourceRoot.createPackageFragment(TESTCASES_PACKAGE, true, null);
+      IPackageFragment packageFragment = sourceRoot.createPackageFragment(testFilePackageName, true, null);
       IResource packageRes = packageFragment.getResource();
       if(packageRes instanceof IContainer) {
          packageContainer = (IContainer) packageRes;

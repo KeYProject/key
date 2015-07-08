@@ -29,7 +29,6 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -99,7 +98,7 @@ public class ProofRunnable implements Runnable {
                      ProofManager.proofsToSave.add(new Pair<ProofElement, InputStream>(pe, generateSaveProof(proof, pe.getProofFile())));
                   }
                   if(KeYProjectProperties.isGenerateTestCases(pe.getProofFile().getProject()) && SolverType.Z3_CE_SOLVER.isInstalled(true)){
-                     generateTestCases(proof);
+                     generateTestCases(pe, proof);
                   }
                   proof.dispose();
                }
@@ -109,12 +108,14 @@ public class ProofRunnable implements Runnable {
          environment.dispose();
    }
 
-   private void generateTestCases(Proof proof){
+   private void generateTestCases(ProofElement pe, Proof proof){
+      String packagename = KeYResourcesUtil.getJavaFilePackage(pe.getJavaFile());
       EclipseTestGenerator testGenerator = null;
       try {
          MemoryTestGenerationLog log = new MemoryTestGenerationLog();
          testGenerator = new EclipseTestGenerator(project, 
                                                   proof.name().toString(), 
+                                                  packagename, 
                                                   environment.getUi(), 
                                                   proof, 
                                                   false);

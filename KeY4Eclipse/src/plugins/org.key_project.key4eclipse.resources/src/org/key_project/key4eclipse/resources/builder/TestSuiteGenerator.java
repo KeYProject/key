@@ -1,6 +1,6 @@
 package org.key_project.key4eclipse.resources.builder;
 
-import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -20,7 +21,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -47,35 +47,50 @@ public class TestSuiteGenerator {
          IPackageFragmentRoot packageRoot = getPackageRoot();
          if(packageRoot != null) {
             try {
-               IPackageFragment testPackage = getPackage(packageRoot, EclipseTestGenerator.TESTCASES_PACKAGE, false);
-               if(testPackage != null) {
-                  IResource testPackageResource = testPackage.getResource();
-                  if(testPackageResource.getType() == IResource.FOLDER && testPackageResource.exists()) {
-                     IFolder testPackageFolder = (IFolder) testPackageResource;
-                     List<IFile> toDelete = new LinkedList<IFile>();
-                     for(IResource member : testPackageFolder.members()) {
-                        if(member != null && member.getType() == IResource.FILE) {
-                           IFile file = (IFile) member;
-                           if(file.exists()) {
-                              if(!isInProofElements(file.getName())) {
-                                 toDelete.add(file);
+               IJavaElement[] children = packageRoot.getChildren();
+               for(IJavaElement child : children) {
+                  if(child instanceof IPackageFragment) {
+                     IPackageFragment pf = (IPackageFragment) child;
+                     if(pf != null) {
+                        IResource pfResource = pf.getResource();
+                        if(pfResource.getType() == IResource.FOLDER && pfResource.exists()) {
+                           IFolder pfFolder = (IFolder) pfResource;
+                           List<IResource> toDelete = new LinkedList<IResource>();
+                           for(IResource member : pfFolder.members()) {
+                              if(member != null && member.getType() == IResource.FILE) {
+                                 IFile file = (IFile) member;
+                                 if(file.exists()) {
+                                    if(!isInProofElements(file.getName())) {
+                                       toDelete.add(file);
+                                    }
+                                 }
+                              }
+                           }
+                           for(IResource res : toDelete) {
+                              res.delete(true, null);
+                           }
+                           if(pfFolder.members().length == 0) {
+                              if(packageRoot.getResource() instanceof IFolder) {
+                                 IFolder src = (IFolder) packageRoot.getResource();
+                                 List<String> folderList = new LinkedList<String>();
+                                 folderList.addAll(Arrays.asList(pf.getElementName().split("\\.")));
+                                 while(folderList != null) {
+                                    String folderPath = "";
+                                    for(String folderPart : folderList) {
+                                       folderPath += folderPart + "/";
+                                    }
+                                    IFolder packageFolder = src.getFolder(folderPath);
+                                    if(packageFolder != null && packageFolder.exists() && packageFolder.members().length == 0 && !"".equals(folderPath)) {
+                                       packageFolder.delete(true, null);
+                                       folderList.remove(folderList.size()-1);
+                                    }
+                                    else {
+                                       folderList = null;
+                                    }
+                                 }
                               }
                            }
                         }
-                     }
-                     for(IFile file : toDelete) {
-                        file.delete(true, null);
-                     }
-                  }
-               }
-               IPackageFragment suitePackage = getPackage(packageRoot, EclipseTestGenerator.TESTCASES_PACKAGE, false);
-               if (suitePackage != null) {
-                  IResource suitePackageResource = suitePackage.getResource();
-                  if(suitePackageResource.getType() == IResource.FOLDER && suitePackageResource.exists()) {
-                     IFolder suitePackageFolder = (IFolder) suitePackageResource;
-                     IFile suiteFile = suitePackageFolder.getFile(TESTSUITE_TYPENAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
-                     if(suiteFile != null && suiteFile.exists()) {
-                        suiteFile.delete(true, null);
                      }
                   }
                }
@@ -91,31 +106,34 @@ public class TestSuiteGenerator {
       if(testJavaProject != null) {
          IPackageFragmentRoot packageRoot = getPackageRoot();
          if(packageRoot != null) {
-            IPackageFragment testPackage = getPackage(packageRoot, EclipseTestGenerator.TESTCASES_PACKAGE, false);
-            if(testPackage != null) {
-               try {
-                  List<String> classes = new LinkedList<String>();
-                  for(ICompilationUnit cu : testPackage.getCompilationUnits()) {
-                     for(IType type : cu.getTypes()) {
-                        String name = type.getTypeQualifiedName();
-                        if(!TESTSUITE_TYPENAME.equals(name) && cu.getResource().exists()) {
-                           classes.add(name + ".class");
+            try {
+               List<String> classes = new LinkedList<String>();
+               IJavaElement[] children = packageRoot.getChildren();
+               for(IJavaElement child : children) {
+                  if(child instanceof IPackageFragment) {
+                     IPackageFragment pf = (IPackageFragment) child;
+                     if(pf != null) {
+                        for(ICompilationUnit cu : pf.getCompilationUnits()) {
+                           for(IType type : cu.getTypes()) {
+                              String name = type.getFullyQualifiedName();
+                              if(!(TESTSUITE_TYPENAME.equals(name) && "".equalsIgnoreCase(pf.getElementName())) && cu.getResource().exists()) {
+                                 String className = name + ".class";
+                                 if(!classes.contains(className)) {
+                                    classes.add(name + ".class");
+                                 }
+                              }
+                           }
                         }
                      }
                   }
-                  IPackageFragment suitePackage = getPackage(packageRoot, TESTSUITE_PACKAGE, true);
-                  IResource suitePackageResource = suitePackage.getResource();
-                  if(suitePackageResource.getType() == IResource.FOLDER && suitePackageResource.exists()) {
-                     IFolder suitePackageFolder = (IFolder) suitePackageResource;
-                     IFile testSuiteFile = suitePackageFolder.getFile(TESTSUITE_TYPENAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
-                     Collections.sort(classes);
-                     String content = createContent(classes);
-                     ResourceUtil.createFile(testSuiteFile, new ByteArrayInputStream(content.getBytes()) , null);
-                  }
                }
-               catch (CoreException e) {
-                  LogUtil.getLogger().logError(e);
-               }
+               IPackageFragment defaultPackage = getPackage(packageRoot, "", true);
+               Collections.sort(classes);
+               String content = createContent(classes);
+               defaultPackage.createCompilationUnit(TESTSUITE_TYPENAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT, content, true, null);
+            }
+            catch (CoreException e) {
+               LogUtil.getLogger().logError(e);
             }
          }
       }
@@ -168,13 +186,9 @@ public class TestSuiteGenerator {
    private String createContent(List<String> classes) {
       String newLine = StringUtil.NEW_LINE;
       StringBuffer sb = new StringBuffer();
-      sb.append("package " + TESTSUITE_PACKAGE + ";" + newLine);
-      sb.append(newLine);
       sb.append("import org.junit.runner.RunWith;" + newLine);
       sb.append("import org.junit.runners.Suite;" + newLine);
       sb.append("import org.junit.runners.Suite.SuiteClasses;" + newLine);
-      sb.append(newLine);
-      sb.append("import " + EclipseTestGenerator.TESTCASES_PACKAGE + ".*;" + newLine);
       sb.append(newLine);
       sb.append("@RunWith(Suite.class)" + newLine);
       sb.append("@SuiteClasses({" + newLine);

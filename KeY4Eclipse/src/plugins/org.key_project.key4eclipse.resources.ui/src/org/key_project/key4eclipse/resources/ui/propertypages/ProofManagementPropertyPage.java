@@ -29,8 +29,12 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildMutexRule;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 
 import de.uka.ilkd.key.smt.SolverType;
 
@@ -318,8 +322,15 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
+         boolean triggerBuild = generateTestCasesButton.getSelection() && (generateTestCasesButton.isEnabled() && generateTestCasesButton.getSelection());
          KeYProjectProperties.setGenerateTestCases(project, generateTestCasesButton.getSelection());
          KeYProjectProperties.setAutoDeleteTestCases(project, autoDeleteTestCasesButton.getSelection());
+         if(triggerBuild) {
+            KeYResourcesUtil.synchronizeProject(project);
+            KeYProjectBuildJob buildJob = new KeYProjectBuildJob(project, KeYProjectBuildJob.FULL_BUILD);
+            buildJob.setRule(new KeYProjectBuildMutexRule(project));
+            buildJob.schedule();
+         }
          return super.performOk();
       }
       catch (CoreException e) {

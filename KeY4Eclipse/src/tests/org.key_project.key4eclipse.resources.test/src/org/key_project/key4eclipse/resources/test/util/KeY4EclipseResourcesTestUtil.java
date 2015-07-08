@@ -227,7 +227,7 @@ public class KeY4EclipseResourcesTestUtil {
    }
    
    
-   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean generateTestCases) throws CoreException{
+   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean generateTestCases, boolean autoDeleteTestCases) throws CoreException{
       KeYProjectProperties.setEnableKeYResourcesBuilds(project, buildProofs);
       KeYProjectProperties.setEnableBuildOnStartup(project, startupBuilds);
       KeYProjectProperties.setEnableBuildProofsEfficient(project, buildProofsEfficient);
@@ -235,15 +235,16 @@ public class KeY4EclipseResourcesTestUtil {
       KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreads));
       KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFiles);
       KeYProjectProperties.setGenerateTestCases(project, generateTestCases);
+      KeYProjectProperties.setAutoDeleteTestCases(project, autoDeleteTestCases);
    }
    
-   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean generateTestCases) throws CoreException, InterruptedException{
+   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean generateTestCases, boolean autoDeleteTestCases) throws CoreException, InterruptedException{
       //turn off autobuild
 //      enableAutoBuild(false);
       //create a KeYProject
       IJavaProject keyProject = createKeYProject(projectName);
       IProject project = keyProject.getProject();
-      setKeYProjectProperties(project, buildProofs, startupBuilds, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles, generateTestCases);
+      setKeYProjectProperties(project, buildProofs, startupBuilds, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles, generateTestCases, autoDeleteTestCases);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       return project;
