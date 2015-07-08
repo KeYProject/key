@@ -11,7 +11,10 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -50,6 +53,8 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
    
    private ILaunchConfiguration launchConfiguration;
    
+   private boolean originalShowLineNumbers;
+   
    public ProofAttemptJavaProjectModifier(String typeName, 
                                           String methodName, 
                                           String[] methodParameters, 
@@ -81,6 +86,18 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
       else {
          return null;
       }
+   }
+
+   @Override
+   public synchronized String modifyWorkbench() throws Exception {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            originalShowLineNumbers = EditorsUI.getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER);
+            EditorsUI.getPreferenceStore().setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, true);
+         }
+      });
+      return super.modifyWorkbench();
    }
 
    @Override
@@ -175,6 +192,12 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
 
    @Override
    protected void doAdditinalCleanup() throws Exception {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            EditorsUI.getPreferenceStore().setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, originalShowLineNumbers);
+         }
+      });
       super.doAdditinalCleanup();
       if (proof != null) {
          proof.dispose();
