@@ -14,6 +14,7 @@ import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
+import org.key_project.sed.key.evaluation.model.input.Trust;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.util.java.CollectionUtil;
@@ -226,7 +227,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
             // Change question 1 (radio)
             QuestionInput radioInput = pageInput.getQuestionInputs()[1];
             radioInput.setValue("This is not a valid radio button value!");
-            radioInput.setTrust(Boolean.TRUE);
+            radioInput.setTrust(Trust.SURE);
             if (pageShownTime > 0) {
                radioInput.setTrustSetAt(111);
                radioInput.setValueSetAt(100);
@@ -234,7 +235,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
             // Change yes sub question of radio
             QuestionInput radioChildInput = radioInput.getChoiceInputs(radioInput.getChoices()[0])[0];
             radioChildInput.setValue("two");
-            radioChildInput.setTrust(Boolean.FALSE);
+            radioChildInput.setTrust(Trust.UNSURE);
             if (pageShownTime > 0) {
                radioInput.setTrustSetAt(4242);
                radioChildInput.setValueSetAt(24);
@@ -242,7 +243,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
             // Change question 2 (checkbox)
             QuestionInput checkboxInput = pageInput.getQuestionInputs()[2];
             checkboxInput.setValue("This is not a valid checkbox button value!");
-            checkboxInput.setTrust(Boolean.TRUE);
+            checkboxInput.setTrust(Trust.EDUCATED_GUESS);
             if (pageShownTime > 0) {
                radioInput.setTrustSetAt(111);
                radioInput.setValueSetAt(100);
@@ -250,7 +251,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
             // Change yes sub question of checkbox
             QuestionInput checkboxChildInput = checkboxInput.getChoiceInputs(checkboxInput.getChoices()[0])[0];
             checkboxChildInput.setValue("two");
-            checkboxChildInput.setTrust(Boolean.FALSE);
+            checkboxChildInput.setTrust(Trust.UNSURE);
             if (pageShownTime > 0) {
                checkboxInput.setTrustSetAt(4242);
                checkboxChildInput.setValueSetAt(24);
@@ -259,7 +260,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
             QuestionInput sectionInput = pageInput.getQuestionInputs()[4];
             QuestionInput sectionChildInput = sectionInput.getChildInputs()[0];
             sectionChildInput.setValue("two");
-            sectionChildInput.setTrust(Boolean.FALSE);
+            sectionChildInput.setTrust(Trust.UNSURE);
             if (pageShownTime > 0) {
                sectionInput.setTrustSetAt(4242);
                sectionChildInput.setValueSetAt(24);
@@ -267,7 +268,7 @@ public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
             // Change question 5 (text)
             QuestionInput textInput = pageInput.getQuestionInputs()[5];
             textInput.setValue("This is a valid text value!");
-            textInput.setTrust(Boolean.TRUE);
+            textInput.setTrust(Trust.SURE);
             if (pageShownTime > 0) {
                textInput.setTrustSetAt(111);
                textInput.setValueSetAt(100);

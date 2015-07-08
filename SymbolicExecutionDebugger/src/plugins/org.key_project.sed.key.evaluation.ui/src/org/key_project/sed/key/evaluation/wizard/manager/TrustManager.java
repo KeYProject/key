@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.model.input.Trust;
 import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 
@@ -26,9 +27,11 @@ public class TrustManager extends AbstractQuestionInputManager {
       }
    };
    
-   private ToolItem trustItem;
+   private ToolItem sureItem;
    
-   private ToolItem dontTrustItem;
+   private ToolItem educatedGuessItem;
+   
+   private ToolItem unsureItem;
    
    public TrustManager(AbstractEvaluationWizardPage<?> wizardPage,
                        Composite parent, 
@@ -38,24 +41,34 @@ public class TrustManager extends AbstractQuestionInputManager {
       this.questionInput.addPropertyChangeListener(QuestionInput.PROP_TRUST, questionInputListener);
       ToolBar toolBar = new ToolBar(parent, SWT.FLAT | SWT.NO_FOCUS);
       toolBar.setBackground(parent.getBackground());
-      trustItem = new ToolItem(toolBar, SWT.CHECK);
-      trustItem.setSelection(questionInput.getTrust() != null && questionInput.getTrust().booleanValue());
-      trustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_FANTASY_DREAMING));
-      trustItem.setToolTipText("I'm sure my answer is right!");
-      trustItem.addSelectionListener(new SelectionAdapter() {
+      sureItem = new ToolItem(toolBar, SWT.CHECK);
+      sureItem.setSelection(Trust.SURE.equals(questionInput.getTrust()));
+      sureItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_FANTASY_DREAMING));
+      sureItem.setToolTipText("Sure: My answer is correct!");
+      sureItem.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            handleTrustItemSelectionChanged();
+            handleSureItemSelectionChanged();
          }
       });
-      dontTrustItem = new ToolItem(toolBar, SWT.CHECK);
-      dontTrustItem.setSelection(questionInput.getTrust() != null && !questionInput.getTrust().booleanValue());
-      dontTrustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_OMG));
-      dontTrustItem.setToolTipText("I'm unsure about my answer, it is probably wrong.");
-      dontTrustItem.addSelectionListener(new SelectionAdapter() {
+      educatedGuessItem = new ToolItem(toolBar, SWT.CHECK);
+      educatedGuessItem.setSelection(Trust.EDUCATED_GUESS.equals(questionInput.getTrust()));
+      educatedGuessItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_WOW_DUDE));
+      educatedGuessItem.setToolTipText("Educated Guess: As far as I understood the content, my answer should be correct!");
+      educatedGuessItem.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            handleDontTrustItemSelectionChanged();
+            handleEducatedGuessItemSelectionChanged();
+         }
+      });
+      unsureItem = new ToolItem(toolBar, SWT.CHECK);
+      unsureItem.setSelection(Trust.UNSURE.equals(questionInput.getTrust()));
+      unsureItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_OMG));
+      unsureItem.setToolTipText("Unsure: I tried my best, but I don't believe that my answer is correct.");
+      unsureItem.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            handleUnsureItemSelectionChanged();
          }
       });
       updateIcons();
@@ -63,19 +76,34 @@ public class TrustManager extends AbstractQuestionInputManager {
 
    protected void updateIcons() {
       if (questionInput.getTrust() != null) {
-         trustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_FANTASY_DREAMING));
-         dontTrustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_OMG));
+         sureItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_FANTASY_DREAMING));
+         educatedGuessItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_WOW_DUDE));
+         unsureItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_OMG));
       }
       else {
-         trustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_FANTASY_DREAMING_ERROR));
-         dontTrustItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_OMG_ERROR));
+         sureItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_FANTASY_DREAMING_ERROR));
+         educatedGuessItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_WOW_DUDE_ERROR));
+         unsureItem.setImage(SEDEvaluationImages.getImage(SEDEvaluationImages.EMOTICON_OMG_ERROR));
       }
    }
 
-   protected void handleTrustItemSelectionChanged() {
-      dontTrustItem.setSelection(false);
-      if (trustItem.getSelection()) {
-         questionInput.setTrust(Boolean.TRUE);
+   protected void handleEducatedGuessItemSelectionChanged() {
+      sureItem.setSelection(false);
+      unsureItem.setSelection(false);
+      if (educatedGuessItem.getSelection()) {
+         questionInput.setTrust(Trust.EDUCATED_GUESS);
+         updateTrustSetAt();
+      }
+      else {
+         questionInput.setTrust(null);
+      }
+   }
+
+   protected void handleSureItemSelectionChanged() {
+      unsureItem.setSelection(false);
+      educatedGuessItem.setSelection(false);
+      if (sureItem.getSelection()) {
+         questionInput.setTrust(Trust.SURE);
          updateTrustSetAt();
       }
       else {
@@ -83,10 +111,11 @@ public class TrustManager extends AbstractQuestionInputManager {
       }
    }
    
-   protected void handleDontTrustItemSelectionChanged() {
-      trustItem.setSelection(false);
-      if (dontTrustItem.getSelection()) {
-         questionInput.setTrust(Boolean.FALSE);
+   protected void handleUnsureItemSelectionChanged() {
+      sureItem.setSelection(false);
+      educatedGuessItem.setSelection(false);
+      if (unsureItem.getSelection()) {
+         questionInput.setTrust(Trust.UNSURE);
          updateTrustSetAt();
       }
       else {
@@ -106,12 +135,14 @@ public class TrustManager extends AbstractQuestionInputManager {
 
    protected void handleQuestionTrustChange(PropertyChangeEvent evt) {
       if (questionInput.getTrust() == null) {
-         trustItem.setSelection(false);
-         dontTrustItem.setSelection(false);
+         sureItem.setSelection(false);
+         educatedGuessItem.setSelection(false);
+         unsureItem.setSelection(false);
       }
       else {
-         trustItem.setSelection(questionInput.getTrust());
-         dontTrustItem.setSelection(!questionInput.getTrust());
+         sureItem.setSelection(Trust.SURE.equals(questionInput.getTrust()));
+         educatedGuessItem.setSelection(Trust.EDUCATED_GUESS.equals(questionInput.getTrust()));
+         unsureItem.setSelection(Trust.UNSURE.equals(questionInput.getTrust()));
       }
       updateIcons();
    }
@@ -123,16 +154,16 @@ public class TrustManager extends AbstractQuestionInputManager {
 
    @Override
    protected void enableControls(boolean enabled) {
-      if (trustItem != null) {
-         trustItem.setEnabled(enabled);
+      if (sureItem != null) {
+         sureItem.setEnabled(enabled);
       }
-      if (dontTrustItem != null) {
-         dontTrustItem.setEnabled(enabled);
+      if (unsureItem != null) {
+         unsureItem.setEnabled(enabled);
       }
    }
 
    @Override
    public Control getFocusControl() {
-      return trustItem.getParent();
+      return sureItem.getParent();
    }
 }

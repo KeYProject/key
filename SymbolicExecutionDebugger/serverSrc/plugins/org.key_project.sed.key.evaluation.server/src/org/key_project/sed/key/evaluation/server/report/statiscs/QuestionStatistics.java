@@ -31,6 +31,11 @@ public class QuestionStatistics {
    private BigInteger wrongTrustCount = BigInteger.ZERO;
    
    /**
+    * The sum of achieved trust points;
+    */
+   private BigInteger trustScoreSum = BigInteger.ZERO;
+   
+   /**
     * Counts how {@link #timesSum} was updated.
     */
    private BigInteger timesCount = BigInteger.ZERO;
@@ -66,6 +71,7 @@ public class QuestionStatistics {
     * @param timesSum The initial value to set.
     * @param trustTimesCount The initial value to set.
     * @param trustTimesSum The initial value to set.
+    * @param trustScoreSum The initial value to set.
     */
    public QuestionStatistics(BigInteger correctCount, 
                              BigInteger wrongCount, 
@@ -74,7 +80,8 @@ public class QuestionStatistics {
                              BigInteger timesCount, 
                              BigInteger timesSum, 
                              BigInteger trustTimesCount, 
-                             BigInteger trustTimesSum) {
+                             BigInteger trustTimesSum,
+                             BigInteger trustScoreSum) {
       this.correctCount = correctCount;
       this.wrongCount = wrongCount;
       this.correctTrustCount = correctTrustCount;
@@ -83,6 +90,7 @@ public class QuestionStatistics {
       this.timesSum = timesSum;
       this.trustTimesCount = trustTimesCount;
       this.trustTimesSum = trustTimesSum;
+      this.trustScoreSum = trustScoreSum;
    }
 
    /**
@@ -92,7 +100,7 @@ public class QuestionStatistics {
     * @param time
     * @param trustTime
     */
-   protected void update(Boolean correct, Boolean correctTrust, long time, long trustTime) {
+   protected void update(Boolean correct, Integer trustScore, long time, long trustTime) {
       if (correct != null) {
          if (correct) {
             correctCount = correctCount.add(BigInteger.ONE); 
@@ -101,8 +109,9 @@ public class QuestionStatistics {
             wrongCount = wrongCount.add(BigInteger.ONE); 
          }
       }
-      if (correctTrust != null) {
-         if (correctTrust) {
+      if (trustScore != null) {
+         trustScoreSum = trustScoreSum.add(BigInteger.valueOf(trustScore.intValue()));
+         if (trustScore.intValue() > 0) {
             correctTrustCount = correctTrustCount.add(BigInteger.ONE); 
          }
          else {
@@ -181,6 +190,27 @@ public class QuestionStatistics {
     */
    public BigInteger getCorrectCount() {
       return correctCount;
+   }
+   
+   /**
+    * Returns the trust score.
+    * @return The trust score.
+    */
+   public BigInteger getTrustScoreSum() {
+      return trustScoreSum;
+   }
+
+   /**
+    * Computes the average trust score.
+    * @return The average trust score.
+    */
+   public BigInteger computeAverageTrustScore() {
+      if (!BigInteger.ZERO.equals(trustScoreSum)) {
+         return trustScoreSum.divide(correctTrustCount.add(wrongTrustCount));
+      }
+      else {
+         return BigInteger.ZERO;
+      }
    }
    
    /**

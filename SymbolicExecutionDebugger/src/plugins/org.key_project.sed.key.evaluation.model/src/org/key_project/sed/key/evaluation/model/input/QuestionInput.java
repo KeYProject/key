@@ -44,11 +44,9 @@ public class QuestionInput extends Bean {
    private long valueSetAt;
    
    /**
-    * {@code Boolean#TRUE} if the user believes the value is right,
-    * {@code Boolean#FALSE} if the user believes the value is wrong,
-    * {@code null} if not yet defined. 
+    * The users {@link Trust} into the correctness of the answer or {@code null} if not yet defined.
     */
-   private Boolean trust;
+   private Trust trust;
    
    private long trustSetAt;
 
@@ -180,12 +178,12 @@ public class QuestionInput extends Bean {
       firePropertyChange(PROP_VALUE_SET_AT, oldValue, getValueSetAt());
    }
 
-   public Boolean getTrust() {
+   public Trust getTrust() {
       return trust;
    }
 
-   public void setTrust(Boolean trust) {
-      Boolean oldValue = getTrust();
+   public void setTrust(Trust trust) {
+      Trust oldValue = getTrust();
       this.trust = trust;
       firePropertyChange(PROP_TRUST, oldValue, getTrust());
    }
@@ -347,11 +345,32 @@ public class QuestionInput extends Bean {
       }
    }
    
-   public Boolean checkTrust() {
+   /**
+    * Computes the achieved trust score as follows:
+    * <table border="1">
+    *    <tr><td>&nbsp;</td><td>Correct</td><td>Wrong</td></tr>
+    *    <tr><td>{@link Trust#SURE}</td><td>2</td><td>-2</td></tr>
+    *    <tr><td>{@link Trust#EDUCATED_GUESS}</td><td>1</td><td>-1</td></tr>
+    *    <tr><td>{@link Trust#UNSURE}</td><td>-1</td><td>1</td></tr>
+    * </table>
+    * @return The computed trust score or {@code null} if no result is available.
+    */
+   public Integer computeTrustScore() {
       if (trust != null) {
          Boolean correct = checkCorrectness();
          if (correct != null) {
-            return correct.equals(getTrust());
+            if (Trust.SURE.equals(trust)) {
+               return correct.booleanValue() ? 2 : -2;
+            }
+            else if (Trust.EDUCATED_GUESS.equals(trust)) {
+               return correct.booleanValue() ? 1 : -1;
+            }
+            else if (Trust.UNSURE.equals(trust)) {
+               return correct.booleanValue() ? -1 : 1;
+            }
+            else {
+               throw new IllegalStateException("Unsupported trust: " + trust);
+            }
          }
          else {
             return null;

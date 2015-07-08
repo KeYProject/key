@@ -23,6 +23,7 @@ import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
+import org.key_project.sed.key.evaluation.model.input.Trust;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -332,7 +333,7 @@ public class EvaluationInputReader {
          }
          String questionTrust = attributes.getValue(EvaluationInputWriter.ATTRIBUTE_QUESTION_TRUST);
          if (!StringUtil.isEmpty(questionTrust)) {
-            questionInput.setTrust(Boolean.valueOf(questionTrust));
+            questionInput.setTrust(Trust.valueOf(questionTrust));
          }
          else {
             questionInput.setTrust(null);

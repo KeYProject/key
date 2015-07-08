@@ -17,6 +17,7 @@ import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
 import org.key_project.sed.key.evaluation.model.input.ToolPageInput;
+import org.key_project.sed.key.evaluation.model.input.Trust;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -357,7 +358,7 @@ public class AbstractEvaluationModelTest extends TestCase {
     * @param questionInput The {@link QuestionInput} to fill.
     */
    public void fillQuestionInput(QuestionInput questionInput) {
-      questionInput.setTrust(Boolean.TRUE);
+      questionInput.setTrust(Trust.SURE);
       questionInput.setTrustSetAt(123);
       questionInput.setValue("A new value set by fillQuestionInput");
       questionInput.setValueSetAt(42);

@@ -26,7 +26,7 @@ public final class Stack {
    }
    
    /**
-    * Constructor for cloning purpose which creates an indepedent stack
+    * Constructor for cloning purpose which creates an independent stack
     * with the content of the given {@link Stack}.
     * @param existingStack The existing {@link Stack} which provides the initial content.
     */

@@ -22,6 +22,7 @@ import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.model.input.Trust;
 import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
@@ -73,17 +74,18 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
                         appendReceivedAnswersTableCellValue(questionInput.getValue(), correct, questionInput.getValueSetAt(), sb);
                         if (questionInput.getQuestion().isAskForTrust()) {
                            sb.append(" (");
-                           Boolean trust = questionInput.getTrust();
+                           Trust trust = questionInput.getTrust();
                            if (trust != null) {
-                              if (trust) {
-                                 appendReceivedAnswersTableCellValue("trusted", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
+                              Integer score = questionInput.computeTrustScore();
+                              if (score != null) {
+                                 appendReceivedAnswersTableCellValue(trust.getName() + "&nbsp;(" + score + ")", score.intValue() > 0, questionInput.getTrustSetAt(), sb);
                               }
                               else {
-                                 appendReceivedAnswersTableCellValue("untrusted", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
+                                 appendReceivedAnswersTableCellValue(trust.getName(), null, questionInput.getTrustSetAt(), sb);
                               }
                            }
                            else {
-                              appendReceivedAnswersTableCellValue("trust&nbsp;missing", questionInput.checkTrust(), questionInput.getTrustSetAt(), sb);
+                              appendReceivedAnswersTableCellValue("trust&nbsp;missing", null, questionInput.getTrustSetAt(), sb);
                            }
                            sb.append(")");
                         }

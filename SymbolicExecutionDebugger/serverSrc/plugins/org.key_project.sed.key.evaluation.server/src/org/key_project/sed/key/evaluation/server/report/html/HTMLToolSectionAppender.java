@@ -38,7 +38,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
       sb.append("<tr>");
       sb.append("<td rowspan=\"3\" colspan=\"3\">&nbsp;</td>");
       for (IStatisticsFilter filter : statistics.getFilters()) {
-         sb.append("<td colspan=\"" + ((evaluation.getTools().length) * 6) + "\" align=\"center\"><b>");
+         sb.append("<td colspan=\"" + ((evaluation.getTools().length) * 7) + "\" align=\"center\"><b>");
          sb.append(filter.getName());
          FilteredStatistics fs = statistics.getFilteredStatistics(filter);
          sb.append(" (");
@@ -50,7 +50,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
       sb.append("<tr>");
       for (@SuppressWarnings("unused") IStatisticsFilter filter : statistics.getFilters()) {
          for (Tool tool : evaluation.getTools()) {
-            sb.append("<td colspan=\"6\" align=\"center\"><b>");
+            sb.append("<td colspan=\"7\" align=\"center\"><b>");
             sb.append(tool.getName());
             sb.append("</b></td>");
          }
@@ -79,7 +79,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
             sb.append("<td rowspan=\"" + (2 + formSpan + formPagesSpan) + "\" valign=\"top\"><b>");
             sb.append(form.getName());
             sb.append("</b></td>");
-            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 6 * statistics.getFilters().size())) + "\">&nbsp;</td>");
+            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 7 * statistics.getFilters().size())) + "\">&nbsp;</td>");
             sb.append("</tr>");
             for (AbstractPage page : form.getPages()) {
                int pageSpan = questionCount.get(page);
@@ -113,7 +113,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
                         else {
                            sb.append("<td>&nbsp;</td>");
                         }
-                        sb.append("<td colspan=\"3\">&nbsp;</td>");
+                        sb.append("<td colspan=\"4\">&nbsp;</td>");
                      }
                   }
                   sb.append("</tr>");
@@ -139,13 +139,14 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
                }
                for (Tool tool : evaluation.getTools()) {
                   appendQuestionValues(questionStatistics.get(tool), 
-                                                     FilteredStatistics.computeWinningCorrectTools(questionStatistics), 
-                                                     FilteredStatistics.computeWinningCorrectTrustTools(questionStatistics), 
-                                                     FilteredStatistics.computeWinningTimeTools(questionStatistics), 
-                                                     FilteredStatistics.computeWinningTrustTimeTools(questionStatistics), 
-                                                     tool, 
-                                                     true, 
-                                                     sb);
+                                       FilteredStatistics.computeWinningCorrectTools(questionStatistics), 
+                                       FilteredStatistics.computeWinningCorrectTrustTools(questionStatistics), 
+                                       FilteredStatistics.computeWinningTimeTools(questionStatistics), 
+                                       FilteredStatistics.computeWinningTrustTimeTools(questionStatistics), 
+                                       FilteredStatistics.computeWinningTrustScoreTools(questionStatistics), 
+                                       tool, 
+                                       true, 
+                                       sb);
                }
             }
             sb.append("</tr>");
@@ -167,6 +168,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
       sb.append("<td align=\"center\"><b>Average Time</b></td>");
       sb.append("<td align=\"center\"><b>Trust Correct</b></td>");
       sb.append("<td align=\"center\"><b>Trust Wrong</b></td>");
+      sb.append("<td align=\"center\"><b>Trust Score</b></td>");
       sb.append("<td align=\"center\"><b>Average Trust Time</b></td>");
    }
 
@@ -189,9 +191,10 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
             Set<Tool> winningCorrectTrustTools = fs.computeWinningCorrectTrustTools(question);
             Set<Tool> winningTimesTools = fs.computeWinningTimeTools(question);
             Set<Tool> winningTrustTimesTools = fs.computeWinningTrustTimeTools(question);
+            Set<Tool> winningTrustScoreTools = fs.computeWinningTrustScoreTools(question);
             for (Tool tool : evaluation.getTools()) {
                QuestionStatistics toolQs = fs.getQuestionStatistics(tool, question);
-               appendQuestionValues(toolQs, winningCorrectTools, winningCorrectTrustTools, winningTimesTools, winningTrustTimesTools, tool, false, sb);
+               appendQuestionValues(toolQs, winningCorrectTools, winningCorrectTrustTools, winningTimesTools, winningTrustTimesTools, winningTrustScoreTools, tool, false, sb);
             }
          }
          sb.append("</tr>");
@@ -225,6 +228,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
     * @param winningCorrectTrustTools The winning {@link Tool}s.
     * @param winningTimesTools The winning {@link Tool}s.
     * @param winningTrustTimesTools The winning {@link Tool}s.
+    * @param winningTrustScoreTools The winning {@link Tool}s.
     * @param currentTool The current {@link Tool}.
     * @param bold {@code true} values are bold, {@code false} values are normla,
     * @param sb The {@link StringBuffer} to append to.
@@ -234,26 +238,29 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
                                        Set<Tool> winningCorrectTrustTools, 
                                        Set<Tool> winningTimesTools, 
                                        Set<Tool> winningTrustTimesTools,
+                                       Set<Tool> winningTrustScoreTools,
                                        Tool currentTool, 
                                        boolean bold,
                                        StringBuffer sb) {
       if (qs != null) {
          appendQuestionValues(qs.computeCorrect(), 
-                                            qs.computeWrong(), 
-                                            qs.computeAverageTime(), 
-                                            qs.computeTrustCorrect(),
-                                            qs.computeTrustWrong(),
-                                            qs.computeAverageTrustTime(),
-                                            winningCorrectTools, 
-                                            winningCorrectTrustTools, 
-                                            winningTimesTools, 
-                                            winningTrustTimesTools, 
-                                            currentTool, 
-                                            bold,
-                                            sb);
+                              qs.computeWrong(), 
+                              qs.computeAverageTime(), 
+                              qs.computeTrustCorrect(),
+                              qs.computeTrustWrong(),
+                              qs.computeAverageTrustScore(),
+                              qs.computeAverageTrustTime(),
+                              winningCorrectTools, 
+                              winningCorrectTrustTools, 
+                              winningTimesTools, 
+                              winningTrustTimesTools, 
+                              winningTrustScoreTools,
+                              currentTool, 
+                              bold,
+                              sb);
       }
       else {
-         sb.append("<td colspan=\"6\">&nbsp;</td>");
+         sb.append("<td colspan=\"7\">&nbsp;</td>");
       }
    }
    
@@ -264,11 +271,13 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
     * @param averageTime The computed value to append.
     * @param trustCorrect The computed value to append.
     * @param trustWrong The computed value to append.
+    * @param averageTrustScore The computed value to append.
     * @param averageTrustTime The computed value to append.
     * @param winningCorrectTools The winning {@link Tool}s.
     * @param winningCorrectTrustTools The winning {@link Tool}s.
     * @param winningTimesTools The winning {@link Tool}s.
     * @param winningTrustTimesTools The winning {@link Tool}s.
+    * @param winningTrustScoreTools The winning {@link Tool}s.
     * @param currentTool The current {@link Tool}.
     * @param bold {@code true} values are bold, {@code false} values are normal,
     * @param sb The {@link StringBuffer} to append to.
@@ -278,11 +287,13 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
                                        BigInteger averageTime,
                                        BigInteger trustCorrect,
                                        BigInteger trustWrong,
+                                       BigInteger averageTrustScore,
                                        BigInteger averageTrustTime,
                                        Set<Tool> winningCorrectTools, 
                                        Set<Tool> winningCorrectTrustTools, 
                                        Set<Tool> winningTimesTools, 
                                        Set<Tool> winningTrustTimesTools,
+                                       Set<Tool> winningTrustScoreTools,
                                        Tool currentTool, 
                                        boolean bold,
                                        StringBuffer sb) {
@@ -316,6 +327,15 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
       else {
          appendQuestionValue(bold, null, trustCorrect + "&nbsp;%", sb);
          appendQuestionValue(bold, null, trustWrong + "&nbsp;%", sb);
+      }
+      if (winningTrustScoreTools != null && winningTrustScoreTools.contains(currentTool)) {
+         String color = winningTrustScoreTools.size() == 1 ?
+                        "blue" :
+                        "#FF00FF";
+         appendQuestionValue(bold, color, averageTrustScore, sb);
+      }
+      else {
+         appendQuestionValue(bold, null, averageTrustScore, sb);
       }
       if (winningTrustTimesTools != null && winningTrustTimesTools.contains(currentTool)) {
          String color = winningTrustTimesTools.size() == 1 ?

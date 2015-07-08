@@ -86,6 +86,16 @@ public final class SEDEvaluationImages {
     public static final String EMOTICON_OMG_ERROR = "org.key_project.sed.key.evaluation.ui.emoticonOmgError";
 
     /**
+     * The key for the emoticon wow dude.
+     */
+    public static final String EMOTICON_WOW_DUDE = "org.key_project.sed.key.evaluation.ui.emoticonWowDude";
+
+    /**
+     * The key for the emoticon wow dude.
+     */
+    public static final String EMOTICON_WOW_DUDE_ERROR = "org.key_project.sed.key.evaluation.ui.emoticonWowDudeError";
+
+    /**
      * The key for the pin shell image.
      */
     public static final String PIN_SHELL = "org.key_project.sed.key.evaluation.ui.pinShell";
@@ -184,6 +194,12 @@ public final class SEDEvaluationImages {
         }
         else if (EMOTICON_OMG_ERROR.equals(key)) {
            return decorateImage(getImage(EMOTICON_OMG), FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
+        }
+        else if (EMOTICON_WOW_DUDE.equals(key)) {
+           path = "icons/emoticons/wow_dude.png";
+        }
+        else if (EMOTICON_WOW_DUDE_ERROR.equals(key)) {
+           return decorateImage(getImage(EMOTICON_WOW_DUDE), FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
         }
         else if (PIN_SHELL.equals(key)) {
            path = "icons/pin_view.gif";
