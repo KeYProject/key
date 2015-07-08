@@ -12,7 +12,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -70,7 +72,8 @@ public class ReportBugButton extends JButton {
    private final JCheckBox sendErrorMessage = new JCheckBox(
          "Send Error Message", true);
    private static final String ERROR_MESSAGE_FILENAME = "errorMessage.txt";
-   private final JCheckBox sendStacktrace = new JCheckBox("Send Stacktrace", true);
+   private final JCheckBox sendStacktrace = new JCheckBox("Send Stacktrace",
+         true);
    private static final String STACKTRACE_FILENAME = "stacktrace.txt";
    private final JCheckBox sendLoadedProblem = new JCheckBox(
          "Send Loaded Problem", true);
@@ -149,13 +152,12 @@ public class ReportBugButton extends JButton {
                @Override
                byte[] getData() {
                   if (sendSystemProperties.isSelected()) {
-                     try {
-                        return serializableToByteArray(System.getProperties());
-                     }
-                     catch (IOException e) {
-                        return ("Cannot serialize system properties:\n" + e
-                              .getMessage()).getBytes();
-                     }
+                     StringWriter sw = new StringWriter();
+                     PrintWriter pw = new PrintWriter(sw);
+                     System.getProperties().list(pw);
+                     String propsAsString = sw.getBuffer().toString();
+                     pw.close();
+                     return propsAsString.getBytes();
                   }
                   else {
                      return null;
