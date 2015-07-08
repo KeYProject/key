@@ -28,6 +28,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
 
@@ -116,6 +117,13 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
                                                                                                KeYResourceProperties.getKeYBootClassPathLocation(projectFile.getProject()),
                                                                                                KeYResourceProperties.getKeYIncludes(projectFile.getProject()), null, false);
                proof = loader.getProof();
+               // Ensure that tab proof is selected.
+               SwingUtil.invokeLater(new Runnable() {
+                  @Override
+                  public void run() {
+                     MainWindow.getInstance().selectFirstTab();
+                  }
+               });
             }
             else if (UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME.equals(getTool().getName())) {
                // Open Symbolic Debug perspective
