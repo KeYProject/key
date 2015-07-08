@@ -6,14 +6,11 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.zip.ZipEntry;
@@ -40,20 +37,6 @@ import de.uka.ilkd.key.util.KeYConstants;
  *
  */
 public class ReportBugButton extends JButton {
-
-   private static byte[] serializableToByteArray(Serializable s)
-         throws IOException {
-      ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      ObjectOutputStream oos = null;
-      try {
-         oos = new ObjectOutputStream(bos);
-         oos.writeObject(s);
-         return bos.toByteArray();
-      }
-      finally {
-         oos.close();
-      }
-   }
 
    // suggested e-Mail address that bug reports shall be sent to
    private final String BUG_REPORT_RECIPIENT = null;
