@@ -322,7 +322,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
-         boolean triggerBuild = generateTestCasesButton.getSelection() && (generateTestCasesButton.isEnabled() && generateTestCasesButton.getSelection());
+         boolean triggerBuild = !KeYProjectProperties.isGenerateTestCases(project) && (generateTestCasesButton.isEnabled() && generateTestCasesButton.getSelection());
          KeYProjectProperties.setGenerateTestCases(project, generateTestCasesButton.getSelection());
          KeYProjectProperties.setAutoDeleteTestCases(project, autoDeleteTestCasesButton.getSelection());
          if(triggerBuild) {
