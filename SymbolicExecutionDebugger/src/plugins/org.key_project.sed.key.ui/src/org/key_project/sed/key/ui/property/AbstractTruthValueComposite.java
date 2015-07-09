@@ -402,6 +402,8 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    protected void updateLayout() {
       root.layout();
+      root.getParent().pack();
+      root.getParent().layout();
       if (layoutListener != null) {
          layoutListener.layoutUpdated();
       }
