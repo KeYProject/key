@@ -1884,8 +1884,8 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         | SEQSUB LPAREN
         | SEQREVERSE
         | SEQREPLACE
-        | (tk1=SEQCONTAINS{tk=tk1;}
-          | tk2= SEQCONCAT{tk=tk2;}
+        | (// tk1=SEQCONTAINS{tk=tk1;} |
+            tk2= SEQCONCAT{tk=tk2;}
           | tk3= SEQGET{tk=tk3;}
           | tk4= INDEXOF{tk=tk4;}))
          => result = sequence    
