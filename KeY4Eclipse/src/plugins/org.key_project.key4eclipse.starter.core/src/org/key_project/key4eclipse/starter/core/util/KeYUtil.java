@@ -720,10 +720,7 @@ public final class KeYUtil {
           NotificationTask task = null;
           try {
              // Deactivate proof closed dialog
-             task = main.getNotificationManager().getNotificationTask(NotificationEventID.PROOF_CLOSED);
-             if (task != null) {
-                main.getNotificationManager().removeNotificationTask(task);
-             }
+             task = main.getNotificationManager().removeNotificationTask(NotificationEventID.PROOF_CLOSED);
              // Execute runnable.
              run.run(main);
           }
