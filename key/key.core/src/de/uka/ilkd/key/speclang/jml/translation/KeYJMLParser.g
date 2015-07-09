@@ -338,7 +338,6 @@ options {
 
 
 top returns [Object ret = null] throws  SLTranslationException
-@init{ Object result = null; }
 @after{ ret = result; }
 :
     (   result = accessibleclause
@@ -367,7 +366,6 @@ top returns [Object ret = null] throws  SLTranslationException
     ;
 
 accessibleclause returns [Term ret = null] throws SLTranslationException
-@init{ Term result = null; }
 @after{ ret = result; }
 :
     acc=ACCESSIBLE result=storeRefUnion
@@ -376,7 +374,6 @@ accessibleclause returns [Term ret = null] throws SLTranslationException
 
 
 assignableclause returns [Term ret = null] throws SLTranslationException
-@init{ Term result = null; }
 @after{ ret = result; }
 :
     ass=ASSIGNABLE
@@ -389,10 +386,6 @@ assignableclause returns [Term ret = null] throws SLTranslationException
 
 
 dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SLTranslationException
-@init {
-    SLExpression lhs, mby = null;
-    Term rhs;
-}
 :
     dep=DEPENDS lhs=expression
     COLON rhs=storeRefUnion
@@ -401,11 +394,7 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
                 dep.getText(), Triple.class, lhs, rhs, mby, services); }
     ;
 
-decreasesclause returns [Term ewr = null] throws SLTranslationException
-@init {
-    Term t;
-    Term result=null;
-}
+decreasesclause returns [Term ret = null] throws SLTranslationException
 @after{ret=result;}
 :
     dec=DECREASES result=termexpression
@@ -449,10 +438,6 @@ axiomsclause returns [Term ret = null] throws SLTranslationException
     ;
 
 representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
-@init {
-    SLExpression lhs, rhs;
-    Term t = null;
-}
 :
     rep=REPRESENTS lhs=expression
     {
