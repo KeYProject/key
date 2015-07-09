@@ -246,6 +246,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("self.value", "self.value"),
                                                                new Choice("summand", "summand"),
                                                                new Choice("summand.value", "summand.value"),
+                                                               new Choice("something else", "something else"),
                                                                new Choice("none", "none"));
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
@@ -377,7 +378,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       new Choice("java.lang.IllegalStateException", "java.lang.IllegalStateException"),
                                                                       new Choice("java.lang.invoke.WrongMethodTypeException", "java.lang.invoke.WrongMethodTypeException"),
                                                                       new Choice("javax.naming.OperationNotSupportedException", "javax.naming.OperationNotSupportedException"),
-                                                                      new Choice("java.lang.OutOfMemoryError", "java.lang.OutOfMemoryError"));
+                                                                      new Choice("java.lang.OutOfMemoryError", "java.lang.OutOfMemoryError"),
+                                                                      new Choice("something else", "something else"),
+                                                                      new Choice("none", "none"));
       return thrownExceptionQuestion;
    }
 
@@ -395,6 +398,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("array[*]", "array[*]"),
                                   new Choice("minIndex", "minIndex"),
                                   new Choice("i", "i"),
+                                  new Choice("something else", "something else"),
                                   new Choice("none", "none"));
    }
    
@@ -496,6 +500,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("newEntries", "newEntries"),
                                   new Choice("newEntries.length", "newEntries.length"),
                                   new Choice("newEntries[*]", "newEntries[*]"),
+                                  new Choice("something else", "something else"),
                                   new Choice("none", "none"));
    }
    
@@ -596,6 +601,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   true,
                                   new Choice("balance", "balance"),
                                   new Choice("amount", "amount"),
+                                  new Choice("something else", "something else"),
                                   new Choice("none", "none"));
    }
    
@@ -744,31 +750,31 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    }
 
    protected String createPreconditionText(String precondition) {
-      return "Precondition (" + precondition + ") could not be proven to hold";
+      return "Precondition (" + precondition + ") not established";
    }
 
    protected String createPreconditionText(String precondition, String method) {
-      return "Precondition (" + precondition + ") of " + method + " could not be proven to hold";
+      return "Precondition (" + precondition + ") of " + method + " not established";
    }
 
    protected String createPostconditionText(String postcondition) {
-      return "Postcondition (" + postcondition + ") could not be proven to hold";
+      return "Postcondition (" + postcondition + ") does not hold";
    }
 
    protected String createPostconditionText(String postcondition, String method) {
-      return "Postcondition (" + postcondition + ") of " + method + " could not be proven to hold";
+      return "Postcondition (" + postcondition + ") of " + method + " does not hold";
    }
 
    protected String createMethodAssignableText() {
-      return "Assignable clause of method contract could not be proven to hold";
+      return "Assignable clause of method contract violated";
    }
 
    protected String createLoopAssignableText() {
-      return "Assignable clause of loop invariant could not be proven to hold";
+      return "Assignable clause of loop invariant violated";
    }
 
    protected String createMethodAssignableText(String postcondition, String method) {
-      return "Assignable clause (" + postcondition + ") of method contract of " + method + " could not be proven to hold";
+      return "Assignable clause (" + postcondition + ") of method contract of " + method + " violated";
    }
    
    protected String createClassInvariantInitiallyText(String invariant) {
