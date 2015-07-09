@@ -48,6 +48,6 @@ public class PreconditionPropertySection extends AbstractTruthValuePropertySecti
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new PreconditionComposite(parent, getWidgetFactory());
+      return new PreconditionComposite(parent, getWidgetFactory(), this);
    }
 }

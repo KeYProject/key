@@ -47,6 +47,6 @@ public class PostconditionPropertySection extends AbstractTruthValuePropertySect
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new PostconditionComposite(parent, getWidgetFactory());
+      return new PostconditionComposite(parent, getWidgetFactory(), this);
    }
 }

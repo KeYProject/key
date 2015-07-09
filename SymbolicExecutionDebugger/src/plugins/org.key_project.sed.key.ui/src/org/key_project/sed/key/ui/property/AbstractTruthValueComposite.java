@@ -78,6 +78,11 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    private final TabbedPropertySheetWidgetFactory factory;
    
    /**
+    * An optional {@link ILayoutListener} invoked when the shown content has changed.
+    */
+   private final ILayoutListener layoutListener;
+   
+   /**
     * The root {@link Composite}.
     */
    private final Composite root;
@@ -116,9 +121,11 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
+    * @param layoutListener An optional {@link ILayoutListener} invoked when the shown content has changed.
     */
-   public AbstractTruthValueComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
+   public AbstractTruthValueComposite(Composite parent, TabbedPropertySheetWidgetFactory factory, ILayoutListener layoutListener) {
       this.factory = factory;
+      this.layoutListener = layoutListener;
       root = factory.createFlatFormComposite(parent);
       root.setLayout(new GridLayout(1, false));
       trueColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.trueRGB);
@@ -395,8 +402,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    protected void updateLayout() {
       root.layout();
-      root.getParent().pack();
-      root.getParent().layout();
+      if (layoutListener != null) {
+         layoutListener.layoutUpdated();
+      }
    }
 
    /**
@@ -497,5 +505,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       Label notConsideredLabel = factory.createLabel(legendComposite, "not considered");
       notConsideredLabel.setForeground(notConsideredColor);
       notConsideredLabel.setToolTipText("The term is not part of the truth value evaluation.");
+   }
+   
+   public static interface ILayoutListener {
+      public void layoutUpdated();
    }
 }

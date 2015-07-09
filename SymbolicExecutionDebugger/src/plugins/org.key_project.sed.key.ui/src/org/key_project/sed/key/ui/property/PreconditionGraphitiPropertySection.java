@@ -50,6 +50,6 @@ public class PreconditionGraphitiPropertySection extends AbstractTruthValueGraph
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new PreconditionComposite(parent, getWidgetFactory());
+      return new PreconditionComposite(parent, getWidgetFactory(), this);
    }
 }

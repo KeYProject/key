@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYMethodContract;
+import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -35,9 +36,10 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
+    * @param layoutListener An optional {@link ILayoutListener} invoked when the shown content has changed.
     */
-   public PreconditionComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
-      super(parent, factory);
+   public PreconditionComposite(Composite parent, TabbedPropertySheetWidgetFactory factory, ILayoutListener layoutListener) {
+      super(parent, factory, layoutListener);
    }
    
    /**

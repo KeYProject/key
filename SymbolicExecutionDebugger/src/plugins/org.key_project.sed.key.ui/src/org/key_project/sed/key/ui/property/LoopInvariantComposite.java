@@ -18,6 +18,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopInvariant;
+import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
@@ -43,9 +44,10 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
+    * @param layoutListener An optional {@link ILayoutListener} invoked when the shown content has changed.
     */
-   public LoopInvariantComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
-      super(parent, factory);
+   public LoopInvariantComposite(Composite parent, TabbedPropertySheetWidgetFactory factory, ILayoutListener layoutListener) {
+      super(parent, factory, layoutListener);
    }
    
    /**

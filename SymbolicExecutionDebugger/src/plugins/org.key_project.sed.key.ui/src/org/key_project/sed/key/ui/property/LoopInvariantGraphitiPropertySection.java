@@ -50,6 +50,6 @@ public class LoopInvariantGraphitiPropertySection extends AbstractTruthValueGrap
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new LoopInvariantComposite(parent, getWidgetFactory());
+      return new LoopInvariantComposite(parent, getWidgetFactory(), this);
    }
 }

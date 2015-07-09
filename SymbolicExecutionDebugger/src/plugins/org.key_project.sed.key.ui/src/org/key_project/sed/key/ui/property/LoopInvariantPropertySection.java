@@ -51,6 +51,6 @@ public class LoopInvariantPropertySection extends AbstractTruthValuePropertySect
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new LoopInvariantComposite(parent, getWidgetFactory());
+      return new LoopInvariantComposite(parent, getWidgetFactory(), this);
    }
 }
