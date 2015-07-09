@@ -338,29 +338,28 @@ options {
 
 
 top returns [Object ret = null] throws  SLTranslationException
-@after{ ret = result; }
 :
-    (   result = accessibleclause
-    |   result = assignableclause
-    |   result = breaksclause
-    |   result = continuesclause
-    |   result = dependsclause
-    |   result = ensuresclause
-    |   result = ensuresfreeclause
-    |   result = representsclause
-    |   result = axiomsclause
-    |   result = requiresclause
-    |   result = joinprocclause
-    |   result = requiresfreeclause
-    |   result = decreasesclause
-    |   result = separatesclause  // old information flow syntax
-    |   result = determinesclause // new information flow syntax
-    |   result = loopseparatesclause  // old information flow syntax
-    |   result = loopdeterminesclause // new information flow syntax
-    |   result = returnsclause
-    |   result = signalsclause
-    |   result = signalsonlyclause
-    |   result = termexpression
+    (   accessibleclause { ret = $accessibleclause.ret; }
+    |   assignableclause { ret = $assignableclause.ret; }
+    |   breaksclause { ret = $breaksclause.result; }
+    |   continuesclause { ret = $continuesclause.result; }
+    |   dependsclause { ret = $dependsclause.result; }
+    |   ensuresclause { ret = $ensuresclause.ret; }
+    |   ensuresfreeclause { ret = $ensuresfreeclause.ret; }
+    |   representsclause { ret = $representsclause.result; }
+    |   axiomsclause { ret = $axiomsclause.ret; }
+    |   requiresclause { ret = $requiresclause.ret; }
+    |   joinprocclause { ret = $joinprocclause.ret; }
+    |   requiresfreeclause { ret = $requiresfreeclause.ret; }
+    |   decreasesclause { ret = $decreasesclause.ret; }
+    |   separatesclause { ret = $separatesclause.result; } // old information flow syntax
+    |   determinesclause { ret = $determinesclause.result; } // new information flow syntax
+    |   loopseparatesclause { ret = $loopseparatesclause.result; } // old information flow syntax
+    |   loopdeterminesclause { ret = $loopdeterminesclause.result; } // new information flow syntax
+    |   returnsclause { ret = $returnsclause.ret; }
+    |   signalsclause { ret = $signalsclause.ret; }
+    |   signalsonlyclause { ret = $signalsonlyclause.result; }
+    |   termexpression { ret = $termexpression.result; }
     )
     (SEMI)? EOF
     ;
