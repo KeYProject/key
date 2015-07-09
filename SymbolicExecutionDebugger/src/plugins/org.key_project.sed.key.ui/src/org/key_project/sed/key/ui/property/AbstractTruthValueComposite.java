@@ -13,6 +13,8 @@
 
 package org.key_project.sed.key.ui.property;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -90,7 +92,6 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    private final List<TruthValueEvaluationViewerDecorator> decorators = new LinkedList<TruthValueEvaluationViewerDecorator>();
 
-   
    /**
     * The {@link Color} to highlight {@link TruthValue#TRUE}.
     */
@@ -288,6 +289,22 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
                                 IExecutionNode<?> executionNode) {
       removeOldContent();
       BranchResult[] branchResults = result.getBranchResults();
+      Arrays.sort(branchResults, new Comparator<BranchResult>() { // Sort branch result to ensure that open nodes are shown first
+         @Override
+         public int compare(BranchResult o1, BranchResult o2) {
+            boolean o1closed = o1.getLeafNode().isClosed();
+            boolean o2closed = o2.getLeafNode().isClosed();
+            if (o1closed && !o2closed) {
+               return 1;
+            }
+            else if (!o1closed && o2closed) {
+               return -1;
+            }
+            else {
+               return 0;
+            }
+         }
+      });
       Color notConsideredColor = null;
       for (BranchResult branchResult : branchResults) {
          if (shouldShowBranchResult(branchResult, uninterpretedPredicate)) {
