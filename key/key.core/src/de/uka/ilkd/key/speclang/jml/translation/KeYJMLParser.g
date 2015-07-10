@@ -37,6 +37,7 @@ options {
 }
 
 @members {
+
     private TermBuilder tb;
 
     private Services services;
@@ -334,6 +335,10 @@ options {
 
 	return null;
     }
+    
+    // Helper variable, which is necessary because antlr doesn't forward local variables to generated DFAs.
+    // It is used in a semantic predicate to determine the branch that will be taken by the generated DFA.
+    private boolean representsClauseLhsIsLocSet;
 }
 
 
@@ -438,7 +443,7 @@ axiomsclause returns [Term ret = null] throws SLTranslationException
 
 representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
 :
-    rep=REPRESENTS lhs=expression
+    rep=REPRESENTS lhs=expression {representsClauseLhsIsLocSet = lhs.getTerm().sort().equals(locSetLDT.targetSort());}
     {
         // TODO: move code out of the parser!
         if(!lhs.isTerm()
@@ -454,8 +459,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         (
         (LARROW | EQUAL_SINGLE)
         (
-        { // TODO: move code out of the parser!
-          !lhs.getTerm().sort().equals(locSetLDT.targetSort())}?
+        { !representsClauseLhsIsLocSet}?
              rhs=expression
             {   // TODO: move code out of the parser!
                 if(!rhs.isTerm()) {
