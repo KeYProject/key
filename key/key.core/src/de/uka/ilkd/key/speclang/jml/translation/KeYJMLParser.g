@@ -2,7 +2,7 @@ parser grammar KeYJMLParser;
 
 options {
     tokenVocab = KeYJMLLexer;
-    k = 2;
+    k = 1;
 }
 
 @header {
@@ -1861,7 +1861,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         }
 
     |   (SEQEMPTY
-        | ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI)
+        | (LPAREN (SEQDEF | SEQ) quantifiedvardecls SEMI)
         | (SEQSINGLETON | SEQ) LPAREN
         | SEQSUB LPAREN
         | SEQREVERSE
@@ -1890,7 +1890,7 @@ sequence returns [SLExpression ret = null] throws SLTranslationException
         {
             result = new SLExpression(tb.seqEmpty());
         }
-    |   ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI) => result=seqdefterm
+    |   (LPAREN (SEQDEF | SEQ) quantifiedvardecls SEMI) => result=seqdefterm
     |   (SEQSINGLETON | SEQ) LPAREN list=exprList RPAREN
         {
             result = translator.translate("\\seq", SLExpression.class, list, services);
