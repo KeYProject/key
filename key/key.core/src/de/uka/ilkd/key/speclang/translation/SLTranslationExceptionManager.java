@@ -14,10 +14,8 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import antlr.ANTLRException;
-import antlr.LLkParser;
 import antlr.RecognitionException;
 import antlr.Token;
-import antlr.TokenStreamException;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
@@ -43,18 +41,8 @@ public class SLTranslationExceptionManager {
     public SLTranslationExceptionManager(KeYJMLParser parser,
                                          String fileName,
                                          Position offsetPos) {
-	int line;
-	int column;
-	try {
-	    line = parser.LT(1).getLine();
-	    column = parser.LT(1).getColumn();
-	} catch (final TokenStreamException e) {
-	    line = 1;
-	    column = 1;
-	}
-
-	this.line = line;
-	this.column = column;
+	this.line = parser.input.LT(1).getLine();
+	this.column = parser.input.LT(1).getCharPositionInLine();
 	this.fileName = fileName;
 	this.offsetPos = offsetPos;
     }
