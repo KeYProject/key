@@ -8,8 +8,10 @@ import java.util.Map;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Comment;
@@ -287,12 +289,23 @@ public class Resolver implements IResolver {
         
         if(jdtNode == null) {
             if(currentTask.isMethod) {
-                final List<ASTNode> resultList = new LinkedList<ASTNode>();
-                findMethod(context, currentTask.resolveString, resultList);
-                if(resultList.size() > 0) {
-                    // TODO pick the best one... change list to a hashmap maybe?
-                    jdtNode = resultList.get(0);
-                }
+                context = getDeclaringClass();
+                
+                final IType type = (IType) ((TypeDeclaration)context).resolveBinding().getJavaElement();                
+                                
+                final IMethod method = type.getMethod(currentTask.resolveString, createParameterSignatures(currentTask.parameters));
+                
+                return findMethodWithKey(context, method);
+                
+                // type.getTypeParameterSignatures();
+                //type.getMethod(name, parameterTypeSignatures)
+                
+                //final List<ASTNode> resultList = new LinkedList<ASTNode>();
+                //findMethod(context, currentTask.resolveString, resultList);
+                //if(resultList.size() > 0) {
+                    // pick the best one... change list to a hashmap maybe?
+                //    jdtNode = resultList.get(0);
+                //}
             } else {
                 jdtNode = findField(context, currentTask.resolveString);
             }
@@ -307,6 +320,52 @@ public class Resolver implements IResolver {
         
         // return what we found... either null or the jdtNode
         return jdtNode;
+    }
+
+    private ASTNode findMethodWithKey(final ASTNode context, final IMethod method) {
+        final LinkedList<MethodDeclaration> result = new LinkedList<MethodDeclaration>();
+        
+        final String key = method.getKey();
+        final String subkey2 = key.substring(key.indexOf("(")+1, key.indexOf(")"));
+                
+        context.accept(new ASTVisitor() {
+            @Override
+            public boolean visit(final MethodDeclaration node) {
+                if(node.getName().getIdentifier().equals(method.getElementName())) {
+                    final String key = node.resolveBinding().getKey();
+                    final String subkey = key.substring(key.indexOf("(")+1, key.indexOf(")"));
+                    if(subkey.equals(subkey2)) {
+                        result.add(node);
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+        return result.poll();
+    }
+
+    private String[] createParameterSignatures(final List<IASTNode> parameters) throws ResolverException {
+        if(parameters.size() == 0) {
+            return new String[0];
+        }
+        
+       final String[] result = new String[currentTask.parameters.size()];
+        
+        for(int i = 0; i < currentTask.parameters.size(); i++) {
+            final JMLTypeComputer tc = new JMLTypeComputer(compilationUnit);
+            
+            ITypeBinding b = null;
+            try {
+                b = tc.computeType(currentTask.parameters.get(i));
+            }
+            catch (final TypeComputerException e) {
+                throw new ResolverException("TypeComputer threw an exception when trying to resolve a method parameter.", e);
+            }
+            result[i] = Signature.createTypeSignature(b.getQualifiedName(), true);
+        }
+        
+        return result;
     }
 
     /**
@@ -576,7 +635,7 @@ public class Resolver implements IResolver {
      * @return the {@link ASTNode} corresponding to the name in the given context
      */
     private void findMethod(final ASTNode context, final String name, final List<ASTNode> resultList) {
-               
+        
         if(context == null || name == null) {
             return;
         }
