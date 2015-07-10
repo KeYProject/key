@@ -304,7 +304,7 @@ options {
 	// Identifier with suffix in parentheses? Probably a method call
 	// parse in the parameter list and call again
 	try {
-	    if (LA(1) == LPAREN) {
+	    if (input.LA(1) == LPAREN) {
 	    	return receiver;
 	    }
 	} catch (TokenStreamException e) {
@@ -1311,7 +1311,7 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 :
 	expr=primaryexpr
 	{
-	    fullyQualifiedName = LT(0).getText();
+	    fullyQualifiedName = input.LT(0).getText();
 	}
 	(
 	    {
@@ -1323,7 +1323,7 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 	    }
 	    expr=primarysuffix[expr, fullyQualifiedName]
 	    {
-		fullyQualifiedName += "." + LT(0).getText();
+		fullyQualifiedName += "." + input.LT(0).getText();
 	    }
 	)*
 
@@ -1880,16 +1880,11 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 
 sequence returns [SLExpression ret = null] throws SLTranslationException
 @init {
-    ImmutableList<SLExpression> list = null;
     ImmutableList<Term> tlist = null;
-    SLExpression e1 = null;
-    SLExpression e2 = null;
-    SLExpression e3 = null;
     KeYJavaType typ;
     Term t, t2;
     Token tk = null;
-    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;    
-    SLExpression result = null;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
 }
 @after { ret = result; }
 :
@@ -1941,7 +1936,7 @@ mapExpression returns [Token token = null] :
   | MAP_SINGLETON
   | IS_FINITE
   )
-    { token = LT(-1); }
+    { token = input.LT(-1); }
   ;
 
 quantifier returns [Token token = null] :
@@ -1953,16 +1948,12 @@ quantifier returns [Token token = null] :
   | PRODUCT
   | SUM
   )
-    { token = LT(0); }
+    { token = input.LT(0); }
   ;
 
 specquantifiedexpression returns [SLExpression result = null] throws SLTranslationException
 @init {
-    SLExpression expr;
-    Term p = tb.tt();
-    Token q;
-    boolean nullable = false;
-    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
+    p = tb.tt();
 }
 :
 	LPAREN
@@ -2015,12 +2006,7 @@ oldexpression returns [SLExpression ret=null] throws SLTranslationException
 ;
 
 bsumterm returns [SLExpression result=null] throws SLTranslationException
-@init {
-    SLExpression a = null;
-    SLExpression b = null;
-    SLExpression t = null;
-    Pair<KeYJavaType,ImmutableList<LogicVariable>> decls = null;
-}:
+    :
         LPAREN
         q=BSUM decls=quantifiedvardecls
         {
@@ -2044,12 +2030,7 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
 
 
 seqdefterm returns [SLExpression result=null] throws SLTranslationException
-@init {
-    SLExpression a = null;
-    SLExpression b = null;
-    SLExpression t = null;
-    Pair<KeYJavaType,ImmutableList<LogicVariable>> decls = null;
-}:
+    :
         LPAREN
         q=SEQDEF decls=quantifiedvardecls
         {
@@ -2074,9 +2055,7 @@ seqdefterm returns [SLExpression result=null] throws SLTranslationException
 quantifiedvardecls returns [Pair<KeYJavaType,ImmutableList<LogicVariable>> result = null]
                    throws SLTranslationException
 @init {
-    KeYJavaType t = null;
     ImmutableList<LogicVariable> vars = ImmutableSLList.<LogicVariable>nil();
-    LogicVariable v = null;
 }
 :
 	t=typespec v=quantifiedvariabledeclarator[t]
@@ -2099,10 +2078,6 @@ boundvarmodifiers returns [boolean nullable = false] throws SLTranslationExcepti
 ;
 
 typespec returns [KeYJavaType ret = null] throws SLTranslationException
-@init {
-    int dim = 0;
-    KeYJavaType t = null;
-}
 @after {ret = t;}
 :
 	t=type
@@ -2148,10 +2123,7 @@ type returns [KeYJavaType ret = null] throws SLTranslationException
 ;
 
 referencetype returns [KeYJavaType type = null] throws SLTranslationException
-@init {
-    String typename;
-}
-:
+    :
 	typename=name
 	{
 	    try {
@@ -2229,7 +2201,6 @@ name returns [String result = ""] throws SLTranslationException
 
 quantifiedvariabledeclarator[KeYJavaType t] returns [LogicVariable v = null] throws SLTranslationException
 @init {
-    int dim = 0;
     KeYJavaType varType = null;
 }
 :
