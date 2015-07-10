@@ -1590,7 +1590,6 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
     SLExpression e3 = null;
     KeYJavaType typ;
     Term t, t2 = null;
-    Token tk = null;
     boolean nullable = false;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
     SLExpression result = null;
@@ -1870,10 +1869,10 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         | SEQSUB LPAREN
         | SEQREVERSE
         | SEQREPLACE
-        | (// tk1=SEQCONTAINS{tk=tk1;} |
-            tk2= SEQCONCAT{tk=tk2;}
-          | tk3= SEQGET{tk=tk3;}
-          | tk4= INDEXOF{tk=tk4;}))
+        // | SEQCONTAINS
+        | SEQCONCAT
+        | SEQGET
+        | INDEXOF)
          => result = sequence    
     
     |   LPAREN result=expression RPAREN
