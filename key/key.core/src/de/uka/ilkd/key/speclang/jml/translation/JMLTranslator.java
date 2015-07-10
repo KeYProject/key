@@ -23,8 +23,9 @@ import java.util.TreeMap;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 
-import antlr.Token;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -1757,7 +1758,7 @@ public final class JMLTranslator {
             result = parser.top();
             // maybe return pair<T, Warnings>?
             //List<PositionedString> warnings = parser.getWarnings();            
-        } catch (antlr.ANTLRException e) {
+        } catch (RecognitionException e) {
             throw parser.getExceptionManager().convertException(e);
         }
         if (resultClass.equals(Term.class)) {

@@ -21,6 +21,7 @@ import antlr.TokenStreamException;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
+import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 
 
 /**
@@ -39,7 +40,7 @@ public class SLTranslationExceptionManager {
     //constructors
     //-------------------------------------------------------------------------
 
-    public SLTranslationExceptionManager(LLkParser parser,
+    public SLTranslationExceptionManager(KeYJMLParser parser,
                                          String fileName,
                                          Position offsetPos) {
 	int line;

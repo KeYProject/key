@@ -304,13 +304,9 @@ options {
 
 	// Identifier with suffix in parentheses? Probably a method call
 	// parse in the parameter list and call again
-	try {
-	    if (input.LA(1) == LPAREN) {
-	    	return receiver;
-	    }
-	} catch (TokenStreamException e) {
-            raiseError("internal Error: no further Token in Stream");
-	}
+    if (input.LA(1) == LPAREN) {
+    	return receiver;
+    }
 
 	SLExpression result = null;
 	try {
@@ -488,11 +484,9 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
 
 separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
 @init {
-    ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
     ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
     ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
     ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> tmp;
 }
 :
     SEPARATES (NOTHING | sep = infflowspeclist)
@@ -521,12 +515,9 @@ loopseparatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SP
 
 determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
 @init {
-    ImmutableList<Term> det = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> by = ImmutableSLList.<Term>nil();
     ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
     ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
     ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> tmp;
 }
 :
     DETERMINES (NOTHING | det = infflowspeclist)
@@ -543,9 +534,7 @@ determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC]
 
 loopdeterminesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
 @init {
-    ImmutableList<Term> det = ImmutableSLList.<Term>nil();
     ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> tmp;
 }
 :
     LOOP_DETERMINES (NOTHING | det = infflowspeclist)
@@ -557,9 +546,6 @@ loopdeterminesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_S
 
 
 infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-@init {
-    Term term = null;
-}
 :
     term = termexpression { result = result.append(term); }
     (COMMA term = termexpression { result = result.append(term); })*
@@ -569,11 +555,9 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
 
 signalsclause returns [Term ret=null] throws SLTranslationException
 @init {
-    KeYJavaType excType = null;
     Term pred = null;
     String vName = null;
     LogicVariable eVar = null;
-    Term result=null;
 }
 @after{ret=result;}
 :
@@ -611,9 +595,6 @@ signalsonlyclause returns [Term result = null] throws SLTranslationException
 
 
 termexpression returns [Term result = null] throws SLTranslationException
-@init {
-    SLExpression exp = null;
-}
 :
     exp=expression { result = (Term) exp.getTerm(); }
     ;
@@ -622,7 +603,6 @@ termexpression returns [Term result = null] throws SLTranslationException
 breaksclause returns [Pair result=null] throws SLTranslationException
 @init {
     String label = null;
-    Term pred = null;
 }
 :
 	breaks=BREAKS LPAREN (id=IDENT { label = id.getText(); })? RPAREN
@@ -636,7 +616,6 @@ breaksclause returns [Pair result=null] throws SLTranslationException
 continuesclause returns [Pair result=null] throws SLTranslationException
 @init {
     String label = null;
-    Term pred = null;
 }
 :
 	continues=CONTINUES LPAREN (id=IDENT { label = id.getText(); })? RPAREN
@@ -648,10 +627,6 @@ continuesclause returns [Pair result=null] throws SLTranslationException
 
 
 returnsclause returns [Term ret=null] throws SLTranslationException
-@init {
-    Term pred = null;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
 	rtrns=RETURNS
@@ -663,34 +638,21 @@ returnsclause returns [Term ret=null] throws SLTranslationException
 
 
 storeRefUnion returns [Term result = null] throws SLTranslationException
-@init {
-    ImmutableList<Term> list = null;
-}
 :   list = storeRefList
     { result = tb.union(list); };
 
 
 storeRefList returns [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-@init {
-    Term t = null;
-}
 :   t = storeref { result = result.append(t); }
 	(COMMA t = storeref { result = result.append(t); } )*;
 
 
 
 storeRefIntersect returns [Term result = null] throws SLTranslationException
-@init {
-    ImmutableList<Term> list = null;
-}
 :   list = storeRefList { result = tb.intersect(list); };
 
 
 storeref returns [Term ret = null] throws SLTranslationException
-@init {
-    SLExpression expr;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :       NOTHING { result = tb.empty(); }
     |   EVERYTHING { result = tb.createdLocs(); }
@@ -699,9 +661,6 @@ storeref returns [Term ret = null] throws SLTranslationException
 
 
 createLocset returns [Term result = null] throws SLTranslationException
-@init {
-    ImmutableList<SLExpression> list;
-}
 :
     (LOCSET | SINGLETON) LPAREN list=exprList RPAREN
     {
@@ -711,17 +670,11 @@ createLocset returns [Term result = null] throws SLTranslationException
 
 
 exprList returns [ImmutableList<SLExpression> result = ImmutableSLList.<SLExpression>nil()] throws SLTranslationException
-@init {
-    SLExpression expr = null;
-}
 :   expr = expression { result = result.append(expr); }
 	(COMMA expr = expression { result = result.append(expr); } )*;
 
 
 storeRefExpr returns [Term result = null] throws SLTranslationException
-@init {
-    SLExpression expr;
-}
 :
     expr=expression
     {
@@ -733,10 +686,6 @@ storeRefExpr returns [Term result = null] throws SLTranslationException
 specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
                returns [SLExpression result = null]
                throws SLTranslationException
-@init {
-    SLExpression rangeFrom=null;
-    SLExpression rangeTo=null;
-}
 :
     (
 	( rangeFrom=expression (DOTDOT rangeTo=expression)? )
@@ -749,7 +698,6 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 
 
 predornot returns [Term ret=null] throws SLTranslationException
-@init { Term result=null; }
 @after{ ret = result; }
 :
 	result=predicate
@@ -758,11 +706,7 @@ predornot returns [Term ret=null] throws SLTranslationException
     |   SAME
     ;
 
-predicate returns [Term ret=null] throws SLTranslationException
-@init {
-    Term result=null;
-}
-@after{ret=result;}
+predicate returns [Term result=null] throws SLTranslationException
 :
 	expr=expression
 	{
@@ -786,7 +730,6 @@ expression returns [SLExpression ret=null] throws SLTranslationException
     ;
 
 conditionalexpr returns [SLExpression ret=null] throws SLTranslationException
-@init{SLExpression result=null;}
 @after{ret=result;}
 :
 	result=equivalenceexpr
@@ -800,10 +743,6 @@ conditionalexpr returns [SLExpression ret=null] throws SLTranslationException
 
 
 equivalenceexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression right = null;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
 	result = impliesexpr
@@ -817,10 +756,6 @@ equivalenceexpr returns [SLExpression ret=null] throws SLTranslationException
  * and backward implication left-associatively.
  */
 impliesexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression expr;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
 	result=logicalorexpr
@@ -843,10 +778,6 @@ impliesexpr returns [SLExpression ret=null] throws SLTranslationException
 ;
 
 impliesforwardexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression expr;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
 	result=logicalorexpr
@@ -860,10 +791,6 @@ impliesforwardexpr returns [SLExpression ret=null] throws SLTranslationException
 ;
 
 logicalorexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression expr;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
 	result=logicalandexpr
@@ -877,10 +804,6 @@ logicalorexpr returns [SLExpression ret=null] throws SLTranslationException
 ;
 
 logicalandexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression expr;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
 	result=inclusiveorexpr
@@ -895,10 +818,6 @@ logicalandexpr returns [SLExpression ret=null] throws SLTranslationException
 
 
 inclusiveorexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression expr;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
 	result=exclusiveorexpr
@@ -917,9 +836,6 @@ inclusiveorexpr returns [SLExpression ret=null] throws SLTranslationException
 
 
 exclusiveorexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression expr;SLExpression result=null;
-}
 @after{ret=result;}
 :
 	result=andexpr
@@ -940,10 +856,6 @@ exclusiveorexpr returns [SLExpression ret=null] throws SLTranslationException
 
 
 andexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression expr;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
 	result=equalityexpr
@@ -967,10 +879,6 @@ andexpr returns [SLExpression ret=null] throws SLTranslationException
 ;
 
 equalityexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-	SLExpression right = null;
-	SLExpression result=null;
-}
 @after{ret=result;}
 	 :
 	result=relationalexpr
@@ -983,10 +891,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 @init {
     Function f = null;
     KeYJavaType type = null;
-    SLExpression right = null;
-    SLExpression right2 = null;
     Token opToken = null;
-    SLExpression result=null;
 }
 @after{ret=result;}
 :
@@ -1116,10 +1021,6 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 ;
 
 shiftexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression e;
-    SLExpression result=null;
-}
 @after{ret=result;}
 :
     result=additiveexpr
@@ -1143,10 +1044,6 @@ shiftexpr returns [SLExpression ret=null] throws SLTranslationException
 
 
 additiveexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression e;
-    SLExpression result=null;
-}
 @after{ret = result;}
 :
     result=multexpr
@@ -1165,10 +1062,6 @@ additiveexpr returns [SLExpression ret=null] throws SLTranslationException
 
 
 multexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression e;
-    SLExpression result=null;
-}
 @after {ret = result;}
 :
     result=unaryexpr
@@ -1225,7 +1118,6 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
 
 
 unaryexpr returns [SLExpression ret=null] throws SLTranslationException
-@init {SLExpression result=null;}
 @after {ret = result;}
 :
     PLUS result=unaryexpr
@@ -1265,10 +1157,6 @@ LPAREN rtype=typespec RPAREN result=unaryexpr
 ;
 
 unaryexprnotplusminus returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    SLExpression e;
-    SLExpression result=null;
-}
 @after {ret = result;}
 :
 	NOT e=unaryexpr
@@ -1306,7 +1194,6 @@ unaryexprnotplusminus returns [SLExpression ret=null] throws SLTranslationExcept
 postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 @init {
     String fullyQualifiedName = "";
-    SLExpression expr = null;
     SLExpression result=null;
 }
 @after { ret = result; }
@@ -1340,7 +1227,6 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 primaryexpr returns [SLExpression ret=null] throws SLTranslationException
 @init {
     Term s1, s2;
-    SLExpression result=null;
 }
 @after {ret = result;}
 :
@@ -1369,7 +1255,6 @@ transactionUpdated
   returns [SLExpression result=null]
   throws SLTranslationException
 @init {
-   SLExpression expr;
    String fieldName = "<transactionConditionallyUpdated>";
 }
 :
@@ -1385,8 +1270,6 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 		throws SLTranslationException
 @init {
     String lookupName = null;
-    ImmutableList<SLExpression> params = ImmutableSLList.<SLExpression>nil();
-    SLExpression result=null;
 }
 @after { ret = result; }
 :
@@ -1463,10 +1346,6 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 ;
 
 new_expr throws SLTranslationException
-@init {
-    KeYJavaType typ = null;
-    ImmutableList<SLExpression> params;
-}
 :
 	NEW typ=type (
 	    LPAREN ( params=expressionlist )? RPAREN
@@ -1485,17 +1364,11 @@ array_dimensions throws SLTranslationException
 ;
 
 array_dimension throws SLTranslationException
-@init {
-    SLExpression length;
-}
 :
     LBRACKET (length=expression)? RBRACKET
 ;
 
 array_initializer throws SLTranslationException
-@init {
-    ImmutableList<SLExpression> init;
-}
 :
     LBRACE init=expressionlist RBRACE
     {
@@ -1505,9 +1378,6 @@ array_initializer throws SLTranslationException
 
 expressionlist returns [ImmutableList<SLExpression> result=ImmutableSLList.<SLExpression>nil()]
                throws SLTranslationException
-@init {
-    SLExpression expr;
-}
 :
 	expr=expression { result = result.append(expr); } (COMMA expr=expression {result = result.append(expr);} )*
 ;
@@ -1518,7 +1388,6 @@ constant returns [SLExpression ret=null] throws SLTranslationException
 ;
 
 javaliteral returns [SLExpression ret=null] throws SLTranslationException
-@init{SLExpresssion result = null;}
 @after{ ret = result; }
 :
 	result=integerliteral
@@ -1549,7 +1418,6 @@ javaliteral returns [SLExpression ret=null] throws SLTranslationException
     ;
 
 integerliteral returns [SLExpression ret=null] throws SLTranslationException
-@init {SLExpression result = null;}
 @after {ret = result;}
 :
 	result=decimalintegerliteral
@@ -1582,18 +1450,6 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 ;
 
 jmlprimary returns [SLExpression ret=null] throws SLTranslationException
-@init {
-    ImmutableList<SLExpression> list = null;
-    ImmutableList<Term> tlist = null;
-    SLExpression e1 = null;
-    SLExpression e2 = null;
-    SLExpression e3 = null;
-    KeYJavaType typ;
-    Term t, t2 = null;
-    boolean nullable = false;
-    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
-    SLExpression result = null;
-}
 @after {ret = result;}
 :
 	RESULT
@@ -1979,7 +1835,6 @@ specquantifiedexpression returns [SLExpression result = null] throws SLTranslati
 oldexpression returns [SLExpression ret=null] throws SLTranslationException
 @init {
     KeYJavaType typ;
-    SLExpression result = null;
 }
 @after {ret = result;}
 :
@@ -2109,7 +1964,6 @@ dims returns [int dimension = 0] throws SLTranslationException
     ;
 
 type returns [KeYJavaType ret = null] throws SLTranslationException
-@init{ KeYJavaType t = null; }
 @after{ ret = t; }
 :
 	(builtintype) => t=builtintype
