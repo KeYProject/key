@@ -13,24 +13,22 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import org.antlr.runtime.RecognitionException;
+
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
-public class SLTranslationException extends ProofInputException {
+public class SLTranslationException extends RecognitionException {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 6600131411834400587L;
     private final String fileName;
     private final Position pos;
+    private final String message;
 
 
     public SLTranslationException(String message,
                                   String fileName,
                                   Position pos) {
-        super(message);
+        this.message = message;
         assert fileName != null;
         assert pos != null;
         this.fileName = fileName;
@@ -84,4 +82,10 @@ public class SLTranslationException extends ProofInputException {
     public int getColumn() {
         return pos.getColumn();
     }
+    
+    @Override
+   public String getMessage() {
+       return message;
+    }
+    
 }
