@@ -451,10 +451,12 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         }
     }
     (
+        (
+        (LARROW | EQUAL_SINGLE)
+        (
         { // TODO: move code out of the parser!
           !lhs.getTerm().sort().equals(locSetLDT.targetSort())}?
-        (
-            (LARROW | EQUAL_SINGLE) rhs=expression
+             rhs=expression
             {   // TODO: move code out of the parser!
                 if(!rhs.isTerm()) {
                     raiseError("Represents clause with unexpected rhs: " + rhs);
@@ -465,16 +467,12 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
                 }
                 t = tb.equals(lhs.getTerm(), rhsTerm);
             }
-        )
         |
-        { // TODO: move code out of the parser!
-          lhs.getTerm().sort().equals(locSetLDT.targetSort())}?
-        (
-            (LARROW | EQUAL_SINGLE) t=storeRefUnion
+            t=storeRefUnion
             {   // TODO: move code out of the parser!
                 t = tb.equals(lhs.getTerm(), t);
             }
-        )
+        ))
         |
         (
             SUCH_THAT t=predicate
