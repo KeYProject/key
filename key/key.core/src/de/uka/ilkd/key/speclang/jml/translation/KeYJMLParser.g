@@ -188,7 +188,7 @@ options {
 	Pair<KeYJavaType,ImmutableList<LogicVariable>> vars;
 	try {
 	    vars = quantifiedvardecls();
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw excManager.convertException(e);
 	}
 
