@@ -175,7 +175,7 @@ options {
 
 	try {
 	    result = expression().getTerm();
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw excManager.convertException(e);
 	}
 
