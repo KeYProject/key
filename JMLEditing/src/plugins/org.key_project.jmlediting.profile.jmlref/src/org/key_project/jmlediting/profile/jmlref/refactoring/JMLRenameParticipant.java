@@ -226,11 +226,11 @@ public class JMLRenameParticipant extends RenameParticipant {
      * @param nodesList list to filter. Should be a list of IStringNodes.
      * @return filtered list
      */
-    private ArrayList<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
+    private ArrayList<IStringNode> filterStringNodes(final List<IASTNode> nodesList) {
         
         final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
         
-        for (IASTNode node: nodesList){
+        for (final IASTNode node: nodesList){
             final IStringNode stringNode = (IStringNode) node;     
             if (stringNode.getString().equals(fOldName)) {     
                 filteredList.add(stringNode);
@@ -240,21 +240,21 @@ public class JMLRenameParticipant extends RenameParticipant {
         return filteredList;
     }
 
-    private List<IASTNode>getPrimaryNodes(List<IStringNode> stringNodes, IASTNode parseResult){
+    private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult){
         final List<IASTNode> primaries = new ArrayList<IASTNode>();
         
-        for (IStringNode stringNode: stringNodes) {       
+        for (final IStringNode stringNode: stringNodes) {       
           final IASTNode primary = getPrimaryNode(parseResult, stringNode);
           primaries.add(primary);  
         }
         return primaries;
     }
     
-    private IASTNode getPrimaryNode(IASTNode context, final IStringNode toTest) {
+    private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest) {
         return context.traverse(new INodeTraverser<IASTNode>() {
 
             @Override
-            public IASTNode traverse(IASTNode node, IASTNode existing) {
+            public IASTNode traverse(final IASTNode node, IASTNode existing) {
                 if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
                     if(node.containsOffset(toTest.getStartOffset())) {
                         if(existing == null) {
@@ -282,11 +282,11 @@ public class JMLRenameParticipant extends RenameParticipant {
      * @param changesToMake
      *            to accumulate needed changes 
      */
-    private void resolvePotentialReferences(final ICompilationUnit unit, final IASTNode node, ArrayList<ReplaceEdit> changesToMake) {
+    private void resolvePotentialReferences(final ICompilationUnit unit, final IASTNode node, final ArrayList<ReplaceEdit> changesToMake) {
     
         //System.out.println(node.prettyPrintAST());
         
-        IASTNode nodeToChange = node;
+        final IASTNode nodeToChange = node;
     
         final IResolver resolver = new Resolver();
         ResolveResult result = null;
@@ -295,21 +295,21 @@ public class JMLRenameParticipant extends RenameParticipant {
             result = resolver.resolve(unit, node);
             
             if (isReferencedElement(result)){
-                computeReplaceEdit(changesToMake,nodeToChange);
+                computeReplaceEdit(changesToMake, nodeToChange);
             }
                       
             while(resolver.hasNext()) { 
                  result = resolver.next();
                  //System.out.println("resolver.next()");
                  
-                 i = i + 1;  
-                 nodeToChange = nodeToChange.getChildren().get(i).getChildren().get(0);
-                 //System.out.println(nodeToChange.prettyPrintAST());
+                 System.out.println(nodeToChange.prettyPrintAST());
                  
                  if (isReferencedElement(result)) {
+                     final IASTNode node2 = nodeToChange.getChildren().get(1).getChildren().get(i);
                      
-                     computeReplaceEdit(changesToMake,nodeToChange);
+                     computeReplaceEdit(changesToMake, node2);
                  } 
+                 i = i + 1;
             }
         }
         catch (final ResolverException e) {
@@ -317,9 +317,10 @@ public class JMLRenameParticipant extends RenameParticipant {
         }
     }
     
-    private Boolean isReferencedElement(ResolveResult result){
-        if (result == null)
+    private Boolean isReferencedElement(final ResolveResult result){
+        if (result == null) {
             return false;
+        }
         
         final IJavaElement jElement = result.getBinding().getJavaElement();
         
@@ -337,6 +338,10 @@ public class JMLRenameParticipant extends RenameParticipant {
             final IASTNode node) {
 
         IASTNode changeThisNode = node;
+        
+        if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
+            changeThisNode = node.getChildren().get(0).getChildren().get(0);
+        }
         
         // Keep the . when it is a member access like this.field
         if (node.getType() == ExpressionNodeTypes.MEMBER_ACCESS){
