@@ -15,27 +15,41 @@
          <b>Please read them carefully before you continue.</b>
          If you are familiar with the SED, you can skip sections you know well.
          <ul>
+            <li><a href="#screencast">1 Screencast</a></li>
             <li>
-               <a href="#set">1 Symbolic Execution</a>
+               <a href="#set">2 Symbolic Execution</a>
                <ul>
-                  <li><a href="#set_mc">1.1 Symbolic Execution with Method Contracts</a></li>
-                  <li><a href="#set_li">1.2 Symbolic Execution with Loop Invariants</a></li>
-                  <li><a href="#verification">1.3 Proving by Symbolic Execution</a></li>
+                  <li><a href="#set_mc">2.1 Symbolic Execution with Method Contracts</a></li>
+                  <li><a href="#set_li">2.2 Symbolic Execution with Loop Invariants</a></li>
+                  <li><a href="#verification">2.3 Proving by Symbolic Execution</a></li>
                </ul>
             </li>
             <li>
-               <a href="#sed">2 User Interface of the Symbolic Execution Debugger (SED)</a>
+               <a href="#sed">3 User Interface of the Symbolic Execution Debugger (SED)</a>
                <ul>
-                  <li><a href="#state">2.1 Inspecting a Symbolic State</a></li>
-                  <li><a href="#layout">2.2 Visualizing Memory Layouts</a></li>
-                  <li><a href="#truth">2.3 Comprehension of Truth Values of Postconditions, Preconditions and Loop Invariants</a></li>
+                  <li><a href="#state">3.1 Inspecting a Symbolic State</a></li>
+                  <li><a href="#layout">3.2 Visualizing Memory Layouts</a></li>
+                  <li><a href="#truth">3.3 Comprehension of Truth Values of Postconditions, Preconditions and Loop Invariants</a></li>
                </ul>
             </li>
-            <li><a href="#best">3 Best Practices to understand a Proof Attempt using SED</a></li>
+            <li><a href="#best">4 Best Practices to understand a Proof Attempt using SED</a></li>
          </ul>
-      </p>      
+      </p>  
       
-      <h2><a name="set">1 Symbolic Execution</a></h2>
+      <h2><a name="screencast">1 Screencast</a></h2>
+      <video width="640" height="360" poster="SED/videos/SEDScreencast.png" controls>
+         <source src="SED/videos/SEDScreencast.mp4" type="video/mp4"></source>
+         <source src="SED/videos/SEDScreencast.ogv" type="SED/videos/ogg"></source>
+         <source src="SED/videos/SEDScreencast.webm" type="SED/videos/webm"></source>
+         <dl>
+            <a href="SED/videos/SEDScreencast.mp4">
+               <dt><img src="SED/videos/SEDScreencast.png" alt="Download Video" title="Download Video" width="640" height="360"></dt>
+               <dd>Download Video</dt>
+            </a>
+         </dl>
+      </video>
+      
+      <h2><a name="set">2 Symbolic Execution</a></h2>
       <p>
          Symbolic execution allows to explore all feasible execution paths of a program at once.
          This is achieved by using symbolic values in lieu of concrete values.
@@ -83,7 +97,7 @@ public class Number {
       </p>
       <img src="SED/SED_SymbolicExecutionTree.png" />
 
-      <h3><a name="set_mc">1.1 Symbolic Execution with Method Contracts</a></h3>
+      <h3><a name="set_mc">2.1 Symbolic Execution with Method Contracts</a></h3>
       <p>
          A method call can be treated by inlining or by application of a method contract during symbolic execution.
          Inlining of a method body as in the previous example is represented by a <i>method call</i> node (<img src="SED/icons/method_call.gif" />) and later after execution of the method body by a <i>method return</i> (<img src="SED/icons/method_return.gif" />) or <i>exceptional method return</i> node (<img src="SED/icons/exceptional_method_return.gif" />).
@@ -113,7 +127,7 @@ public class IntegerUtil {
       </p>
       <img src="SED/SED_MC.png" />
 
-      <h3><a name="set_li">1.2 Symbolic Execution with Loop Invariants</a></h3>
+      <h3><a name="set_li">2.2 Symbolic Execution with Loop Invariants</a></h3>
       <p>
          A loop is always treated in this evaluation by applying the specified loop invariant.
          Consider for instance the following example.
@@ -143,7 +157,7 @@ public class LoopExample {
       </p>
       <img src="SED/SED_LI.png" />
 
-      <h3><a name="verification">1.3 Proving by Symbolic Execution</a></h3>
+      <h3><a name="verification">2.3 Proving by Symbolic Execution</a></h3>
       <p>
          Termination (<img src="SED/icons/termination_not_verified.gif" />) and exceptional termination (<img src="SED/icons/exceptional_termination_not_verified.gif" />) nodes indicate by a red crossed icon if the postcondition (including assignable clause and uncaught exceptions) could not be proven to be correct. 
          A method contract (<img src="SED/icons/method_contract_not_pre.gif" />) node is also marked by a red crossed icon if the precondition of the applied contract could not be proven to be correct.
@@ -169,7 +183,7 @@ public class LoopExample {
       </p>
 
 
-      <h2><a name="sed">2 User Interface of the Symbolic Execution Debugger (SED)</a></h2>
+      <h2><a name="sed">3 User Interface of the Symbolic Execution Debugger (SED)</a></h2>
       <p>
          The Symbolic Execution Debugger offers a new perspective named <i>Symbolic Debug</i> which offers everything related to symbolic execution:
          <ul>
@@ -183,7 +197,7 @@ public class LoopExample {
       </p>
       <img src="SED/SED.png" />
       
-      <h3><a name="state">2.1 Inspecting a Symbolic State</a></h3>
+      <h3><a name="state">3.1 Inspecting a Symbolic State</a></h3>
       <p>
          Each node in the symbolic execution tree represents the state before a statement is executed. 
          The state can be inspected after selection of the node of interest in view <i>Variables</i>.
@@ -192,7 +206,7 @@ public class LoopExample {
       </p>
       <img src="SED/SED_Variables.png" />      
       
-      <h3><a name="layout">2.2 Visualizing Memory Layouts</a></h3>
+      <h3><a name="layout">3.2 Visualizing Memory Layouts</a></h3>
       <p>
          A symbolic execution path is representative for possibly infinite concrete executions with different memory layouts.
          The SED allows to visualize all possible memory layouts by selecting context menu item <i>Visualize Memory Layouts</i> of a node.
@@ -209,7 +223,7 @@ public class LoopExample {
       </p>
       <img src="SED/SED_Layouts.png" />      
 
-      <h3><a name="truth">2.3 Comprehension of Truth Values of Postconditions, Preconditions and Loop Invariants</a></h3>
+      <h3><a name="truth">3.3 Comprehension of Truth Values of Postconditions, Preconditions and Loop Invariants</a></h3>
       <p>
          KeY tries to evaluate postconditions within a proof after symbolic execution has finished. 
          Additionally, preconditions of applied method contracts and loop invariants are evaluated.
@@ -238,7 +252,7 @@ public class LoopExample {
       </p>
       <img src="SED/SED_Truth.png" />
       
-      <h2><a name="best">3 Best Practices to understand a Proof Attempt using SED</a></h3>
+      <h2><a name="best">4 Best Practices to understand a Proof Attempt using SED</a></h3>
       <ol>
          <li>Check if all execution paths end with a termination, exceptional termination or loop body termination node. Otherwise symbolic execution has not finished.</li>
          <li>Look for unverified nodes indicated by a red cross. For each of them:

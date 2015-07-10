@@ -120,7 +120,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    @Override
    protected List<Tool> computeTools() {
       URL keyURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/KeY.html") : null;
-      URL sedURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/SED.html") : null;
+      URL sedURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/SED-Screencast.html") : null;
       Tool key = new Tool(KEY_TOOL_NAME, keyURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
       Tool sed = new Tool(SED_TOOL_NAME, sedURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
       return CollectionUtil.toList(key, sed);
