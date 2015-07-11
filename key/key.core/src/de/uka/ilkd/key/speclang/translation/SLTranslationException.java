@@ -13,79 +13,59 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import org.antlr.runtime.RecognitionException;
-
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
+public class SLTranslationException extends ProofInputException {
 
-public class SLTranslationException extends RecognitionException {
+   private final String fileName;
+   private final Position pos;
 
-    private final String fileName;
-    private final Position pos;
-    private final String message;
+   public SLTranslationException(String message, Throwable cause,
+         String fileName, Position pos) {
+      super(message, cause);
+      assert fileName != null;
+      assert pos != null;
+      this.fileName = fileName;
+      this.pos = pos;
+   }
 
+   public SLTranslationException(String message, String fileName, Position pos,
+         Throwable cause) {
+      this(message, cause, fileName, pos);
+   }
 
-    public SLTranslationException(String message,
-                                  String fileName,
-                                  Position pos) {
-        this.message = message;
-        assert fileName != null;
-        assert pos != null;
-        this.fileName = fileName;
-        this.pos      = pos;
-    }
+   public SLTranslationException(String message, String fileName, Position pos) {
+      this(message, null, fileName, pos);
+   }
 
+   public SLTranslationException(String message, String fileName, int line,
+         int column) {
+      this(message, null, fileName, new Position(line, column));
+   }
 
-    public SLTranslationException(String message,
-                                  String fileName,
-                                  Position pos,
-                                  Throwable cause) {
-        this(message, fileName, pos);
-        initCause(cause);
-    }
+   public SLTranslationException(String message) {
+      this(message, null, "no file", Position.UNDEFINED);
+   }
 
+   public SLTranslationException(String message, Throwable cause) {
+      this(message);
+   }
 
-    public SLTranslationException(String message,
-                                  String fileName,
-                                  int line,
-                                  int column) {
-        this(message, fileName, new Position(line, column));
-    }
+   public String getFileName() {
+      return fileName;
+   }
 
+   public Position getPosition() {
+      return pos;
+   }
 
-    public SLTranslationException(String message) {
-        this(message, "no file", Position.UNDEFINED);
-    }
+   public int getLine() {
+      return pos.getLine();
+   }
 
+   public int getColumn() {
+      return pos.getColumn();
+   }
 
-    public SLTranslationException(String message, Throwable cause) {
-        this(message);
-        initCause(cause);
-    }
-
-
-    public String getFileName() {
-        return fileName;
-    }
-
-
-    public Position getPosition() {
-    	return pos;
-    }
-
-
-    public int getLine() {
-        return pos.getLine();
-    }
-
-
-    public int getColumn() {
-        return pos.getColumn();
-    }
-    
-    @Override
-   public String getMessage() {
-       return message;
-    }
-    
 }
