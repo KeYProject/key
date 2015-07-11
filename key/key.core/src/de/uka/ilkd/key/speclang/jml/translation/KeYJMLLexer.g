@@ -172,8 +172,8 @@ ST : '<:';
 UNSIGNEDSHIFTRIGHT : '>>>';
 XOR : '^';
 
-fragment GT : '>';
-fragment LT : '<';
+GT : '>';
+LT : '<';
 
 fragment IMPLICIT_IDENT
     :
