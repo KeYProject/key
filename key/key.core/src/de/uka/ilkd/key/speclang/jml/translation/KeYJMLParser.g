@@ -1429,7 +1429,7 @@ hexintegerliteral returns [SLExpression result=null] throws SLTranslationExcepti
 :
     n=HEXNUMERAL
     {
-	BigInteger decInteger = new BigInteger(n.getText(), 16);
+	BigInteger decInteger = new BigInteger(n.getText().substring(2), 16);
 	result = new SLExpression(tb.zTerm(decInteger.toString()),
 	                          javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
     }

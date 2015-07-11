@@ -267,6 +267,11 @@ BACKSLASH_PREFIXED:
  | JML_IDENT
  ;
 
+HEXNUMERAL
+    :
+        '0' ('x'|'X') (HEXDIGIT)+
+;
+
 DIGITS
     :
         (DIGIT)+
