@@ -4,6 +4,21 @@ lexer grammar KeYJMLLexer;
     package de.uka.ilkd.key.speclang.jml.translation;
 }
 
+@members {
+   @Override
+   public void reportError(RecognitionException e) {
+      if (e instanceof MismatchedTokenException) {
+         MismatchedTokenException m = (MismatchedTokenException) e;
+         String message = "Unexpected character '" + (char) e.c + "' in line "
+               + e.line + ":" + e.charPositionInLine
+               + ". Expected character is: '" + (char) m.expecting + "'";
+         message += "\nFile name: " + getSourceName();
+         throw new RuntimeException(message, e);
+      }
+      throw new RuntimeException(e);
+   }
+}
+
     /* Java keywords */
     BOOLEAN : 'boolean';
     BYTE : 'byte';
