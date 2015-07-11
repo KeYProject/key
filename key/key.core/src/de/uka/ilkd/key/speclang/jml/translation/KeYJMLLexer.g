@@ -188,21 +188,13 @@ UNSIGNEDSHIFTRIGHT : '>>>';
 XOR : '^';
 
 GT : '>';
-LT : '<';
-
-fragment IMPLICIT_IDENT
-    :
-    LT (LETTER)+ GT
-    ;
+fragment LT : '<';
 
 LT_IMPLICIT_GT_DISPATCH
     :
       (LT (LETTER)+ GT) => LT (LETTER)+ GT {$type = IDENT;}
     |
       LT {$type = LT;}
-    |
-      GT {$type = GT;}
-    
     ;
 
 LPAREN
