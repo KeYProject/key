@@ -1200,7 +1200,7 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 :
 	expr=primaryexpr
 	{
-	    fullyQualifiedName = input.LT(0).getText();
+	    fullyQualifiedName = input.LT(-1).getText();
 	}
 	(
 	    {
@@ -1212,7 +1212,7 @@ postfixexpr returns [SLExpression ret=null] throws SLTranslationException
 	    }
 	    expr=primarysuffix[expr, fullyQualifiedName]
 	    {
-		fullyQualifiedName += "." + input.LT(0).getText();
+		fullyQualifiedName += "." + input.LT(-1).getText();
 	    }
 	)*
 
@@ -1324,7 +1324,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
               if(atPres == null || atPres.get(heap) == null) { p = tb.var(heap); } else { p = atPres.get(heap); }
               preHeapParams = preHeapParams.append(new SLExpression(p));
             }
-            params = params.prepend(preHeapParams);
+            params = (params == null) ? preHeapParams : params.prepend(preHeapParams);
 
 	    lookupName = lookupName.substring(lookupName.lastIndexOf('.')+1);
 
@@ -1793,7 +1793,7 @@ mapExpression returns [Token token = null] :
   | MAP_SINGLETON
   | IS_FINITE
   )
-    { token = input.LT(-1); }
+    { token = input.LT(-2); }
   ;
 
 quantifier returns [Token token = null] :
@@ -1805,7 +1805,7 @@ quantifier returns [Token token = null] :
   | PRODUCT
   | SUM
   )
-    { token = input.LT(0); }
+    { token = input.LT(-1); }
   ;
 
 specquantifiedexpression returns [SLExpression result = null] throws SLTranslationException
