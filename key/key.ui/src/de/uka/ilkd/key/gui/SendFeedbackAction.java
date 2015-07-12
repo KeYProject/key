@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Window;
@@ -53,145 +52,99 @@ public class SendFeedbackAction extends AbstractAction {
    // suggested e-Mail address that bug reports shall be sent to
    private final String BUG_REPORT_RECIPIENT = null;
 
-   private static abstract class SendFeedbackItem<C extends Component> {
-      final String fileName;
-      final C component;
+   private static abstract class SendFeedbackItem {
+      String fileName;
+      final JCheckBox checkBox;
 
-      SendFeedbackItem(String fileName, C component) {
+      SendFeedbackItem(String fileName, JCheckBox checkBox) {
          this.fileName = fileName;
-         this.component = component;
+         this.checkBox = checkBox;
       }
 
-      abstract byte[] getData();
+      abstract byte[] computeData() throws Exception;
+
+      void addZipEntry(ZipOutputStream stream) throws IOException {
+         if (checkBox.isSelected() && checkBox.isEnabled()) {
+            byte[] data;
+            try {
+               data = computeData();
+            }
+            catch (Exception e) {
+               fileName += ".exception";
+               data = (e.getClass().getSimpleName()
+                     + " occured while trying to read data.\n" + e.getMessage()
+                     + "\n" + serializeStackTrace(e)).getBytes();
+            }
+            stream.putNextEntry(new ZipEntry(fileName));
+            stream.write(data);
+            stream.closeEntry();
+         }
+      }
    }
 
-   private LinkedList<SendFeedbackItem<JCheckBox>> checkBoxes = new LinkedList<>();
+   private LinkedList<SendFeedbackItem> checkBoxes = new LinkedList<>();
    private final Window parent;
 
-   SendFeedbackItem<JTextArea> bugDescription = new SendFeedbackItem<JTextArea>(
-         "bugDescription.txt", new JTextArea(20, 50)) {
-      @Override
-      byte[] getData() {
-         return component.getText().getBytes();
-      }
-   };
+   JTextArea bugDescription = new JTextArea(20, 50);
 
    public SendFeedbackAction(Window parent) {
       super("Send Feedback");
       this.parent = parent;
 
-      checkBoxes.add(new SendFeedbackItem<JCheckBox>("loadedProblem.key",
-            new JCheckBox("Send Loaded Problem", true)) {
+      checkBoxes.add(new SendFeedbackItem("loadedProblem.key", new JCheckBox(
+            "Send Loaded Problem", true)) {
          @Override
-         byte[] getData() {
-            if (component.isSelected()) {
-               File mostRecentFile = new File(MainWindow.getInstance()
-                     .getRecentFiles().getMostRecent().getAbsolutePath());
-               try {
-                  return Files.readAllBytes(mostRecentFile.toPath());
-               }
-               catch (IOException e) {
-                  return ("Cannot read most recent file:\n" + e.getMessage())
-                        .getBytes();
-               }
-            }
-            else {
-               return null;
-            }
+         byte[] computeData() throws IOException {
+            File mostRecentFile = new File(MainWindow.getInstance()
+                  .getRecentFiles().getMostRecent().getAbsolutePath());
+            return Files.readAllBytes(mostRecentFile.toPath());
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem<JCheckBox>("keyVersion.txt",
-            new JCheckBox("Send KeY Version", true)) {
+      checkBoxes.add(new SendFeedbackItem("keyVersion.txt", new JCheckBox(
+            "Send KeY Version", true)) {
          @Override
-         byte[] getData() {
-            if (component.isSelected()) {
-               return KeYConstants.VERSION.getBytes();
-            }
-            else {
-               return null;
-            }
+         byte[] computeData() {
+            return KeYConstants.VERSION.getBytes();
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem<JCheckBox>("systemProperties.txt",
+      checkBoxes.add(new SendFeedbackItem("systemProperties.txt",
             new JCheckBox("Send System Properties", true)) {
          @Override
-         byte[] getData() {
-            if (component.isSelected()) {
-               StringWriter sw = new StringWriter();
-               PrintWriter pw = new PrintWriter(sw);
-               System.getProperties().list(pw);
-               String propsAsString = sw.getBuffer().toString();
-               pw.close();
-               return propsAsString.getBytes();
-            }
-            else {
-               return null;
-            }
+         byte[] computeData() {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            System.getProperties().list(pw);
+            String propsAsString = sw.getBuffer().toString();
+            pw.close();
+            return propsAsString.getBytes();
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem<JCheckBox>("openGoal.txt",
-            new JCheckBox("Send Open Goal", true)) {
+      checkBoxes.add(new SendFeedbackItem("openGoal.txt", new JCheckBox(
+            "Send Open Goal", true)) {
          @Override
-         byte[] getData() {
-            if (component.isSelected()) {
-               try {
-                  return MainWindow.getInstance().getMediator()
-                        .getSelectedGoal().toString().getBytes();
-               }
-               catch (Exception e) {
-                  return ("Cannot read open goal: "
-                        + e.getClass().getSimpleName() + "\n" + serializeStackTrace(e))
-                        .getBytes();
-               }
-            }
-            else {
-               return null;
-            }
+         byte[] computeData() {
+            return MainWindow.getInstance().getMediator().getSelectedGoal()
+                  .toString().getBytes();
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem<JCheckBox>("openProof.proof",
-            new JCheckBox("Send Open Proof", true)) {
+      checkBoxes.add(new SendFeedbackItem("openProof.proof", new JCheckBox(
+            "Send Open Proof", true)) {
          @Override
-         byte[] getData() {
-            if (component.isSelected()) {
-               try {
-                  return MainWindow.getInstance().getMediator()
-                        .getSelectedProof().toString().getBytes();
-               }
-               catch (Exception e) {
-                  return ("Cannot read open proof: "
-                        + e.getClass().getSimpleName() + "\n" + serializeStackTrace(e))
-                        .getBytes();
-               }
-            }
-            else {
-               return null;
-            }
+         byte[] computeData() {
+            return MainWindow.getInstance().getMediator().getSelectedProof()
+                  .toString().getBytes();
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem<JCheckBox>("keySettings.txt",
-            new JCheckBox("Send KeY Settings", true)) {
+      checkBoxes.add(new SendFeedbackItem("keySettings.txt", new JCheckBox(
+            "Send KeY Settings", true)) {
          @Override
-         byte[] getData() {
-            if (component.isSelected()) {
-               try {
-                  return ProofSettings.DEFAULT_SETTINGS.settingsToString()
-                        .getBytes();
-               }
-               catch (Exception e) {
-                  return ("Cannot read open proof: "
-                        + e.getClass().getSimpleName() + "\n" + serializeStackTrace(e))
-                        .getBytes();
-               }
-            }
-            else {
-               return null;
-            }
+         byte[] computeData() {
+            return ProofSettings.DEFAULT_SETTINGS.settingsToString().getBytes();
          }
       });
    }
@@ -201,31 +154,21 @@ public class SendFeedbackAction extends AbstractAction {
 
       final JCheckBox sendErrorMessageCheckBox = new JCheckBox(
             "Send Error Message", true);
-      SendFeedbackItem<JCheckBox> errorMessageFeedbackitem = new SendFeedbackItem<JCheckBox>(
+      SendFeedbackItem errorMessageFeedbackitem = new SendFeedbackItem(
             "errorMessage.txt", sendErrorMessageCheckBox) {
          @Override
-         byte[] getData() {
-            if (component.isSelected()) {
-               return exception.getMessage().getBytes();
-            }
-            else {
-               return null;
-            }
+         byte[] computeData() {
+            return exception.getMessage().getBytes();
          }
       };
 
       final JCheckBox sendStackTraceCheckBox = new JCheckBox("Send Stacktrace",
             true);
-      SendFeedbackItem<JCheckBox> stackTraceFeedbackItem = new SendFeedbackItem<JCheckBox>(
+      SendFeedbackItem stackTraceFeedbackItem = new SendFeedbackItem(
             "stacktrace.txt", sendStackTraceCheckBox) {
          @Override
-         byte[] getData() {
-            if (component.isEnabled() && component.isSelected()) {
-               return serializeStackTrace(exception).getBytes();
-            }
-            else {
-               return null;
-            }
+         byte[] computeData() {
+            return serializeStackTrace(exception).getBytes();
          }
       };
 
@@ -252,14 +195,13 @@ public class SendFeedbackAction extends AbstractAction {
 
       JPanel right = new JPanel();
       right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-      for (SendFeedbackItem<JCheckBox> i : checkBoxes) {
-         right.add(i.component);
+      for (SendFeedbackItem i : checkBoxes) {
+         right.add(i.checkBox);
       }
 
-      bugDescription.component.setLineWrap(true);
-      bugDescription.component.setBorder(new TitledBorder(
-            "Message to Developers"));
-      JScrollPane left = new JScrollPane(bugDescription.component);
+      bugDescription.setLineWrap(true);
+      bugDescription.setBorder(new TitledBorder("Message to Developers"));
+      JScrollPane left = new JScrollPane(bugDescription);
       left.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
       left.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
@@ -308,14 +250,12 @@ public class SendFeedbackAction extends AbstractAction {
             try {
                stream = new ZipOutputStream(new BufferedOutputStream(
                      new FileOutputStream(zipFile)));
-               for (SendFeedbackItem<JCheckBox> i : checkBoxes) {
-                  byte[] data = i.getData();
-                  if (data != null) {
-                     stream.putNextEntry(new ZipEntry(i.fileName));
-                     stream.write(data);
-                     stream.closeEntry();
-                  }
+               for (SendFeedbackItem item : checkBoxes) {
+                  item.addZipEntry(stream);
                }
+               stream.putNextEntry(new ZipEntry("bugDescription.txt"));
+               stream.write(bugDescription.getText().getBytes());
+               stream.closeEntry();
             }
             catch (FileNotFoundException e) {
                JOptionPane.showMessageDialog(parent, e.getMessage());
