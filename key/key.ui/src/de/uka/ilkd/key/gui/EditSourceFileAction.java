@@ -61,11 +61,12 @@ public class EditSourceFileAction extends AbstractAction {
    public void actionPerformed(ActionEvent arg0) {
       try {
          Location location = ExceptionTools.getLocation(exception);
-         String fileName = location.getFilename();
-         if (fileName == null || fileName.length() == 0) {
+         if (location == null || location.getFilename() == null
+               || location.getFilename().length() == 0) {
             throw new IOException(
                   "Cannot recover file location from exception.");
          }
+         String fileName = location.getFilename();
          final File sourceFile = new File(fileName);
          String source = IOUtil.readFrom(sourceFile);
          final JDialog dialog = new JDialog(parent, "Edit "
