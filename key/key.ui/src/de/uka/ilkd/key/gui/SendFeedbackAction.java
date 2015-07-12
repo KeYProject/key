@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.KeYConstants;
  * @author Kai Wallisch
  *
  */
-public class ReportBugAction extends AbstractAction {
+public class SendFeedbackAction extends AbstractAction {
 
    // suggested e-Mail address that bug reports shall be sent to
    private final String BUG_REPORT_RECIPIENT = null;
@@ -77,8 +77,8 @@ public class ReportBugAction extends AbstractAction {
    private final BugMetaDataObject metaDataObject[];
    private final Window parent;
 
-   ReportBugAction(final Window parent, final Throwable exception) {
-      super("Report Bug");
+   SendFeedbackAction(final Window parent, final Throwable exception) {
+      super("Send Feedback");
       this.parent = parent;
 
       metaDataObject = new BugMetaDataObject[] {
