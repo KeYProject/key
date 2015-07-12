@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -30,13 +31,13 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.util.KeYConstants;
 
 /**
- * Button contained in {@link ExceptionDialog} that can be used to report an
- * error to KeY developers.
+ * {@link AbstractAction} used by {@link ExceptionDialog} in KeY report error
+ * button was pressed.
  * 
  * @author Kai Wallisch
  *
  */
-public class ReportBugButton extends JButton {
+public class ReportBugAction extends AbstractAction {
 
    // suggested e-Mail address that bug reports shall be sent to
    private final String BUG_REPORT_RECIPIENT = null;
@@ -73,11 +74,14 @@ public class ReportBugButton extends JButton {
    private final JTextArea bugDescription = new JTextArea(20, 50);
    private static final String BUG_DESCRIPTION_FILENAME = "bugDescription.txt";
 
-   ReportBugButton(final Window parent, final Throwable exception) {
-      super("Report Bug");
-      this.setName("Report bug button");
+   private final BugMetaDataObject metaDataObject[];
+   private final Window parent;
 
-      final BugMetaDataObject metaDataObject[] = new BugMetaDataObject[] {
+   ReportBugAction(final Window parent, final Throwable exception) {
+      super("Report Bug");
+      this.parent = parent;
+
+      metaDataObject = new BugMetaDataObject[] {
             new BugMetaDataObject(ERROR_MESSAGE_FILENAME) {
                @Override
                byte[] getData() {
@@ -152,109 +156,107 @@ public class ReportBugButton extends JButton {
                   return bugDescription.getText().getBytes();
                }
             } };
+   }
 
-      addActionListener(new ActionListener() {
+   @Override
+   public void actionPerformed(ActionEvent arg0) {
+      final JDialog dialog = new JDialog(parent,
+            "Report an Error to KeY Developers",
+            Dialog.ModalityType.DOCUMENT_MODAL);
+      dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+      dialog.setBounds(parent.getBounds());
+
+      JPanel right = new JPanel();
+      right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+      right.add(sendErrorMessage);
+      right.add(sendStacktrace);
+      right.add(sendLoadedProblem);
+      right.add(sendKeYVersion);
+      right.add(sendKeYSettings);
+      right.add(sendSystemProperties);
+      sendErrorMessage.addActionListener(new ActionListener() {
          @Override
-         public void actionPerformed(ActionEvent arg0) {
-            final JDialog dialog = new JDialog(parent,
-                  "Report an Error to KeY Developers",
-                  Dialog.ModalityType.DOCUMENT_MODAL);
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            dialog.setBounds(parent.getBounds());
-
-            JPanel right = new JPanel();
-            right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-            right.add(sendErrorMessage);
-            right.add(sendStacktrace);
-            right.add(sendLoadedProblem);
-            right.add(sendKeYVersion);
-            right.add(sendKeYSettings);
-            right.add(sendSystemProperties);
-            sendErrorMessage.addActionListener(new ActionListener() {
-               @Override
-               public void actionPerformed(ActionEvent e) {
-                  sendStacktrace.setEnabled(sendErrorMessage.isSelected());
-               }
-            });
-
-            bugDescription.setLineWrap(true);
-            bugDescription.setBorder(new TitledBorder("Bug Description"));
-            JScrollPane left = new JScrollPane(bugDescription);
-            left.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-            left.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-            JPanel topPanel = new JPanel();
-            topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-            topPanel.add(left);
-            topPanel.add(right);
-
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            JButton sendButReportButton = new JButton("Send Bug Report");
-            JButton closeButton = new JButton("Close");
-            sendButReportButton.addActionListener(new ActionListener() {
-               @Override
-               public void actionPerformed(ActionEvent arg0) {
-                  int confirmed = JOptionPane
-                        .showConfirmDialog(
-                              parent,
-                              "A zip archive containing the selected metadata will be created.\n"
-                                    + "Please send an e-Mail containing this zip file as attachment to:\n"
-                                    + BUG_REPORT_RECIPIENT, "Send Bug Report",
-                              JOptionPane.OK_CANCEL_OPTION);
-                  if (confirmed == JOptionPane.OK_OPTION) {
-                     KeYFileChooser fileChooser = KeYFileChooser
-                           .getFileChooser("Save Zip File");
-                     File zipFile = new File(fileChooser.getCurrentDirectory(),
-                           "BugReport.zip");
-                     boolean fileSelectionConfirmed = fileChooser
-                           .showSaveDialog(parent, zipFile);
-                     if (fileSelectionConfirmed) {
-                        zipFile = fileChooser.getSelectedFile();
-                        try {
-                           saveMetaDataToFile(zipFile);
-                        }
-                        catch (IOException e) {
-                           JOptionPane.showMessageDialog(parent, e.getMessage());
-                        }
-                        dialog.dispose();
-                     }
-                  }
-               }
-
-               private void saveMetaDataToFile(File zipFile) throws IOException {
-
-                  ZipOutputStream stream = null;
-                  try {
-                     stream = new ZipOutputStream(new BufferedOutputStream(
-                           new FileOutputStream(zipFile)));
-                     for (BugMetaDataObject o : metaDataObject) {
-                        stream.putNextEntry(new ZipEntry(o.fileName));
-                        stream.write(o.getData());
-                        stream.closeEntry();
-                     }
-                  }
-                  catch (FileNotFoundException e) {
-                     JOptionPane.showMessageDialog(parent, e.getMessage());
-                  }
-                  finally {
-                     if (stream != null) {
-                        stream.close();
-                     }
-                  }
-               }
-            });
-            buttonPanel.add(sendButReportButton);
-            buttonPanel.add(closeButton);
-
-            Container container = dialog.getContentPane();
-            container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-            container.add(topPanel);
-            container.add(buttonPanel);
-
-            dialog.pack();
-            dialog.setVisible(true);
+         public void actionPerformed(ActionEvent e) {
+            sendStacktrace.setEnabled(sendErrorMessage.isSelected());
          }
       });
+
+      bugDescription.setLineWrap(true);
+      bugDescription.setBorder(new TitledBorder("Bug Description"));
+      JScrollPane left = new JScrollPane(bugDescription);
+      left.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+      left.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+      JPanel topPanel = new JPanel();
+      topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+      topPanel.add(left);
+      topPanel.add(right);
+
+      JPanel buttonPanel = new JPanel();
+      buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+      JButton sendButReportButton = new JButton("Send Bug Report");
+      JButton closeButton = new JButton("Close");
+      sendButReportButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent arg0) {
+            int confirmed = JOptionPane
+                  .showConfirmDialog(
+                        parent,
+                        "A zip archive containing the selected metadata will be created.\n"
+                              + "Please send an e-Mail containing this zip file as attachment to:\n"
+                              + BUG_REPORT_RECIPIENT, "Send Bug Report",
+                        JOptionPane.OK_CANCEL_OPTION);
+            if (confirmed == JOptionPane.OK_OPTION) {
+               KeYFileChooser fileChooser = KeYFileChooser
+                     .getFileChooser("Save Zip File");
+               File zipFile = new File(fileChooser.getCurrentDirectory(),
+                     "BugReport.zip");
+               boolean fileSelectionConfirmed = fileChooser.showSaveDialog(
+                     parent, zipFile);
+               if (fileSelectionConfirmed) {
+                  zipFile = fileChooser.getSelectedFile();
+                  try {
+                     saveMetaDataToFile(zipFile);
+                  }
+                  catch (IOException e) {
+                     JOptionPane.showMessageDialog(parent, e.getMessage());
+                  }
+                  dialog.dispose();
+               }
+            }
+         }
+
+         private void saveMetaDataToFile(File zipFile) throws IOException {
+
+            ZipOutputStream stream = null;
+            try {
+               stream = new ZipOutputStream(new BufferedOutputStream(
+                     new FileOutputStream(zipFile)));
+               for (BugMetaDataObject o : metaDataObject) {
+                  stream.putNextEntry(new ZipEntry(o.fileName));
+                  stream.write(o.getData());
+                  stream.closeEntry();
+               }
+            }
+            catch (FileNotFoundException e) {
+               JOptionPane.showMessageDialog(parent, e.getMessage());
+            }
+            finally {
+               if (stream != null) {
+                  stream.close();
+               }
+            }
+         }
+      });
+      buttonPanel.add(sendButReportButton);
+      buttonPanel.add(closeButton);
+
+      Container container = dialog.getContentPane();
+      container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+      container.add(topPanel);
+      container.add(buttonPanel);
+
+      dialog.pack();
+      dialog.setVisible(true);
    }
 }
