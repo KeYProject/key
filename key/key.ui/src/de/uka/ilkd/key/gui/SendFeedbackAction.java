@@ -39,6 +39,14 @@ import de.uka.ilkd.key.util.KeYConstants;
  */
 public class SendFeedbackAction extends AbstractAction {
 
+   private static String serializeStackTrace(Throwable t) {
+      String stackTrace = "";
+      for (StackTraceElement e : t.getStackTrace()) {
+         stackTrace += e.toString() + "\n";
+      }
+      return stackTrace;
+   }
+
    // suggested e-Mail address that bug reports shall be sent to
    private final String BUG_REPORT_RECIPIENT = null;
 
@@ -73,6 +81,11 @@ public class SendFeedbackAction extends AbstractAction {
    private static final String SYSTEM_PROPERTIES_FILENAME = "systemProperties.txt";
    private final JTextArea bugDescription = new JTextArea(20, 50);
    private static final String BUG_DESCRIPTION_FILENAME = "bugDescription.txt";
+   private static final String OPEN_GOAL_FILENAME = "openGoal.txt";
+   private final JCheckBox sendOpenGoal = new JCheckBox("Send Open Goal", true);
+   private static final String OPEN_PROOF_FILENAME = "openProof.proof";
+   private final JCheckBox sendOpenProof = new JCheckBox("Send Open Proof",
+         true);
 
    private final BugMetaDataObject metaDataObject[];
    private final Window parent;
@@ -97,11 +110,7 @@ public class SendFeedbackAction extends AbstractAction {
                @Override
                byte[] getData() {
                   if (sendStacktrace.isEnabled() && sendStacktrace.isSelected()) {
-                     String stackTrace = "";
-                     for (StackTraceElement e : exception.getStackTrace()) {
-                        stackTrace += e.toString() + "\n";
-                     }
-                     return stackTrace.getBytes();
+                     return serializeStackTrace(exception).getBytes();
                   }
                   else {
                      return null;
@@ -155,6 +164,42 @@ public class SendFeedbackAction extends AbstractAction {
                byte[] getData() {
                   return bugDescription.getText().getBytes();
                }
+            }, new BugMetaDataObject(OPEN_GOAL_FILENAME) {
+               @Override
+               byte[] getData() {
+                  if (sendOpenGoal.isSelected()) {
+                     try {
+                        return MainWindow.getInstance().getMediator()
+                              .getSelectedGoal().toString().getBytes();
+                     }
+                     catch (Exception e) {
+                        return ("Cannot read open goal: "
+                              + e.getClass().getSimpleName() + "\n" + serializeStackTrace(e))
+                              .getBytes();
+                     }
+                  }
+                  else {
+                     return null;
+                  }
+               }
+            }, new BugMetaDataObject(OPEN_PROOF_FILENAME) {
+               @Override
+               byte[] getData() {
+                  if (sendOpenProof.isSelected()) {
+                     try {
+                        return MainWindow.getInstance().getMediator()
+                              .getSelectedProof().toString().getBytes();
+                     }
+                     catch (Exception e) {
+                        return ("Cannot read open proof: "
+                              + e.getClass().getSimpleName() + "\n" + serializeStackTrace(e))
+                              .getBytes();
+                     }
+                  }
+                  else {
+                     return null;
+                  }
+               }
             } };
    }
 
@@ -170,16 +215,18 @@ public class SendFeedbackAction extends AbstractAction {
       right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
       right.add(sendErrorMessage);
       right.add(sendStacktrace);
-      right.add(sendLoadedProblem);
-      right.add(sendKeYVersion);
-      right.add(sendKeYSettings);
-      right.add(sendSystemProperties);
       sendErrorMessage.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent e) {
             sendStacktrace.setEnabled(sendErrorMessage.isSelected());
          }
       });
+      right.add(sendLoadedProblem);
+      right.add(sendKeYVersion);
+      right.add(sendKeYSettings);
+      right.add(sendSystemProperties);
+      right.add(sendOpenGoal);
+      right.add(sendOpenProof);
 
       bugDescription.setLineWrap(true);
       bugDescription.setBorder(new TitledBorder("Message to Developers"));
