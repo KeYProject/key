@@ -52,8 +52,11 @@ public class SendFeedbackAction extends AbstractAction {
    // suggested e-Mail address that bug reports shall be sent to
    private final String BUG_REPORT_RECIPIENT = null;
 
+   // dialog that opens in case user wished to send feedback
+   private final JDialog dialog;
+
    private static abstract class SendFeedbackItem {
-      String fileName;
+      final String fileName;
       final JCheckBox checkBox;
 
       SendFeedbackItem(String fileName, JCheckBox checkBox) {
@@ -66,30 +69,28 @@ public class SendFeedbackAction extends AbstractAction {
       void addZipEntry(ZipOutputStream stream) throws IOException {
          if (checkBox.isSelected() && checkBox.isEnabled()) {
             byte[] data;
+            String zipEntryFileName = fileName;
             try {
                data = computeData();
             }
             catch (Exception e) {
-               fileName += ".exception";
+               zipEntryFileName += ".exception";
                data = (e.getClass().getSimpleName()
                      + " occured while trying to read data.\n" + e.getMessage()
                      + "\n" + serializeStackTrace(e)).getBytes();
             }
-            stream.putNextEntry(new ZipEntry(fileName));
+            stream.putNextEntry(new ZipEntry(zipEntryFileName));
             stream.write(data);
             stream.closeEntry();
          }
       }
    }
 
+   // checkboxes specifing which data will be contained in feedback
    private LinkedList<SendFeedbackItem> checkBoxes = new LinkedList<>();
-   private final Window parent;
 
-   JTextArea bugDescription = new JTextArea(20, 50);
-
-   public SendFeedbackAction(Window parent) {
+   public SendFeedbackAction(final Window parent) {
       super("Send Feedback");
-      this.parent = parent;
 
       checkBoxes.add(new SendFeedbackItem("loadedProblem.key", new JCheckBox(
             "Send Loaded Problem", true)) {
@@ -147,48 +148,8 @@ public class SendFeedbackAction extends AbstractAction {
             return ProofSettings.DEFAULT_SETTINGS.settingsToString().getBytes();
          }
       });
-   }
 
-   SendFeedbackAction(final Window parent, final Throwable exception) {
-      this(parent);
-
-      final JCheckBox sendErrorMessageCheckBox = new JCheckBox(
-            "Send Error Message", true);
-      SendFeedbackItem errorMessageFeedbackitem = new SendFeedbackItem(
-            "errorMessage.txt", sendErrorMessageCheckBox) {
-         @Override
-         byte[] computeData() {
-            return exception.getMessage().getBytes();
-         }
-      };
-
-      final JCheckBox sendStackTraceCheckBox = new JCheckBox("Send Stacktrace",
-            true);
-      SendFeedbackItem stackTraceFeedbackItem = new SendFeedbackItem(
-            "stacktrace.txt", sendStackTraceCheckBox) {
-         @Override
-         byte[] computeData() {
-            return serializeStackTrace(exception).getBytes();
-         }
-      };
-
-      sendErrorMessageCheckBox.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            sendStackTraceCheckBox.setEnabled(sendErrorMessageCheckBox
-                  .isSelected());
-         }
-      });
-
-      checkBoxes.addFirst(errorMessageFeedbackitem);
-      checkBoxes.addFirst(stackTraceFeedbackItem);
-
-   }
-
-   @Override
-   public void actionPerformed(ActionEvent arg0) {
-      final JDialog dialog = new JDialog(parent,
-            "Report an Error to KeY Developers",
+      dialog = new JDialog(parent, "Report an Error to KeY Developers",
             Dialog.ModalityType.DOCUMENT_MODAL);
       dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
       dialog.setBounds(parent.getBounds());
@@ -199,6 +160,7 @@ public class SendFeedbackAction extends AbstractAction {
          right.add(i.checkBox);
       }
 
+      final JTextArea bugDescription = new JTextArea(20, 50);
       bugDescription.setLineWrap(true);
       bugDescription.setBorder(new TitledBorder("Message to Developers"));
       JScrollPane left = new JScrollPane(bugDescription);
@@ -283,7 +245,46 @@ public class SendFeedbackAction extends AbstractAction {
       container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
       container.add(topPanel);
       container.add(buttonPanel);
+   }
 
+   SendFeedbackAction(final Window parent, final Throwable exception) {
+      this(parent);
+
+      final JCheckBox sendErrorMessageCheckBox = new JCheckBox(
+            "Send Error Message", true);
+      SendFeedbackItem errorMessageFeedbackitem = new SendFeedbackItem(
+            "errorMessage.txt", sendErrorMessageCheckBox) {
+         @Override
+         byte[] computeData() {
+            return exception.getMessage().getBytes();
+         }
+      };
+
+      final JCheckBox sendStackTraceCheckBox = new JCheckBox("Send Stacktrace",
+            true);
+      SendFeedbackItem stackTraceFeedbackItem = new SendFeedbackItem(
+            "stacktrace.txt", sendStackTraceCheckBox) {
+         @Override
+         byte[] computeData() {
+            return serializeStackTrace(exception).getBytes();
+         }
+      };
+
+      sendErrorMessageCheckBox.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            sendStackTraceCheckBox.setEnabled(sendErrorMessageCheckBox
+                  .isSelected());
+         }
+      });
+
+      checkBoxes.addFirst(errorMessageFeedbackitem);
+      checkBoxes.addFirst(stackTraceFeedbackItem);
+
+   }
+
+   @Override
+   public void actionPerformed(ActionEvent arg0) {
       dialog.pack();
       dialog.setVisible(true);
    }
