@@ -60,7 +60,7 @@ public class EditSourceFileAction extends AbstractAction {
    @Override
    public void actionPerformed(ActionEvent arg0) {
       try {
-         Location location = ExceptionTools.getLocation(exception);
+         final Location location = ExceptionTools.getLocation(exception);
          if (location == null || location.getFilename() == null
                || location.getFilename().length() == 0) {
             throw new IOException(
@@ -86,10 +86,16 @@ public class EditSourceFileAction extends AbstractAction {
          parserMessageScrollPane
                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-         final JTextArea textArea = new JTextArea(30, columnNumber);
+         final JTextArea textArea = new JTextArea(30, columnNumber) {
+            @Override
+            public void addNotify() {
+               super.addNotify();
+               requestFocus();
+               textAreaGoto(this, location.getLine(), location.getColumn());
+            }
+         };
          textArea.setText(source);
          textArea.setFont(ExceptionDialog.MESSAGE_FONT);
-         textAreaGoto(textArea, location.getLine(), location.getColumn());
          textArea.setLineWrap(false);
          textArea.setBorder(new TitledBorder(sourceFile.getName()));
          JScrollPane textAreaScrollPane = new JScrollPane(textArea);
