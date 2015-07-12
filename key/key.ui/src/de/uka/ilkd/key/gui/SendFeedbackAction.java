@@ -182,7 +182,7 @@ public class SendFeedbackAction extends AbstractAction {
       });
 
       bugDescription.setLineWrap(true);
-      bugDescription.setBorder(new TitledBorder("Bug Description"));
+      bugDescription.setBorder(new TitledBorder("Message to Developers"));
       JScrollPane left = new JScrollPane(bugDescription);
       left.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
       left.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -194,9 +194,9 @@ public class SendFeedbackAction extends AbstractAction {
 
       JPanel buttonPanel = new JPanel();
       buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-      JButton sendButReportButton = new JButton("Send Bug Report");
-      JButton closeButton = new JButton("Close");
-      sendButReportButton.addActionListener(new ActionListener() {
+
+      JButton sendFeedbackReportButton = new JButton("Send Feedback");
+      sendFeedbackReportButton.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent arg0) {
             int confirmed = JOptionPane
@@ -248,8 +248,17 @@ public class SendFeedbackAction extends AbstractAction {
             }
          }
       });
-      buttonPanel.add(sendButReportButton);
-      buttonPanel.add(closeButton);
+
+      JButton cancelButton = new JButton("Cancel");
+      cancelButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            dialog.dispose();
+         }
+      });
+
+      buttonPanel.add(sendFeedbackReportButton);
+      buttonPanel.add(cancelButton);
 
       Container container = dialog.getContentPane();
       container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
