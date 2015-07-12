@@ -102,7 +102,7 @@ public class EditSourceFileAction extends AbstractAction {
          buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
          JButton saveButton = new JButton("Save");
          JButton reloadButton = new JButton("Save, Close and Reload");
-         JButton closeButton = new JButton("Close");
+         JButton cancelButton = new JButton("Cancel");
          ActionListener closeAction = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -129,13 +129,13 @@ public class EditSourceFileAction extends AbstractAction {
                MainWindow.getInstance().loadProblem(sourceFile);
             }
          };
-         closeButton.addActionListener(closeAction);
+         cancelButton.addActionListener(closeAction);
          saveButton.addActionListener(saveAction);
          reloadButton.addActionListener(saveAction);
          reloadButton.addActionListener(closeAction);
          reloadButton.addActionListener(reloadAction);
          buttonPanel.add(saveButton);
-         buttonPanel.add(closeButton);
+         buttonPanel.add(cancelButton);
          buttonPanel.add(reloadButton);
 
          Container container = dialog.getContentPane();
