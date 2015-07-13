@@ -10,6 +10,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.key.evaluation.io.SendThread;
@@ -359,48 +360,58 @@ public class EvaluationWizard extends Wizard {
     * @param evaluationInput The {@link EvaluationInput} to perform.
     */
    public static void openWizard(Shell parentShell, boolean alwaysOnTop, EvaluationInput evaluationInput, ImageDescriptor imageDescriptor, Image image) {
-      EvaluationWizardDialog openedDialog = EvaluationWizardDialog.getFirstVisibleWizardDialog(evaluationInput);
-      if (openedDialog != null) {
-         openedDialog.getShell().setFocus();
-      }
-      else {
-         boolean openWizard = true;
-         // Check existing input
-         if (evaluationInput.getCurrentFormInput() == evaluationInput.getFormInput(0)) {
-            // Ensure that evaluation always start from beginning
-            evaluationInput.reset();
+      try {
+         EvaluationWizardDialog openedDialog = EvaluationWizardDialog.getFirstVisibleWizardDialog(evaluationInput);
+         if (openedDialog != null) {
+            openedDialog.getShell().setFocus();
          }
          else {
-            // Ask to restart evaluation
-            int result = SWTUtil.openMessageDialog(parentShell, 
-                                                   "Continue Evaluation?", 
-                                                   image,
-                                                   "Continue the already started evaluation? (Recommended)", 
-                                                   MessageDialog.QUESTION, 
-                                                   new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL});
-            if (result == 1) {
-               int secondResult = SWTUtil.openMessageDialog(parentShell, 
-                                                            "Continue Evaluation?", 
-                                                            image,
-                                                            "Please do only restart the evaluation if you have not participated before and if you have not seen parts of the evaluation.\n\nContinue the already started evaluation? (Recommended)", 
-                                                            MessageDialog.WARNING, 
-                                                            new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL});
-               if (secondResult == 1) {
-                  evaluationInput.reset();
+            boolean openWizard = true;
+            // Check existing input
+            if (evaluationInput.getCurrentFormInput() == evaluationInput.getFormInput(0)) {
+               // Ensure that evaluation always start from beginning
+               evaluationInput.reset();
+            }
+            else {
+               // Ask to restart evaluation
+               int result = SWTUtil.openMessageDialog(parentShell, 
+                                                      "Continue Evaluation?", 
+                                                      image,
+                                                      "Continue the already started evaluation? (Recommended)", 
+                                                      MessageDialog.QUESTION, 
+                                                      new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL});
+               if (result == 1) {
+                  int secondResult = SWTUtil.openMessageDialog(parentShell, 
+                                                               "Continue Evaluation?", 
+                                                               image,
+                                                               "Please do only restart the evaluation if you have not participated before and if you have not seen parts of the evaluation.\n\nContinue the already started evaluation? (Recommended)", 
+                                                               MessageDialog.WARNING, 
+                                                               new String[] {IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL});
+                  if (secondResult == 1) {
+                     evaluationInput.reset();
+                  }
+                  else if (secondResult != 0) {
+                     openWizard = false; // -1 if cancelled, e.g. ESC
+                  }
                }
-               else if (secondResult != 0) {
-                  openWizard = false; // -1 if cancelled, e.g. ESC
+               else if (result != 0) { // -1 if cancelled, e.g. ESC
+                  openWizard = false;
                }
             }
-            else if (result != 0) { // -1 if cancelled, e.g. ESC
-               openWizard = false;
+            // Open wizard
+            if (openWizard) {
+               EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput, imageDescriptor, image);
+               dialog.open();
             }
          }
-         // Open wizard
-         if (openWizard) {
-            EvaluationWizardDialog dialog = new EvaluationWizardDialog(parentShell, alwaysOnTop, evaluationInput, imageDescriptor, image);
-            dialog.open();
-         }
+      }
+      catch (SWTError e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(parentShell, 
+                                             "Error", 
+                                             "Ensure that the internal Browser of Eclipse is available.\n"
+                                             + "Installation of libwebkitgtk (sudo apt-get install libwebkitgtk-1.0-0) might help.", // See http://askubuntu.com/questions/220505/how-to-enable-the-eclipse-internal-browser-ubuntu-12-10
+                                             e); 
       }
    }
 }
