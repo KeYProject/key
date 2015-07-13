@@ -18,6 +18,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.key_project.sed.key.evaluation.model.definition.AbstractButtonsQuestion;
@@ -57,6 +58,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       
    protected void createwithChildQuestionControls(FormToolkit toolkit, Composite parent, Q question, ICreateControlCallback callback) {
       createSection(toolkit, parent, question);
+      createImageLabel(toolkit, parent, question);
       composite = toolkit.createComposite(parent, SWT.WRAP);
       composite.setLayout(new TableWrapLayout());
       for (final Choice choice : question.getChoices()) {
@@ -98,6 +100,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
    protected void createNoChildQuestionControls(FormToolkit toolkit, Composite parent, Q question) {
       if (question.getLabel() != null) {
          createSection(toolkit, parent, question);
+         createImageLabel(toolkit, parent, question);
          composite = toolkit.createComposite(parent, SWT.WRAP);
          composite.setLayout(new TableWrapLayout());
          if (question.isVertical()) {
@@ -119,6 +122,13 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       }
       for (final Choice choice : question.getChoices()) {
          createChoiceControl(toolkit, choice, question);
+      }
+   }
+   
+   protected void createImageLabel(final FormToolkit toolkit, final Composite parent, final Q question) {
+      if (question.getImage() != null) {
+         Label imageLabel = toolkit.createLabel(parent, null);
+         imageLabel.setImage(question.getImage());
       }
    }
    

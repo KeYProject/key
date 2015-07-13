@@ -653,6 +653,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String proofTreeTitle = "Shown proof tree (tab 'Proof')";
       RadioButtonsQuestion proofTreeQuestion = new RadioButtonsQuestion("proofTree", 
                                                                         proofTreeTitle, 
+                                                                        EvaluationModelImages.getImage(EvaluationModelImages.KEY_PROOF_TREE),
                                                                         false,
                                                                         null, 
                                                                         new NotUndefinedValueValidator("Question '" + proofTreeTitle + "' not answered."), 
@@ -660,7 +661,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                         choices);
       String goalsTitle = "Shown goals  (tab 'Goals')";
       RadioButtonsQuestion goalsQuestion = new RadioButtonsQuestion("goals", 
-                                                                    goalsTitle, 
+                                                                    goalsTitle,
+                                                                    EvaluationModelImages.getImage(EvaluationModelImages.KEY_GOALS),
                                                                     false,
                                                                     null, 
                                                                     new NotUndefinedValueValidator("Question '" + goalsTitle + "' not answered."), 
@@ -669,6 +671,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String sequentTitle = "Shown sequent";
       RadioButtonsQuestion sequentQuestion = new RadioButtonsQuestion("sequent", 
                                                                       sequentTitle, 
+                                                                      EvaluationModelImages.getImage(EvaluationModelImages.KEY_SEQUENT),
                                                                       false,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + sequentTitle + "' not answered."), 
@@ -677,48 +680,61 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String hideTitle = "Hiding of intermediate proofsteps";
       RadioButtonsQuestion hideQuestion = new RadioButtonsQuestion("hideIntermediateProofsteps", 
                                                                    hideTitle, 
+                                                                   EvaluationModelImages.getImage(EvaluationModelImages.KEY_HIDE_ITERMEDIATE_STEPS),
                                                                    false,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + hideTitle + "' not answered."), 
                                                                    false,
                                                                    choices);
-      String searchProofTreeTitle = "Search in proof tree";
-      RadioButtonsQuestion searchProofTreeQuestion = new RadioButtonsQuestion("searchProofTree", 
-                                                                              searchProofTreeTitle, 
-                                                                              false,
-                                                                              null, 
-                                                                              new NotUndefinedValueValidator("Question '" + searchProofTreeTitle + "' not answered."), 
-                                                                              false,
-                                                                              choices);
-      String searchSequentTitle = "Search in sequent";
-      RadioButtonsQuestion searchSequentQuestion = new RadioButtonsQuestion("searchSequent", 
-                                                                            searchSequentTitle, 
-                                                                            false,
-                                                                            null, 
-                                                                            new NotUndefinedValueValidator("Question '" + searchSequentTitle + "' not answered."), 
-                                                                            false,
-                                                                            choices);
+//      String searchProofTreeTitle = "Search in proof tree";
+//      RadioButtonsQuestion searchProofTreeQuestion = new RadioButtonsQuestion("searchProofTree", 
+//                                                                              searchProofTreeTitle, 
+//                                                                              false,
+//                                                                              null, 
+//                                                                              new NotUndefinedValueValidator("Question '" + searchProofTreeTitle + "' not answered."), 
+//                                                                              false,
+//                                                                              choices);
+//      String searchSequentTitle = "Search in sequent";
+//      RadioButtonsQuestion searchSequentQuestion = new RadioButtonsQuestion("searchSequent", 
+//                                                                            searchSequentTitle, 
+//                                                                            false,
+//                                                                            null, 
+//                                                                            new NotUndefinedValueValidator("Question '" + searchSequentTitle + "' not answered."), 
+//                                                                            false,
+//                                                                            choices);
       String listContractsTitle = "List of applied contracts";
       RadioButtonsQuestion listContractsQuestion = new RadioButtonsQuestion("listContracts", 
                                                                             listContractsTitle, 
+                                                                            EvaluationModelImages.getImage(EvaluationModelImages.KEY_APPLIED_CONTRACTS),
                                                                             false,
                                                                             null, 
                                                                             new NotUndefinedValueValidator("Question '" + listContractsTitle + "' not answered."), 
                                                                             false,
                                                                             choices);
-      SectionQuestion keySection = new SectionQuestion("KeY", "KeY", false, proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, searchProofTreeQuestion, searchSequentQuestion, listContractsQuestion);
+      SectionQuestion keySection = new SectionQuestion("KeY", "KeY", false, proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, listContractsQuestion);
       // SED
       String setTitle = "Shown symbolic execution tree";
       RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
                                                                   setTitle, 
+                                                                  EvaluationModelImages.getImage(EvaluationModelImages.SED_SET),
                                                                   false,
                                                                   null, 
                                                                   new NotUndefinedValueValidator("Question '" + setTitle + "' not answered."), 
                                                                   false,
                                                                   choices);
+      String reachedTitle = "Highlighting of source code reached during symbolic execution";
+      RadioButtonsQuestion reachedQuestion = new RadioButtonsQuestion("reachedSourceCode", 
+                                                                      reachedTitle, 
+                                                                      EvaluationModelImages.getImage(EvaluationModelImages.SED_REACHED),
+                                                                      false,
+                                                                      null, 
+                                                                      new NotUndefinedValueValidator("Question '" + reachedTitle + "' not answered."), 
+                                                                      false,
+                                                                      choices);
       String variablesTitle = "Shown variables of a node (view 'Variables')";
       RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
                                                                         variablesTitle, 
+                                                                        EvaluationModelImages.getImage(EvaluationModelImages.SED_VARIABLES),
                                                                         false,
                                                                         null, 
                                                                         new NotUndefinedValueValidator("Question '" + variablesTitle + "' not answered."), 
@@ -727,6 +743,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String layoutTitle = "Visualization of memory layouts";
       RadioButtonsQuestion layoutQuestion = new RadioButtonsQuestion("layouts", 
                                                                      layoutTitle, 
+                                                                     EvaluationModelImages.getImage(EvaluationModelImages.SED_MEMORY_LAYOUTS),
                                                                      false,
                                                                      null, 
                                                                      new NotUndefinedValueValidator("Question '" + layoutTitle + "' not answered."), 
@@ -735,12 +752,13 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String truthTitle = "Truth value evaluation of postconditions, preconditions and loop invariants";
       RadioButtonsQuestion truthQuestion = new RadioButtonsQuestion("truth", 
                                                                     truthTitle, 
+                                                                    EvaluationModelImages.getImage(EvaluationModelImages.SED_TRUTH),
                                                                     false,
                                                                     null, 
                                                                     new NotUndefinedValueValidator("Question '" + truthTitle + "' not answered."), 
                                                                     false,
                                                                     choices);
-      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, variablesQuestion, layoutQuestion, truthQuestion);
+      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, reachedQuestion, variablesQuestion, layoutQuestion, truthQuestion);
       // KeY vs SED
       String keyVsSedTitle = "I prefer to inspect proofs with";
       RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion("toolPreference", 

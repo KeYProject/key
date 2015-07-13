@@ -66,6 +66,56 @@ public final class EvaluationModelImages {
     public static final String EVALUATION = "org.key_project.sed.key.evaluation.model.evaluation";
     
     /**
+     * The key for the evaluation image.
+     */
+    public static final String KEY_APPLIED_CONTRACTS = "org.key_project.sed.key.evaluation.model.evaluation.key.appliedContracts";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String KEY_GOALS = "org.key_project.sed.key.evaluation.model.evaluation.key.goals";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String KEY_HIDE_ITERMEDIATE_STEPS = "org.key_project.sed.key.evaluation.model.evaluation.key.hideItermediateSteps";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String KEY_PROOF_TREE = "org.key_project.sed.key.evaluation.model.evaluation.key.proofTree";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String KEY_SEQUENT = "org.key_project.sed.key.evaluation.model.evaluation.key.sequent";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_MEMORY_LAYOUTS = "org.key_project.sed.key.evaluation.model.evaluation.sed.memoryLayouts";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_SET = "org.key_project.sed.key.evaluation.model.evaluation.sed.set";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_TRUTH = "org.key_project.sed.key.evaluation.model.evaluation.sed.truth";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_VARIABLES = "org.key_project.sed.key.evaluation.model.evaluation.sed.variables";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_REACHED = "org.key_project.sed.key.evaluation.model.evaluation.sed.reachedSourceCode";
+    
+    /**
      * Forbid instances.
      */
     private EvaluationModelImages() {
@@ -142,6 +192,36 @@ public final class EvaluationModelImages {
         }
         else if (EVALUATION.equals(key)) {
            path = "data/understandingProofAttempts/icons/evaluation.png";
+        }
+        else if (KEY_APPLIED_CONTRACTS.equals(key)) {
+           path = "data/understandingProofAttempts/icons/KeY_Applied_Contracts.png";
+        }
+        else if (KEY_GOALS.equals(key)) {
+           path = "data/understandingProofAttempts/icons/KeY_Goals.png";
+        }
+        else if (KEY_HIDE_ITERMEDIATE_STEPS.equals(key)) {
+           path = "data/understandingProofAttempts/icons/KeY_Hide_Itermediate_Steps.png";
+        }
+        else if (KEY_PROOF_TREE.equals(key)) {
+           path = "data/understandingProofAttempts/icons/KeY_Proof_Tree.png";
+        }
+        else if (KEY_SEQUENT.equals(key)) {
+           path = "data/understandingProofAttempts/icons/KeY_Sequent.png";
+        }
+        else if (SED_MEMORY_LAYOUTS.equals(key)) {
+           path = "data/understandingProofAttempts/icons/SED_Memory_Layout.png";
+        }
+        else if (SED_SET.equals(key)) {
+           path = "data/understandingProofAttempts/icons/SED_SET.png";
+        }
+        else if (SED_TRUTH.equals(key)) {
+           path = "data/understandingProofAttempts/icons/SED_Truth.png";
+        }
+        else if (SED_VARIABLES.equals(key)) {
+           path = "data/understandingProofAttempts/icons/SED_Variables.png";
+        }
+        else if (SED_REACHED.equals(key)) {
+           path = "data/understandingProofAttempts/icons/SED_Reached.png";
         }
         // Load image if possible
         if (path != null) {

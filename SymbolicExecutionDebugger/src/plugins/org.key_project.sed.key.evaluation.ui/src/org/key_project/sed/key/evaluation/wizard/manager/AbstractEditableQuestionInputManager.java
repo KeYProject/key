@@ -49,6 +49,10 @@ public abstract class AbstractEditableQuestionInputManager extends AbstractQuest
       }
    }
 
+   protected Section getQuestionSection() {
+      return questionSection;
+   }
+
    protected abstract void handleQuestionValueChanged(PropertyChangeEvent evt);
 
    public QuestionInput getQuestionInput() {
