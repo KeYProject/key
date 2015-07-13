@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -14,6 +15,7 @@ import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.tooling.AbstractWorkbenchModifier;
 import org.key_project.sed.key.evaluation.model.util.EvaluationModelImages;
 import org.key_project.sed.key.evaluation.model.validation.NotUndefinedValueValidator;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
@@ -69,8 +71,10 @@ public class BrowserExampleEvaluation extends AbstractEvaluation {
                                                             public void run() {
                                                                try {
                                                                   IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
-                                                                  IWebBrowser browser = support.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.AS_EDITOR, null, null, null);
+                                                                  browser = support.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.AS_EDITOR, null, null, null);
                                                                   browser.openURL(new URL("http://key-project.org"));
+                                                                  IWorkbenchPage page = WorkbenchUtil.getActivePage();
+                                                                  page.toggleZoom(page.getActivePartReference());
                                                                }
                                                                catch (Exception e) {
                                                                   setException(e);

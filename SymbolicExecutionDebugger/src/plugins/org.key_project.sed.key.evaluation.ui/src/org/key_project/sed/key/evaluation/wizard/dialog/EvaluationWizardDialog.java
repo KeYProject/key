@@ -424,13 +424,18 @@ public class EvaluationWizardDialog extends WizardDialog {
       }
       // Perform runnable of current page if available
       if (getWizard().getCurrentPageRunnable() != null) {
-         getShell().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               getCurrentPage().perfomRunnables(null, getWizard().getCurrentPageRunnable());
-               getWizard().setCurrentPageRunnable(null);
-            }
-         });
+         if (wizardToClose == null) {
+            getShell().getDisplay().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+                  getCurrentPage().perfomRunnables(null, getWizard().getCurrentPageRunnable());
+                  getWizard().setCurrentPageRunnable(null);
+               }
+            });
+         }
+         else {
+            getWizard().setCurrentPageRunnable(null);
+         }
       }
    }
    

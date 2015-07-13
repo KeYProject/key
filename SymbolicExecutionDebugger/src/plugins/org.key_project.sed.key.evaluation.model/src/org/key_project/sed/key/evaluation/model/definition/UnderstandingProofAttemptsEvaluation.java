@@ -201,7 +201,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                  backgroundPage,
                                                  sendConditionsPage);
       // Create evaluation form
-      URL evaluationURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/EvaluationIntroduction.html") : null;
+      URL evaluationURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/EvaluationIntroduction-Screencast.html") : null;
       URL jmlURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/JML.html") : null;
       InstructionPage evaluationPage = new InstructionPage(EVALUATION_PAGE_NAME, "Evaluation Instructions", "Read the evaluation instructions carefully before continuing.", evaluationURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.EVALUATION) : null);
       InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO) : null);
@@ -246,7 +246,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("self.value", "self.value"),
                                                                new Choice("summand", "summand"),
                                                                new Choice("summand.value", "summand.value"),
-                                                               new Choice("something else", "something else"),
+                                                               new Choice("something else", "something else", createElseLocationSubQuestion()),
                                                                new Choice("none", "none"));
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
@@ -259,7 +259,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createPostconditionText("value == \\old(value) + summand.value"), createPostconditionValue(), true),
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), locationQuestion),
                                                               new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion()),
-                                                              createBugfreeChoice());
+                                                              createBugfreeChoice(),
+                                                              createSomethingElseIsReasonChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -315,7 +316,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createLoopInvariantPreservedText("\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]"), createLoopInvariantPreservedValue("array elements"), true, createMinTerminationQuestion("preservedArrayElementsTermination", false, true)),
                                                               new Choice(createDecreasingText("array.length - i"), createDecreasingValue(), createMinTerminationQuestion("decreasingTermination", false, false)),
                                                               new Choice(createLoopAssignableText(), createLoopAssignableValue(), createMinLocationQuestion("whichLoopLocationsHaveChanged"), createMinTerminationQuestion("loopAssignableTermination", false, false)),
-                                                              createBugfreeChoice());
+                                                              createBugfreeChoice(),
+                                                              createSomethingElseIsReasonChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -379,7 +381,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       new Choice("java.lang.invoke.WrongMethodTypeException", "java.lang.invoke.WrongMethodTypeException"),
                                                                       new Choice("javax.naming.OperationNotSupportedException", "javax.naming.OperationNotSupportedException"),
                                                                       new Choice("java.lang.OutOfMemoryError", "java.lang.OutOfMemoryError"),
-                                                                      new Choice("something else", "something else"),
+                                                                      new Choice("something else", "something else", createElseExceptionSubQuestion()),
                                                                       new Choice("none", "none"));
       return thrownExceptionQuestion;
    }
@@ -398,7 +400,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("array[*]", "array[*]"),
                                   new Choice("minIndex", "minIndex"),
                                   new Choice("i", "i"),
-                                  new Choice("something else", "something else"),
+                                  new Choice("something else", "something else", createElseLocationSubQuestion()),
                                   new Choice("none", "none"));
    }
    
@@ -439,7 +441,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createLoopInvariantPreservedText("\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]"), createLoopInvariantPreservedValue("array elements"), createCalendarTerminationQuestion("loopInvariantArrayElementsPreservedTermination", false)),
                                                               new Choice(createDecreasingText("entries.length - i"), createDecreasingValue(), createCalendarTerminationQuestion("decreasingTermination", false)),
                                                               new Choice(createLoopAssignableText(), createLoopAssignableValue(), createCalendarLocationQuestion("whichLoopLocationsHaveChanged"), createCalendarTerminationQuestion("loopAssingableTermination", false)),
-                                                              createBugfreeChoice());
+                                                              createBugfreeChoice(),
+                                                              createSomethingElseIsReasonChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -500,7 +503,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("newEntries", "newEntries"),
                                   new Choice("newEntries.length", "newEntries.length"),
                                   new Choice("newEntries[*]", "newEntries[*]"),
-                                  new Choice("something else", "something else"),
+                                  new Choice("something else", "something else", createElseLocationSubQuestion()),
                                   new Choice("none", "none"));
    }
    
@@ -533,7 +536,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createPreconditionText("amount > 0", "canWithdraw(int)"), createPreconditionValue("canWithdraw"), createAccountTerminationQuestion("canWithdrawPreconditionTermination", false)),
                                                               new Choice(createPreconditionText("true", "getBalance()"), createPreconditionValue("getBalance"), createAccountTerminationQuestion("getBalancePreconditionTermination", false)),
                                                               new Choice(createExceptionThrownText("checkAndWithdraw(int)"), createExceptionThrownValue(), createThrownExceptionsQuestion()),
-                                                              createBugfreeChoice());
+                                                              createBugfreeChoice(),
+                                                              createSomethingElseIsReasonChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -587,6 +591,24 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               contractsQuestion);
    }
 
+   private Choice createSomethingElseIsReasonChoice() {
+      String reasonTitle = "What is the reason?";
+      return new Choice("Something else is the reason why the proof is still open", 
+                        "Something else", 
+                        new TextQuestion("reason", reasonTitle, null, new NotUndefinedValueValidator("Question '" + reasonTitle + "' not answered."), false));
+   }
+   
+   private TextQuestion createElseLocationSubQuestion() {
+      String locationTitle = "Which location(s) have changed?";
+      return new TextQuestion("changedLocation", locationTitle, null, new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), false);
+   }
+   
+
+   private TextQuestion createElseExceptionSubQuestion() {
+      String exceptionTitle = "Which exception is thrown?";
+      return new TextQuestion("thrownException", exceptionTitle, null, new NotUndefinedValueValidator("Question '" + exceptionTitle + "' not answered."), false);
+   }
+
    private Choice createBugfreeChoice() {
       return new Choice("Code and specifications are bug free, proof can be closed interactively", "Bug free");
    }
@@ -601,7 +623,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   true,
                                   new Choice("balance", "balance"),
                                   new Choice("amount", "amount"),
-                                  new Choice("something else", "something else"),
+                                  new Choice("something else", "something else", createElseLocationSubQuestion()),
                                   new Choice("none", "none"));
    }
    

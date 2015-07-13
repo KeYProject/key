@@ -32,7 +32,9 @@ public class TextManager extends AbstractEditableQuestionInputManager {
                       TextQuestion question) {
       super(wizardPage, questionInput);
       Composite composite = toolkit.createComposite(parent);
-      composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+      if (parent.getLayout() instanceof GridLayout) {
+         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+      }
       composite.setLayout(new GridLayout(1, false));
       createSection(toolkit, composite, question);
       text = toolkit.createText(composite, questionInput.getValue(), SWT.MULTI | SWT.V_SCROLL);
