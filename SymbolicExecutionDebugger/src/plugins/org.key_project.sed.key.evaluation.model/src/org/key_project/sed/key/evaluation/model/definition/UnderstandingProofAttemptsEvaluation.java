@@ -653,7 +653,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String proofTreeTitle = "Shown proof tree (tab 'Proof')";
       RadioButtonsQuestion proofTreeQuestion = new RadioButtonsQuestion("proofTree", 
                                                                         proofTreeTitle, 
-                                                                        EvaluationModelImages.getImage(EvaluationModelImages.KEY_PROOF_TREE),
+                                                                        isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_PROOF_TREE) : null,
                                                                         false,
                                                                         null, 
                                                                         new NotUndefinedValueValidator("Question '" + proofTreeTitle + "' not answered."), 
@@ -662,7 +662,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String goalsTitle = "Shown goals  (tab 'Goals')";
       RadioButtonsQuestion goalsQuestion = new RadioButtonsQuestion("goals", 
                                                                     goalsTitle,
-                                                                    EvaluationModelImages.getImage(EvaluationModelImages.KEY_GOALS),
+                                                                    isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_GOALS) : null,
                                                                     false,
                                                                     null, 
                                                                     new NotUndefinedValueValidator("Question '" + goalsTitle + "' not answered."), 
@@ -671,7 +671,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String sequentTitle = "Shown sequent";
       RadioButtonsQuestion sequentQuestion = new RadioButtonsQuestion("sequent", 
                                                                       sequentTitle, 
-                                                                      EvaluationModelImages.getImage(EvaluationModelImages.KEY_SEQUENT),
+                                                                      isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_SEQUENT) : null,
                                                                       false,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + sequentTitle + "' not answered."), 
@@ -680,7 +680,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String hideTitle = "Hiding of intermediate proofsteps";
       RadioButtonsQuestion hideQuestion = new RadioButtonsQuestion("hideIntermediateProofsteps", 
                                                                    hideTitle, 
-                                                                   EvaluationModelImages.getImage(EvaluationModelImages.KEY_HIDE_ITERMEDIATE_STEPS),
+                                                                   isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_HIDE_ITERMEDIATE_STEPS) : null,
                                                                    false,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + hideTitle + "' not answered."), 
@@ -705,7 +705,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String listContractsTitle = "List of applied contracts";
       RadioButtonsQuestion listContractsQuestion = new RadioButtonsQuestion("listContracts", 
                                                                             listContractsTitle, 
-                                                                            EvaluationModelImages.getImage(EvaluationModelImages.KEY_APPLIED_CONTRACTS),
+                                                                            isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_APPLIED_CONTRACTS) : null,
                                                                             false,
                                                                             null, 
                                                                             new NotUndefinedValueValidator("Question '" + listContractsTitle + "' not answered."), 
@@ -716,7 +716,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String setTitle = "Shown symbolic execution tree";
       RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
                                                                   setTitle, 
-                                                                  EvaluationModelImages.getImage(EvaluationModelImages.SED_SET),
+                                                                  isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_SET) : null,
                                                                   false,
                                                                   null, 
                                                                   new NotUndefinedValueValidator("Question '" + setTitle + "' not answered."), 
@@ -725,7 +725,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String reachedTitle = "Highlighting of source code reached during symbolic execution";
       RadioButtonsQuestion reachedQuestion = new RadioButtonsQuestion("reachedSourceCode", 
                                                                       reachedTitle, 
-                                                                      EvaluationModelImages.getImage(EvaluationModelImages.SED_REACHED),
+                                                                      isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_REACHED) : null,
                                                                       false,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + reachedTitle + "' not answered."), 
@@ -734,7 +734,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String variablesTitle = "Shown variables of a node (view 'Variables')";
       RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
                                                                         variablesTitle, 
-                                                                        EvaluationModelImages.getImage(EvaluationModelImages.SED_VARIABLES),
+                                                                        isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_VARIABLES) : null,
                                                                         false,
                                                                         null, 
                                                                         new NotUndefinedValueValidator("Question '" + variablesTitle + "' not answered."), 
@@ -743,7 +743,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String layoutTitle = "Visualization of memory layouts";
       RadioButtonsQuestion layoutQuestion = new RadioButtonsQuestion("layouts", 
                                                                      layoutTitle, 
-                                                                     EvaluationModelImages.getImage(EvaluationModelImages.SED_MEMORY_LAYOUTS),
+                                                                     isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_MEMORY_LAYOUTS) : null,
                                                                      false,
                                                                      null, 
                                                                      new NotUndefinedValueValidator("Question '" + layoutTitle + "' not answered."), 
@@ -752,7 +752,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String truthTitle = "Truth value evaluation of postconditions, preconditions and loop invariants";
       RadioButtonsQuestion truthQuestion = new RadioButtonsQuestion("truth", 
                                                                     truthTitle, 
-                                                                    EvaluationModelImages.getImage(EvaluationModelImages.SED_TRUTH),
+                                                                    isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_TRUTH) : null,
                                                                     false,
                                                                     null, 
                                                                     new NotUndefinedValueValidator("Question '" + truthTitle + "' not answered."), 
