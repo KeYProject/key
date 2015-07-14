@@ -111,8 +111,8 @@ public class SendFeedbackAction extends AbstractAction {
    public SendFeedbackAction(final Window parent) {
       super("Send Feedback");
 
-      checkBoxes.add(new SendFeedbackItem("loadedProblem.key", new JCheckBox(
-            "Send Loaded Problem", true)) {
+      checkBoxes.add(new SendFeedbackItem("lastLoadedProblem.key", new JCheckBox(
+            "Send Last Loaded Problem", true)) {
          @Override
          byte[] computeData() throws IOException {
             File mostRecentFile = new File(MainWindow.getInstance()
