@@ -6,6 +6,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
@@ -183,10 +185,13 @@ public class SendFeedbackAction extends AbstractAction {
       checkBoxes.add(new SendFeedbackItem("openProof.proof", new JCheckBox(
             "Send Open Proof", true)) {
          @Override
-         byte[] computeData() {
+         byte[] computeData() throws IOException {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             Proof proof = mediator.getSelectedProof();
-            return proof.toString().getBytes();
+            OutputStreamProofSaver saver = new OutputStreamProofSaver(proof);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            saver.save(stream);
+            return stream.toByteArray();
          }
 
          @Override
