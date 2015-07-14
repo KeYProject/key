@@ -151,19 +151,22 @@ public class EditSourceFileAction extends AbstractAction {
          container.add(buttonPanel);
 
          dialog.pack();
-         Rectangle bounds = dialog.getBounds();
-         Rectangle mainWindowBounds = MainWindow.getInstance().getBounds();
-         int x = Math.max(0, mainWindowBounds.x
-               + (mainWindowBounds.width - bounds.width) / 2);
-         int y = Math.max(0, mainWindowBounds.y
-               + (mainWindowBounds.height - bounds.height) / 2);
-
-         dialog.setBounds(x, y, bounds.width, bounds.height);
+         centerDialogRelativeToMainWindow(dialog);
          dialog.setVisible(true);
       }
       catch (IOException ioe) {
          String message = "Cannot open file:\n" + ioe.getMessage();
          JOptionPane.showMessageDialog(parent, message);
       }
+   }
+
+   static void centerDialogRelativeToMainWindow(final JDialog dialog) {
+      Rectangle bounds = dialog.getBounds();
+      Rectangle mainWindowBounds = MainWindow.getInstance().getBounds();
+      int x = Math.max(0, mainWindowBounds.x
+            + (mainWindowBounds.width - bounds.width) / 2);
+      int y = Math.max(0, mainWindowBounds.y
+            + (mainWindowBounds.height - bounds.height) / 2);
+      dialog.setBounds(x, y, bounds.width, bounds.height);
    }
 }
