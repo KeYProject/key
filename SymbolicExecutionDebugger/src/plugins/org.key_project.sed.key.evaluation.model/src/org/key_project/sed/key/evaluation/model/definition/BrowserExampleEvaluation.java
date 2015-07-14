@@ -104,13 +104,13 @@ public class BrowserExampleEvaluation extends AbstractEvaluation {
                                                    new RadioButtonsQuestion("url", urlQuestion, true, null, new NotUndefinedValueValidator("Question '" + urlQuestion + "' not answered."), true, new Choice("http://www.se.tu-darmstadt.de", "se"), new Choice("http://key-project.org", "key", protocolSubQuestion)),
                                                    new CheckboxQuestion("buttons", buttonsQuestion, true, null, new NotUndefinedValueValidator("Question '" + buttonsQuestion + "' not answered."), true, new Choice("Back", "Back"), new Choice("Forward", "Forward"), new Choice("Stop", "Stop"), new Choice("Refresh", "Refresh")));
       SendFormPage sendFixedPage = new SendFormPage("sendFixedPage", "sendFixedPageTitle", "sendFixedPageMessage", "additionalDataCollectedByServer");
-      RandomForm form = new RandomForm("form", false, new ToolPage(getTool(BROWSER_NAME)), questionPage, sendFixedPage);
+      RandomForm form = new RandomForm("form", false, new ToolPage(getTool(BROWSER_NAME), null, false), questionPage, sendFixedPage);
       return Collections.<AbstractForm>singletonList(form);
    }
 
    @Override
    protected List<Tool> computeTools() {
-      Tool browser = new Tool(BROWSER_NAME, null, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.BROWSER) : null);
+      Tool browser = new Tool(BROWSER_NAME, null, null, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.BROWSER) : null);
       return CollectionUtil.toList(browser);
    }
 }

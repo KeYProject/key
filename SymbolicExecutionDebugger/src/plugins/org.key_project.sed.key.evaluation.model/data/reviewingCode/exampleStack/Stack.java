@@ -4,9 +4,13 @@
 public final class Stack {
    /**
     * The elements on the stack.
-    * The array is never {@code null}.
+    * The array is never {@code null} and all array indices
+    * {@code >= size} are {@code null}.
     */
-   private final /*@ non_null @*/ Object[] elements;
+   /*@ invariant elements != null;
+     @ invariant (\forall int i; i >= size && i < elements.length; elements[i] == null);
+     @*/
+   private final /*@ nullable @*/ Object[] elements;
    
    /**
     * The current size of the stack 

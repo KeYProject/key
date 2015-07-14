@@ -37,8 +37,8 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
+import org.key_project.sed.key.evaluation.model.definition.IPageWithWorkbenchModifier;
 import org.key_project.sed.key.evaluation.model.definition.InstructionPage;
-import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
@@ -224,8 +224,8 @@ public class EvaluationWizardDialog extends WizardDialog {
          separatorNeeded = true;
       }
       // Create reset workbench item
-      if (pageInput.getPage() instanceof QuestionPage &&
-          ((QuestionPage) pageInput.getPage()).getWorkbenchModifier() != null) {
+      if (pageInput.getPage() instanceof IPageWithWorkbenchModifier &&
+          ((IPageWithWorkbenchModifier) pageInput.getPage()).getWorkbenchModifier() != null) {
          // Create pin item
          if (separatorNeeded) {
             new ToolItem(toolBar, SWT.SEPARATOR);
@@ -238,7 +238,12 @@ public class EvaluationWizardDialog extends WizardDialog {
                resetWorkbench();
             }
          });
-         resetItem.setToolTipText("Reset workbench to the state when the current wizard page was shown?");
+         if (currentWizardPage.isPerformWorkbenchModifierAutomatically()) {
+            resetItem.setToolTipText("Reset workbench to the state when the current wizard page was shown?");
+         }
+         else {
+            resetItem.setToolTipText("Show related content in the workbench?");
+         }
          separatorNeeded = true;
       }
       // Create pin item
@@ -260,13 +265,13 @@ public class EvaluationWizardDialog extends WizardDialog {
       toolBar.getParent().layout();
    }
    
-   protected void resetWorkbench() {
+   public void resetWorkbench() {
       IRunnableWithProgressAndResult<String> hiddenRunnable = getCurrentPage().computeRunnable(false);
       IRunnableWithProgressAndResult<String> visibleRunnable = getCurrentPage().computeRunnable(true);
       getCurrentPage().perfomRunnables(hiddenRunnable, visibleRunnable);
    }
 
-   protected void togglePinnedState() {
+   public void togglePinnedState() {
       EvaluationWizardDialog dialog = new EvaluationWizardDialog(originalParentShell, !alwaysOnTop, evaluationInput, this, getWizard().getImageDescriptor(), image);
       dialog.open();
    }
@@ -505,8 +510,8 @@ public class EvaluationWizardDialog extends WizardDialog {
          try {
             if (!hasDialogs(evaluationInput)) {
                AbstractPage currentPage = getCurrentPage().getPageInput().getPage();
-               if (currentPage instanceof QuestionPage) {
-                  IWorkbenchModifier modifier = ((QuestionPage) currentPage).getWorkbenchModifier();
+               if (currentPage instanceof IPageWithWorkbenchModifier) {
+                  IWorkbenchModifier modifier = ((IPageWithWorkbenchModifier) currentPage).getWorkbenchModifier();
                   if (modifier != null) {
                      modifier.cleanWorkbench();
                   }

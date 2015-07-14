@@ -56,10 +56,13 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
    
    private boolean originalShowLineNumbers;
    
+   private final boolean showCompletionMessage;
+   
    public ProofAttemptJavaProjectModifier(String typeName, 
                                           String methodName, 
                                           String[] methodParameters, 
                                           String methodSignature,
+                                          boolean showCompletionMessage,
                                           FileDefinition proofFileDefinition, 
                                           FileDefinition... files) {
       super(ArrayUtil.add(files, proofFileDefinition));
@@ -67,22 +70,28 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
       this.methodName = methodName;
       this.methodParameters = methodParameters;
       this.methodSignature = methodSignature;
+      this.showCompletionMessage = showCompletionMessage;
       this.proofFileDefinition = proofFileDefinition;
    }
 
    @Override
    protected String getCompletionMessage() {
-      if (UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME.equals(getTool().getName())) {
-         return "The proof attempt of '" + typeName + "#" + methodSignature + "' is shown in KeY (separate window). " +
-                "The corresponding source code is shown in Eclipse (active editor).\n\n" +
-                "Please answer the questions shown in the evaluation wizard.\n" +
-                "Do NOT open the proof attempt with SED!";
-      }
-      else if (UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME.equals(getTool().getName())) {
-         return "The symbolic execution tree of the proof attempt of '" + typeName + "#" + methodSignature + "' is shown in Eclipse. " +
-                "The corresponding source code is shown in the active editor.\n\n" +
-                "Please answer the questions shown in the evaluation wizard.\n" +
-                "Do NOT open the proof attempt with KeY!";
+      if (showCompletionMessage) {
+         if (UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME.equals(getTool().getName())) {
+            return "The proof attempt of '" + typeName + "#" + methodSignature + "' is shown in KeY (separate window). " +
+                   "The corresponding source code is shown in Eclipse (active editor).\n\n" +
+                   "Please answer the questions shown in the evaluation wizard.\n" +
+                   "Do NOT open the proof attempt with SED!";
+         }
+         else if (UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME.equals(getTool().getName())) {
+            return "The symbolic execution tree of the proof attempt of '" + typeName + "#" + methodSignature + "' is shown in Eclipse. " +
+                   "The corresponding source code is shown in the active editor.\n\n" +
+                   "Please answer the questions shown in the evaluation wizard.\n" +
+                   "Do NOT open the proof attempt with KeY!";
+         }
+         else {
+            return null;
+         }
       }
       else {
          return null;
@@ -121,6 +130,7 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
                SwingUtil.invokeLater(new Runnable() {
                   @Override
                   public void run() {
+                     MainWindow.getInstance().setShowTacletInfo(true);
                      MainWindow.getInstance().selectFirstTab();
                   }
                });
@@ -224,7 +234,12 @@ public class ProofAttemptJavaProjectModifier extends JavaProjectModifier {
          launchConfiguration = null;
       }
       if (originalPerspective != null) {
-         getWorkbenchPage().setPerspective(originalPerspective);
+         Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               getWorkbenchPage().setPerspective(originalPerspective);
+            }
+         });
       }
    }
 }

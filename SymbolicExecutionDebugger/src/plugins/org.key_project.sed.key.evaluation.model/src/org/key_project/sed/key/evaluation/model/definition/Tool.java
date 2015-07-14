@@ -9,11 +9,14 @@ public class Tool {
    
    private final URL descriptionURL;
    
+   private final URL wizardDescriptionURL;
+   
    private final Image image;
 
-   public Tool(String name, URL descriptionURL, Image image) {
+   public Tool(String name, URL descriptionURL, URL wizardDescriptionURL, Image image) {
       this.name = name;
       this.descriptionURL = descriptionURL;
+      this.wizardDescriptionURL = wizardDescriptionURL;
       this.image = image;
    }
 
@@ -23,6 +26,10 @@ public class Tool {
 
    public URL getDescriptionURL() {
       return descriptionURL;
+   }
+
+   public URL getWizardDescriptionURL() {
+      return wizardDescriptionURL;
    }
 
    public Image getImage() {

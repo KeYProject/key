@@ -35,8 +35,14 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    protected List<Tool> computeTools() {
       URL noToolURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/NoTool.html") : null;
       URL sedURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/SED.html") : null;
-      Tool noTool = new Tool(NO_TOOL_NAME, noToolURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
-      Tool sed = new Tool(SED_TOOL_NAME, sedURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
+      Tool noTool = new Tool(NO_TOOL_NAME, 
+                             noToolURL, 
+                             noToolURL, 
+                             isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
+      Tool sed = new Tool(SED_TOOL_NAME, 
+                          sedURL, 
+                          sedURL, 
+                          isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
       return CollectionUtil.toList(noTool, sed);
    }
 
@@ -68,6 +74,24 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                               true,
                                                               new Choice("Yes", "Yes"), 
                                                               new Choice("No", "No"));
+      String sizeTitle = "Is instance field 'elements' initialized as documented (invariant holds)?";
+      RadioButtonsQuestion size = new RadioButtonsQuestion("size", 
+                                                           sizeTitle, 
+                                                           true, 
+                                                           null, 
+                                                           createNotUndefinedValueValidator(sizeTitle), 
+                                                           true,
+                                                           new Choice("Yes", "Yes"), 
+                                                           new Choice("No", "No"));
+      String elementsTitle = "Is instance field 'size' initialized as documented (invariant holds)?";
+      RadioButtonsQuestion elements = new RadioButtonsQuestion("elements", 
+                                                               elementsTitle, 
+                                                               true, 
+                                                               null, 
+                                                               createNotUndefinedValueValidator(elementsTitle), 
+                                                               true,
+                                                               new Choice("Yes", "Yes"), 
+                                                               new Choice("No", "No"));
       String line25Title = "Is it possible to execute line 25 (elements = new Object[maximalSize])?";
       RadioButtonsQuestion line25 = new RadioButtonsQuestion("line25Executable", 
                                                              line25Title, 
@@ -82,6 +106,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                            false, 
                                                            emptyStack, 
                                                            maxSize, 
+                                                           elements,
+                                                           size,
                                                            line25,
                                                            createThrownExceptionsQuestion());
       return new QuestionPage(pageName, 
@@ -102,11 +128,12 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
                                                                       true,
-                                                                      new Choice("No Exceptions possible", "No Exceptions possible"),
+                                                                      new Choice("No Exceptions are possible", "No Exceptions are possible"),
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException"),
                                                                       new Choice("java.lang.ArrayStoreException", "java.lang.ArrayStoreException"),
+                                                                      new Choice("java.lang.NegativeArraySizeException", "java.lang.NegativeArraySizeException"),
                                                                       new Choice("java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException"),
                                                                       new Choice("java.lang.IllegalStateException", "java.lang.IllegalStateException"));
       return thrownExceptionQuestion;

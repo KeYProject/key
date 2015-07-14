@@ -9,7 +9,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
-public class QuestionPage extends AbstractPage {
+public class QuestionPage extends AbstractPage implements IPageWithWorkbenchModifier {
    private final List<AbstractQuestion> questions;
 
    private final IWorkbenchModifier workbenchModifier;

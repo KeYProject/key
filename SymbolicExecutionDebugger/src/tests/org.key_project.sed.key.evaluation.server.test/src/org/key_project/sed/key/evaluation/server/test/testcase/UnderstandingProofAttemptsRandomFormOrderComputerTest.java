@@ -678,9 +678,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
    @Test
    public void testIsToolUsedFirst() {
       // Get tools
-      Tool key = new Tool("key", null, null);
-      Tool sed = new Tool("sed", null, null);
-      Tool invalid = new Tool("invalidTool", null, null);
+      Tool key = new Tool("key", null, null, null);
+      Tool sed = new Tool("sed", null, null, null);
+      Tool invalid = new Tool("invalidTool", null, null, null);
       // Perform tests
       assertTrue(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed, sed), key.getName(), sed.getName()));
       assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(sed, sed, key, key), key.getName(), sed.getName()));

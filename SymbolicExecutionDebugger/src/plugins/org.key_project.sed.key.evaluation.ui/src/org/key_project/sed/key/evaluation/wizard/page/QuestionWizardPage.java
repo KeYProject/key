@@ -2,7 +2,6 @@ package org.key_project.sed.key.evaluation.wizard.page;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -10,11 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.sed.key.evaluation.model.definition.BrowserQuestion;
@@ -25,11 +22,8 @@ import org.key_project.sed.key.evaluation.model.definition.LabelQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.sed.key.evaluation.model.definition.TextQuestion;
-import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
-import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
-import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 import org.key_project.sed.key.evaluation.wizard.manager.CheckboxManager;
 import org.key_project.sed.key.evaluation.wizard.manager.IQuestionInputManager;
@@ -38,9 +32,6 @@ import org.key_project.sed.key.evaluation.wizard.manager.LabelManager;
 import org.key_project.sed.key.evaluation.wizard.manager.RadioButtonsManager;
 import org.key_project.sed.key.evaluation.wizard.manager.SectionManager;
 import org.key_project.sed.key.evaluation.wizard.manager.TextManager;
-import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
-import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPageInput> {
    private final List<IQuestionInputManager> controls = new LinkedList<IQuestionInputManager>();
@@ -240,42 +231,5 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    protected boolean isInputErrornous(QuestionInput questionInput) {
       return questionInput.validateValue() != null || 
              questionInput.validateTrust() != null;
-   }
-
-   @Override
-   public IRunnableWithProgressAndResult<String> computeRunnable(final boolean visible) {
-      final IWorkbenchModifier modifier = getPageInput().getPage().getWorkbenchModifier();
-      if (modifier != null) {
-         final Tool tool = getPageInput().getFormInput() instanceof RandomFormInput ?
-                           ((RandomFormInput) getPageInput().getFormInput()).getTool(getPageInput()) :
-                           null;
-         final IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
-         return new AbstractRunnableWithProgressAndResult<String>() {
-            @Override
-            public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-               try {
-                  if (visible) {
-                     monitor.beginTask("Modifying Workbench, Please wait...", IProgressMonitor.UNKNOWN);
-                     modifier.init(activePage, getShell(), getPageInput(), tool);
-                     String completionMessage = modifier.modifyWorkbench();
-                     monitor.done();
-                     setResult(completionMessage);
-                  }
-                  else {
-                     monitor.beginTask("Cleaning Workbench, Please wait...", IProgressMonitor.UNKNOWN);
-                     modifier.cleanWorkbench();
-                     monitor.done();
-                     setResult(null);
-                  }
-               }
-               catch (Exception e) {
-                  throw new InvocationTargetException(e, e.getMessage());
-               }
-            }
-         };
-      }
-      else {
-         return null;
-      }
    }
 }

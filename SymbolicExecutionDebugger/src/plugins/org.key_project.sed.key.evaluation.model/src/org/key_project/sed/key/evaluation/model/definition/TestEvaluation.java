@@ -46,7 +46,7 @@ public class TestEvaluation extends AbstractEvaluation {
          SendFormPage sendFixedPage = new SendFormPage("sendFixedPage", "sendFixedPageTitle", "sendFixedPageMessage", "additionalDataCollectedByServer");
          FixedForm fixedForm = new FixedForm("fixedForm", false, questionPage, sendFixedPage);
          InstructionPage instructionPage = new InstructionPage("instructionPage", "instructionPageTitle", "instructionPageMessage", new URL("http://key-project.org/"), null);
-         ToolPage tool1Page = new ToolPage(getTool(TOOL_1_NAME));
+         ToolPage tool1Page = new ToolPage(getTool(TOOL_1_NAME), null, false);
          QuestionPage random1Page = new QuestionPage("random1Page", "random1PageTitle", "random1PageMessage", false, false, null);
          QuestionPage random2Page = new QuestionPage("random2Page", "random2PageTitle", "random2PageMessage", false, false, null);
          QuestionPage random3Page = new QuestionPage("random3Page", "random3PageTitle", "random3PageMessage", false, false, null);
@@ -61,8 +61,8 @@ public class TestEvaluation extends AbstractEvaluation {
 
    @Override
    protected List<Tool> computeTools() {
-      Tool t1 = new Tool(TOOL_1_NAME, null, null);
-      Tool t2 = new Tool(TOOL_2_NAME, null, null);
+      Tool t1 = new Tool(TOOL_1_NAME, null, null, null);
+      Tool t2 = new Tool(TOOL_2_NAME, null, null, null);
       return CollectionUtil.toList(t1, t2);
    }
 }

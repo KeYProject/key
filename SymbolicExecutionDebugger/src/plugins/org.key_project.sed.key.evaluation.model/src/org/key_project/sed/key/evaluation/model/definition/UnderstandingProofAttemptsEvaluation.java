@@ -120,9 +120,17 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    @Override
    protected List<Tool> computeTools() {
       URL keyURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/KeY-Screencast.html") : null;
+      URL keyWizardURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/KeY-ScreencastWizard.html") : null;
       URL sedURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/SED-Screencast.html") : null;
-      Tool key = new Tool(KEY_TOOL_NAME, keyURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
-      Tool sed = new Tool(SED_TOOL_NAME, sedURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
+      URL sedWizardURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/SED-ScreencastWizard.html") : null;
+      Tool key = new Tool(KEY_TOOL_NAME, 
+                          keyURL, 
+                          keyWizardURL,
+                          isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
+      Tool sed = new Tool(SED_TOOL_NAME, 
+                          sedURL, 
+                          sedWizardURL,
+                          isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
       return CollectionUtil.toList(key, sed);
    }
    
@@ -205,8 +213,25 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       URL jmlURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/JML.html") : null;
       InstructionPage evaluationPage = new InstructionPage(EVALUATION_PAGE_NAME, "Evaluation Instructions", "Read the evaluation instructions carefully before continuing.", evaluationURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.EVALUATION) : null);
       InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO) : null);
-      ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME));
-      ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME));
+      ToolPage keyToolPage = new ToolPage(getTool(KEY_TOOL_NAME),
+                                          new ProofAttemptJavaProjectModifier("Example",
+                                                                              "magic",
+                                                                              new String[] {"I", "QExample;", "QExample;"},
+                                                                              "magic(int, Example, Example)",
+                                                                              false,
+                                                                              new FileDefinition("data/understandingProofAttempts/instructions-archived/instructionProof/ExampleKeY.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Example.proof", false),
+                                                                              new FileDefinition("data/understandingProofAttempts/instructions-archived/instructionProof/Example.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Example.java", true)),
+                                          false);
+            
+      ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME),
+                                          new ProofAttemptJavaProjectModifier("Example",
+                                                                              "magic",
+                                                                              new String[] {"I", "QExample;", "QExample;"},
+                                                                              "magic(int, Example, Example)",
+                                                                              false,
+                                                                              new FileDefinition("data/understandingProofAttempts/instructions-archived/instructionProof/ExampleSED.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Example.proof", false),
+                                                                              new FileDefinition("data/understandingProofAttempts/instructions-archived/instructionProof/Example.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Example.java", true)),
+                                          false);
       QuestionPage proof1Page = createCalendarQuestionPage(PROOF_1_PAGE_NAME, "Proof Attempt of Calendar#addEntry(Entry)");
       QuestionPage proof2Page = createAccountQuestionPage(PROOF_2_PAGE_NAME, "Proof Attempt of Account#checkAndWithdraw(int)");
       QuestionPage proof3Page = createMinQuestionPage(PROOF_3_PAGE_NAME, "Proof Attempt of ArrayUtil#minIndex(int[])");
@@ -260,7 +285,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), locationQuestion),
                                                               new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion()),
                                                               createBugfreeChoice(),
-                                                              createSomethingElseIsReasonChoice());
+                                                              createSomethingElseIsReasonChoice(),
+                                                              createGiveupChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -288,6 +314,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                   "add",
                                                                   new String[] {"QMyInteger;"},
                                                                   "add(MyInteger)",
+                                                                  true,
                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofMyInteger/MyInteger.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MyInteger.java", true)),
                               new LabelQuestion("generalDescription", createGeneralDescription("MyInteger#add(MyInteger)")),
@@ -317,7 +344,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createDecreasingText("array.length - i"), createDecreasingValue(), createMinTerminationQuestion("decreasingTermination", false, false)),
                                                               new Choice(createLoopAssignableText(), createLoopAssignableValue(), createMinLocationQuestion("whichLoopLocationsHaveChanged"), createMinTerminationQuestion("loopAssignableTermination", false, false)),
                                                               createBugfreeChoice(),
-                                                              createSomethingElseIsReasonChoice());
+                                                              createSomethingElseIsReasonChoice(),
+                                                              createGiveupChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -357,6 +385,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                   "minIndex",
                                                                   new String[] {"[I"},
                                                                   "minIndex(int[])",
+                                                                  true,
                                                                   new FileDefinition("data/understandingProofAttempts/proofMin/ArrayUtil.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayUtil.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofMin/ArrayUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayUtil.java", true)),
                               new LabelQuestion("generalDescription", createGeneralDescription("ArrayUtil#minIndex(int[])")),
@@ -442,7 +471,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createDecreasingText("entries.length - i"), createDecreasingValue(), createCalendarTerminationQuestion("decreasingTermination", false)),
                                                               new Choice(createLoopAssignableText(), createLoopAssignableValue(), createCalendarLocationQuestion("whichLoopLocationsHaveChanged"), createCalendarTerminationQuestion("loopAssingableTermination", false)),
                                                               createBugfreeChoice(),
-                                                              createSomethingElseIsReasonChoice());
+                                                              createSomethingElseIsReasonChoice(),
+                                                              createGiveupChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -478,13 +508,14 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                   "addEntry",
                                                                   new String[] {"QEntry;"},
                                                                   "addEntry(Entry)",
+                                                                  true,
                                                                   new FileDefinition("data/understandingProofAttempts/proofCalendar/Calendar.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Calendar.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofCalendar/Calendar.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Calendar.java", true)),
                               new LabelQuestion("generalDescription", createGeneralDescription("Calendar#addEntry(Entry)")),
                               openQuestion,
                               executedQuestion);
    }
-   
+
    private CheckboxQuestion createCalendarLocationQuestion(String name) {
       String title = "Which not specified location(s) have changed?";
       return new CheckboxQuestion(name, 
@@ -537,7 +568,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createPreconditionText("true", "getBalance()"), createPreconditionValue("getBalance"), createAccountTerminationQuestion("getBalancePreconditionTermination", false)),
                                                               new Choice(createExceptionThrownText("checkAndWithdraw(int)"), createExceptionThrownValue(), createThrownExceptionsQuestion()),
                                                               createBugfreeChoice(),
-                                                              createSomethingElseIsReasonChoice());
+                                                              createSomethingElseIsReasonChoice(),
+                                                              createGiveupChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -583,6 +615,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                   "checkAndWithdraw",
                                                                   new String[] {"I"},
                                                                   "checkAndWithdraw(int)",
+                                                                  true,
                                                                   new FileDefinition("data/understandingProofAttempts/proofAccount/Account.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Account.proof", false),
                                                                   new FileDefinition("data/understandingProofAttempts/proofAccount/Account.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Account.java", true)),
                               new LabelQuestion("generalDescription", createGeneralDescription("Account#checkAndWithdraw(int)")),
@@ -611,6 +644,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
 
    private Choice createBugfreeChoice() {
       return new Choice("Code and specifications are bug free, proof can be closed interactively", "Bug free");
+   }
+   
+   private Choice createGiveupChoice() {
+      return new Choice("I tried my best to find out what (else) is wrong, but after 10 minutes I gave up.", "Give up");
    }
 
    private CheckboxQuestion createAccountLocationQuestion(String name) {
@@ -770,6 +807,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                        new Choice("KeY", "KeY"),
                                                                        new Choice("KeY and SED, both are equally good", "KeYandSEDequal"),
                                                                        new Choice("KeY and SED, depending on the proof", "KeYandSEDproof"),
+                                                                       new Choice("KeY and SED, both are equally bad and should be improved", "KeYandSEDbad"),
                                                                        new Choice("SED", "SED"));
       SectionQuestion keyVsSedSection = new SectionQuestion("KeYvsSED", "KeY vs SED", false, keyVsSedQuestion);
       // Feedback

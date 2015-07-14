@@ -1,5 +1,8 @@
 package org.key_project.sed.key.evaluation.wizard.page;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -8,13 +11,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.key_project.sed.key.evaluation.model.definition.IPageWithWorkbenchModifier;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
+import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
+import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
+import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
 import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?>> extends WizardPage {
@@ -85,7 +95,9 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    public void setVisible(final boolean visible) {
       super.setVisible(visible);
       if (visible) {
-         getWizard().setCurrentPageRunnable(computeRunnable(visible));
+         if (isPerformWorkbenchModifierAutomatically()) {
+            getWizard().setCurrentPageRunnable(computeRunnable(visible));
+         }
       }
       if (!visible) { // The new page is set first to visible before the old page is set to hidden
          if (!pageInput.getPage().isReadonly() && pageInput.getFormInput().getForm().isCollectTimes()) {
@@ -105,12 +117,57 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
       }
    }
    
+   public boolean isPerformWorkbenchModifierAutomatically() {
+      return true;
+   }
+   
    public void updateShownAt() {
       shownAt = System.currentTimeMillis();
    }
+
+   public IRunnableWithProgressAndResult<String> computeRunnable(final boolean visible) {
+      if (getPageInput().getPage() instanceof IPageWithWorkbenchModifier) {
+         final IWorkbenchModifier modifier = ((IPageWithWorkbenchModifier) getPageInput().getPage()).getWorkbenchModifier();
+         if (modifier != null) {
+            final Tool tool = getCurrentTool();
+            final IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
+            return new AbstractRunnableWithProgressAndResult<String>() {
+               @Override
+               public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                  try {
+                     if (visible) {
+                        monitor.beginTask("Modifying Workbench, Please wait...", IProgressMonitor.UNKNOWN);
+                        modifier.init(activePage, getShell(), getPageInput(), tool);
+                        String completionMessage = modifier.modifyWorkbench();
+                        monitor.done();
+                        setResult(completionMessage);
+                     }
+                     else {
+                        monitor.beginTask("Cleaning Workbench, Please wait...", IProgressMonitor.UNKNOWN);
+                        modifier.cleanWorkbench();
+                        monitor.done();
+                        setResult(null);
+                     }
+                  }
+                  catch (Exception e) {
+                     throw new InvocationTargetException(e, e.getMessage());
+                  }
+               }
+            };
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
+   }
    
-   public IRunnableWithProgressAndResult<String> computeRunnable(boolean visible) {
-      return null;
+   protected Tool getCurrentTool() {
+      return getPageInput().getFormInput() instanceof RandomFormInput ?
+             ((RandomFormInput) getPageInput().getFormInput()).getTool(getPageInput()) :
+             null;
    }
 
    public void perfomRunnables(IRunnableWithProgressAndResult<String> hiddenRunnable, 
@@ -187,5 +244,10 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
 
    public SharedScrolledComposite getForm() {
       return form;
+   }
+
+   @Override
+   protected EvaluationWizardDialog getContainer() {
+      return (EvaluationWizardDialog) super.getContainer();
    }
 }

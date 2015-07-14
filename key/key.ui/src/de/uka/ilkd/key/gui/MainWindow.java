@@ -1571,4 +1571,14 @@ public final class MainWindow extends JFrame  {
    public JToolBar getControlToolBar() {
       return controlToolBar;
    }
+   
+   /**
+    * Defines if talcet infos are shown or not.
+    * <p>
+    * Used by the Eclipse integration.
+    * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
+    */
+   public void setShowTacletInfo(boolean show) {
+      mainWindowTabbedPane.getProofTreeView().tacletInfoToggle.setSelected(show);
+   }
 }
