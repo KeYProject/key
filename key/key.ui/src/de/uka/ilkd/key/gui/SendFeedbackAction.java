@@ -30,9 +30,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
 
 /**
@@ -111,8 +113,8 @@ public class SendFeedbackAction extends AbstractAction {
    public SendFeedbackAction(final Window parent) {
       super("Send Feedback");
 
-      checkBoxes.add(new SendFeedbackItem("lastLoadedProblem.key", new JCheckBox(
-            "Send Last Loaded Problem", true)) {
+      checkBoxes.add(new SendFeedbackItem("lastLoadedProblem.key",
+            new JCheckBox("Send Last Loaded Problem", true)) {
          @Override
          byte[] computeData() throws IOException {
             File mostRecentFile = new File(MainWindow.getInstance()
@@ -308,6 +310,20 @@ public class SendFeedbackAction extends AbstractAction {
 
    SendFeedbackAction(final Window parent, final Throwable exception) {
       this(parent);
+
+      Location location = ExceptionTools.getLocation(exception);
+      if (location != null) {
+         final String sourceFileName = location.getFilename();
+         if (sourceFileName != null) {
+            checkBoxes.addFirst(new SendFeedbackItem("exceptionSourceFile.txt",
+                  new JCheckBox("Send Exception Source File", true)) {
+               @Override
+               byte[] computeData() throws IOException {
+                  return Files.readAllBytes(new File(sourceFileName).toPath());
+               }
+            });
+         }
+      }
 
       final JCheckBox sendErrorMessageCheckBox = new JCheckBox(
             "Send Error Message", true);
