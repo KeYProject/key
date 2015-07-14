@@ -13,14 +13,13 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import antlr.ANTLRException;
-import antlr.LLkParser;
-import antlr.RecognitionException;
-import antlr.Token;
-import antlr.TokenStreamException;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
+import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 
 
 /**
@@ -39,21 +38,11 @@ public class SLTranslationExceptionManager {
     //constructors
     //-------------------------------------------------------------------------
 
-    public SLTranslationExceptionManager(LLkParser parser,
+    public SLTranslationExceptionManager(KeYJMLParser parser,
                                          String fileName,
                                          Position offsetPos) {
-	int line;
-	int column;
-	try {
-	    line = parser.LT(1).getLine();
-	    column = parser.LT(1).getColumn();
-	} catch (final TokenStreamException e) {
-	    line = 1;
-	    column = 1;
-	}
-
-	this.line = line;
-	this.column = column;
+	this.line = parser.input.LT(1).getLine();
+	this.column = parser.input.LT(1).getCharPositionInLine();
 	this.fileName = fileName;
 	this.offsetPos = offsetPos;
     }
@@ -97,13 +86,7 @@ public class SLTranslationExceptionManager {
         return new PositionedString(text,
                                     fileName,
                                     createAbsolutePosition(t.getLine(),
-                                                           t.getColumn()));
-    }
-
-    public PositionedString createPositionedString(String text,
-	    org.antlr.runtime.Token t) {
-	return new PositionedString(text, fileName, createAbsolutePosition(
-		t.getLine(), t.getCharPositionInLine()));
+                                                           t.getCharPositionInLine()));
     }
 
     /**
@@ -151,13 +134,7 @@ public class SLTranslationExceptionManager {
         return new SLTranslationException(message,
                                           fileName,
                                           createAbsolutePosition(t.getLine(),
-                                                                 t.getColumn()));
-    }
-
-    public SLTranslationException createException(String message,
-	    org.antlr.runtime.Token t) {
-	return new SLTranslationException(message, fileName,
-		createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
+                                                                 t.getCharPositionInLine()));
     }
 
     /**
@@ -197,24 +174,13 @@ public class SLTranslationExceptionManager {
         return new SLWarningException(new PositionedString(message, t));
     }
 
-    public SLTranslationException createWarningException(String message,
-	    org.antlr.runtime.Token t) {
-	return new SLWarningException(new PositionedString(message, t));
-    }
-
     /**
      * Converts an ANTLRException into an SLTranslationException with the same
      * message and stack trace, and with current absolute position information.
      */
-    public SLTranslationException convertException(ANTLRException e) {
+    public SLTranslationException convertException(RecognitionException e) {
         Position pos;
-        if(e instanceof RecognitionException) {
-            RecognitionException re = (RecognitionException) e;
-            pos = createAbsolutePosition(re.getLine(), re.getColumn());
-        } else {
-            pos = createAbsolutePosition(this.line, this.column);
-        }
-
+        pos = createAbsolutePosition(e.line, e.charPositionInLine);
         return new SLTranslationException(e.getMessage()
                                           + " ("
                                           + e.getClass().getName()
