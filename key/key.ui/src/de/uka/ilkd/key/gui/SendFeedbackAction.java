@@ -29,6 +29,9 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.KeYConstants;
 
@@ -66,6 +69,22 @@ public class SendFeedbackAction extends AbstractAction {
 
       abstract byte[] computeData() throws Exception;
 
+      /*
+       * Override this in case "enabled" state of corresponding checkbox changes
+       * dynamically.
+       */
+      boolean isEnabled() {
+         return checkBox.isEnabled();
+      }
+
+      /*
+       * Used when showing feedback dialog to disable checkboxes whose
+       * corresponding metadata is not retrievable (e.g. no proof loaded).
+       */
+      void refreshEnabledProperty() {
+         checkBox.setEnabled(isEnabled());
+      }
+
       void addZipEntry(ZipOutputStream stream) throws IOException {
          if (checkBox.isSelected() && checkBox.isEnabled()) {
             byte[] data;
@@ -100,6 +119,21 @@ public class SendFeedbackAction extends AbstractAction {
                   .getRecentFiles().getMostRecent().getAbsolutePath());
             return Files.readAllBytes(mostRecentFile.toPath());
          }
+
+         @Override
+         boolean isEnabled() {
+            try {
+               String file = MainWindow.getInstance().getRecentFiles()
+                     .getMostRecent().getAbsolutePath();
+               if (file == null || file.length() == 0) {
+                  return false;
+               }
+               return true;
+            }
+            catch (Exception e) {
+               return false;
+            }
+         }
       });
 
       checkBoxes.add(new SendFeedbackItem("keyVersion.txt", new JCheckBox(
@@ -127,8 +161,20 @@ public class SendFeedbackAction extends AbstractAction {
             "Send Open Goal", true)) {
          @Override
          byte[] computeData() {
-            return MainWindow.getInstance().getMediator().getSelectedGoal()
-                  .toString().getBytes();
+            KeYMediator mediator = MainWindow.getInstance().getMediator();
+            Goal goal = mediator.getSelectedGoal();
+            return goal.toString().getBytes();
+         }
+
+         @Override
+         boolean isEnabled() {
+            try {
+               MainWindow.getInstance().getMediator().getSelectedGoal();
+               return true;
+            }
+            catch (Exception e) {
+               return false;
+            }
          }
       });
 
@@ -136,8 +182,21 @@ public class SendFeedbackAction extends AbstractAction {
             "Send Open Proof", true)) {
          @Override
          byte[] computeData() {
-            return MainWindow.getInstance().getMediator().getSelectedProof()
-                  .toString().getBytes();
+            KeYMediator mediator = MainWindow.getInstance().getMediator();
+            Proof proof = mediator.getSelectedProof();
+            return proof.toString().getBytes();
+         }
+
+         @Override
+         boolean isEnabled() {
+            try {
+               Proof proof = MainWindow.getInstance().getMediator()
+                     .getSelectedProof();
+               return proof == null ? false : true;
+            }
+            catch (Exception e) {
+               return false;
+            }
          }
       });
 
@@ -285,6 +344,9 @@ public class SendFeedbackAction extends AbstractAction {
 
    @Override
    public void actionPerformed(ActionEvent arg0) {
+      for (SendFeedbackItem i : checkBoxes) {
+         i.refreshEnabledProperty();
+      }
       dialog.pack();
       EditSourceFileAction.centerDialogRelativeToMainWindow(dialog);
       dialog.setVisible(true);
