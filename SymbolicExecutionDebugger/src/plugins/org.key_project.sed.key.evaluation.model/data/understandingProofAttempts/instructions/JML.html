@@ -55,7 +55,7 @@
       <p>
          Consider the following example. 
          The method contract of <code>addCredits</code> says that the method should be called in a state in which <code>credits</code> is greater than zero (<code>requires</code>).
-         Then the method will guarantee, that no exception is thrown (<code>normal_behavior</code>) and that the value of <code>acquiredCredits</code> is increased by <code>credits</code> (first <code>ensures</code>).
+         Then the method will guarantee that no exception is thrown (<code>normal_behavior</code>) and that the value of <code>acquiredCredits</code> is increased by <code>credits</code> (first <code>ensures</code>).
          It also guarantees that the returned value is the new value of <code>acquiredCredits</code> (second <code>ensures</code>).
          At last, the <code>assignable</code> clause says that only <code>acquiredCredits</code> and no other locations like <code>firstname</code> or <code>surname</code> are allowed to be changed by the method.
          <code>
