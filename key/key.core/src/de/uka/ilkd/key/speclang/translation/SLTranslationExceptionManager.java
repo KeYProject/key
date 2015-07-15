@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -161,6 +162,28 @@ public class SLTranslationExceptionManager {
         return new SLWarningException(new PositionedString(message, t));
     }
 
+   /**
+    * Create a message from a {@link RecognitionException}. This needs to be
+    * done manually because antlr exceptions are not designed to provide error
+    * messages, see: http://www.antlr3.org/api/ActionScript/org/antlr/runtime/
+    * RecognitionException.html
+    */
+   private String createMessage(RecognitionException e, Position pos) {
+      String message = e.getMessage();
+      if (message != null) {
+         return message;
+      }
+      else {
+         String p = pos.getLine() + ":" + pos.getColumn();
+         if (e instanceof NoViableAltException) {
+            return "No viable alternative at " + p + ": " + e.token.getText()
+                  + "\nSource file name: " + fileName;
+         }
+         return "Received " + e.getClass().getName() + " at line " + p
+               + " in file:\n" + fileName;
+      }
+   }
+
     /**
      * Converts an ANTLRException into an SLTranslationException with the same
      * message and stack trace, and with current absolute position information.
@@ -168,15 +191,7 @@ public class SLTranslationExceptionManager {
    public SLTranslationException convertException(RecognitionException e) {
       Position pos;
       pos = createAbsolutePosition(e.line, e.charPositionInLine);
-      String message = e.getMessage();
-      if (message != null) {
-         message = "[" + e.getClass().getName() + "] " + message;
-      }
-      else {
-         message = "Received " + e.getClass().getName() + " at line "
-               + pos.getLine() + ":" + pos.getColumn() + " in file:\n"
-               + fileName;
-      }
+      String message = createMessage(e, pos);
       return new SLTranslationException(message, fileName, pos, e);
    }
 
