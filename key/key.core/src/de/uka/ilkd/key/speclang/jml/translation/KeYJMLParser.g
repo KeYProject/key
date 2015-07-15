@@ -63,9 +63,8 @@ options {
     private JavaIntegerSemanticsHelper intHelper;
 
 
-    public KeYJMLParser(KeYJMLLexer lexer,
+    private KeYJMLParser(KeYJMLLexer lexer,
 		String fileName,
-		Position offsetPos,
 		Services services,
 		KeYJavaType specInClass,
 		ProgramVariable self,
@@ -86,7 +85,7 @@ options {
 	this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName,
-				    				offsetPos);
+				    				new Position(0,0));
         this.translator     = new JMLTranslator(excManager, fileName, services);
 
 	this.selfVar	    = self;
@@ -113,6 +112,13 @@ options {
 	}
     }
 
+    static ANTLRStringStream createANTLRStringStream(PositionedString ps){
+       ANTLRStringStream result = new ANTLRStringStream(ps.text);
+       result.name = ps.fileName;
+       result.setCharPositionInLine(ps.pos.getColumn());
+       result.setLine(ps.pos.getLine() + 1);
+       return result;
+    }
 
     public KeYJMLParser(PositionedString ps,
 		Services services,
@@ -122,9 +128,8 @@ options {
 		ProgramVariable result,
 		ProgramVariable exc,
 		Map<LocationVariable,Term> atPres) {
-	this(new KeYJMLLexer(new org.antlr.runtime.ANTLRStringStream(ps.text)),
+	this(new KeYJMLLexer(createANTLRStringStream(ps)),
 	     ps.fileName,
-	     ps.pos,
 	     services,
 	     specInClass,
 	     self,

@@ -13,13 +13,12 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
-import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 
 
 /**
@@ -38,25 +37,13 @@ public class SLTranslationExceptionManager {
     //constructors
     //-------------------------------------------------------------------------
 
-    public SLTranslationExceptionManager(KeYJMLParser parser,
-                                         String fileName,
-                                         Position offsetPos) {
-	this.line = parser.input.LT(1).getLine();
-	this.column = parser.input.LT(1).getCharPositionInLine();
-	this.fileName = fileName;
-	this.offsetPos = offsetPos;
-    }
-
-    public SLTranslationExceptionManager(KeYJMLPreParser parser,
-                                         String fileName,
-                                         Position offsetPos) {
-        this.line = parser.input.LT(1).getLine();
-        this.column = parser.input.LT(1).getCharPositionInLine();
-        this.fileName  = fileName;
-        this.offsetPos = offsetPos;
-    }
-
-
+   public SLTranslationExceptionManager(Parser parser, String fileName,
+         Position offsetPos) {
+      this.line = parser.input.LT(1).getLine();
+      this.column = parser.input.LT(1).getCharPositionInLine();
+      this.fileName = fileName;
+      this.offsetPos = offsetPos;
+   }
 
     //-------------------------------------------------------------------------
     //internal methods
