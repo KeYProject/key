@@ -335,8 +335,44 @@ options {
     // Helper variable, which is necessary because antlr doesn't forward local variables to generated DFAs.
     // It is used in a semantic predicate to determine the branch that will be taken by the generated DFA.
     private boolean representsClauseLhsIsLocSet;
+
+
+    /* ---- antlr stuff ---- (Exception handling) */
+
+    @Override
+    public void reportError(RecognitionException ex) {
+        // dont do anything
+    }
+
+    public void recover(IntStream input, RecognitionException re) {
+        throw new RuntimeException(re);
+    }
+
+    /** Not currently used */
+    @Override
+    public Object recoverFromMismatchedSet(IntStream input,
+            RecognitionException e, BitSet follow) throws RecognitionException {
+        // comment says it is never used, still make sure ...
+        throw e;
+    }
+
+    protected Object recoverFromMismatchedToken(IntStream input, int ttype,
+            BitSet follow) throws RecognitionException {
+        throw new MismatchedTokenException(ttype, input);
+    }
+    
+    protected void mismatch(IntStream input, int ttype, BitSet follow) throws RecognitionException
+    {
+        throw new MismatchedTokenException(ttype, input);
+    }
+
 }
 
+@rulecatch {
+    catch(RecognitionException re) {
+        throw re;
+    }
+}
 
 top returns [Object ret = null] throws  SLTranslationException
 :
