@@ -12,12 +12,12 @@
 	</path>
 
 	<path id="key.ui.run.class.path">
-	  <pathelement path="${basedir}/../key.ui/bin"/>
+	  <pathelement path="${basedir}/../key.core.example/bin"/>
 	  <path refid="key.ui.class.path"/>
 	</path>
-	  
+
 	<target name="start" depends="compile" description="Starts KeY.">
-		<java classname="de.uka.ilkd.key.core.Main"
+		<java classname="example.Main"
 		      classpathref="key.ui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
 	</target>
 

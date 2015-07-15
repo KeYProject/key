@@ -25,6 +25,10 @@ public class SkipMacro extends AbstractProofMacro {
         return "SkipMacro";
     }
 
+    @Override
+    public String getCategory() {
+        return null;
+    }
 
     @Override
     public String getDescription() {

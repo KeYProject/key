@@ -108,7 +108,21 @@ public class JoinRuleTests extends TestCase {
      */
     @Test
     public void testJoinIndistinguishablePathConditionsWithITE() {
-        final Proof proof = loadProof("IndistinguishablePathConditions.key.proof");
+        final Proof proof = loadProof("IndistinguishablePathConditions.proof");
+        
+        try {
+            joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
+            fail("The join operation should not be applicable.");
+        } catch (IncompleteRuleAppException e) {}
+    }
+    
+    /**
+     * Same as testJoinIndistinguishablePathConditionsWithITE(), but
+     * with two join partners.
+     */
+    @Test
+    public void testJoinThreeIndistinguishablePathConditionsWithITE() {
+        final Proof proof = loadProof("IndistinguishablePathConditions.twoJoins.proof");
         
         try {
             joinFirstGoal(proof, JoinIfThenElseAntecedent.instance());
@@ -124,7 +138,7 @@ public class JoinRuleTests extends TestCase {
      */
     @Test
     public void testJoinIndistinguishablePathConditionsWithFullAnonymization() {
-        final Proof proof = loadProof("IndistinguishablePathConditions.key.proof");
+        final Proof proof = loadProof("IndistinguishablePathConditions.proof");
         
         joinFirstGoal(proof, JoinWeaken.instance());
         startAutomaticStrategy(proof);

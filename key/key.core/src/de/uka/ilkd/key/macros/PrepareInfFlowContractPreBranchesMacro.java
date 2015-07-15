@@ -39,6 +39,10 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
         return "Prepare information flow pre branches";
     }
 
+    @Override
+    public String getCategory() {
+        return "Information Flow";
+    }
 
     @Override
     public String getDescription() {

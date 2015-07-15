@@ -27,14 +27,14 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
 public abstract class NotificationEvent {
 
     /** the unique id identifying the kind of this event */
-    private final int eventID;
+    private final NotificationEventID eventID;
            
     /**
      * creates an instance of this event
      * @param eventID the int identifying the kind of this event
      * @see NotificationEventID
      */
-    public NotificationEvent(int eventID) {
+    public NotificationEvent(NotificationEventID eventID) {
         this.eventID = eventID;        
     }
 
@@ -42,7 +42,7 @@ public abstract class NotificationEvent {
      * @return returns the eventID
      * @see NotificationEventID    
      */
-    public int getEventID() {
+    public NotificationEventID getEventID() {
         return eventID;
     }
         

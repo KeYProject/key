@@ -52,9 +52,10 @@ public class AntecTaclet extends FindTaclet{
 		     TacletAttributes attrs,
 		     Term find,
                      boolean ignoreTopLevelUpdates,
-		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<Choice> choices){
+		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<Choice> choices,
+		     ImmutableSet<TacletAnnotation> tacletAnnotations){
         super(name, applPart, goalTemplates, heuristics, attrs, 
-                find, prefixMap, choices);
+                find, prefixMap, choices, tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
     }
@@ -93,6 +94,6 @@ public class AntecTaclet extends FindTaclet{
         attrs.setDisplayName(displayName());
         
         return new AntecTaclet(new Name(s), 
-                applPart, goalTemplates(), getRuleSets(), attrs, find, ignoreTopLevelUpdates, prefixMap, choices);
+                applPart, goalTemplates(), getRuleSets(), attrs, find, ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
     }
 }

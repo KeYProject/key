@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.util.DefaultExperimentalFeature;
 import de.uka.ilkd.key.util.ExperimentalFeature;
 
 /**
@@ -41,24 +42,7 @@ public class JoinRuleMenuItem extends JMenuItem {
      * Controls whether joining is available to the user. WARNING: You may
      * refresh your GUI elements after (de-)activation.
      */
-    public static final ExperimentalFeature FEATURE = new ExperimentalFeature() {
-        private boolean active = true;
-
-        @Override
-        public void deactivate() {
-            active = false;
-        }
-
-        @Override
-        public void activate() {
-            active = true;
-        }
-
-        @Override
-        public boolean active() {
-            return active;
-        }
-    };
+    public static final ExperimentalFeature FEATURE = new DefaultExperimentalFeature();
 
     /**
      * Creates a new menu item for the join rule.
@@ -81,12 +65,10 @@ public class JoinRuleMenuItem extends JMenuItem {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediator.stopInterface(true);
-
                 final JoinRule joinRule = JoinRule.INSTANCE;
                 final JoinRuleBuiltInRuleApp app = (JoinRuleBuiltInRuleApp) joinRule
                         .createApp(pio, services);
-                final JoinRuleCompletion completion = new JoinRuleCompletion();
+                final JoinRuleCompletion completion = JoinRuleCompletion.INSTANCE;
                 final JoinRuleBuiltInRuleApp completedApp = (JoinRuleBuiltInRuleApp) completion
                         .complete(app, goal, false);
 
@@ -94,7 +76,7 @@ public class JoinRuleMenuItem extends JMenuItem {
                 // possible (e.g., if no candidates were selected by the
                 // user in the displayed dialog).
                 if (completedApp != null && completedApp.complete()) {
-                    Thread thread = new Thread(new Runnable() {
+                    SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             try {
@@ -106,16 +88,8 @@ public class JoinRuleMenuItem extends JMenuItem {
                             catch (final AssertionError e) {
                                 signalError(e, mediator);
                             }
-                            finally {
-                                mediator.startInterface(true);
-                            }
                         }
-                    }, "DefocusingJoinRule");
-
-                    thread.start();
-                }
-                else {
-                    mediator.startInterface(true);
+                    });
                 }
             }
         });

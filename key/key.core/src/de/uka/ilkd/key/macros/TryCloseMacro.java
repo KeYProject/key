@@ -86,6 +86,15 @@ public class TryCloseMacro extends AbstractProofMacro {
         return "Close provable goals below";
     }
 
+    /*
+     * (non-Javadoc)
+     * @see de.uka.ilkd.key.macros.ProofMacro#getCategory()
+     */
+    @Override
+    public String getCategory() {
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getDescription()
      */

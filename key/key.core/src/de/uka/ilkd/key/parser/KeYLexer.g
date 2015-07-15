@@ -258,6 +258,7 @@ lexer grammar KeYLexer;
 	EQUAL_UNIQUE : '\\equalUnique';
         NEW : '\\new';
         NEWLABEL : '\\newLabel';
+   CONTAINS_ASSIGNMENT : '\\containsAssignment';
 // label occurs again for character `!'
 	NOT_ : '\\not';
         NOTFREEIN : '\\notFreeIn';
@@ -327,6 +328,9 @@ lexer grammar KeYLexer;
         PROOF : '\\proof';
         CONTRACTS : '\\contracts';
         INVARIANTS : '\\invariants';
+
+   // Taclet annotations (see TacletAnnotations.java for more details)
+   LEMMA : '\\lemma';
 
         // The first two guys are not really meta operators, treated separately
 	IN_TYPE : '\\inType';

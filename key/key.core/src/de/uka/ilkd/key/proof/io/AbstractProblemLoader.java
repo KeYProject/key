@@ -270,6 +270,11 @@ public abstract class AbstractProblemLoader {
                                       
                 // this message is propagated to the top level in console mode
                 return; // Everything fine
+            } catch (Throwable t) {
+                // Throw this exception; otherwise, it can for instance occur
+                // that "result" will be null (if replayProof(...) fails) and
+                // we get a NullPointerException that is hard to analyze.
+                throw t;
             }
             finally {
                control.loadingFinished(this, poContainer, proofList, result);

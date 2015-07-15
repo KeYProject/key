@@ -16,7 +16,9 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import javax.swing.JFrame;
+
+import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;
 
 /**
  * This notification task is used to inform the user about a non-error
@@ -25,22 +27,16 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
  */
 public class GeneralInformationNotification extends NotificationTask {
 
-     
-    /**
-     * @see NotificationTask#executeImpl(NotificationEvent, NotificationManager)      
-     */
-    protected void executeImpl(NotificationEvent event,
-            NotificationManager manager) {
-        for (final NotificationAction action : getNotificationActions()) {         
-            action.execute(event);
-        }
-    }
+    public GeneralInformationNotification(JFrame comp) {
+       addNotificationAction(new GeneralInformationJTextPaneDisplay(comp));
+   }
 
     /** 
      * @return the event id of a general information event
      * @see NotificationEventID
      */
-    public int getEventID() {
+    @Override
+   public NotificationEventID getEventID() {
         return NotificationEventID.GENERAL_INFORMATION;
     }
 

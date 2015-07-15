@@ -1,3 +1,4 @@
+
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -3626,8 +3627,10 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
     int applicationRestriction = RewriteTaclet.NONE;
     choices_ = choices;
     switchToNormalMode();
+    ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
 }
     : 
+      (LEMMA {tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);})?
       name=IDENT (choices_=option_list[choices_])? 
       LBRACE 
       ( (formula RBRACE) => /* check for rbrace needed to distinguish from "label" : goalspec*/ 
@@ -3642,6 +3645,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
            addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null);
            b.setName(new Name(name.getText()));
            b.setChoices(choices_);
+           b.setAnnotations(tacletAnnotations);
            r = b.getTaclet(); 
            taclet2Builder.put(r,b);
          }
@@ -3671,6 +3675,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         modifiers[b]
         { 
             b.setChoices(choices_);
+            b.setAnnotations(tacletAnnotations);
             r = b.getTaclet(); 
             taclet2Builder.put(r,b);
 	  // dump local schema var decls
@@ -3769,7 +3774,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]
+    | varcond_differentFields[b]  
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -3790,6 +3795,7 @@ varexp[TacletBuilder b]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
+        | varcond_containsAssignment[b, negated]        
       )
   )
 ;
@@ -4007,7 +4013,15 @@ varcond_fieldtype [TacletBuilder b]
                                                                (GenericSort)s));
         }
     }
-;      
+;    
+
+varcond_containsAssignment[TacletBuilder b, boolean negated]
+:
+   CONTAINS_ASSIGNMENT LPAREN x=varId RPAREN 
+   {
+      b.addVariableCondition(new ContainsAssignmentCondition((SchemaVariable)x, negated));
+   }
+;  
 
 varcond_enumtype [TacletBuilder b, boolean negated]
 :

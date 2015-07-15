@@ -81,8 +81,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO
     public void readProblem() throws ProofInputException {
         assert proofConfig == null;
 
-        proofConfig = environmentConfig.deepCopy();
-        Services proofServices = proofConfig.getServices();
+        final Services proofServices = postInit();
 
         // create proof obligation
         InfFlowPOSnippetFactory f =

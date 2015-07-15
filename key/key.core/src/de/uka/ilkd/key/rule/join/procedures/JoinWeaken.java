@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -21,11 +23,9 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
  * Rule that joins two sequents based on "total" weakening: Replacement of
@@ -51,14 +51,14 @@ public class JoinWeaken extends JoinProcedure {
 
     @Override
     public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            LocationVariable v, SymbolicExecutionState state1,
+            Term v, SymbolicExecutionState state1,
             Term valueInState1, SymbolicExecutionState state2,
             Term valueInState2, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
         final Function newSkolemConstant = getNewSkolemConstantForPrefix(v
-                .name().toString(), v.sort(), services);
+                .op().name().toString(), v.sort(), services);
         ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
         newNames = newNames.add(newSkolemConstant.name());
 
