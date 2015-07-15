@@ -181,7 +181,7 @@ public class SLTranslationExceptionManager {
    }
 
     public SLTranslationException convertException(
-	    String message, org.antlr.runtime.RecognitionException e) {
+	    String message, RecognitionException e) {
 	Position pos;
 	pos = createAbsolutePosition(e.line, e.charPositionInLine);
 
