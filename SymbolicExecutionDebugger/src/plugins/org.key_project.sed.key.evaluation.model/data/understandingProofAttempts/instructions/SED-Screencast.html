@@ -22,11 +22,11 @@
       
       <h2><a name="best">Best Practices</a></h3>
       <ol>
-         <li>Check if all execution paths end with a termination, exceptional termination or loop body termination node. Otherwise symbolic execution has not finished.</li>
-         <li>Look for unverified nodes indicated by a red cross. For each of them:
+         <li>Focus on an unverified node indicated by a red cross.</li>
              <ol>
-                <li>Comprehend the truth values to identify what could not be shown.</li>
-                <li>Inspect the current state to identify bugs. If there is none, the proof can be closed interactively outside of SED.</li>
+                <li>Inspect the parent nodes to comprehend the followed execution path.</li>
+                <li>Comprehend the truth values of the unverified node to identify what could not be shown.</li>
+                <li>Inspect the symbolic state to identify bugs. If there is none, the proof can be closed interactively outside of SED.</li>
              </ol>
          </li>
       </ol>
