@@ -64,15 +64,11 @@ public class SendFeedbackAction extends AbstractAction {
    private final JDialog dialog;
 
    private static abstract class SendFeedbackItem {
-      final String fileName;
       final JCheckBox checkBox;
 
-      SendFeedbackItem(String fileName, JCheckBox checkBox) {
-         this.fileName = fileName;
+      SendFeedbackItem(JCheckBox checkBox) {
          this.checkBox = checkBox;
       }
-
-      abstract byte[] computeData() throws Exception;
 
       /*
        * Override this in case "enabled" state of corresponding checkbox changes
@@ -90,23 +86,37 @@ public class SendFeedbackAction extends AbstractAction {
          checkBox.setEnabled(isEnabled());
       }
 
-      void addZipEntry(ZipOutputStream stream) throws IOException {
-         if (checkBox.isSelected() && checkBox.isEnabled()) {
-            byte[] data;
-            String zipEntryFileName = fileName;
-            try {
-               data = computeData();
-            }
-            catch (Exception e) {
-               zipEntryFileName += ".exception";
-               data = (e.getClass().getSimpleName()
-                     + " occured while trying to read data.\n" + e.getMessage()
-                     + "\n" + serializeStackTrace(e)).getBytes();
-            }
-            stream.putNextEntry(new ZipEntry(zipEntryFileName));
-            stream.write(data);
-            stream.closeEntry();
+      abstract void appendDataToZipOutputStream(ZipOutputStream stream)
+            throws IOException;
+   }
+
+   private static abstract class SendFeedbackFileItem extends SendFeedbackItem {
+      final String fileName;
+
+      SendFeedbackFileItem(String fileName, JCheckBox checkBox) {
+         super(checkBox);
+         this.fileName = fileName;
+      }
+
+      abstract byte[] retrieveFileData() throws Exception;
+
+      @Override
+      void appendDataToZipOutputStream(ZipOutputStream stream)
+            throws IOException {
+         byte[] data;
+         String zipEntryFileName = fileName;
+         try {
+            data = retrieveFileData();
          }
+         catch (Exception e) {
+            zipEntryFileName += ".exception";
+            data = (e.getClass().getSimpleName()
+                  + " occured while trying to read data.\n" + e.getMessage()
+                  + "\n" + serializeStackTrace(e)).getBytes();
+         }
+         stream.putNextEntry(new ZipEntry(zipEntryFileName));
+         stream.write(data);
+         stream.closeEntry();
       }
    }
 
@@ -116,10 +126,10 @@ public class SendFeedbackAction extends AbstractAction {
    public SendFeedbackAction(final Window parent) {
       super("Send Feedback");
 
-      checkBoxes.add(new SendFeedbackItem("lastLoadedProblem.key",
+      checkBoxes.add(new SendFeedbackFileItem("lastLoadedProblem.key",
             new JCheckBox("Send Last Loaded Problem", true)) {
          @Override
-         byte[] computeData() throws IOException {
+         byte[] retrieveFileData() throws IOException {
             File mostRecentFile = new File(MainWindow.getInstance()
                   .getRecentFiles().getMostRecent().getAbsolutePath());
             return Files.readAllBytes(mostRecentFile.toPath());
@@ -141,18 +151,18 @@ public class SendFeedbackAction extends AbstractAction {
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem("keyVersion.txt", new JCheckBox(
+      checkBoxes.add(new SendFeedbackFileItem("keyVersion.txt", new JCheckBox(
             "Send KeY Version", true)) {
          @Override
-         byte[] computeData() {
+         byte[] retrieveFileData() {
             return KeYConstants.VERSION.getBytes();
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem("systemProperties.txt",
+      checkBoxes.add(new SendFeedbackFileItem("systemProperties.txt",
             new JCheckBox("Send System Properties", true)) {
          @Override
-         byte[] computeData() {
+         byte[] retrieveFileData() {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             System.getProperties().list(pw);
@@ -162,10 +172,10 @@ public class SendFeedbackAction extends AbstractAction {
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem("openGoal.txt", new JCheckBox(
+      checkBoxes.add(new SendFeedbackFileItem("openGoal.txt", new JCheckBox(
             "Send Open Goal", true)) {
          @Override
-         byte[] computeData() {
+         byte[] retrieveFileData() {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             Goal goal = mediator.getSelectedGoal();
             return goal.toString().getBytes();
@@ -183,10 +193,10 @@ public class SendFeedbackAction extends AbstractAction {
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem("openProof.proof", new JCheckBox(
+      checkBoxes.add(new SendFeedbackFileItem("openProof.proof", new JCheckBox(
             "Send Open Proof", true)) {
          @Override
-         byte[] computeData() throws IOException {
+         byte[] retrieveFileData() throws IOException {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             Proof proof = mediator.getSelectedProof();
             OutputStreamProofSaver saver = new OutputStreamProofSaver(proof);
@@ -208,16 +218,16 @@ public class SendFeedbackAction extends AbstractAction {
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem("keySettings.txt", new JCheckBox(
+      checkBoxes.add(new SendFeedbackFileItem("keySettings.txt", new JCheckBox(
             "Send KeY Settings", true)) {
          @Override
-         byte[] computeData() {
+         byte[] retrieveFileData() {
             return ProofSettings.DEFAULT_SETTINGS.settingsToString().getBytes();
          }
       });
 
-      checkBoxes.add(new SendFeedbackItem("javaSource", new JCheckBox(
-            "Send Java Source", true)) {
+      checkBoxes.add(new SendFeedbackItem(new JCheckBox("Send Java Source",
+            true)) {
          @Override
          boolean isEnabled() {
             try {
@@ -228,13 +238,6 @@ public class SendFeedbackAction extends AbstractAction {
             catch (Exception e) {
                return false;
             }
-         }
-
-         @Override
-         byte[] computeData() throws Exception {
-            throw new UnsupportedOperationException(
-                  "Computing data disabled for directory with Java sources. "
-                        + "Manipulation of ZipOutputStream is handled directly by this object.");
          }
 
          private void getJavaFilesRecursively(File directory, List<File> list) {
@@ -249,7 +252,8 @@ public class SendFeedbackAction extends AbstractAction {
          }
 
          @Override
-         void addZipEntry(ZipOutputStream stream) throws IOException {
+         void appendDataToZipOutputStream(ZipOutputStream stream)
+               throws IOException {
             File javaSourceLocation = MainWindow.getInstance().getMediator()
                   .getSelectedProof().getJavaSourceLocation();
             List<File> javaFiles = new LinkedList<>();
@@ -327,7 +331,9 @@ public class SendFeedbackAction extends AbstractAction {
                stream = new ZipOutputStream(new BufferedOutputStream(
                      new FileOutputStream(zipFile)));
                for (SendFeedbackItem item : checkBoxes) {
-                  item.addZipEntry(stream);
+                  if (item.checkBox.isSelected() && item.checkBox.isEnabled()) {
+                     item.appendDataToZipOutputStream(stream);
+                  }
                }
                stream.putNextEntry(new ZipEntry("bugDescription.txt"));
                stream.write(bugDescription.getText().getBytes());
@@ -368,10 +374,11 @@ public class SendFeedbackAction extends AbstractAction {
       if (location != null) {
          final String sourceFileName = location.getFilename();
          if (sourceFileName != null) {
-            checkBoxes.addFirst(new SendFeedbackItem("exceptionSourceFile.txt",
-                  new JCheckBox("Send Exception Source File", true)) {
+            checkBoxes.addFirst(new SendFeedbackFileItem(
+                  "exceptionSourceFile.txt", new JCheckBox(
+                        "Send Exception Source File", true)) {
                @Override
-               byte[] computeData() throws IOException {
+               byte[] retrieveFileData() throws IOException {
                   return Files.readAllBytes(new File(sourceFileName).toPath());
                }
             });
@@ -380,20 +387,20 @@ public class SendFeedbackAction extends AbstractAction {
 
       final JCheckBox sendErrorMessageCheckBox = new JCheckBox(
             "Send Error Message", true);
-      SendFeedbackItem errorMessageFeedbackitem = new SendFeedbackItem(
+      SendFeedbackFileItem errorMessageFeedbackitem = new SendFeedbackFileItem(
             "errorMessage.txt", sendErrorMessageCheckBox) {
          @Override
-         byte[] computeData() {
+         byte[] retrieveFileData() {
             return exception.getMessage().getBytes();
          }
       };
 
       final JCheckBox sendStackTraceCheckBox = new JCheckBox("Send Stacktrace",
             true);
-      SendFeedbackItem stackTraceFeedbackItem = new SendFeedbackItem(
+      SendFeedbackFileItem stackTraceFeedbackItem = new SendFeedbackFileItem(
             "stacktrace.txt", sendStackTraceCheckBox) {
          @Override
-         byte[] computeData() {
+         byte[] retrieveFileData() {
             return serializeStackTrace(exception).getBytes();
          }
       };
