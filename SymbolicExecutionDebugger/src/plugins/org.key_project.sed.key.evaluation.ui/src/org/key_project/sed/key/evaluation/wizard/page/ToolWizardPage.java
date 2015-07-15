@@ -12,7 +12,7 @@ import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 
 public class ToolWizardPage extends AbstractEvaluationWizardPage<ToolPageInput> {
    public ToolWizardPage(ToolPageInput pageInput, ImageDescriptor imageDescriptor) {
-      super(pageInput, imageDescriptor);
+      super(pageInput, imageDescriptor, true);
    }
 
    @Override

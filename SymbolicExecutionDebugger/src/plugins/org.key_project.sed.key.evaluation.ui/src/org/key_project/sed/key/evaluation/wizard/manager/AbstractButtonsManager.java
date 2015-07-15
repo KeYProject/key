@@ -237,7 +237,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
             else {
                pair.getStackLayout().topControl = null;
             }
-            getWizardPage().getForm().reflow(true);
+            getWizardPage().reflow();
          }
       }
    }

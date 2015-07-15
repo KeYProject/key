@@ -48,7 +48,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    private final Map<QuestionInput, IQuestionInputManager> input2managerMap = new HashMap<QuestionInput, IQuestionInputManager>();
 
    public QuestionWizardPage(QuestionPageInput pageInput, ImageDescriptor imageDescriptor) {
-      super(pageInput, imageDescriptor);
+      super(pageInput, imageDescriptor, true);
    }
 
    @Override

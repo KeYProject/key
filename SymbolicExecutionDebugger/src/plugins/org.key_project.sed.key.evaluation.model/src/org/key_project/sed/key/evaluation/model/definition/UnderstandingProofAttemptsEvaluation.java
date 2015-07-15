@@ -288,7 +288,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
                                                               createGiveupWhyOpenChoice());
-      String openQuestionTitle = "Is the proof closed?";
+      String openQuestionTitle = "Is the method successfully verified (Is the proof closed)?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
                                                                    true,
@@ -347,7 +347,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
                                                               createGiveupWhyOpenChoice());
-      String openQuestionTitle = "Is the proof closed?";
+      String openQuestionTitle = "Is the method successfully verified (Is the proof closed)?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
                                                                    true,
@@ -478,7 +478,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
                                                               createGiveupWhyOpenChoice());
-      String openQuestionTitle = "Is the proof closed?";
+      String openQuestionTitle = "Is the method successfully verified (Is the proof closed)?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
                                                                    true,
@@ -578,7 +578,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
                                                               createGiveupWhyOpenChoice());
-      String openQuestionTitle = "Is the proof closed?";
+      String openQuestionTitle = "Is the method successfully verified (Is the proof closed)?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
                                                                    true,

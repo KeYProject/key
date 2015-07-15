@@ -35,7 +35,7 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
    };
    
    public SendFormWizardPage(SendFormPageInput pageInput, AbstractFormInput<?> formInput, ImageDescriptor imageDescriptor) {
-      super(pageInput, imageDescriptor);
+      super(pageInput, imageDescriptor, false);
       this.formInput = formInput;
       pageInput.getAcceptInput().addPropertyChangeListener(QuestionInput.PROP_VALUE, acceptListener);
    }
@@ -53,7 +53,7 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
       // Content to send
       Label label = toolkit.createLabel(parent, "&Content to send");
       label.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-      contentText = toolkit.createText(parent, EvaluationInputWriter.toFormAnswerXML(formInput), SWT.READ_ONLY | SWT.MULTI);
+      contentText = toolkit.createText(parent, EvaluationInputWriter.toFormAnswerXML(formInput), SWT.READ_ONLY | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
       contentText.setLayoutData(new GridData(GridData.FILL_BOTH));
       // Additional data stored on server
       toolkit.createLabel(parent, "Additional &data");

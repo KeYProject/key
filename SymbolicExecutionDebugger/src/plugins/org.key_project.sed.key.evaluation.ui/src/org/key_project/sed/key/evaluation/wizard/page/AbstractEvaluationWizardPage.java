@@ -38,9 +38,12 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    
    private SharedScrolledComposite form;
    
-   public AbstractEvaluationWizardPage(P pageInput, ImageDescriptor imageDescriptor) {
+   private final boolean useForm;
+   
+   public AbstractEvaluationWizardPage(P pageInput, ImageDescriptor imageDescriptor, boolean useForm) {
       super(pageInput.getPage().getName());
       this.pageInput = pageInput;
+      this.useForm = useForm;
       setTitle(pageInput.getPage().getTitle());
       setMessage(pageInput.getPage().getMessage());
       setImageDescriptor(imageDescriptor);
@@ -48,23 +51,29 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
 
    @Override
    public void createControl(Composite parent) {
-      // Tutorial about Forms: https://eclipse.org/articles/Article-Forms/article.html
       FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-      form = new SharedScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL) {};
-      toolkit.adapt(form);
-      Composite content = toolkit.createComposite(form);
-      if (getPageInput().getPage().isWrapLayout()) {
-         content.setLayout(new TableWrapLayout());
+      if (useForm) {
+         // Tutorial about Forms: https://eclipse.org/articles/Article-Forms/article.html
+         form = new SharedScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL) {};
+         toolkit.adapt(form);
+         Composite content = toolkit.createComposite(form);
+         if (getPageInput().getPage().isWrapLayout()) {
+            content.setLayout(new TableWrapLayout());
+         }
+         else {
+            content.setLayout(new GridLayout(1, false));
+         }
+         form.setContent(content);
+         form.setExpandHorizontal(true);
+         form.setExpandVertical(true);
+         createContent(toolkit, content);
+         setControl(form);
       }
       else {
-         content.setLayout(new GridLayout(1, false));
+         Composite content = toolkit.createComposite(parent);
+         createContent(toolkit, content);
+         setControl(content);
       }
-      form.setContent(content);
-      form.setExpandHorizontal(true);
-      form.setExpandVertical(true);
-      
-      createContent(toolkit, content);
-      setControl(form);
       updatePageCompleted();
    }
 
@@ -237,13 +246,15 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    }
    
    public void performMessageClick() {
-      if (errornousControl != null) {
+      if (form != null && errornousControl != null) {
          form.showControl(errornousControl);
       }
    }
-
-   public SharedScrolledComposite getForm() {
-      return form;
+   
+   public void reflow() {
+      if (form != null) {
+         form.reflow(true);
+      }
    }
 
    @Override
