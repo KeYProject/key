@@ -272,7 +272,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("summand", "summand"),
                                                                new Choice("summand.value", "summand.value"),
                                                                new Choice("something else", "something else", createElseLocationSubQuestion()),
-                                                               new Choice("none", "none"));
+                                                               new Choice("none", "none"),
+                                                               createGiveupLocationChoice());
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
                                                               whyOpenTitle, 
@@ -286,7 +287,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion()),
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
-                                                              createGiveupChoice());
+                                                              createGiveupWhyOpenChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -345,7 +346,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createLoopAssignableText(), createLoopAssignableValue(), createMinLocationQuestion("whichLoopLocationsHaveChanged"), createMinTerminationQuestion("loopAssignableTermination", false, false)),
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
-                                                              createGiveupChoice());
+                                                              createGiveupWhyOpenChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -375,7 +376,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 26: if (array[i] < array[minIndex])", "Line 26", true),
                                                                new Choice("Line 27: minIndex = 1", "Line 27", true),
                                                                new Choice("Line 34: return minIndex", "Line 34", true),
-                                                               new Choice("Line 39: return -1", "Line 39", true));
+                                                               new Choice("Line 39: return -1", "Line 39", true),
+                                                               createGiveupExecutedChoice());
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -411,7 +413,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       new Choice("javax.naming.OperationNotSupportedException", "javax.naming.OperationNotSupportedException"),
                                                                       new Choice("java.lang.OutOfMemoryError", "java.lang.OutOfMemoryError"),
                                                                       new Choice("something else", "something else", createElseExceptionSubQuestion()),
-                                                                      new Choice("none", "none"));
+                                                                      new Choice("none", "none"),
+                                                                      createGiveupExceptionChoice());
       return thrownExceptionQuestion;
    }
 
@@ -430,7 +433,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("minIndex", "minIndex"),
                                   new Choice("i", "i"),
                                   new Choice("something else", "something else", createElseLocationSubQuestion()),
-                                  new Choice("none", "none"));
+                                  new Choice("none", "none"),
+                                  createGiveupLocationChoice());
    }
    
    private CheckboxQuestion createMinTerminationQuestion(String name, boolean termination2expected, boolean loop1expected) {
@@ -446,7 +450,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("Termination 3: array != null & array.length > 1", "Termination 3"),
                                   new Choice("Termination 4: array == null", "Termination 4"),
                                   new Choice("Loop Body Termination 1: array[i] < array[minIndex]", "Loop Body Termination 1", loop1expected),
-                                  new Choice("Loop Body Termination 2: array[i] >= array[minIndex]", "Loop Body Termination 2"));
+                                  new Choice("Loop Body Termination 2: array[i] >= array[minIndex]", "Loop Body Termination 2"),
+                                  createGiveupTerminationPathChoice());
    }
    
    private QuestionPage createCalendarQuestionPage(String pageName, String title) {
@@ -472,7 +477,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createLoopAssignableText(), createLoopAssignableValue(), createCalendarLocationQuestion("whichLoopLocationsHaveChanged"), createCalendarTerminationQuestion("loopAssingableTermination", false)),
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
-                                                              createGiveupChoice());
+                                                              createGiveupWhyOpenChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -498,7 +503,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 23: newEntries[i] = entries[i]", "Line 23"),
                                                                new Choice("Line 26: entries = newEntries", "Line 26"),
                                                                new Choice("Line 32: entries[entrySize] = entry", "Line 32", true),
-                                                               new Choice("Line 33: entrySize++", "Line 33", true));
+                                                               new Choice("Line 33: entrySize++", "Line 33", true),
+                                                               createGiveupExecutedChoice());
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -535,7 +541,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("newEntries.length", "newEntries.length"),
                                   new Choice("newEntries[*]", "newEntries[*]"),
                                   new Choice("something else", "something else", createElseLocationSubQuestion()),
-                                  new Choice("none", "none"));
+                                  new Choice("none", "none"),
+                                  createGiveupLocationChoice());
    }
    
    private CheckboxQuestion createCalendarTerminationQuestion(String name, boolean expectedAfterElse) {
@@ -548,7 +555,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   true,
                                   new Choice("Continuation After Then: entrySize == entries.length", "Continuation After Then"),
                                   new Choice("Continuation After Else: entrySize != entries.length", "Continuation After Else", expectedAfterElse),
-                                  new Choice("Loop Body Termination (of the 'Body Preserves Invariant' branch)", "Loop Body Termination"));
+                                  new Choice("Loop Body Termination (of the 'Body Preserves Invariant' branch)", "Loop Body Termination"),
+                                  createGiveupTerminationPathChoice());
    }
 
    private QuestionPage createAccountQuestionPage(String pageName, String title) {
@@ -569,7 +577,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createExceptionThrownText("checkAndWithdraw(int)"), createExceptionThrownValue(), createThrownExceptionsQuestion()),
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
-                                                              createGiveupChoice());
+                                                              createGiveupWhyOpenChoice());
       String openQuestionTitle = "Is the proof closed?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
@@ -593,7 +601,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 16: return 0", "Line 16", true),
                                                                new Choice("Line 26: balance -= amount", "Line 26"),
                                                                new Choice("Line 35: return amount > 0", "Line 35"),
-                                                               new Choice("Line 44: return balance", "Line 44"));
+                                                               new Choice("Line 44: return balance", "Line 44"),
+                                                               createGiveupExecutedChoice());
       String contractsTitle = "Which method contracts are applied at least once during symbolic execution of the proof?";
       CheckboxQuestion contractsQuestion = new CheckboxQuestion("appliedContracts", 
                                                                 contractsTitle, 
@@ -605,7 +614,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                 new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
                                                                 new Choice("Contract of method withdraw(int)", "withdraw", true),
                                                                 new Choice("Contract of method canWithdraw(int)", "canWithdraw", true),
-                                                                new Choice("Contract of method getBalance()", "getBalance"));
+                                                                new Choice("Contract of method getBalance()", "getBalance"),
+                                                                createGiveupAppliedContractsChoice());
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -646,9 +656,30 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return new Choice("Code and specifications are bug free, proof can be closed interactively", "Bug free");
    }
    
-   private Choice createGiveupChoice() {
+   private Choice createGiveupWhyOpenChoice() {
       return new Choice("I tried my best to find out what (else) is wrong, but after 10 minutes I gave up.", "Give up");
    }
+   
+   private Choice createGiveupExecutedChoice() {
+      return new Choice("I tried my best to find out what (else) is executed, but after 10 minutes I gave up.", "Give up");
+   }
+   
+   private Choice createGiveupAppliedContractsChoice() {
+      return new Choice("I tried my best to find out what (else) was applied, but after 10 minutes I gave up.", "Give up");
+   }
+   
+   private Choice createGiveupLocationChoice() {
+      return new Choice("I tried my best to find out what (else) has changed, but after 10 minutes I gave up.", "Give up");
+   }
+   
+   private Choice createGiveupExceptionChoice() {
+      return new Choice("I tried my best to find out what (else) can be thrown, but after 10 minutes I gave up.", "Give up");
+   }
+   
+   private Choice createGiveupTerminationPathChoice() {
+      return new Choice("I tried my best to find out at which execution path(s), but after 10 minutes I gave up.", "Give up");
+   }
+
 
    private CheckboxQuestion createAccountLocationQuestion(String name) {
       String title = "Which not specified location(s) have changed?";
@@ -661,7 +692,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("balance", "balance"),
                                   new Choice("amount", "amount"),
                                   new Choice("something else", "something else", createElseLocationSubQuestion()),
-                                  new Choice("none", "none"));
+                                  new Choice("none", "none"),
+                                  createGiveupLocationChoice());
    }
    
    private CheckboxQuestion createAccountTerminationQuestion(String name, boolean termination2expected) {
@@ -673,7 +705,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
                                   new Choice("Termination 1: canWithdraw(amount)", "Termination 1"),
-                                  new Choice("Termination 2: !canWithdraw(amount)", "Termination 2", termination2expected));
+                                  new Choice("Termination 2: !canWithdraw(amount)", "Termination 2", termination2expected),
+                                  createGiveupTerminationPathChoice());
    }
    
    private String createGeneralDescription(String po) {
