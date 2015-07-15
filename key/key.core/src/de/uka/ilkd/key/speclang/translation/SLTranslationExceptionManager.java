@@ -178,17 +178,20 @@ public class SLTranslationExceptionManager {
      * Converts an ANTLRException into an SLTranslationException with the same
      * message and stack trace, and with current absolute position information.
      */
-    public SLTranslationException convertException(RecognitionException e) {
-        Position pos;
-        pos = createAbsolutePosition(e.line, e.charPositionInLine);
-        return new SLTranslationException(e.getMessage()
-                                          + " ("
-                                          + e.getClass().getName()
-                                          + ")",
-                                          fileName,
-                                          pos,
-                                          e);
-    }
+   public SLTranslationException convertException(RecognitionException e) {
+      Position pos;
+      pos = createAbsolutePosition(e.line, e.charPositionInLine);
+      String message = e.getMessage();
+      if (message != null) {
+         message = "[" + e.getClass().getName() + "] " + message;
+      }
+      else {
+         message = "Received " + e.getClass().getName() + " at line "
+               + pos.getLine() + ":" + pos.getColumn() + " in file:\n"
+               + fileName;
+      }
+      return new SLTranslationException(message, fileName, pos, e);
+   }
 
     public SLTranslationException convertException(
 	    String message, org.antlr.runtime.RecognitionException e) {
