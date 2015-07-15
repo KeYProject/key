@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -212,6 +213,53 @@ public class SendFeedbackAction extends AbstractAction {
          @Override
          byte[] computeData() {
             return ProofSettings.DEFAULT_SETTINGS.settingsToString().getBytes();
+         }
+      });
+
+      checkBoxes.add(new SendFeedbackItem("javaSource", new JCheckBox(
+            "Send Java Source", true)) {
+         @Override
+         boolean isEnabled() {
+            try {
+               File javaSourceLocation = MainWindow.getInstance().getMediator()
+                     .getSelectedProof().getJavaSourceLocation();
+               return javaSourceLocation == null ? false : true;
+            }
+            catch (Exception e) {
+               return false;
+            }
+         }
+
+         @Override
+         byte[] computeData() throws Exception {
+            throw new UnsupportedOperationException(
+                  "Computing data disabled for directory with Java sources. "
+                        + "Manipulation of ZipOutputStream is handled directly by this object.");
+         }
+
+         private void getJavaFilesRecursively(File directory, List<File> list) {
+            for (File f : directory.listFiles()) {
+               if (f.isDirectory()) {
+                  getJavaFilesRecursively(f, list);
+               }
+               else if (f.getName().endsWith(".java")) {
+                  list.add(f);
+               }
+            }
+         }
+
+         @Override
+         void addZipEntry(ZipOutputStream stream) throws IOException {
+            File javaSourceLocation = MainWindow.getInstance().getMediator()
+                  .getSelectedProof().getJavaSourceLocation();
+            List<File> javaFiles = new LinkedList<>();
+            getJavaFilesRecursively(javaSourceLocation, javaFiles);
+            for (File f : javaFiles) {
+               stream.putNextEntry(new ZipEntry("javaSource/"
+                     + javaSourceLocation.toURI().relativize(f.toURI())));
+               stream.write(Files.readAllBytes(f.toPath()));
+               stream.closeEntry();
+            }
          }
       });
 
