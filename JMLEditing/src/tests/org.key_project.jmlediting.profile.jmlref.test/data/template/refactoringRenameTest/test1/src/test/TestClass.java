@@ -1,20 +1,20 @@
 package test;
 
-public class TestClass1 {
-    public int /*@ spec_public @*/ aVeryLongNewName;
+public class TestClass {
+    private int /*@ spec_public @*/ balance;
     
     /*@ normal_behavior
       @ pure
       @*/
     public int getBalance() {
-        return aVeryLongNewName;
+        return balance;
     }
 
     /*@ normal_behavior
       @ 
-      @ assignable aVeryLongNewName;
+      @ assignable balance;
       @*/ 
     public void setBalance(int newBalance) {
-        aVeryLongNewName = newBalance;
+        balance = newBalance;
     }
 }

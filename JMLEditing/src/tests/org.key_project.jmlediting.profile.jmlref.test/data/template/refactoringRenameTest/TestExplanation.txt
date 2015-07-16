@@ -1,0 +1,15 @@
+Basic idea: 
+Run a renaming and compare the editor content to a given oracle, i.e. the result which should be achieved.
+
+
+1) Each test in its own folder. Separated in src and oracle.
+2) First files are copied and oracle string is generated.
+3) Renaming is done.
+4) Comparison of editor after renaming to oracle.
+
+
+What is tested:
+
+Test1: one occurrence in a simple assignable clause
+Test2: 
+...

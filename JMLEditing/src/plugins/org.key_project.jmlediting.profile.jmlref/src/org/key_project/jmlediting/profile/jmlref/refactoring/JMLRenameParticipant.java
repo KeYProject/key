@@ -3,6 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.refactoring;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -14,8 +15,10 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
+import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
@@ -128,7 +131,16 @@ public class JMLRenameParticipant extends RenameParticipant {
                             }
                         }
                         else {
-                            // TODO: changes to JML but not to Java
+                            TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());
+                            MultiTextEdit allEdits = new MultiTextEdit();
+                            
+                            for (final ReplaceEdit edit: changesToJML) {
+                               allEdits.addChild(edit);
+                            }
+                            
+                            tfChange.setEdit(allEdits);
+                            
+                            return tfChange;
                         }
                     }
                 }
