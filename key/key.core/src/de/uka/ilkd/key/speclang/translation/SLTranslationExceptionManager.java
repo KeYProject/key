@@ -202,6 +202,10 @@ public class SLTranslationExceptionManager {
      * message and stack trace, and with current absolute position information.
      */
    public SLTranslationException convertException(RecognitionException e) {
+      // no conversion necessary if e is already a SLTranslationException
+      if (e instanceof SLTranslationException) {
+         return (SLTranslationException) e;
+      }
       Position pos = createAbsolutePosition(e.line, e.charPositionInLine);
       String message = createMessage(e, pos);
       return new SLTranslationException(message, fileName, pos, e);
