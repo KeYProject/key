@@ -176,11 +176,9 @@ public class SLTranslationExceptionManager {
       else {
          String p = pos.getLine() + ":" + pos.getColumn();
          if (e instanceof NoViableAltException) {
-            return "No viable alternative at " + p + ": " + e.token.getText()
-                  + "\nSource file name: " + fileName;
+            return "No viable alternative at " + p + ": " + e.token.getText();
          }
-         return "Received " + e.getClass().getName() + " at line " + p
-               + " in file:\n" + fileName;
+         return "["+e.getClass().getName()+"] Unspecified syntax error.";
       }
    }
 
@@ -189,8 +187,7 @@ public class SLTranslationExceptionManager {
      * message and stack trace, and with current absolute position information.
      */
    public SLTranslationException convertException(RecognitionException e) {
-      Position pos;
-      pos = createAbsolutePosition(e.line, e.charPositionInLine);
+      Position pos = createAbsolutePosition(e.line, e.charPositionInLine);
       String message = createMessage(e, pos);
       return new SLTranslationException(message, fileName, pos, e);
    }

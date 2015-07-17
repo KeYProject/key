@@ -26,6 +26,10 @@ public final class ExceptionTools {
     
         Location location = null;
 
+        /*
+         *  This must be before check for RecognitionException because currently
+         *  SLTranslationException is subtype of RecognitionException.
+         */
         if (exc instanceof SLTranslationException) {
            SLTranslationException ste = (SLTranslationException) exc;
            location = new Location(ste.getFileName(), 

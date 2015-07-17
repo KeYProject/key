@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import recoder.util.Debug;
 import antlr.Token;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -62,6 +63,17 @@ public class PositionedString {
         this(text, (String)null);
     }
 
+   public PositionedString prependAndUpdatePosition(String text) {
+      if (this.pos.getColumn() < text.length()) {
+         Debug.info("Given position " + pos
+               + " column is smaller than prepended text " + "\"" + text
+               + "\". This will result in a negative column value for "
+               + "returned " + PositionedString.class.getSimpleName());
+      }
+      Position newPos = new Position(this.pos.getLine(), this.pos.getColumn()
+            - text.length());
+      return new PositionedString(text + this.text, this.fileName, newPos);
+   }
 
     public PositionedString prepend(String text) {
         return new PositionedString(text + this.text.trim(), this.fileName, this.pos);

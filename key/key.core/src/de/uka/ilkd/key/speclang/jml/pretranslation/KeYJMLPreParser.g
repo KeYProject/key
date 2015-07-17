@@ -131,6 +131,13 @@ options {
        return flipHeaps(declString, result, false);
     }
 
+    /*
+     * This method prepends a String to a given PositionedString and removes whitespaces from
+     * heap brackets.
+     * 
+     * Static changes in Strings that will be passed to KeYJMLParser can result
+     * shifted/inaccurate position values. This method should be replaced by a more accurate implementation.
+     */
     private PositionedString flipHeaps(String declString, PositionedString result, boolean allowPreHeaps) {
       String t = result.text;
       String p = declString+" ";
@@ -150,10 +157,10 @@ options {
         if(t.startsWith(l) || t.startsWith(lsp)) {
            p = l + p;
            t = t.substring(t.startsWith(lsp) ? lsp.length() : l.length());
+           result = new PositionedString(t, result.fileName, result.pos);
         }
-        result = new PositionedString(t, result.fileName, result.pos);
       }
-      result = result.prepend(p);
+      result = result.prependAndUpdatePosition(p);
       return result;
     }
     
