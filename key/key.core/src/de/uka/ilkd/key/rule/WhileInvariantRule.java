@@ -93,6 +93,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Loop Invariant");
 
+    public static final String BODY_PRESERVES_INVARIANT_LABEL = "Body Preserves Invariant";
+
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
 
@@ -677,7 +679,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                             final Term[] uBeforeLoopDefAnonVariant,
                                             final Term uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
-        bodyGoal.setBranchLabel("Body Preserves Invariant");
+        bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
         bodyGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 true, 
                 false);         

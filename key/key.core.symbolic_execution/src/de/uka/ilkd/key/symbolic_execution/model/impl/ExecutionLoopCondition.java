@@ -15,6 +15,8 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -27,7 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionLoopCondition}.
  * @author Martin Hentschel
  */
-public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<LoopStatement> implements IExecutionLoopCondition {
+public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<JavaStatement> implements IExecutionLoopCondition {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
@@ -51,7 +53,15 @@ public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<Loop
     */
    @Override
    public Expression getGuardExpression() {
-      return getActiveStatement().getGuardExpression();
+      if (getActiveStatement() instanceof LoopStatement) {
+         return ((LoopStatement) getActiveStatement()).getGuardExpression();
+      }
+      else if (getActiveStatement() instanceof If) {
+         return ((If) getActiveStatement()).getExpression();
+      }
+      else {
+         return null;
+      }
    }
 
    /**

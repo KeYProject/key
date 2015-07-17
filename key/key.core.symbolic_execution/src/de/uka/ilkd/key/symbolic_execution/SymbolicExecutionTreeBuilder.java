@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
+import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -60,6 +61,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -741,25 +743,67 @@ public class SymbolicExecutionTreeBuilder {
             parentToAddTo = executionNode;
          }
          // Check if loop condition is available
+         boolean isLoopCondition = false;
          if (SymbolicExecutionUtil.hasLoopCondition(node, node.getAppliedRuleApp(), statement)) {
-            if (((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &&
+            if (((LoopStatement) statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &&
                 !SymbolicExecutionUtil.isDoWhileLoopCondition(node, statement) && 
                 !SymbolicExecutionUtil.isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
-               ExecutionLoopCondition condition = keyNodeLoopConditionMapping.get(node);
-               if (condition == null) {
-                  condition = new ExecutionLoopCondition(settings, node);
-                  addChild(parentToAddTo, condition);
-                  keyNodeLoopConditionMapping.put(node, condition);
-                  // Set call stack on new created node
-                  condition.setCallStack(createCallStack(node));
-                  Pair<Integer, SourceElement> secondPair = SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
-                  addToBlockMap(node, condition, secondPair.first, secondPair.second, statement);
-               }
-               parentToAddTo = condition;
+               isLoopCondition = true;
             }
+         }
+         // Check if loop condition is available after loop invariant (rewritten into if statement)
+         if (statement instanceof If && 
+             ((If) statement).getExpression().getPositionInfo() != PositionInfo.UNDEFINED && 
+             SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp()) != null &&
+             searchDirectParentBodyPreservesInvariantBranchCondition(parentToAddTo) != null) {
+            isLoopCondition = true;
+         }
+         // Create loop condition if required
+         if (isLoopCondition) {
+            ExecutionLoopCondition condition = keyNodeLoopConditionMapping.get(node);
+            if (condition == null) {
+               condition = new ExecutionLoopCondition(settings, node);
+               addChild(parentToAddTo, condition);
+               keyNodeLoopConditionMapping.put(node, condition);
+               // Set call stack on new created node
+               condition.setCallStack(createCallStack(node));
+               Pair<Integer, SourceElement> secondPair = SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
+               addToBlockMap(node, condition, secondPair.first, secondPair.second, statement);
+            }
+            parentToAddTo = condition;
          }
       }
       return parentToAddTo;
+   }
+   
+   /**
+    * Searches the direct parent {@link IExecutionBranchCondition} representing
+    * the 'Body Preserves Invariant' branch.
+    * @param current The {@link IExecutionNode} to check its parent {@link IExecutionBranchCondition}s.
+    * @return The found {@link IExecutionBranchCondition} or {@code null} if not available.
+    */
+   protected IExecutionBranchCondition searchDirectParentBodyPreservesInvariantBranchCondition(IExecutionNode<?> current) {
+      Iterator<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>> iter = branchConditionsStack.iterator();
+      while (current instanceof IExecutionBranchCondition) {
+         if (WhileInvariantRule.BODY_PRESERVES_INVARIANT_LABEL.equals(current.getProofNode().getNodeInfo().getBranchLabel())) {
+            return (IExecutionBranchCondition) current;
+         }
+         else {
+            // Search parent (current.getParent() is not yet defined)
+            boolean parentFound = false;
+            while (!parentFound && iter.hasNext()) {
+               Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> entry = iter.next();
+               if (entry.getValue().contains(current)) {
+                  current = entry.getKey();
+                  parentFound = true;
+               }
+            }
+            if (!parentFound) {
+               current = null;
+            }
+         }
+      }
+      return null;
    }
 
    protected boolean shouldPrune(Node node) {

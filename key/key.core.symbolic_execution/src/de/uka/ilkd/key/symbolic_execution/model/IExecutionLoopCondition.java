@@ -15,7 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
 
@@ -32,7 +32,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionLoopCondition
  */
-public interface IExecutionLoopCondition extends IExecutionBlockStartNode<LoopStatement> {
+public interface IExecutionLoopCondition extends IExecutionBlockStartNode<JavaStatement> {
    /**
     * Returns the loop expression which is executed.
     * @return The executed loop expression.

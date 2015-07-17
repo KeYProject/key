@@ -156,7 +156,7 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
-                  <statement name="x++;" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="false">
+                  <loopCondition name="x&lt;-1" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="false" blockOpened="false">
                      <variable name="x" isArrayIndex="false">
                         <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
@@ -178,7 +178,11 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                         </value>
                      </variable>
                      <callStackEntry path="/0"/>
-                     <termination name="&lt;loop body end&gt;" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                     <statement name="x++;" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="false">
+                        <variable name="x" isArrayIndex="false">
+                           <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                         <variable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
@@ -195,12 +199,31 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                            <value name="exc_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="x" isArrayIndex="false">
-                           <value name="x {true}" typeString="int" valueString="1 + x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           </value>
-                        </variable>
-                     </termination>
-                  </statement>
+                        <callStackEntry path="/0"/>
+                        <termination name="&lt;loop body end&gt;" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="heapBefore_LOOP" isArrayIndex="false">
+                              <value name="heapBefore_LOOP {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="variant" isArrayIndex="false">
+                              <value name="variant {true}" typeString="int" valueString="x_0 * -1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="exc_1" isArrayIndex="false">
+                              <value name="exc_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="x" isArrayIndex="false">
+                              <value name="x {true}" typeString="int" valueString="1 + x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </termination>
+                     </statement>
+                  </loopCondition>
                </branchCondition>
                <branchCondition name="x_0 = -1" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="true" branchCondition="x_0 = -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <variable name="x" isArrayIndex="false">
@@ -277,6 +300,6 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
       <methodReturnEntry path="/0/0/1/0/1/0/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/1/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0/0"/>
    <terminationEntry path="/0/0/1/0/1/0/0/0"/>
 </start>

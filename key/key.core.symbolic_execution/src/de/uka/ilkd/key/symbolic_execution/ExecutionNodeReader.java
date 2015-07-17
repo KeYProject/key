@@ -42,6 +42,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Throw;
@@ -1705,7 +1706,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionBlockStartNode<LoopStatement> implements IExecutionLoopCondition {
+   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionBlockStartNode<JavaStatement> implements IExecutionLoopCondition {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
