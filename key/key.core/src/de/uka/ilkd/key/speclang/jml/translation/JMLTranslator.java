@@ -2389,11 +2389,7 @@ public final class JMLTranslator {
             checkNotType(e1,man);
             checkNotType(e2,man);
             SLExpression result = null;
-            try {
-                result = translate(jish,e1,e2);
-            } catch (SLTranslationException cause){
-                throw man.createException("Cannot create JML arithmetic expression", cause);
-            }
+            result = translate(jish,e1,e2);
             return result;
         }
 
