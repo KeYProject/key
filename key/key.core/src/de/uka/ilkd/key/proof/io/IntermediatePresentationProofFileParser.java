@@ -90,6 +90,9 @@ public class IntermediatePresentationProofFileParser implements
     /* + State information that is returned after parsing */
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
+    
+    /* + The number of parsed apps */
+    private int nrApps;
 
     /**
      * @param proof
@@ -285,6 +288,7 @@ public class IntermediatePresentationProofFileParser implements
                     .setIntermediateRuleApp(constructTacletApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp()
                     .setLineNr(lineNr);
+            nrApps++;
             break;
 
         case BUILT_IN_RULE: // BuiltIn rules
@@ -292,6 +296,7 @@ public class IntermediatePresentationProofFileParser implements
                     .setIntermediateRuleApp(constructBuiltInApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp()
                     .setLineNr(lineNr);
+            nrApps++;
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
@@ -311,7 +316,7 @@ public class IntermediatePresentationProofFileParser implements
      * @return The results of the parsing procedure.
      */
     public Result getResult() {
-        return new Result(getErrors(), getStatus(), root);
+        return new Result(getErrors(), getStatus(), root, nrApps);
     }
 
     @Override
@@ -469,12 +474,14 @@ public class IntermediatePresentationProofFileParser implements
         private List<Throwable> errors;
         private String status;
         private BranchNodeIntermediate parsedResult = null;
+        private int nrApps;
 
         public Result(List<Throwable> errors, String status,
-                BranchNodeIntermediate parsedResult) {
+                BranchNodeIntermediate parsedResult, int nrApps) {
             this.errors = errors;
             this.status = status;
             this.parsedResult = parsedResult;
+            this.nrApps = nrApps;
         }
 
         public List<Throwable> getErrors() {
@@ -487,6 +494,10 @@ public class IntermediatePresentationProofFileParser implements
 
         public BranchNodeIntermediate getParsedResult() {
             return parsedResult;
+        }
+
+        public int getNrApps() {
+            return nrApps;
         }
 
     }

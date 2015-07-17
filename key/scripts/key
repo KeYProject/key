@@ -116,7 +116,7 @@ keyoptions=""
 
 #default values for Java Options Xmx and Xms
 javaOptionXmx="-Xmx6000m";
-javaOptionXms="-Xms256m";
+javaOptionXms="-Xms4000m";
 
 while [ $# -ne 0 ]; do
     case $1 in
