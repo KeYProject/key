@@ -57,8 +57,8 @@ public class SendFeedbackAction extends AbstractAction {
       return stackTrace;
    }
 
-   // suggested e-Mail address that bug reports shall be sent to
-   private final String BUG_REPORT_RECIPIENT = null;
+   // TODO provide a recipient e-mail address for developer feedback
+   static final String FEEDBACK_RECIPIENT = null;
 
    // dialog that opens in case user wished to send feedback
    private final JDialog dialog;
@@ -302,7 +302,7 @@ public class SendFeedbackAction extends AbstractAction {
                         parent,
                         "A zip archive containing the selected metadata will be created.\n"
                               + "Please send an e-Mail containing this zip file as attachment to:\n"
-                              + BUG_REPORT_RECIPIENT, "Send Bug Report",
+                              + FEEDBACK_RECIPIENT, "Send Bug Report",
                         JOptionPane.OK_CANCEL_OPTION);
             if (confirmed == JOptionPane.OK_OPTION) {
                KeYFileChooser fileChooser = KeYFileChooser
