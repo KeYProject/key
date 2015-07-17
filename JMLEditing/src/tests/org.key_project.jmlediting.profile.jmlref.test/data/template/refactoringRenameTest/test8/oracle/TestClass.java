@@ -10,13 +10,6 @@ public class TestClass {
     public /*@ pure @*/ int getBalance() {
         return aNewName;
     }
-
-    /*@ normal_behavior
-      @ assignable aNewName;
-      @*/ 
-    public void setBalance(int newBalance) {
-        aNewName = newBalance;
-    }
     
     /*@ normal_behavior
       @ ensures \result == otherClass.balance;

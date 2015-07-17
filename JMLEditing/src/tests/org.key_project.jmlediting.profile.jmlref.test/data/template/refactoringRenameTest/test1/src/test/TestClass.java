@@ -2,13 +2,6 @@ package test;
 
 public class TestClass {
     private int /*@ spec_public @*/ balance;
-    
-    /*@ normal_behavior
-      @ pure
-      @*/
-    public int getBalance() {
-        return balance;
-    }
 
     /*@ normal_behavior
       @ 

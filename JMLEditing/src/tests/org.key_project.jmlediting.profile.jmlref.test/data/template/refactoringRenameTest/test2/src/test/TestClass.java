@@ -2,13 +2,6 @@ package test;
 
 public class TestClass {
     private int /*@ spec_public @*/ balance;
-    
-    /*@ normal_behavior
-      @ 
-      @*/
-    public /*@ pure @*/ int getBalance() {
-        return balance;
-    }
 
     /*@ normal_behavior
       @ ensures balance = something + \old(balance);

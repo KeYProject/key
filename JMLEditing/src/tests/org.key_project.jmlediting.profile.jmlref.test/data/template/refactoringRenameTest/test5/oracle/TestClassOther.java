@@ -5,13 +5,6 @@ public class TestClassOther {
     public TestClass mainClass = new TestClass();
     
     /*@ normal_behavior
-      @ 
-      @*/
-    public /*@ pure @*/ int getBalance() {
-        return balance;
-    }
-
-    /*@ normal_behavior
       @ assignable balance;
       @*/ 
     public void setBalance(int newBalance) {

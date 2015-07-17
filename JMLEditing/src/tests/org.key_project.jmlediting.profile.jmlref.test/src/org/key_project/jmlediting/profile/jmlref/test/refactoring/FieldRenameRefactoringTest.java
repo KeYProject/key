@@ -100,7 +100,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     @Test
-    public void testSimpleAssignableClause() throws InterruptedException, CoreException {
+    public void test1SimpleAssignableClause() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test1";
         final String pathToTests = path + "\\src";
@@ -124,7 +124,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     @Test
-    public void testAssignableRequiresAndEnsures() throws InterruptedException, CoreException {
+    public void test2AssignableRequiresAndEnsures() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test2";
         final String pathToTests = path + "\\src";
@@ -147,7 +147,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     @Test
-    public void testThisQualifier() throws InterruptedException, CoreException {
+    public void test3ThisQualifier() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test3";
         final String pathToTests = path + "\\src";
@@ -170,7 +170,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     @Test
-    public void testTwoFilesSamePackageNoChangeInFileTwo() throws InterruptedException, CoreException {
+    public void test4TwoFilesSamePackageNoChangeInFileTwo() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test4";
         final String pathToTests = path + "\\src";
@@ -201,7 +201,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     @Test
-    public void testTwoFilesSamePackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
+    public void test5TwoFilesSamePackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test5";
         final String pathToTests = path + "\\src";
@@ -232,9 +232,10 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     @Test
-    public void testTwoFilesOtherPackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
+    public void test6TwoFilesOtherPackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
+       
         
-        final String path = "data\\template\\refactoringRenameTest\\test6";
+                final String path = "data\\template\\refactoringRenameTest\\test6";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
         
@@ -264,7 +265,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     @Test
-    public void testTwoFilesMemberAccess() throws InterruptedException, CoreException {
+    public void test7TwoFilesMemberAccess() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test7";
         final String pathToTests = path + "\\src";
@@ -295,7 +296,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     @Test
-    public void testNoJavaChangesInOtherFile() throws InterruptedException, CoreException {
+    public void test8NoJavaChangesInOtherFile() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test8";
         final String pathToTests = path + "\\src";
@@ -325,8 +326,9 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("test").delete(true, null);
     }
     
-    
-    public void testInvariant() throws InterruptedException, CoreException {
+    //TODO: does not work yet
+    //@Test
+    public void test9Invariant() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test9";
         final String pathToTests = path + "\\src";
@@ -347,4 +349,28 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         
         srcFolder.getFolder("test").delete(true, null);
     }
+    
+    // TODO: does not work yet
+    //@Test
+     public void test10ManyMemberAccesses() throws InterruptedException, CoreException {
+            
+            final String path = "data\\template\\refactoringRenameTest\\test10";
+            final String pathToTests = path + "\\src";
+            final String pathToOracle = path + "\\oracle";
+            
+            copyFiles(pathToTests, srcFolder);
+            copyFiles(pathToOracle, oracleFolder);
+            
+            String oracleString = getOracle(oracleFolder, CLASS_NAME);
+            
+            TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+            
+            executeRenaming(CLASS_NAME, "test : TestClass", "newName");
+            
+            String afterRenaming = getContentAfterRefactoring();
+            
+            assertEquals(oracleString,afterRenaming);
+            
+            srcFolder.getFolder("test").delete(true, null);
+        }
 }

@@ -5,13 +5,6 @@ import test.TestClass;
 public class TestClassOther {
     public int balance;
     public TestClass mainClass = new TestClass();
-    
-    /*@ normal_behavior
-      @ 
-      @*/
-    public /*@ pure @*/ int getBalance() {
-        return balance;
-    }
 
     /*@ normal_behavior
       @ assignable balance;
@@ -21,10 +14,10 @@ public class TestClassOther {
     }
     
     /*@ normal_behavior
-    @ ensures \result == mainClass.aNewName;
-    @ assignable \nothing;
+    @ ensures balance == mainClass.aNewName;
+    @ assignable mainClass.aNewName;
     @*/
-    private int accessBalanceFromMainClass() {
-        return mainClass.aNewName;
+    private void accessBalanceFromMainClass(int balance) {
+        mainClass.aNewName = balance;
     }
 }
