@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognitionException;
@@ -174,11 +175,25 @@ public class SLTranslationExceptionManager {
          return message;
       }
       else {
-         String p = pos.getLine() + ":" + pos.getColumn();
+         /*
+          * A sequence of "instanceof" cases can be defined here in order to
+          * create custom error messages for all relevant exception types.
+          */
+
+         // Convert the error position into a string
+         String errorPosition = pos.getLine() + ":" + pos.getColumn();
+         String token = e.token != null ? "'" + e.token.getText() + "'" : "";
+
          if (e instanceof NoViableAltException) {
-            return "No viable alternative at " + p + ": " + e.token.getText();
+            return "No viable alternative at line " + errorPosition + " "
+                  + token;
          }
-         return "["+e.getClass().getName()+"] Unspecified syntax error.";
+         if (e instanceof MismatchedTokenException) {
+            return "Mismatched token at line " + errorPosition + " " + token;
+         }
+         return "[" + e.getClass().getName()
+               + "] Unspecified syntax error at line " + errorPosition + " "
+               + token;
       }
    }
 

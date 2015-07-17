@@ -65,10 +65,10 @@ public class PositionedString {
 
    public PositionedString prependAndUpdatePosition(String text) {
       if (this.pos.getColumn() < text.length()) {
-         Debug.info("Given position " + pos
-               + " column is smaller than prepended text " + "\"" + text
+         Debug.info("Column of given position " + pos
+               + " is smaller than prepended text " + "\"" + text
                + "\". This will result in a negative column value for "
-               + "returned " + PositionedString.class.getSimpleName());
+               + "returned " + PositionedString.class.getSimpleName() + ".");
       }
       Position newPos = new Position(this.pos.getLine(), this.pos.getColumn()
             - text.length());

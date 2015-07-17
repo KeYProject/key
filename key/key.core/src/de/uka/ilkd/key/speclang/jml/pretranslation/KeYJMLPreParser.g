@@ -133,10 +133,12 @@ options {
 
     /*
      * This method prepends a String to a given PositionedString and removes whitespaces from
-     * heap brackets.
+     * heap brackets at the beginning of it. (Why is this necessary?)
      * 
-     * Static changes in Strings that will be passed to KeYJMLParser can result
-     * shifted/inaccurate position values. This method should be replaced by a more accurate implementation.
+     * Note: Static manipulation of Strings that are passed to KeYJMLParser is fragile when it
+     * comes to error reporting. Original JML input should be left unmodified as much as possible
+     * so that correct error location can be reported to the user. Functionality of this method
+     * should be replaced by a more accurate implementation. (Kai Wallisch 07/2015)
      */
     private PositionedString flipHeaps(String declString, PositionedString result, boolean allowPreHeaps) {
       String t = result.text;
