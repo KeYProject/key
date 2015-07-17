@@ -142,7 +142,7 @@ options {
      */
     private PositionedString flipHeaps(String declString, PositionedString result, boolean allowPreHeaps) {
       String t = result.text;
-      String p = declString+" ";
+      String p = declString;
 
       List<Name> validHeapNames = new ArrayList<Name>();
 
@@ -171,7 +171,7 @@ options {
          * method that does not rely on low-level string manipulation is recommended
          * to fix this issue.
          */
-         result = result.prepend(p);
+         result = result.prepend(p + " ");
       } else {
         result = result.prependAndUpdatePosition(p);
       }
