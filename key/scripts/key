@@ -115,7 +115,7 @@ keysysprops=" "
 keyoptions=""
 
 #default values for Java Options Xmx and Xms
-javaOptionXmx="-Xmx1024m";
+javaOptionXmx="-Xmx6000m";
 javaOptionXms="-Xms256m";
 
 while [ $# -ne 0 ]; do

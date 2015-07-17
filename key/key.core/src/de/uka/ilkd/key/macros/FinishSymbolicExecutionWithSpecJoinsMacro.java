@@ -320,7 +320,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             }
         }
         catch (NullPointerException e) {
-            // This may happen if the statement has not method frame.
+            // This may happen if the statement has no method frame.
             // TODO: Should probably replace this by an explicit check.
         }
 
