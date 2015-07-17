@@ -162,7 +162,19 @@ options {
            result = new PositionedString(t, result.fileName, result.pos);
         }
       }
-      result = result.prependAndUpdatePosition(p);
+      if (p.contains("<")) {
+        /*
+         * Using normal prepend without update of position in case p contains a heap
+         * because in that case prependAndUpdatePosition() might produce a negative
+         * column value. However, this alternative is also not ideal because it does
+         * not update the position after prepending a string. A rewrite of this
+         * method that does not rely on low-level string manipulation is recommended
+         * to fix this issue.
+         */
+         result = result.prepend(p);
+      } else {
+        result = result.prependAndUpdatePosition(p);
+      }
       return result;
     }
     
