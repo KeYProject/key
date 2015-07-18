@@ -523,24 +523,24 @@ public class BuilderTests extends AbstractResourceTest {
       testTestCaseGeneration(project, false);
       project.close(null);
    }
-   @Test
-   public void testFullBuildMultipleThreadsGenerateTestCases() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestCases", true, false, false, true, 2, false, true, false);
-      testTestCaseGeneration(project, false);
-      project.close(null);
-   }
+//   @Test
+//   public void testFullBuildMultipleThreadsGenerateTestCases() throws CoreException, InterruptedException, IOException{
+//      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestCases", true, false, false, true, 2, false, true, false);
+//      testTestCaseGeneration(project, false);
+//      project.close(null);
+//   }
    @Test
    public void testEfficientBuildSingleThreadGenerateTestCases() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestCases", true, false, true, false, 1, false, true, false);
       testTestCaseGeneration(project, false);
       project.close(null);
    }
-   @Test
-   public void testEfficientBuildMultipleThreadsGenerateTestCases() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestCases", true, false, true, true, 2, false, true, false);
-      testTestCaseGeneration(project, false);
-      project.close(null);
-   }
+//   @Test
+//   public void testEfficientBuildMultipleThreadsGenerateTestCases() throws CoreException, InterruptedException, IOException{
+//      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestCases", true, false, true, true, 2, false, true, false);
+//      testTestCaseGeneration(project, false);
+//      project.close(null);
+//   }
    
    @Test
    public void testFullBuildSingleThreadGenerateTestCasesAutoDelete() throws CoreException, InterruptedException, IOException{
@@ -548,24 +548,24 @@ public class BuilderTests extends AbstractResourceTest {
       testTestCaseGeneration(project, true);
       project.close(null);
    }
-   @Test
-   public void testFullBuildMultipleThreadsGenerateTestCasesAutoDelete() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestCasesAutoDelete", true, false, false, true, 2, false, true, true);
-      testTestCaseGeneration(project, true);
-      project.close(null);
-   }
+//   @Test
+//   public void testFullBuildMultipleThreadsGenerateTestCasesAutoDelete() throws CoreException, InterruptedException, IOException{
+//      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestCasesAutoDelete", true, false, false, true, 2, false, true, true);
+//      testTestCaseGeneration(project, true);
+//      project.close(null);
+//   }
    @Test
    public void testEfficientBuildSingleThreadGenerateTestCasesAutoDelete() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestCasesAutoDelete", true, false, true, false, 1, false, true, true);
       testTestCaseGeneration(project, true);
       project.close(null);
    }
-   @Test
-   public void testEfficientBuildMultipleThreadsGenerateTestCasesAutoDelete() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestCasesAutoDelete", true, false, true, true, 2, false, true, true);
-      testTestCaseGeneration(project, true);
-      project.close(null);
-   }
+//   @Test
+//   public void testEfficientBuildMultipleThreadsGenerateTestCasesAutoDelete() throws CoreException, InterruptedException, IOException{
+//      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestCasesAutoDelete", true, false, true, true, 2, false, true, true);
+//      testTestCaseGeneration(project, true);
+//      project.close(null);
+//   }
    
    //Test Suite Generation Tests
    //The Z3 solver path ({@code z3SolverPath}) needs to be set
@@ -576,24 +576,24 @@ public class BuilderTests extends AbstractResourceTest {
       testTestSuiteGeneration(project, false);
       project.close(null);
    }
-   @Test
-   public void testFullBuildMultipleThreadsGenerateTestSuite() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestSuite", true, false, false, true, 2, false, true, false);
-      testTestSuiteGeneration(project, false);
-      project.close(null);
-   }
+//   @Test
+//   public void testFullBuildMultipleThreadsGenerateTestSuite() throws CoreException, InterruptedException, IOException{
+//      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestSuite", true, false, false, true, 2, false, true, false);
+//      testTestSuiteGeneration(project, false);
+//      project.close(null);
+//   }
    @Test
    public void testEfficientBuildSingleThreadGenerateTestSuite() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestSuite", true, false, true, false, 1, false, true, false);
       testTestSuiteGeneration(project, false);
       project.close(null);
    }
-   @Test
-   public void testEfficientBuildMultipleThreadsGenerateTestSuite() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestSuite", true, false, true, true, 2, false, true, false);
-      testTestSuiteGeneration(project, false);
-      project.close(null);
-   }
+//   @Test
+//   public void testEfficientBuildMultipleThreadsGenerateTestSuite() throws CoreException, InterruptedException, IOException{
+//      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestSuite", true, false, true, true, 2, false, true, false);
+//      testTestSuiteGeneration(project, false);
+//      project.close(null);
+//   }
 
    @Test
    public void testFullBuildSingleThreadGenerateTestSuiteAutoDelete() throws CoreException, InterruptedException, IOException{
@@ -601,24 +601,24 @@ public class BuilderTests extends AbstractResourceTest {
       testTestSuiteGeneration(project, true);
       project.close(null);
    }
-   @Test
-   public void testFullBuildMultipleThreadsGenerateTestSuiteAutoDelete() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestSuiteAutoDelete", true, false, false, true, 2, false, true, true);
-      testTestSuiteGeneration(project, true);
-      project.close(null);
-   }
+//   @Test
+//   public void testFullBuildMultipleThreadsGenerateTestSuiteAutoDelete() throws CoreException, InterruptedException, IOException{
+//      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsGenerateTestSuiteAutoDelete", true, false, false, true, 2, false, true, true);
+//      testTestSuiteGeneration(project, true);
+//      project.close(null);
+//   }
    @Test
    public void testEfficientBuildSingleThreadGenerateTestSuiteAutoDelete() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildSingleThreadGenerateTestSuiteAutoDelete", true, false, true, false, 1, false, true, true);
       testTestSuiteGeneration(project, true);
       project.close(null);
    }
-   @Test
-   public void testEfficientBuildMultipleThreadsGenerateTestSuiteAutoDelete() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestSuiteAutoDelete", true, false, true, true, 2, false, true, true);
-      testTestSuiteGeneration(project, true);
-      project.close(null);
-   }
+//   @Test
+//   public void testEfficientBuildMultipleThreadsGenerateTestSuiteAutoDelete() throws CoreException, InterruptedException, IOException{
+//      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testEfficientBuildMultipleThreadsGenerateTestSuiteAutoDelete", true, false, true, true, 2, false, true, true);
+//      testTestSuiteGeneration(project, true);
+//      project.close(null);
+//   }
 
 
    private void testBuildDisabled(IProject project) throws CoreException{

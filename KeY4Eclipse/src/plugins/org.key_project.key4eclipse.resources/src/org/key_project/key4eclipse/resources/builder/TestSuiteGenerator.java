@@ -12,12 +12,15 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
@@ -44,7 +47,7 @@ public class TestSuiteGenerator {
    
    public void cleanUpTestProject(){
       if(testProject != null && testProject.exists() && testProject.isOpen() && testJavaProject != null) {
-         IPackageFragmentRoot packageRoot = getPackageRoot();
+         IPackageFragmentRoot packageRoot = getSourcePackageRoot();
          if(packageRoot != null) {
             try {
                IJavaElement[] children = packageRoot.getChildren();
@@ -104,7 +107,7 @@ public class TestSuiteGenerator {
    
    public void generateTestSuit() {
       if(testJavaProject != null) {
-         IPackageFragmentRoot packageRoot = getPackageRoot();
+         IPackageFragmentRoot packageRoot = getSourcePackageRoot();
          if(packageRoot != null) {
             try {
                List<String> classes = new LinkedList<String>();
@@ -151,12 +154,12 @@ public class TestSuiteGenerator {
       return false;
    }
    
-   private IPackageFragmentRoot getPackageRoot(){
+   private IPackageFragmentRoot getSourcePackageRoot(){
       try {
-         IPackageFragmentRoot[] roots = testJavaProject.getAllPackageFragmentRoots();
-         for(IPackageFragmentRoot r : roots) {
-            if(r.getKind() == IPackageFragmentRoot.K_SOURCE && r.getResource() instanceof IContainer) {
-               return r;
+         List<IPackageFragmentRoot> roots = JDTUtil.getSourcePackageFragmentRoots(testJavaProject);
+         for(IPackageFragmentRoot root : roots) {
+            if(root.getResource() instanceof IContainer) {
+               return root;
             }
          }
       }

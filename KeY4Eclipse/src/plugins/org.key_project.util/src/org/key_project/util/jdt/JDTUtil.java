@@ -455,7 +455,13 @@ public class JDTUtil {
    public static void addClasspathEntry(IJavaProject javaProject,
                                         IClasspathEntry entryToAdd) throws JavaModelException {
        if (javaProject != null && entryToAdd != null) {
-           IClasspathEntry[] newEntries = ArrayUtil.add(javaProject.getRawClasspath(), entryToAdd);
+           IClasspathEntry[] entries = javaProject.getRawClasspath();
+           for(IClasspathEntry e : entries) {
+              if(e != null && e.getPath().equals(entryToAdd.getPath())) {
+                 return;
+              }
+           }
+           IClasspathEntry[] newEntries = ArrayUtil.add(entries, entryToAdd);
            javaProject.setRawClasspath(newEntries, null);
        }
    }

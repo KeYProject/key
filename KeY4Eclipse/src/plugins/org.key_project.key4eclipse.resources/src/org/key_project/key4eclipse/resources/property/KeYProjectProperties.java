@@ -23,6 +23,8 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public final class KeYProjectProperties {
    
+   public static final boolean TEST_CASE_GENERATION_SUPPORTS_MULTITHREADING = false;
+   
    public static final QualifiedName PROP_ENABLE_KEY_RESOURCES_BUILDS = new QualifiedName("org.key_project.key4eclipse.resources", "buildProofs");
    public static final QualifiedName PROP_ENABLE_BUILD_ON_STARTUP = new QualifiedName("org.key_project.key4eclipse.resources", "buildOnStartup");
    public static final QualifiedName PROP_ENABLE_BUILD_REQUIRED_PROOFS_ONLY = new QualifiedName("org.key_project.key4eclipse.resources", "buildRequiredProofsOnly");

@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -175,8 +176,8 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       IJavaProject testProject = JDTUtil.createJavaProject(sourceProject.getName() + TEST_PROJECT_SUFFIX, sourceProject);
       List<IPackageFragmentRoot> sourceResources = JDTUtil.getSourcePackageFragmentRoots(testProject);
       IPackageFragmentRoot sourceRoot = findFirstSourceRoot(sourceResources);
-      IContainer sourceContainer = (IContainer) sourceRoot.getResource();
-      if (sourceContainer == null) {
+      IContainer sourceContainer = sourceRoot == null ? null : (IContainer) sourceRoot.getResource();
+      if (sourceRoot == null || sourceContainer == null) {
          throw new IllegalStateException("The Java project '" + testProject.getProject().getName() + "' has no source folder.");
       }
       // Create test generator
@@ -185,19 +186,11 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof, true);
       tg.setLogger(log);
       tg.setFileName(JDTUtil.ensureValidJavaTypeName(testFileName, testProject));
-      tg.setPackageName("".equals(testFilePackageName) ? null : testFilePackageName); 
+      tg.setPackageName("".equals(testFilePackageName) ? null : testFilePackageName);
       //Add JUnit 4
-      IClasspathEntry[] entries = testProject.getRawClasspath();
       Path junitPath = new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/4");
       IClasspathEntry junitEntry = JavaCore.newContainerEntry(junitPath);
-      if(!hasJUnit4(entries, junitEntry)){
-         IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
-   
-         System.arraycopy(entries, 0, newEntries, 0, entries.length);
-   
-         newEntries[entries.length] = JavaCore.newContainerEntry(junitEntry.getPath());
-         testProject.setRawClasspath(newEntries, null);
-      }
+      JDTUtil.addClasspathEntry(testProject, junitEntry);
       // Create library folder
       IFolder libFolder = ResourceUtil.createFolder(testProject.getProject(), LIB_FOLDER_NAME);
       IFile readmeFile = libFolder.getFile(LIB_FOLDER_README_NAME);
@@ -237,15 +230,6 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
             }
          });
       }
-   }
-
-   private boolean hasJUnit4(IClasspathEntry[] entries, IClasspathEntry entry) {
-      for(IClasspathEntry e : entries) {
-         if(e.getPath() != null && e.getPath().equals(entry.getPath())) {
-            return true;
-         }
-      }
-      return false;
    }
 
    /**

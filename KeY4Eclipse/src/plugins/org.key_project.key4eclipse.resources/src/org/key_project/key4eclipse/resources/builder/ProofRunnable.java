@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -54,13 +53,15 @@ public class ProofRunnable implements Runnable {
    private List<ProofElement> proofElements;
    private List<ProofElement> proofsToDo;
    private final KeYEnvironment<DefaultUserInterfaceControl> environment;
+   private final boolean generateTestCases;
    private final IProgressMonitor monitor;
    
-   public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<DefaultUserInterfaceControl> environment, IProgressMonitor monitor){
+   public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<DefaultUserInterfaceControl> environment, boolean generateTestCases, IProgressMonitor monitor){
       this.proofsToDo = Collections.synchronizedList(proofsToDo);
       this.project = project;
       this.proofElements = proofElements;
       this.environment = environment;
+      this.generateTestCases = generateTestCases;
       this.monitor = monitor;
    }
    
@@ -97,7 +98,7 @@ public class ProofRunnable implements Runnable {
                   synchronized (ProofManager.proofsToSave) {
                      ProofManager.proofsToSave.add(new Pair<ProofElement, InputStream>(pe, generateSaveProof(proof, pe.getProofFile())));
                   }
-                  if(KeYProjectProperties.isGenerateTestCases(pe.getProofFile().getProject()) && SolverType.Z3_CE_SOLVER.isInstalled(true)){
+                  if(generateTestCases && SolverType.Z3_CE_SOLVER.isInstalled(true)){
                      generateTestCases(pe, proof);
                   }
                   proof.dispose();

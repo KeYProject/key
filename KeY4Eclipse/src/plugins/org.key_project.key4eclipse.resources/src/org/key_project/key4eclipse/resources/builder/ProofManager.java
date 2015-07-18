@@ -57,7 +57,7 @@ import org.key_project.key4eclipse.resources.projectinfo.PackageInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ProjectInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
 import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
+import org.key_project.key4eclipse.resources.property.KeYProjectBuildProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
@@ -100,6 +100,7 @@ public class ProofManager {
 
    private final IProject project;
    private int buildType;
+   private KeYProjectBuildProperties properties;
    private final IFolder mainProofFolder;
    private List<ProofElement> proofElements;
    private KeYProjectDelta keyDelta;
@@ -116,9 +117,10 @@ public class ProofManager {
     * @throws CoreException
     * @throws ProblemLoaderException 
     */
-   public ProofManager(IProject project, int buildType, EditorSelection editorSelection) throws CoreException, ProblemLoaderException{
+   public ProofManager(IProject project, int buildType, KeYProjectBuildProperties properties, EditorSelection editorSelection) throws CoreException, ProblemLoaderException{
       this.project = project;
       this.buildType = buildType;
+      this.properties = properties;
       this.mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME));
       this.keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       this.editorSelection = editorSelection;
@@ -183,16 +185,16 @@ public class ProofManager {
          keyDelta.resetDelta();
       }
       cleanMarker();
-      if(KeYProjectProperties.isAutoDeleteProofFiles(project)){
+      if(properties.isAutoDeleteProofFiles()){
          cleanProofFolder(getAllFiles(), mainProofFolder);
       }
       //set up monitor
       monitor.beginTask("Building proofs for " + project.getName(), proofElements.size());
       initThreads(monitor);
       checkContractRecursion();
-      if(KeYProjectProperties.isGenerateTestCases(project)) {
+      if(properties.isGenerateTestCases()) {
          TestSuiteGenerator testSuiteGenerator = new TestSuiteGenerator(project, proofElements);
-         if(KeYProjectProperties.isAutoDeleteTestCases(project)) {
+         if(properties.isAutoDeleteTestCases()) {
             testSuiteGenerator.cleanUpTestProject();
          }
          testSuiteGenerator.generateTestSuit();
@@ -504,7 +506,7 @@ public class ProofManager {
       for(ProofElement pe : proofElements){
          boolean build = false;
          if(buildType == KeYProjectBuildJob.FULL_BUILD 
-               || (buildType == KeYProjectBuildJob.AUTO_BUILD && !KeYProjectProperties.isEnableBuildRequiredProofsOnly(project))){
+               || (buildType == KeYProjectBuildJob.AUTO_BUILD && !properties.isBuildRequiredProofsOnly())){
             build = true;
          }
          else if(buildType == KeYProjectBuildJob.STARTUP_BUILD || buildType == KeYProjectBuildJob.MANUAL_BUILD){
@@ -699,17 +701,17 @@ public class ProofManager {
    private void initThreads(IProgressMonitor monitor) {
       proofQueue = Collections.synchronizedList(KeYResourcesUtil.cloneList(proofElements));
 
-      int numOfThreads = KeYProjectProperties.getNumberOfThreads(project);
+      int numOfThreads = properties.getNumberOfThreads();
       int numOfProofs = getNumOfProofsToDo();
       if(numOfProofs < numOfThreads){
          numOfThreads = numOfProofs;
       }
       Thread[] threads = null;
-      if (KeYProjectProperties.isEnableMultiThreading(project)) {
+      if (properties.isEnableMultiThreading()) {
          threads = new Thread[numOfThreads];
          for (int i = 0; i < threads.length; i++) {
 
-            ProofRunnable run = new ProofRunnable(project, KeYResourcesUtil.cloneList(proofElements), proofQueue, cloneEnvironment(), monitor);
+            ProofRunnable run = new ProofRunnable(project, KeYResourcesUtil.cloneList(proofElements), proofQueue, cloneEnvironment(), properties.isGenerateTestCases(), monitor);
             threads[i] = new Thread(run);
          }
          for(Thread thread : threads){
@@ -718,7 +720,7 @@ public class ProofManager {
       }
       else{
          threads = new Thread[1];
-         ProofRunnable run = new ProofRunnable(project, proofElements,proofQueue, environment, monitor);
+         ProofRunnable run = new ProofRunnable(project, proofElements,proofQueue, environment, properties.isGenerateTestCases(), monitor);
          Thread thread = new Thread(run);
          threads[0] = thread;
          thread.start();
