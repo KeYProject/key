@@ -216,17 +216,17 @@ public class TestCaseGenerator {
 		}
 	}
 
-	private Set<ObjectVal> getPrestateObjects(Model m){ // TODO: Remove unused method or use it
-
-		Set<ObjectVal> result  =new HashSet<ObjectVal>();
-
-		Set<String> refs = oracleGenerator.getPrestateTerms();
-		for(String ref : refs){
-			result.addAll(m.getNecessaryPrestateObjects(ref));
-		}
-
-		return result;
-	}
+//	private Set<ObjectVal> getPrestateObjects(Model m){ // TODO: Remove unused method or use it
+//
+//		Set<ObjectVal> result  =new HashSet<ObjectVal>();
+//
+//		Set<String> refs = oracleGenerator.getPrestateTerms();
+//		for(String ref : refs){
+//			result.addAll(m.getNecessaryPrestateObjects(ref));
+//		}
+//
+//		return result;
+//	}
 
 
 
@@ -753,7 +753,9 @@ public class TestCaseGenerator {
 				if (type.endsWith("[]")) {
 					right = "new " + type.substring(0, type.length() - 2) + "["
 							+ o.getLength() + "]";
-				} else {
+				}else if(o.getSort() == null || o.getSort().equals("Null")){
+					right = "null";
+				}else {
 					if(useRFL){
 						right = "RFL.new"+ReflectionClassCreator.cleanTypeName(type)+"()";
 						rflCreator.addSort(type);
@@ -1025,7 +1027,7 @@ public class TestCaseGenerator {
 
 
 	public String getSafeType(Sort sort) {
-		if (sort == null) {
+		if (sort == null || sort.name().equals("Null")) {
 			return "java.lang.Object"; // TODO:Hopefully this is correct
 		} else if (sort.isAbstract()) {
 			return buildDummyClassForAbstractSort(sort);
