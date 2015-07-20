@@ -278,12 +278,12 @@ public class QuestionStatistics {
     * Computes how often the answer was correct in average.
     * @return The average correct value.
     */
-   public BigInteger computeCorrect() {
+   public BigDecimal computeCorrect() {
       if (!BigInteger.ZERO.equals(correctCount.add(wrongCount))) {
-         return correctCount.multiply(BigInteger.valueOf(100)).divide(correctCount.add(wrongCount));
+         return new BigDecimal(correctCount).multiply(BigDecimal.valueOf(100)).divide(new BigDecimal(correctCount.add(wrongCount)), 2, RoundingMode.HALF_EVEN);
       }
       else {
-         return BigInteger.ZERO;
+         return BigDecimal.ZERO;
       }
    }
    
@@ -291,12 +291,12 @@ public class QuestionStatistics {
     * Computes how often the trust in the answer was correct in average.
     * @return The average correct value.
     */
-   public BigInteger computeTrustCorrect() {
+   public BigDecimal computeTrustCorrect() {
       if (!BigInteger.ZERO.equals(correctTrustCount.add(wrongTrustCount))) {
-         return correctTrustCount.multiply(BigInteger.valueOf(100)).divide(correctTrustCount.add(wrongTrustCount));
+         return new BigDecimal(correctTrustCount).multiply(BigDecimal.valueOf(100)).divide(new BigDecimal(correctTrustCount.add(wrongTrustCount)), 2, RoundingMode.HALF_EVEN);
       }
       else {
-         return BigInteger.ZERO;
+         return BigDecimal.ZERO;
       }
    }
    
@@ -304,12 +304,12 @@ public class QuestionStatistics {
     * Computes how often the answer was wrong in average.
     * @return The average correct value.
     */
-   public BigInteger computeWrong() {
+   public BigDecimal computeWrong() {
       if (!BigInteger.ZERO.equals(correctCount.add(wrongCount))) {
-         return wrongCount.multiply(BigInteger.valueOf(100)).divide(correctCount.add(wrongCount));
+         return new BigDecimal(wrongCount).multiply(BigDecimal.valueOf(100)).divide(new BigDecimal(correctCount.add(wrongCount)), 2, RoundingMode.HALF_EVEN);
       }
       else {
-         return BigInteger.ZERO;
+         return BigDecimal.ZERO;
       }
    }
    
@@ -317,12 +317,12 @@ public class QuestionStatistics {
     * Computes how often the trust in the answer was wrong in average.
     * @return The average correct value.
     */
-   public BigInteger computeTrustWrong() {
+   public BigDecimal computeTrustWrong() {
       if (!BigInteger.ZERO.equals(correctTrustCount.add(wrongTrustCount))) {
-         return wrongTrustCount.multiply(BigInteger.valueOf(100)).divide(correctTrustCount.add(wrongTrustCount));
+         return new BigDecimal(wrongTrustCount).multiply(BigDecimal.valueOf(100)).divide(new BigDecimal(correctTrustCount.add(wrongTrustCount)), 2, RoundingMode.HALF_EVEN);
       }
       else {
-         return BigInteger.ZERO;
+         return BigDecimal.ZERO;
       }
    }
 }

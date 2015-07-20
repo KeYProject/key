@@ -286,12 +286,12 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
     * @param bold {@code true} values are bold, {@code false} values are normal,
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendQuestionValues(BigInteger correct,
-                                       BigInteger wrong,
+   protected void appendQuestionValues(BigDecimal correct,
+                                       BigDecimal wrong,
                                        BigDecimal averageCorrectnessScore,
                                        BigInteger averageTime,
-                                       BigInteger trustCorrect,
-                                       BigInteger trustWrong,
+                                       BigDecimal trustCorrect,
+                                       BigDecimal trustWrong,
                                        BigDecimal averageTrustScore,
                                        BigInteger averageTrustTime,
                                        Set<Tool> winningCorrectTools, 

@@ -1,5 +1,6 @@
 package org.key_project.sed.key.evaluation.server.report.statiscs;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
@@ -270,12 +271,12 @@ public class FilteredStatistics {
     * @return The {@link Set} of winning {@link Tool}s.
     */
    public static Set<Tool> computeWinningCorrectTools(Map<Tool, QuestionStatistics> questionStatistics) {
-      BigInteger max = BigInteger.valueOf(-1);
+      BigDecimal max = BigDecimal.valueOf(-1);
       Set<Tool> maxTools = null;
       for (Entry<Tool, QuestionStatistics> entry : questionStatistics.entrySet()) {
          QuestionStatistics qs = entry.getValue();
          if (qs != null) {
-            BigInteger current = qs.computeCorrect();
+            BigDecimal current = qs.computeCorrect();
             if (current.compareTo(max) > 0) {
                max = current;
                maxTools = new HashSet<Tool>();
@@ -305,12 +306,12 @@ public class FilteredStatistics {
     * @return The {@link Set} of winning {@link Tool}s.
     */
    public static Set<Tool> computeWinningCorrectTrustTools(Map<Tool, QuestionStatistics> questionStatistics) {
-      BigInteger max = BigInteger.valueOf(-1);
+      BigDecimal max = BigDecimal.valueOf(-1);
       Set<Tool> maxTools = null;
       for (Entry<Tool, QuestionStatistics> entry : questionStatistics.entrySet()) {
          QuestionStatistics qs = entry.getValue();
          if (qs != null) {
-            BigInteger current = qs.computeTrustCorrect();
+            BigDecimal current = qs.computeTrustCorrect();
             if (current.compareTo(max) > 0) {
                max = current;
                maxTools = new HashSet<Tool>();

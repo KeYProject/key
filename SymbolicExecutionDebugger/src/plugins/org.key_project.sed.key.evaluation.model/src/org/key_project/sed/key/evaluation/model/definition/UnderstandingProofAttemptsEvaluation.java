@@ -530,7 +530,6 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
-                                  new Choice("None of the statements was executed", "None"),
                                   new Choice("entries", "entries"),
                                   new Choice("entries[entrySize]", "entries[entrySize]"),
                                   new Choice("entries[*]", "entries[*]"),

@@ -48,7 +48,7 @@ public final class Stack {
     */
    public void push(Object e) {
       if (size < elements.length) {
-         elements[size++] = e; // TODO: Memory leak
+         elements[size++] = e;
       }
       else {
          throw new IllegalStateException("Stack is full.");
@@ -64,7 +64,7 @@ public final class Stack {
     */
    public Object pop() {
       if (size >= 1) {
-         return elements[--size];
+         return elements[--size]; // TODO: Memory leak
       }
       else {
          throw new IllegalStateException("Stack is empty.");
