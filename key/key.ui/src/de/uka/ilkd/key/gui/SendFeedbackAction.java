@@ -58,7 +58,7 @@ public class SendFeedbackAction extends AbstractAction {
    }
 
    // TODO provide a recipient e-mail address for developer feedback
-   static final String FEEDBACK_RECIPIENT = null;
+   static final String FEEDBACK_RECIPIENT = "feedback@key-project.org";
 
    // dialog that opens in case user wished to send feedback
    private final JDialog dialog;
