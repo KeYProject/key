@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.model.definition;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +44,16 @@ public abstract class AbstractChoicesQuestion extends AbstractQuestion {
             }
          }
       }
+   }
+   
+   public Set<Choice> getCorrectChoices() {
+      Set<Choice> correctChoices = new LinkedHashSet<Choice>();
+      for (Choice choice : choices) {
+         if (choice.isExpectedChecked()) {
+            correctChoices.add(choice);
+         }
+      }
+      return correctChoices;
    }
    
    public abstract boolean isMultiValued();

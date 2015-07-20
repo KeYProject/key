@@ -1,7 +1,6 @@
 package org.key_project.sed.key.evaluation.model.input;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -251,12 +250,13 @@ public class QuestionInput extends Bean {
    }
 
    public Choice[] getSelectedChoices() {
-      if (choiceInputs != null) {
-         if (((AbstractChoicesQuestion) question).isMultiValued()) {
+      if (question instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+         if (choiceQuestion.isMultiValued()) {
             if (!StringUtil.isEmpty(value)) {
                final String[] values = value.split(AbstractChoicesQuestion.VALUE_SEPARATOR);
                final Set<String> valuesSet = CollectionUtil.toSet(values);
-               List<Choice> choices = CollectionUtil.searchAll(choiceInputs.keySet(), new IFilter<Choice>() {
+               List<Choice> choices = CollectionUtil.searchAll(CollectionUtil.toList(choiceQuestion.getChoices()), new IFilter<Choice>() {
                   @Override
                   public boolean select(Choice element) {
                      return valuesSet.contains(element.getValue());
@@ -269,7 +269,7 @@ public class QuestionInput extends Bean {
             }
          }
          else {
-            Choice choice = CollectionUtil.search(choiceInputs.keySet(), new IFilter<Choice>() {
+            Choice choice = ArrayUtil.search(choiceQuestion.getChoices(), new IFilter<Choice>() {
                @Override
                public boolean select(Choice element) {
                   return ObjectUtil.equals(value, element.getValue());
@@ -314,12 +314,7 @@ public class QuestionInput extends Bean {
          }
          else if (question instanceof AbstractChoicesQuestion) {
             AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
-            Set<Choice> remainingCorrectChoices = new HashSet<Choice>();
-            for (Choice choice : choiceQuestion.getChoices()) {
-               if (choice.isExpectedChecked()) {
-                  remainingCorrectChoices.add(choice);
-               }
-            }
+            Set<Choice> remainingCorrectChoices = choiceQuestion.getCorrectChoices();
             if (!remainingCorrectChoices.isEmpty()) {
                Choice[] selectedChoices = getSelectedChoices();
                boolean correct = true;
@@ -331,6 +326,40 @@ public class QuestionInput extends Bean {
                   i++;
                }
                return correct && remainingCorrectChoices.isEmpty();
+            }
+            else {
+               return null; // Correctness not supported
+            }
+         }
+         else {
+            throw new IllegalStateException("Unsupported question: " + question);
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   public Integer computeCorrectnessScore() {
+      if (question.isEditable()) {
+         if (question instanceof TextQuestion) {
+            return null; // Correctness not supported
+         }
+         else if (question instanceof AbstractChoicesQuestion) {
+            AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+            Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
+            if (!correctChoices.isEmpty()) {
+               Choice[] selectedChoices = getSelectedChoices();
+               int correctCount = 0;
+               for (Choice choice : selectedChoices) {
+                  if (correctChoices.contains(choice)) {
+                     correctCount++;
+                  }
+                  else {
+                     correctCount--;
+                  }
+               }
+               return correctCount;
             }
             else {
                return null; // Correctness not supported

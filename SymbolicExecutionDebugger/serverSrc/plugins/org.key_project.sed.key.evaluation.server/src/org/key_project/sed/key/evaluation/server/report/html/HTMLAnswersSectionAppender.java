@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
@@ -45,6 +46,56 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
       // Append header
       List<Object> questionOrder = new LinkedList<Object>();
       appendReceivedAnswersResultsHeader(evaluation, sb, questionOrder);
+      // Append expected answers
+      sb.append("<tr>");
+      sb.append("<td><font color=\"#FF80FF\">Expected Answers</font></td>");
+      for (Object object : questionOrder) {
+         if (object instanceof AbstractQuestion) {
+            AbstractQuestion question = (AbstractQuestion) object;
+            if (question.isEditable()) {
+               if (question instanceof AbstractChoicesQuestion) {
+                  AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+                  Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
+                  if (!CollectionUtil.isEmpty(correctChoices)) {
+                     sb.append("<td><font color=\"#FF80FF\">");
+                     boolean afterFirst = false;
+                     for (Choice choice : correctChoices) {
+                        if (afterFirst) {
+                           sb.append(AbstractChoicesQuestion.VALUE_SEPARATOR);
+                        }
+                        else {
+                           afterFirst = true;
+                        }
+                        sb.append(choice.getValue());
+                     }
+                     sb.append("</font></td>");
+                  }
+                  else {
+                     sb.append("<td>&nbsp;</td>");
+                  }
+               }
+               else {
+                  sb.append("<td>&nbsp;</td>");
+               }
+            }
+            else {
+               sb.append("<td>&nbsp;</td>");
+            }
+         }
+         else if (object instanceof AbstractPage) {
+            AbstractPage page = (AbstractPage) object;
+            if (page.getForm().isCollectTimes()) {
+               sb.append("<td>&nbsp;</td>");
+            }
+            if (page.isToolBased()) {
+               sb.append("<td>&nbsp;</td>");
+            }
+         }
+         else if (object instanceof AbstractForm) {
+            sb.append("<td>&nbsp;</td>");
+         }
+      }
+      sb.append("</tr>");
       // Append answers
       for (Entry<String, EvaluationAnswers> entry : result.getIdInputMap().entrySet()) {
          if (entry.getValue().hasMultipleValues()) {
@@ -72,13 +123,17 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
                      if (!StringUtil.isTrimmedEmpty(questionInput.getValue())) {
                         Boolean correct = questionInput.checkCorrectness();
                         appendReceivedAnswersTableCellValue(questionInput.getValue(), correct, questionInput.getValueSetAt(), sb);
+                        Integer correctessScore = questionInput.computeCorrectnessScore();
+                        if (correctessScore != null) {
+                           appendReceivedAnswersTableCellValue(" {score:&nbsp;" + correctessScore + "}", correctessScore > 0, -1, sb);
+                        }
                         if (questionInput.getQuestion().isAskForTrust()) {
                            sb.append(" (");
                            Trust trust = questionInput.getTrust();
                            if (trust != null) {
-                              Integer score = questionInput.computeTrustScore();
-                              if (score != null) {
-                                 appendReceivedAnswersTableCellValue(trust.getName() + "&nbsp;(" + score + ")", score.intValue() > 0, questionInput.getTrustSetAt(), sb);
+                              Integer trustScore = questionInput.computeTrustScore();
+                              if (trustScore != null) {
+                                 appendReceivedAnswersTableCellValue(trust.getName() + "&nbsp;(" + trustScore + ")", trustScore.intValue() > 0, questionInput.getTrustSetAt(), sb);
                               }
                               else {
                                  appendReceivedAnswersTableCellValue(trust.getName(), null, questionInput.getTrustSetAt(), sb);
@@ -196,7 +251,7 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
       if (time > 0) {
          sb.append(" [");
          sb.append(time);
-         sb.append(" ]");
+         sb.append("&nbsp;ms]");
       }
       if (correct != null) {
          sb.append("</font>");

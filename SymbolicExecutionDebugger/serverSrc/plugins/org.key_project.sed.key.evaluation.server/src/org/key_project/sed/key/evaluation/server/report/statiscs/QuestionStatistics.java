@@ -1,6 +1,8 @@
 package org.key_project.sed.key.evaluation.server.report.statiscs;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -19,6 +21,11 @@ public class QuestionStatistics {
     * Counts how often the answer was wrongly answered.
     */
    private BigInteger wrongCount = BigInteger.ZERO;
+   
+   /**
+    * The sum of the correctness score.
+    */
+   private BigInteger scoreSum = BigInteger.ZERO;
    
    /**
     * Counts how often the trust in the answer was correct.
@@ -65,6 +72,7 @@ public class QuestionStatistics {
     * Constructor with specified values.
     * @param correctCount The initial value to set.
     * @param wrongCount The initial value to set.
+    * @param scoreSum The initial value to set.
     * @param correctTrustCount The initial value to set.
     * @param wrongTrustCount The initial value to set.
     * @param timesCount The initial value to set.
@@ -75,6 +83,7 @@ public class QuestionStatistics {
     */
    public QuestionStatistics(BigInteger correctCount, 
                              BigInteger wrongCount, 
+                             BigInteger scoreSum,
                              BigInteger correctTrustCount, 
                              BigInteger wrongTrustCount, 
                              BigInteger timesCount, 
@@ -84,6 +93,7 @@ public class QuestionStatistics {
                              BigInteger trustScoreSum) {
       this.correctCount = correctCount;
       this.wrongCount = wrongCount;
+      this.scoreSum = scoreSum;
       this.correctTrustCount = correctTrustCount;
       this.wrongTrustCount = wrongTrustCount;
       this.timesCount = timesCount;
@@ -96,11 +106,12 @@ public class QuestionStatistics {
    /**
     * Updates the statics.
     * @param correct
-    * @param correctTrust
+    * @param correctnessScore
+    * @param trustScore
     * @param time
     * @param trustTime
     */
-   protected void update(Boolean correct, Integer trustScore, long time, long trustTime) {
+   protected void update(Boolean correct, Integer correctnessScore, Integer trustScore, long time, long trustTime) {
       if (correct != null) {
          if (correct) {
             correctCount = correctCount.add(BigInteger.ONE); 
@@ -108,6 +119,9 @@ public class QuestionStatistics {
          else {
             wrongCount = wrongCount.add(BigInteger.ONE); 
          }
+      }
+      if (correctnessScore != null) {
+         scoreSum = scoreSum.add(BigInteger.valueOf(correctnessScore.intValue()));
       }
       if (trustScore != null) {
          trustScoreSum = trustScoreSum.add(BigInteger.valueOf(trustScore.intValue()));
@@ -134,6 +148,14 @@ public class QuestionStatistics {
     */
    public BigInteger getWrongCount() {
       return wrongCount;
+   }
+
+   /**
+    * Returns the sum of score.
+    * @return The sum of score.
+    */
+   public BigInteger getScoreSum() {
+      return scoreSum;
    }
 
    /**
@@ -204,12 +226,25 @@ public class QuestionStatistics {
     * Computes the average trust score.
     * @return The average trust score.
     */
-   public BigInteger computeAverageTrustScore() {
+   public BigDecimal computeAverageTrustScore() {
       if (!BigInteger.ZERO.equals(trustScoreSum)) {
-         return trustScoreSum.divide(correctTrustCount.add(wrongTrustCount));
+         return new BigDecimal(trustScoreSum).divide(new BigDecimal(correctTrustCount.add(wrongTrustCount)), 2, RoundingMode.HALF_EVEN);
       }
       else {
-         return BigInteger.ZERO;
+         return BigDecimal.ZERO;
+      }
+   }
+
+   /**
+    * Computes the average correctness score.
+    * @return The average correctness score.
+    */
+   public BigDecimal computeAverageCorrectnessScore() {
+      if (!BigInteger.ZERO.equals(correctCount.add(wrongCount))) {
+         return new BigDecimal(scoreSum).divide(new BigDecimal(correctCount.add(wrongCount)), 2, RoundingMode.HALF_EVEN);
+      }
+      else {
+         return BigDecimal.ZERO;
       }
    }
    

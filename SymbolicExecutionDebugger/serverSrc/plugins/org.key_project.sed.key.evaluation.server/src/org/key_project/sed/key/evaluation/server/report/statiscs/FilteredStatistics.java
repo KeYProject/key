@@ -58,10 +58,11 @@ public class FilteredStatistics {
     */
    protected void update(QuestionInput questionInput, Tool tool) {
       Boolean correct = questionInput.checkCorrectness();
+      Integer correctnessScore = questionInput.computeCorrectnessScore();
       Integer trustScore = questionInput.computeTrustScore();
       long time = questionInput.getValueSetAt();
       long trustTime = questionInput.getTrustSetAt();
-      if (correct != null || trustScore != null || time > 0 || trustTime > 0) {
+      if (correct != null || correctnessScore != null || trustScore != null || time > 0 || trustTime > 0) {
          Map<AbstractQuestion, QuestionStatistics> questionMap;
          if (tool != null) {
             questionMap = toolQuestionStatistics.get(tool);
@@ -78,7 +79,7 @@ public class FilteredStatistics {
             qs = new QuestionStatistics();
             questionMap.put(questionInput.getQuestion(), qs);
          }
-         qs.update(correct, trustScore, time, trustTime);
+         qs.update(correct, correctnessScore, trustScore, time, trustTime);
       }
       if (questionInput.getQuestion() instanceof AbstractChoicesQuestion) {
          AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) questionInput.getQuestion();
@@ -475,6 +476,7 @@ public class FilteredStatistics {
    public QuestionStatistics computeAllTogetherQuestionStatistics(Tool tool) {
       BigInteger correctCount = BigInteger.ZERO;
       BigInteger wrongCount = BigInteger.ZERO;
+      BigInteger scoreSum = BigInteger.ZERO;
       BigInteger correctTrustCount = BigInteger.ZERO;
       BigInteger wrongTrustCount = BigInteger.ZERO;
       BigInteger timesCount = BigInteger.ZERO;
@@ -487,6 +489,7 @@ public class FilteredStatistics {
          for (QuestionStatistics qs : toolQuestions.values()) {
             correctCount = correctCount.add(qs.getCorrectCount());
             wrongCount = wrongCount.add(qs.getWrongCount());
+            scoreSum = scoreSum.add(qs.getScoreSum());
             correctTrustCount = correctTrustCount.add(qs.getCorrectTrustCount());
             wrongTrustCount = wrongTrustCount.add(qs.getWrongTrustCount());
             timesCount = timesCount.add(qs.getTimesCount());
@@ -496,6 +499,6 @@ public class FilteredStatistics {
             trustScoreSum = trustScoreSum.add(qs.getTrustScoreSum());
          }
       }
-      return new QuestionStatistics(correctCount, wrongCount, correctTrustCount, wrongTrustCount, timesCount, timesSum, trustTimesCount, trustTimesSum, trustScoreSum);
+      return new QuestionStatistics(correctCount, wrongCount, scoreSum, correctTrustCount, wrongTrustCount, timesCount, timesSum, trustTimesCount, trustTimesSum, trustScoreSum);
    }
 }
