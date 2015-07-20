@@ -39,14 +39,32 @@ public class ParserMessageTest {
 
    private final String docFile = "key/doc/README.parserMessageTest";
 
-   private final File sourceDir;
+   private final String parserMessageRegExp;
+   private final int expectedLineNumber;
+   private final int expectedColumnNumber;
+   private final ProblemLoaderException exception;
+   private final Location location;
+   private File javaFile;
 
-   public ParserMessageTest(String testName, File sourceDir) {
-      this.sourceDir = sourceDir;
+   /**
+    * Method for creating parameters for a parameterized test run. Returned
+    * collection is a set of constructor parameters.
+    */
+   @Parameters(name = "{0}")
+   public static Collection<Object[]> data() {
+      File testDataDir = new File(KEY_CORE_TEST, "resources" + File.separator
+            + "testcase" + File.separator + "parserMessageTest");
+      Collection<Object[]> data = new LinkedList<>();
+      for (File file : testDataDir.listFiles()) {
+         if (file.isDirectory()) {
+            data.add(new Object[] { file.getName(), file });
+         }
+      }
+      return data;
    }
 
-   @Test
-   public void verifyParserMessage() throws IOException {
+   public ParserMessageTest(String testName, File sourceDir) throws IOException {
+
       // retrieve the Java file contained in the given source directory:
       File javaFile = null;
       for (File file : sourceDir.listFiles()) {
@@ -90,23 +108,21 @@ public class ParserMessageTest {
             + "to specify the column number in which a parser error is "
             + "expected to occur.", thirdLine.startsWith("//COL "));
 
-      String parserMessageRegExp = firstLine.substring(6);
-      int expectedLineNumber = Integer.parseInt(secondLine.substring(7));
-      int expectedColumnNumber = Integer.parseInt(thirdLine.substring(6));
-
-      ProblemLoaderException pe = null;
+      parserMessageRegExp = firstLine.substring(6);
+      expectedLineNumber = Integer.parseInt(secondLine.substring(7));
+      expectedColumnNumber = Integer.parseInt(thirdLine.substring(6));
       try {
          KeYEnvironment.load(javaFile);
+         throw new RuntimeException("Parsing unexpectedly did not throw a "
+               + "ProblemLoaderException for file " + javaFile);
       }
       catch (ProblemLoaderException e) {
-         pe = e;
+         exception = e;
       }
-      assertNotEquals("Parsing unexpectedly did not throw a "
-            + "ProblemLoaderException for file " + javaFile, null, pe);
 
-      Location location = ExceptionTools.getLocation(pe);
+      location = ExceptionTools.getLocation(exception);
 
-      assertTrue("Cannot recover error location from Exception: " + pe,
+      assertTrue("Cannot recover error location from Exception: " + exception,
             location != null);
 
       assertTrue("Couldn't recreate filename from received exception.",
@@ -116,33 +132,30 @@ public class ParserMessageTest {
       assertEquals("Filename retrieved from parser message "
             + "doesn't match filename of originally parsed file.", javaFile,
             new File(location.getFilename()));
+   }
 
-      assertEquals("Line number of retrieved parser message "
-            + "doesn't match expected line number.", expectedLineNumber,
-            location.getLine());
-
-      assertEquals("Column number of retrieved parser message "
-            + "doesn't match expected column number.", expectedColumnNumber,
-            location.getColumn());
-
+   @Test
+   public void verifyMessage() {
       assertTrue(
             "Message of ProblemLoaderException doesn't match regular expression, "
                   + "that was specified in file " + javaFile
                   + "\nRequested regular expression: " + parserMessageRegExp
-                  + "\nRetrieved exception message: " + pe.getMessage(), pe
-                  .getMessage().matches(parserMessageRegExp));
+                  + "\nRetrieved exception message: " + exception.getMessage(),
+            exception.getMessage().matches(parserMessageRegExp));
    }
 
-   @Parameters(name = "{0}")
-   public static Collection<Object[]> data() {
-      File testDataDir = new File(KEY_CORE_TEST, "resources" + File.separator
-            + "testcase" + File.separator + "parserMessageTest");
-      Collection<Object[]> data = new LinkedList<>();
-      for (File file : testDataDir.listFiles()) {
-         if (file.isDirectory()) {
-            data.add(new Object[] { file.getName(), file });
-         }
-      }
-      return data;
+   @Test
+   public void verifyLineNumber() {
+      assertEquals("Line number of retrieved parser message "
+            + "doesn't match expected line number.", expectedLineNumber,
+            location.getLine());
    }
+
+   @Test
+   public void verifyColumnNumber() {
+      assertEquals("Column number of retrieved parser message "
+            + "doesn't match expected column number.", expectedColumnNumber,
+            location.getColumn());
+   }
+
 }
