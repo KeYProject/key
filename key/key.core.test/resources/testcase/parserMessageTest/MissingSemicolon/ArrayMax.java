@@ -1,6 +1,6 @@
-// MSG ".*Missing.*;.*"
-// LINE 7
-// COL 32
+//MSG ".*Missing.*;.*"
+//LINE 7
+//COL 32
 
 class ArrayMax {
 

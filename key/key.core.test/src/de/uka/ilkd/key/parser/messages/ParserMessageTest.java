@@ -22,11 +22,14 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.ExceptionTools;
 
 /**
- * Parameterized JUnit test suite for testing parser messages. For
- * documentation, see: key/doc/README.parserMessageTest
+ * Parameterized JUnit test suite intended for ensuring a certain quality for
+ * parser messages. Every test case consists of an erroneous JML file that will
+ * be opened by JML parser during a test run. The parser will throw an exception
+ * whose contents will be verified.
+ * <p>
+ * For further documentation, see: key/doc/README.parserMessageTest
  * 
  * @author Kai Wallisch
- *
  */
 @RunWith(Parameterized.class)
 public class ParserMessageTest {
@@ -72,29 +75,20 @@ public class ParserMessageTest {
       String firstLine = lines.get(0);
       String secondLine = lines.get(1);
       String thirdLine = lines.get(2);
-      String errorMessage = "";
-      if (!firstLine.startsWith("//MSG ")) {
-         errorMessage += "First line of file " + javaFile
-               + " must start with \"//MSG *regexp*\", "
-               + "to specify a regular expression for the "
-               + "expected parser message.";
-      }
-      if (!secondLine.startsWith("//LINE ")) {
-         errorMessage += errorMessage.length() > 0 ? "\n" : "";
-         errorMessage += "Second line of file " + javaFile
-               + " must start with \"//LINE *number*\", "
-               + "to specify the line number in which a parser error is "
-               + "expected to occur.";
-      }
-      if (!thirdLine.startsWith("//COL ")) {
-         errorMessage += errorMessage.length() > 0 ? "\n" : "";
-         errorMessage += "Third line of file " + javaFile
-               + " must start with \"//COL *number*\", "
-               + "to specify the column number in which a parser error is "
-               + "expected to occur.";
-      }
-      assertTrue(errorMessage + "\nSee file " + docFile
-            + " for more information.", errorMessage.length() == 0);
+      assertTrue("First line of file " + javaFile
+            + " must start with \"//MSG *regexp*\", "
+            + "to specify a regular expression for the "
+            + "expected parser message.", firstLine.startsWith("//MSG "));
+
+      assertTrue("Second line of file " + javaFile
+            + " must start with \"//LINE *number*\", "
+            + "to specify the line number in which a parser error is "
+            + "expected to occur.", secondLine.startsWith("//LINE "));
+
+      assertTrue("Third line of file " + javaFile
+            + " must start with \"//COL *number*\", "
+            + "to specify the column number in which a parser error is "
+            + "expected to occur.", thirdLine.startsWith("//COL "));
 
       String parserMessageRegExp = firstLine.substring(6);
       int expectedLineNumber = Integer.parseInt(secondLine.substring(7));
@@ -111,6 +105,9 @@ public class ParserMessageTest {
             + "ProblemLoaderException for file " + javaFile, null, pe);
 
       Location location = ExceptionTools.getLocation(pe);
+
+      assertTrue("Cannot recover error location from Exception: " + pe,
+            location != null);
 
       assertTrue("Couldn't recreate filename from received exception.",
             location.getFilename() != null
