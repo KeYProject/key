@@ -39,9 +39,7 @@ public class ParserMessageTest {
 
    private final String docFile = "key/doc/README.parserMessageTest";
 
-   private final String parserMessageRegExp;
-   private final int expectedLineNumber;
-   private final int expectedColumnNumber;
+   private final List<String> lines;
    private final ProblemLoaderException exception;
    private final Location location;
    private File javaFile;
@@ -82,35 +80,13 @@ public class ParserMessageTest {
        * Retrieve information about expected parser message from given Java
        * source file.
        */
-      List<String> lines = Files.readAllLines(javaFile.toPath(),
-            Charset.defaultCharset());
+      lines = Files.readAllLines(javaFile.toPath(), Charset.defaultCharset());
       assertTrue("Number of lines in file " + javaFile
             + " is less than required minimal number of lines."
             + "\nFirst three lines of tested Java source file must contain "
             + "information about expected parser message. " + "See file "
             + docFile + " for more information.", lines.size() >= 3);
 
-      String firstLine = lines.get(0);
-      String secondLine = lines.get(1);
-      String thirdLine = lines.get(2);
-      assertTrue("First line of file " + javaFile
-            + " must start with \"//MSG *regexp*\", "
-            + "to specify a regular expression for the "
-            + "expected parser message.", firstLine.startsWith("//MSG "));
-
-      assertTrue("Second line of file " + javaFile
-            + " must start with \"//LINE *number*\", "
-            + "to specify the line number in which a parser error is "
-            + "expected to occur.", secondLine.startsWith("//LINE "));
-
-      assertTrue("Third line of file " + javaFile
-            + " must start with \"//COL *number*\", "
-            + "to specify the column number in which a parser error is "
-            + "expected to occur.", thirdLine.startsWith("//COL "));
-
-      parserMessageRegExp = firstLine.substring(6);
-      expectedLineNumber = Integer.parseInt(secondLine.substring(7));
-      expectedColumnNumber = Integer.parseInt(thirdLine.substring(6));
       try {
          KeYEnvironment.load(javaFile);
          throw new RuntimeException("Parsing unexpectedly did not throw a "
@@ -136,6 +112,13 @@ public class ParserMessageTest {
 
    @Test
    public void verifyMessage() {
+      String firstLine = lines.get(0);
+      assertTrue("First line of file " + javaFile
+            + " must start with \"//MSG *regexp*\", "
+            + "to specify a regular expression for the "
+            + "expected parser message.", firstLine.startsWith("//MSG "));
+      String parserMessageRegExp = firstLine.substring(6);
+
       assertTrue(
             "Message of ProblemLoaderException doesn't match regular expression, "
                   + "that was specified in file " + javaFile
@@ -146,6 +129,13 @@ public class ParserMessageTest {
 
    @Test
    public void verifyLineNumber() {
+      String secondLine = lines.get(1);
+      assertTrue("Second line of file " + javaFile
+            + " must start with \"//LINE *number*\", "
+            + "to specify the line number in which a parser error is "
+            + "expected to occur.", secondLine.startsWith("//LINE "));
+      int expectedLineNumber = Integer.parseInt(secondLine.substring(7));
+
       assertEquals("Line number of retrieved parser message "
             + "doesn't match expected line number.", expectedLineNumber,
             location.getLine());
@@ -153,6 +143,13 @@ public class ParserMessageTest {
 
    @Test
    public void verifyColumnNumber() {
+      String thirdLine = lines.get(2);
+      assertTrue("Third line of file " + javaFile
+            + " must start with \"//COL *number*\", "
+            + "to specify the column number in which a parser error is "
+            + "expected to occur.", thirdLine.startsWith("//COL "));
+      int expectedColumnNumber = Integer.parseInt(thirdLine.substring(6));
+
       assertEquals("Column number of retrieved parser message "
             + "doesn't match expected column number.", expectedColumnNumber,
             location.getColumn());
