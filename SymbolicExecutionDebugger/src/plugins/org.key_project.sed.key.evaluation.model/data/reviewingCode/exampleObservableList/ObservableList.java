@@ -1,5 +1,3 @@
-package observableList;
-
 import java.util.LinkedList;
 import java.util.List;
 

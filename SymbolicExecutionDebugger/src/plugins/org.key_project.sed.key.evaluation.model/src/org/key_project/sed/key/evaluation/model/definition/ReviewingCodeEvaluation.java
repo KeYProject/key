@@ -249,6 +249,18 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
+      String returnValueTitle = "Which claims about the returned value are true?";
+      CheckboxQuestion returnValue = new CheckboxQuestion("returnValue", 
+                                                          returnValueTitle, 
+                                                          description,
+                                                          true,
+                                                          null, 
+                                                          new NotUndefinedValueValidator("Question '" + returnValueTitle + "' not answered."), 
+                                                          true,
+                                                          new Choice("null might be returned", "NullReturned", true),
+                                                          new Choice("An object might be returned", "ObjectReturned", true),
+                                                          new Choice("Element at index size is returned", "ElementAtSizeReturned"),
+                                                          new Choice("Element at index size - 1 is returned", "ElementAtSizePlusOneReturned", true));
       String executedTitle = "Which statement(s) can be executed?";
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
@@ -268,7 +280,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              createStackClassInvariantQuestion(description, false, true),
                              createThrownExceptionsQuestion(description, false, false, true),
                              executedQuestion,
-                             createStackLocationQuestion(description, false, true, false));
+                             createStackLocationQuestion(description, false, true, false),
+                             returnValue);
    }
 
    private Choice createElseWrongChoice(String description) {
