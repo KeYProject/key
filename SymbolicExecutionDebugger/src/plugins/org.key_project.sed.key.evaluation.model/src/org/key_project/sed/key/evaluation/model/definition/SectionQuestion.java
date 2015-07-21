@@ -16,7 +16,7 @@ public class SectionQuestion extends AbstractQuestion {
    }
 
    public SectionQuestion(String name, String label, boolean grapVerticalSpace, List<AbstractQuestion> childQuestions) {
-      super(name, label, null, null, false);
+      super(name, label, null, null, null, false);
       this.childQuestions = childQuestions;
       this.grapVerticalSpace = grapVerticalSpace;
       validateChildren();

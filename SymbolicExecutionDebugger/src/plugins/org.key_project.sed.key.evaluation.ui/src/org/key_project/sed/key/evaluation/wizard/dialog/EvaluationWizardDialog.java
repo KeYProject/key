@@ -450,6 +450,7 @@ public class EvaluationWizardDialog extends WizardDialog {
       handCursor = new Cursor(getShell().getDisplay(), SWT.CURSOR_HAND);
       Control control = super.createContents(parent);
       updateToolbar();
+      getCurrentPage().reflow();
       return control;
    }
 

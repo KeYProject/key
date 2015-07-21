@@ -44,6 +44,9 @@ public abstract class AbstractEditableQuestionInputManager extends AbstractQuest
       if (question.getLabel() != null) {
          questionSection.setText(question.getLabel());
       }
+      if (question.getDescription() != null) {
+         questionSection.setClient(toolkit.createLabel(questionSection, question.getDescription(), SWT.WRAP));
+      }
       if (question.isAskForTrust()) {
          trustManager = new TrustManager(wizardPage, sectionComposite, getQuestionInput());
       }

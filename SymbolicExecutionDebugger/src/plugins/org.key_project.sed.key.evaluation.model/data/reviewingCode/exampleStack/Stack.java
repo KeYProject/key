@@ -1,13 +1,17 @@
 /**
- * Effective Java 2nd Edition, Page 24 (PDF Page 47)
+ * A stack which stores contained elements in an array.
+ * <p>
+ * A new element is added on top of the stack by {@link #push(Object)}
+ * and the top element can be removed by {@link #pop()}.
  */
 public final class Stack {
    /**
     * The elements on the stack.
-    * The array is never {@code null} and all array indices
+    * The {@link Object} array is never {@code null} and all array indices
     * {@code >= size} are {@code null}.
     */
    /*@ invariant elements != null;
+     @ invariant \typeof(elements) == \type(Object[]);
      @ invariant (\forall int i; i >= size && i < elements.length; elements[i] == null);
      @*/
    private final /*@ nullable @*/ Object[] elements;
@@ -19,14 +23,15 @@ public final class Stack {
     */
    /*@ invariant size >= 0 && size <= elements.length;
      @*/
-   private int size = 0;
+   private int size;
    
    /**
     * Constructor to create an empty stack with the specified maximal size.
     * @param maximalSize The maximal stack size.
     */
    public Stack(int maximalSize) {
-      elements = new Object[maximalSize];
+      elements = new Object[size];
+      size = 0;
    }
    
    /**
@@ -35,7 +40,7 @@ public final class Stack {
     * @param existingStack The existing {@link Stack} which provides the initial content.
     */
    public Stack(Stack existingStack) {
-      this.elements = existingStack.elements; // TODO: Aliasing problem
+      this.elements = existingStack.elements;
       this.size = existingStack.size;
    }
 
@@ -64,7 +69,7 @@ public final class Stack {
     */
    public Object pop() {
       if (size >= 1) {
-         return elements[--size]; // TODO: Memory leak
+         return elements[--size];
       }
       else {
          throw new IllegalStateException("Stack is empty.");
