@@ -10,7 +10,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuesti
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
-import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
+import org.key_project.sed.key.evaluation.model.definition.IQuestionWithCildren;
 import org.key_project.sed.key.evaluation.model.definition.TextQuestion;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.ArrayUtil;
@@ -75,10 +75,10 @@ public class QuestionInput extends Bean {
       else {
          choiceInputs = null;
       }
-      if (question instanceof SectionQuestion) {
-         SectionQuestion sectionQuestion = (SectionQuestion) question;
-         childInputs = new ArrayList<QuestionInput>(sectionQuestion.countChildQuestions());
-         for (AbstractQuestion childQuestion : sectionQuestion.getChildQuestions()) {
+      if (question instanceof IQuestionWithCildren) {
+         IQuestionWithCildren withChildrenQuestion = (IQuestionWithCildren) question;
+         childInputs = new ArrayList<QuestionInput>(withChildrenQuestion.countChildQuestions());
+         for (AbstractQuestion childQuestion : withChildrenQuestion.getChildQuestions()) {
             childInputs.add(new QuestionInput(pageInput, childQuestion));
          }
       }

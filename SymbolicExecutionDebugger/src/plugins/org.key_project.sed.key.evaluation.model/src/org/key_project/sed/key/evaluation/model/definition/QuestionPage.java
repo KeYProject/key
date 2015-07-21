@@ -14,14 +14,25 @@ public class QuestionPage extends AbstractPage implements IPageWithWorkbenchModi
 
    private final IWorkbenchModifier workbenchModifier;
    
+   private final boolean useForm;
+
    public QuestionPage(String name, String title, String message, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, AbstractQuestion... questions) {
-      this(name, title, message, wrapLayout, toolBased, workbenchModifier, CollectionUtil.toList(questions));
+      this(name, title, message, true, wrapLayout, toolBased, workbenchModifier, questions);
    }
 
    public QuestionPage(String name, String title, String message, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
+      this(name, title, message, true, wrapLayout, toolBased, workbenchModifier, questions);
+   }
+   
+   public QuestionPage(String name, String title, String message, boolean useForm, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, AbstractQuestion... questions) {
+      this(name, title, message, useForm, wrapLayout, toolBased, workbenchModifier, CollectionUtil.toList(questions));
+   }
+
+   public QuestionPage(String name, String title, String message, boolean useForm, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
       super(name, title, message, wrapLayout, toolBased);
       this.workbenchModifier = workbenchModifier;
       this.questions = questions;
+      this.useForm = useForm;
       validateQuestions();
    }
    
@@ -56,5 +67,9 @@ public class QuestionPage extends AbstractPage implements IPageWithWorkbenchModi
 
    public IWorkbenchModifier getWorkbenchModifier() {
       return workbenchModifier;
+   }
+
+   public boolean isUseForm() {
+      return useForm;
    }
 }

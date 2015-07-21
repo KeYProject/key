@@ -11,7 +11,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
-import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
+import org.key_project.sed.key.evaluation.model.definition.IQuestionWithCildren;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -128,10 +128,10 @@ public class Statistics {
             }
          }
       }
-      else if (question instanceof SectionQuestion) {
-         SectionQuestion sectionQuestion = (SectionQuestion) question;
-         if (sectionQuestion.countChildQuestions() > 0) {
-            for (AbstractQuestion cildQuestion : sectionQuestion.getChildQuestions()) {
+      else if (question instanceof IQuestionWithCildren) {
+         IQuestionWithCildren withChildrenQuestion = (IQuestionWithCildren) question;
+         if (withChildrenQuestion.countChildQuestions() > 0) {
+            for (AbstractQuestion cildQuestion : withChildrenQuestion.getChildQuestions()) {
                initQuestion(filteredStatistics, answer, cildQuestion);
             }
          }

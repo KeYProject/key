@@ -6,19 +6,16 @@ import java.util.Set;
 
 import org.key_project.util.java.CollectionUtil;
 
-public class SectionQuestion extends AbstractQuestion implements IQuestionWithCildren {
-   private final List<AbstractQuestion> childQuestions;
-   
-   private final boolean grapVerticalSpace;
+public class TabbedQuestion extends AbstractQuestion implements IQuestionWithCildren {
+   private final List<TabQuestion> childQuestions;
 
-   public SectionQuestion(String name, String label, boolean grapVerticalSpace, AbstractQuestion... childQuestions) {
-      this(name, label, grapVerticalSpace, CollectionUtil.toList(childQuestions));
+   public TabbedQuestion(String name, TabQuestion... childQuestions) {
+      this(name, CollectionUtil.toList(childQuestions));
    }
 
-   public SectionQuestion(String name, String label, boolean grapVerticalSpace, List<AbstractQuestion> childQuestions) {
-      super(name, label, null, null, null, false);
+   public TabbedQuestion(String name, List<TabQuestion> childQuestions) {
+      super(name, null, null, null, null, false);
       this.childQuestions = childQuestions;
-      this.grapVerticalSpace = grapVerticalSpace;
       validateChildren();
    }
    
@@ -34,13 +31,9 @@ public class SectionQuestion extends AbstractQuestion implements IQuestionWithCi
       }
    }
 
-   public boolean isGrapVerticalSpace() {
-      return grapVerticalSpace;
-   }
-
    @Override
-   public AbstractQuestion[] getChildQuestions() {
-      return childQuestions.toArray(new AbstractQuestion[childQuestions.size()]);
+   public TabQuestion[] getChildQuestions() {
+      return childQuestions.toArray(new TabQuestion[childQuestions.size()]);
    }
    
    @Override
@@ -52,4 +45,5 @@ public class SectionQuestion extends AbstractQuestion implements IQuestionWithCi
    public boolean isEditable() {
       return false;
    }
+
 }

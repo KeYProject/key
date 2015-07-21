@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
@@ -16,9 +16,9 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
+import org.key_project.sed.key.evaluation.model.definition.IQuestionWithCildren;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
-import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
@@ -378,10 +378,10 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
             }
          }
       }
-      else if (question instanceof SectionQuestion) {
-         SectionQuestion sectionQuestion = (SectionQuestion) question;
-         if (sectionQuestion.countChildQuestions() > 0) {
-            for (AbstractQuestion cildQuestion : sectionQuestion.getChildQuestions()) {
+      else if (question instanceof IQuestionWithCildren) {
+         IQuestionWithCildren withChildrenQuestion = (IQuestionWithCildren) question;
+         if (withChildrenQuestion.countChildQuestions() > 0) {
+            for (AbstractQuestion cildQuestion : withChildrenQuestion.getChildQuestions()) {
                questionCount += appendReceivedAnswersQuestionHeader(cildQuestion, sb, questionOrder);
             }
          }

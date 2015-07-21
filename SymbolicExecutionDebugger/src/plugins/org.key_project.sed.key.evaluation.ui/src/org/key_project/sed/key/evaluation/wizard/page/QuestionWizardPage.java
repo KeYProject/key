@@ -21,16 +21,21 @@ import org.key_project.sed.key.evaluation.model.definition.ImageQuestion;
 import org.key_project.sed.key.evaluation.model.definition.LabelQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
+import org.key_project.sed.key.evaluation.model.definition.TabQuestion;
+import org.key_project.sed.key.evaluation.model.definition.TabbedQuestion;
 import org.key_project.sed.key.evaluation.model.definition.TextQuestion;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 import org.key_project.sed.key.evaluation.wizard.manager.CheckboxManager;
 import org.key_project.sed.key.evaluation.wizard.manager.IQuestionInputManager;
+import org.key_project.sed.key.evaluation.wizard.manager.IReflowParticipant;
 import org.key_project.sed.key.evaluation.wizard.manager.ImageManager;
 import org.key_project.sed.key.evaluation.wizard.manager.LabelManager;
 import org.key_project.sed.key.evaluation.wizard.manager.RadioButtonsManager;
 import org.key_project.sed.key.evaluation.wizard.manager.SectionManager;
+import org.key_project.sed.key.evaluation.wizard.manager.TabManager;
+import org.key_project.sed.key.evaluation.wizard.manager.TabbedManager;
 import org.key_project.sed.key.evaluation.wizard.manager.TextManager;
 
 public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPageInput> {
@@ -48,7 +53,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    private final Map<QuestionInput, IQuestionInputManager> input2managerMap = new HashMap<QuestionInput, IQuestionInputManager>();
 
    public QuestionWizardPage(QuestionPageInput pageInput, ImageDescriptor imageDescriptor) {
-      super(pageInput, imageDescriptor, true);
+      super(pageInput, imageDescriptor, pageInput.getPage().isUseForm());
    }
 
    @Override
@@ -116,6 +121,12 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
          else if (questionInput.getQuestion() instanceof TextQuestion) {
             manager = createText(wizardPage, toolkit, parent, questionInput, (TextQuestion) questionInput.getQuestion());
          }
+         else if (questionInput.getQuestion() instanceof TabbedQuestion) {
+            manager = createTabbed(wizardPage, toolkit, parent, questionInput, (TabbedQuestion) questionInput.getQuestion(), callback);
+         }
+         else if (questionInput.getQuestion() instanceof TabQuestion) {
+            manager = createTab(wizardPage, toolkit, parent, questionInput, (TabQuestion) questionInput.getQuestion(), callback);
+         }
          else {
             throw new IllegalStateException("Unsupported question: " + questionInput.getQuestion());
          }
@@ -147,6 +158,14 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
 
    public static SectionManager createSection(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, SectionQuestion question, ICreateControlCallback callback) {
       return new SectionManager(wizardPage, toolkit, parent, questionInput, question, callback);
+   }
+
+   public static TabbedManager createTabbed(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, TabbedQuestion question, ICreateControlCallback callback) {
+      return new TabbedManager(wizardPage, toolkit, parent, questionInput, question, callback);
+   }
+
+   public static TabManager createTab(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, TabQuestion question, ICreateControlCallback callback) {
+      return new TabManager(wizardPage, toolkit, parent, questionInput, question, callback);
    }
 
    public static TextManager createText(AbstractEvaluationWizardPage<?> wizardPage, FormToolkit toolkit, Composite parent, QuestionInput questionInput, TextQuestion question) {
@@ -203,12 +222,14 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
          Choice[] selectedChoices = questionInput.getSelectedChoices();
          for (int i = 0; errornousInput == null && i < selectedChoices.length; i++) {
             QuestionInput[] childInputs = questionInput.getChoiceInputs(selectedChoices[i]);
-            for (int j = 0; errornousInput == null && j < childInputs.length; j++) {
-               if (isInputErrornous(childInputs[j])) {
-                  errornousInput = childInputs[j];
-               }
-               else {
-                  errornousInput = findErrornousInput(childInputs[j]);
+            if (childInputs != null) {
+               for (int j = 0; errornousInput == null && j < childInputs.length; j++) {
+                  if (isInputErrornous(childInputs[j])) {
+                     errornousInput = childInputs[j];
+                  }
+                  else {
+                     errornousInput = findErrornousInput(childInputs[j]);
+                  }
                }
             }
          }
@@ -230,6 +251,16 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    
    protected boolean isInputErrornous(QuestionInput questionInput) {
       return questionInput.validateValue() != null || 
-             questionInput.validateTrust() != null;
+             (questionInput.getQuestion().isAskForTrust() && questionInput.validateTrust() != null);
+   }
+
+   @Override
+   public void reflow() {
+      for (IQuestionInputManager manager : input2managerMap.values()) {
+         if (manager instanceof IReflowParticipant) {
+            ((IReflowParticipant) manager).reflow();
+         }
+      }
+      super.reflow();
    }
 }

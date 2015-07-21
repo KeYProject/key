@@ -8,6 +8,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -24,6 +27,8 @@ import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
 import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
@@ -71,6 +76,12 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
       }
       else {
          Composite content = toolkit.createComposite(parent);
+         if (getPageInput().getPage().isWrapLayout()) {
+            content.setLayout(new TableWrapLayout());
+         }
+         else {
+            content.setLayout(new GridLayout(1, false));
+         }
          createContent(toolkit, content);
          setControl(content);
       }
@@ -246,8 +257,31 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    }
    
    public void performMessageClick() {
-      if (form != null && errornousControl != null) {
-         form.showControl(errornousControl);
+      if (errornousControl != null) {
+         Control current = errornousControl;
+         // Ensure that control is visible
+         while (current != getControl()) {
+            Composite parent = current.getParent();
+            if (parent instanceof CTabFolder) {
+               final Control controlOfTabItem = current;
+               CTabFolder tabFolder = (CTabFolder) parent;
+               CTabItem tabItem = ArrayUtil.search(tabFolder.getItems(), new IFilter<CTabItem>() {
+                  @Override
+                  public boolean select(CTabItem element) {
+                     return element.getControl() == controlOfTabItem;
+                  }
+               });
+               ((CTabFolder) parent).setSelection(tabItem);
+            }
+            else if (parent instanceof ScrolledComposite) {
+               ((ScrolledComposite) parent).showControl(errornousControl);
+            }
+            current = parent;
+         }
+         // Scroll to control
+         if (form != null) {
+            form.showControl(errornousControl);
+         }
       }
    }
    

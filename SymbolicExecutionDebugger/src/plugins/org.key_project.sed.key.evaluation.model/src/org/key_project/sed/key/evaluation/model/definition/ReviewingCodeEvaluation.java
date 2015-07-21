@@ -55,20 +55,23 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
 
    private QuestionPage createStackQuestionPage(String pageName, String title) {
+      TabbedQuestion tabbedQuestion = new TabbedQuestion("methods", 
+                                                         createStackIntSection(),
+                                                         createStackStackSection(),
+                                                         createPushSection(),
+                                                         createPopSection());
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
-                              true,
+                              false,
+                              false,
                               true,
                               null,
                               new LabelQuestion("generalDescription", createGeneralClassDescription("Stack")),
-                              createStackIntSection(),
-                              createStackStackSection(),
-                              createPushSection(),
-                              createPopSection());
+                              tabbedQuestion);
    }
    
-   private SectionQuestion createStackIntSection() {
+   private TabQuestion createStackIntSection() {
       String description = "Stack(int) related question.";
       String methodProblemsTitle = "What is wrong?";
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
@@ -104,17 +107,17 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("None of the statements can be executed", "None"),
                                                                new Choice("Line 33: elements = new Object[maximalSize]", "Line 33", true),
                                                                new Choice("Line 34: size = 0", "Line 34", true));
-      return new SectionQuestion("Stack_int", 
-                                 "Stack(int)", 
-                                 false, 
-                                 implementedAsDocumented,
-                                 createStackClassInvariantQuestion(description, true, false),
-                                 createThrownExceptionsQuestion(description, false, true, false),
-                                 executedQuestion,
-                                 createStackLocationQuestion(description, true, true, false));
+      return new TabQuestion("Stack_int", 
+                             "Stack(int)", 
+                             false, 
+                             implementedAsDocumented,
+                             createStackClassInvariantQuestion(description, true, false),
+                             createThrownExceptionsQuestion(description, false, true, false),
+                             executedQuestion,
+                             createStackLocationQuestion(description, true, true, false));
    }
    
-   private SectionQuestion createStackStackSection() {
+   private TabQuestion createStackStackSection() {
       String description = "Stack(Stack) related question.";
       String methodProblemsTitle = "What is wrong?";
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
@@ -154,17 +157,17 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("None of the statements can be executed", "None"),
                                                                new Choice("Line 43: this.elements = existingStack.elements", "Line 43", true),
                                                                new Choice("Line 44: this.size = existingStack.size", "Line 44", true));
-      return new SectionQuestion("Stack_Stack", 
-                                 "Stack(Stack)", 
-                                 false, 
-                                 implementedAsDocumented,
-                                 createStackClassInvariantQuestion(description, true, false),
-                                 createThrownExceptionsQuestion(description, true, false, false),
-                                 executedQuestion,
-                                 createStackLocationQuestion(description, true, true, false));
+      return new TabQuestion("Stack_Stack", 
+                             "Stack(Stack)", 
+                             false, 
+                             implementedAsDocumented,
+                             createStackClassInvariantQuestion(description, true, false),
+                             createThrownExceptionsQuestion(description, true, false, false),
+                             executedQuestion,
+                             createStackLocationQuestion(description, true, true, false));
    }
    
-   private SectionQuestion createPushSection() {
+   private TabQuestion createPushSection() {
       String description = "push(Object) related question.";
       String methodProblemsTitle = "What is wrong?";
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
@@ -206,17 +209,17 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 55: if (size < elements.length)", "Line 55", true),
                                                                new Choice("Line 56: elements[size++] = e", "Line 56", true),
                                                                new Choice("Line 59: throw new IllegalStateException(\"Stack is full.\")", "Line 59", true));
-      return new SectionQuestion("push(Object)", 
-                                 "push(Object)", 
-                                 false, 
-                                 implementedAsDocumented,
-                                 createStackClassInvariantQuestion(description, false, false),
-                                 createThrownExceptionsQuestion(description, false, false, true),
-                                 executedQuestion,
-                                 createStackLocationQuestion(description, false, true, true));
+      return new TabQuestion("push(Object)", 
+                             "push(Object)", 
+                             false, 
+                             implementedAsDocumented,
+                             createStackClassInvariantQuestion(description, false, false),
+                             createThrownExceptionsQuestion(description, false, false, true),
+                             executedQuestion,
+                             createStackLocationQuestion(description, false, true, true));
    }
    
-   private SectionQuestion createPopSection() {
+   private TabQuestion createPopSection() {
       String description = "pop() related question.";
       String methodProblemsTitle = "What is wrong?";
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
@@ -258,14 +261,14 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 71: if (size >= 1)", "Line 71", true),
                                                                new Choice("Line 72: return elements[--size]", "Line 72", true),
                                                                new Choice("Line 75: throw new IllegalStateException(\"Stack is empty.\")", "Line 75", true));
-      return new SectionQuestion("pop()", 
-                                 "pop()", 
-                                 false, 
-                                 implementedAsDocumented,
-                                 createStackClassInvariantQuestion(description, false, true),
-                                 createThrownExceptionsQuestion(description, false, false, true),
-                                 executedQuestion,
-                                 createStackLocationQuestion(description, false, true, false));
+      return new TabQuestion("pop()", 
+                             "pop()", 
+                             false, 
+                             implementedAsDocumented,
+                             createStackClassInvariantQuestion(description, false, true),
+                             createThrownExceptionsQuestion(description, false, false, true),
+                             executedQuestion,
+                             createStackLocationQuestion(description, false, true, false));
    }
 
    private Choice createElseWrongChoice(String description) {
