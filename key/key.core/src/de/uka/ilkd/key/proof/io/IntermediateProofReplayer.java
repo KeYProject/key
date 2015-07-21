@@ -272,9 +272,9 @@ public class IntermediateProofReplayer {
 
                                 assert joinApp.complete() : "Join app should be automatically completed in replay";
 
-                                System.out.print("[INFO] Performing a join app, this can take some time...");
+                                System.out.println("[INFO] Performing a join app, this can take some time...");
                                 currGoal.apply(joinApp);
-                                System.out.println(" Done.");
+                                System.out.println("[INFO] Performing a join app, this can take some time... Done.");
 
                                 // Join node has exactly one child in a closed proof, and
                                 // zero or one children in an open proof.

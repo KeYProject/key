@@ -43,8 +43,11 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * @see JoinRule
  */
 public class JoinIfThenElse extends JoinProcedure {
-
     private static JoinIfThenElse INSTANCE = null;
+    
+    /** Time in milliseconds after which a simplification attempt
+     *  of a distinguishing formula times out. */
+    private static final int SIMPLIFICATION_TIMEOUT_MS = 1000;
 
     public static JoinIfThenElse instance() {
         if (INSTANCE == null) {
@@ -235,7 +238,7 @@ public class JoinIfThenElse extends JoinProcedure {
 
         // Try an automatic simplification
         distinguishingFormula = trySimplify(services.getProof(),
-                distinguishingFormula, true);
+                distinguishingFormula, true, SIMPLIFICATION_TIMEOUT_MS);
 
         // Originally, here was a specific check of whether the equal parts
         // of the two path conditions was still included in the new path

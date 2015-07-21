@@ -67,6 +67,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.CloseAfterJoin;
+import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -624,10 +625,13 @@ public class JoinRuleUtils {
      *            Formula to prove.
      * @param services
      *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
-    public static boolean isProvable(Term toProve, Services services) {
-        return isProvable(toProve, services, false);
+    public static boolean isProvable(Term toProve, Services services, int timeout) {
+        return isProvable(toProve, services, false, timeout);
     }
 
     /**
@@ -638,11 +642,14 @@ public class JoinRuleUtils {
      *            Formula to prove.
      * @param services
      *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
     public static boolean isProvableWithSplitting(Term toProve,
-            Services services) {
-        return isProvable(toProve, services, true);
+            Services services, int timeout) {
+        return isProvable(toProve, services, true, timeout);
     }
 
     /**
@@ -655,16 +662,19 @@ public class JoinRuleUtils {
      *            Second term to check.
      * @param services
      *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * 
      * @throws RuntimeException
      *             iff proving the equivalence of term1 and term2 fails.
      */
     public static void assertEquivalent(Term term1, Term term2,
-            Services services) {
+            Services services, int timeout) {
         TermBuilder tb = services.getTermBuilder();
 
         Term assertionForm = tb.and(tb.imp(term1, term2), tb.imp(term2, term1));
-        if (!isProvableWithSplitting(assertionForm, services)) {
+        if (!isProvableWithSplitting(assertionForm, services, timeout)) {
             throw new RuntimeException("Could not prove expected equivalence.");
         }
     }
@@ -679,7 +689,9 @@ public class JoinRuleUtils {
      * If this attempt is successful, i.e. the number of atoms in the simplified
      * formula is lower (and, if requested, also the number of disjunctions),
      * the simplified formula is returned; otherwise, the original formula is
-     * returned.
+     * returned.<p>
+     * 
+     * <i>Please note that using this method can consume a great amount of time!</i>
      * 
      * @param parentProof
      *            The parent {@link Proof}.
@@ -689,6 +701,9 @@ public class JoinRuleUtils {
      *            If set to true, the method also takes the number of
      *            disjunctions (in addition to the number of atoms) into account
      *            when judging about the complexity of the "simplified" formula.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return The simplified {@link Term} or the original term, if
      *         simplification was not successful.
      * 
@@ -696,10 +711,10 @@ public class JoinRuleUtils {
      * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     public static Term trySimplify(final Proof parentProof, final Term term,
-            boolean countDisjunctions) {
+            boolean countDisjunctions, int timeout) {
 
         try {
-            Term simplified = simplify(parentProof, term);
+            Term simplified = simplify(parentProof, term, timeout);
 
             if (countAtoms(simplified) < countAtoms(term)
                     && (!countDisjunctions || countDisjunctions(simplified,
@@ -810,11 +825,14 @@ public class JoinRuleUtils {
      *            Second path condition to join.
      * @param services
      *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return A path condition that is equivalent to the disjunction of the two
      *         supplied formulae, but possibly simpler.
      */
     public static Term createSimplifiedDisjunctivePathCondition(
-            final Term cond1, final Term cond2, Services services) {
+            final Term cond1, final Term cond2, Services services, int simplificationTimeout) {
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -826,6 +844,7 @@ public class JoinRuleUtils {
         final ArrayList<Term> fCond2ConjElems = new ArrayList<Term>(
                 cond2ConjElems);
 
+        final long startTime_elementaryCheck = JoinRule.getCpuTime();
         if (cond1ConjElems.size() == cond2ConjElems.size()) {
             for (int i = 0; i < fCond1ConjElems.size(); i++) {
                 Term elem1 = fCond1ConjElems.get(i);
@@ -834,7 +853,7 @@ public class JoinRuleUtils {
                 if (!elem1.equals(elem2)) {
                     // Try to show that the different elements can be left
                     // out in the disjunction, since they are complementary
-                    if (isProvableWithSplitting(tb.or(elem1, elem2), services)) {
+                    if (isProvableWithSplitting(tb.or(elem1, elem2), services, simplificationTimeout)) {
                         cond1ConjElems.remove(elem1);
                         cond2ConjElems.remove(elem2);
                     }
@@ -849,6 +868,7 @@ public class JoinRuleUtils {
                 }
             }
         }
+        JoinRule.printTimeSummary(3, "checking if conjunctive elements are complementary", startTime_elementaryCheck);
 
         Term result1 = joinConjuctiveElements(cond1ConjElems, services);
         Term result2 = joinConjuctiveElements(cond2ConjElems, services);
@@ -859,6 +879,7 @@ public class JoinRuleUtils {
             result = result1;
         }
         else {
+            final long startTime_computingDistinguishingFormula = JoinRule.getCpuTime();
             Option<Pair<Term, Term>> distinguishingAndEqual = getDistinguishingFormula(
                     result1, result2, services);
             
@@ -866,12 +887,14 @@ public class JoinRuleUtils {
                 distinguishingAndEqual = getDistinguishingFormula(
                         result2, result1, services);
             }
+            JoinRule.printTimeSummary(3, "computing distinguishing and equal formula", startTime_computingDistinguishingFormula);
             
             assert distinguishingAndEqual instanceof Option.Some : "Possibly, this join is not sound!";
             
             ArrayList<Term> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.getValue().second);
 
             // Apply distributivity to simplify the formula
+            final long startTime_applyDistributivity= JoinRule.getCpuTime();
             cond1ConjElems.removeAll(equalConjunctiveElems);
             cond2ConjElems.removeAll(equalConjunctiveElems);
 
@@ -881,14 +904,21 @@ public class JoinRuleUtils {
                     equalConjunctiveElems, services);
 
             result = tb.and(tb.or(result1, result2), commonElemsTerm);
+            JoinRule.printTimeSummary(3, "applying distributivity for simplification", startTime_applyDistributivity);
 
             // Last try: Check if the formula is equivalent to only the
             // common elements...
+            final long startTime_equivalentToCommonsCheck= JoinRule.getCpuTime();
             Term equivalentToCommon = tb.and(tb.imp(result, commonElemsTerm),
                     tb.imp(commonElemsTerm, result));
-            if (isProvableWithSplitting(equivalentToCommon, services)) {
+            if (isProvableWithSplitting(equivalentToCommon, services, simplificationTimeout)) {
                 result = commonElemsTerm;
+                System.out.println("[DEBUG] Equivalent to commons check was successful.");
             }
+            else {
+                System.out.println("[DEBUG] Equivalent to commons check was NOT successful.");
+            }
+            JoinRule.printTimeSummary(3, "checking whether result is equivalent to common elements only", startTime_equivalentToCommonsCheck);
         }
 
         return result;
@@ -1291,10 +1321,14 @@ public class JoinRuleUtils {
      *            The services object.
      * @param doSplit
      *            if true, splitting is allowed (normal mode).
+     * @param sideProofName
+     *            name for the generated side proof.
+     * @param timeout
+     *            A timeout for the proof in milliseconds.
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Term toProve,
-            Services services, boolean doSplit, String sideProofName) {
+            Services services, boolean doSplit, String sideProofName, int timeout) {
         final ProofEnvironment sideProofEnv = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
                         services.getProof(), // Parent Proof
@@ -1310,6 +1344,8 @@ public class JoinRuleUtils {
                                     Semisequent.EMPTY_SEMISEQUENT,
                                     new Semisequent(new SequentFormula(toProve))),
                                     sideProofName); // Proof name
+            
+            proofStarter.setTimeout(timeout * 1000000);
 
             proofResult = proofStarter.start();
         }
@@ -1329,12 +1365,15 @@ public class JoinRuleUtils {
      *            The services object.
      * @param doSplit
      *            if true, splitting is allowed (normal mode).
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
     private static boolean isProvable(Term toProve, Services services,
-            boolean doSplit) {
+            boolean doSplit, int timeout) {
 
-        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check");
+        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check", timeout);
         boolean result = proofResult.getProof().closed();
 
         return result;
@@ -1350,18 +1389,21 @@ public class JoinRuleUtils {
      *            The parent {@link Proof}.
      * @param term
      *            The {@link Term} to simplify.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return The simplified {@link Term}.
      * @throws ProofInputException
      *             Occurred Exception.
      * 
      * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
-    private static Term simplify(Proof parentProof, Term term)
+    private static Term simplify(Proof parentProof, Term term, int timeout)
             throws ProofInputException {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo info = tryToProve(term, services, true, "Term simplification");
+        final ApplyStrategyInfo info = tryToProve(term, services, true, "Term simplification", timeout);
 
         // The simplified formula is the conjunction of all open goals
         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
