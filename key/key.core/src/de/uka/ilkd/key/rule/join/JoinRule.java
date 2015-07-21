@@ -26,11 +26,6 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isUpdateNormalForm;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
-import java.nio.CharBuffer;
-import java.text.DecimalFormat;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -146,8 +141,6 @@ public class JoinRule implements BuiltInRule {
     @Override
     public final ImmutableList<Goal> apply(Goal goal, final Services services,
             RuleApp ruleApp) throws RuleAbortException {
-
-        final long startTime_joining = getCpuTime();
         
         final JoinRuleBuiltInRuleApp joinRuleApp = (JoinRuleBuiltInRuleApp) ruleApp;
 
@@ -174,7 +167,6 @@ public class JoinRule implements BuiltInRule {
                 thisSEState.first, thisSEState.second, newGoal.node());
         ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
 
-        final long startTime_joinPartners = getCpuTime();
         for (SymbolicExecutionState state : joinPartnerStates) {
             Pair<SymbolicExecutionState, ImmutableSet<Name>> joinResult = joinStates(
                     joinRule, joinedState, state, thisSEState.third, services);
@@ -183,7 +175,6 @@ public class JoinRule implements BuiltInRule {
             joinedState = joinResult.first;
             joinedState.setCorrespondingNode(newGoal.node());
         }
-        printTimeSummary(1, "computing the join state", startTime_joinPartners);
 
         Term resultPathCondition = joinedState.second;
         
@@ -195,7 +186,6 @@ public class JoinRule implements BuiltInRule {
 //                resultPathCondition, true);
 
         // Delete previous sequents
-        final long startTime_buildingJoinNode = getCpuTime();
         clearSemisequent(newGoal, true);
         clearSemisequent(newGoal, false);
 
@@ -213,7 +203,6 @@ public class JoinRule implements BuiltInRule {
         SequentFormula newSuccedent = new SequentFormula(succedentFormula);
         newGoal.addFormula(newSuccedent, new PosInOccurrence(newSuccedent,
                 PosInTerm.getTopLevel(), false));
-        printTimeSummary(1, "building join node", startTime_buildingJoinNode);
 
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will
@@ -223,7 +212,6 @@ public class JoinRule implements BuiltInRule {
         services.saveNameRecorder(currentNode);
 
         // Close partner goals
-        final long startTime_closingPartners = getCpuTime();
         for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
             closeJoinPartnerGoal(
                     newGoal.node(),
@@ -233,14 +221,11 @@ public class JoinRule implements BuiltInRule {
                     sequentToSEPair(joinPartner.first.node(),
                             joinPartner.second, services), thisSEState.third);
         }
-        printTimeSummary(1, "closing join partners", startTime_closingPartners);
 
         // Register new names
         for (Name newName : newNames) {
             services.addNameProposal(newName);
         }
-        
-        printTimeSummary(0, "join: apply()", startTime_joining);
 
         return newGoals;
     }
@@ -278,10 +263,8 @@ public class JoinRule implements BuiltInRule {
         ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
 
         // Construct path condition as (optimized) disjunction
-        final long startTime_createSimplifiedPC = getCpuTime();
         Term newPathCondition = createSimplifiedDisjunctivePathCondition(
                 state1.second, state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
-        printTimeSummary(2, "computing simplified path condition", startTime_createSimplifiedPC);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
 
@@ -737,26 +720,6 @@ public class JoinRule implements BuiltInRule {
         }
 
         return potentialPartners;
-    }
-
-    /// DEBUGGING METHODS
-    public static void printTimeSummary(int level, String task, long start) {
-        printTimeSummary(level, task, start, getCpuTime());
-    }
-    
-    public static void printTimeSummary(int level, String task, long start, long end) {
-        DecimalFormat myFormatter = new DecimalFormat("###,###.###");
-        System.out.printf("[DEBUG] %s %s micro secconds for %s%n", indent(level * 2), myFormatter.format(((double)end - (double)start) / 1000d), task);
-    }
-    
-    public static long getCpuTime() {
-        ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-        return bean.isCurrentThreadCpuTimeSupported() ? bean
-                .getCurrentThreadCpuTime() : 0L;
-    }
-    
-    public static String indent(int spaces) {
-        return CharBuffer.allocate(spaces).toString().replace('\0', '>');
     }
 
 }

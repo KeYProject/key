@@ -116,8 +116,6 @@ public class IntermediateProofReplayer {
 
     /** Maps join node IDs to previously seen join partners */
     private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
-
-    private final int totalNrApps;
     
     /**
      * a value == 1 means the current branch is ignored; a value > 1 means that
@@ -146,7 +144,6 @@ public class IntermediateProofReplayer {
             IntermediatePresentationProofFileParser.Result parserResult) {
         this.proof = proof;
         this.loader = loader;
-        this.totalNrApps = parserResult.getNrApps();
 
         queue.addFirst(new Pair<Node, NodeIntermediate>(proof.root(),
                 parserResult.getParsedResult()));
@@ -165,9 +162,6 @@ public class IntermediateProofReplayer {
      * {@link #getLastSelectedGoal()}.
      */
     public Result replay() {
-        int currNrApps = 0;
-        float lastDisplayedRatioLoaded = 0f;
-        
         while (!queue.isEmpty()) {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
@@ -183,14 +177,6 @@ public class IntermediateProofReplayer {
                 continue;
             }
             else if (currNodeInterm instanceof AppNodeIntermediate) {
-                float ratioLoaded = (float) currNrApps / (float) totalNrApps;
-                if (ratioLoaded - lastDisplayedRatioLoaded >= 0.1) {
-                    System.out.printf("Replayed %d of %d nodes (%.1f%%)%n", currNrApps, totalNrApps, ratioLoaded * 100);
-                    lastDisplayedRatioLoaded = ratioLoaded;
-                }
-                currNrApps++;
-                
-                
                 AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
                 currNode.getNodeInfo().setInteractiveRuleApplication(
                         currInterm.isInteractiveRuleApplication());
@@ -272,9 +258,7 @@ public class IntermediateProofReplayer {
 
                                 assert joinApp.complete() : "Join app should be automatically completed in replay";
 
-                                System.out.println("[INFO] Performing a join app, this can take some time...");
                                 currGoal.apply(joinApp);
-                                System.out.println("[INFO] Performing a join app, this can take some time... Done.");
 
                                 // Join node has exactly one child in a closed proof, and
                                 // zero or one children in an open proof.

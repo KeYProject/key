@@ -67,7 +67,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.CloseAfterJoin;
-import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -844,7 +843,6 @@ public class JoinRuleUtils {
         final ArrayList<Term> fCond2ConjElems = new ArrayList<Term>(
                 cond2ConjElems);
 
-        final long startTime_elementaryCheck = JoinRule.getCpuTime();
         if (cond1ConjElems.size() == cond2ConjElems.size()) {
             for (int i = 0; i < fCond1ConjElems.size(); i++) {
                 Term elem1 = fCond1ConjElems.get(i);
@@ -868,7 +866,6 @@ public class JoinRuleUtils {
                 }
             }
         }
-        JoinRule.printTimeSummary(3, "checking if conjunctive elements are complementary", startTime_elementaryCheck);
 
         Term result1 = joinConjuctiveElements(cond1ConjElems, services);
         Term result2 = joinConjuctiveElements(cond2ConjElems, services);
@@ -879,7 +876,6 @@ public class JoinRuleUtils {
             result = result1;
         }
         else {
-            final long startTime_computingDistinguishingFormula = JoinRule.getCpuTime();
             Option<Pair<Term, Term>> distinguishingAndEqual = getDistinguishingFormula(
                     result1, result2, services);
             
@@ -887,14 +883,12 @@ public class JoinRuleUtils {
                 distinguishingAndEqual = getDistinguishingFormula(
                         result2, result1, services);
             }
-            JoinRule.printTimeSummary(3, "computing distinguishing and equal formula", startTime_computingDistinguishingFormula);
             
             assert distinguishingAndEqual instanceof Option.Some : "Possibly, this join is not sound!";
             
             ArrayList<Term> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.getValue().second);
 
             // Apply distributivity to simplify the formula
-            final long startTime_applyDistributivity= JoinRule.getCpuTime();
             cond1ConjElems.removeAll(equalConjunctiveElems);
             cond2ConjElems.removeAll(equalConjunctiveElems);
 
@@ -904,11 +898,9 @@ public class JoinRuleUtils {
                     equalConjunctiveElems, services);
 
             result = tb.and(tb.or(result1, result2), commonElemsTerm);
-            JoinRule.printTimeSummary(3, "applying distributivity for simplification", startTime_applyDistributivity);
 
             // Last try: Check if the formula is equivalent to only the
             // common elements...
-            final long startTime_equivalentToCommonsCheck= JoinRule.getCpuTime();
             Term equivalentToCommon = tb.and(tb.imp(result, commonElemsTerm),
                     tb.imp(commonElemsTerm, result));
             if (isProvableWithSplitting(equivalentToCommon, services, simplificationTimeout)) {
@@ -918,7 +910,6 @@ public class JoinRuleUtils {
             else {
                 System.out.println("[DEBUG] Equivalent to commons check was NOT successful.");
             }
-            JoinRule.printTimeSummary(3, "checking whether result is equivalent to common elements only", startTime_equivalentToCommonsCheck);
         }
 
         return result;
