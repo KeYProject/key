@@ -905,10 +905,6 @@ public class JoinRuleUtils {
                     tb.imp(commonElemsTerm, result));
             if (isProvableWithSplitting(equivalentToCommon, services, simplificationTimeout)) {
                 result = commonElemsTerm;
-                System.out.println("[DEBUG] Equivalent to commons check was successful.");
-            }
-            else {
-                System.out.println("[DEBUG] Equivalent to commons check was NOT successful.");
             }
         }
 
