@@ -2,7 +2,10 @@ package org.key_project.jmlediting.ui.outlineView;
 
 
 
+import java.util.List;
+
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -18,6 +21,9 @@ public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
    @Override
    public Object[] modify(Object parent, Object[] currentChildren) {
       
+      if(!(parent instanceof IJavaElement)){
+         return currentChildren;
+      }
       
       final IJavaElement javaParent = (IJavaElement)parent;
       
@@ -49,7 +55,7 @@ public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
             IMethod method = (IMethod)javaParent;
             int offset = -1;
             int arroffset = 0;
-            JMLComments com = null;
+            List<JMLComments> comlist = null;
             Object[] newArray;
             
             try {
@@ -58,14 +64,18 @@ public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
                LogUtil.getLogger().logError(e);;
             }
             
-            com  = comments.getMethodJMLComm(offset);
             
-            if (com != null)  {
+            comlist  = comments.getMethodJMLComm(offset);
+            
+            if (comlist != null)  {
                
-               arroffset = 1;
+               arroffset = comlist.size();
                newArray = new Object[currentChildren.length+arroffset];
-               newArray[0] = new JMLOutlineElement((IJavaElement) parent, com);
-               for (int i = offset; i < newArray.length; i++){
+               int i=0;
+               for (JMLComments com : comlist){
+                  newArray[i++] = new JMLOutlineElement((IJavaElement) parent, com);
+               }
+               for (i = offset; i < newArray.length; i++){
                   newArray[i] = currentChildren[i-1];
                }
             } else newArray = currentChildren;
@@ -74,6 +84,27 @@ public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
                
             
               
+         }
+         if (javaParent.getElementType() == IJavaElement.FIELD){
+            IField field = (IField) javaParent;
+            JMLComments toAdd = null;
+            Object [] newarray;
+            try {
+               toAdd = comments.getFieldJMLComm(field.getSourceRange().getOffset());
+            }
+            catch (JavaModelException e) {
+               LogUtil.getLogger().logError(e);
+            }
+            if (toAdd != null) {
+               newarray = new Object[currentChildren.length+1];
+               newarray[0] = new JMLOutlineElement(javaParent, toAdd);
+               for (int i= 1; i <= currentChildren.length; i++){
+                  newarray[i] = currentChildren[i-1];
+               }
+            }else newarray = currentChildren;
+            
+            return newarray;
+            
          }
          
       }

@@ -54,16 +54,11 @@ public class SWTBotJMLOutlineView {
       
       SWTBotView view = bot.viewByTitle("Outline");
        bot.menu("Window").click().menu("Show View").click().menu("Outline").click();
-       bot.sleep(1000);
        view.show();
        tree = view.bot().tree();
-       initKeywords();
+       
    }
    
-   private static void initKeywords() {
-      KEYWORD_LIST.add("invariant");
-      
-   }
 
    @AfterClass
    public static void closeEditor() {
@@ -148,7 +143,7 @@ public class SWTBotJMLOutlineView {
    }
    
    @Test 
-   public void behaviorTest1() {
+   public void behaviorTest1Normal() {
       testbehavior("a() : void","/*@ normal_behavior\r\n   @  requires x > y;\r\n   @*/","normal_behavior requires x > y",false);
    }
    @Test 
@@ -156,7 +151,7 @@ public class SWTBotJMLOutlineView {
       testbehavior("ab() : void","/*@ behavior\r\n   @ requires x > y;\r\n   @*/","behavior requires x > y",false);
    }
    @Test 
-   public void behaviorTest3() {
+   public void behaviorTest3Exceptional() {
       testbehavior("acb() : void","/*@ exceptional_behavior\r\n   @ requires x > y;\r\n   @*/","exceptional_behavior requires x > y",false);
    }
    
