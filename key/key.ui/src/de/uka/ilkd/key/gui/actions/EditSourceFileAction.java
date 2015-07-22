@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Container;
 import java.awt.Dialog;
@@ -22,6 +22,8 @@ import javax.swing.border.TitledBorder;
 
 import org.key_project.util.java.IOUtil;
 
+import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
 
@@ -51,7 +53,7 @@ public class EditSourceFileAction extends AbstractAction {
    private final ExceptionDialog parent;
    private final Throwable exception;
 
-   EditSourceFileAction(final ExceptionDialog parent, final Throwable exception) {
+   public EditSourceFileAction(final ExceptionDialog parent, final Throwable exception) {
       super("Edit Source File");
       this.parent = parent;
       this.exception = exception;
@@ -131,7 +133,7 @@ public class EditSourceFileAction extends AbstractAction {
          ActionListener reloadAction = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-               parent.close();
+               parent.setVisible(false);
                MainWindow.getInstance().loadProblem(sourceFile);
             }
          };

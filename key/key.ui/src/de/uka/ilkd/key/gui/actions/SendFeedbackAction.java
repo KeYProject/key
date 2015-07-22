@@ -1,7 +1,8 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -47,21 +51,26 @@ import de.uka.ilkd.key.util.KeYConstants;
  * @author Kai Wallisch
  *
  */
+@SuppressWarnings("serial")
 public class SendFeedbackAction extends AbstractAction {
 
+    /*
+     * This is the email address to which feedback will be sent.
+     */
+    private static final String FEEDBACK_RECIPIENT = "feedback@key-project.org";
+
    private static String serializeStackTrace(Throwable t) {
-      String stackTrace = "";
-      for (StackTraceElement e : t.getStackTrace()) {
-         stackTrace += e.toString() + "\n";
-      }
-      return stackTrace;
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
    }
 
-   // TODO provide a recipient e-mail address for developer feedback
-   static final String FEEDBACK_RECIPIENT = "feedback@key-project.org";
 
    // dialog that opens in case user wished to send feedback
    private final JDialog dialog;
+
+    // checkboxes specifing which data will be contained in feedback
+    private final LinkedList<SendFeedbackItem> checkBoxes = new LinkedList<>();
 
    private static abstract class SendFeedbackItem {
       final JCheckBox checkBox;
@@ -75,7 +84,7 @@ public class SendFeedbackAction extends AbstractAction {
        * dynamically.
        */
       boolean isEnabled() {
-         return checkBox.isEnabled();
+            return true;
       }
 
       /*
@@ -120,8 +129,7 @@ public class SendFeedbackAction extends AbstractAction {
       }
    }
 
-   // checkboxes specifing which data will be contained in feedback
-   private LinkedList<SendFeedbackItem> checkBoxes = new LinkedList<>();
+
 
    public SendFeedbackAction(final Window parent) {
       super("Send Feedback");
@@ -291,7 +299,7 @@ public class SendFeedbackAction extends AbstractAction {
       topPanel.add(right);
 
       JPanel buttonPanel = new JPanel();
-      buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setLayout(new FlowLayout());
 
       JButton sendFeedbackReportButton = new JButton("Send Feedback");
       sendFeedbackReportButton.addActionListener(new ActionListener() {
@@ -367,7 +375,7 @@ public class SendFeedbackAction extends AbstractAction {
       container.add(buttonPanel);
    }
 
-   SendFeedbackAction(final Window parent, final Throwable exception) {
+    public SendFeedbackAction(final Window parent, final Throwable exception) {
       this(parent);
 
       Location location = ExceptionTools.getLocation(exception);

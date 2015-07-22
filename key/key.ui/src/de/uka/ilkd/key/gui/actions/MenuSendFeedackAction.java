@@ -1,12 +1,13 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.MainWindow;
 
 public class MenuSendFeedackAction extends MainWindowAction {
    
-   protected MenuSendFeedackAction(MainWindow mainWindow) {
+   public MenuSendFeedackAction(MainWindow mainWindow) {
       super(mainWindow);
       setName("Send Feedback");
    }
@@ -14,7 +15,7 @@ public class MenuSendFeedackAction extends MainWindowAction {
    /**
     * Re-using {@link SendFeedbackAction} from {@link ExceptionDialog} for this.
     */
-   private SendFeedbackAction action = new SendFeedbackAction(mainWindow);
+   private final SendFeedbackAction action = new SendFeedbackAction(mainWindow);
 
    @Override
    public void actionPerformed(ActionEvent arg0) {
