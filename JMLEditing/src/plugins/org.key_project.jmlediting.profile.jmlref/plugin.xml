@@ -31,4 +31,22 @@
             </enablement>
       </renameParticipant>
    </extension>
+     <extension
+point="org.eclipse.ltk.core.refactoring.moveParticipants">
+<moveParticipant
+     id="org.eclipse.jdt.junit.moveTypeParticipant"
+     name="Test Move Participant"
+class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipant">
+     <enablement>
+       <with variable="affectedNatures">
+         <iterate operator="or">
+           <equals value="org.eclipse.jdt.core.javanature"/>
+         </iterate>
+       </with>
+       <with variable="element">
+         <instanceof value="org.eclipse.jdt.core.IType"/>
+       </with>
+     </enablement>
+</moveParticipant>
+         </extension>
 </plugin>
