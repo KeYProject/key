@@ -50,16 +50,277 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    protected List<AbstractForm> computeForms() {
       FixedForm evaluationForm = new FixedForm("evaluationForm", 
                                                true, 
-                                               createStackQuestionPage("middleExample", "Review of IntegerUtil#middle(int, int, int)"));
+                                               createObservableArrayQuestionPage("ObservableArrayExample", "Review of cass ObservableArray"),
+                                               createStackQuestionPage("StackExample", "Review of class Stack"));
       return CollectionUtil.toList((AbstractForm)evaluationForm);
    }
 
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   private QuestionPage createObservableArrayQuestionPage(String pageName, String title) {
+      TabbedQuestion tabbedQuestion = new TabbedQuestion("methods", 
+                                                         createObservableArrayArrayTab(),
+                                                         createSetTab(),
+                                                         createSetArrayListenersTab());
+      return new QuestionPage(pageName, 
+                              title, 
+                              createQuestionPageMessage(), 
+                              false,
+                              false,
+                              true,
+                              null,
+                              new LabelQuestion("generalDescription", createGeneralClassDescription("ObservableArray")),
+                              tabbedQuestion);
+   }
+   
+   private TabQuestion createObservableArrayArrayTab() {
+      String description = "ObservableArray(Object[]) related question.";
+      String methodProblemsTitle = "What is wrong?";
+      CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
+                                                             methodProblemsTitle, 
+                                                             description,
+                                                             true, 
+                                                             null, 
+                                                             createNotUndefinedValueValidator(methodProblemsTitle), 
+                                                             true,
+                                                             new Choice("Future calls of set(int, Object) will modify the given array", "ArrayModified"), 
+                                                             new Choice("Future calls of set(int, Object) will not modify the given array", "ArrayNotModified"), 
+                                                             new Choice("ObservableArray is created instead of throwing an exception", "ExceptionMissing"), 
+                                                             new Choice("Exception is thrown instead of creating an ObservableArray", "ExceptionThrown"), 
+                                                             createElseWrongChoice(description));
+      String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
+      RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
+                                                                              implementedAsDocumentedTitle, 
+                                                                              description,
+                                                                              true, 
+                                                                              null, 
+                                                                              createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
+                                                                              true,
+                                                                              new Choice("Yes", "Yes", true), 
+                                                                              new Choice("No", "No", methodProblems));
+      String executedTitle = "Which statement(s) can be executed?";
+      CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
+                                                               executedTitle, 
+                                                               description,
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
+                                                               new Choice("None of the statements can be executed", "None"),
+                                                               new Choice("Line 30: if (array == null)", "Line 30", true),
+                                                               new Choice("Line 31: throw new IllegalArgumentException(\"Array is null.\")", "Line 31", true),
+                                                               new Choice("Line 33: this.array = array", "Line 33", true),
+                                                               new Choice("Line 34: this.arrayListeners = null", "Line 34", true));
+      return new TabQuestion("ObservableArray", 
+                             "ObservableArray(Object[])", 
+                             false, 
+                             implementedAsDocumented,
+                             createObservableArrayClassInvariantQuestion(description, true),
+                             createThrownExceptionsQuestion(description, false, false, false, true, false, false),
+                             executedQuestion,
+                             createObservableArrayLocationQuestion(description, true, true, false));
+   }
+   
+   private TabQuestion createSetTab() {
+      String description = "set(int, Object) related question.";
+      String methodProblemsTitle = "What is wrong?";
+      CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
+                                                             methodProblemsTitle, 
+                                                             description,
+                                                             true, 
+                                                             null, 
+                                                             createNotUndefinedValueValidator(methodProblemsTitle), 
+                                                             true,
+                                                             new Choice("array[index] is assigned to element", "ArrayUpdated"), 
+                                                             new Choice("array[index] is not assigned to element", "ArrayNotUpdated"), 
+                                                             new Choice("All ArrayListener of arrayListeners are informed about the change", "ArrayListenerInformed"), 
+                                                             new Choice("Not all ArrayListener of arrayListeners are informed about the change", "ArrayListenerNotInformed"), 
+                                                             new Choice("An ArrayEvent is created.", "ArrayEventCreated"), 
+                                                             new Choice("No ArrayEvent is created.", "ArrayEventNotCreated"), 
+                                                             new Choice("The ArrayEvent contains all details about the modification.", "ArrayEventHasDetails"), 
+                                                             new Choice("The ArrayEvent does not contains all details about the modification.", "ArrayEventDoesNotHaveDetails"), 
+                                                             createElseWrongChoice(description));
+      String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
+      RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
+                                                                              implementedAsDocumentedTitle, 
+                                                                              description,
+                                                                              true, 
+                                                                              null, 
+                                                                              createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
+                                                                              true,
+                                                                              new Choice("Yes", "Yes", true), 
+                                                                              new Choice("No", "No", methodProblems));
+      String executedTitle = "Which statement(s) can be executed?";
+      CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
+                                                               executedTitle, 
+                                                               description,
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
+                                                               new Choice("None of the statements can be executed", "None"),
+                                                               new Choice("Line 49: array[index] = element", "Line 49", true),
+                                                               new Choice("Line 50: fireElementChanged(new ArrayEvent(this, index, element))", "Line 50", true),
+                                                               new Choice("Line 59: if (arrayListeners != null)", "Line 59", true),
+                                                               new Choice("Line 64: int i = 0", "Line 64 initial", true),
+                                                               new Choice("Line 64: i < arrayListeners.length", "Line 64 guard", true),
+                                                               new Choice("Line 64: i++", "Line 64 increment", true),
+                                                               new Choice("Line 65 if (arrayListeners[i] != null)", "Line 65", true),
+                                                               new Choice("Line 66 arrayListeners[i].elementChanged(e)", "Line 66", true));
+      return new TabQuestion("set", 
+                             "set(int, Object)", 
+                             false, 
+                             implementedAsDocumented,
+                             createObservableArrayClassInvariantQuestion(description, false),
+                             createThrownExceptionsQuestion(description, true, false, false, false, true, true),
+                             executedQuestion,
+                             createObservableArrayLocationQuestion(description, false, false, true));
+   }
+   
+   private TabQuestion createSetArrayListenersTab() {
+      String description = "setArrayListeners(ArrayListener[]) related question.";
+      String methodProblemsTitle = "What is wrong?";
+      CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
+                                                             methodProblemsTitle, 
+                                                             description,
+                                                             true, 
+                                                             null, 
+                                                             createNotUndefinedValueValidator(methodProblemsTitle), 
+                                                             true,
+                                                             new Choice("ArrayListener are replaced by the new once", "ArrayListenerReplaced"), 
+                                                             new Choice("ArrayListener are not replaced by the new once", "ArrayListenerNotReplaced"), 
+                                                             createElseWrongChoice(description));
+      String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
+      RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
+                                                                              implementedAsDocumentedTitle, 
+                                                                              description,
+                                                                              true, 
+                                                                              null, 
+                                                                              createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
+                                                                              true,
+                                                                              new Choice("Yes", "Yes", true), 
+                                                                              new Choice("No", "No", methodProblems));
+      String executedTitle = "Which statement(s) can be executed?";
+      CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
+                                                               executedTitle, 
+                                                               description,
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
+                                                               new Choice("None of the statements can be executed", "None"),
+                                                               new Choice("Line 74 this.arrayListeners = arrayListeners", "Line 74", true));
+      return new TabQuestion("setArrayListeners", 
+                             "setArrayListeners(ArrayListener[])", 
+                             false, 
+                             implementedAsDocumented,
+                             createObservableArrayClassInvariantQuestion(description, false),
+                             createThrownExceptionsQuestion(description, false, false, false, false, false, false),
+                             executedQuestion,
+                             createObservableArrayLocationQuestion(description, false, true, false));
+   }
+   
+   private RadioButtonsQuestion createObservableArrayClassInvariantQuestion(String description, boolean constructor) {
+      String problemsTitle = "What is wrong?";
+      CheckboxQuestion problems = new CheckboxQuestion("classInvariantProblems", 
+                                                       problemsTitle, 
+                                                       description,
+                                                       true, 
+                                                       null, 
+                                                       createNotUndefinedValueValidator(problemsTitle), 
+                                                       true,
+                                                       new Choice("array might be null", "ArrayNull"), 
+                                                       new Choice("array might be not null", "ArrayNotNull"), 
+                                                       new Choice("array might have length 0", "ArrayLengthZero"), 
+                                                       new Choice("array might be empty", "ArrayEmpty"), 
+                                                       new Choice("array might be not empty", "ArrayNotEmpty"), 
+                                                       new Choice("array might contain null as element", "ArrayContainsNull"), 
+                                                       new Choice("array might contain an Object as element", "ArrayContainsObject"), 
+                                                       new Choice("arrayListeners might be null", "ArrayListenersNull"), 
+                                                       new Choice("arrayListeners might be not null", "ArrayListenersNotNull"), 
+                                                       new Choice("arrayListeners might have length 0", "ArrayListenersLengthZero"), 
+                                                       new Choice("arrayListeners might be empty", "ArrayListenersEmpty"), 
+                                                       new Choice("arrayListeners might be not empty", "ArrayListenersNotEmpty"), 
+                                                       new Choice("arrayListeners might contain null as element", "ArrayListenersContainsNull"), 
+                                                       new Choice("arrayListeners might contain an Object as element", "ArrayarrayListenersContainsObject"), 
+                                                       createElseWrongChoice(description));
+      String title = constructor ?
+                     "Is the class invariant established?" :
+                     "Is the class invariant preserved?";
+      return new RadioButtonsQuestion("classInvariant", 
+                                      title, 
+                                      description,
+                                      true, 
+                                      null, 
+                                      createNotUndefinedValueValidator(title), 
+                                      true,
+                                      new Choice("Yes", "Yes", true), 
+                                      new Choice("No", "No", problems));
+   }
+
+   private CheckboxQuestion createObservableArrayLocationQuestion(String description, boolean expectedArray, boolean expectedArrayListeners, boolean expectedArrayAtIndex) {
+      String title = "Which location(s) of the initial state before method invocation might be changed during execution?";
+      return new CheckboxQuestion("changedLocations", 
+                                  title, 
+                                  description,
+                                  true,
+                                  null, 
+                                  new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  true,
+                                  new Choice("None", "None"),
+                                  new Choice("array", "array", expectedArray),
+                                  new Choice("array[index - 1]", "array[index - 1]"),
+                                  new Choice("array[index]", "array[index]", expectedArrayAtIndex),
+                                  new Choice("array[index + 1]", "array[index + 1]"),
+                                  new Choice("array[*]", "array[*]"),
+                                  new Choice("array.length", "array.length"),
+                                  new Choice("arrayListeners", "arrayListeners", expectedArrayListeners),
+                                  new Choice("arrayListeners[i - 1]", "arrayListeners[i - 1]"),
+                                  new Choice("arrayListeners[i]", "arrayListeners[i]"),
+                                  new Choice("arrayListeners[i + 1]", "arrayListeners[i + 1]"),
+                                  new Choice("arrayListeners[*]", "arrayListeners[*]"),
+                                  new Choice("arrayListeners.length", "arrayListeners.length"),
+                                  new Choice("something else", "SomethingElse", createElseExceptionSubQuestion(description)));
+   }
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+
    private QuestionPage createStackQuestionPage(String pageName, String title) {
       TabbedQuestion tabbedQuestion = new TabbedQuestion("methods", 
-                                                         createStackIntSection(),
-                                                         createStackStackSection(),
-                                                         createPushSection(),
-                                                         createPopSection());
+                                                         createStackIntTab(),
+                                                         createStackStackTab(),
+                                                         createPushTab(),
+                                                         createPopTab());
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -71,7 +332,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               tabbedQuestion);
    }
    
-   private TabQuestion createStackIntSection() {
+   private TabQuestion createStackIntTab() {
       String description = "Stack(int) related question.";
       String methodProblemsTitle = "What is wrong?";
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
@@ -112,12 +373,12 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createStackClassInvariantQuestion(description, true, false),
-                             createThrownExceptionsQuestion(description, false, true, false),
+                             createThrownExceptionsQuestion(description, false, true, false, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, true, true, false));
    }
    
-   private TabQuestion createStackStackSection() {
+   private TabQuestion createStackStackTab() {
       String description = "Stack(Stack) related question.";
       String methodProblemsTitle = "What is wrong?";
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
@@ -162,12 +423,12 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createStackClassInvariantQuestion(description, true, false),
-                             createThrownExceptionsQuestion(description, true, false, false),
+                             createThrownExceptionsQuestion(description, true, false, false, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, true, true, false));
    }
    
-   private TabQuestion createPushSection() {
+   private TabQuestion createPushTab() {
       String description = "push(Object) related question.";
       String methodProblemsTitle = "What is wrong?";
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
@@ -214,12 +475,12 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createStackClassInvariantQuestion(description, false, false),
-                             createThrownExceptionsQuestion(description, false, false, true),
+                             createThrownExceptionsQuestion(description, false, false, true, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, false, true, true));
    }
    
-   private TabQuestion createPopSection() {
+   private TabQuestion createPopTab() {
       String description = "pop() related question.";
       String methodProblemsTitle = "What is wrong?";
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
@@ -278,7 +539,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createStackClassInvariantQuestion(description, false, true),
-                             createThrownExceptionsQuestion(description, false, false, true),
+                             createThrownExceptionsQuestion(description, false, false, true, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, false, true, false),
                              returnValue);
@@ -354,7 +615,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       return new TextQuestion("elseLocation", locationTitle, description, null, new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), false);
    }
    
-   private RadioButtonsQuestion createThrownExceptionsQuestion(String description, boolean expectedNPE, boolean expectedNASE, boolean expectedISE) {
+   private RadioButtonsQuestion createThrownExceptionsQuestion(String description, boolean expectedNPE, boolean expectedNASE, boolean expectedISE, boolean expectedIAE, boolean expectedAIOOBE, boolean expectedASE) {
       String title = "Is it possible that an exception is thrown?";
       return new RadioButtonsQuestion("exceptionThrown", 
                                       title, 
@@ -363,11 +624,11 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                       null, 
                                       createNotUndefinedValueValidator(title), 
                                       true,
-                                      new Choice("Yes", "Yes", !expectedNPE && !expectedNASE && !expectedISE, createThrownExceptionsSubQuestion(description, expectedNPE, expectedNASE, expectedISE)), 
+                                      new Choice("Yes", "Yes", !expectedNPE && !expectedNASE && !expectedISE, createThrownExceptionsSubQuestion(description, expectedNPE, expectedNASE, expectedISE, expectedIAE, expectedAIOOBE, expectedASE)), 
                                       new Choice("No", "No"));
    }
    
-   private CheckboxQuestion createThrownExceptionsSubQuestion(String description, boolean expectedNPE, boolean expectedNASE, boolean expectedISE) {
+   private CheckboxQuestion createThrownExceptionsSubQuestion(String description, boolean expectedNPE, boolean expectedNASE, boolean expectedISE, boolean expectedIAE, boolean expectedAIOOBE, boolean expectedASE) {
       String thrownExceptionTitle = "Which exception(s) might be thrown?";
       CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsMightBeThrown", 
                                                                       thrownExceptionTitle, 
@@ -378,10 +639,10 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                       true,
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException", expectedNPE),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
-                                                                      new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException"),
-                                                                      new Choice("java.lang.ArrayStoreException", "java.lang.ArrayStoreException"),
+                                                                      new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException", expectedAIOOBE),
+                                                                      new Choice("java.lang.ArrayStoreException", "java.lang.ArrayStoreException", expectedASE),
                                                                       new Choice("java.lang.NegativeArraySizeException", "java.lang.NegativeArraySizeException", expectedNASE),
-                                                                      new Choice("java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException"),
+                                                                      new Choice("java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException", expectedIAE),
                                                                       new Choice("java.lang.IllegalStateException", "java.lang.IllegalStateException", expectedISE),
                                                                       new Choice("something else", "SomethingElse", createElseExceptionSubQuestion(description)));
       return thrownExceptionQuestion;

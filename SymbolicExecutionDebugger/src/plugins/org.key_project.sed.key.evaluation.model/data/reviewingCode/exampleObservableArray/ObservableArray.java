@@ -1,14 +1,13 @@
-
 /**
- * An observable array which delegates all actions to a base array.
+ * An observable array which delegates all actions to an array.
  * @see ArrayListener
  * @see ArrayEvent
  */
 public class ObservableArray {
    /**
-    * The base array to which all actions are delegated.
+    * The array to which all actions are delegated.
     * <p>
-    * The base array is never {@code null}.
+    * The array is never {@code null}.
     */
    private final /*@ non_null @*/ Object[] array;
    
@@ -20,18 +19,26 @@ public class ObservableArray {
    private /*@ nullable @*/ ArrayListener[] arrayListeners;
    
    /**
-    * Constructor.
-    * @param array The base array to which all actions are delegated.
+    * Constructs an {@link ObservableArray} modifying the given array.
+    * <p>
+    * In case that the given array is {@code null} an 
+    * {@link IllegalArgumentException} will be thrown.
+    * @param array The array to which all actions are delegated.
     */
    public ObservableArray(Object[] array) {
       if (array == null) {
-         throw new IllegalArgumentException("Base array is null.");
+         throw new IllegalArgumentException("Array is null.");
       }
       this.array = array;
+      this.arrayListeners = null;
    }
 
    /**
-    * Sets the value at index to the given {@link Object}.
+    * Sets the value at index to the given {@link Object} and
+    * informs all available {@link ArrayListener} about the change.
+    * <p>
+    * The change is represented as {@link ArrayEvent} which offers all
+    * details about the performed modification.
     * @param index The index in the array to modify.
     * @param element The element to set at the given index.
     */
