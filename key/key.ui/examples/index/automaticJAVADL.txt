@@ -765,6 +765,10 @@ group permissionHeap {
    provable ./heap/permissions/mulleretal/ReadWrite_inv1_accessible.key
    provable ./heap/permissions/mulleretal/ReadWrite_inv2_accessible.key
 
+   # The LockSpec example (permissions & model methods)
+   provable ./heap/permissions/lockspec/Counter_lockConsistent_contract.key
+   provable ./heap/permissions/lockspec/Counter_increase_contract.key
+
    # These need (a lot of) interaction at the moment:
    # provable: ./heap/permissions/threads/AFilter_run.key
    # provable: ./heap/permissions/threads/BFilter_run.key
