@@ -1,0 +1,25 @@
+Basic idea: 
+Run a renaming and compare the editor content to a given oracle, i.e. the result which should be achieved.
+
+
+1) Each test in its own folder. Separated in src and oracle.
+2) First files are copied and oracle string is generated.
+3) Renaming is done.
+4) Comparison of editor after renaming to oracle.
+
+
+What is tested:
+
+Test1: one occurrence in a simple assignable clause
+Test2: additional occurrences in requires and ensures clauses
+Test3: local variable with the same name (balance) and use of this qualifier
+Test4: a field from another class is accessed which has the same name as the field to be renamed (balance).
+Test5: the other class accesses and returns the balance field of the main class and thus need to change the name.
+Test6: the other class is additionally in another package and instead of returning the balance field of the main class
+      it sets the field with the local parameter called balance too.
+Test7: more complex usage of balance. More than one member access.
+Test8: Changes to the JML code in the other class but no changes to the java code. Other class accesses the balance field
+      from the main class by using getBalance() but refers to the field in the JML code.
+Test9: change within an invariant.
+Test10: lots of member accesses but of the same class.
+...

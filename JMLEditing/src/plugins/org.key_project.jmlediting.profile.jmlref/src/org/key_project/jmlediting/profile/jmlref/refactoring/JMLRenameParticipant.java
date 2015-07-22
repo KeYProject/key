@@ -1,8 +1,9 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -14,10 +15,13 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
+import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.INodeTraverser;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
@@ -107,18 +111,16 @@ public class JMLRenameParticipant extends RenameParticipant {
         try {
             projects = JDTUtil.getAllJavaProjects();
 
-            // In each Project
+            // Look through all source files in each package and project
             for (final IJavaProject project : projects) {
-                // In each Package
                 for (final IPackageFragment pac : project.getPackageFragments()) {
-                    // In each Compilation Unit
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
-
-                        final LinkedList<ReplaceEdit> changesToJML = computeNeededChangesToJML(
+                         
+                        final ArrayList<ReplaceEdit> changesToJML = computeNeededChangesToJML(
                                 unit, project);
 
-                        // Get scheduled changes to the java code
+                        // Get scheduled changes to the java code from the rename processor
                         final TextChange changesToJavaCode = getTextChange(unit);
 
                         // add our edits to the java changes (computes the
@@ -129,7 +131,16 @@ public class JMLRenameParticipant extends RenameParticipant {
                             }
                         }
                         else {
-                            // TODO: changes to JML but not to Java
+                            TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());
+                            MultiTextEdit allEdits = new MultiTextEdit();
+                            
+                            for (final ReplaceEdit edit: changesToJML) {
+                               allEdits.addChild(edit);
+                            }
+                            
+                            tfChange.setEdit(allEdits);
+                            
+                            return tfChange;
                         }
                     }
                 }
@@ -142,157 +153,222 @@ public class JMLRenameParticipant extends RenameParticipant {
     }
 
     /**
-     * Computes the text changed which need to be done to JML code by finding
+     * Computes the text changes which need to be done to JML code by finding
      * all JML comments in the file and asking the resolver if it references the
      * java element which is to be renamed.
      * 
      * @param unit
      *            ICompilation unit for which to create the changes
      * @param project
-     *            project of the compilation unit
-     * @return list of edits which need to be done
+     *            Project of the compilation unit
+     * @return List of edits which need to be done
      * @throws JavaModelException
-     *             thrown when the source file cannot be loaded from
+     *             Thrown when the source file cannot be loaded from
      *             ICompilationUnit or he JMLcomments could not be received
      */
-    private LinkedList<ReplaceEdit> computeNeededChangesToJML(
+    private ArrayList<ReplaceEdit> computeNeededChangesToJML(
             final ICompilationUnit unit, final IJavaProject project)
             throws JavaModelException {
-        final LinkedList<ReplaceEdit> changesToMake = new LinkedList<ReplaceEdit>();
+        
+        final ArrayList<ReplaceEdit> changesToMake = new ArrayList<ReplaceEdit>();
 
-        // Find the JML comments in the given source file
+        // Look through the JML comments and find the potential references which need to be renamed
         final String source = unit.getSource();
         final CommentLocator loc = new CommentLocator(source);
 
         for (final CommentRange range : loc.findJMLCommentRanges()) {
 
-            final List<IASTNode> nodesList = getJMLcomments(unit, project,
+            final List<IASTNode> potentialReferences = getPotentialReferencesInJMLcomments(project,
                     source, range);
-            // NodeTypes.KEYWORD_APPL);
 
-            // Step through the list of IASTNodes and ask the resolver if it
-            // references the element to be renamed
-            for (final IASTNode stringNode : nodesList) {
-                //System.out.println("node = " + stringNode);
+            for (final IASTNode node : potentialReferences) {
 
-                if (isReferenceToRefactoredElement(unit, stringNode)) {
-                    // Create the text change and add it to the list to be
-                    // returned
-                    final int startOffset = stringNode.getStartOffset();
-                    final int length = stringNode.getEndOffset()
-                            - stringNode.getStartOffset();
-
-                    final ReplaceEdit edit = new ReplaceEdit(startOffset,
-                            length, fNewName);
-
-                    changesToMake.add(edit);
-                    //System.out.println("Adding Replace Edit to Validate");
-                }
+                resolvePotentialReferences(unit, node, changesToMake);
             }
         }
         return changesToMake;
     }
 
+
     /**
-     * Searches through a given CommentRange range in a ICompilationUnit from a
-     * given IJavaProject and returns all JML comments as a potentially empty
-     * List
+     * Searches through a given CommentRange in a source file and returns 
+     * all JML comments as a potentially empty List.
      * 
-     * @param unit
-     *            ICompilationUnit to search through
      * @param project
-     *            IJavaProject unit is in. Needed to get active JMLProfile for
+     *            IJavaProject the unit resides in. Needed to get active JMLProfile for
      *            parser
      * @param source
-     *            Source File to be used in the Parser
+     *            String representation of the source file to be used in the {@link IJMLParser}
      * @param range
      *            CommentRange to be parsed
-     * @return list of JML comments found
+     * @return List of found JML comments
      * @throws JavaModelException
-     *             could not access source of given ICompilationUnit
+     *             Could not access source of given ICompilationUnit
      */
-    private List<IASTNode> getJMLcomments(final ICompilationUnit unit,
-            final IJavaProject project, final String source, final CommentRange range)
+    private List<IASTNode> getPotentialReferencesInJMLcomments(final IJavaProject project, final String source, final CommentRange range)
             throws JavaModelException {
 
-        List<IASTNode> nodesList = new LinkedList<IASTNode>();
-
+        List<IASTNode> stringNodes = new ArrayList<IASTNode>();
+        
         final IJMLProfile activeProfile = JMLPreferencesHelper
                 .getProjectActiveJMLProfile(project.getProject());
         final IJMLParser parser = activeProfile.createParser();
         IASTNode parseResult;
         try {
             parseResult = parser.parse(source, range);
-            nodesList = Nodes.getAllNodesOfType(parseResult, ExpressionNodeTypes.PRIMARY_EXPR);
-
-//            System.out.println();
-//            System.out.println("found keywords "
-//                    + nodesList
-//                    + " in "
-//                    + source.substring(range.getBeginOffset(),
-//                            range.getEndOffset() + 1));
+            stringNodes = Nodes.getAllNodesOfType(parseResult, NodeTypes.STRING);
         }
         catch (final ParserException e) {
-            return new LinkedList<IASTNode>();
+            return new ArrayList<IASTNode>();
         }
-        //System.out.println("Returning: " + nodesList);
-        return nodesList;
+ 
+        //System.out.println("Unfiltered: "+stringNodes);
+        final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
+        //System.out.println("Filtered: "+filtedStringNodes);
+        
+        final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult);
+        
+        //System.out.println("Primaries: " + primaries);
+        return primaries;
     }
 
     /**
-     * Checks if a given IASTNode in a given ICompilationUnit references the
-     * element to be renamed
+     * Filters a list of {@link IASTNode} for those which potentially reference 
+     * the element to be renamed by comparing the name.
+     * @param nodesList list to filter. Should be a list of IStringNodes.
+     * @return filtered list
+     */
+    private ArrayList<IStringNode> filterStringNodes(final List<IASTNode> nodesList) {
+        
+        final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
+        
+        for (final IASTNode node: nodesList){
+            final IStringNode stringNode = (IStringNode) node;     
+            if (stringNode.getString().equals(fOldName)) {     
+                filteredList.add(stringNode);
+            }
+        }
+        
+        return filteredList;
+    }
+
+    private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult){
+        final List<IASTNode> primaries = new ArrayList<IASTNode>();
+        
+        for (final IStringNode stringNode: stringNodes) {       
+          final IASTNode primary = getPrimaryNode(parseResult, stringNode);
+          primaries.add(primary);  
+        }
+        return primaries;
+    }
+    
+    private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest) {
+        return context.traverse(new INodeTraverser<IASTNode>() {
+
+            @Override
+            public IASTNode traverse(final IASTNode node, IASTNode existing) {
+                if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
+                    if(node.containsOffset(toTest.getStartOffset())) {
+                        if(existing == null) {
+                            existing = node;
+                        } else if(node.getEndOffset() - node.getStartOffset() < existing.getEndOffset() - existing.getStartOffset()) {
+                            existing = node;
+                            return node;
+                        }
+                    }
+                }
+                return existing;
+            }        
+        }, null);
+    }
+
+    /**
+     * Checks if a given {@link IASTNode} in a given {@link ICompilationUnit} references the
+     * element to be renamed. It then creates the needed {@Link ReplaceEdit} and 
+     * adds it to changesToMake.
      * 
      * @param unit
      *            the ICompilationUnit the IASTNode is in
      * @param node
-     *            IASTNode to check
-     * @return true if the given IASTNode references the element to be renamed
-     *         else false
+     *            IASTNode of type Primary to resolve
+     * @param changesToMake
+     *            to accumulate needed changes 
      */
-    private Boolean isReferenceToRefactoredElement(final ICompilationUnit unit,
-            final IASTNode node) {
+    private void resolvePotentialReferences(final ICompilationUnit unit, final IASTNode node, final ArrayList<ReplaceEdit> changesToMake) {
+    
+        //System.out.println(node.prettyPrintAST());
         
-        // correct name?
-        if (((node.getChildren().get(0).getType()) == ExpressionNodeTypes.IDENTIFIER) && 
-        ((node.getChildren().get(0).getChildren().get(0).getType()) == NodeTypes.STRING)) {
-            if (((IStringNode) node.getChildren().get(0).getChildren().get(0)).getString().equals(fOldName)) {
-                
-            final IResolver resolver = new Resolver();
-            ResolveResult result = null;
-            try {
-                result = resolver.resolve(unit, node);
-                while(resolver.hasNext()) {
-                    result = resolver.next();
-                }
+        final IASTNode nodeToChange = node;
+    
+        final IResolver resolver = new Resolver();
+        ResolveResult result = null;
+        try {
+            int i = 0;
+            result = resolver.resolve(unit, node);
+            
+            if (isReferencedElement(result)){
+                computeReplaceEdit(changesToMake, nodeToChange);
             }
-            catch (final ResolverException e) {
-                LogUtil.getLogger().logError(e);
-                return false;
+                      
+            while(resolver.hasNext()) { 
+                 result = resolver.next();
+                 //System.out.println("resolver.next()");
+                 
+                 System.out.println(nodeToChange.prettyPrintAST());
+                 
+                 if (isReferencedElement(result)) {
+                     final IASTNode node2 = nodeToChange.getChildren().get(1).getChildren().get(i);
+                     
+                     computeReplaceEdit(changesToMake, node2);
+                 } 
+                 i = i + 1;
             }
-
-            if (result == null) {
-                //System.out.println("Resolver returned null");
-                return false;
-            }
-            else {
-
-                //System.out.println("Resolve Type = " + result.getResolveType());
-
-                final IJavaElement jElement = result.getBinding()
-                        .getJavaElement();
-
-                // Some Java Element found but is it the same?
-                //System.out.println("Java Element == Element to be renamed is "
-                //        + jElement.equals(fJavaElementToRename));
-
-                return jElement.equals(fJavaElementToRename);
-            }   
         }
-            else // wrong name 
-                return false;
+        catch (final ResolverException e) {
+            LogUtil.getLogger().logError(e);
         }
-        else // not of correct type
-            return false;
     }
+    
+    private Boolean isReferencedElement(final ResolveResult result){
+        if (result == null) {
+            return false;
+        }
+        
+        final IJavaElement jElement = result.getBinding().getJavaElement();
+        
+        return jElement.equals(fJavaElementToRename);
+    }
+    
+
+    /**
+     * Creates the text change and adds it to changesToMake.
+     * 
+     * @param changesToMake
+     * @param node
+     */
+    private void computeReplaceEdit(final ArrayList<ReplaceEdit> changesToMake,
+            final IASTNode node) {
+
+        IASTNode changeThisNode = node;
+        
+        if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
+            changeThisNode = node.getChildren().get(0).getChildren().get(0);
+        }
+        
+        // Keep the . when it is a member access like this.field
+        if (node.getType() == ExpressionNodeTypes.MEMBER_ACCESS){
+            changeThisNode = node.getChildren().get(1);
+        }
+        
+        final int startOffset = changeThisNode.getStartOffset();
+        final int length = changeThisNode.getEndOffset()
+                - changeThisNode.getStartOffset();
+
+        final ReplaceEdit edit = new ReplaceEdit(startOffset,
+                length, fNewName);
+
+        changesToMake.add(edit);
+        //System.out.println("Adding Replace Edit");
+    }
+    
 }
