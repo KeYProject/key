@@ -757,11 +757,19 @@ group permissionHeap {
    provable ./heap/permissions/threads/Sampler_staticPermissions_accessible.key
    provable ./heap/permissions/threads/Sampler_workingPermissions_accessible.key
 
+   # Müller et al example
+   provable ./heap/permissions/mulleretal/ReadWrite_doRead_contract.key
+   provable ./heap/permissions/mulleretal/ReadWrite_doWrite_contract.key
+   provable ./heap/permissions/mulleretal/ReadWrite_read_contract.key
+   provable ./heap/permissions/mulleretal/ReadWrite_write_contract.key
+   provable ./heap/permissions/mulleretal/ReadWrite_inv1_accessible.key
+   provable ./heap/permissions/mulleretal/ReadWrite_inv2_accessible.key
+
    # These need (a lot of) interaction at the moment:
    # provable: ./heap/permissions/threads/AFilter_run.key
    # provable: ./heap/permissions/threads/BFilter_run.key
    # provable: ./heap/permissions/threads/Fib_run.key
-   #  provable: ./heap/permissions/threads/Plotter_run.key
+   # provable: ./heap/permissions/threads/Plotter_run.key
    # provable: ./heap/permissions/threads/Main_main.key
 
    # Should be provable, but isn't at the moment:
@@ -769,3 +777,4 @@ group permissionHeap {
    # Is provable, but very heavy (~400000 steps)
    # provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
 }
+
