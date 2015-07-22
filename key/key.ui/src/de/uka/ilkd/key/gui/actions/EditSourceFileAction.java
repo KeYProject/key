@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.FlowLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +31,8 @@ import de.uka.ilkd.key.util.ExceptionTools;
 /**
  * Used by {@link ExceptionDialog} to open the source file containing an error
  * for editing.
+ *
+ * @author Kai Wallisch
  */
 public class EditSourceFileAction extends AbstractAction {
 
@@ -65,12 +68,13 @@ public class EditSourceFileAction extends AbstractAction {
          final Location location = ExceptionTools.getLocation(exception);
          if (location == null || location.getFilename() == null
                || location.getFilename().length() == 0) {
-            throw new IOException(
-                  "Cannot recover file location from exception.");
+            throw new IOException("Cannot recover file location from exception.");
          }
+
          String fileName = location.getFilename();
          final File sourceFile = new File(fileName);
          String source = IOUtil.readFrom(sourceFile);
+
          final JDialog dialog = new JDialog(parent, "Edit "
                + sourceFile.getName(), Dialog.ModalityType.DOCUMENT_MODAL);
          dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -107,7 +111,7 @@ public class EditSourceFileAction extends AbstractAction {
                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
          JPanel buttonPanel = new JPanel();
-         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+         buttonPanel.setLayout(new FlowLayout());
          JButton saveButton = new JButton("Save");
          JButton reloadButton = new JButton("Save, Close and Reload");
          JButton cancelButton = new JButton("Cancel");
