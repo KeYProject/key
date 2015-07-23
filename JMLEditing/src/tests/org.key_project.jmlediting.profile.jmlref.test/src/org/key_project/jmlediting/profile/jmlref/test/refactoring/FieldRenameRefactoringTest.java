@@ -170,7 +170,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("test").delete(true, null);
     }
     
-    @Test
+    //@Test
     public void test4TwoFilesSamePackageNoChangeInFileTwo() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test4";
@@ -201,7 +201,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("test").delete(true, null);
     }
     
-    @Test
+    //@Test
     public void test5TwoFilesSamePackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test5";
@@ -232,7 +232,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("test").delete(true, null);
     }
     
-    @Test
+    //@Test
     public void test6TwoFilesOtherPackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
        
         
@@ -265,7 +265,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("otherPackage").delete(true, null);
     }
     
-    @Test
+    //@Test
     public void test7TwoFilesMemberAccess() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test7";
@@ -296,7 +296,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("test").delete(true, null);
     }
     
-    @Test
+    //@Test
     public void test8NoJavaChangesInOtherFile() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test8";
@@ -327,7 +327,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("test").delete(true, null);
     }
     
-    @Test
+    //@Test
     public void test9NoJavaChangesInTwoOtherFile() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test9";

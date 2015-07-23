@@ -247,7 +247,7 @@ public class JMLRenameParticipant extends RenameParticipant {
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
         //System.out.println("Filtered: "+filtedStringNodes);
         
-        final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult);
+        final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
         
         //System.out.println("Primaries: " + primaries);
         return primaries;
@@ -273,17 +273,17 @@ public class JMLRenameParticipant extends RenameParticipant {
         return filteredList;
     }
 
-    private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult){
+    private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult, final boolean notKeYProfile){
         final List<IASTNode> primaries = new ArrayList<IASTNode>();
         
         for (final IStringNode stringNode: stringNodes) {       
-          final IASTNode primary = getPrimaryNode(parseResult, stringNode);
+          final IASTNode primary = getPrimaryNode(parseResult, stringNode, notKeYProfile);
           primaries.add(primary);  
         }
         return primaries;
     }
     
-    private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest) {
+    private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest, final boolean notKeYProfile) {
         return context.traverse(new INodeTraverser<IASTNode>() {
 
             @Override
@@ -298,7 +298,14 @@ public class JMLRenameParticipant extends RenameParticipant {
                         }
                     }
                 }
-                return existing;
+                // If the KeY Profile is not used, the primary node from the assignable node
+                // cannot be found. Resolver will still resolve the string node though.
+                if (notKeYProfile && existing == null){
+                    //System.out.println("primary found: null");
+                    return toTest;
+                }     
+                else
+                    return existing;
             }        
         }, null);
     }
@@ -328,6 +335,7 @@ public class JMLRenameParticipant extends RenameParticipant {
             result = resolver.resolve(unit, node);
             
             if (isReferencedElement(result)){
+                //System.out.println("Computing Changes to " +nodeToChange);
                 computeReplaceEdit(changesToMake, nodeToChange);
             }
                       
