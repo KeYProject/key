@@ -123,8 +123,8 @@ public class JMLRenameParticipant extends RenameParticipant {
                         // Get scheduled changes to the java code from the rename processor
                         final TextChange changesToJavaCode = getTextChange(unit);
 
-                        // add our edits to the java changes (computes the
-                        // shifts of the words and the preview)
+                        // add our edits to the java changes
+                        // JDT will compute the shifts and the preview
                         if (changesToJavaCode != null) {
                             for (final ReplaceEdit edit : changesToJML) {
                                 changesToJavaCode.addEdit(edit);
@@ -132,15 +132,24 @@ public class JMLRenameParticipant extends RenameParticipant {
                         }
                         else {
                             TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());
+                            
+                            // Gather all the edits to the text in a MultiTextEdit
+                            // and add those to the change object.
                             MultiTextEdit allEdits = new MultiTextEdit();
                             
                             for (final ReplaceEdit edit: changesToJML) {
                                allEdits.addChild(edit);
                             }
                             
+                            
                             tfChange.setEdit(allEdits);
                             
-                            return tfChange;
+                            // Do not return an empty change object.
+                            // The class will be shown in the rename preview despite no change occurs.
+                            if (allEdits.hasChildren())
+                                return tfChange;
+                            else
+                                return null;
                         }
                     }
                 }
@@ -161,7 +170,7 @@ public class JMLRenameParticipant extends RenameParticipant {
      *            ICompilation unit for which to create the changes
      * @param project
      *            Project of the compilation unit
-     * @return List of edits which need to be done
+     * @return ArrayList of edits which need to be done
      * @throws JavaModelException
      *             Thrown when the source file cannot be loaded from
      *             ICompilationUnit or he JMLcomments could not be received
@@ -215,6 +224,7 @@ public class JMLRenameParticipant extends RenameParticipant {
         final IJMLParser parser = activeProfile.createParser();
         IASTNode parseResult;
         try {
+            //System.out.println(source);
             parseResult = parser.parse(source, range);
             stringNodes = Nodes.getAllNodesOfType(parseResult, NodeTypes.STRING);
         }
@@ -222,13 +232,13 @@ public class JMLRenameParticipant extends RenameParticipant {
             return new ArrayList<IASTNode>();
         }
  
-        //System.out.println("Unfiltered: "+stringNodes);
+        System.out.println("Unfiltered: "+stringNodes);
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
-        //System.out.println("Filtered: "+filtedStringNodes);
+        System.out.println("Filtered: "+filtedStringNodes);
         
         final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult);
         
-        //System.out.println("Primaries: " + primaries);
+        System.out.println("Primaries: " + primaries);
         return primaries;
     }
 
@@ -335,7 +345,7 @@ public class JMLRenameParticipant extends RenameParticipant {
         }
         
         final IJavaElement jElement = result.getBinding().getJavaElement();
-        
+        System.out.println(jElement + " " + fJavaElementToRename);
         return jElement.equals(fJavaElementToRename);
     }
     
