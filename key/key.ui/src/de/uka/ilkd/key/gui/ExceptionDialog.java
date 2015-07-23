@@ -43,6 +43,8 @@ import javax.swing.border.TitledBorder;
 
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
+import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.util.ExceptionTools;
@@ -54,15 +56,11 @@ import de.uka.ilkd.key.util.ExceptionTools;
  */
 public class ExceptionDialog extends JDialog {
 
-   static Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+    public final static Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
 
     private static final long serialVersionUID = -4532724315711726522L;
     private JScrollPane stScroll;
     private JTextArea stTextArea;
-
-    void close() {
-       setVisible(false);
-    }
 
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
@@ -79,7 +77,7 @@ public class ExceptionDialog extends JDialog {
         ActionListener closeListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                close();
+                setVisible(false);
             }
         };
 
@@ -115,11 +113,8 @@ public class ExceptionDialog extends JDialog {
         JPanel bPanel = new JPanel();
 //        bPanel.add(reloadButton); // XXX useful for debugging
 
-        if(SendFeedbackAction.FEEDBACK_RECIPIENT != null) {
-           JButton sendFeedbackButton = new JButton("Send Feedback");
-           sendFeedbackButton.addActionListener(new SendFeedbackAction(this, exception));
+        JButton sendFeedbackButton = new JButton(new SendFeedbackAction(this, exception));
            bPanel.add(sendFeedbackButton);
-        }
 
         JButton editSourceFileButton = new JButton("Edit Source File");
         editSourceFileButton.addActionListener(new EditSourceFileAction(this, exception));
