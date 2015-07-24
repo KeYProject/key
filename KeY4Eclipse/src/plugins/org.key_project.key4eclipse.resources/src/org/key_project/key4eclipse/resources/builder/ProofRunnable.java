@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
@@ -291,14 +292,16 @@ public class ProofRunnable implements Runnable {
    private InputStream generateSaveProof(Proof proof, IFile file) {
       Assert.isNotNull(proof);
       try {
-         File location = ResourceUtil.getLocation(file);
+         final File location = ResourceUtil.getLocation(file);
          // Create proof file content
-         ProofSaver saver = new ProofSaver(proof, location.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
+         OutputStreamProofSaver saver = new OutputStreamProofSaver(proof, KeYConstants.INTERNAL_VERSION) {
+            @Override
+            protected String getBasePath() throws IOException {
+                return ProofSaver.computeBasePath(location);
+            }
+         };
          ByteArrayOutputStream out = new ByteArrayOutputStream();
-         String errorMessage = saver.save(out);
-         if (errorMessage != null) {
-            return null;
-         }
+         saver.save(out);
          return new ByteArrayInputStream(out.toByteArray());
       }
       catch (IOException e) {

@@ -35,6 +35,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestZ3;
@@ -1983,9 +1984,7 @@ public class BuilderTests extends AbstractResourceTest {
       InputStream in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testTestSuiteGeneration/Suite0");
       String expected = IOUtil.readFrom(in);
       String actual = ResourceUtil.readFrom(testSuite);
-      actual = actual.replaceAll("(\r\n|\n\r)", "\n");
-      assertEquals(expected, actual);
-      in.close();
+      TestUtilsUtil.assertEqualsIgnoreWhitespace(expected, actual);
 
       javaFile1.delete(true, null);
       
@@ -2002,8 +2001,6 @@ public class BuilderTests extends AbstractResourceTest {
       in = BundleUtil.openInputStream(Activator.PLUGIN_ID, compareFile);
       expected = IOUtil.readFrom(in);
       actual = ResourceUtil.readFrom(testSuite);
-      actual = actual.replaceAll("(\r\n|\n\r)", "\n");
-      assertEquals(expected, actual);
-      in.close();
+      TestUtilsUtil.assertEqualsIgnoreWhitespace(expected, actual);
    }
 }
