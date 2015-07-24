@@ -43,6 +43,11 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     @Override
+    public String getCategory() {
+        return "Auto Pilot";
+    }
+
+    @Override
     public String getDescription() {
         return "Continue automatic strategy application until no more modality is on the sequent.";
     }

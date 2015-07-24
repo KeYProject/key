@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Quadruple;
@@ -58,7 +57,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
 
    @Override
    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-         LocationVariable v,
+         Term v,
          SymbolicExecutionState state1,
          Term valueInState1,
          SymbolicExecutionState state2,
@@ -68,7 +67,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
       final TermBuilder tb = services.getTermBuilder();
       
       Function newSkolemConst = JoinRuleUtils.getNewSkolemConstantForPrefix(
-            v.name().toString(), v.sort(), services);
+            v.op().name().toString(), v.sort(), services);
       ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       newNames = newNames.add(newSkolemConst.name());
       

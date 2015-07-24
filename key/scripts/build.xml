@@ -30,6 +30,7 @@
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="compile" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="compile" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="compile" dir="${key.dir}/key.removegenerics" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 	</target>
 
 	<target name="deployAll">
@@ -52,6 +53,7 @@
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="deploy" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 		<!-- Deploy license -->
 		<copy todir="${key.dir}/deployment">
 			<fileset file="${key.dir}/LICENSE.TXT"/>
@@ -77,6 +79,7 @@
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="clean" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="clean" dir="${key.dir}/key.removegenerics" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 		<!-- Delete deployed files -->
 		<delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false" />
 		<delete file="${key.dir}/deployment/KeY.jar" failonerror="false" />

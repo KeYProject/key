@@ -13,6 +13,20 @@
 
 package de.uka.ilkd.key.rule.join;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.closeJoinPartnerGoal;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.createSimplifiedDisjunctivePathCondition;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.equalsModBranchUniqueRenaming;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getConjunctiveElementsFor;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isProvableWithSplitting;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isUpdateNormalForm;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.trySimplify;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -24,7 +38,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -51,7 +64,6 @@ import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
 
 /**
  * Base for implementing join rules. Extend this class,
@@ -131,21 +143,20 @@ public class JoinRule implements BuiltInRule {
           return null;
       }
       
+      final ImmutableList<Goal> newGoals = goal.split(1);
+      final Goal newGoal = newGoals.head();
+      
       final TermBuilder tb = services.getTermBuilder();
       final JoinProcedure joinRule = joinRuleApp.getConcreteRule();
-      final Node currentNode = goal.node();
+      final Node currentNode = newGoal.node();
       final ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = joinRuleApp.getJoinPartners();
       
       final ImmutableList<SymbolicExecutionState> joinPartnerStates = joinRuleApp.getJoinPartnerStates();
       final SymbolicExecutionStateWithProgCnt thisSEState = joinRuleApp.getJoinSEState();
       
-      ImmutableList<Goal> newGoals = goal.split(1);
-      
-      final Goal newGoal = newGoals.head();
-      
       // The join loop
       SymbolicExecutionState joinedState =
-            new SymbolicExecutionState(thisSEState.first, thisSEState.second, goal.node());    
+            new SymbolicExecutionState(thisSEState.first, thisSEState.second, newGoal.node());    
       ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       
       for (SymbolicExecutionState state : joinPartnerStates) {
@@ -153,7 +164,7 @@ public class JoinRule implements BuiltInRule {
          newNames = newNames.union(joinResult.second);
          
          joinedState = joinResult.first;         
-         joinedState.setCorrespondingNode(goal.node());
+         joinedState.setCorrespondingNode(newGoal.node());
       }
       
       Term resultPathCondition = joinedState.second;
@@ -311,7 +322,7 @@ public class JoinRule implements BuiltInRule {
             } else {
                
                Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedVal =
-                     joinRule.joinValuesInStates(v, state1, rightSide1, state2, rightSide2, services);
+                     joinRule.joinValuesInStates(tb.var(v), state1, rightSide1, state2, rightSide2, services);
                
                newNames = newNames.union(joinedVal.third);
                
@@ -355,15 +366,15 @@ public class JoinRule implements BuiltInRule {
     * @return A joined heap term.
     */
    protected Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinHeaps(
-		 JoinProcedure joinRule,
-         LocationVariable heapVar,
-         Term heap1,
-         Term heap2,
-         SymbolicExecutionState state1,
-         SymbolicExecutionState state2,
-         Services services) {
+         final JoinProcedure joinRule,
+         final LocationVariable heapVar,
+         final Term heap1,
+         final Term heap2,
+         final SymbolicExecutionState state1,
+         final SymbolicExecutionState state2,
+         final Services services) {
       
-      TermBuilder tb = services.getTermBuilder();
+      final TermBuilder tb = services.getTermBuilder();
       ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
       ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
       
@@ -381,8 +392,8 @@ public class JoinRule implements BuiltInRule {
                newNames);
       }
       
-      Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
-      Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
+      final Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+      final Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
       //Note: Check if there are other functions that should be covered.
       //      Unknown functions are treated by if-then-else procedure.
       
@@ -392,15 +403,15 @@ public class JoinRule implements BuiltInRule {
          // Store operations.
          
          // Decompose the heap operations.
-         Term subHeap1 = heap1.sub(0);
-         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
-         Function field1 = (Function) heap1.sub(2).op();
-         Term value1 = heap1.sub(3);
+         final Term subHeap1 = heap1.sub(0);
+         final Term pointer1 = heap1.sub(1);
+         final Term field1 = heap1.sub(2);
+         final Term value1 = heap1.sub(3);
          
-         Term subHeap2 = heap2.sub(0);
-         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
-         Function field2 = (Function) heap2.sub(2).op();
-         Term value2 = heap2.sub(3);
+         final Term subHeap2 = heap2.sub(0);
+         final Term pointer2 = heap2.sub(1);
+         final Term field2 = heap2.sub(2);
+         final Term value2 = heap2.sub(3);
          
          if (pointer1.equals(pointer2) && field1.equals(field2)) {
             // Potential for deep merge: Access of same object / field.
@@ -419,10 +430,7 @@ public class JoinRule implements BuiltInRule {
                
                 Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedValAndConstr =
                      joinRule.joinValuesInStates(
-                           new LocationVariable(
-                                 new ProgramElementName(field1.name().toString()),
-                                 value1.sort()),
-                           state1, value1, state2, value2, services);
+                           field1, state1, value1, state2, value2, services);
 
                newConstraints = newConstraints.union(joinedValAndConstr.first);
                newNames = newNames.union(joinedValAndConstr.third);
@@ -431,9 +439,9 @@ public class JoinRule implements BuiltInRule {
             }
             
             return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
-                  newConstraints,
-                  tb.func((Function) heap1.op(), joinedSubHeap.second, tb.var(pointer1), tb.func(field1), joinedVal),
-                  newNames);
+                    newConstraints, tb.func((Function) heap1.op(),
+                            joinedSubHeap.second, heap1.sub(1),
+                            field1, joinedVal), newNames);
             
          } // end if (pointer1.equals(pointer2) && field1.equals(field2))
          
@@ -444,10 +452,10 @@ public class JoinRule implements BuiltInRule {
          
          // Decompose the heap operations.
          Term subHeap1 = heap1.sub(0);
-         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         Term pointer1 = heap1.sub(1);
          
          Term subHeap2 = heap2.sub(0);
-         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         Term pointer2 = heap2.sub(1);
          
          if (pointer1.equals(pointer2)) {
             // Same objects are created: Join.
@@ -459,7 +467,7 @@ public class JoinRule implements BuiltInRule {
             
             return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                   newConstraints,
-                  tb.func((Function) heap1.op(), joinedSubHeap.second, tb.var(pointer1)),
+                  tb.func((Function) heap1.op(), joinedSubHeap.second, pointer1),
                   newNames);
          }
          

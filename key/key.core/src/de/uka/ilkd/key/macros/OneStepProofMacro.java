@@ -35,10 +35,14 @@ public class OneStepProofMacro extends StrategyProofMacro {
     }
 
     @Override
+    public String getCategory() {
+        return "Simplification";
+    }
+
+    @Override
     public String getDescription() {	        
         return "One single proof step is applied";
     }
-
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {

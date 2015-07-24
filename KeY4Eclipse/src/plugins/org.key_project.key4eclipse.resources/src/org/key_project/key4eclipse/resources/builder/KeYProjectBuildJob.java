@@ -30,13 +30,16 @@ import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.log.LogRecord;
 import org.key_project.key4eclipse.resources.log.LogRecordKind;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
-import org.key_project.key4eclipse.resources.util.EditorSelection;
+import org.key_project.key4eclipse.resources.property.KeYProjectBuildProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
+/**
+ * A job for running KeY Project Builds.
+ * @author Stefan Käsdorf
+ */
 @SuppressWarnings("restriction")
 public class KeYProjectBuildJob extends Job{
    
@@ -49,20 +52,22 @@ public class KeYProjectBuildJob extends Job{
 
    private IProject project;
    private int buildType;
+   private KeYProjectBuildProperties properties;
    private EditorSelection editorSelection;
 
-   public KeYProjectBuildJob(IProject project, int buildType) {
+   public KeYProjectBuildJob(IProject project, int buildType, KeYProjectBuildProperties properties) {
       super(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB_NAME);
       this.project = project;
       this.buildType = buildType;
+      this.properties = properties;
       this.editorSelection = null;
       if(buildType != KeYProjectBuildJob.FULL_BUILD){
          this.editorSelection = getEditorSelection();
       }
-      if(buildType != KeYProjectBuildJob.AUTO_BUILD && buildType != KeYProjectBuildJob.FULL_BUILD ){
+      if(buildType == KeYProjectBuildJob.MANUAL_BUILD){
          KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
          keyDelta.update(null);
-         keyDelta.setIsBuilding(true);
+         keyDelta.setIsSettingUp(true);
       }
       cancelProjectJobs();
    }
@@ -101,14 +106,11 @@ public class KeYProjectBuildJob extends Job{
     */
    @Override
    protected IStatus run(IProgressMonitor monitor) {
-      final long start = System.currentTimeMillis();
-      final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
-      final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
-      final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);     
+      final long start = System.currentTimeMillis();   
       
       ProofManager proofManager = null;
       try{
-         proofManager = new ProofManager(project, buildType, editorSelection);
+         proofManager = new ProofManager(project, buildType, properties, editorSelection);
          proofManager.runProofs(monitor);
          return Status.OK_STATUS;
       }
@@ -127,7 +129,7 @@ public class KeYProjectBuildJob extends Job{
             proofManager.dispose();
          }
          try {
-            LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
+            LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, properties.isBuildRequiredProofsOnly(), properties.isEnableMultiThreading(), properties.getNumberOfThreads()));
          }
          catch (CoreException e) {
             LogUtil.getLogger().logError(e);
@@ -135,7 +137,10 @@ public class KeYProjectBuildJob extends Job{
       }
    }
    
-   
+   /**
+    * Acquires the current {@link EditorSelection} to allow intelligent proof ordering.
+    * @return the current {@link EditorSelection}
+    */
    private EditorSelection getEditorSelection(){
       final EditorSelection editorSelection = new EditorSelection();
       Display.getDefault().syncExec(new Runnable() {

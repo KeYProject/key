@@ -38,6 +38,11 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
     }
 
     @Override
+    public String getCategory() {
+        return "Information Flow";
+    }
+
+    @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition " +
                "proofs, this macro starts a side calculation which does " +

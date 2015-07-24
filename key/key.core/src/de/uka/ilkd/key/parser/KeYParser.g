@@ -1,3 +1,4 @@
+
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -3773,7 +3774,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]
+    | varcond_differentFields[b]  
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -3794,6 +3795,7 @@ varexp[TacletBuilder b]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
+        | varcond_containsAssignment[b, negated]        
       )
   )
 ;
@@ -4011,7 +4013,15 @@ varcond_fieldtype [TacletBuilder b]
                                                                (GenericSort)s));
         }
     }
-;      
+;    
+
+varcond_containsAssignment[TacletBuilder b, boolean negated]
+:
+   CONTAINS_ASSIGNMENT LPAREN x=varId RPAREN 
+   {
+      b.addVariableCondition(new ContainsAssignmentCondition((SchemaVariable)x, negated));
+   }
+;  
 
 varcond_enumtype [TacletBuilder b, boolean negated]
 :

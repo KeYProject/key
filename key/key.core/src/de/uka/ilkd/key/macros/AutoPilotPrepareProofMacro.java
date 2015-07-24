@@ -59,6 +59,11 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
+    public String getCategory() {
+        return "Auto Pilot";
+    }
+
+    @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" +
                 "<li>Separate proof obligations" +

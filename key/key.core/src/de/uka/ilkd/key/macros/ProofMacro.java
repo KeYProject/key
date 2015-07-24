@@ -86,6 +86,16 @@ public interface ProofMacro {
     public String getName();
 
     /**
+     * Gets the category of this macro.
+     *
+     * Used as name of the menu under which the macro is sorted.
+     * Return <code>null</code> if no submenu is to be created.
+     *
+     * @return a constant string, or <code>null</code>
+     */
+    public String getCategory();
+
+    /**
      * Gets the description of this macro.
      *
      * Used as tooltip.

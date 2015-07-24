@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -40,18 +39,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.io.LastChangesFileWriter;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
+import org.key_project.key4eclipse.resources.io.ProofMetaReferencesComparator;
 import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
@@ -64,8 +57,7 @@ import org.key_project.key4eclipse.resources.projectinfo.PackageInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ProjectInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
 import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
-import org.key_project.key4eclipse.resources.util.EditorSelection;
+import org.key_project.key4eclipse.resources.property.KeYProjectBuildProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
@@ -86,6 +78,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -93,6 +86,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -106,6 +100,7 @@ public class ProofManager {
 
    private final IProject project;
    private int buildType;
+   private KeYProjectBuildProperties properties;
    private final IFolder mainProofFolder;
    private List<ProofElement> proofElements;
    private KeYProjectDelta keyDelta;
@@ -122,9 +117,10 @@ public class ProofManager {
     * @throws CoreException
     * @throws ProblemLoaderException 
     */
-   public ProofManager(IProject project, int buildType, EditorSelection editorSelection) throws CoreException, ProblemLoaderException{
+   public ProofManager(IProject project, int buildType, KeYProjectBuildProperties properties, EditorSelection editorSelection) throws CoreException, ProblemLoaderException{
       this.project = project;
       this.buildType = buildType;
+      this.properties = properties;
       this.mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME));
       this.keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       this.editorSelection = editorSelection;
@@ -159,38 +155,18 @@ public class ProofManager {
     * @throws CoreException
     */
    private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
+      Location location = ExceptionTools.getLocation(e);
       IResource res = project;
       int lineNumber = -1;
-      if(e.getOrigin() != null && e.getOrigin().getFile() != null){
-         String originPath = e.getOrigin().getFile().getAbsolutePath();
-         StringBuffer sb = new StringBuffer(e.getMessage());
-         int indexOfOriginPath = sb.indexOf(originPath);
-         if(indexOfOriginPath != -1){
-            sb.delete(0, indexOfOriginPath);
-            StringBuffer tmpSb = new StringBuffer(sb.toString().toLowerCase(Locale.US));
-            int indexOfOriginPathEnd = tmpSb.indexOf(".java") + 5;
-            if(indexOfOriginPathEnd != -1){
-               String errorFilePath = sb.substring(0, indexOfOriginPathEnd);
-               IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(errorFilePath));
-               if(file != null && file.exists()){
-                  sb.delete(0, indexOfOriginPathEnd);
-                  int indexOfLine = sb.indexOf("line ");
-                  int indexOfColumn = sb.indexOf(", column");
-                  if(indexOfLine != -1 && indexOfColumn != -1 && indexOfLine < indexOfColumn){
-                     String lineNumberStr = sb.substring(indexOfLine+5, indexOfColumn);
-                     int lineNumberInt = Integer.parseInt(lineNumberStr);
-                     if(lineNumberInt != -1){
-                        res = file;
-                        lineNumber = lineNumberInt;
-                     }
-                  }
-               }
-            }
-         }
+      if(location != null){
+         res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(location.getFilename()));
+         lineNumber = location.getLine();
       }
-      keyDelta.resetDelta();
-      LastChangesFileWriter.resetLastChangesFiles(project);
-      MarkerUtil.setProblemLoaderExceptionMarker(res, lineNumber, e.getMessage());
+      String markerMessage = e.getMessage();
+      synchronized (keyDelta.lock) {
+         keyDelta.resetDelta();
+      }
+      MarkerUtil.setProblemLoaderExceptionMarker(res, lineNumber, markerMessage);
    }
    
 
@@ -198,27 +174,39 @@ public class ProofManager {
     * Runs the {@link Proof}s available in the {@link IProject} dependent on the ProofManageMentProperties.
     * @param changedJavaFiles - {@link LinkedList} with all changed java{@link IFile}s
     * @param monitor - the {@link IProgressMonitor}
-    * @throws Exception
+    * @throws CoreException 
     */
    public void runProofs(IProgressMonitor monitor) throws CoreException{
       proofElements = computeProofElementsAndUpdateProjectInfo();
       synchronized (keyDelta.lock) {
          changedJavaFiles = keyDelta.getChangedJavaFiles();
-         keyDelta.resetDelta();
+         sortProofElements(editorSelection);
          selectProofElementsForBuild();
-         LastChangesFileWriter.resetLastChangesFiles(project);
+         keyDelta.resetDelta();
       }
-      sortProofElements(editorSelection);
       cleanMarker();
-      if(KeYProjectProperties.isAutoDeleteProofFiles(project)){
+      if(properties.isAutoDeleteProofFiles()){
          cleanProofFolder(getAllFiles(), mainProofFolder);
       }
       //set up monitor
       monitor.beginTask("Building proofs for " + project.getName(), proofElements.size());
       initThreads(monitor);
       checkContractRecursion();
+      if(properties.isGenerateTestCases()) {
+         TestSuiteGenerator testSuiteGenerator = new TestSuiteGenerator(project, proofElements);
+         if(properties.isAutoDeleteTestCases()) {
+            testSuiteGenerator.cleanUpTestProject();
+         }
+         testSuiteGenerator.generateTestSuit();
+      }
+      if(!monitor.isCanceled()){
+         synchronized (keyDelta.lock) {
+            LastChangesFileWriter.updateBuildState(project, false);
+         }
+      }
       monitor.done();
    }
+   
    
    /**
     * Collects all {@link Proof}s available in the {@link IProject} and returns their
@@ -518,49 +506,41 @@ public class ProofManager {
       for(ProofElement pe : proofElements){
          boolean build = false;
          if(buildType == KeYProjectBuildJob.FULL_BUILD 
-               || (buildType == KeYProjectBuildJob.AUTO_BUILD && !KeYProjectProperties.isEnableBuildRequiredProofsOnly(project))){
+               || (buildType == KeYProjectBuildJob.AUTO_BUILD && !properties.isBuildRequiredProofsOnly())){
             build = true;
          }
          else if(buildType == KeYProjectBuildJob.STARTUP_BUILD || buildType == KeYProjectBuildJob.MANUAL_BUILD){
             build = pe.getOutdated();
          }
          else if(buildType == KeYProjectBuildJob.AUTO_BUILD){
-            if(pe.getOutdated()){
+            if (pe.getOutdated()) {
                build = true;
             }
-            else{
-               try{
-                  LinkedList<IType> javaTypes = collectAllJavaITypes();
-                  if(MD5changed(pe) || typeOrSubTypeChanged(pe.getTypeElements(), javaTypes) || superTypeChanged(pe, javaTypes)){
-                     build = true;
-                  }
-               }
-               catch (JavaModelException e){
+            else {
+               ProofMetaReferencesComparator comparator = new ProofMetaReferencesComparator(pe, environment, changedJavaFiles);
+               if (MD5changed(pe) || comparator.compareReferences()) {
                   build = true;
-                  LogUtil.getLogger().logError(e);
                }
             }
          }
          if(build){
             pe.setBuild(true);
-            if(!pe.getOutdated()){
-               pe.setOutdated(true);
-               MarkerUtil.setOutdated(pe, true);
-               if(pe.hasMetaFile() && pe.hasProofFile()){
-                  try {
-                     keyDelta.addJobChangedFile(pe.getMetaFile());
-                     ProofMetaFileWriter.writeMetaFile(pe);
-                  }
-                  catch (Exception e) {
-                     LogUtil.getLogger().logError(e);
-                  }
+            pe.setOutdated(true);
+            MarkerUtil.setOutdated(pe);
+            if(pe.hasMetaFile() && pe.hasProofFile()){
+               try {
+                  keyDelta.addJobChangedFile(pe.getMetaFile());
+                  ProofMetaFileWriter.writeMetaFile(pe);
+               }
+               catch (Exception e) {
+                  LogUtil.getLogger().logError(e);
                }
             }
          }
       }
    }
    
-   
+
    /**
     * Sorts all {@link ProofElement}s in the following order: Selected method, active editor proofs, open editor proofs, affected/outdated proofs, other proofs.
     * @param editorSelection - the current workbench state of the editor windows.
@@ -648,7 +628,9 @@ public class ProofManager {
       return fileProofs;
    }
    
-   
+   /**
+    * Removes all unnecessary KeY Marker.
+    */
    private void cleanMarker() {
       List<IMarker> peMarker = new LinkedList<IMarker>();
       for(ProofElement pe : proofElements){
@@ -691,7 +673,8 @@ public class ProofManager {
             if(res.getType() == IResource.FILE){
                if(!proofFiles.contains(res) && 
                   !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res) &&
-                  !LogManager.getInstance().isLogFile((IFile)res) && !KeYResourcesUtil.isLastChangesFile((IFile) res)) {
+                  !LogManager.getInstance().isLogFile((IFile)res) &&
+                  !KeYResourcesUtil.isLastChangesFile((IFile)res)) {
                   keyDelta.addJobChangedFile((IFile) res);
                   res.delete(true, null);
                }
@@ -718,17 +701,17 @@ public class ProofManager {
    private void initThreads(IProgressMonitor monitor) {
       proofQueue = Collections.synchronizedList(KeYResourcesUtil.cloneList(proofElements));
 
-      int numOfThreads = KeYProjectProperties.getNumberOfThreads(project);
+      int numOfThreads = properties.getNumberOfThreads();
       int numOfProofs = getNumOfProofsToDo();
       if(numOfProofs < numOfThreads){
          numOfThreads = numOfProofs;
       }
       Thread[] threads = null;
-      if (KeYProjectProperties.isEnableMultiThreading(project)) {
+      if (properties.isEnableMultiThreading()) {
          threads = new Thread[numOfThreads];
          for (int i = 0; i < threads.length; i++) {
 
-            ProofRunnable run = new ProofRunnable(project, KeYResourcesUtil.cloneList(proofElements), proofQueue, cloneEnvironment(), monitor);
+            ProofRunnable run = new ProofRunnable(project, KeYResourcesUtil.cloneList(proofElements), proofQueue, cloneEnvironment(), properties.isGenerateTestCases(), monitor);
             threads[i] = new Thread(run);
          }
          for(Thread thread : threads){
@@ -737,7 +720,7 @@ public class ProofManager {
       }
       else{
          threads = new Thread[1];
-         ProofRunnable run = new ProofRunnable(project, proofElements,proofQueue, environment, monitor);
+         ProofRunnable run = new ProofRunnable(project, proofElements,proofQueue, environment, properties.isGenerateTestCases(), monitor);
          Thread thread = new Thread(run);
          threads[0] = thread;
          thread.start();
@@ -751,6 +734,10 @@ public class ProofManager {
    }
    
    
+   /**
+    * Saves all proofs in the {@code proofsToSave} list to the proof folder and creates their meta files. 
+    * Also updates the {@link KeYProjectDelta}'s {@code jobChangedFiles} list and creates the KeY Marker for the proof.
+    */
    private void saveProofs() {
       Pair<ProofElement, InputStream> proofToSave = null;
       while((proofToSave = getProofToSave()) != null){
@@ -770,6 +757,13 @@ public class ProofManager {
       }
    }
    
+   /**
+    * Saves a proof into a file.
+    * @param proofFile the file to save the proof in
+    * @param is the {@link InputStream} of the proof to save 
+    * @param isClosed the status of the proof
+    * @throws CoreException
+    */
    private void saveProof(IFile proofFile, InputStream is, boolean isClosed) throws CoreException{
       IFolder proofFolder = KeYResourcesUtil.createFolder(proofFile);
       if(proofFolder != null && proofFolder.exists()){
@@ -783,6 +777,10 @@ public class ProofManager {
       }
    }
    
+   /**
+    * Returns the next proof from the proof queue.
+    * @return the next proof in the queue
+    */
    public synchronized Pair<ProofElement, InputStream> getProofToSave(){
       synchronized (proofsToSave) {
          if(!proofsToSave.isEmpty()){
@@ -793,6 +791,10 @@ public class ProofManager {
    }
    
    
+   /**
+    * Returns the number of proofs that require to be build.
+    * @return the number of proofs 
+    */
    private int getNumOfProofsToDo(){
       int num = 0;
       for(ProofElement pe : proofElements){
@@ -909,49 +911,8 @@ public class ProofManager {
    
    
    /**
-    * Collects all {@link IType}s of the project.
-    * @return a {@link LinkedList} with all {@link IType}s
-    * @throws JavaModelException
-    */
-   private LinkedList<IType> collectAllJavaITypes() throws JavaModelException{
-      LinkedList<IType> typeList = new LinkedList<IType>();
-      IJavaProject javaProject = JavaCore.create(project);
-      IPackageFragment[] packageFragments = javaProject.getPackageFragments();
-      for(IPackageFragment packageFragment : packageFragments){
-         ICompilationUnit[] units = packageFragment.getCompilationUnits();
-         for(ICompilationUnit unit : units){
-            IType[] types = unit.getTypes();
-            for(IType type : types){
-               typeList.add(type);
-               typeList.addAll(collectAllJavaITypesForIType(type));
-            }
-         }
-      }
-      return typeList;
-   }
-
-   
-   /**
-    * Collects all {@link IType}s of the given {@link IType}.
-    * @param type - the {@link IType} to use
-    * @return all {@link IType}s of the given {@link IType}
-    * @throws JavaModelException
-    */
-   private LinkedList<IType> collectAllJavaITypesForIType(IType type) throws JavaModelException{
-      LinkedList<IType> types = new LinkedList<IType>();
-      IType[] subTypes = type.getTypes();
-      for(IType subType : subTypes){
-         types.add(subType);
-         types.addAll(collectAllJavaITypesForIType(subType));
-      }
-      return types;
-   }
-   
-   
-   /**
-    * Checks if the MD5 of the proof{@link IFile} is different to the MD5 stored in the metafile.
-    * @param proofFile - the proof{@link IFile} to use
-    * @param pmfr - the {@link ProofMetaFileReader} to use
+    * Checks if the MD5 of the proofs {@link IFile} is different to the MD5 stored in the meta file.
+    * @param pe the proof to be checked
     * @return false if both MD5s are equal. true otherwise
     * @throws CoreException 
     * @throws IOException 
@@ -974,129 +935,10 @@ public class ProofManager {
       return true;
    }
    
-
-   /**
-    * Checks if a type or a subtype from the metafile were changed.  
-    * @param pmfr - the {@link ProofMetaFileReader} to use
-    * @param javaTypes the {@link LinkedList} with all changed java{@link IFile}s
-    * @return true if a type or a subtype was changed. false otherwise
-    * @throws JavaModelException
-    */
-   private boolean typeOrSubTypeChanged(List<ProofMetaFileTypeElement> types, LinkedList<IType> javaTypes) {
-      for(ProofMetaFileTypeElement type : types){
-         List<String> subTypes = type.getSubTypes();
-         if(typeChanged(type.getType(), javaTypes)){
-            return true;
-         }
-         else if(subTypeChanged(type.getType(), subTypes, javaTypes)){
-            return true;
-         }
-      }
-      return false;
-   }
-   
    
    /**
-    * Checks if the given type was changed.
-    * @param type - the type to check
-    * @param javaTypes - all {@link IType}s of the project
-    * @return true if the type was changed. false otherwise
-    * @throws JavaModelException
+    * Restores the old marker of the proof if the proof is no longer part of a cycle.
     */
-   private boolean typeChanged(String type, List<IType> javaTypes) {
-      IFile javaFile = getJavaFileForType(type, javaTypes);
-      //check if type has changed itself
-      if(changedJavaFiles.contains(javaFile)){
-         return true;
-      }
-      return false;
-   }
-   
-   
-   /**
-    * Checks if any subTypes of the given {@link ProofMetaFileTypeElement} were changed.
-    * @param te - the {@link ProofMetaFileTypeElement} to use
-    * @param javaTypes - all {@link IType}s of the project
-    * @return true if any subTypes were changed. false otherwise
-    * @throws JavaModelException
-    */
-   private boolean subTypeChanged(String type, List<String> subTypes, List<IType> javaTypes) {
-      KeYJavaType kjt = getkeYJavaType(environment, type);
-      ImmutableList<KeYJavaType> envSubKjts = environment.getJavaInfo().getAllSubtypes(kjt);      
-      if(envSubKjts.size() != subTypes.size()){
-         return true;
-      }
-      for(String subType : subTypes){
-         if(typeChanged(subType, javaTypes)){
-            return true;
-         }
-      }
-      return false;
-   }
-   
-   
-   /**
-    * Checks if any superTypes of the given {@link KeYJavaType} were changed.
-    * @param kjt - the {@link KeYJavaType} to use
-    * @param changedJavaFiles - all changed java{@link IFile}s
-    * @param javaTypes - all {@link IType}s of the project
-    * @return true if any superTypes were changed. false otherwise
-    * @throws JavaModelException
-    */
-   private boolean superTypeChanged(ProofElement pe, LinkedList<IType> javaTypes) {
-      KeYJavaType kjt = pe.getContract().getKJT();
-      KeYJavaType envKjt = getkeYJavaType(environment, kjt.getFullName());
-      if(envKjt != null){
-         ImmutableList<KeYJavaType> envSuperKjts = environment.getJavaInfo().getAllSupertypes(envKjt);
-         for(KeYJavaType envSuperKjt : envSuperKjts){
-            IFile javaFile = getJavaFileForType(envSuperKjt.getFullName(), javaTypes);
-            if(changedJavaFiles.contains(javaFile)){
-               return true;
-            }
-         }
-         return false;
-      }
-      return true;
-   }
-
-   
-   /**
-    * Returns the java{@link IFile} for the given metaType.
-    * @param metaType - the given type
-    * @param typeList - all {@link IType}s of the project
-    * @return the java{@link IFile} for the given type
-    * @throws JavaModelException
-    */
-   private IFile getJavaFileForType(String metaType, List<IType> typeList) {
-      for(IType iType : typeList){
-         String typeName = iType.getFullyQualifiedName('.');
-         if(typeName.equalsIgnoreCase(metaType)){
-            IPath filePath = iType.getResource().getFullPath();
-            IFile javaFile = ResourcesPlugin.getWorkspace().getRoot().getFile(filePath);
-            return javaFile;
-         }
-      }
-      
-      return null;
-   }
-   
-   
-   /**
-    * Returns the {@link KeYJavaType} for the given fullName.
-    * @param type - the types full name
-    * @return the {@link KeYJavaType}
-    */
-   private KeYJavaType getkeYJavaType(KeYEnvironment<DefaultUserInterfaceControl> env, String type){
-      Set<KeYJavaType> envKjts = env.getServices().getJavaInfo().getAllKeYJavaTypes();
-      for(KeYJavaType kjt : envKjts){
-         if(type.equals(kjt.getFullName())){
-            return kjt;
-         }
-      }
-      return null;
-   }
-   
-   
    private void restoreOldMarkerForRemovedCycles() {
       for(ProofElement pe : proofElements){
          if(pe.getProofMarker() == null && (pe.getRecursionMarker() == null || pe.getRecursionMarker().isEmpty())){
@@ -1108,6 +950,11 @@ public class ProofManager {
    }
 
 
+   /**
+    * Searches for recursion cycles within the whole project and returns them as a {@link HashMap} of 
+    * {@link List}s of {@link ProofElement}s where each {@link List} represents one cycle. 
+    * @param cycles A {@link HashMap} of {@link List}s of {@link ProofElement}s
+    */
    private void findCycles(HashSet<List<ProofElement>> cycles){
       Map<ProofElement, List<ProofElement>> usedContracts = new LinkedHashMap<ProofElement, List<ProofElement>>();
       for(ProofElement pe : proofElements){
@@ -1120,6 +967,12 @@ public class ProofManager {
       }
    }
    
+   /**
+    * Recursive method to follow every possible cycle path
+    * @param cycle the current path
+    * @param cycles the {@link Set} of found cycles
+    * @param usedContracts the contracts used by the cycles last {@link ProofElement}
+    */
    private void searchCycle(List<ProofElement> cycle, HashSet<List<ProofElement>> cycles, Map<ProofElement, List<ProofElement>> usedContracts){
       List<ProofElement> succs = usedContracts.get(cycle.get(cycle.size()-1));
       for(ProofElement pe : succs){
@@ -1139,6 +992,10 @@ public class ProofManager {
    }
    
    
+   /**
+    * Removes all recursion marker in the {@link IProject}. Called before detecting recursion marker.
+    * @throws CoreException
+    */
    private void removeAllRecursionMarker() throws CoreException {
       for(ProofElement pe : proofElements){
          pe.setRecursionMarker(new LinkedList<IMarker>());

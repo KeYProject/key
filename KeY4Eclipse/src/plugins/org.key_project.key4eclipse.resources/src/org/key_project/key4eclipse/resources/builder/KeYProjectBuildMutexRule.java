@@ -13,11 +13,17 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
+import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -27,14 +33,17 @@ import org.key_project.util.java.ArrayUtil;
  */
 public class KeYProjectBuildMutexRule implements ISchedulingRule{
    
-   private IProject[] projects;
+   private List<IProject> projects;
    
    public KeYProjectBuildMutexRule(IProject... projects){
-      this.projects = projects;
-   }
-   
-   public IProject[] getProjects(){
-      return projects;
+      this.projects = new LinkedList<IProject>();
+      for(IProject project : projects) {
+         this.projects.add(project);
+         if(KeYProjectProperties.isGenerateTestCases(project)) {
+            IProject testProject = ResourcesPlugin.getWorkspace().getRoot().getProject(project.getName() + EclipseTestGenerator.TEST_PROJECT_SUFFIX);
+            this.projects.add(testProject);
+         }
+      }
    }
    
    /**
@@ -45,14 +54,22 @@ public class KeYProjectBuildMutexRule implements ISchedulingRule{
       if(rule != null){
          if(rule instanceof IFolder || rule instanceof IFile){
             IResource ruleResource = (IResource) rule;
-            IFolder proofFolder = ruleResource.getProject().getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
-            if(proofFolder.exists()){
-               return proofFolder.getFullPath().isPrefixOf(ruleResource.getFullPath());
+            IProject ruleProject = ruleResource.getProject();
+            if(projects.contains(ruleProject)) {
+               if(KeYResourcesUtil.isKeYProject(ruleProject)){
+                  IFolder proofFolder = ruleResource.getProject().getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
+                  if(proofFolder.exists()){
+                     return proofFolder.getFullPath().isPrefixOf(ruleResource.getFullPath());
+                  }
+               }
+               else {
+                  return true;
+               }
             }
             return false;
          }
          else if(rule instanceof IProject){
-            return ArrayUtil.contains(projects, (IProject) rule);
+            return projects.contains((IProject) rule);
          }
       }
       return (rule == this);
@@ -72,6 +89,6 @@ public class KeYProjectBuildMutexRule implements ISchedulingRule{
     */
    @Override
    public String toString() {
-      return getClass().getSimpleName() + " (" + ArrayUtil.toString(projects) + ")";
+      return getClass().getSimpleName() + " (" + ArrayUtil.toString(projects.toArray()) + ")";
    }
 }

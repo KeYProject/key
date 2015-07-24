@@ -29,8 +29,14 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildMutexRule;
+import org.key_project.key4eclipse.resources.property.KeYProjectBuildProperties;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+
+import de.uka.ilkd.key.smt.SolverType;
 
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
@@ -47,19 +53,21 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    private Button enableMultiThreadingButton;
    
    private Button autoDeleteProofFilesButton;
+
+   private Button generateTestCasesButton;
+   
+   private Button autoDeleteTestCasesButton;
    
    private Text fillText;
+   
+   private static final String generateTestCasesButtonText = "Generate test cases";
 
    
-   private SelectionListener buildProofButtonSelectionListener = new SelectionListener() {
+   private SelectionListener buttonSelectionListener = new SelectionListener() {
       
       @Override
       public void widgetSelected(SelectionEvent e) {
-         setEnabledForBuildOnStartupButton();
-         setEnabledForBuildReqiredProofsOnlyButton();
-         setEnabledForEnableMultiThreadingButton();
-         setEnabledForSetNumberOfThreads();
-         setEnabledForAutoDeleteProofFilesButton();
+         update();
       }
       
       @Override
@@ -67,17 +75,38 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          
       }
    };
-   
+
    
    private SelectionListener enableMultiThreadingButtonSelectionListener = new SelectionListener() {
       
       @Override
       public void widgetSelected(SelectionEvent e) {
-         setEnabledForSetNumberOfThreads(); 
+         if(enableMultiThreadingButton.getSelection() && !KeYProjectProperties.TEST_CASE_GENERATION_SUPPORTS_MULTITHREADING){
+            generateTestCasesButton.setSelection(false);
+         }
+         update();
       }
-
+      
       @Override
       public void widgetDefaultSelected(SelectionEvent e) {
+         
+      }
+   };
+
+   
+   private SelectionListener generateTestCasesButtonSelectionListener = new SelectionListener() {
+      
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+         if(generateTestCasesButton.getSelection() && !KeYProjectProperties.TEST_CASE_GENERATION_SUPPORTS_MULTITHREADING){
+            enableMultiThreadingButton.setSelection(false);
+         }
+         update();
+      }
+      
+      @Override
+      public void widgetDefaultSelected(SelectionEvent e) {
+         
       }
    };
 
@@ -93,8 +122,8 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
 
       enableKeYResourcesBuildsButton = new Button(root, SWT.CHECK);
       enableKeYResourcesBuildsButton.setText("Enable KeY Resources builds");
-      enableKeYResourcesBuildsButton.addSelectionListener(buildProofButtonSelectionListener);
-      setSelectionForKeYResourcesBuildsButton();
+      enableKeYResourcesBuildsButton.addSelectionListener(buttonSelectionListener);
+      enableKeYResourcesBuildsButton.setSelection(KeYProjectProperties.isEnableKeYResourcesBuilds(getProject()));
       
       Group builderSettings = new Group(root, SWT.NONE);
       builderSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -106,13 +135,15 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
 
       enableBuildOnStartupButton = new Button(builderSettingsComposite, SWT.CHECK);
       enableBuildOnStartupButton.setText("Continue build on startup");
-      setSelectionForEnableBuildOnStartupButton();
-      setEnabledForBuildOnStartupButton();
+      enableBuildOnStartupButton.setSelection(KeYProjectProperties.isEnableBuildOnStartup(getProject()));
       
       enableBuildRequiredProofsOnlyButton = new Button(builderSettingsComposite, SWT.CHECK);
       enableBuildRequiredProofsOnlyButton.setText("Build required proofs only");
-      setSelectionForEnableBuildRequiredProofsOnlyButton();
-      setEnabledForBuildReqiredProofsOnlyButton();
+      enableBuildRequiredProofsOnlyButton.setSelection(KeYProjectProperties.isEnableBuildRequiredProofsOnly(getProject()));
+
+      autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
+      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
+      autoDeleteProofFilesButton.setSelection(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
       
       Group multiThreadingSettings = new Group(builderSettingsComposite, SWT.NONE);
       multiThreadingSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -125,14 +156,13 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       enableMultiThreadingButton = new Button(multiThreadingComposite, SWT.CHECK);
       enableMultiThreadingButton.setText("Enable multithreading");
       enableMultiThreadingButton.addSelectionListener(enableMultiThreadingButtonSelectionListener);
-      setSelectionForEnableMultiThreadingButton();
-      setEnabledForEnableMultiThreadingButton();
+      enableMultiThreadingButton.setSelection(KeYProjectProperties.isEnableMultiThreading(getProject()));
       
       fillText = new Text(multiThreadingComposite, SWT.SINGLE);
       fillText.setText("");
-      Display display = Display.getCurrent();
-      Color backgroundColor = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+      Color backgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
       fillText.setBackground(backgroundColor);
+      fillText.setEnabled(false);
       
       numberOfThreadsText = new Text(multiThreadingComposite, SWT.SINGLE);
       numberOfThreadsText.setText("Number of threads:");
@@ -143,63 +173,50 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       numberOfThreadsSpinner.setMaximum(100);
       numberOfThreadsSpinner.setIncrement(1);
       setSelectionForSetNumberOfThreads();
-      setEnabledForSetNumberOfThreads();
       
+      Group testCaseGenSettings = new Group(builderSettingsComposite, SWT.NONE);
+      testCaseGenSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      testCaseGenSettings.setLayout(new GridLayout(1, false));
+      testCaseGenSettings.setText("Test Case Generation");
+      Composite testCaseGenComposite = new Composite(testCaseGenSettings, SWT.NONE);
+      testCaseGenComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      testCaseGenComposite.setLayout(new GridLayout(1, false));
+      
+      generateTestCasesButton = new Button(testCaseGenComposite, SWT.CHECK);
+      generateTestCasesButton.setText("Generate test cases");
+      generateTestCasesButton.addSelectionListener(generateTestCasesButtonSelectionListener);
+      generateTestCasesButton.setSelection(KeYProjectProperties.isGenerateTestCases(getProject()));
+      
+      autoDeleteTestCasesButton = new Button(testCaseGenComposite, SWT.CHECK);
+      autoDeleteTestCasesButton.setText("Delete unnecessary test cases automatically");
+      autoDeleteTestCasesButton.setSelection(KeYProjectProperties.isAutoDeleteTestCases(getProject()));
 
-      autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
-      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
-      setSelectionForAutoDeleteProofFilesButton();
-      setEnabledForAutoDeleteProofFilesButton();
-            
+      update();
       return root;
    }
    
-   
-   private void setSelectionForKeYResourcesBuildsButton(){
-      enableKeYResourcesBuildsButton.setSelection(KeYProjectProperties.isEnableKeYResourcesBuilds(getProject()));    
-   }
-   
-   
-   /**
-    * Sets the selection for the EnableEfficientProofManagementButton CheckBox.
-    */
-   private void setSelectionForEnableBuildOnStartupButton(){
-      enableBuildOnStartupButton.setSelection(KeYProjectProperties.isEnableBuildOnStartup(getProject()));
+   private void update(){
+      boolean buildsEnabled = enableKeYResourcesBuildsButton.getSelection();
+      enableBuildOnStartupButton.setEnabled(buildsEnabled);
+      enableBuildRequiredProofsOnlyButton.setEnabled(buildsEnabled);
+      autoDeleteProofFilesButton.setEnabled(buildsEnabled);
       
-   }
-   
-   
-   private void setEnabledForBuildOnStartupButton(){
-      enableBuildOnStartupButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
-   }
-
-   
-   /**
-    * Sets the selection for the EnableEfficientProofManagementButton CheckBox.
-    */
-   private void setSelectionForEnableBuildRequiredProofsOnlyButton(){
-      enableBuildRequiredProofsOnlyButton.setSelection(KeYProjectProperties.isEnableBuildRequiredProofsOnly(getProject()));
+      enableMultiThreadingButton.setEnabled(buildsEnabled);
+      boolean multiThreadingEnabled = enableMultiThreadingButton.getSelection() && enableMultiThreadingButton.getEnabled();
+      numberOfThreadsSpinner.setEnabled(multiThreadingEnabled);
+      numberOfThreadsText.setEnabled(multiThreadingEnabled);
       
+      if(!SolverType.Z3_CE_SOLVER.isInstalled(true)) {
+         generateTestCasesButton.setText(generateTestCasesButtonText + " - SMT Solver Z3 not installed!");
+         generateTestCasesButton.setEnabled(false);
+         autoDeleteTestCasesButton.setEnabled(false);
+      }
+      else {
+         generateTestCasesButton.setText(generateTestCasesButtonText);
+         generateTestCasesButton.setEnabled(buildsEnabled);
+         autoDeleteTestCasesButton.setEnabled(generateTestCasesButton.getSelection() && generateTestCasesButton.getEnabled());
+      }
    }
-   
-   
-   private void setEnabledForBuildReqiredProofsOnlyButton(){
-      enableBuildRequiredProofsOnlyButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
-   }
-   
-   
-   /**
-    * Sets the selection for the EnableMultiThreadingButton CheckBox.
-    */
-   private void setSelectionForEnableMultiThreadingButton(){
-      enableMultiThreadingButton.setSelection(KeYProjectProperties.isEnableMultiThreading(getProject()));
-   }
-   
-   
-   private void setEnabledForEnableMultiThreadingButton(){
-      enableMultiThreadingButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
-   }
-   
    
    
    /**
@@ -215,25 +232,6 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       }
    }
    
-   private void setEnabledForSetNumberOfThreads(){
-      boolean enable = enableMultiThreadingButton.isEnabled() && enableMultiThreadingButton.getSelection();
-      numberOfThreadsSpinner.setEnabled(enable);
-      numberOfThreadsText.setEnabled(enable);
-   }
-   
-
-   /**
-    * Sets the selection for the AutoDeleteProofFilesButton CheckBox.
-    */
-   private void setSelectionForAutoDeleteProofFilesButton(){
-      autoDeleteProofFilesButton.setSelection(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
-   }
-   
-   
-   private void setEnabledForAutoDeleteProofFilesButton(){
-      autoDeleteProofFilesButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
-   }
-   
    
    /**
     * {@inheritDoc}
@@ -243,11 +241,21 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       try {
          IProject project = getProject();
          KeYProjectProperties.setEnableKeYResourcesBuilds(project, enableKeYResourcesBuildsButton.getSelection());
-         KeYProjectProperties.setEnableBuildOnStartup(project, enableBuildOnStartupButton.getSelection());
-         KeYProjectProperties.setEnableBuildProofsEfficient(project, enableBuildRequiredProofsOnlyButton.getSelection());
-         KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
+         KeYProjectProperties.setEnableBuildOnStartup(project, enableBuildOnStartupButton.getSelection() && enableBuildOnStartupButton.isEnabled());
+         KeYProjectProperties.setEnableBuildProofsEfficient(project, enableBuildRequiredProofsOnlyButton.getSelection() && enableBuildRequiredProofsOnlyButton.isEnabled());
+         KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection() && autoDeleteProofFilesButton.isEnabled());
+         KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection() && enableMultiThreadingButton.isEnabled());
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreadsSpinner.getSelection()));
-         KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
+         boolean triggerBuild = !KeYProjectProperties.isGenerateTestCases(project) && (generateTestCasesButton.isEnabled() && generateTestCasesButton.getSelection());
+         KeYProjectProperties.setGenerateTestCases(project, generateTestCasesButton.getSelection() && generateTestCasesButton.isEnabled());
+         KeYProjectProperties.setAutoDeleteTestCases(project, autoDeleteTestCasesButton.getSelection() && autoDeleteTestCasesButton.isEnabled());
+         if(triggerBuild) {
+            KeYResourcesUtil.synchronizeProject(project);
+            KeYProjectBuildProperties properties = new KeYProjectBuildProperties(project);
+            KeYProjectBuildJob buildJob = new KeYProjectBuildJob(project, KeYProjectBuildJob.FULL_BUILD, properties);
+            buildJob.setRule(new KeYProjectBuildMutexRule(project));
+            buildJob.schedule();
+         }
          return super.performOk();
       }
       catch (CoreException e) {
@@ -265,15 +273,13 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    protected void performDefaults() {
       enableKeYResourcesBuildsButton.setSelection(true);
       enableBuildOnStartupButton.setSelection(true);
-      setEnabledForBuildOnStartupButton();
       enableBuildRequiredProofsOnlyButton.setSelection(true);
-      setEnabledForBuildReqiredProofsOnlyButton();
-      enableMultiThreadingButton.setSelection(true);
-      setEnabledForEnableMultiThreadingButton();
-      setEnabledForSetNumberOfThreads();
-      numberOfThreadsSpinner.setSelection(2);
       autoDeleteProofFilesButton.setSelection(true);
-      setEnabledForAutoDeleteProofFilesButton();
+      enableMultiThreadingButton.setSelection(true);
+      numberOfThreadsSpinner.setSelection(2);
+      generateTestCasesButton.setSelection(false);
+      autoDeleteTestCasesButton.setSelection(false);
+      update();
       super.performDefaults();
    }
 }

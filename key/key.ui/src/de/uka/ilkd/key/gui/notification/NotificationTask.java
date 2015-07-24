@@ -69,13 +69,14 @@ public abstract class NotificationTask {
         }
         // notify thread safe
         if (SwingUtilities.isEventDispatchThread()) {
-            executeImpl(event, manager);
+            executeActions(event, manager);
         } else {
             final NotificationEvent eventObject = event;
             final NotificationManager notManager = manager;
             SwingUtilities.invokeLater(new Runnable() {                                    
-                public void run() {                
-                    executeImpl(eventObject, notManager);
+                @Override
+               public void run() {                
+                    executeActions(eventObject, notManager);
                 }               
             });
         }
@@ -89,13 +90,17 @@ public abstract class NotificationTask {
      * tasks belongs to
      * @param event the NotificationEvent triggering this task
      */
-    protected abstract void executeImpl(NotificationEvent event, 
-            NotificationManager manager);
+    protected void executeActions(NotificationEvent event, 
+            NotificationManager manager) {
+       for (final NotificationAction action : getNotificationActions()) {         
+          action.execute(event);
+      }
+    }
     
     /**
      * @return the event if of this task
      */
-    public abstract int getEventID(); 
+    public abstract NotificationEventID getEventID(); 
 
     /**
      * returns if this task should be executed in auto mode

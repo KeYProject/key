@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.log.LogRecord;
 import org.key_project.key4eclipse.resources.log.LogRecordKind;
+import org.key_project.key4eclipse.resources.property.KeYProjectBuildProperties;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
@@ -37,6 +38,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * The builder id.
     */
    public final static String BUILDER_ID = "org.key_project.key4eclipse.resources.KeYProjectBuilder";
+   
    /**
     * {@inheritDoc}
     */
@@ -44,26 +46,24 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
       IResourceDelta delta = getDelta(project);
+      KeYProjectBuildProperties properties = new KeYProjectBuildProperties(project);
       final long start = System.currentTimeMillis();
-      final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
-      final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
-      final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);
       KeYResourcesUtil.synchronizeProject(project);
       KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       keyDelta.update(delta);
       try {
-         if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){ 
-            if((IncrementalProjectBuilder.FULL_BUILD == kind || keyDelta.isBuildRequired()) && !keyDelta.isBuilding()){
-               keyDelta.setIsBuilding(true);
+         if(properties.isEnableKeYResourcesBuilds()){ 
+            if((IncrementalProjectBuilder.FULL_BUILD == kind || keyDelta.getCleanRequest() || keyDelta.isBuildRequired()) && !keyDelta.isSettingUp()){
+               keyDelta.setIsSettingUp(true);
                int buildType = IncrementalProjectBuilder.FULL_BUILD == kind ? KeYProjectBuildJob.FULL_BUILD : KeYProjectBuildJob.AUTO_BUILD;
-               KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob(project, buildType);
+               KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob(project, buildType, properties);
                proofManagerJob.setRule(new KeYProjectBuildMutexRule(project));
                proofManagerJob.schedule();
             }
          }
       }
       finally {
-         LogManager.getInstance().log(project, new LogRecord(LogRecordKind.BUILD, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
+         LogManager.getInstance().log(project, new LogRecord(LogRecordKind.BUILD, start, System.currentTimeMillis() - start, properties.isBuildRequiredProofsOnly(), properties.isEnableMultiThreading(), properties.getNumberOfThreads()));
       }
       return null;
    }
@@ -79,6 +79,8 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
       final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
       final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);
+      KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
+      keyDelta.requestClean();
       LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
    }
 }

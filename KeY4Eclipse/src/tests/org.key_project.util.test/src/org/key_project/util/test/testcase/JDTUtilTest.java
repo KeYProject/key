@@ -75,6 +75,10 @@ public class JDTUtilTest extends TestCase {
       assertEquals("a", JDTUtil.ensureValidJavaTypeName("a", null));
       assertEquals("A", JDTUtil.ensureValidJavaTypeName("A", null));
       assertEquals("_", JDTUtil.ensureValidJavaTypeName("?", null));
+      // Qualified names
+      assertEquals("My_Class", JDTUtil.ensureValidJavaTypeName("My.Class", null));
+      assertEquals("_MyClass", JDTUtil.ensureValidJavaTypeName(".MyClass", null));
+      assertEquals("MyClass_", JDTUtil.ensureValidJavaTypeName("MyClass.", null));
    }
    
    /**

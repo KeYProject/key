@@ -455,7 +455,13 @@ public class JDTUtil {
    public static void addClasspathEntry(IJavaProject javaProject,
                                         IClasspathEntry entryToAdd) throws JavaModelException {
        if (javaProject != null && entryToAdd != null) {
-           IClasspathEntry[] newEntries = ArrayUtil.add(javaProject.getRawClasspath(), entryToAdd);
+           IClasspathEntry[] entries = javaProject.getRawClasspath();
+           for(IClasspathEntry e : entries) {
+              if(e != null && e.getPath().equals(entryToAdd.getPath())) {
+                 return;
+              }
+           }
+           IClasspathEntry[] newEntries = ArrayUtil.add(entries, entryToAdd);
            javaProject.setRawClasspath(newEntries, null);
        }
    }
@@ -1029,7 +1035,7 @@ public class JDTUtil {
             IStatus status = project != null ?
                              JavaConventionsUtil.validateJavaTypeName(nameToValidate, project) :
                              JavaConventions.validateJavaTypeName(nameToValidate, JavaModelUtil.VERSION_LATEST, JavaModelUtil.VERSION_LATEST);
-            if (status.isOK() || status.getSeverity() == IStatus.WARNING) {
+            if (status.isOK() || (status.getSeverity() == IStatus.WARNING && characters[i] != '.')) {
                sb.append(characters[i]);
             }
             else {
@@ -1042,6 +1048,7 @@ public class JDTUtil {
          return null;
       }
    }
+   
    
    /**
     * Returns all {@link IPackageFragmentRoot}s of the given {@link IJavaProject}.

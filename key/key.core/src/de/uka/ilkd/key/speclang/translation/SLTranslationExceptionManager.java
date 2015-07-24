@@ -13,14 +13,14 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import antlr.ANTLRException;
-import antlr.LLkParser;
-import antlr.RecognitionException;
-import antlr.Token;
-import antlr.TokenStreamException;
+import org.antlr.runtime.MismatchedTokenException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.Parser;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 
 
 /**
@@ -39,35 +39,13 @@ public class SLTranslationExceptionManager {
     //constructors
     //-------------------------------------------------------------------------
 
-    public SLTranslationExceptionManager(LLkParser parser,
-                                         String fileName,
-                                         Position offsetPos) {
-	int line;
-	int column;
-	try {
-	    line = parser.LT(1).getLine();
-	    column = parser.LT(1).getColumn();
-	} catch (final TokenStreamException e) {
-	    line = 1;
-	    column = 1;
-	}
-
-	this.line = line;
-	this.column = column;
-	this.fileName = fileName;
-	this.offsetPos = offsetPos;
-    }
-
-    public SLTranslationExceptionManager(KeYJMLPreParser parser,
-                                         String fileName,
-                                         Position offsetPos) {
-        this.line = parser.input.LT(1).getLine();
-        this.column = parser.input.LT(1).getCharPositionInLine();
-        this.fileName  = fileName;
-        this.offsetPos = offsetPos;
-    }
-
-
+   public SLTranslationExceptionManager(Parser parser, String fileName,
+         Position offsetPos) {
+      this.line = parser.input.LT(1).getLine();
+      this.column = parser.input.LT(1).getCharPositionInLine();
+      this.fileName = fileName;
+      this.offsetPos = offsetPos;
+   }
 
     //-------------------------------------------------------------------------
     //internal methods
@@ -97,13 +75,7 @@ public class SLTranslationExceptionManager {
         return new PositionedString(text,
                                     fileName,
                                     createAbsolutePosition(t.getLine(),
-                                                           t.getColumn()));
-    }
-
-    public PositionedString createPositionedString(String text,
-	    org.antlr.runtime.Token t) {
-	return new PositionedString(text, fileName, createAbsolutePosition(
-		t.getLine(), t.getCharPositionInLine()));
+                                                           t.getCharPositionInLine()));
     }
 
     /**
@@ -151,13 +123,7 @@ public class SLTranslationExceptionManager {
         return new SLTranslationException(message,
                                           fileName,
                                           createAbsolutePosition(t.getLine(),
-                                                                 t.getColumn()));
-    }
-
-    public SLTranslationException createException(String message,
-	    org.antlr.runtime.Token t) {
-	return new SLTranslationException(message, fileName,
-		createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
+                                                                 t.getCharPositionInLine()));
     }
 
     /**
@@ -197,35 +163,56 @@ public class SLTranslationExceptionManager {
         return new SLWarningException(new PositionedString(message, t));
     }
 
-    public SLTranslationException createWarningException(String message,
-	    org.antlr.runtime.Token t) {
-	return new SLWarningException(new PositionedString(message, t));
-    }
+   /**
+    * Create a message from a {@link RecognitionException}. This needs to be
+    * done manually because antlr exceptions are not designed to provide error
+    * messages, see: http://www.antlr3.org/api/ActionScript/org/antlr/runtime/
+    * RecognitionException.html
+    */
+   private String createMessage(RecognitionException e, Position pos) {
+      String message = e.getMessage();
+      if (message != null) {
+         return message;
+      }
+      else {
+         /*
+          * A sequence of "instanceof" cases can be defined here in order to
+          * create custom error messages for all relevant exception types.
+          */
+
+         // Convert the error position into a string
+         String errorPosition = pos.getLine() + ":" + pos.getColumn();
+         String token = e.token != null ? "'" + e.token.getText() + "'" : "";
+
+         if (e instanceof NoViableAltException) {
+            return "No viable alternative at line " + errorPosition + " "
+                  + token;
+         }
+         if (e instanceof MismatchedTokenException) {
+            return "Mismatched token at line " + errorPosition + " " + token;
+         }
+         return "[" + e.getClass().getName()
+               + "] Unspecified syntax error at line " + errorPosition + " "
+               + token;
+      }
+   }
 
     /**
      * Converts an ANTLRException into an SLTranslationException with the same
      * message and stack trace, and with current absolute position information.
      */
-    public SLTranslationException convertException(ANTLRException e) {
-        Position pos;
-        if(e instanceof RecognitionException) {
-            RecognitionException re = (RecognitionException) e;
-            pos = createAbsolutePosition(re.getLine(), re.getColumn());
-        } else {
-            pos = createAbsolutePosition(this.line, this.column);
-        }
-
-        return new SLTranslationException(e.getMessage()
-                                          + " ("
-                                          + e.getClass().getName()
-                                          + ")",
-                                          fileName,
-                                          pos,
-                                          e);
-    }
+   public SLTranslationException convertException(RecognitionException e) {
+      // no conversion necessary if e is already a SLTranslationException
+      if (e instanceof SLTranslationException) {
+         return (SLTranslationException) e;
+      }
+      Position pos = createAbsolutePosition(e.line, e.charPositionInLine);
+      String message = createMessage(e, pos);
+      return new SLTranslationException(message, fileName, pos, e);
+   }
 
     public SLTranslationException convertException(
-	    String message, org.antlr.runtime.RecognitionException e) {
+	    String message, RecognitionException e) {
 	Position pos;
 	pos = createAbsolutePosition(e.line, e.charPositionInLine);
 

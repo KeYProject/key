@@ -3,7 +3,7 @@ example.path = Benchmarks/VerifyThis2015
 example.additionalFile.1 = src/DoubleLinkedList.java
 example.proofFile = doUndo.proof
 
-This is the third challenge from the VerifyThis competition @ ETAPS 2015 organized by M. Huisman, R. Klebanov, and R. Monahan.
+This is the third challenge from the VerifyThis competition @ ETAPS 2015 organized by M. Huisman, V. Klebanov, and R. Monahan.
 
 Dancing links is a technique introduced in 1979 by Hitotumatu and Noshita and later popularized by Knuth. The technique can be used to efficiently implement a search for all solutions of the exact cover
 problem, which in its turn can be used to solve Tiling, Sudoku, N-Queens, and other problems.

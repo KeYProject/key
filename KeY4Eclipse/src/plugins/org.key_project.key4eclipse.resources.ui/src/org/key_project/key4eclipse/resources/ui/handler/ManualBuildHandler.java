@@ -9,6 +9,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildMutexRule;
+import org.key_project.key4eclipse.resources.property.KeYProjectBuildProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
@@ -32,7 +33,8 @@ public class ManualBuildHandler extends AbstractSaveExecutionHandler {
             }
             if(project != null && KeYResourcesUtil.isKeYProject(project)){
                KeYResourcesUtil.synchronizeProject(project);
-               KeYProjectBuildJob buildJob = new KeYProjectBuildJob(project, KeYProjectBuildJob.MANUAL_BUILD);
+               KeYProjectBuildProperties properties = new KeYProjectBuildProperties(project);
+               KeYProjectBuildJob buildJob = new KeYProjectBuildJob(project, KeYProjectBuildJob.MANUAL_BUILD, properties);
                buildJob.setRule(new KeYProjectBuildMutexRule(project));
                buildJob.schedule();
             }

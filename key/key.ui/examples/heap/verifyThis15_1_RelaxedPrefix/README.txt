@@ -3,7 +3,7 @@ example.path = Benchmarks/VerifyThis2015
 example.additionalFile.1 = src/Relaxed.java
 example.proofFile = relax.proof
 
-This is the first challenge from the VerifyThis competition @ ETAPS 2015 organized by M. Huisman, R. Klebanov, and R. Monahan.
+This is the first challenge from the VerifyThis competition @ ETAPS 2015 organized by M. Huisman, V. Klebanov, and R. Monahan.
 
 A 'relaxed prefix' of an array _a_ is an array _pat_ such that, after deleting at most one element from _pat_, the remaining array is a prefix of _a_. 
 

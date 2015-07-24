@@ -40,8 +40,13 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class LastChangesFileReader {
    
+   private boolean isBuilding = false;
    private final Set<IFile> changedJavaFiles = new LinkedHashSet<IFile>();
    private final Set<IFile> changedProofAndMetaFiles = new LinkedHashSet<IFile>();
+   
+   public boolean isBuilding(){
+      return isBuilding;
+   }
 
    public Set<IFile> getChangedJavaFiles(){
       return changedJavaFiles;
@@ -99,6 +104,14 @@ public class LastChangesFileReader {
             Assert.isTrue(parentStack.isEmpty());
             parentStack.addFirst(LastChangesFileWriter.TAG_LAST_CHANGES_FILE);
          }
+         else if (LastChangesFileWriter.TAG_BUILD_STATE.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!LastChangesFileWriter.TAG_LAST_CHANGES_FILE.equals(parent)) {
+               throw new SAXException(LastChangesFileWriter.TAG_BUILD_STATE  + " has to be a child of " + LastChangesFileWriter.TAG_LAST_CHANGES_FILE + ".");
+            }
+            isBuilding = getBuildState(attributes);
+            parentStack.addFirst(LastChangesFileWriter.TAG_BUILD_STATE);
+         }
          else if (LastChangesFileWriter.TAG_CHANGED_JAVA_FILES.equals(qName)){
             Object parent = parentStack.peekFirst();
             if (!LastChangesFileWriter.TAG_LAST_CHANGES_FILE.equals(parent)) {
@@ -142,6 +155,16 @@ public class LastChangesFileReader {
          if (!parentStack.isEmpty()) {
             parentStack.removeFirst();
          }
+      }
+      
+      
+      /**
+       * Returns the state of the last build
+       * @param attributes The attributes to read from.
+       * @return false if the last build was finished. True otherwise
+       */
+      protected boolean getBuildState(Attributes attributes) {
+         return Boolean.parseBoolean(attributes.getValue(LastChangesFileWriter.ATTRIBUTE_IS_BUILDING));
       }
       
 

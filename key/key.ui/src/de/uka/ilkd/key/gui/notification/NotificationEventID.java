@@ -17,28 +17,25 @@
 package de.uka.ilkd.key.gui.notification;
 
 /**
- * This interface constants used to uniquely identify 
- * KeY system events
+ * This interface constants used to uniquely identify KeY system events
+ * 
+ * Refactored this type into an enum. // Kai Walisch 06/2015
+ * 
  * @author bubel
  */
-public interface NotificationEventID {
+public enum NotificationEventID {
 
-    /** reserved for dummy implementations */
-    int RESERVED = -1; // used by dummy implementation
-    /** tasks notifying about proof closed events have this ID */
-    int PROOF_CLOSED = 0;
-    /** tasks notifying about abandoned tasks have this ID */
-    int TASK_ABANDONED = 1;
-    /** tasks notifying about general failures */
-    int GENERAL_FAILURE = 2;    
-    /** tasks notifying the user when KeY is shutdown have this ID */
-    int EXIT_KEY = 3;
-    /** tasks used to inform the user should have this ID */
-    int GENERAL_INFORMATION = 4;
-    
-    /** tasks used to inform the user should have this ID */
-    int EXCEPTION_CAUSED_FAILURE = 5;
+   /** tasks notifying about proof closed events have this ID */
+   PROOF_CLOSED,
+   /** tasks notifying about abandoned tasks have this ID */
+   TASK_ABANDONED,
+   /** tasks notifying about general failures */
+   GENERAL_FAILURE,
+   /** tasks notifying the user when KeY is shutdown have this ID */
+   EXIT_KEY,
+   /** tasks used to inform the user should have this ID */
+   GENERAL_INFORMATION,
+   /** tasks used to inform the user should have this ID */
+   EXCEPTION_CAUSED_FAILURE
 
-    
-    
 }

@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.speclang;
 
+import org.antlr.runtime.Token;
 import org.key_project.util.collection.ImmutableArray;
 
-import antlr.Token;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * A string with associated position information (file and line number). The
@@ -46,10 +47,6 @@ public class PositionedString {
     }
     
     public PositionedString(String text, Token t){
-        this(text, t.getFilename(), new Position(t.getLine(),t.getColumn()));
-    }
-    
-    public PositionedString(String text, org.antlr.runtime.Token t){
         this(text, t.getInputStream().getSourceName(), new Position(t.getLine(),t.getCharPositionInLine()));
     }
     
@@ -62,6 +59,17 @@ public class PositionedString {
         this(text, (String)null);
     }
 
+   public PositionedString prependAndUpdatePosition(String text) {
+      if (this.pos.getColumn() < text.length()) {
+         Debug.out("Column of given position " + pos
+               + " is smaller than prepended text " + "\"" + text
+               + "\". This will result in a negative column value for "
+               + "returned " + PositionedString.class.getSimpleName() + ".");
+      }
+      Position newPos = new Position(this.pos.getLine(), this.pos.getColumn()
+            - text.length());
+      return new PositionedString(text + this.text, this.fileName, newPos);
+   }
 
     public PositionedString prepend(String text) {
         return new PositionedString(text + this.text.trim(), this.fileName, this.pos);

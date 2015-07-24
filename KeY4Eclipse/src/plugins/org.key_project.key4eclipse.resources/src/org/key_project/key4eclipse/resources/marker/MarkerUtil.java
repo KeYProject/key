@@ -21,10 +21,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
-import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -108,8 +108,8 @@ public class MarkerUtil {
    
    
    /**
-    * Creates the {@link MarkerUtil#RECURSIONMARKER_ID} for the given {@ink ProofElement}.
-    * @param pe - the {@link ProofElement} to use
+    * Creates the {@link MarkerUtil#RECURSIONMARKER_ID} for the first element of the given cycle.
+    * @param cycle list of {@link ProofElement}s
     * @throws CoreException
     */
    public static void setRecursionMarker(List<ProofElement> cycle) {
@@ -140,14 +140,18 @@ public class MarkerUtil {
    }
    
    
-   public static void setOutdated(ProofElement pe, boolean outdated){
+   /**
+    * Marks the given {@link ProofElement} as outdated and updates the marker message
+    * @param pe the given {@link ProofElement}
+    */
+   public static void setOutdated(ProofElement pe){
       IMarker proofMarker = pe.getProofMarker();
       List<IMarker> recursionMarker = pe.getRecursionMarker();
       if(proofMarker != null && proofMarker.exists()){
          try {
-            String msg = getUpdatedOutdatedProofMessage(proofMarker.getAttribute(IMarker.MESSAGE, ""), outdated);
+            String msg = getUpdatedOutdatedProofMessage(proofMarker.getAttribute(IMarker.MESSAGE, ""), true);
             pe.setMarkerMsg(msg);            
-            proofMarker.setAttribute(MarkerUtil.MARKER_ATTRIBUTE_OUTDATED, outdated);
+            proofMarker.setAttribute(MarkerUtil.MARKER_ATTRIBUTE_OUTDATED, true);
             proofMarker.setAttribute(IMarker.MESSAGE, msg);
          }
          catch (CoreException e) {
@@ -158,8 +162,8 @@ public class MarkerUtil {
          for(IMarker marker : recursionMarker){
             if(marker != null && marker.exists()){
                try {
-                  String msg = getUpdatedOutdatedProofMessage(marker.getAttribute(IMarker.MESSAGE, ""), outdated);
-                  marker.setAttribute(MarkerUtil.MARKER_ATTRIBUTE_OUTDATED, outdated);
+                  String msg = getUpdatedOutdatedProofMessage(marker.getAttribute(IMarker.MESSAGE, ""), true);
+                  marker.setAttribute(MarkerUtil.MARKER_ATTRIBUTE_OUTDATED, true);
                   marker.setAttribute(IMarker.MESSAGE, msg);
                }
                catch (CoreException e) {
@@ -170,7 +174,12 @@ public class MarkerUtil {
       }
    }
          
-      
+   /**
+    * Generates the updated marker message for outdated proofs   
+    * @param message the current marker message
+    * @param outdated the outdated state of the proof
+    * @return the new marker message
+    */
    private static String getUpdatedOutdatedProofMessage(String message, boolean outdated) {
       String appendix = StringUtil.NEW_LINE + StringUtil.NEW_LINE + "Outdated proof - new build required!";
       StringBuilder sb = new StringBuilder(message);
@@ -222,6 +231,13 @@ public class MarkerUtil {
    }
    
    
+   /**
+    * Returns the proof marker of a particular java file, {@link SourceLocation} and proof file.
+    * @param javaFile
+    * @param scl
+    * @param proofFile
+    * @return
+    */
    public static IMarker getProofMarker(IFile javaFile, SourceLocation scl, IFile proofFile){
       IMarker proofMarker = null;
       List<IMarker> markerList = null;
@@ -247,6 +263,13 @@ public class MarkerUtil {
    }
    
    
+   /**
+    * Returns a list of recursion marker for a particular java file, {@link SourceLocation} and proof file.
+    * @param javaFile
+    * @param scl
+    * @param proofFile
+    * @return
+    */
    public static List<IMarker> getRecursionMarker(IFile javaFile, SourceLocation scl, IFile proofFile){
       List<IMarker> recursionMarker = new LinkedList<IMarker>();
       List<IMarker> markerList = null;
@@ -271,7 +294,8 @@ public class MarkerUtil {
 
    /**
     * Collects all KeY{@link IMarker} for the given {@link IResource}.
-    * @param res - the {@link IResource} to use
+    * @param res the {@link IResource} to use
+    * @param depth the search depth 
     * @return a {@link LinkedList} with all KeY{@link IMarker}
     * @throws CoreException
     */
@@ -293,7 +317,7 @@ public class MarkerUtil {
       for(String type : types){
          if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || RECURSIONMARKER_ID.equals(type)){
             try {
-               markerList.addAll(KeYResourcesUtil.arrayToList(res.findMarkers(type, true, depth)));
+               markerList.addAll(CollectionUtil.arrayToList(res.findMarkers(type, true, depth)));
             }
             catch (CoreException e) {
                LogUtil.getLogger().logError(e);
@@ -307,7 +331,7 @@ public class MarkerUtil {
    /**
     * Removes all KeYResource {@link IMarker} from the given {@link IResource} matching the given types using the given depth.
     * @param res - the {@link IResource} to use
-    * @param type - the type to be delete
+    * @param types - the types to be delete
     * @param depth - the depth to use
     * @throws CoreException
     */

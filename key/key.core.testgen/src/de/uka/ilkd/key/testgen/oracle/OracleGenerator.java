@@ -10,7 +10,6 @@ import java.util.Set;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
+import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 
 public class OracleGenerator {
 	
@@ -46,7 +46,6 @@ public class OracleGenerator {
 	private static int varNum;
 	
 	private HashMap<Operator, String> ops;
-
 
 	private Set<OracleMethod> oracleMethods;
 	
@@ -265,18 +264,17 @@ public class OracleGenerator {
 			}
 			else if(javaOp.equals(OR)){
 				return or(left,right);
-			}
-			
+			}			
 			
 			return new OracleBinTerm(javaOp,left,right);			
 		}//negation
 		else if(op == Junctor.NOT){
 			OracleTerm sub = generateOracle(term.sub(0), initialSelect);
-			if(sub instanceof OracleNegTerm){
-				OracleNegTerm neg = (OracleNegTerm) sub;
+			if(sub instanceof OracleUnaryTerm){
+				OracleUnaryTerm neg = (OracleUnaryTerm) sub;
 				return neg.getSub();
 			}
-			return new OracleNegTerm(sub);
+			return new OracleUnaryTerm(sub, Op.Neg);
 		}
 		//true
 		else if (op == Junctor.TRUE) {
@@ -288,10 +286,7 @@ public class OracleGenerator {
 		}
 		else if (op == Junctor.IMP){
 			OracleTerm left = generateOracle(term.sub(0), initialSelect);
-			OracleTerm right = generateOracle(term.sub(1), initialSelect);
-			
-			
-			
+			OracleTerm right = generateOracle(term.sub(1), initialSelect);			
 			OracleTerm notLeft = neg(left);
 			return new OracleBinTerm(OR, notLeft, right);
 		}
@@ -320,7 +315,7 @@ public class OracleGenerator {
 			List<OracleTerm> args = new LinkedList<OracleTerm>();
 			args.addAll(quantifiedVariables);
 			args.addAll(methodArgs);
-			return new OracleTermCall(method, args);
+			return new OracleMethodCall(method, args);
 		}		
 		//if-then-else
 		else if(op == IfThenElse.IF_THEN_ELSE){
@@ -329,7 +324,7 @@ public class OracleGenerator {
 			List<OracleTerm> args = new LinkedList<OracleTerm>();
 			args.addAll(quantifiedVariables);
 			args.addAll(methodArgs);
-			return new OracleTermCall(method, args);
+			return new OracleMethodCall(method, args);
 		}
 		//functions
 		else if (op instanceof Function) {
@@ -377,6 +372,7 @@ public class OracleGenerator {
 	    else if(term.arity() == 0){
 	    	return new OracleConstant(name, term.sort());
 	    }
+	    
 	    else if(name.endsWith("select")){
 	    	
 	    	//System.out.println(term+ " init: "+initialSelect);
@@ -429,7 +425,7 @@ public class OracleGenerator {
 	    		args.addAll(quantifiedVariables);
 	    		args.addAll(methodArgs);
 	    		
-	    		return new OracleTermCall(m, args);
+	    		return new OracleMethodCall(m, args);
 	    	}
 	    }
 	    else if (name.endsWith("::instance")){
@@ -455,6 +451,10 @@ public class OracleGenerator {
 	    	
 	    	
 	    }
+	    else if(name.equals("javaUnaryMinusInt")){
+	    	OracleTerm sub = generateOracle(term.sub(0), initialSelect);
+	    	return new OracleUnaryTerm(sub, Op.Minus);
+	    }
 	    
 	    throw new RuntimeException("Unsupported function found: "+name+ " of type "+fun.getClass().getName());
     }
@@ -473,7 +473,7 @@ public class OracleGenerator {
 			params.add(param);
 		}		
 		
-		return new OracleTermCall(m,params);
+		return new OracleMethodCall(m,params);
 	}
 
 	private OracleMethod createDummyOracleMethod(ProgramMethod pm) {
@@ -706,7 +706,7 @@ public class OracleGenerator {
 		OracleTerm sub = generateOracle(term.sub(0), initialSelect);
 		quantifiedVariables.remove(var);
 		
-		OracleNegTerm neg = new OracleNegTerm(sub);
+		OracleUnaryTerm neg = new OracleUnaryTerm(sub,Op.Neg);
 		
 		String body;
 		if(term.op() == Quantifier.ALL){
@@ -729,7 +729,7 @@ public class OracleGenerator {
 	}
 
 	private String createForallBody(QuantifiableVariable qv, String setName,
-            OracleNegTerm neg) {
+            OracleUnaryTerm neg) {
 		String tab = TestCaseGenerator.TAB;
 	    String body = "\n"+tab+"for("+qv.sort().name()+" "+qv.name()+" : "+setName+"){"
 				+ "\n"+tab+tab+"if("+neg.toString()+"){"
@@ -754,11 +754,11 @@ public class OracleGenerator {
 	
 	private static OracleTerm neg(OracleTerm t){
 		
-		if(t instanceof OracleNegTerm){			
-			return ((OracleNegTerm) t).getSub();
+		if(t instanceof OracleUnaryTerm){			
+			return ((OracleUnaryTerm) t).getSub();
 		}
 		else{
-			return new OracleNegTerm(t);
+			return new OracleUnaryTerm(t,Op.Neg);
 		}
 		
 	}

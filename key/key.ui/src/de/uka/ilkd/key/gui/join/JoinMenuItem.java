@@ -30,9 +30,15 @@ import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.JoinProcessor.Listener;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+import de.uka.ilkd.key.util.DefaultExperimentalFeature;
 import de.uka.ilkd.key.util.ExperimentalFeature;
 
-
+/**
+ * The menu item for the "delayed-cut" join rule.
+ *
+ * @author Benjamin Niedermann
+ * @see JoinProcessor
+ */
 public class JoinMenuItem extends JMenuItem {
 
     private static final long serialVersionUID = -2602116358650063634L;
@@ -40,19 +46,7 @@ public class JoinMenuItem extends JMenuItem {
     /** Controls whether joining is available to the user.
      * WARNING: You may refresh your GUI elements after (de-)activation.
      */
-    public static final ExperimentalFeature FEATURE = new ExperimentalFeature(){
-        private boolean active = true;
-        @Override
-        public void deactivate() { active = false; }
-
-        @Override
-        public void activate() {
-            active = true;
-        }
-
-        @Override
-        public boolean active() { return active; }
-    };
+    public static final ExperimentalFeature FEATURE = new DefaultExperimentalFeature();
 
 
     public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof, final KeYMediator mediator) {
