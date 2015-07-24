@@ -71,7 +71,17 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private boolean distinguishablePathConditionsRequirement() {
         final Services services = joinNode.proof().getServices();
 
-        if (concreteRule.requiresDistinguishablePathConditions()) {
+        // NOTE: Requiring distinguishable path conditions for the abstraction
+        // procedures here is an intermediate construction: JoinRule returns
+        // if-then-else terms along with abstraction values when lattice
+        // abstraction is applied; furthermore, if-then-else is a fallback
+        // for unsupported data types.
+        // Future finalization: Remove if-then-else fallbacks (can however
+        // affect completeness) and check for each variable in the symbolic
+        // states whether the corresponding data types are supported by
+        // the concrete lattice.
+        if (concreteRule.requiresDistinguishablePathConditions() ||
+                concreteRule instanceof JoinWithLatticeAbstraction) {
             ImmutableList<SymbolicExecutionState> allStates = ImmutableSLList.nil();
             allStates = allStates.prepend(joinPartnerStates);
             allStates = allStates.prepend(thisSEState.toSymbolicExecutionState());
@@ -90,16 +100,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
             return true;
         }
         else {
-            // This is an intermediate construction. In principle, we should
-            // return true here. However, JoinRule returns if-then-else terms
-            // along with abstraction values when lattice abstraction is
-            // applied; furthermore, if-then-else is a fallback for unsupported
-            // data types.
-            // Future finalization: Remove if-then-else fallbacks (can however
-            // affect completeness) and check for each variable in the symbolic
-            // states whether the corresponding data types are supported by
-            // the concrete lattice.
-            return !(concreteRule instanceof JoinWithLatticeAbstraction);
+            return true;
         }
     }
     
