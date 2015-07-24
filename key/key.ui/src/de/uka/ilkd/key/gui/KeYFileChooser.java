@@ -124,8 +124,7 @@ public class KeYFileChooser {
         return showSaveDialog(parent, originalFile);
     }
 
-
-    private boolean showSaveDialog(Component parent, File selectedFile) {
+    public boolean showSaveDialog(Component parent, File selectedFile) {
         if (selectedFile != null) {
             if (selectedFile.isDirectory()) {
                 fileChooser.setSelectedFile(null);

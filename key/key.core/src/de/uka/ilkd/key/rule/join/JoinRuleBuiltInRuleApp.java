@@ -72,10 +72,18 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         final Services services = joinNode.proof().getServices();
 
         if (concreteRule.requiresDistinguishablePathConditions()) {
-            for (SymbolicExecutionState partnerState : joinPartnerStates) {
-                if (!JoinRuleUtils.pathConditionsAreDistinguishable(
-                        thisSEState.second, partnerState.second, services)) {
-                    return false;
+            ImmutableList<SymbolicExecutionState> allStates = ImmutableSLList.nil();
+            allStates = allStates.prepend(joinPartnerStates);
+            allStates = allStates.prepend(thisSEState.toSymbolicExecutionState());
+            
+            for (SymbolicExecutionState state1 : allStates) {
+                for (SymbolicExecutionState state2: allStates) {
+                    if (state1 != state2) {
+                        if (!JoinRuleUtils.pathConditionsAreDistinguishable(
+                                state1.second, state2.second, services)) {
+                            return false;
+                        }
+                    }
                 }
             }
 

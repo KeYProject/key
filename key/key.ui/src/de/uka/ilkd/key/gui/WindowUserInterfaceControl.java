@@ -95,10 +95,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
-        completions.add(new JoinRuleCompletion());
+        completions.add(JoinRuleCompletion.INSTANCE);
     }
 
-    protected MediatorProofControl createProofControl() {
+    @Override
+   protected MediatorProofControl createProofControl() {
        return new MediatorProofControl(this) {
           /**
            * {@inheritDoc}
@@ -107,7 +108,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
           public boolean isAutoModeSupported(Proof proof) {
              return super.isAutoModeSupported(proof) &&
                     mainWindow.getProofList().containsProof(proof);
-          }          
+          }
        };
     }
     
@@ -412,12 +413,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       ThreadUtilities.invokeAndWait(new Runnable() {
          @Override
          public void run() {
-            mainWindow.getProofList().removeProof(e.getSource());
+            mainWindow.getProofList().removeProof(e.getSource());            
          }
       });
-      // Run the garbage collector.
-      Runtime r = Runtime.getRuntime();
-      r.gc();
     }
 
    @Override
@@ -447,6 +445,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             getMediator().getSelectionModel().setSelectedNode(result.getNode());
          } else {
             // should never happen as replay always returns a result object
+             //TODO (DS): Why is it then there? If this happens, we will get\\
+             // a NullPointerException just a line below...
             getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
          }
 
@@ -553,6 +553,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      //ok button
      final JButton button = new JButton("OK");
      button.addActionListener(new ActionListener() {
+         @Override
          public void actionPerformed(ActionEvent e) {
              dialog.setVisible(false);
          }
@@ -567,7 +568,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      
      button.registerKeyboardAction(
          new ActionListener() {
-             public void actionPerformed(ActionEvent event) {
+             @Override
+            public void actionPerformed(ActionEvent event) {
                  if(event.getActionCommand().equals("ESC")) {
                      button.doClick();
                  }

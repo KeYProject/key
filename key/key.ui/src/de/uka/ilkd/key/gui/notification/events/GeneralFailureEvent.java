@@ -28,7 +28,7 @@ public class GeneralFailureEvent extends NotificationEvent {
     private String errorMessage = "Unknown Error.";
     
     
-    protected GeneralFailureEvent(int id) {
+    protected GeneralFailureEvent(NotificationEventID id) {
         super(id);
     }
 

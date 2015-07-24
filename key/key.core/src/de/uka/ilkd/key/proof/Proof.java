@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.swing.SwingUtilities;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -640,6 +642,12 @@ public class Proof implements Named {
                             }
 
                             linkedGoal.setLinkedGoal(null);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pruneProof(linkedGoal);
+                                }
+                            });
                         }
                     }
 
@@ -1133,4 +1141,22 @@ public class Proof implements Named {
        ProofSaver saver = new ProofSaver(this, file);
        saver.save();
     }
+    
+   /**
+    * Extracts java source directory from {@link #header()}, if it exists.
+    */
+   public File getJavaSourceLocation() {
+      String header = header();
+      int i = header.indexOf("\\javaSource");
+      if (i >= 0) {
+         int begin = header.indexOf('\"', i);
+         int end = header.indexOf('\"', begin + 1);
+         String sourceLocation = header.substring(begin + 1, end);
+         if (sourceLocation.length() > 0) {
+            return new File(sourceLocation);
+         }
+      }
+      return null;
+   }
+
 }

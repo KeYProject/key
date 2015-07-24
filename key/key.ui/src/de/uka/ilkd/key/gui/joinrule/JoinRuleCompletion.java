@@ -21,9 +21,14 @@ import de.uka.ilkd.key.util.Pair;
  * @author Dominic Scheurer
  */
 public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion {
-	
-	private static final JoinProcedure STD_CONCRETE_JOIN_RULE = JoinIfThenElse.instance(); 
 
+    /** Singleton instance */
+    public static final JoinRuleCompletion INSTANCE = new JoinRuleCompletion();
+    
+	private static final JoinProcedure STD_CONCRETE_JOIN_RULE = JoinIfThenElse.instance();
+
+	private JoinRuleCompletion() {}
+	
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
             boolean forced) {

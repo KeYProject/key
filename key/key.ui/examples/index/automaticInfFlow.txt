@@ -21,8 +21,8 @@ provable: ./InformationFlow/ToyVoting/Voter(Voter__isValid(int)).JML normal_beha
 provable: ./InformationFlow/ToyVoting/Voter(Voter__sendVote(int)).JML normal_behavior operation contract.0.key
 provable: ./InformationFlow/ToyVoting/Voter(Voter__inputVote()).JML normal_behavior operation contract.0.key
 provable: ./InformationFlow/ToyVoting/Voter(Voter__secure_voting()).JML normal_behavior operation contract.0.key
-provable: ./InformationFlow/ConditionalConfidential/ConditionalConfidentialExample(ConditionalConfidential/ConditionalConfidentialExample__hasAccessRight(ConditionalConfidential/ConditionalConfidentialExample.User)).JML normal_behavior operation contract.0.key
-provable: ./InformationFlow/ConditionalConfidential/ConditionalConfidentialExample(ConditionalConfidential/ConditionalConfidentialExample__getConfidentialData(ConditionalConfidential/ConditionalConfidentialExample.User)).JML normal_behavior operation contract.0.key
+provable: ./InformationFlow/ConditionalConfidential/CCExample(CCExample__hasAccessRight(CCExample.User)).JML normal_behavior operation contract.0.key
+provable: ./InformationFlow/ConditionalConfidential/CCExample(CCExample__getConfidentialData(CCExample.User)).JML normal_behavior operation contract.0.key
 provable: ./InformationFlow/Sum/SumExample(SumExample__getSum()).JML normal_behavior operation contract.0.key
 provable: ./InformationFlow/ToyBanking/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).JML normal_behavior operation contract.0.key
 provable: ./InformationFlow/ToyBanking/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).JML normal_behavior operation contract.0.key
