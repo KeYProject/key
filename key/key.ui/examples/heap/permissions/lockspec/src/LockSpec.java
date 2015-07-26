@@ -94,7 +94,7 @@ public class Counter implements LockSpec {
    /*@ model two_state boolean unlockTransfer() { return (\permission(this.val) == \dl_returnPermission(\dl_currentThread(), lockRef(), \old(\permission(this.val)))); } @*/
 
    /*@ model Lock lockRef() { return this.lock; } @*/
-   /*@ model boolean lockStatus(boolean locked) { return (locked ? \dl_writePermission(\permission(this.val)) : !\dl_readPermission(\permission(this.val))); } @*/
+   /*@ model boolean lockStatus(boolean locked) { return (locked ? \dl_writePermission(\permission(this.val)) : !\dl_readPermission(\permission(this.val)) && \dl_writePermissionObject(lock, \permission(this.val))   ); } @*/
 
    /*@ normal_behavior
         requires lockStatus(\dl_FALSE());
