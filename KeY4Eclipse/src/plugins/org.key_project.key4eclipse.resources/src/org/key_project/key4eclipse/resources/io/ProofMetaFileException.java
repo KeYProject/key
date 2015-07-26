@@ -20,9 +20,6 @@ package org.key_project.key4eclipse.resources.io;
 @SuppressWarnings("serial")
 public class ProofMetaFileException extends Exception{
    
-   /**
-    * The Constructor
-    */
    public ProofMetaFileException(String message){
       super(message);
    }

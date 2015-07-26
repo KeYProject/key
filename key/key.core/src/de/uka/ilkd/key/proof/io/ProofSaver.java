@@ -82,7 +82,19 @@ public class ProofSaver extends OutputStreamProofSaver {
 
    @Override
    protected String getBasePath() throws IOException {
-      return file.getCanonicalFile().getParentFile().getCanonicalPath();
+       return computeBasePath(file);
+   }
+   
+   /**
+    * Computes the base path of the given proof {@link File}.
+    * <p>
+    * This method is used by {@link #getBasePath()} and by the Eclipse integration.
+    * @param proofFile The proof {@link File}.
+    * @return The computed base path of the given proof {@link File}.
+    * @throws IOException Occurred Exception.
+    */
+   public static String computeBasePath(File proofFile) throws IOException {
+       return proofFile.getCanonicalFile().getParentFile().getCanonicalPath();
    }
 
     /**

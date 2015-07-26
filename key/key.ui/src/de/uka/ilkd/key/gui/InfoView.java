@@ -12,6 +12,9 @@
 // 
 package de.uka.ilkd.key.gui;
 
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.event.TreeSelectionEvent;
@@ -20,6 +23,11 @@ import javax.swing.event.TreeSelectionListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.ThreadUtilities;
 import de.uka.ilkd.key.util.XMLResources;
 
@@ -34,18 +42,19 @@ public class InfoView extends JSplitPane {
      *
      */
     private static final long serialVersionUID = -6944612837850368411L;
+    
+    private Node lastShownGoalNode; 
     private final InfoTree infoTree;
     private final InfoViewContentPane contentPane;
-    private final KeYMediator mediator;
     private final MainWindow mainWindow;
     private final XMLResources xmlResources;
+    private final ProofDisposedListener proofDisposedListener;
 
-    public InfoView(KeYMediator mediator, MainWindow mainWindow) {
+    public InfoView(final KeYMediator mediator, MainWindow mainWindow) {
         super(VERTICAL_SPLIT);
         assert mediator != null;
         xmlResources = new XMLResources();
         this.mainWindow = mainWindow;
-        this.mediator = mediator;
         mediator.addKeYSelectionListener(new InfoViewSelectionListener());
 
         // initial placement of the divider
@@ -64,16 +73,52 @@ public class InfoView extends JSplitPane {
                 InfoTreeNode node = infoTree.getLastSelectedPathComponent();
                 if (node != null) {
                     contentPane.setNode(node);
+                } else {
+                    contentPane.clear();
                 }
             }
         });
 
+        lastShownGoalNode = null;
+        
+        addComponentListener(new ComponentListener() {            
+            @Override
+            public void componentShown(ComponentEvent e) {
+                if (mediator.getSelectedProof() != null) {
+                    Goal goal = mediator.getSelectedGoal(); 
+                    if (goal != null) {
+                        updateModel(mediator.getSelectedGoal());
+                    }
+                }
+            }
+            
+            @Override
+            public void componentResized(ComponentEvent e) {                
+            }
+            
+            @Override
+            public void componentMoved(ComponentEvent e) { }
+            
+            @Override
+            public void componentHidden(ComponentEvent e) { }
+        });
+        
+        proofDisposedListener = new ProofDisposedListener() {                
+            @Override
+            public void proofDisposing(ProofDisposedEvent e) {
+            }
+            
+            @Override
+            public void proofDisposed(ProofDisposedEvent e) {
+                updateModel(null);
+            }
+        };
+
+        
         contentPane = new InfoViewContentPane();
 
         setLeftComponent(new JScrollPane(infoTree));
         setRightComponent(contentPane);
-
-        setVisible(true);
     }
 
     private class InfoViewSelectionListener implements KeYSelectionListener {
@@ -90,12 +135,17 @@ public class InfoView extends JSplitPane {
          */
         @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
+            final KeYSelectionModel selectionModel = e.getSource();
             Runnable action = new Runnable() {
                 @Override
                 public void run() {
-                    if (mediator.getSelectedProof() != null && mediator.getSelectedGoal() != null) {
-                        infoTree.setModel(new InfoTreeModel(mediator.getSelectedGoal(),
-                                xmlResources, mainWindow));
+                    if (isVisible()) {
+                        if (selectionModel.getSelectedProof() == null) {
+                            updateModel(null);
+                        } else if (selectionModel.getSelectedGoal() != null) {
+                            // keep old view if an inner node has been selected
+                            updateModel(selectionModel.getSelectedGoal());
+                        }
                     }
                 }
             };
@@ -104,4 +154,22 @@ public class InfoView extends JSplitPane {
 
     }
 
+    private void updateModel(Goal g) {                
+        if (g == null || lastShownGoalNode != g.node()) {
+            if (lastShownGoalNode != null) {
+                lastShownGoalNode.proof().removeProofDisposedListener(proofDisposedListener);
+            }
+            final InfoTreeModel model;
+            if ( g != null ) {
+                model = new InfoTreeModel(g, xmlResources, mainWindow);
+                g.proof().addProofDisposedListener(proofDisposedListener);
+                lastShownGoalNode = g.node();
+            } else {
+                model = null;
+                lastShownGoalNode = null;
+            }
+            contentPane.clear();
+            infoTree.setModel(model);    
+        }
+    }
 }

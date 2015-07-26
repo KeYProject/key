@@ -31,4 +31,9 @@ public class InfoViewContentPane extends JScrollPane {
         description.setCaretPosition(0);
     }
 
+    public void clear() {
+        setBorder(BorderFactory.createTitledBorder("Description"));
+        description.setText("");
+    }
+
 }

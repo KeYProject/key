@@ -13,15 +13,15 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
+import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
 import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
@@ -29,7 +29,6 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
 
 /**
@@ -57,11 +56,10 @@ public class ProofElement {
    private Contract contract;
    private ProofOblInput proofObl;
    private boolean proofClosed;
-   private LinkedHashSet<IProofReference<?>> proofReferences;
+   private List<ProofMetaFileAssumption> assumptions;
+   private ProofMetaReferences proofMetaReferences;
    private List<IFile> usedContracts;
    private List<String> calledMethods;
-
-   private List<ProofMetaFileTypeElement> typeElements;
    
    private final SpecificationRepository specificationRepository;
    
@@ -83,13 +81,13 @@ public class ProofElement {
       this.contract = contract;
       this.proofObl = null;
       
-      this.proofReferences = new LinkedHashSet<IProofReference<?>>();
+      this.assumptions = new LinkedList<ProofMetaFileAssumption>();
+      this.proofMetaReferences = null;
       
       this.proofFileMD5 = null;
       this.markerMsg = null;
       this.proofClosed = false;
       this.usedContracts = new LinkedList<IFile>();
-      this.typeElements = new LinkedList<ProofMetaFileTypeElement>();
       this.specificationRepository = environment.getSpecificationRepository();
       init();
    }
@@ -104,7 +102,9 @@ public class ProofElement {
             this.markerMsg = pmfr.getMarkerMessage();
             this.proofClosed = pmfr.getProofClosed();
             this.usedContracts = pmfr.getUsedContracts();
-            this.typeElements = pmfr.getTypeElements();
+            this.calledMethods = pmfr.getCalledMethods();
+            this.assumptions = pmfr.getAssumptions();
+            this.proofMetaReferences = pmfr.getReferences();
 
             if(!hasMarker()){
                MarkerUtil.setMarker(this);
@@ -199,21 +199,23 @@ public class ProofElement {
    public void setProofClosed(boolean proofStatus){
       this.proofClosed = proofStatus;
    }
-   public LinkedHashSet<IProofReference<?>> getProofReferences(){
-      return proofReferences;
+   public List<ProofMetaFileAssumption> getAssumptions(){
+      return assumptions;
    }
-   public void setProofReferences(LinkedHashSet<IProofReference<?>> proofReferences){
-      this.proofReferences = proofReferences;
+   public void setAssumptions(List<ProofMetaFileAssumption> assumptions) {
+      this.assumptions = assumptions;
+   }
+   public ProofMetaReferences getProofMetaReferences(){
+      return proofMetaReferences;
+   }
+   public void setProofMetaReferences(ProofMetaReferences proofMetaReferences){
+      this.proofMetaReferences  = proofMetaReferences;
    }
    public List<IFile> getUsedContracts() {
       return usedContracts;
    }
    public void setUsedContracts(List<IFile> usedContracts) {
       this.usedContracts = usedContracts;
-   }
-
-   public List<ProofMetaFileTypeElement> getTypeElements() {
-      return typeElements;
    }
    
    public List<String> getCalledMethods() {
@@ -244,26 +246,6 @@ public class ProofElement {
       if(proofMarker != null && proofMarker.exists()){
          return true;
       }
-      if(recursionMarker != null && !recursionMarker.isEmpty()){
-         for(IMarker marker : recursionMarker){
-            if(marker != null && marker.exists()){
-               return true;
-            }
-         }
-      }
-      return false;
-   }
-   
-   
-   public boolean hasProofMarker(){
-      if(proofMarker != null && proofMarker.exists()){
-         return true;
-      }
-      return false;
-   }
-   
-   
-   public boolean hasRecursionMarker(){
       if(recursionMarker != null && !recursionMarker.isEmpty()){
          for(IMarker marker : recursionMarker){
             if(marker != null && marker.exists()){

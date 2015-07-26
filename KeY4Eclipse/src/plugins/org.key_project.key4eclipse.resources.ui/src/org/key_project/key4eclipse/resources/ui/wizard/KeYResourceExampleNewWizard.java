@@ -1,9 +1,15 @@
 package org.key_project.key4eclipse.resources.ui.wizard;
 
+import java.io.IOException;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageOne;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -95,21 +101,31 @@ public class KeYResourceExampleNewWizard extends KeYProjectWizard {
     * @throws Exception Occurred Exception.
     */
    @SuppressWarnings("restriction")
-   protected boolean createExampleContent(IContainer sourceDirectory) throws Exception {
-      // Add source code
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/exampleProject/src", sourceDirectory);
-      IFile integerUtilFile = sourceDirectory.getFile(new Path("IntegerUtil.java"));
-      IFile multipleRecursionFile = sourceDirectory.getFile(new Path("MultipleRecursion.java"));
-      // Add proofs
-      IFolder fileFolder = KeYResourcesUtil.getProofFolder(multipleRecursionFile);
-      IFile aProof = KeYResourcesUtil.getProofFile("MultipleRecursion[MultipleRecursion::b()].JML normal_behavior operation contract.0", fileFolder.getFullPath());
-      IFile bProof = KeYResourcesUtil.getProofFile("MultipleRecursion[MultipleRecursion::a()].JML normal_behavior operation contract.0", fileFolder.getFullPath());
-      if (!fileFolder.exists()) {
-         KeYResourcesUtil.createFolder(aProof);
-      }
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/exampleProject/proofs/a.proof", aProof);
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/exampleProject/proofs/b.proof", bProof);
+   protected boolean createExampleContent(final IContainer sourceDirectory) throws Exception {
+      ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+          @Override
+          public void run(IProgressMonitor monitor) throws CoreException {
+              try {
+                  // Add source code
+                  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/exampleProject/src", sourceDirectory);
+                  IFile multipleRecursionFile = sourceDirectory.getFile(new Path("MultipleRecursion.java"));
+                  // Add proofs
+                  IFolder fileFolder = KeYResourcesUtil.getProofFolder(multipleRecursionFile);
+                  IFile aProof = KeYResourcesUtil.getProofFile("MultipleRecursion[MultipleRecursion::b()].JML normal_behavior operation contract.0", fileFolder.getFullPath());
+                  IFile bProof = KeYResourcesUtil.getProofFile("MultipleRecursion[MultipleRecursion::a()].JML normal_behavior operation contract.0", fileFolder.getFullPath());
+                  if (!fileFolder.exists()) {
+                     KeYResourcesUtil.createFolder(aProof);
+                  }
+                  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/exampleProject/proofs/a.proof", aProof);
+                  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/exampleProject/proofs/b.proof", bProof);
+              }
+              catch (IOException e) {
+                  throw new CoreException(LogUtil.getLogger().createErrorStatus(e.getMessage(), e));
+              }
+          }
+      }, null);
       // Open first example file
+      IFile integerUtilFile = sourceDirectory.getFile(new Path("IntegerUtil.java"));
       if (integerUtilFile != null && integerUtilFile.exists()) {
          selectAndReveal(integerUtilFile);
          WorkbenchUtil.openEditor(integerUtilFile);
