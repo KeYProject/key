@@ -15,8 +15,8 @@ import org.key_project.javaeditor.util.LogUtil;
 public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
 
    
-   public static JMLASTCommentLocator comments = null;
-   
+   private static JMLASTCommentLocator comments = null;
+   private static IJavaElement root = null;
    
    @Override
    public Object[] modify(Object parent, Object[] currentChildren) {
@@ -26,15 +26,15 @@ public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
       }
       
       final IJavaElement javaParent = (IJavaElement)parent;
-      
 //first call with i compilation unit initialize everything
-      if(javaParent.getElementType() == IJavaElement.COMPILATION_UNIT) {
-         comments = new JMLASTCommentLocator((ICompilationUnit)javaParent);  
-      }
+      if(javaParent.getParent().getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
+         comments = new JMLASTCommentLocator((ICompilationUnit)javaParent);
+         root =  javaParent;
+      }else if (comments == null) return currentChildren;
       
       if (comments != null) {
    // add invariants to class
-         if (javaParent.getElementType() == IJavaElement.TYPE){
+         if (javaParent.getElementType() == IJavaElement.TYPE && javaParent.getParent().equals(root)){
          
          Object[] newArray = new Object[currentChildren.length+comments.getClassInvariants().size()];
          

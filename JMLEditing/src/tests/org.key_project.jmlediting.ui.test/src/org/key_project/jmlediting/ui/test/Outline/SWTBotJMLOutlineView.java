@@ -3,8 +3,6 @@ package org.key_project.jmlediting.ui.test.Outline;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -33,7 +31,6 @@ public class SWTBotJMLOutlineView {
    private static final String PROJECT_NAME = "OutlineTest";
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineTestClass";
-   private static final List<String> KEYWORD_LIST = new LinkedList<String>();
    
    private static SWTBotTree tree;
    

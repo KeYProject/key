@@ -21,6 +21,7 @@ import javax.naming.OperationNotSupportedException;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.eclipse.jdt.internal.ui.javaeditor.SemanticHighlightingManager;
+import org.eclipse.jdt.internal.ui.viewsupport.JavaUILabelProvider;
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -46,10 +47,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.eclipse.ui.texteditor.IElementStateListener;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
 import org.key_project.javaeditor.outline.OutlineContentProviderWrapper;
+import org.key_project.javaeditor.outline.OutlineLableWrapper;
 import org.key_project.javaeditor.util.ExtendableConfigurationUtil;
 import org.key_project.javaeditor.util.LogUtil;
 import org.key_project.javaeditor.util.PreferenceUtil;
@@ -328,6 +331,38 @@ public final class JavaEditorManager {
     * @param javaEditor The {@link JavaEditor} to update its outline.
     */
    private static void updateOutline(final JavaEditor javaEditor) {
+      javaEditor.getDocumentProvider().addElementStateListener(new IElementStateListener() {
+         
+         @Override
+         public void elementMoved(Object originalElement, Object movedElement) {
+         }
+         
+         @Override
+         public void elementDirtyStateChanged(Object element, boolean isDirty) {
+            //gets called on save and initial changes
+            try {
+               IContentOutlinePage outline = (IContentOutlinePage)javaEditor.getAdapter(IContentOutlinePage.class);
+               updateOutline(outline);
+            }
+            catch (Exception e) {
+               LogUtil.getLogger().logError(e);
+            }
+            
+         }
+         
+         @Override
+         public void elementDeleted(Object element) {
+         }
+         
+         @Override
+         public void elementContentReplaced(Object element) {
+         }
+         
+         @Override
+         public void elementContentAboutToBeReplaced(Object element) {
+         }
+      });
+      
       javaEditor.getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
          @Override
          public void run() {
@@ -354,8 +389,9 @@ public final class JavaEditorManager {
    private static void updateOutline(IPage outlinePage) throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
       if (outlinePage instanceof JavaOutlinePage) {
          JavaOutlinePage joutline = (JavaOutlinePage) outlinePage;
-         TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
+         final TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
          ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
+         outlineViewer.setLabelProvider(new OutlineLableWrapper(new JavaUILabelProvider())); //Set new LableProvider to an extended one with overwritten getImage method
          if (contentProvider instanceof OutlineContentProviderWrapper) {
             if (!PreferenceUtil.isExtensionsEnabled()) { // Restore input if required
                outlineViewer.setContentProvider(((OutlineContentProviderWrapper) contentProvider).getOriginalProvider());
