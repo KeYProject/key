@@ -177,11 +177,11 @@ lexer grammar KeYLexer;
 
       }
       newText.append(modName+"\n");
-      Debug.out("Modality name :", modName);
+      //Debug.out("Modality name :", modName);
       last = s.lastIndexOf(modalityEnd);
       newText.append(s.substring(index,last));
       setText(newText.toString());
-      Debug.out("Lexer: recognised Java block string: ", getText());
+      //Debug.out("Lexer: recognised Java block string: ", getText());
    }
 
 }
