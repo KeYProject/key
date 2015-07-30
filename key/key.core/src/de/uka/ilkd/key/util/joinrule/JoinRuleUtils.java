@@ -47,6 +47,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.VariableNamer.Globals;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -1115,7 +1116,7 @@ public class JoinRuleUtils {
         // Note: We may not rename variables in the program counter that also
         // occur in the post condition. Otherwise, we may render the goal
         // unprovable.
-
+        
         LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
                 node, getLocationVariables(postCondition, services));
 
@@ -1123,7 +1124,6 @@ public class JoinRuleUtils {
         // branch-unique versions
         Term progCntAndPostCond = null;
         if (programCounter != null) {
-
             ProgVarReplaceVisitor replVisitor = new ProgVarReplaceVisitor(
                     programCounter, replMap, services);
             replVisitor.start();
@@ -1140,8 +1140,7 @@ public class JoinRuleUtils {
         ImmutableList<Term> newElementaries = ImmutableSLList.nil();
 
         if (updateTerm != null) {
-            LinkedList<Term> elementaries = getElementaryUpdates(selected
-                    .sub(0));
+            LinkedList<Term> elementaries = getElementaryUpdates(updateTerm);
             for (Term elementary : elementaries) {
                 ElementaryUpdate upd = (ElementaryUpdate) elementary.op();
                 LocationVariable lhs = (LocationVariable) upd.lhs();
