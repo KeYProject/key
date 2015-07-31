@@ -61,6 +61,7 @@ import de.uka.ilkd.key.rule.join.procedures.JoinWithSignLattice;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.joinrule.ProgramVariablesMatchVisitor;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
 
@@ -111,9 +112,11 @@ public class JoinRule implements BuiltInRule {
      * earlier.
      */
     private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
-    
-    /** Time threshold in milliseconds for the automatic simplification of
-     *  formulae (side proofs are stopped after that amount of time). */
+
+    /**
+     * Time threshold in milliseconds for the automatic simplification of
+     * formulae (side proofs are stopped after that amount of time).
+     */
     private static final int SIMPLIFICATION_TIMEOUT_MS = 2000;
 
     /**
@@ -141,7 +144,7 @@ public class JoinRule implements BuiltInRule {
     @Override
     public final ImmutableList<Goal> apply(Goal goal, final Services services,
             RuleApp ruleApp) throws RuleAbortException {
-        
+
         final JoinRuleBuiltInRuleApp joinRuleApp = (JoinRuleBuiltInRuleApp) ruleApp;
 
         if (!joinRuleApp.complete()) {
@@ -177,13 +180,13 @@ public class JoinRule implements BuiltInRule {
         }
 
         Term resultPathCondition = joinedState.second;
-        
+
         // NOTE (DS): The following simplification has been commented
         // out since it was usually not successful and consumed an
         // inadequate amount of time.
-//        final Term previousResultPathCondition = resultPathCondition;
-//        resultPathCondition = trySimplify(services.getProof(),
-//                resultPathCondition, true);
+        // final Term previousResultPathCondition = resultPathCondition;
+        // resultPathCondition = trySimplify(services.getProof(),
+        // resultPathCondition, true);
 
         // Delete previous sequents
         clearSemisequent(newGoal, true);
@@ -264,7 +267,8 @@ public class JoinRule implements BuiltInRule {
 
         // Construct path condition as (optimized) disjunction
         Term newPathCondition = createSimplifiedDisjunctivePathCondition(
-                state1.second, state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
+                state1.second, state2.second, services,
+                SIMPLIFICATION_TIMEOUT_MS);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
 
@@ -311,7 +315,8 @@ public class JoinRule implements BuiltInRule {
                 Term toProve = tb.and(tb.imp(appl1, appl2),
                         tb.imp(appl2, appl1));
 
-                proofClosed = isProvableWithSplitting(toProve, services, SIMPLIFICATION_TIMEOUT_MS);
+                proofClosed = isProvableWithSplitting(toProve, services,
+                        SIMPLIFICATION_TIMEOUT_MS);
 
             }
 
@@ -673,19 +678,17 @@ public class JoinRule implements BuiltInRule {
                                 g.node(), gPio, services);
 
                         // NOTE: The equality check for the Java blocks can be
-                        // problematic,
-                        // since KeY instantiates declared program variables
-                        // with different
-                        // identifiers; e.g. {int x = 10; if (x...)} could get
+                        // problematic, since KeY instantiates declared program
+                        // variables with different identifiers; e.g.
+                        // {int x = 10; if (x...)} could get
                         // {x_1 = 10; if (x_1...)}
                         // in one and {x_2 = 10; if (x_2...)} in the other
-                        // branch. This cannot
-                        // be circumvented with equalsModRenaming, since at this
-                        // point, the
-                        // PVs are already declared. We therefore check equality
-                        // modulo
-                        // switching to branch-unique (and not globally unique)
-                        // names.
+                        // branch. This cannot be circumvented with
+                        // equalsModRenaming, since at this point, the PVs are
+                        // already declared. We therefore check equality
+                        // modulo switching to branch-unique (and not globally
+                        // unique) names.
+                        //TODO: Update this comment above
 
                         JavaProgramElement ownProgramElem = ownSEState.third
                                 .javaBlock().program();
@@ -697,17 +700,18 @@ public class JoinRule implements BuiltInRule {
                         Term partnerPostCond = partnerSEState.third.op() instanceof Modality ? partnerSEState.third
                                 .sub(0) : partnerSEState.third;
 
+                        ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
+                                ownProgramElem, partnerProgramElem, services);
+                        matchVisitor.start();
+
                         // Requirement: Same post condition, matching program
-                        // parts
+                        // parts.
                         // NOTE: If we have a modality in the post condition,
-                        // the equality
-                        // of post conditions may be too strict, so some legal
-                        // cases will
-                        // be excluded from the join partners list.
+                        // the equality of post conditions may be too strict,
+                        // so some legal cases will be excluded from the join
+                        // partners list.
                         if (ownPostCond.equals(partnerPostCond)
-                                && equalsModBranchUniqueRenaming(
-                                        ownProgramElem, partnerProgramElem,
-                                        goal.node(), services)) {
+                                && !matchVisitor.isIncompatible()) {
 
                             potentialPartners = potentialPartners
                                     .prepend(new Pair<Goal, PosInOccurrence>(g,

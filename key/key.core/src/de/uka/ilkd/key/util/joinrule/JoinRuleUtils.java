@@ -47,7 +47,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.VariableNamer.Globals;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -1074,8 +1073,6 @@ public class JoinRuleUtils {
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(
             Node node, PosInOccurrence pio, Services services) {
 
-        TermBuilder tb = services.getTermBuilder();
-
         ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent()
                 .asList());
@@ -1090,71 +1087,15 @@ public class JoinRuleUtils {
         }
 
         Term updateTerm = null;
-        ProgramElement programCounter = null;
-        Term postCondition = null;
-        Modality modality = null;
-
-        Term termAfterUpdate = null;
+        Term programCounter = null;
 
         if (selected.op() instanceof UpdateApplication) {
             updateTerm = selected.sub(0);
-            termAfterUpdate = selected.sub(1);
-        }
-        else {
-            termAfterUpdate = selected;
         }
 
-        if (termAfterUpdate.op() instanceof Modality) {
-            programCounter = termAfterUpdate.javaBlock().program();
-            postCondition = termAfterUpdate.sub(0);
-            modality = (Modality) termAfterUpdate.op();
-        }
-        else {
-            postCondition = termAfterUpdate;
-        }
-
-        // Note: We may not rename variables in the program counter that also
-        // occur in the post condition. Otherwise, we may render the goal
-        // unprovable.
-        
-        LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
-                node, getLocationVariables(postCondition, services));
-
-        // Replace location variables in program counter by their
-        // branch-unique versions
-        Term progCntAndPostCond = null;
-        if (programCounter != null) {
-            ProgVarReplaceVisitor replVisitor = new ProgVarReplaceVisitor(
-                    programCounter, replMap, services);
-            replVisitor.start();
-            programCounter = replVisitor.result();
-            progCntAndPostCond = services.getTermBuilder().prog(modality,
-                    JavaBlock.createJavaBlock((StatementBlock) programCounter),
-                    postCondition);
-        }
-        else {
-            progCntAndPostCond = postCondition;
-        }
-
-        // Replace location variables in update by branch-unique versions
-        ImmutableList<Term> newElementaries = ImmutableSLList.nil();
-
-        if (updateTerm != null) {
-            LinkedList<Term> elementaries = getElementaryUpdates(updateTerm);
-            for (Term elementary : elementaries) {
-                ElementaryUpdate upd = (ElementaryUpdate) elementary.op();
-                LocationVariable lhs = (LocationVariable) upd.lhs();
-
-                newElementaries = newElementaries.prepend(tb.elementary(
-                        (LocationVariable) (replMap.get(lhs)),
-                        elementary.sub(0)));
-            }
-        }
-
-        return new SymbolicExecutionStateWithProgCnt(
-                tb.parallel(newElementaries), // Update
+        return new SymbolicExecutionStateWithProgCnt(updateTerm, // Update
                 joinListToAndTerm(pathConditionSet, services), // Path Condition
-                progCntAndPostCond, // Program Counter and Post Condition
+                programCounter, // Program Counter and Post Condition
                 node); // CorrespondingNode
     }
 
