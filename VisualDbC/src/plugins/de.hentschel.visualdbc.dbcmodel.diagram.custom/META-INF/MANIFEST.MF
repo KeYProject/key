@@ -11,6 +11,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.gmf.runtime.diagram.ui.providers;bundle-version="1.4.0",
  de.hentschel.visualdbc.dbcmodel.diagram;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Martin Hentschel
 Export-Package: de.hentschel.visualdbc.dbcmodel.diagram.custom.util

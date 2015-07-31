@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  de.hentschel.visualdbc.dbcmodel;bundle-version="1.0.0",
  de.hentschel.visualdbc.dataSource.key;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Martin Hentschel
 Export-Package: de.hentschel.visualdbc.example.action,
  de.hentschel.visualdbc.example.util,
