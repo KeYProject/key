@@ -8,6 +8,7 @@ import java.util.HashMap;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils.Option;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils.Option.None;
@@ -76,6 +77,19 @@ public class ProgramVariablesMatchVisitor extends SimultaneousJavaASTVisitor {
         else {
             matches.put(x1, x2);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.uka.ilkd.key.util.joinrule.SimultaneousJavaASTVisitor#visit(de.uka
+     * .ilkd.key.logic.op.ProgramVariable,
+     * de.uka.ilkd.key.logic.op.ProgramVariable)
+     */
+    @Override
+    public void visit(LocationVariable x1, LocationVariable x2) {
+        visit((ProgramVariable) x1, (ProgramVariable) x2);
     }
 
 }

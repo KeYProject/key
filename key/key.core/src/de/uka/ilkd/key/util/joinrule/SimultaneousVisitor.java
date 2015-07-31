@@ -122,7 +122,7 @@ import de.uka.ilkd.key.java.reference.SuperConstructorReference;
 import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.java.statement.Assert;
 import de.uka.ilkd.key.java.statement.Break;
@@ -154,10 +154,10 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
@@ -404,7 +404,7 @@ public interface SimultaneousVisitor {
 
     public void visit(ProgramTransformer x1, ProgramTransformer x2);
 
-    public void visit(IProgramMethod x1, IProgramMethod x2);
+    public void visit(ProgramMethod x1, ProgramMethod x2);
 
     public void visit(ProgramVariable x1, ProgramVariable x2);
 
@@ -456,7 +456,7 @@ public interface SimultaneousVisitor {
 
     public void visit(TypeCast x1, TypeCast x2);
 
-    public void visit(TypeReference x1, TypeReference x2);
+    public void visit(TypeRef x1, TypeRef x2);
 
     public void visit(UnsignedShiftRight x1, UnsignedShiftRight x2);
 

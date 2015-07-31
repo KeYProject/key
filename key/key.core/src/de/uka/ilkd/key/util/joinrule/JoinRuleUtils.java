@@ -1091,6 +1091,7 @@ public class JoinRuleUtils {
 
         if (selected.op() instanceof UpdateApplication) {
             updateTerm = selected.sub(0);
+            programCounter = selected.sub(1);
         }
 
         return new SymbolicExecutionStateWithProgCnt(updateTerm, // Update
