@@ -95,7 +95,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String executedTitle = "Which statement(s) can be executed starting at find(int[], int)?";
+      String executedTitle = createExecutedQuestion("find(int[], int)");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -152,7 +152,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("computeInsuranceRate(int)");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -244,7 +244,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("median(int[], int, int)");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -310,7 +310,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("middle(int, int, int)");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -391,7 +391,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("ObservableArray(Object[])");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -443,7 +443,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("set(int, Object)");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -493,7 +493,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("setArrayListeners(ArrayListener[])");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -639,7 +639,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("Stack(int)");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -689,7 +689,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("Stack(Stack)");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -740,7 +740,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("push(Object)");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -804,7 +804,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                           new Choice("An object might be returned", "ObjectReturned", true),
                                                           new Choice("Element at index size is returned", "ElementAtSizeReturned"),
                                                           new Choice("Element at index size - 1 is returned", "ElementAtSizePlusOneReturned", true));
-      String executedTitle = "Which statement(s) can be executed?";
+      String executedTitle = createExecutedQuestion("pop()");
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -954,5 +954,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 
    protected String createQuestionPageMessage() {
       return "Please answer the questions to the best of your knowledge.";
+   }
+   
+   protected String createExecutedQuestion(String startMethod) {
+      return "Which statement(s) can be executed starting at " + startMethod + "?";
    }
 }
