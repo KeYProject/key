@@ -31,6 +31,7 @@ import org.key_project.removegenerics.ui.util.LogUtil;
 import org.key_project.removegenerics.ui.wizard.page.RemoveGenericsPreviewWizardPage;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.util.removegenerics.PreviewGenericRemover;
@@ -99,8 +100,11 @@ public class RemoveGenericsWizard extends Wizard {
                catch (OperationCanceledException e) {
                   throw new InterruptedException("Remove Generics Cancelled");
                }
+               catch (InvocationTargetException e) {
+                  throw e;
+               }
                catch (Exception e) {
-                  throw new InvocationTargetException(e);
+                  throw new InvocationTargetException(e, e.getMessage());
                }
             }
          });
@@ -118,58 +122,67 @@ public class RemoveGenericsWizard extends Wizard {
    /**
     * Removes the generics (preview only)
     * @param monitor The {@link IProgressMonitor} to use.
-    * @throws Exception Occurred Exception.
+    * @throws InvocationTargetException Occurred Exception.
     */
-   protected void removeGeneris(final IProgressMonitor monitor) throws Exception {
+   protected void removeGeneris(final IProgressMonitor monitor) throws InvocationTargetException {
       // Create remover
       SWTUtil.checkCanceled(monitor);
       final WrapperGenericRemoverMonitor removerMonitor = new WrapperGenericRemoverMonitor(monitor);
       final PreviewGenericRemover remover = new PreviewGenericRemover(removerMonitor);
-      final Map<File, IFile> fileToResourceMap = new HashMap<File, IFile>();
-      // List libraries
-      SWTUtil.checkCanceled(monitor);
-      Set<IProject> alreadyHandledProjects = new HashSet<IProject>();
-      IClasspathEntry[] entries = javaProject.getRawClasspath();
-      monitor.beginTask("Listing libraries", entries.length);
-      for (IClasspathEntry entry : entries) {
+      try {
+         final Map<File, IFile> fileToResourceMap = new HashMap<File, IFile>();
+         // List libraries
          SWTUtil.checkCanceled(monitor);
-         List<File> locations = JDTUtil.getLocationFor(javaProject, entry, IPackageFragmentRoot.K_BINARY, alreadyHandledProjects);
-         for (File location : locations) {
-            remover.addSearchPath(location.getAbsolutePath());
-         }
-         monitor.worked(1);
-      }
-      monitor.done();
-      // List source files
-      SWTUtil.checkCanceled(monitor);
-      monitor.beginTask("Listing source files", IProgressMonitor.UNKNOWN);
-      source.accept(new IResourceVisitor() {
-         @Override
-         public boolean visit(IResource resource) throws CoreException {
+         Set<IProject> alreadyHandledProjects = new HashSet<IProject>();
+         IClasspathEntry[] entries = javaProject.getRawClasspath();
+         monitor.beginTask("Listing libraries", entries.length);
+         for (IClasspathEntry entry : entries) {
             SWTUtil.checkCanceled(monitor);
-            if (JDTUtil.isJavaFile(resource)) {
-               File localFile = ResourceUtil.getLocation(resource);
-               remover.addSourceFile(localFile.getAbsolutePath());
-               fileToResourceMap.put(localFile, (IFile) resource);
+            List<File> locations = JDTUtil.getLocationFor(javaProject, entry, IPackageFragmentRoot.K_BINARY, alreadyHandledProjects);
+            for (File location : locations) {
+               remover.addSearchPath(location.getAbsolutePath());
             }
             monitor.worked(1);
-            return true;
          }
-      });
-      // Remove generics and store result in a temporary directory.
-      remover.removeGenerics();
-      // Map new content back to resources
-      monitor.beginTask("Assigning new content to resources", remover.getResultMap().size());
-      Map<IFile, String> contentMap = new HashMap<IFile, String>();
-      for (Entry<File, String> entry: remover.getResultMap().entrySet()) {
+         monitor.done();
+         // List source files
          SWTUtil.checkCanceled(monitor);
-         IFile resource = fileToResourceMap.get(entry.getKey());
-         assert resource != null;
-         contentMap.put(resource, entry.getValue());
-         monitor.worked(1);
+         monitor.beginTask("Listing source files", IProgressMonitor.UNKNOWN);
+         source.accept(new IResourceVisitor() {
+            @Override
+            public boolean visit(IResource resource) throws CoreException {
+               SWTUtil.checkCanceled(monitor);
+               if (JDTUtil.isJavaFile(resource)) {
+                  File localFile = ResourceUtil.getLocation(resource);
+                  remover.addSourceFile(localFile.getAbsolutePath());
+                  fileToResourceMap.put(localFile, (IFile) resource);
+               }
+               monitor.worked(1);
+               return true;
+            }
+         });
+         // Remove generics and store result in a temporary directory.
+         remover.removeGenerics();
+         // Map new content back to resources
+         monitor.beginTask("Assigning new content to resources", remover.getResultMap().size());
+         Map<IFile, String> contentMap = new HashMap<IFile, String>();
+         for (Entry<File, String> entry: remover.getResultMap().entrySet()) {
+            SWTUtil.checkCanceled(monitor);
+            IFile resource = fileToResourceMap.get(entry.getKey());
+            assert resource != null;
+            contentMap.put(resource, entry.getValue());
+            monitor.worked(1);
+         }
+         previewPage.setContentMap(contentMap);
+         monitor.done();
       }
-      previewPage.setContentMap(contentMap);
-      monitor.done();
+      catch (Exception e) {
+         throw new InvocationTargetException(e, "Remove generics failed: " + e.getMessage() + ".\n" + 
+                                                "\nUsed search path:\n" +
+                                                remover.getSearchPath() + 
+                                                "\n\nUsed source path:\n" +
+                                                CollectionUtil.toString(remover.getSourceFiles(), File.pathSeparator));
+      }
    }
 
    /**
