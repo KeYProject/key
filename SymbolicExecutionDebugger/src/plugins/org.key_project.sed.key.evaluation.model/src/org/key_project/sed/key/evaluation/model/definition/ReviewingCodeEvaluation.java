@@ -231,6 +231,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Average is computed wrongly", "WrongAverage"), 
                                                              new Choice("array is modified during compuation", "ArrayModified"), 
                                                              new Choice("array is not modified during compuation", "ArrayNotModified"), 
+                                                             new Choice("Exception is thrown instead of returning average", "ExceptionThrown"), 
+                                                             new Choice("Value is returned instead of thrown exception", "ValueReturned"), 
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
@@ -251,10 +253,16 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 21: int middle = (start + end) / 2", "Line 21", true),
-                                                               new Choice("Line 22:  if ((start + end) % 2 == 0)", "Line 22", true),
-                                                               new Choice("Line 23: return array[middle]", "Line 23", true),
-                                                               new Choice("Line 26: return (array[middle] + array[middle + 1]) / 2", "Line 26", true));
+                                                               new Choice("Line 22: if (array == null)", "Line 22", true),
+                                                               new Choice("Line 23: throw new IllegalArgumentException(\"Array is null.\")", "Line 23", true),
+                                                               new Choice("Line 25: if (start < 0 || start >= array.length)", "Line 25", true),
+                                                               new Choice("Line 26: throw new IllegalArgumentException(\"Start is not a valid array index.\")", "Line 26", true),
+                                                               new Choice("Line 28: if (end < 0 || end >= array.length)", "Line 28", true),
+                                                               new Choice("Line 29: throw new IllegalArgumentException(\"Start is not a valid array index.\")", "Line 29", true),
+                                                               new Choice("Line 32: int middle = (start + end) / 2", "Line 32", true),
+                                                               new Choice("Line 33:  if ((start + end) % 2 == 0)", "Line 33", true),
+                                                               new Choice("Line 34: return array[middle]", "Line 34", true),
+                                                               new Choice("Line 37: return (array[middle] + array[middle + 1]) / 2", "Line 37", true));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 

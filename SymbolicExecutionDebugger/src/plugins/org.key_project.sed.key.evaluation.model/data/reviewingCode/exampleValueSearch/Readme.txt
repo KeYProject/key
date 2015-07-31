@@ -1,0 +1,1 @@
+Inspired by Book test case generation example from Mauro Baluda.

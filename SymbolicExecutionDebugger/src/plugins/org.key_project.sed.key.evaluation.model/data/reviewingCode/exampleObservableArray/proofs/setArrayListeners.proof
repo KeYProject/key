@@ -1,0 +1,234 @@
+\profile "Java Profile for Symbolic Execution";
+
+\settings {
+"#Proof-Settings-Config-File
+#Fri Jul 31 14:29:54 CEST 2015
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , joinGenerateIsWeakeningGoal-joinGenerateIsWeakeningGoal\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=Symbolic Execution Strategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\bootclasspath "../stubs";
+
+\javaSource "";
+
+\proofObligation "#Proof Obligation Settings
+#Fri Jul 31 14:29:54 CEST 2015
+name=setArrayListeners(ArrayListener[])
+addSymbolicExecutionLabel=true
+addUninterpretedPredicate=true
+class=de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO
+precondition=\\\\invariant_for(this) &&\\r\\narrayListeners \\!\\= null \\=\\=> (\\\\forall int i; i >\\= 0 && i < arrayListeners.length; \\\\invariant_for(arrayListeners[i]))
+method=ObservableArray\\#setArrayListeners(ArrayListener[])
+";
+
+\proof {
+(keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "81696825")
+
+(branch "dummy ID"
+(builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,SETAccumulate"))
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "inEqSimp_ltToLeq" (formula "5") (term "1,0,0,1"))
+(rule "polySimp_mulComm0" (formula "5") (term "1,0,0,1,0,0,1"))
+(rule "inEqSimp_sepPosMonomial0" (formula "5") (term "1,0,0,1"))
+(rule "polySimp_mulComm0" (formula "5") (term "1,1,0,0,1"))
+(rule "polySimp_rightDist" (formula "5") (term "1,1,0,0,1"))
+(rule "polySimp_mulLiterals" (formula "5") (term "1,1,1,0,0,1"))
+(rule "mul_literals" (formula "5") (term "0,1,1,0,0,1"))
+(rule "polySimp_elimOne" (formula "5") (term "1,1,1,0,0,1"))
+(rule "nnf_imp2or" (formula "5") (term "0,1"))
+(rule "nnf_notAnd" (formula "5") (term "0,0,1"))
+(rule "inEqSimp_notLeq" (formula "5") (term "1,0,0,1"))
+(rule "polySimp_rightDist" (formula "5") (term "1,0,0,1,0,0,1"))
+(rule "mul_literals" (formula "5") (term "0,1,0,0,1,0,0,1"))
+(rule "polySimp_addAssoc" (formula "5") (term "0,0,1,0,0,1"))
+(rule "add_literals" (formula "5") (term "0,0,0,1,0,0,1"))
+(rule "add_zero_left" (formula "5") (term "0,0,1,0,0,1"))
+(rule "inEqSimp_sepPosMonomial1" (formula "5") (term "1,0,0,1"))
+(rule "polySimp_mulLiterals" (formula "5") (term "1,1,0,0,1"))
+(rule "polySimp_elimOne" (formula "5") (term "1,1,0,0,1"))
+(rule "inEqSimp_notGeq" (formula "5") (term "0,0,0,1"))
+(rule "times_zero_1" (formula "5") (term "1,0,0,0,0,0,1"))
+(rule "add_zero_right" (formula "5") (term "0,0,0,0,0,1"))
+(rule "inEqSimp_sepPosMonomial0" (formula "5") (term "0,0,0,1"))
+(rule "mul_literals" (formula "5") (term "1,0,0,0,1"))
+(rule "Class_invariant_axiom_for_ObservableArray" (formula "5") (term "0,0") (inst "sk=sk_0") (ifseqformula "3"))
+(branch "Use Axiom"
+   (rule "nonNull" (formula "5") (term "0,0") (inst "i=i"))
+   (rule "greater_literals" (formula "5") (term "0,1,0,0"))
+   (builtin "One Step Simplification" (formula "5"))
+   (rule "sub_literals" (formula "5") (term "2,1,0,1,0,0"))
+   (builtin "One Step Simplification" (formula "5"))
+   (rule "inEqSimp_ltToLeq" (formula "5") (term "1,0,0,1,0,0"))
+   (rule "polySimp_mulComm0" (formula "5") (term "1,0,0,1,0,0,1,0,0"))
+   (rule "inEqSimp_commuteLeq" (formula "5") (term "0,0,0,1,0,0"))
+   (rule "inEqSimp_sepPosMonomial0" (formula "5") (term "1,0,0,1,0,0"))
+   (rule "polySimp_mulComm0" (formula "5") (term "1,1,0,0,1,0,0"))
+   (rule "polySimp_rightDist" (formula "5") (term "1,1,0,0,1,0,0"))
+   (rule "mul_literals" (formula "5") (term "0,1,1,0,0,1,0,0"))
+   (rule "polySimp_mulLiterals" (formula "5") (term "1,1,1,0,0,1,0,0"))
+   (rule "polySimp_elimOne" (formula "5") (term "1,1,1,0,0,1,0,0"))
+   (rule "nnf_imp2or" (formula "5") (term "0,1,0,0"))
+   (rule "nnf_notAnd" (formula "5") (term "0,0,1,0,0"))
+   (rule "inEqSimp_notGeq" (formula "5") (term "0,0,0,1,0,0"))
+   (rule "times_zero_1" (formula "5") (term "1,0,0,0,0,0,1,0,0"))
+   (rule "add_zero_right" (formula "5") (term "0,0,0,0,0,1,0,0"))
+   (rule "inEqSimp_sepPosMonomial0" (formula "5") (term "0,0,0,1,0,0"))
+   (rule "mul_literals" (formula "5") (term "1,0,0,0,1,0,0"))
+   (rule "inEqSimp_notLeq" (formula "5") (term "1,0,0,1,0,0"))
+   (rule "polySimp_rightDist" (formula "5") (term "1,0,0,1,0,0,1,0,0"))
+   (rule "mul_literals" (formula "5") (term "0,1,0,0,1,0,0,1,0,0"))
+   (rule "polySimp_addAssoc" (formula "5") (term "0,0,1,0,0,1,0,0"))
+   (rule "add_literals" (formula "5") (term "0,0,0,1,0,0,1,0,0"))
+   (rule "add_zero_left" (formula "5") (term "0,0,1,0,0,1,0,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "5") (term "1,0,0,1,0,0"))
+   (rule "polySimp_mulLiterals" (formula "5") (term "1,1,0,0,1,0,0"))
+   (rule "polySimp_elimOne" (formula "5") (term "1,1,0,0,1,0,0"))
+   (rule "commute_or_2" (formula "5") (term "0,1"))
+   (rule "commute_or" (formula "5") (term "0,0,1"))
+   (rule "arrayLengthNotNegative" (formula "5") (term "1,1,0,0,1,0,0"))
+   (rule "arrayLengthIsAnInt" (formula "6") (term "1,1,0,0,1,0,0"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "true_left" (formula "6"))
+   (rule "arrayLengthNotNegative" (formula "6") (term "1,1,0,1"))
+   (rule "arrayLengthIsAnInt" (formula "7") (term "1,1,0,1"))
+   (builtin "One Step Simplification" (formula "7"))
+   (rule "true_left" (formula "7"))
+   (rule "onlyCreatedObjectsAreReferenced" (formula "7") (term "0,1,1,0,0,1,0,0") (ifseqformula "1"))
+   (rule "assignment" (formula "10"))
+   (rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_setArrayListeners,savedHeapBefore_setArrayListeners"))
+   (builtin "One Step Simplification" (formula "10"))
+   (rule "assignment_write_attribute_this" (formula "10") (term "1"))
+   (builtin "One Step Simplification" (formula "10"))
+   (rule "methodCallEmpty" (formula "10") (term "1"))
+   (rule "tryEmpty" (formula "10") (term "1"))
+   (rule "emptyModality" (formula "10") (term "1"))
+   (builtin "One Step Simplification" (formula "10"))
+   (rule "cut_direct" (formula "7") (term "0"))
+   (branch "CUT: self.array = null TRUE"
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "true_left" (formula "8"))
+      (rule "replace_known_left" (formula "8") (term "0,0,0,0") (ifseqformula "7"))
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "true_left" (formula "8"))
+      (rule "applyEq" (formula "5") (term "0,0") (ifseqformula "7"))
+      (rule "cut_direct" (formula "4") (term "0"))
+      (branch "CUT: arrayListeners = null TRUE"
+         (builtin "One Step Simplification" (formula "5"))
+         (rule "true_left" (formula "5"))
+         (rule "applyEq" (formula "9") (term "3,0") (ifseqformula "4"))
+         (rule "applyEq" (formula "6") (term "0,0") (ifseqformula "4"))
+         (rule "applyEq" (formula "8") (term "2") (ifseqformula "4"))
+         (rule "arrayLengthNotNegative" (formula "5") (term "0"))
+         (rule "arrayLengthIsAnInt" (formula "5") (term "0"))
+         (builtin "One Step Simplification" (formula "5"))
+         (rule "true_left" (formula "5"))
+         (opengoal " ")
+      )
+      (branch "CUT: arrayListeners = null FALSE"
+         (builtin "One Step Simplification" (formula "4"))
+         (rule "arrayLengthNotNegative" (formula "5") (term "0"))
+         (rule "arrayLengthIsAnInt" (formula "5") (term "0"))
+         (builtin "One Step Simplification" (formula "5"))
+         (rule "true_left" (formula "5"))
+         (opengoal " ")
+      )
+   )
+   (branch "CUT: self.array = null FALSE"
+      (builtin "One Step Simplification" (formula "7"))
+      (rule "replace_known_right" (formula "8") (term "0,0,0,0") (ifseqformula "9"))
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "cut_direct" (formula "4") (term "0"))
+      (branch "CUT: arrayListeners = null TRUE"
+         (builtin "One Step Simplification" (formula "5"))
+         (rule "true_left" (formula "5"))
+         (rule "replace_known_left" (formula "8") (term "0,1,0") (ifseqformula "4"))
+         (builtin "One Step Simplification" (formula "8"))
+         (rule "true_left" (formula "8"))
+         (rule "applyEq" (formula "10") (term "2") (ifseqformula "4"))
+         (rule "applyEq" (formula "6") (term "0,0") (ifseqformula "4"))
+         (rule "applyEq" (formula "10") (term "3,0") (ifseqformula "4"))
+         (rule "arrayLengthIsAnInt" (formula "6") (term "0"))
+         (builtin "One Step Simplification" (formula "6"))
+         (rule "true_left" (formula "6"))
+         (rule "arrayLengthNotNegative" (formula "6") (term "0"))
+         (opengoal " ")
+      )
+      (branch "CUT: arrayListeners = null FALSE"
+         (builtin "One Step Simplification" (formula "4"))
+         (rule "replace_known_right" (formula "8") (term "0,1,0") (ifseqformula "9"))
+         (builtin "One Step Simplification" (formula "8"))
+         (rule "impLeft" (formula "8"))
+         (branch
+            (rule "allRight" (formula "8") (inst "sk=i_0"))
+            (rule "orRight" (formula "8"))
+            (rule "orRight" (formula "8"))
+            (rule "notRight" (formula "10"))
+            (rule "inEqSimp_geqRight" (formula "10"))
+            (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+            (rule "polySimp_addComm1" (formula "1") (term "0"))
+            (rule "inEqSimp_leqRight" (formula "10"))
+            (rule "mul_literals" (formula "1") (term "1,0,0"))
+            (rule "add_literals" (formula "1") (term "0,0"))
+            (rule "add_zero_left" (formula "1") (term "0"))
+            (rule "inEqSimp_sepNegMonomial0" (formula "2"))
+            (rule "polySimp_mulLiterals" (formula "2") (term "0"))
+            (rule "polySimp_elimOne" (formula "2") (term "0"))
+            (rule "onlyCreatedObjectsAreReferenced" (formula "3") (term "0") (ifseqformula "4"))
+            (rule "replace_known_left" (formula "3") (term "0") (ifseqformula "4"))
+            (builtin "One Step Simplification" (formula "3"))
+            (rule "true_left" (formula "3"))
+            (opengoal " ")
+         )
+         (branch
+            (opengoal " ")
+         )
+      )
+   )
+)
+(branch "Show Axiom Satisfiability"
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "closeTrue" (formula "6"))
+)
+)
+
+}
