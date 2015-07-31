@@ -122,9 +122,9 @@ public class RemoveGenericsWizard extends Wizard {
    /**
     * Removes the generics (preview only)
     * @param monitor The {@link IProgressMonitor} to use.
-    * @throws InvocationTargetException Occurred Exception.
+    * @throws Exception Occurred Exception.
     */
-   protected void removeGeneris(final IProgressMonitor monitor) throws InvocationTargetException {
+   protected void removeGeneris(final IProgressMonitor monitor) throws Exception {
       // Create remover
       SWTUtil.checkCanceled(monitor);
       final WrapperGenericRemoverMonitor removerMonitor = new WrapperGenericRemoverMonitor(monitor);
@@ -140,7 +140,8 @@ public class RemoveGenericsWizard extends Wizard {
             SWTUtil.checkCanceled(monitor);
             List<File> locations = JDTUtil.getLocationFor(javaProject, entry, IPackageFragmentRoot.K_BINARY, alreadyHandledProjects);
             for (File location : locations) {
-               remover.addSearchPath(location.getAbsolutePath());
+               String path = location.getAbsolutePath();
+               remover.addSearchPath(path);
             }
             monitor.worked(1);
          }
@@ -174,14 +175,20 @@ public class RemoveGenericsWizard extends Wizard {
             monitor.worked(1);
          }
          previewPage.setContentMap(contentMap);
-         monitor.done();
       }
       catch (Exception e) {
-         throw new InvocationTargetException(e, "Remove generics failed: " + e.getMessage() + ".\n" + 
+         List<String> container = JDTUtil.getJavaContainerDescriptions(javaProject);
+         // Throw a more meaningful exception
+         throw new InvocationTargetException(e, "Unable to remove generics caused by: " + e.getMessage() + ".\n" + 
+                                                "Please ensure that libraries and source code are compatible with Java 7.\n" +
+                                                "Current JRE of project '" + javaProject.getProject().getName() + "' is " + CollectionUtil.toString(container) + ".\n" +
                                                 "\nUsed search path:\n" +
                                                 remover.getSearchPath() + 
                                                 "\n\nUsed source path:\n" +
                                                 CollectionUtil.toString(remover.getSourceFiles(), File.pathSeparator));
+      }
+      finally {
+         monitor.done();
       }
    }
 
