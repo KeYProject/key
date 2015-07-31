@@ -25,7 +25,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
  org.key_project.key4eclipse.common.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.keyide.ui.editor,
  org.key_project.keyide.ui.handlers,

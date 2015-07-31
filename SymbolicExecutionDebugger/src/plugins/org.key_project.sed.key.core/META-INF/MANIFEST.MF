@@ -23,7 +23,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.debug;bundle-version="3.7.1",
  org.eclipse.jdt.debug.ui;bundle-version="3.6.1"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.key.core.breakpoints,
  org.key_project.sed.key.core.launch,

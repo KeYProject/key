@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.hentschel.visualdbc.dbcmodel,
  de.hentschel.visualdbc.dbcmodel.impl,
  de.hentschel.visualdbc.dbcmodel.util
