@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
@@ -51,6 +52,7 @@ import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
@@ -442,7 +444,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
                                 // Consider only the partners below the common
                                 // parent node. Otherwise, we obtain
                                 // behavior that may be hard to understand.
-                                ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = JoinRule
+                                ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                                         .findPotentialJoinPartners(goal,
                                                 joinPio,
                                                 commonParents.get(breakpoint));

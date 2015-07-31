@@ -21,9 +21,8 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils.Option.Some;
  */
 public class ProgramVariablesMatchVisitor extends SimultaneousJavaASTVisitor {
 
-    private HashMap<ProgramVariable, ProgramVariable> matches =
-            new HashMap<ProgramVariable, ProgramVariable>();
-    
+    private HashMap<ProgramVariable, ProgramVariable> matches = new HashMap<ProgramVariable, ProgramVariable>();
+
     /**
      * TODO: Document.
      *
@@ -37,7 +36,8 @@ public class ProgramVariablesMatchVisitor extends SimultaneousJavaASTVisitor {
     }
 
     /**
-     * @return The matched program variables.
+     * @return The matched program variables. Is a Option.Some iff
+     *         isIncompatible evaluates to false.
      */
     public Option<HashMap<ProgramVariable, ProgramVariable>> getMatches() {
         if (isIncompatible()) {
@@ -70,7 +70,7 @@ public class ProgramVariablesMatchVisitor extends SimultaneousJavaASTVisitor {
     @Override
     public void visit(ProgramVariable x1, ProgramVariable x2) {
         super.visit(x1, x2);
-        
+
         if (matches.containsKey(x1) && !matches.get(x1).equals(x2)) {
             setIncompatible();
         }

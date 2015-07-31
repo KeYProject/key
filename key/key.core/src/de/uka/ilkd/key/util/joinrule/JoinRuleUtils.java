@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.Choice;
@@ -52,7 +51,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -1166,6 +1164,8 @@ public class JoinRuleUtils {
     }
 
     /**
+     * TODO (DS): Check if possibly needed in future and remove if not.
+     * 
      * Returns all elementary updates of a parallel update.
      * 
      * @param u
