@@ -1,6 +1,5 @@
 /**
  * This class provides general utility methods dealing with integer numbers.
- * @author Martin Hentschel
  */
 public class IntegerUtil {
    /**
@@ -16,7 +15,7 @@ public class IntegerUtil {
 				return y;
 			}
 			else if (x < z) {
-				return y; // TODO: Needs to be x
+				return y;
 			}
 		}
 		else {

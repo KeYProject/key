@@ -50,6 +50,10 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    protected List<AbstractForm> computeForms() {
       FixedForm evaluationForm = new FixedForm("evaluationForm", 
                                                true, 
+                                               createValueSearchQuestionPage("ValueSearch", "Review of class ValueSearch"),
+                                               createBankUtilQuestionPage("BankUtil", "Review of class BankUtil"),
+                                               createMathUtilQuestionPage("MathUtil", "Review of class MathUtil"),
+                                               createIntegerUtilQuestionPage("IntegerUtil", "Review of class IntegerUtil"),
                                                createObservableArrayQuestionPage("ObservableArrayExample", "Review of cass ObservableArray"),
                                                createStackQuestionPage("StackExample", "Review of class Stack"));
       return CollectionUtil.toList((AbstractForm)evaluationForm);
@@ -58,6 +62,276 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    
    
+   
+
+   
+   private QuestionPage createValueSearchQuestionPage(String pageName, String title) {
+      String description = "find(int[], int) related question.";
+      String methodProblemsTitle = "What is wrong?";
+      CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
+                                                             methodProblemsTitle, 
+                                                             description,
+                                                             true, 
+                                                             null, 
+                                                             createNotUndefinedValueValidator(methodProblemsTitle), 
+                                                             true,
+                                                             new Choice("All array elements are considered during search", "AllConsidered"), 
+                                                             new Choice("Not all array elements are considered during search", "NotAllConsidered"), 
+                                                             new Choice("First matching array element is returned", "FirstFoundReturned"), 
+                                                             new Choice("Not the first matching array element is returned", "NotFirstFoundReturned"), 
+                                                             new Choice("-1 is returned instead of found index", "MinusOneReturned"), 
+                                                             new Choice("Found index is retruned instead of -1", "FoundReturned"), 
+                                                             new Choice("Index of wrong array element might be returned", "WrongIndex", true), 
+                                                             new Choice("array is modified during search", "ArrayModified"), 
+                                                             new Choice("array is not modified during search", "ArrayNotModified"), 
+                                                             createElseWrongChoice(description));
+      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
+                                                                              implementedAsDocumentedTitle, 
+                                                                              description,
+                                                                              true, 
+                                                                              null, 
+                                                                              createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
+                                                                              true,
+                                                                              new Choice("Yes", "Yes"), 
+                                                                              new Choice("No", "No", true, methodProblems));
+      String executedTitle = "Which statement(s) can be executed starting at find(int[], int)?";
+      CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
+                                                               executedTitle, 
+                                                               description,
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
+                                                               new Choice("None of the statements can be executed", "None"),
+                                                               new Choice("Line 20: return new ValueSearch().search(array)", "Line 20", true),
+                                                               new Choice("Line 31: if (index < 0 || index >= array.length)", "Line 31", true),
+                                                               new Choice("Line 32: return false", "Line 32"),
+                                                               new Choice("Line 35: return array[index] == value", "Line 35", true));
+      return new QuestionPage(pageName, 
+                              title, 
+                              createQuestionPageMessage(), 
+                              true,
+                              true,
+                              null,
+                              new LabelQuestion("generalDescription", createGeneralClassDescription("ValueSearch")),
+                              implementedAsDocumented,
+                              createThrownExceptionsQuestion(description, true, false, false, false, false, false),
+                              executedQuestion);
+   }
+
+   
+   
+   
+   
+
+   
+   private QuestionPage createBankUtilQuestionPage(String pageName, String title) {
+      String description = "computeInsuranceRate(int) related question.";
+      String methodProblemsTitle = "What is wrong?";
+      CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
+                                                             methodProblemsTitle, 
+                                                             description,
+                                                             true, 
+                                                             null, 
+                                                             createNotUndefinedValueValidator(methodProblemsTitle), 
+                                                             true,
+                                                             new Choice("Wrong value returned in case age < 18", "WrongLess18", createBankUtilReturnedValue(description, false)), 
+                                                             new Choice("Wrong value returned in case age >= 18 and age < 19", "WrongLess19", createBankUtilReturnedValue(description, false)), 
+                                                             new Choice("Wrong value returned in case age >= 19 and age < 21", "WrongLess21", createBankUtilReturnedValue(description, false)), 
+                                                             new Choice("Wrong value returned in case age >= 21 and age < 35", "WrongLess35", createBankUtilReturnedValue(description, false)), 
+                                                             new Choice("Wrong value returned in case age >= 35", "WrongGreaterOrEqual35", true, createBankUtilReturnedValue(description, true)), 
+                                                             createElseWrongChoice(description));
+      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
+                                                                              implementedAsDocumentedTitle, 
+                                                                              description,
+                                                                              true, 
+                                                                              null, 
+                                                                              createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
+                                                                              true,
+                                                                              new Choice("Yes", "Yes"), 
+                                                                              new Choice("No", "No", true, methodProblems));
+      String executedTitle = "Which statement(s) can be executed?";
+      CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
+                                                               executedTitle, 
+                                                               description,
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
+                                                               new Choice("None of the statements can be executed", "None"),
+                                                               new Choice("Line 18: int[] ageLimits = {18, 19, 21, 35, 65}", "Line 18", true),
+                                                               new Choice("Line 19: long[] insuranceRates = {200, 250, 300, 450, 575}", "Line 19", true),
+                                                               new Choice("Line 20: int ageLevel = 0", "Line 20", true),
+                                                               new Choice("Line 21: long insuranceRate = 570", "Line 21", true),
+                                                               new Choice("Line 22: while (ageLevel < ageLimits.length - 1)", "Line 22", true),
+                                                               new Choice("Line 23: if (age < ageLimits[ageLevel])", "Line 23", true),
+                                                               new Choice("Line 24: return insuranceRates[ageLevel]", "Line 24", true),
+                                                               new Choice("Line 26: ageLevel++", "Line 26", true),
+                                                               new Choice("Line 28: return insuranceRate", "Line 28", true));
+      return new QuestionPage(pageName, 
+                              title, 
+                              createQuestionPageMessage(), 
+                              true,
+                              true,
+                              null,
+                              new LabelQuestion("generalDescription", createGeneralClassDescription("BankUtil")),
+                              implementedAsDocumented,
+                              createThrownExceptionsQuestion(description, false, false, false, false, false, false),
+                              executedQuestion);
+   }
+   
+   private CheckboxQuestion createBankUtilReturnedValue(String description, boolean expectedSelected) {
+      String returnedValueTitle = "Which value is returned?";
+      return new CheckboxQuestion("methodProblems", 
+                                  returnedValueTitle, 
+                                  description,
+                                  true, 
+                                  null, 
+                                  createNotUndefinedValueValidator(returnedValueTitle), 
+                                  true,
+                                  new Choice("-1", "-1"), 
+                                  new Choice("0", "0"), 
+                                  new Choice("18", "18"), 
+                                  new Choice("19", "19"), 
+                                  new Choice("21", "21"), 
+                                  new Choice("35", "35"), 
+                                  new Choice("65", "65"), 
+                                  new Choice("200", "200"), 
+                                  new Choice("250", "250"), 
+                                  new Choice("300", "300"), 
+                                  new Choice("450", "450"), 
+                                  new Choice("570", "570", expectedSelected), 
+                                  new Choice("575", "575"), 
+                                  createElseRetrunedChoice(description));
+
+   }
+
+   
+   
+   
+   
+
+   
+   private QuestionPage createMathUtilQuestionPage(String pageName, String title) {
+      String description = "median(int[], int, int) related question.";
+      String methodProblemsTitle = "What is wrong?";
+      CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
+                                                             methodProblemsTitle, 
+                                                             description,
+                                                             true, 
+                                                             null, 
+                                                             createNotUndefinedValueValidator(methodProblemsTitle), 
+                                                             true,
+                                                             new Choice("The returned value is contained in the array", "ContainedInArray"), 
+                                                             new Choice("The returned value is not contained in the array", "NotContainedInArray"), 
+                                                             new Choice("Middle value returned instead of average", "MiddleInsteadOfAverage"), 
+                                                             new Choice("Average returned instead of middle value", "AverageInsteadOfMiddle"), 
+                                                             new Choice("Average is computed wrongly", "WrongAverage"), 
+                                                             new Choice("array is modified during compuation", "ArrayModified"), 
+                                                             new Choice("array is not modified during compuation", "ArrayNotModified"), 
+                                                             createElseWrongChoice(description));
+      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
+                                                                              implementedAsDocumentedTitle, 
+                                                                              description,
+                                                                              true, 
+                                                                              null, 
+                                                                              createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
+                                                                              true,
+                                                                              new Choice("Yes", "Yes", true), 
+                                                                              new Choice("No", "No", methodProblems));
+      String executedTitle = "Which statement(s) can be executed?";
+      CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
+                                                               executedTitle, 
+                                                               description,
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
+                                                               new Choice("None of the statements can be executed", "None"),
+                                                               new Choice("Line 21: int middle = (start + end) / 2", "Line 21", true),
+                                                               new Choice("Line 22:  if ((start + end) % 2 == 0)", "Line 22", true),
+                                                               new Choice("Line 23: return array[middle]", "Line 23", true),
+                                                               new Choice("Line 26: return (array[middle] + array[middle + 1]) / 2", "Line 26", true));
+      return new QuestionPage(pageName, 
+                              title, 
+                              createQuestionPageMessage(), 
+                              true,
+                              true,
+                              null,
+                              new LabelQuestion("generalDescription", createGeneralClassDescription("MathUtil")),
+                              implementedAsDocumented,
+                              createThrownExceptionsQuestion(description, false, false, false, false, true, false),
+                              executedQuestion);
+   }
+
+   
+   
+   
+   
+
+   
+   private QuestionPage createIntegerUtilQuestionPage(String pageName, String title) {
+      String description = "middle(int, int, int) related question.";
+      String methodProblemsTitle = "What is wrong?";
+      CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
+                                                             methodProblemsTitle, 
+                                                             description,
+                                                             true, 
+                                                             null, 
+                                                             createNotUndefinedValueValidator(methodProblemsTitle), 
+                                                             true,
+                                                             new Choice("The returned value is x, y or z", "XYZReturned"), 
+                                                             new Choice("The returned value is none of x, y and z", "NotXYZReturned"), 
+                                                             new Choice("x returned instead of y", "xInsteadOfy"), 
+                                                             new Choice("x returned instead of z", "xInsteadOfz"), 
+                                                             new Choice("y returned instead of x", "yInsteadOfx", true), 
+                                                             new Choice("y returned instead of z", "yInsteadOfz"), 
+                                                             new Choice("z returned instead of x", "zInsteadOfx"), 
+                                                             new Choice("z returned instead of y", "zInsteadOfy"), 
+                                                             createElseWrongChoice(description));
+      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
+                                                                              implementedAsDocumentedTitle, 
+                                                                              description,
+                                                                              true, 
+                                                                              null, 
+                                                                              createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
+                                                                              true,
+                                                                              new Choice("Yes", "Yes"), 
+                                                                              new Choice("No", "No", true, methodProblems));
+      String executedTitle = "Which statement(s) can be executed?";
+      CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
+                                                               executedTitle, 
+                                                               description,
+                                                               true,
+                                                               null, 
+                                                               new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
+                                                               true,
+                                                               new Choice("None of the statements can be executed", "None"),
+                                                               new Choice("Line 13: if (y < z)", "Line 13", true),
+                                                               new Choice("Line 14: if (x < y)", "Line 14", true),
+                                                               new Choice("Line 15: return y", "Line 15", true),
+                                                               new Choice("Line 17: if (x < z)", "Line 17", true),
+                                                               new Choice("Line 18: return y", "Line 18", true),
+                                                               new Choice("Line 22: if (x > y)", "Line 22", true),
+                                                               new Choice("Line 23: return y", "Line 23", true),
+                                                               new Choice("Line 25: if (x > z)", "Line 25", true),
+                                                               new Choice("Line 26: return x", "Line 26", true),
+                                                               new Choice("Line 29: return z", "Line 29", true));
+      return new QuestionPage(pageName, 
+                              title, 
+                              createQuestionPageMessage(), 
+                              true,
+                              true,
+                              null,
+                              new LabelQuestion("generalDescription", createGeneralClassDescription("IntegerUtil")),
+                              implementedAsDocumented,
+                              createThrownExceptionsQuestion(description, false, false, false, false, false, false),
+                              executedQuestion);
+   }
    
    
    
@@ -543,6 +817,15 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              executedQuestion,
                              createStackLocationQuestion(description, false, true, false),
                              returnValue);
+   }
+
+   private Choice createElseRetrunedChoice(String description) {
+      return new Choice("Something else is returned", "SomethingElse", createElseReturnedSubQuestion(description));
+   }
+
+   private TextQuestion createElseReturnedSubQuestion(String description) {
+      String title = "What is returned?";
+      return new TextQuestion("whatsReturned", title, description, null, new NotUndefinedValueValidator("Question '" + title + "' not answered."), false);
    }
 
    private Choice createElseWrongChoice(String description) {
