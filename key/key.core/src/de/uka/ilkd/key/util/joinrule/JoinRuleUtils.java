@@ -153,6 +153,31 @@ public class JoinRuleUtils {
     }
 
     /**
+     * Returns all elementary updates of a parallel update.
+     * 
+     * @param u
+     *            Parallel update to get elementary updates from.
+     * @return Elementary updates of the supplied parallel update.
+     */
+    public static LinkedList<Term> getElementaryUpdates(Term u) {
+        LinkedList<Term> result = new LinkedList<Term>();
+
+        if (u.op() instanceof ElementaryUpdate) {
+            result.add(u);
+        }
+        else if (u.op() instanceof UpdateJunctor) {
+            for (Term sub : u.subs()) {
+                result.addAll(getElementaryUpdates(sub));
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Expected an update!");
+        }
+
+        return result;
+    }
+
+    /**
      * Returns all program variables in the given term.
      * 
      * @param term
@@ -1161,33 +1186,6 @@ public class JoinRuleUtils {
             return services.getTermBuilder().and(formulae.head().formula(),
                     joinListToAndTerm(formulae.tail(), services));
         }
-    }
-
-    /**
-     * TODO (DS): Check if possibly needed in future and remove if not.
-     * 
-     * Returns all elementary updates of a parallel update.
-     * 
-     * @param u
-     *            Parallel update to get elementary updates from.
-     * @return Elementary updates of the supplied parallel update.
-     */
-    private static LinkedList<Term> getElementaryUpdates(Term u) {
-        LinkedList<Term> result = new LinkedList<Term>();
-
-        if (u.op() instanceof ElementaryUpdate) {
-            result.add(u);
-        }
-        else if (u.op() instanceof UpdateJunctor) {
-            for (Term sub : u.subs()) {
-                result.addAll(getElementaryUpdates(sub));
-            }
-        }
-        else {
-            throw new IllegalArgumentException("Expected an update!");
-        }
-
-        return result;
     }
 
     /**

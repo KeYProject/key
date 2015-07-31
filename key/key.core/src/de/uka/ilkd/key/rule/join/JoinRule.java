@@ -26,6 +26,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -43,6 +44,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -51,6 +53,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
@@ -166,12 +169,48 @@ public class JoinRule implements BuiltInRule {
 
         final SymbolicExecutionStateWithProgCnt thisSEState =
                 joinRuleApp.getJoinSEState();
-        
-        ImmutableList<SymbolicExecutionState> joinPartnerStates = ImmutableSLList.nil();
-        
-        // Unify names in join partner symbolic state
-        for (SymbolicExecutionState joinPartnerState: joinRuleApp.getJoinPartnerStates()) {
-            //TODO!!!
+
+        ImmutableList<SymbolicExecutionState> joinPartnerStates =
+                ImmutableSLList.nil();
+
+        // Unify names in join partner symbolic state and path condition
+        {
+            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> tmpJoinPartners =
+                    joinPartners;
+            for (final SymbolicExecutionState joinPartnerState : joinRuleApp
+                    .getJoinPartnerStates()) {
+
+                final HashMap<ProgramVariable, ProgramVariable> replMap =
+                        tmpJoinPartners.head().third;
+                final ProgVarReplacer replacer =
+                        new ProgVarReplacer(replMap, services);
+
+                ImmutableList<Term> newElementaries = ImmutableSLList.nil();
+                final LinkedList<Term> elementaries =
+                        JoinRuleUtils.getElementaryUpdates(joinPartnerState
+                                .getSymbolicState());
+                for (final Term elementary : elementaries) {
+                    final ElementaryUpdate upd =
+                            (ElementaryUpdate) elementary.op();
+                    final LocationVariable lhs =
+                            replMap.containsKey((LocationVariable) upd.lhs()) ? (LocationVariable) replMap
+                                    .get((LocationVariable) upd.lhs())
+                                    : (LocationVariable) upd.lhs();
+
+                    newElementaries =
+                            newElementaries.prepend(tb.elementary(
+                                    lhs,
+                                    elementary.sub(0)));
+                }
+
+                joinPartnerStates =
+                        joinPartnerStates.prepend(new SymbolicExecutionState(tb
+                                .parallel(newElementaries), replacer
+                                .replace(joinPartnerState.getPathCondition())));
+
+                tmpJoinPartners = tmpJoinPartners.tail();
+
+            }
         }
 
         // The join loop
@@ -190,7 +229,7 @@ public class JoinRule implements BuiltInRule {
             joinedState.setCorrespondingNode(newGoal.node());
         }
 
-        Term resultPathCondition = joinedState.second;
+        final Term resultPathCondition = joinedState.second;
 
         // NOTE (DS): The following simplification has been commented
         // out since it was usually not successful and consumed an
@@ -208,14 +247,16 @@ public class JoinRule implements BuiltInRule {
 
         // Add new antecedent (path condition)
         for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            SequentFormula newAntecedent =
+            final SequentFormula newAntecedent =
                     new SequentFormula(antecedentFormula);
             newGoal.addFormula(newAntecedent, true, false);
         }
 
         // Add new succedent (symbolic state & program counter)
-        Term succedentFormula = tb.apply(joinedState.first, thisSEState.third);
-        SequentFormula newSuccedent = new SequentFormula(succedentFormula);
+        final Term succedentFormula =
+                tb.apply(joinedState.first, thisSEState.third);
+        final SequentFormula newSuccedent =
+                new SequentFormula(succedentFormula);
         newGoal.addFormula(newSuccedent, new PosInOccurrence(newSuccedent,
                 PosInTerm.getTopLevel(), false));
 
@@ -722,7 +763,7 @@ public class JoinRule implements BuiltInRule {
 
                         ProgramVariablesMatchVisitor matchVisitor =
                                 new ProgramVariablesMatchVisitor(
-                                        ownProgramElem, partnerProgramElem,
+                                        partnerProgramElem, ownProgramElem,
                                         services);
                         matchVisitor.start();
 

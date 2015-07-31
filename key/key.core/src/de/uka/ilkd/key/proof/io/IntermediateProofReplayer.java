@@ -258,7 +258,7 @@ public class IntermediateProofReplayer {
                                     Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                                             partnerNodeInfo.first, partnerNodeInfo.second, services);
                                     ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
-                                            ownSEState.third.javaBlock().program(), partnerSEState.third.javaBlock().program(), services);
+                                            partnerSEState.third.javaBlock().program(), ownSEState.third.javaBlock().program(), services);
                                     matchVisitor.start();
                                     
                                     assert !matchVisitor.isIncompatible() : "Cannot join incompatible program counters";
