@@ -14,10 +14,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
@@ -75,6 +79,16 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
     * The name of the test file to generate without file extension.
     */
    private final String testFileName;
+   
+   /**
+    * The name of the files package.
+    */
+   private final String testFilePackageName;
+   
+   /**
+    * Determines whether the created test file should be opened.
+    */
+   private final boolean openTestFile;
 
    /**
     * Constructor.
@@ -90,6 +104,21 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       super(ui, originalProof);
       this.sourceProject = sourceProject;
       this.testFileName = testFileName;
+      this.testFilePackageName = "";
+      this.openTestFile = true;
+   }
+   
+   public EclipseTestGenerator(IProject sourceProject, 
+                              String testFileName,
+                              String testFilePackageName, 
+                              UserInterfaceControl ui, 
+                              Proof originalProof,
+                              boolean openTestFile) {
+      super(ui, originalProof);
+      this.sourceProject = sourceProject;
+      this.testFileName = testFileName;
+      this.testFilePackageName = testFilePackageName;
+      this.openTestFile = openTestFile;
    }
 
    /**
@@ -146,8 +175,9 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       // Create test project
       IJavaProject testProject = JDTUtil.createJavaProject(sourceProject.getName() + TEST_PROJECT_SUFFIX, sourceProject);
       List<IPackageFragmentRoot> sourceResources = JDTUtil.getSourcePackageFragmentRoots(testProject);
-      IContainer sourceContainer = findFirstSourceContainer(sourceResources);
-      if (sourceContainer == null) {
+      IPackageFragmentRoot sourceRoot = findFirstSourceRoot(sourceResources);
+      IContainer sourceContainer = sourceRoot == null ? null : (IContainer) sourceRoot.getResource();
+      if (sourceRoot == null || sourceContainer == null) {
          throw new IllegalStateException("The Java project '" + testProject.getProject().getName() + "' has no source folder.");
       }
       // Create test generator
@@ -156,12 +186,23 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof, true);
       tg.setLogger(log);
       tg.setFileName(JDTUtil.ensureValidJavaTypeName(testFileName, testProject));
+      tg.setPackageName("".equals(testFilePackageName) ? null : testFilePackageName);
+      //Add JUnit 4
+      Path junitPath = new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/4");
+      IClasspathEntry junitEntry = JavaCore.newContainerEntry(junitPath);
+      JDTUtil.addClasspathEntry(testProject, junitEntry);
       // Create library folder
       IFolder libFolder = ResourceUtil.createFolder(testProject.getProject(), LIB_FOLDER_NAME);
       IFile readmeFile = libFolder.getFile(LIB_FOLDER_README_NAME);
       ResourceUtil.createFile(readmeFile, createLibFolderReadmeContent(), null);
       // Create test file
-      final IFile testFile = sourceContainer.getFile(new Path(tg.getFileName() + TestCaseGenerator.JAVA_FILE_EXTENSION_WITH_DOT));
+      IContainer packageContainer = sourceContainer;
+      IPackageFragment packageFragment = sourceRoot.createPackageFragment(testFilePackageName, true, null);
+      IResource packageRes = packageFragment.getResource();
+      if(packageRes instanceof IContainer) {
+         packageContainer = (IContainer) packageRes;
+      }
+      final IFile testFile = packageContainer.getFile(new Path(tg.getFileName() + TestCaseGenerator.JAVA_FILE_EXTENSION_WITH_DOT));
       StringBuffer testSb = tg.createTestCaseCotent(problemSolvers);
       ResourceUtil.createFile(testFile, new ByteArrayInputStream(testSb.toString().getBytes()), null);
       // Create RFL file (needs to be done after the test file is created)
@@ -175,18 +216,38 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       IFile logFile = logFolder.getFile(tg.getFileName() + LOG_FILE_EXTENSION_WITH_DOT);
       ResourceUtil.createFile(logFile, new ByteArrayInputStream(log.toString().getBytes()), null);
       // Select and open generated test file
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               WorkbenchUtil.selectAndReveal(testFile);
-               WorkbenchUtil.openEditor(testFile);
+      if(openTestFile) {
+         Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               try {
+                  WorkbenchUtil.selectAndReveal(testFile);
+                  WorkbenchUtil.openEditor(testFile);
+               }
+               catch (PartInitException e) {
+                  LogUtil.getLogger().openErrorDialog(null, e);
+               }
             }
-            catch (PartInitException e) {
-               LogUtil.getLogger().openErrorDialog(null, e);
-            }
+         });
+      }
+   }
+
+   /**
+    * Returns the first fund {@link IContainer} of a source location.
+    * @param sourceResources The available source {@link IPackageFragmentRoot}s.
+    * @return The first found {@link IContainer} or {@code null} if no one was found.
+    */
+   protected IPackageFragmentRoot findFirstSourceRoot(List<IPackageFragmentRoot> sourceResources) {
+      IContainer result = null;
+      Iterator<IPackageFragmentRoot> iter = sourceResources.iterator();
+      while (result == null && iter.hasNext()) {
+         IPackageFragmentRoot root = iter.next();
+         IResource resource = root.getResource();
+         if (resource instanceof IContainer) {
+            return root;
          }
-      });
+      }
+      return null;
    }
 
    /**

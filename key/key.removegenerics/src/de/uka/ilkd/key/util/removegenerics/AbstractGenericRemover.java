@@ -41,6 +41,14 @@ public abstract class AbstractGenericRemover {
       sourceFiles.add(file);
    }
    
+   public PathList getSearchPath() {
+      return sc.getProjectSettings().getSearchPathList();
+   }
+   
+   public List<String> getSourceFiles() {
+      return sourceFiles;
+   }
+
    public void removeGenerics() throws ParserException, IOException {
       for (String fileName : sourceFiles) {
          File file = new File(fileName);

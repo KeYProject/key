@@ -757,11 +757,35 @@ group permissionHeap {
    provable ./heap/permissions/threads/Sampler_staticPermissions_accessible.key
    provable ./heap/permissions/threads/Sampler_workingPermissions_accessible.key
 
+   # Müller et al example
+   provable ./heap/permissions/mulleretal/ReadWrite_doRead_contract.key
+   provable ./heap/permissions/mulleretal/ReadWrite_doWrite_contract.key
+   provable ./heap/permissions/mulleretal/ReadWrite_read_contract.key
+   provable ./heap/permissions/mulleretal/ReadWrite_write_contract.key
+   provable ./heap/permissions/mulleretal/ReadWrite_inv1_accessible.key
+   provable ./heap/permissions/mulleretal/ReadWrite_inv2_accessible.key
+
+   # The LockSpec example (permissions & model methods)
+   provable ./heap/permissions/lockspec/Counter_lockConsistent_contract.key
+   provable ./heap/permissions/lockspec/Counter_increase_contract.key
+   provable ./heap/permissions/lockspec/Counter_fp_accessible.key
+   provable ./heap/permissions/lockspec/Counter_fpLock_accessible.key
+   provable ./heap/permissions/lockspec/Counter_fpPerm_accessible.key
+   provable ./heap/permissions/lockspec/Counter_inv_accessible1.key
+   provable ./heap/permissions/lockspec/Counter_inv_accessible2.key
+   provable ./heap/permissions/lockspec/Counter_lockRef_accessible.key
+   provable ./heap/permissions/lockspec/Counter_lockRef_contract1.key
+   provable ./heap/permissions/lockspec/Counter_lockRef_contract2.key
+   provable ./heap/permissions/lockspec/Counter_lockState_accessible.key
+   provable ./heap/permissions/lockspec/Counter_lockStatus_accessible.key
+   provable ./heap/permissions/lockspec/Counter_lockTransfer_accessible.key
+   provable ./heap/permissions/lockspec/Counter_unlockTransfer_accessible.key
+
    # These need (a lot of) interaction at the moment:
    # provable: ./heap/permissions/threads/AFilter_run.key
    # provable: ./heap/permissions/threads/BFilter_run.key
    # provable: ./heap/permissions/threads/Fib_run.key
-   #  provable: ./heap/permissions/threads/Plotter_run.key
+   # provable: ./heap/permissions/threads/Plotter_run.key
    # provable: ./heap/permissions/threads/Main_main.key
 
    # Should be provable, but isn't at the moment:
@@ -769,3 +793,4 @@ group permissionHeap {
    # Is provable, but very heavy (~400000 steps)
    # provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
 }
+

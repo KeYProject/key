@@ -64,18 +64,18 @@ public final class TipOfTheDay {
         is.close();
         return res.split("\n");
     }
-    
+
     private static String[] getTipsOnline() throws IOException {
-        return new String[]{checkLatestVersion()};
+        return new String[]{/*checkLatestVersion()*/};
     }
-    
-    private static String checkLatestVersion() {
-        final String latestVersion = NetworkUtils.getLatestVersion();
-        final String currentVersion = KeYResourceManager.getManager().getVersion();
-        final VersionStringComparator vsc = new VersionStringComparator();
-        final boolean versionOK = vsc.compare(currentVersion, latestVersion) < 0;
-        if (versionOK) return "You are using an up-to-date version of KeY; good for you.";
-        else return "It seems that you are using an old version of KeY. The current stable version is "+latestVersion;
-    }
+
+//    private static String checkLatestVersion() {
+//        final String latestVersion = NetworkUtils.getLatestVersion();
+//        final String currentVersion = KeYResourceManager.getManager().getVersion();
+//        final VersionStringComparator vsc = new VersionStringComparator();
+//        final boolean versionOK = vsc.compare(currentVersion, latestVersion) < 0;
+//        if (versionOK) return "You are using an up-to-date version of KeY; good for you.";
+//        else return "It seems that you are using an old version of KeY. The current stable version is "+latestVersion;
+//    }
 
 }

@@ -10,5 +10,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.sed.core,
  org.key_project.sed.ui,
  org.key_project.sed.example.core
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

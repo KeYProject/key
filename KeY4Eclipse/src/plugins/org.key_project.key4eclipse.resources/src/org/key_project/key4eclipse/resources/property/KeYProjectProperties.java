@@ -23,12 +23,16 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public final class KeYProjectProperties {
    
+   public static final boolean TEST_CASE_GENERATION_SUPPORTS_MULTITHREADING = false;
+   
    public static final QualifiedName PROP_ENABLE_KEY_RESOURCES_BUILDS = new QualifiedName("org.key_project.key4eclipse.resources", "buildProofs");
    public static final QualifiedName PROP_ENABLE_BUILD_ON_STARTUP = new QualifiedName("org.key_project.key4eclipse.resources", "buildOnStartup");
    public static final QualifiedName PROP_ENABLE_BUILD_REQUIRED_PROOFS_ONLY = new QualifiedName("org.key_project.key4eclipse.resources", "buildRequiredProofsOnly");
    public static final QualifiedName PROP_ENABLE_MULTITHREADING = new QualifiedName("org.key_project.key4eclipse.resources", "enableMultiThreading");
    public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
+   public static final QualifiedName PROP_GENERATE_TEST_CASES = new QualifiedName("org.key_project.key4eclipse.resources", "generateTestCases");
+   public static final QualifiedName PROP_AUTO_DELETE_TEST_CASES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteTestCases");
     
    public static boolean isEnableKeYResourcesBuilds(IProject project) {
       if (project != null) {
@@ -167,6 +171,55 @@ public final class KeYProjectProperties {
    public static void setAutoDeleteProofFiles(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
          project.setPersistentProperty(PROP_AUTO_DELETE_PROOFFILES, enabled + "");
+      }
+   }
+   
+   
+   public static boolean isGenerateTestCases(IProject project) {
+      if (project != null) {
+         String value;
+         try {
+            value = project.getPersistentProperty(PROP_GENERATE_TEST_CASES);
+            if(value == null){
+               return false;
+            }
+            return Boolean.parseBoolean(value);
+         }
+         catch (CoreException e) {
+            return false;
+         }
+      }
+      return false;
+   }
+   
+   
+   public static void setGenerateTestCases(IProject project,  boolean enabled) throws CoreException {
+      if (project != null) {
+         project.setPersistentProperty(PROP_GENERATE_TEST_CASES, enabled + "");
+      }
+   }
+   
+   public static boolean isAutoDeleteTestCases(IProject project) {
+      if (project != null) {
+         String value;
+         try {
+            value = project.getPersistentProperty(PROP_AUTO_DELETE_TEST_CASES);
+            if(value == null){
+               return false;
+            }
+            return Boolean.parseBoolean(value);
+         }
+         catch (CoreException e) {
+            return false;
+         }
+      }
+      return false;
+   }
+   
+   
+   public static void setAutoDeleteTestCases(IProject project,  boolean enabled) throws CoreException {
+      if (project != null) {
+         project.setPersistentProperty(PROP_AUTO_DELETE_TEST_CASES, enabled + "");
       }
    }
 }

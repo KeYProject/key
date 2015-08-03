@@ -15,14 +15,11 @@ package org.key_project.key4eclipse.resources.io;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourceAttributes;
-import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.java.XMLUtil;
@@ -30,52 +27,56 @@ import org.key_project.util.java.XMLUtil;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
- * Writer for the meta files.
+ * Writer for the lastChangesFile.
  * @author Stefan Käsdorf
  */
 public class LastChangesFileWriter {
-   
+
+   public static final String TAG_BUILD_STATE = "buildState";
    public static final String TAG_LAST_CHANGES_FILE = "lastChangesFile";
    public static final String TAG_CHANGED_JAVA_FILES = "changedJavaFiles";
    public static final String TAG_CHANGED_PROOF_AND_META_FILES = "changedProofAndMetaFiles";
    public static final String TAG_CHANGED_JAVA_FILE = "changedJavaFile";
    public static final String TAG_CHANGED_PROOF_OR_META_FILE = "changedProofOrMetaFile";
    public static final String ATTRIBUTE_FILE_PATH = "path";
+   public static final String ATTRIBUTE_IS_BUILDING = "isBuilding";
 
    /**
     * Forbid instances.
     */
    private LastChangesFileWriter() {
    }
-   
-   
-   public static void resetLastChangesFiles(IProject project) {
-      writeLastChangesFile(project, new HashSet<IFile>(), new HashSet<IFile>());
-   }
-   
+
    
    /**
-    * Creates the meta file for the given {@link ProofElement}.
-    * @param pe - the {@link ProofElement} to use
+    * Updates the build state of the file. Changed files are untouched.
+    * @param project the particular {@link IProject}
+    * @param buildState the new build state
+    */
+   public static void updateBuildState(IProject project, boolean buildState){
+      LastChangesFileReader lcfr = new LastChangesFileReader(project);
+      writeLastChangesFile(project, buildState, lcfr.getChangedJavaFiles(), lcfr.getCHangedProofAndMetaFiles());
+   }
+   
+   /**
+    * Creates the lastChangesFile
+    * @param project the particular {@link IProject}
+    * @param buildState the build state
+    * @param changedJavaFiles changed java files
+    * @param changedProofAndMetaFiles changed proof and meta files
     * @throws Exception
     */
-   public static void writeLastChangesFile(IProject project, Set<IFile> changedJavaFiles, Set<IFile> changedProofAndMetaFiles)  {
+   public static void writeLastChangesFile(IProject project, boolean buildState, Set<IFile> changedJavaFiles, Set<IFile> changedProofAndMetaFiles)  {
       if(changedJavaFiles != null && changedProofAndMetaFiles != null){
          try{
             IFile lastChangesFile = KeYResourcesUtil.getProofFolder(project).getFile(KeYResourcesUtil.LAST_CHANGES_FILE);
             String encoding = Charset.defaultCharset().name();
-            String xml = toXml(changedJavaFiles, changedProofAndMetaFiles, encoding);
+            String xml = toXml(buildState, changedJavaFiles, changedProofAndMetaFiles, encoding);
             KeYResourcesUtil.createFolder(lastChangesFile);
             if(!lastChangesFile.exists()){
                lastChangesFile.create(new ByteArrayInputStream(xml.getBytes(encoding)), true, null);
             }
             else {
-               // Make sure that file is not read-only for compatibility with older relases. But do not set read-only flag because it requires admin rights on Mac OS to delete it.
-               if (lastChangesFile.isReadOnly()) {
-                  ResourceAttributes resAttr = lastChangesFile.getResourceAttributes();
-                  resAttr.setReadOnly(false);
-                  lastChangesFile.setResourceAttributes(resAttr);
-               }
                lastChangesFile.setContents(new ByteArrayInputStream(xml.getBytes(encoding)), true, true, null);
             }
          } catch (Exception e){
@@ -84,16 +85,26 @@ public class LastChangesFileWriter {
       }
    }
    
-   private static String toXml(Set<IFile> changedJavaFiles, Set<IFile> changedProofAndMetaFiles, String encoding) {
+   
+   private static String toXml(boolean buildState, Set<IFile> changedJavaFiles, Set<IFile> changedProofAndMetaFiles, String encoding) {
       StringBuffer sb = new StringBuffer();
       XMLUtil.appendXmlHeader(encoding, sb);;
       XMLUtil.appendStartTag(0, TAG_LAST_CHANGES_FILE, null, sb);
+      appendIsBuilding(1, buildState, sb);
       appendChangedJavaFiles(1, changedJavaFiles, sb);
       appendChangedProofAndMetaFiles(1, changedProofAndMetaFiles, sb);
       XMLUtil.appendEndTag(0, TAG_LAST_CHANGES_FILE, sb);
       return sb.toString();
    }
    
+   
+   private static void appendIsBuilding(int level, boolean buildState, StringBuffer sb) {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_IS_BUILDING, String.valueOf(buildState));
+      XMLUtil.appendEmptyTag(level, TAG_BUILD_STATE, attributeValues, sb);
+   }
+
+
    private static void appendChangedJavaFiles(int level, Set<IFile> changedJavaFiles, StringBuffer sb){
       XMLUtil.appendStartTag(level, TAG_CHANGED_JAVA_FILES, null, sb);
       for(IFile file : changedJavaFiles){
@@ -103,6 +114,7 @@ public class LastChangesFileWriter {
       }
       XMLUtil.appendEndTag(level, TAG_CHANGED_JAVA_FILES, sb);
    }
+   
    
    private static void appendChangedProofAndMetaFiles(int level, Set<IFile> changedProofFiles, StringBuffer sb){
       XMLUtil.appendStartTag(level, TAG_CHANGED_PROOF_AND_META_FILES, null, sb);

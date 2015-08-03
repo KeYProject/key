@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.test.Activator;
@@ -32,7 +31,7 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    @Test
    public void testInvalidXMLFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testInvalidXMLFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testInvalidXMLFile", true, false, true, false, 1, false, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testInvalidXMLFile/File");
       project.close(null);
    }
@@ -40,7 +39,7 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    @Test
    public void testNoMD5InMetaFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNoMD5InMetaFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNoMD5InMetaFile", true, false, true, false, 1, false, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testNoMD5InMetaFile/File");
       project.close(null);
    }
@@ -48,14 +47,14 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    @Test
    public void testMoreThenOneMD5InMetaFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testMoreThenOneMD5InMetaFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testMoreThenOneMD5InMetaFile", true, false, true, false, 1, false, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testMoreThenOneMD5InMetaFile/File");
       project.close(null);
    }
    
    @Test
    public void testNotATypeNodeInMetaFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNotATypeNodeInMetaFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNotATypeNodeInMetaFile", true, false, true, false, 1, false, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testNotATypeNodeInMetaFile/File");
       project.close(null);
    }
@@ -63,7 +62,7 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    @Test
    public void testNotASubTypeNodeInMetaFile() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNotASubTypeNodeInMetaFile", true, false, true, false, 1, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProofMetaFileContentExceptionTests_testNotASubTypeNodeInMetaFile", true, false, true, false, 1, false, false, false);
       testEditMetaFile(project, "data/ProofMetaFileContentExceptionTests/testNotASubTypeNodeInMetaFile/File");
       project.close(null);
    }
@@ -96,19 +95,9 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
       long proofFileModStamp = proofFile.getLocalTimeStamp();
       long metaFileModStamp = metaFile.getLocalTimeStamp();
       
-      metaFile.refreshLocal(IResource.DEPTH_ZERO, null);
-      ResourceAttributes resAttr = metaFile.getResourceAttributes();
-      resAttr.setReadOnly(false);
-      metaFile.setResourceAttributes(resAttr);
-      
       InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, newContentPathInBundle);
       metaFile.setContents(is, IResource.FORCE, null);
       is.close();
-      
-      metaFile.refreshLocal(IResource.DEPTH_ZERO, null);
-      resAttr = metaFile.getResourceAttributes();
-      resAttr.setReadOnly(true);
-      metaFile.setResourceAttributes(resAttr);
       
       assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
       metaFileModStamp = metaFile.getLocalTimeStamp();

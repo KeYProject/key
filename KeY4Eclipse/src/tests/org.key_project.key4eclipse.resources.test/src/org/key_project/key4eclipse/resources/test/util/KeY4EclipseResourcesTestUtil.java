@@ -16,10 +16,11 @@ package org.key_project.key4eclipse.resources.test.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -28,6 +29,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
@@ -50,16 +55,9 @@ import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
-import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
-import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.test.util.TestUtilsUtil;
-
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 public class KeY4EclipseResourcesTestUtil {
 
@@ -229,22 +227,24 @@ public class KeY4EclipseResourcesTestUtil {
    }
    
    
-   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles) throws CoreException{
+   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean generateTestCases, boolean autoDeleteTestCases) throws CoreException{
       KeYProjectProperties.setEnableKeYResourcesBuilds(project, buildProofs);
       KeYProjectProperties.setEnableBuildOnStartup(project, startupBuilds);
       KeYProjectProperties.setEnableBuildProofsEfficient(project, buildProofsEfficient);
       KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreading);
       KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreads));
       KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFiles);
+      KeYProjectProperties.setGenerateTestCases(project, generateTestCases);
+      KeYProjectProperties.setAutoDeleteTestCases(project, autoDeleteTestCases);
    }
    
-   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles) throws CoreException, InterruptedException{
+   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean generateTestCases, boolean autoDeleteTestCases) throws CoreException, InterruptedException{
       //turn off autobuild
 //      enableAutoBuild(false);
       //create a KeYProject
       IJavaProject keyProject = createKeYProject(projectName);
       IProject project = keyProject.getProject();
-      setKeYProjectProperties(project, buildProofs, startupBuilds, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles);
+      setKeYProjectProperties(project, buildProofs, startupBuilds, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles, generateTestCases, autoDeleteTestCases);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       return project;
@@ -313,5 +313,61 @@ public class KeY4EclipseResourcesTestUtil {
       public int getMetaFileCount() {
          return metaFileCount;
       }
+   }
+   
+   
+   public static class cleanBuildResourceChangeListener implements IResourceChangeListener {
+      private boolean deleted = false;
+      private IFile[] files;
+      public cleanBuildResourceChangeListener(IFile... files){
+         this.files = files;
+      }
+      public boolean getDeleted(){
+         return deleted;
+      }
+      @Override
+      public void resourceChanged(IResourceChangeEvent event) {
+         if(event.getDelta() != null) {
+            try {
+               cleanBuildDelteVisitor cbdv = new cleanBuildDelteVisitor(files);
+               event.getDelta().accept(cbdv);
+               if(!deleted){
+                  deleted = cbdv.getDeleted();
+               }
+            }
+            catch (CoreException e) {
+               deleted = true;
+            }
+         }
+      }
+   }
+   
+   
+   private static class cleanBuildDelteVisitor implements IResourceDeltaVisitor {
+      private boolean deleted = false;
+      private IFile[] files;
+      public cleanBuildDelteVisitor(IFile... files){
+         this.files = files;
+      }
+      public boolean getDeleted(){
+         return deleted;
+      }
+      @Override
+      public boolean visit(IResourceDelta delta) throws CoreException {
+         IResource resource = delta.getResource();
+         for(IFile file : files){
+            if(file != null && file.equals(resource) && delta.getKind() == IResourceDelta.REMOVED){
+               deleted = true;
+               return false;
+            }
+         }
+         return true;
+      }
+   };
+   
+   
+   public static long getCreationTime(IResource res) throws IOException {
+      BasicFileAttributes attr = Files.readAttributes(res.getLocation().toFile().toPath(), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+      return attr.creationTime().toMillis();
    }
 }

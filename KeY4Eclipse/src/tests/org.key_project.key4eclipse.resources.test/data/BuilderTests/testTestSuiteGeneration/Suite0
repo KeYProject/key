@@ -1,0 +1,10 @@
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+@RunWith(Suite.class)
+@SuiteClasses({
+	A_A__id_int___JML_operation_contract_0.class,
+	testpackage.testpackage_B_testpackage_B__id_int___JML_operation_contract_0.class
+})
+public class AllTests { }

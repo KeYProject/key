@@ -14,8 +14,11 @@
 package org.key_project.key4eclipse.resources.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +48,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaCore;
@@ -52,9 +56,14 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.decorator.ProofFileLightweightLabelDecorator;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
+import org.key_project.key4eclipse.resources.io.ProofMetaReferencesPrettyPrinter;
+import org.key_project.key4eclipse.resources.io.ProofReferenceException;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.util.event.IKeYResourcePropertyListener;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
@@ -63,15 +72,29 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
 
@@ -84,7 +107,6 @@ public class KeYResourcesUtil {
    public static final String PROOF_FILE_EXTENSION = "proof";
    public static final String META_FILE_EXTENSION = "proofmeta";
    public static final String LAST_CHANGES_FILE = ".lastChanges";
-   
    
    /**
     * Key of {@link IResource#getPersistentProperty(QualifiedName)} to store the proof closed result of a proof file.
@@ -125,16 +147,178 @@ public class KeYResourcesUtil {
       return false;
    }
    
+   
+   /**
+    * Returns the {@link KeYJavaType} for the given {@link IProofReference}.
+    * @param proofRef - the {@link IProofReference} to use
+    * @return the {@link KeYJavaType}
+    * @throws ProofReferenceException 
+    */
+   public static KeYJavaType getKeYJavaType(IProofReference<?> proofRef) throws ProofReferenceException{
+      KeYJavaType kjt = null;
+      Object target = proofRef.getTarget();
+      if(IProofReference.ACCESS.equals(proofRef.getKind())){
+         if(target instanceof IProgramVariable){
+            IProgramVariable progVar = (IProgramVariable) target;
+            if (progVar instanceof LocationVariable) {
+               kjt = ((LocationVariable) progVar).getContainerType();
+            }
+            else if (progVar instanceof ProgramConstant) {
+               kjt = ((ProgramConstant) progVar).getContainerType();
+            }
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+         }
+      }
+      else if(IProofReference.CALL_METHOD.equals(proofRef.getKind()) || 
+              IProofReference.INLINE_METHOD.equals(proofRef.getKind())){
+         if(target instanceof IProgramMethod){
+            IProgramMethod progMeth = (IProgramMethod) target;
+            kjt = progMeth.getContainerType();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramMethod");
+         }
+      }
+      else if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
+         if(target instanceof ClassAxiom){
+            ClassAxiom classAx = (ClassAxiom) target;
+            kjt = classAx.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassAxiom");
+         }
+      }
+      else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
+         if(target instanceof Contract){
+            Contract contract = (Contract) target;
+            kjt = contract.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected Contract");
+         }
+      }
+      else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
+         if(target instanceof ClassInvariant){
+            ClassInvariant classInv = (ClassInvariant) target;
+            kjt = classInv.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassInvariant");
+         }
+      }
+      else {
+         throw new ProofReferenceException("Unknow proof reference kind found: " + proofRef.getKind());
+      }
+      return kjt;
+   }
+   
+   //TODO: fix javadoc
+   /**
+    * Filters a {@link Set} of {@link IProofReference}s in order to exclude external resources. 
+    * @param proofReferences {@link Set} of {@link IProofReference}s
+    * @return {@link Set} of filtered {@link IProofReference}s 
+    */
+   public static void filterProofReferences(Set<IProofReference<?>> proofReferences, Set<IProofReference<?>> filteredProofReferences, Set<IProofReference<?>> assumptions) {
+      for(IProofReference<?> proofReference : proofReferences){
+         try {
+            KeYJavaType kjt = getKeYJavaType(proofReference);
+            if(!filterKeYJavaType(kjt)){
+               filteredProofReferences.add(proofReference);
+            }
+            else {
+               assumptions.add(proofReference);
+            }
+         }
+         catch (ProofReferenceException e) {
+            LogUtil.getLogger().logError(e);
+         }
+      }
+   }
+   
+   /**
+    * Sorts all elements of a {@link Set} of {@link IProofReference}s by the given {@code sortOrder} and returns a {@link List} with the result.
+    * @param proofReferences a {@link Set} of {@link IProofReference}s
+    * @param sortOrder the sort order
+    * @return a {@link List} with the sorted {@link IProofReference}s
+    */
+   public static List<IProofReference<?>> sortProofReferences(Set<IProofReference<?>> proofReferences, String... sortOrder) {
+      if (proofReferences != null && sortOrder != null && sortOrder.length > 0) {
+         List<IProofReference<?>> sortedReferences = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> axiomList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> invList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> accessList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> callMethodList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> inlineMethodList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> contractList = new LinkedList<IProofReference<?>>();
+         for (IProofReference<?> ref : proofReferences) {
+            if (IProofReference.USE_AXIOM.equals(ref.getKind())) {
+               axiomList.add(ref);
+            }
+            else if (IProofReference.USE_INVARIANT.equals(ref.getKind())) {
+               invList.add(ref);
+            }
+            else if (IProofReference.ACCESS.equals(ref.getKind())) {
+               accessList.add(ref);
+            }
+            else if (IProofReference.CALL_METHOD.equals(ref.getKind())) {
+               callMethodList.add(ref);
+            }
+            else if (IProofReference.INLINE_METHOD.equals(ref.getKind())) {
+               inlineMethodList.add(ref);
+            }
+            else if (IProofReference.USE_CONTRACT.equals(ref.getKind())) {
+               contractList.add(ref);
+            }
+         }
+         for (String kind : sortOrder) {
+            if (IProofReference.USE_AXIOM.equals(kind)) {
+               sortedReferences.addAll(axiomList);
+               axiomList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.USE_INVARIANT.equals(kind)) {
+               sortedReferences.addAll(invList);
+               invList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.ACCESS.equals(kind)) {
+               sortedReferences.addAll(accessList);
+               accessList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.CALL_METHOD.equals(kind)) {
+               sortedReferences.addAll(callMethodList);
+               callMethodList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.INLINE_METHOD.equals(kind)) {
+               sortedReferences.addAll(inlineMethodList);
+               inlineMethodList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.USE_CONTRACT.equals(kind)) {
+               sortedReferences.addAll(contractList);
+               contractList = new LinkedList<IProofReference<?>>();
+            }
+         }
+         sortedReferences.addAll(axiomList);
+         sortedReferences.addAll(invList);
+         sortedReferences.addAll(accessList);
+         sortedReferences.addAll(callMethodList);
+         sortedReferences.addAll(inlineMethodList);
+         sortedReferences.addAll(contractList);
+         return sortedReferences;
+      }
+      return null;
+   }
+   
+   
    /**
     * Computes the used contracts and called methods.
     * @param pe The {@link ProofElement}.
     * @param proofElements The {@link List} of all available {@link ProofElement}s.
     * @return A {@link Pair} of the used contracts and the called methods.
     */
-   public static Pair<List<IFile>, List<String>> computeUsedProofElements(ProofElement pe, List<ProofElement> proofElements){
+   public static Pair<List<IFile>, List<String>> computeUsedProofElements(ProofElement pe, HashSet<IProofReference<?>> proofReferences, List<ProofElement> proofElements){
       List<IFile> usedContracts = new LinkedList<IFile>();
       List<String> calledMethods = new LinkedList<String>();
-      HashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       if(proofReferences != null && !proofReferences.isEmpty()){
          for(IProofReference<?> proofRef : proofReferences){
             Object target = proofRef.getTarget();
@@ -163,6 +347,12 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Acquires the {@link ProofElement}s associated with the given proof files. 
+    * @param proofFiles the given proof files
+    * @param proofElements {@link List} of proof elements to check
+    * @return a {@link List} of the {@link ProofElement} associated with the given proof files
+    */
    public static List<ProofElement> getProofElementsByProofFiles(List<IFile> proofFiles, List<ProofElement> proofElements){
       List<ProofElement> tmpProofElements = cloneList(proofElements);
       List<ProofElement> foundproofElements = new LinkedList<ProofElement>();
@@ -205,9 +395,7 @@ public class KeYResourcesUtil {
     * @param project - the project to search the source folders for.
     * @return the {@link LinkedList} with the source folders
     */
-   public static LinkedList<IPath> getAllJavaSrcFolders(IProject project) {
-      LinkedList<IPath> srcFolders = new LinkedList<IPath>();
-
+   public static IFolder getJavaSrcFolder(IProject project) {
       IJavaProject javaProject = JavaCore.create(project);
       IClasspathEntry[] classpathEntries;
       try {
@@ -216,14 +404,14 @@ public class KeYResourcesUtil {
             IClasspathEntry entry = classpathEntries[i];
             if(entry.getContentKind() == IPackageFragmentRoot.K_SOURCE){
                IPath path = entry.getPath();
-               srcFolders.add(path);
+               return ResourcesPlugin.getWorkspace().getRoot().getFolder(path);
             }
          }
       }
       catch (JavaModelException e) {
-         srcFolders = new LinkedList<IPath>();
+         return null;
       }
-      return srcFolders;
+      return null;
    }
 
    /**
@@ -237,34 +425,6 @@ public class KeYResourcesUtil {
              PROOF_FOLDER_NAME.equals(element.getName()) &&
              element.getParent() instanceof IProject &&
              isKeYProject(element.getProject());
-   }
-   
-   
-
-   
-   
-   public static int getLineForOffset(String str, int offset){
-      StringBuilder sb = new StringBuilder(str);
-      int index = 0;
-      int lineCount = 0;
-      while(index <= offset){
-         int indexRN = sb.indexOf("\r\n", index);
-         int indexR = sb.indexOf("\r", index);
-         int indexN = sb.indexOf("\n", index);
-         if(indexRN > -1 && (indexRN <= indexR || indexR == -1) && (indexRN < indexN || indexN == -1)){
-            index = indexRN + 2;
-         }
-         else if(indexR > -1 && (indexR < indexRN || indexRN == -1) && (indexR < indexN || indexN == -1)){
-            index = indexR + 1;
-         }
-         else if(indexN > -1 && (indexN < indexRN || indexRN == -1) && (indexN < indexR || indexR == -1)){
-            index = indexN + 1;
-         }
-         else return 1;
-         
-         lineCount++;
-      }
-      return lineCount;
    }
    
    
@@ -304,14 +464,7 @@ public class KeYResourcesUtil {
    }
    
    
-   public static <T> void mergeLists(List<T> dest, List<T> inserts){ // TODO: Move to CollectionUtil
-      for(T t : inserts){
-         if(!dest.contains(t)){
-            dest.add(t);
-         }
-      }
-   }
-   
+
    public static <K,V> void mergeMaps(Map<K,V> dest, Map<K,V> inserts){
       for(Map.Entry<K, V> entry : inserts.entrySet()){
          K key = entry.getKey();
@@ -322,15 +475,7 @@ public class KeYResourcesUtil {
       }
    }
    
-   
-   public static <T> List<T> arrayToList(T[] array){ // TODO: Move to CollectionUtil
-      List<T> list = new LinkedList<T>();
-      for(T t : array){
-         list.add(t);
-      }
-      return list;
-   }
-   
+
    /**
     * Creates the folder for the given {@link IFile}
     * @param file - the {@link IFile} to use
@@ -363,6 +508,12 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Collects all {@link ProofElement}s associated with a {@link IMethod}
+    * @param proofElements {@link List} of all available {@link ProofElement}s
+    * @param method the {@link IMethod} to use
+    * @return {@link List} with all associated {@link ProofElement}s
+    */
    public static List<ProofElement> getProofElementsForMethod(List<ProofElement> proofElements, IMethod method) {
       List<ProofElement> methodProofElements = new LinkedList<ProofElement>();
       if(method != null){
@@ -395,7 +546,20 @@ public class KeYResourcesUtil {
     * @return true if the given {@link IResource} is a java file and is stored in a source folder.
     */
    public static boolean isJavaFileAndInSrcFolder(IResource res){
-      if(IResource.FILE == res.getType() && isInSourceFolder(res)){
+      if(isJavaFile(res) && isInSourceFolder(res)){
+         return true;
+      }
+      return false;
+   }
+   
+   
+   /**
+    * Checks if the given {@link IResource} is a java file.
+    * @param res - the {@link IResource} to be checked
+    * @return true if the given {@link IResource} is a java file.
+    */
+   public static boolean isJavaFile(IResource res){
+      if(IResource.FILE == res.getType()){
          IJavaElement element = JavaCore.create(res);
          if (element instanceof ICompilationUnit) {
             return true;
@@ -412,10 +576,9 @@ public class KeYResourcesUtil {
     * @return true if the given {@link IResource} is stored in a source folder.
     */
    public static boolean isInSourceFolder(IResource res){
-      for(IPath path : KeYResourcesUtil.getAllJavaSrcFolders(res.getProject())){
-         if(path.isPrefixOf(res.getFullPath())){
-            return true;
-         }
+      IFolder srcFolder  = KeYResourcesUtil.getJavaSrcFolder(res.getProject());
+      if(srcFolder != null && srcFolder.getFullPath().isPrefixOf(res.getFullPath())){
+         return true;
       }
       return false;
    }
@@ -435,6 +598,11 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Returns the {@link IProject}'s proof folder
+    * @param project the {@link IProject} to use
+    * @return the proof folder
+    */
    public static IFolder getProofFolder(IProject project){
       if(isKeYProject(project)){
          return project.getFolder(PROOF_FOLDER_NAME);
@@ -681,6 +849,11 @@ public class KeYResourcesUtil {
 //   }
    
    
+   /**
+    * Collects all currently living {@link KeYProjectBuildJob}s of a particular {@link IProject}
+    * @param project the {@link IProject} to use
+    * @return {@link List} with all {@link KeYProjectBuildJob}s
+    */
    public static List<KeYProjectBuildJob> getProjectBuildJobs(IProject project){
       List<KeYProjectBuildJob> projectKeYJobs = new LinkedList<KeYProjectBuildJob>();
       if(project != null){
@@ -697,67 +870,53 @@ public class KeYResourcesUtil {
       }
       return projectKeYJobs;
    }
+
    
-   
-   public static int getNumberOfAutoBuildsInQueue(IProject project){
-      int num = 0;
-      List<KeYProjectBuildJob> projectBuildJobs = KeYResourcesUtil.getProjectBuildJobs(project);
-      for(KeYProjectBuildJob job : projectBuildJobs){
-         if(KeYProjectBuildJob.AUTO_BUILD == job.getBuildType() && Job.WAITING == job.getState()){
-            num++;
-         }
+   /**
+    * Checks if the given {@link IResource} is a proof file
+    * @param res the {@link IResource} to use 
+    * @return true if the {@link IResource} is a proof file. Otherwise false 
+    */
+   public static boolean isProofFile(IResource res){
+      if(res != null && res.exists()){
+         return KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(res.getFileExtension());
       }
-      return num;
+      return false;
+   }
+   
+   /**
+    * Checks if the given {@link IResource} is a meta file
+    * @param res the {@link IResource} to use 
+    * @return true if the {@link IResource} is a meta file. Otherwise false 
+    */
+   public static boolean isMetaFile(IResource res){
+      if(res != null && res.exists()){
+         return KeYResourcesUtil.META_FILE_EXTENSION.equals(res.getFileExtension());
+      }
+      return false;
    }
    
    
-   public static boolean isProofFile(IFile file){
-      if(file != null && file.exists()){
-         IProject project = file.getProject();
-         if(KeYResourcesUtil.isKeYProject(project) && isInProofFolder(file) && KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(file.getFileExtension())){
+   /**
+    * Checks if the given {@link IResource} is a proof file and if it is located in the {@link IProject}'s proof folder
+    * @param res the {@link IResource} to use 
+    * @return true if the {@link IResource} is a proof file in the proof folder. Otherwise false 
+    */
+   public static boolean isProofFileAndInProofFolder(IResource res){
+      if(res != null && res.exists() && isProofFile(res)){
+         IProject project = res.getProject();
+         if(KeYResourcesUtil.isKeYProject(project) && isInProofFolder(res)){
             return true;
          }
       }
       return false;
    }
    
-   
-   public static List<IFile> getAllProofFiles(IResource res){
-      if(res != null && res.exists()){
-         if(res.getType() == IResource.PROJECT){
-            IProject project = (IProject) res;
-            if(KeYResourcesUtil.isKeYProject(project)){
-               return getAllProofFiles(project.getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME));
-            }
-         }
-         else if(res.getType() == IResource.FOLDER){
-            IFolder folder = (IFolder) res;
-            if(KeYResourcesUtil.isKeYProject(folder.getProject()) && KeYResourcesUtil.isInProofFolder(folder)){
-               try{
-                  List<IFile> files = new LinkedList<IFile>();
-                  for(IResource subRes : folder.members()){
-                     files.addAll(KeYResourcesUtil.getAllProofFiles(subRes));
-                  }
-                  return files;
-               }
-               catch(CoreException e){
-                  LogUtil.getLogger().logError(e);
-               }
-            }
-         }
-         else if(res.getType() == IResource.FILE){
-            IFile file = (IFile) res;
-            if(KeYResourcesUtil.isKeYProject(file.getProject()) && KeYResourcesUtil.isInProofFolder(file) && KeYResourcesUtil.isProofFile(file)){
-               List<IFile> files = new LinkedList<IFile>();
-               files.add(file);
-               return files;
-            }
-         }
-      }
-      return new LinkedList<IFile>();
-   }
-   
-
+   /**
+    * Checks if the given {@link IFile} is the {@link IProject}s lastChangesFile
+    * @param file the IFile to check
+    * @return true if the {@link IFile} is the lastChangesFile. Otherwise false
+    */
    public static boolean isLastChangesFile(IFile file) {
       if (file != null) {
          return LAST_CHANGES_FILE.equals(file.getName()) &&
@@ -767,7 +926,11 @@ public class KeYResourcesUtil {
       return false;
    }
    
-   
+
+   /**
+    * Synchronizes the given {@link IProject}
+    * @param project the {@link IProject} to use
+    */
    public static void synchronizeProject(IProject project){
       if(!project.isSynchronized(IResource.DEPTH_INFINITE)){
          try {
@@ -777,5 +940,257 @@ public class KeYResourcesUtil {
             LogUtil.getLogger().logError(e);
          }
       }
+   }
+   
+   
+   /**
+    * Converts a {@link ImmutableArray} of {@link ParameterDeclaration}s into a semicolon separated {@link String}
+    * @param parameters {@link ImmutableArray} of {@link ParameterDeclaration}s 
+    * @return the converted Array
+    */
+   public static String parametersToString(ImmutableArray<ParameterDeclaration> parameters){
+      String parameterString = "";
+      for(ParameterDeclaration parameter : parameters){
+         parameterString += parameter.getTypeReference().getName() + ";";
+      }
+      return parameterString;
+   }
+   
+
+   /**
+    * Removes all line breaks in a {@link String}
+    * @param str the {@link String} to use
+    * @return {@link String} without line breaks
+    */
+   private static String removeLineBreaks(String str){
+      str = str.replaceAll("\r\n", " ");
+      str = str.replaceAll("\r", " ");
+      str = str.replaceAll("\n", " ");
+      return str;
+   }
+
+   /**
+    * Removes all tabs in a {@link String} and replaces them with a single space
+    * @param str the {@link String} to use
+    * @return {@link String} without tabs
+    */
+   private static String removeTabs(String str){
+      str = str.replaceAll("\t", " ");
+      return str;
+   }
+
+   /**
+    * Removes all multiple spaces and replaces them with a single space
+    * @param str the {@link String} to use
+    * @return {@link String} without tabs
+    */
+   private static String removeMultiSpaces(String str){
+      String[] splits = str.split(" ");
+      String trimmed = "";
+      for(String split : splits) {
+         trimmed += split + " ";
+      }
+      return trimmed.trim();
+   }
+   
+   
+   /**
+    * Creates a single line {@link String} representation of the source code of a {@link MethodDeclaration}
+    * @param methodDecl the {@link MethodDeclaration} to use
+    * @return the source {@link String}
+    */
+   public static String createSourceString(MethodDeclaration methodDecl){
+      StringWriter sw = new StringWriter();
+      try{
+         ProofMetaReferencesPrettyPrinter pp = new ProofMetaReferencesPrettyPrinter(sw, true);
+         pp.printInlineMethodDeclaration(methodDecl);
+      }
+      catch (IOException e){
+         LogUtil.getLogger().logError(e);
+      }
+      String src = sw.toString();
+      src = KeYResourcesUtil.removeLineBreaks(src);
+      src = KeYResourcesUtil.removeTabs(src);
+      src = KeYResourcesUtil.removeMultiSpaces(src);
+      return src;
+   }
+   
+   
+   /**
+    * Searches a {@link KeYJavaType} for a {@link IProgramMethod} with the given name and parameters
+    * @param kjt the {@link KeYJavaType} to use
+    * @param method the method name
+    * @param parameters semicolon separated parameters
+    * @return the {@link IProgramMethod} of null
+    */
+   public static IProgramMethod getMethodForKjt(KeYJavaType kjt, String method, String parameters) {
+      if(kjt != null && kjt.getJavaType() instanceof TypeDeclaration) {
+         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+         for(MemberDeclaration memberDecl : typeDecl.getMembers()) {
+            if (memberDecl instanceof IProgramMethod) {
+               IProgramMethod pm = (IProgramMethod) memberDecl;
+               MethodDeclaration md = pm.getMethodDeclaration();
+               if (md.getName().equals(method) && KeYResourcesUtil.parametersToString(md.getParameters()).equals(parameters)) {
+                  return pm;
+               }
+            }
+         }
+      }
+      return null;
+   }
+   
+   
+   /**
+    * Collects each implementation of the method specified by {@code methodName} and {@code parameters} in the given {@link KeYJavaType} and all subTypes. 
+    * @param env the {@link KeYEnvironment} to use
+    * @param kjt the {@link KeYJavaType} to use
+    * @param methodName the method name
+    * @param parameters semicolon separated parameters
+    * @return {@link Map} with each {@link KeYJavaType} mapping to the associated {@link IProgramMethod}
+    */
+   public static List<Pair<KeYJavaType, IProgramMethod>> getKjtsOfAllImplementations(KeYEnvironment<?> env, KeYJavaType kjt, String methodName, String parameters) {
+      List<Pair<KeYJavaType, IProgramMethod>> types = new LinkedList<Pair<KeYJavaType, IProgramMethod>>();
+      IProgramMethod pm = KeYResourcesUtil.getMethodForKjt(kjt, methodName, parameters);
+      if(pm != null) {
+         types.add(new Pair<KeYJavaType, IProgramMethod>(kjt, pm));
+      }
+      ImmutableList<KeYJavaType> subTypes = env.getJavaInfo().getAllSubtypes(kjt);
+      Iterator<KeYJavaType> it = subTypes.iterator();
+      while(it.hasNext()){
+         kjt = it.next();
+         if((pm = KeYResourcesUtil.getMethodForKjt(kjt, methodName, parameters)) != null){
+            types.add(new Pair<KeYJavaType, IProgramMethod>(kjt, pm));
+         }
+      }
+      return types;
+   }
+   
+   
+   /**
+    * Creates a semicolon separated {@link String} of all {@link KeYJavaType} keys in the given {@link Map}
+    * @param implementations the {@link Map} to use
+    * @return semicolon separated {@link String} of all {@link KeYJavaType}s
+    */
+   public static String implementationTypesToString(List<Pair<KeYJavaType, IProgramMethod>> implementations) {
+      String implementationTypesString = "";
+      for(Pair<KeYJavaType, IProgramMethod> pair : implementations){
+         if(implementationTypesString != null){
+            implementationTypesString += pair.first.getFullName() + ";";
+         }
+      }
+      return implementationTypesString;
+   }
+
+   
+   /**
+    * Returns the {@link FieldDeclaration} matching the given name in the given {@link KeYJavaType}
+    * @param kjt the {@link KeYJavaType} to use
+    * @param name the field name
+    * @return the {@link FieldDeclaration} or null
+    */
+   public static FieldDeclaration getFieldDeclFromKjt(KeYJavaType kjt, String name) {
+      if(kjt.getJavaType() instanceof TypeDeclaration) {
+         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+         for(MemberDeclaration memberDecl : typeDecl.getMembers()){
+            if(memberDecl instanceof FieldDeclaration){
+               FieldDeclaration fieldDecl = (FieldDeclaration) memberDecl;
+               ImmutableArray<FieldSpecification> fieldSpecs = fieldDecl.getFieldSpecifications();
+               if(fieldSpecs.size() == 1){
+                  FieldSpecification fieldSpec = fieldSpecs.get(0);
+                  if(fieldSpec.getName().equals(name)){
+                     return fieldDecl;
+                  }
+               }
+            }
+         }
+      }
+      return null;
+   }
+
+   
+   /**
+    * Converts the given {@link Contract} into a {@link String} representation
+    * @param contract the {@link Contract} to use
+    * @return the {@link String} representation
+    */
+   public static String contractToString(Contract contract) {
+      return contract.toString();
+   }
+   
+
+   /**
+    * Converts the given {@link RepresentsAxiom} into a {@link String} representation
+    * @param axiom the {@link RepresentsAxiom} to use
+    * @return the {@link String} representation
+    */
+   public static String repAxiomToString(RepresentsAxiom axiom) {
+      return axiom.toString();
+   }
+
+
+   /**
+    * Converts the given {@link ClassInvariant} into a {@link String} representation
+    * @param invariant the {@link ClassInvariant} to use
+    * @return the {@link String} representation
+    */
+   public static String invariantToString(ClassInvariant invariant){
+      return invariant.getOriginalInv().toString();
+   }
+
+
+   public static List<ProofMetaFileAssumption> computeProofMetaFileAssumtionList(Services services, Set<IProofReference<?>> assumptions) {
+      List<ProofMetaFileAssumption> assumptionList = new LinkedList<ProofMetaFileAssumption>();
+      for (IProofReference<?> proofRef : assumptions) {
+         String kind = null;
+         String name = null;
+         String targetStr = null;
+         String type = null;
+         Object target = proofRef.getTarget();
+         if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
+            if(target instanceof ClassAxiom){
+               ClassAxiom classAx = (ClassAxiom) target;
+               kind = proofRef.getKind();
+               name = classAx.getDisplayName();
+               targetStr = ClassTree.getDisplayName(services, classAx.getTarget());
+               type = classAx.getKJT().getFullName();
+            }
+         }
+         else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
+            if(target instanceof Contract){
+               Contract contract = (Contract) target;
+               kind = proofRef.getKind();
+               name = contract.getDisplayName();
+               targetStr = ClassTree.getDisplayName(services, contract.getTarget());
+               type = contract.getKJT().getFullName();
+            }
+         }
+         else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
+            if(target instanceof ClassInvariant){
+               ClassInvariant classInv = (ClassInvariant) target;
+               kind = proofRef.getKind();
+               name = classInv.getDisplayName();
+               type = classInv.getKJT().getFullName();
+            }
+         }
+         if(kind != null){
+            assumptionList.add(new ProofMetaFileAssumption(kind, name, targetStr, type));
+         }
+      }
+      return assumptionList;
+   }
+
+   public static String getJavaFilePackage(IFile file){
+      IJavaElement je = JavaCore.create(file);
+      if(je != null) {
+         if(je instanceof ICompilationUnit) {
+            ICompilationUnit cu = (ICompilationUnit) je;
+            IJavaElement parent = cu.getParent();
+            if(parent instanceof IPackageFragment) {
+               IPackageFragment pf = (IPackageFragment) parent;
+               return pf.getElementName();
+            }
+         }
+      }
+      return null;
    }
 }

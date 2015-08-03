@@ -7,7 +7,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 
 /**
- * Manages the {@link KeYProjectDelta}, updates and creates them.
+ * Manages and creates the {@link KeYProjectDelta}.
  * @author Stefan Käsdorf
  */
 public class KeYProjectDeltaManager {

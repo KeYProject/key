@@ -410,6 +410,19 @@ public class CollectionUtil {
       catch (NoSuchElementException e) {
          return null; // Iterable must be empty.
       }
+   }   
+   
+   /**
+    * Converts the given array to a new {@link List<T>}.
+    * @param array to be converted.
+    * @return the new {@link List<T>} containing all array elements.
+    */
+   public static <T> List<T> arrayToList(T[] array){ // TODO: Move to CollectionUtil
+      List<T> list = new LinkedList<T>();
+      for(T t : array){
+         list.add(t);
+      }
+      return list;
    }
 
    /**

@@ -499,7 +499,7 @@ public abstract class AbstractProblemLoader {
 
         final boolean isOSSActivated =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-        
+        ReplayResult result;
         try {
         	if (envInput instanceof KeYUserProblemFile) {
         	    
@@ -536,9 +536,9 @@ public abstract class AbstractProblemLoader {
             
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
             OneStepSimplifier.refreshOSS(proof);
+            result = new ReplayResult(status, errors, lastTouchedNode);
         }
         	
-        ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);
         
         return result;
     }

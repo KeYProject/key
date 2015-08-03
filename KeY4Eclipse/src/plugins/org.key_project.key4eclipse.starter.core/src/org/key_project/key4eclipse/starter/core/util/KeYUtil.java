@@ -92,6 +92,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
@@ -1412,14 +1413,16 @@ public final class KeYUtil {
       Assert.isNotNull(proof);
       Assert.isNotNull(file);
       try {
-         File location = ResourceUtil.getLocation(file);
+         final File location = ResourceUtil.getLocation(file);
          // Create proof file content
-         ProofSaver saver = new ProofSaver(proof, location.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
+         OutputStreamProofSaver saver = new OutputStreamProofSaver(proof, KeYConstants.INTERNAL_VERSION) {
+            @Override
+            protected String getBasePath() throws IOException {
+                return ProofSaver.computeBasePath(location);
+            }
+         };
          ByteArrayOutputStream out = new ByteArrayOutputStream();
-         String errorMessage = saver.save(out);
-         if (errorMessage != null) {
-            throw new CoreException(LogUtil.getLogger().createErrorStatus(errorMessage));
-         }
+         saver.save(out);
          // Save proof file content
          if (file.exists()) {
             file.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);

@@ -23,7 +23,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 /**
- * DeltaVisitor to visit every child of the given delta and extract KeY Project relevant changes.
+ * DeltaVisitor to visit every child of the given delta and extract KeY Project relevant changes. Includes changed java, proof and meta files.
  * @author Stefan Käsdorf
  */
 public class KeYProjectDeltaVisitor implements IResourceDeltaVisitor{

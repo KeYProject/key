@@ -1148,4 +1148,22 @@ public class Proof implements Named {
        ProofSaver saver = new ProofSaver(this, file);
        saver.save();
     }
+    
+   /**
+    * Extracts java source directory from {@link #header()}, if it exists.
+    */
+   public File getJavaSourceLocation() {
+      String header = header();
+      int i = header.indexOf("\\javaSource");
+      if (i >= 0) {
+         int begin = header.indexOf('\"', i);
+         int end = header.indexOf('\"', begin + 1);
+         String sourceLocation = header.substring(begin + 1, end);
+         if (sourceLocation.length() > 0) {
+            return new File(sourceLocation);
+         }
+      }
+      return null;
+   }
+
 }
