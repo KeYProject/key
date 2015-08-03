@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
@@ -37,6 +38,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
     private ImmutableList<SymbolicExecutionState> joinPartnerStates = null;
+    private Term distForm = null;
 
 	public JoinRuleBuiltInRuleApp(BuiltInRule builtInRule,
             PosInOccurrence pio) {
@@ -143,6 +145,19 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		this.joinNode = joinNode;
 		this.thisSEState = JoinRuleUtils.sequentToSETriple(joinNode, super.pio, joinNode.proof().getServices());
 	}
+	
+	public void setDistinguishingFormula(Term distForm) {
+	    // null is OK: In this case, we generate the distinguishing
+	    // formula automatically. Otherwise, the term must indeed be
+	    // a formula.
+	    assert distForm == null || distForm.sort() == Sort.FORMULA;
+	    
+	    this.distForm  = distForm;
+	}
+    
+    public Term getDistinguishingFormula() {
+        return distForm;
+    }
 	
 	public SymbolicExecutionStateWithProgCnt getJoinSEState() {
 	    return thisSEState;

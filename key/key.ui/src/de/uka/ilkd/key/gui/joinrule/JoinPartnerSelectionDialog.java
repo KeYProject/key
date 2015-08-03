@@ -288,17 +288,18 @@ public class JoinPartnerSelectionDialog extends JDialog {
         txtDistForm = new JTextField();
         txtDistForm.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 chosenDistForm =
-                        translate(MAIN_WINDOW_INSTANCE.getMediator()
-                                .getServices(), txtDistForm.getText());
+                        translate(txtDistForm.getText());
                 
                 if (chosenDistForm == null) {
                     txtDistForm.setForeground(Color.RED);
                 }
                 else {
-                    txtDistForm.setForeground(Color.WHITE);
+                    txtDistForm.setForeground(Color.BLACK);
                 }
+                
+                checkApplicable();
             }
         });
         
@@ -438,7 +439,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
      * @return The chosen distinguishing formula. If null, an automatic
      *         generation of the distinguishing formula should be performed.
      */
-    public Term getChosenDistFormula() {
+    public Term getChosenDistinguishingFormula() {
         return chosenDistForm;
     }
 
@@ -475,9 +476,15 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private void checkApplicable() {
         okButton.setEnabled(chosenGoals.size() > 0
                 && isApplicableForCandidates(immutableListFromIterabe(chosenGoals)));
+        
         chooseAllButton
                 .setEnabled(candidates.size() > 0
                         && isApplicableForCandidates(immutableListFromIterabe(candidates)));
+        
+        txtDistForm.setEnabled(candidates.size() == 1 || chosenGoals.size() == 1);
+        if (!txtDistForm.isEnabled()) {
+            chosenDistForm = null;
+        }
     }
 
     /**
@@ -539,23 +546,22 @@ public class JoinPartnerSelectionDialog extends JDialog {
     }
     
     /**
-     * Translates a String into a formula to null if not applicable.
+     * Translates a String into a formula or to null if not applicable.
      *
      * @param services The services object.
      * @param toTranslate The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
      */
-    private static Term translate(final Services services, final String toTranslate) {
+    private Term translate(final String toTranslate) {
         try {
             final KeYParserF parser =
                     new KeYParserF(ParserMode.TERM, new KeYLexerF(
                             new StringReader(toTranslate), ""), services,
                             services.getNamespaces());
             final Term result = parser.term();
-            return result.op() == Sort.FORMULA ? result : null;
+            return result.sort() == Sort.FORMULA ? result : null;
         }
         catch (Throwable e) {
-            e.printStackTrace();
             return null;
         }
     }
