@@ -15,11 +15,19 @@ public abstract class AbstractChoicesQuestion extends AbstractQuestion {
    private final List<Choice> choices;
 
    public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Choice... choices) {
-      this(name, label, description, defaultChoice, validator, askForTrust, CollectionUtil.toList(choices));
+      this(name, label, description, defaultChoice, validator, askForTrust, null, CollectionUtil.toList(choices));
+   }
+
+   public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, Choice... choices) {
+      this(name, label, description, defaultChoice, validator, askForTrust, relatedTools, CollectionUtil.toList(choices));
    }
 
    public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, List<Choice> choices) {
-      super(name, label, description, defaultChoice, validator, askForTrust);
+      this(name, label, description, defaultChoice, validator, askForTrust, null, choices);
+   }
+
+   public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, List<Choice> choices) {
+      super(name, label, description, defaultChoice, validator, askForTrust, relatedTools);
       this.choices = choices;
       validateChocies(choices);
    }

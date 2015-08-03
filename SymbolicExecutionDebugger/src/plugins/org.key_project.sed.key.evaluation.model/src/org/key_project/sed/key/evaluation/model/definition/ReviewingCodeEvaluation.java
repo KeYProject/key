@@ -356,7 +356,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               new LabelQuestion("generalDescription", createGeneralClassDescription("ValueSearch")),
                               implementedAsDocumented,
                               createThrownExceptionsQuestion(description, true, false, false, false, false, false),
-                              executedQuestion);
+                              executedQuestion,
+                              createSEDUsedQuestion(),
+                              createCodeExecutedQuestion());
    }
 
    
@@ -418,9 +420,11 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               new LabelQuestion("generalDescription", createGeneralClassDescription("BankUtil")),
                               implementedAsDocumented,
                               createThrownExceptionsQuestion(description, false, false, false, false, false, false),
-                              executedQuestion);
+                              executedQuestion,
+                              createSEDUsedQuestion(),
+                              createCodeExecutedQuestion());
    }
-   
+
    private CheckboxQuestion createBankUtilReturnedValue(String description, boolean expectedSelected) {
       String returnedValueTitle = "Which value is returned?";
       return new CheckboxQuestion("methodProblems", 
@@ -511,7 +515,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               new LabelQuestion("generalDescription", createGeneralClassDescription("MathUtil")),
                               implementedAsDocumented,
                               createThrownExceptionsQuestion(description, false, false, false, false, true, false),
-                              executedQuestion);
+                              executedQuestion,
+                              createSEDUsedQuestion(),
+                              createCodeExecutedQuestion());
    }
 
    
@@ -577,7 +583,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               new LabelQuestion("generalDescription", createGeneralClassDescription("IntegerUtil")),
                               implementedAsDocumented,
                               createThrownExceptionsQuestion(description, false, false, false, false, false, false),
-                              executedQuestion);
+                              executedQuestion,
+                              createSEDUsedQuestion(),
+                              createCodeExecutedQuestion());
    }
    
    
@@ -650,7 +658,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              createObservableArrayClassInvariantQuestion(description, true),
                              createThrownExceptionsQuestion(description, false, false, false, true, false, false),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, true, true, false));
+                             createObservableArrayLocationQuestion(description, true, true, false),
+                             createSEDUsedQuestion(),
+                             createCodeExecutedQuestion());
    }
    
    private TabQuestion createSetTab() {
@@ -706,7 +716,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              createObservableArrayClassInvariantQuestion(description, false),
                              createThrownExceptionsQuestion(description, true, false, false, false, true, true),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, false, false, true));
+                             createObservableArrayLocationQuestion(description, false, false, true),
+                             createSEDUsedQuestion(),
+                             createCodeExecutedQuestion());
    }
    
    private TabQuestion createSetArrayListenersTab() {
@@ -749,7 +761,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              createObservableArrayClassInvariantQuestion(description, false),
                              createThrownExceptionsQuestion(description, false, false, false, false, false, false),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, false, true, false));
+                             createObservableArrayLocationQuestion(description, false, true, false),
+                             createSEDUsedQuestion(),
+                             createCodeExecutedQuestion());
    }
    
    private RadioButtonsQuestion createObservableArrayClassInvariantQuestion(String description, boolean constructor) {
@@ -896,7 +910,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              createStackClassInvariantQuestion(description, true, false),
                              createThrownExceptionsQuestion(description, false, true, false, false, false, false),
                              executedQuestion,
-                             createStackLocationQuestion(description, true, true, false));
+                             createStackLocationQuestion(description, true, true, false),
+                             createSEDUsedQuestion(),
+                             createCodeExecutedQuestion());
    }
    
    private TabQuestion createStackStackTab() {
@@ -946,7 +962,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              createStackClassInvariantQuestion(description, true, false),
                              createThrownExceptionsQuestion(description, true, false, false, false, false, false),
                              executedQuestion,
-                             createStackLocationQuestion(description, true, true, false));
+                             createStackLocationQuestion(description, true, true, false),
+                             createSEDUsedQuestion(),
+                             createCodeExecutedQuestion());
    }
    
    private TabQuestion createPushTab() {
@@ -998,7 +1016,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              createStackClassInvariantQuestion(description, false, false),
                              createThrownExceptionsQuestion(description, false, false, true, false, false, false),
                              executedQuestion,
-                             createStackLocationQuestion(description, false, true, true));
+                             createStackLocationQuestion(description, false, true, true),
+                             createSEDUsedQuestion(),
+                             createCodeExecutedQuestion());
    }
    
    private TabQuestion createPopTab() {
@@ -1063,7 +1083,61 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              createThrownExceptionsQuestion(description, false, false, true, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, false, true, false),
-                             returnValue);
+                             returnValue,
+                             createSEDUsedQuestion(),
+                             createCodeExecutedQuestion());
+   }
+   
+   private RadioButtonsQuestion createSEDUsedQuestion() {
+      String title = "Does the symbolic execution tree help to answer the questions?";
+      return new RadioButtonsQuestion("setConsidered", 
+                                      title, 
+                                      (String) null,
+                                      true, 
+                                      null, 
+                                      createNotUndefinedValueValidator(title), 
+                                      false,
+                                      new Tool[] {getTool(SED_TOOL_NAME)},
+                                      new Choice("Yes, Very helpful", "YesVeryHelpful"), 
+                                      new Choice("Yes, Helpful", "YesHelpful"), 
+                                      new Choice("Yes, Little helpful", "YesLittleHelpful"), 
+                                      new Choice("No, Not helpful", "NoNotHelpful"),
+                                      new Choice("Not considered", "NotConsidered"));
+   }
+   
+   private RadioButtonsQuestion createCodeExecutedQuestion() {
+      String helpfulTitle = "Does executing/debugging the source code help to answer the questions?";
+      RadioButtonsQuestion helpfulQuestion = new RadioButtonsQuestion("executionHelpful", 
+                                                                      helpfulTitle, 
+                                                                      (String) null,
+                                                                      true, 
+                                                                      null, 
+                                                                      createNotUndefinedValueValidator(helpfulTitle), 
+                                                                      false,
+                                                                      new Tool[] {getTool(NO_TOOL_NAME)},
+                                                                      new Choice("Yes, Very helpful", "YesVeryHelpful"), 
+                                                                      new Choice("Yes, Helpful", "YesHelpful"), 
+                                                                      new Choice("Yes, Little helpful", "YesLittleHelpful"), 
+                                                                      new Choice("No, Not helpful", "NoNotHelpful"));
+      String writtenCodetitle = "Which code has been written?";
+      TextQuestion writtenCodeQuestion = new TextQuestion("writtenCode", 
+                                                          writtenCodetitle, 
+                                                          "(Only if code is still available.)", 
+                                                          null, 
+                                                          null, 
+                                                          false,
+                                                          new Tool[] {getTool(NO_TOOL_NAME)});
+      String title = "Have you executed/debugged the source code to answer the questions?";
+      return new RadioButtonsQuestion("codeExecuted", 
+                                      title, 
+                                      (String) null,
+                                      true, 
+                                      null, 
+                                      createNotUndefinedValueValidator(title), 
+                                      false,
+                                      new Tool[] {getTool(NO_TOOL_NAME)},
+                                      new Choice("Yes", "Yes", helpfulQuestion, writtenCodeQuestion), 
+                                      new Choice("No", "No"));
    }
 
    private Choice createElseRetrunedChoice(String description) {

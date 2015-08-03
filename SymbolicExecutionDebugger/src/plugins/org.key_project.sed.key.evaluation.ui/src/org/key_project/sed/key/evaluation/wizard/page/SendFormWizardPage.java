@@ -89,7 +89,7 @@ public class SendFormWizardPage extends AbstractEvaluationWizardPage<SendFormPag
       Control errornousControl = null;
       String errorMessage = getRunnablesFailure();
       if (errorMessage == null) {
-         errorMessage = getPageInput().getAcceptInput().validate();
+         errorMessage = getPageInput().getAcceptInput().validate(null);
          if (errorMessage != null) {
             errornousControl = acceptManager.getComposite();
          }

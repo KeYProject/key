@@ -12,6 +12,7 @@ import org.key_project.sed.key.evaluation.model.definition.CheckboxQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.IQuestionWithCildren;
 import org.key_project.sed.key.evaluation.model.definition.TextQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -197,33 +198,39 @@ public class QuestionInput extends Bean {
       firePropertyChange(PROP_TRUST_SET_AT, oldValue, getTrustSetAt());
    }
 
-   public String validate() {
-      // Validate input
-      String errorMessage = validateValue();
-      if (errorMessage == null && question.isAskForTrust()) {
-         errorMessage = validateTrust();
-      }
-      // Validate choice inputs
-      if (errorMessage == null && hasChoiceInputs()) {
-         Choice[] selectedChoices = getSelectedChoices();
-         for (int i = 0; errorMessage == null && i < selectedChoices.length; i++) {
-            List<QuestionInput> childInputs = choiceInputs.get(selectedChoices[i]);
-            if (childInputs != null) {
-               Iterator<QuestionInput> iter = childInputs.iterator();
-               while (errorMessage == null && iter.hasNext()) {
-                  errorMessage = iter.next().validate();
+   public String validate(Tool currentTool) {
+      if (!question.isToolRelated() ||
+          ArrayUtil.contains(question.getRelatedTools(), currentTool)) {
+         // Validate input
+         String errorMessage = validateValue();
+         if (errorMessage == null && question.isAskForTrust()) {
+            errorMessage = validateTrust();
+         }
+         // Validate choice inputs
+         if (errorMessage == null && hasChoiceInputs()) {
+            Choice[] selectedChoices = getSelectedChoices();
+            for (int i = 0; errorMessage == null && i < selectedChoices.length; i++) {
+               List<QuestionInput> childInputs = choiceInputs.get(selectedChoices[i]);
+               if (childInputs != null) {
+                  Iterator<QuestionInput> iter = childInputs.iterator();
+                  while (errorMessage == null && iter.hasNext()) {
+                     errorMessage = iter.next().validate(currentTool);
+                  }
                }
             }
          }
-      }
-      // Validate child inputs
-      if (errorMessage == null && childInputs != null) {
-         Iterator<QuestionInput> iter = childInputs.iterator();
-         while (errorMessage == null && iter.hasNext()) {
-            errorMessage = iter.next().validate();
+         // Validate child inputs
+         if (errorMessage == null && childInputs != null) {
+            Iterator<QuestionInput> iter = childInputs.iterator();
+            while (errorMessage == null && iter.hasNext()) {
+               errorMessage = iter.next().validate(currentTool);
+            }
          }
+         return errorMessage;
       }
-      return errorMessage;
+      else {
+         return null;
+      }
    }
    
    public String validateValue() {

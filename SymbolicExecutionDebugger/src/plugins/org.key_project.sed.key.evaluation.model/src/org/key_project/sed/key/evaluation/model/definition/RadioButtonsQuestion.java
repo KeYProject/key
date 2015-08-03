@@ -25,6 +25,10 @@ public class RadioButtonsQuestion extends AbstractButtonsQuestion {
    public RadioButtonsQuestion(String name, String label, String description, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Choice... choices) {
       this(name, label, description, null, vertical, defaultChoice, validator, askForTrust, choices);
    }
+   
+   public RadioButtonsQuestion(String name, String label, String description, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, Choice... choices) {
+      this(name, label, description, null, vertical, defaultChoice, validator, askForTrust, relatedTools, choices);
+   }
 
    public RadioButtonsQuestion(String name, String label, String description, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, List<Choice> choices) {
       this(name, label, description, null, vertical, defaultChoice, validator, askForTrust, choices);
@@ -34,8 +38,16 @@ public class RadioButtonsQuestion extends AbstractButtonsQuestion {
       super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, choices);
    }
 
+   public RadioButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, Choice... choices) {
+      super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, relatedTools, choices);
+   }
+
    public RadioButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, List<Choice> choices) {
       super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, choices);
+   }
+
+   public RadioButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, List<Choice> choices) {
+      super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, relatedTools, choices);
    }
 
    @Override

@@ -52,6 +52,7 @@ import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
+import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.SendFormWizardPage;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -178,6 +179,9 @@ public class EvaluationWizardDialog extends WizardDialog {
 
    @Override
    public void showPage(IWizardPage page) {
+      if (page instanceof QuestionWizardPage) {
+         ((QuestionWizardPage) page).ensureContentIsCreated();
+      }
       if (getCurrentPage() instanceof SendFormWizardPage) {
          ((SendFormWizardPage) getCurrentPage()).getPageInput().removePropertyChangeListener(SendFormPageInput.PROP_SENDING_IN_PROGRESS, sendingListener);
       }
@@ -449,6 +453,9 @@ public class EvaluationWizardDialog extends WizardDialog {
       getShell().setImage(image);
       handCursor = new Cursor(getShell().getDisplay(), SWT.CURSOR_HAND);
       Control control = super.createContents(parent);
+      if (getCurrentPage() instanceof QuestionWizardPage) {
+         ((QuestionWizardPage) getCurrentPage()).ensureContentIsCreated();
+      }
       updateToolbar();
       getCurrentPage().reflow();
       return control;

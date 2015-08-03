@@ -12,11 +12,19 @@ public abstract class AbstractButtonsQuestion extends AbstractChoicesQuestion {
    private final Image image;
 
    public AbstractButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Choice... choices) {
-      this(name, label, description, image, vertical, defaultChoice, validator, askForTrust, CollectionUtil.toList(choices));
+      this(name, label, description, image, vertical, defaultChoice, validator, askForTrust, null, CollectionUtil.toList(choices));
+   }
+
+   public AbstractButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, Choice... choices) {
+      this(name, label, description, image, vertical, defaultChoice, validator, askForTrust, relatedTools, CollectionUtil.toList(choices));
    }
 
    public AbstractButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, List<Choice> choices) {
-      super(name, label, description, defaultChoice, validator, askForTrust, choices);
+      this(name, label, description, image, vertical, defaultChoice, validator, askForTrust, null, choices);
+   }
+
+   public AbstractButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, List<Choice> choices) {
+      super(name, label, description, defaultChoice, validator, askForTrust, relatedTools, choices);
       this.image = image;
       this.vertical = vertical;
    }

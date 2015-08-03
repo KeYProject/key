@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.model.definition;
 
 import org.key_project.sed.key.evaluation.model.validation.IValueValidator;
+import org.key_project.util.java.ArrayUtil;
 
 public abstract class AbstractQuestion {
    private final String name;
@@ -14,18 +15,25 @@ public abstract class AbstractQuestion {
    private final IValueValidator validator;
    
    private final boolean askForTrust;
+   
+   private final Tool[] relatedTools;
 
    public AbstractQuestion(String name) {
-      this(name, null, null, null, null, false);
+      this(name, null, null, null, null, false, null);
    }
 
    public AbstractQuestion(String name, String label, String description, String defaultValue, IValueValidator validator, boolean askForTrust) {
+      this(name, label, description, defaultValue, validator, askForTrust, null);
+   }
+
+   public AbstractQuestion(String name, String label, String description, String defaultValue, IValueValidator validator, boolean askForTrust, Tool[] relatedTools) {
       this.name = name;
       this.label = label;
       this.description = description;
       this.defaultValue = defaultValue;
       this.validator = validator;
       this.askForTrust = askForTrust;
+      this.relatedTools = relatedTools;
    }
 
    public String getName() {
@@ -53,6 +61,14 @@ public abstract class AbstractQuestion {
       }
    }
    
+   public boolean isToolRelated() {
+      return !ArrayUtil.isEmpty(relatedTools);
+   }
+   
+   public Tool[] getRelatedTools() {
+      return relatedTools;
+   }
+
    public boolean isAskForTrust() {
       return askForTrust;
    }

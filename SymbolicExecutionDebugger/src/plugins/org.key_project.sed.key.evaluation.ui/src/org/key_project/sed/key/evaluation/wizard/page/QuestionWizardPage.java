@@ -24,6 +24,7 @@ import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.sed.key.evaluation.model.definition.TabQuestion;
 import org.key_project.sed.key.evaluation.model.definition.TabbedQuestion;
 import org.key_project.sed.key.evaluation.model.definition.TextQuestion;
+import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.wizard.manager.BrowserManager;
@@ -37,6 +38,7 @@ import org.key_project.sed.key.evaluation.wizard.manager.SectionManager;
 import org.key_project.sed.key.evaluation.wizard.manager.TabManager;
 import org.key_project.sed.key.evaluation.wizard.manager.TabbedManager;
 import org.key_project.sed.key.evaluation.wizard.manager.TextManager;
+import org.key_project.util.java.ArrayUtil;
 
 public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPageInput> {
    private final List<IQuestionInputManager> controls = new LinkedList<IQuestionInputManager>();
@@ -51,7 +53,11 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    private final Set<QuestionInput> observedInputs = new HashSet<QuestionInput>();
    
    private final Map<QuestionInput, IQuestionInputManager> input2managerMap = new HashMap<QuestionInput, IQuestionInputManager>();
+   
+   private FormToolkit toolkit;
 
+   private Composite parent;
+   
    public QuestionWizardPage(QuestionPageInput pageInput, ImageDescriptor imageDescriptor) {
       super(pageInput, imageDescriptor, pageInput.getPage().isUseForm());
    }
@@ -70,27 +76,39 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
 
    @Override
    protected void createContent(FormToolkit toolkit, Composite parent) {
-      ICreateControlCallback callBack = new ICreateControlCallback() {
-         @Override
-         public void handleQuestionInput(QuestionInput questionInput) {
-            questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, valueAndTrustListener);
-            questionInput.addPropertyChangeListener(QuestionInput.PROP_TRUST, valueAndTrustListener);
-            observedInputs.add(questionInput);
-         }
-
-         @Override
-         public void handleManagerCreated(QuestionInput questionInput, IQuestionInputManager manager) {
-            input2managerMap.put(questionInput, manager);
-         }
-      };
-      List<IQuestionInputManager> managers = createQuestionControls(this,
-                                                                    toolkit, 
-                                                                    parent, 
-                                                                    getPageInput().getQuestionInputs(),
-                                                                    callBack);
-      controls.addAll(managers);
+      // Nothing to do, content is created when wizard page becomes visible the first time.
+      this.toolkit = toolkit;
+      this.parent = parent;
    }
    
+   public void ensureContentIsCreated() {
+      if (parent != null && toolkit != null) {
+         ICreateControlCallback callBack = new ICreateControlCallback() {
+            @Override
+            public void handleQuestionInput(QuestionInput questionInput) {
+               questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, valueAndTrustListener);
+               questionInput.addPropertyChangeListener(QuestionInput.PROP_TRUST, valueAndTrustListener);
+               observedInputs.add(questionInput);
+            }
+
+            @Override
+            public void handleManagerCreated(QuestionInput questionInput, IQuestionInputManager manager) {
+               input2managerMap.put(questionInput, manager);
+            }
+         };
+         List<IQuestionInputManager> managers = createQuestionControls(this,
+                                                                       toolkit, 
+                                                                       parent, 
+                                                                       getPageInput().getQuestionInputs(),
+                                                                       callBack);
+         controls.addAll(managers);
+         reflow();
+         toolkit = null;
+         parent = null;
+         updatePageCompleted();
+      }
+   }
+
    public static List<IQuestionInputManager> createQuestionControls(AbstractEvaluationWizardPage<?> wizardPage,
                                                                     FormToolkit toolkit, 
                                                                     Composite parent, 
@@ -99,39 +117,42 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       List<IQuestionInputManager> managers = new LinkedList<IQuestionInputManager>();
       for (QuestionInput questionInput : questionInputs) {
          callback.handleQuestionInput(questionInput);
-         IQuestionInputManager manager;
-         if (questionInput.getQuestion() instanceof BrowserQuestion) {
-            manager = createBrowser(toolkit, parent, (BrowserQuestion) questionInput.getQuestion());
+         if (!questionInput.getQuestion().isToolRelated() ||
+             ArrayUtil.contains(questionInput.getQuestion().getRelatedTools(), wizardPage.getCurrentTool())) {
+            IQuestionInputManager manager;
+            if (questionInput.getQuestion() instanceof BrowserQuestion) {
+               manager = createBrowser(toolkit, parent, (BrowserQuestion) questionInput.getQuestion());
+            }
+            else if (questionInput.getQuestion() instanceof RadioButtonsQuestion) {
+               manager = createRadioButtons(wizardPage, toolkit, parent, questionInput, (RadioButtonsQuestion) questionInput.getQuestion(), callback);
+            }
+            else if (questionInput.getQuestion() instanceof CheckboxQuestion) {
+               manager = createCheckboxes(wizardPage, toolkit, parent, questionInput, (CheckboxQuestion) questionInput.getQuestion(), callback);
+            }
+            else if (questionInput.getQuestion() instanceof LabelQuestion) {
+               manager = createLabel(toolkit, parent, (LabelQuestion) questionInput.getQuestion());
+            }
+            else if (questionInput.getQuestion() instanceof ImageQuestion) {
+               manager = createImage(toolkit, parent, (ImageQuestion) questionInput.getQuestion());
+            }
+            else if (questionInput.getQuestion() instanceof SectionQuestion) {
+               manager = createSection(wizardPage, toolkit, parent, questionInput, (SectionQuestion) questionInput.getQuestion(), callback);
+            }
+            else if (questionInput.getQuestion() instanceof TextQuestion) {
+               manager = createText(wizardPage, toolkit, parent, questionInput, (TextQuestion) questionInput.getQuestion());
+            }
+            else if (questionInput.getQuestion() instanceof TabbedQuestion) {
+               manager = createTabbed(wizardPage, toolkit, parent, questionInput, (TabbedQuestion) questionInput.getQuestion(), callback);
+            }
+            else if (questionInput.getQuestion() instanceof TabQuestion) {
+               manager = createTab(wizardPage, toolkit, parent, questionInput, (TabQuestion) questionInput.getQuestion(), callback);
+            }
+            else {
+               throw new IllegalStateException("Unsupported question: " + questionInput.getQuestion());
+            }
+            managers.add(manager);
+            callback.handleManagerCreated(questionInput, manager);
          }
-         else if (questionInput.getQuestion() instanceof RadioButtonsQuestion) {
-            manager = createRadioButtons(wizardPage, toolkit, parent, questionInput, (RadioButtonsQuestion) questionInput.getQuestion(), callback);
-         }
-         else if (questionInput.getQuestion() instanceof CheckboxQuestion) {
-            manager = createCheckboxes(wizardPage, toolkit, parent, questionInput, (CheckboxQuestion) questionInput.getQuestion(), callback);
-         }
-         else if (questionInput.getQuestion() instanceof LabelQuestion) {
-            manager = createLabel(toolkit, parent, (LabelQuestion) questionInput.getQuestion());
-         }
-         else if (questionInput.getQuestion() instanceof ImageQuestion) {
-            manager = createImage(toolkit, parent, (ImageQuestion) questionInput.getQuestion());
-         }
-         else if (questionInput.getQuestion() instanceof SectionQuestion) {
-            manager = createSection(wizardPage, toolkit, parent, questionInput, (SectionQuestion) questionInput.getQuestion(), callback);
-         }
-         else if (questionInput.getQuestion() instanceof TextQuestion) {
-            manager = createText(wizardPage, toolkit, parent, questionInput, (TextQuestion) questionInput.getQuestion());
-         }
-         else if (questionInput.getQuestion() instanceof TabbedQuestion) {
-            manager = createTabbed(wizardPage, toolkit, parent, questionInput, (TabbedQuestion) questionInput.getQuestion(), callback);
-         }
-         else if (questionInput.getQuestion() instanceof TabQuestion) {
-            manager = createTab(wizardPage, toolkit, parent, questionInput, (TabQuestion) questionInput.getQuestion(), callback);
-         }
-         else {
-            throw new IllegalStateException("Unsupported question: " + questionInput.getQuestion());
-         }
-         managers.add(manager);
-         callback.handleManagerCreated(questionInput, manager);
       }
       return managers;
    }
@@ -187,26 +208,32 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       Control errornousControl = null;
       String errorMessage = getRunnablesFailure();
       // Validate questions
-      if (errorMessage == null) {
-         QuestionInput[] inputs = getPageInput().getQuestionInputs();
-         int i = 0;
-         while (errorMessage == null && i < inputs.length) {
-            errorMessage = inputs[i].validate();
-            if (errorMessage != null) {
-               if (isInputErrornous(inputs[i])) {
-                  errornousControl = controls.get(i).getFocusControl();
-               }
-               else {
-                  QuestionInput errornousInput = findErrornousInput(inputs[i]);
-                  if (errornousInput != null) {
-                     IQuestionInputManager errornousManager = input2managerMap.get(errornousInput);
+      if (parent == null) { // Validate input only if controls have been created
+         Tool tool = getCurrentTool();
+         if (errorMessage == null) {
+            QuestionInput[] inputs = getPageInput().getQuestionInputs();
+            int i = 0;
+            while (errorMessage == null && i < inputs.length) {
+               errorMessage = inputs[i].validate(tool);
+               if (errorMessage != null) {
+                  if (isInputErrornous(inputs[i], tool)) {
+                     IQuestionInputManager errornousManager = input2managerMap.get(inputs[i]);
                      if (errornousManager != null) {
                         errornousControl = errornousManager.getFocusControl();
                      }
                   }
+                  else {
+                     QuestionInput errornousInput = findErrornousInput(inputs[i]);
+                     if (errornousInput != null) {
+                        IQuestionInputManager errornousManager = input2managerMap.get(errornousInput);
+                        if (errornousManager != null) {
+                           errornousControl = errornousManager.getFocusControl();
+                        }
+                     }
+                  }
                }
+               i++;
             }
-            i++;
          }
       }
       // Update page completed state
@@ -218,13 +245,14 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    protected QuestionInput findErrornousInput(QuestionInput questionInput) {
       QuestionInput errornousInput = null;
       // Search in choice inputs
+      Tool currentTool = getCurrentTool();
       if (questionInput.hasChoiceInputs()) {
          Choice[] selectedChoices = questionInput.getSelectedChoices();
          for (int i = 0; errornousInput == null && i < selectedChoices.length; i++) {
             QuestionInput[] childInputs = questionInput.getChoiceInputs(selectedChoices[i]);
             if (childInputs != null) {
                for (int j = 0; errornousInput == null && j < childInputs.length; j++) {
-                  if (isInputErrornous(childInputs[j])) {
+                  if (isInputErrornous(childInputs[j], currentTool)) {
                      errornousInput = childInputs[j];
                   }
                   else {
@@ -238,7 +266,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       if (errornousInput == null && questionInput.countChildInputs() > 0) {
          QuestionInput[] childInputs = questionInput.getChildInputs();
          for (int i = 0; errornousInput == null && i < childInputs.length; i++) {
-            if (isInputErrornous(childInputs[i])) {
+            if (isInputErrornous(childInputs[i], currentTool)) {
                errornousInput = childInputs[i];
             }
             else {
@@ -249,9 +277,15 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       return errornousInput;
    }
    
-   protected boolean isInputErrornous(QuestionInput questionInput) {
-      return questionInput.validateValue() != null || 
-             (questionInput.getQuestion().isAskForTrust() && questionInput.validateTrust() != null);
+   protected boolean isInputErrornous(QuestionInput questionInput, Tool currentTool) {
+      if (!questionInput.getQuestion().isToolRelated() ||
+          ArrayUtil.contains(questionInput.getQuestion().getRelatedTools(), currentTool)) {
+         return questionInput.validateValue() != null || 
+                (questionInput.getQuestion().isAskForTrust() && questionInput.validateTrust() != null);
+      }
+      else {
+         return false;
+      }
    }
 
    @Override
