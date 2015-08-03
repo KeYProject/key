@@ -387,7 +387,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
       }
       IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes, type);
       if (pm == null) {
-         throw new IOException("Can't find program method \"" + value + "\".");
+         pm = javaInfo.getConstructor(type, parameterTypes);
+         if (pm == null) {
+            throw new IOException("Can't find program method \"" + value + "\".");
+         }
       }
       return pm;
    }
