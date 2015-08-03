@@ -57,12 +57,9 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
 
    @Override
    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-         Term v,
-         SymbolicExecutionState state1,
-         Term valueInState1,
-         SymbolicExecutionState state2,
-         Term valueInState2,
-         Services services) {
+            Term v, SymbolicExecutionState state1, Term valueInState1,
+            SymbolicExecutionState state2, Term valueInState2,
+            Term distinguishingFormula, Services services) {
       
       final TermBuilder tb = services.getTermBuilder();
       
@@ -78,6 +75,7 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
             valueInState2,
             state1,
             state2,
+            distinguishingFormula,
             services
       ));
       
@@ -90,49 +88,68 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
         return true;
     }
    
-   /**
-    * Returns a list of if-then-else constraints for the given constrained
-    * term, states and if/else terms.
-    * 
-    * @param constrained The constrained term.
-    * @param ifTerm The value for the if case.
-    * @param elseTerm The value for the else case.
-    * @param state1 First SE state ("if").
-    * @param state2 Second SE state ("else").
-    * @param services The services object.
-    * @return A list of if-then-else constraints for the given constrained
-    *    term, states and if/else terms.
-    */
+    /**
+     * Returns a list of if-then-else constraints for the given constrained
+     * term, states and if/else terms.
+     * 
+     * @param constrained
+     *            The constrained term.
+     * @param ifTerm
+     *            The value for the if case.
+     * @param elseTerm
+     *            The value for the else case.
+     * @param state1
+     *            First SE state ("if").
+     * @param state2
+     *            Second SE state ("else").
+     * @param distinguishingFormula
+     *            The user-specified distinguishing formula. May be null (for
+     *            automatic generation).
+     * @param services
+     *            The services object.
+     * @return A list of if-then-else constraints for the given constrained
+     *         term, states and if/else terms.
+     */
    private static ImmutableSet<Term> getIfThenElseConstraints(
          Term constrained,
          Term ifTerm,
          Term elseTerm,
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
+         Term distinguishingFormula,
          Services services) {
       
-      TermBuilder tb = services.getTermBuilder();
+      final TermBuilder tb = services.getTermBuilder();
       ImmutableSet<Term> result = DefaultImmutableSet.nil();
       
-      Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-            JoinIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
-      
-      Term cond         = distFormAndRightSidesForITEUpd.first;
-      Term ifForm       = distFormAndRightSidesForITEUpd.second;
-      Term elseForm     = distFormAndRightSidesForITEUpd.third;
-      boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
-      
-      Term varEqualsIfForm   = tb.equals(constrained, ifForm);
-      Term varEqualsElseForm = tb.equals(constrained, elseForm);
-      
-      if (!(ifTerm.equals(constrained) && !isSwapped ||
-            elseTerm.equals(constrained) && isSwapped)) {
-          result = result.add(tb.imp(cond, varEqualsIfForm));
+      if (distinguishingFormula == null) {
+          final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+                JoinIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
+          
+          final Term cond         = distFormAndRightSidesForITEUpd.first;
+          final Term ifForm       = distFormAndRightSidesForITEUpd.second;
+          final Term elseForm     = distFormAndRightSidesForITEUpd.third;
+          final boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
+          
+          final Term varEqualsIfForm   = tb.equals(constrained, ifForm);
+          final Term varEqualsElseForm = tb.equals(constrained, elseForm);
+          
+          if (!(ifTerm.equals(constrained) && !isSwapped ||
+                elseTerm.equals(constrained) && isSwapped)) {
+              result = result.add(tb.imp(cond, varEqualsIfForm));
+          }
+          
+          if (!(elseTerm.equals(constrained) && !isSwapped ||
+                ifTerm.equals(constrained) && isSwapped)) {
+             result = result.add(tb.or(cond, varEqualsElseForm));
+          }
       }
-      
-      if (!(elseTerm.equals(constrained) && !isSwapped ||
-            ifTerm.equals(constrained) && isSwapped)) {
-         result = result.add(tb.or (cond, varEqualsElseForm));
+      else {
+          final Term varEqualsIfForm   = tb.equals(constrained, ifTerm);
+          final Term varEqualsElseForm = tb.equals(constrained, elseTerm);
+          
+          result = result.add(tb.imp(distinguishingFormula, varEqualsIfForm));
+          result = result.add(tb.or(distinguishingFormula, varEqualsElseForm));
       }
       
       return result;

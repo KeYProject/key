@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui.joinrule;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -22,6 +23,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -45,6 +48,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.html.HTMLDocument;
 
@@ -55,6 +59,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.WrapLayout;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
@@ -63,6 +72,7 @@ import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a join rule
@@ -94,6 +104,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
      */
     private static final Font TXT_AREA_FONT = new Font(Font.MONOSPACED,
             Font.PLAIN, 14);
+    
+    private final static MainWindow MAIN_WINDOW_INSTANCE = MainWindow.getInstance();
 
     /** Comparator for goals; sorts by serial nr. of the node */
     private static Comparator<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> GOAL_COMPARATOR =
@@ -116,12 +128,16 @@ public class JoinPartnerSelectionDialog extends JDialog {
 
     /** The chosen join method. */
     private JoinProcedure chosenRule = JoinProcedure.getJoinProcedures().head();
+    
+    /** The chosen distinguishing formula */
+    private Term chosenDistForm = null;
 
     private JEditorPane txtPartner1 = null;
     private JEditorPane txtPartner2 = null;
     private JComboBox<String> cmbCandidates = null;
     private JCheckBox cbSelectCandidate = null;
     private ButtonGroup bgJoinMethods = null;
+    private final JTextField txtDistForm;
 
     private JScrollPane scrpPartner1 = null;
     private JScrollPane scrpPartner2 = null;
@@ -130,10 +146,10 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private JButton chooseAllButton = null;
 
     private JoinPartnerSelectionDialog() {
-        super(MainWindow.getInstance(),
+        super(MAIN_WINDOW_INSTANCE,
                 "Select partner node for join operation", true);
 
-        setLocation(MainWindow.getInstance().getLocation());
+        setLocation(MAIN_WINDOW_INSTANCE.getLocation());
 
         // Text areas for goals to join
         txtPartner1 = new JEditorPane();
@@ -268,6 +284,35 @@ public class JoinPartnerSelectionDialog extends JDialog {
         joinRulesContainerTitle.setBorder(joinStateContainerTitle);
         joinRulesContainer.setBorder(joinRulesContainerTitle);
 
+        // Distinguishing method input field container
+        txtDistForm = new JTextField();
+        txtDistForm.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                chosenDistForm =
+                        JoinRuleUtils.translateToFormula(services, txtDistForm.getText());
+                
+                if (chosenDistForm == null || !isSuitableDistFormula()) {
+                    txtDistForm.setForeground(Color.RED);
+                }
+                else {
+                    txtDistForm.setForeground(Color.BLACK);
+                }
+                
+                checkApplicable();
+            }
+        });
+        
+        JPanel distFormContainer = new JPanel();
+        distFormContainer.setLayout(new BorderLayout());
+        
+        distFormContainer.add(txtDistForm, BorderLayout.CENTER);
+        
+        TitledBorder distFormContainerTitle = BorderFactory
+                .createTitledBorder("Distinguishing formula (leave empty for automatic generation!)");
+        distFormContainerTitle.setTitleJustification(TitledBorder.LEFT);
+        distFormContainer.setBorder(distFormContainerTitle);
+        
         // Control buttons container: OK / Cancel
         okButton = new JButton("OK");
         chooseAllButton = new JButton("Choose All");
@@ -322,6 +367,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
         lowerContainer
                 .setLayout(new BoxLayout(lowerContainer, BoxLayout.Y_AXIS));
         lowerContainer.add(joinRulesContainer);
+        lowerContainer.add(distFormContainer);
         lowerContainer.add(ctrlBtnsContainer);
 
         // Add components to content pane
@@ -388,11 +434,23 @@ public class JoinPartnerSelectionDialog extends JDialog {
     public JoinProcedure getChosenJoinRule() {
         return chosenRule;
     }
+    
+    /**
+     * @return The chosen distinguishing formula. If null, an automatic
+     *         generation of the distinguishing formula should be performed.
+     */
+    public Term getChosenDistinguishingFormula() {
+        return isSuitableDistFormula() ? chosenDistForm : null;
+    }
 
     /**
-     * TODO: Document.
+     * Checks whether the join rule is applicable for the given set of
+     * candidates.
      *
-     * @return
+     * @param theCandidates
+     *            Candidates to instantiate the join rule application with.
+     * @return true iff the join rule instance induced by the given set of
+     *         candidates is applicable.
      */
     private boolean isApplicableForCandidates(
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> theCandidates) {
@@ -412,14 +470,80 @@ public class JoinPartnerSelectionDialog extends JDialog {
     }
 
     /**
-     * TODO: Document.
+     * Enables / disables the OK and Choose all button depending on whether or
+     * not the currently chosen join rule instance is applicable.
      */
     private void checkApplicable() {
         okButton.setEnabled(chosenGoals.size() > 0
                 && isApplicableForCandidates(immutableListFromIterabe(chosenGoals)));
+        
         chooseAllButton
                 .setEnabled(candidates.size() > 0
                         && isApplicableForCandidates(immutableListFromIterabe(candidates)));
+        
+        txtDistForm.setEnabled(candidates.size() == 1 || chosenGoals.size() == 1);
+        if (!txtDistForm.isEnabled()) {
+            chosenDistForm = null;
+        }
+    }
+    
+    /**
+     * Checks whether the selected distinguishable formula is actually suitable
+     * for this purpose.
+     * 
+     * @return true iff the chosen "distinguishing formula" is a distinguishing
+     *         formula.
+     */
+    private boolean isSuitableDistFormula() {
+        if (chosenDistForm == null) {
+            return false;
+        }
+        
+        // The formula should be provable for the first state
+        // whilst its complement should be provable for the second state.
+        
+        final TermBuilder tb = services.getTermBuilder();
+        
+        {
+            Semisequent antecedent = joinGoalPio.first.sequent().antecedent();
+
+            for (SequentFormula succedentFormula : joinGoalPio.first.sequent()
+                    .succedent()) {
+                antecedent = antecedent.insertFirst(new SequentFormula(tb
+                        .not(succedentFormula.formula()))).semisequent();
+            }
+
+            if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
+                    new Semisequent(new SequentFormula(chosenDistForm))),
+                    services, 1000)) {
+                return false;
+            }
+        }
+        
+        {
+            final Goal partnerGoal = candidates.size() == 1 ? candidates.getFirst().first :
+                (chosenGoals.size() == 1 ? chosenGoals.first().first : null);
+            
+            if (partnerGoal == null) {
+                return false;
+            }
+            
+            Semisequent antecedent = partnerGoal.sequent().antecedent();
+
+            for (SequentFormula succedentFormula : partnerGoal.sequent()
+                    .succedent()) {
+                antecedent = antecedent.insertFirst(new SequentFormula(tb
+                        .not(succedentFormula.formula()))).semisequent();
+            }
+
+            if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
+                    new Semisequent(new SequentFormula(tb.not(chosenDistForm)))),
+                    services, 1000)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /**

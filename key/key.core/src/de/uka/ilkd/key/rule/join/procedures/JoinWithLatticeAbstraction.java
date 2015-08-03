@@ -63,7 +63,8 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
     @Override
     public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
-            SymbolicExecutionState state2, Term valueInState2, Services services) {
+            SymbolicExecutionState state2, Term valueInState2,
+            Term distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -101,7 +102,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
             // removed (no harm to soundness!).
             newConstraints = newConstraints.add(tb.equals(tb
                     .func(newSkolemConst), JoinIfThenElse.createIfThenElseTerm(
-                    state1, state2, valueInState1, valueInState2, services)));
+                    state1, state2, valueInState1, valueInState2, distinguishingFormula, services)));
 
             return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                     newConstraints, tb.func(newSkolemConst), newNames);
@@ -112,7 +113,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
             return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                     DefaultImmutableSet.<Term> nil(),
                     JoinIfThenElse.createIfThenElseTerm(state1, state2,
-                            valueInState1, valueInState2, services),
+                            valueInState1, valueInState2, distinguishingFormula, services),
                     DefaultImmutableSet.<Name> nil());
 
         }

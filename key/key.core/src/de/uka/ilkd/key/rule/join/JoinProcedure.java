@@ -61,15 +61,18 @@ public abstract class JoinProcedure {
      *            Second SE state.
      * @param valueInState2
      *            Value in state2.
+     * @param distinguishingFormula
+     *            The user-specified distinguishing formula. May be null (for
+     *            automatic generation).
      * @param services
      *            The services object.
      * @return A joined value for valueInState1 and valueInState2, that is a triple
      *  consisting of new constraints, the actual value and new names introduced.
      */
     public abstract Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2,
-            Term valueInState2, Services services);
+            Term v, SymbolicExecutionState state1, Term valueInState1,
+            SymbolicExecutionState state2, Term valueInState2,
+            Term distinguishingFormula, Services services);
 
     /**
      * @return true iff the join procedure requires distinguishable path
