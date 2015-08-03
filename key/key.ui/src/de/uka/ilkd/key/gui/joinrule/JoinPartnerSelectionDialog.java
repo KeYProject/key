@@ -17,6 +17,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -49,6 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.html.HTMLDocument;
 
@@ -286,6 +288,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
 
         // Distinguishing method input field container
         txtDistForm = new JTextField();
+        txtDistForm.setMargin(new Insets(5, 0, 5, 0));
         txtDistForm.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -364,10 +367,13 @@ public class JoinPartnerSelectionDialog extends JDialog {
         ctrlBtnsContainer.add(Box.createHorizontalGlue());
 
         JPanel lowerContainer = new JPanel();
+        Dimension verticalFillerDim = new Dimension(0, 10);
         lowerContainer
                 .setLayout(new BoxLayout(lowerContainer, BoxLayout.Y_AXIS));
         lowerContainer.add(joinRulesContainer);
+        lowerContainer.add(new Box.Filler(verticalFillerDim, verticalFillerDim, verticalFillerDim));
         lowerContainer.add(distFormContainer);
+        lowerContainer.add(new Box.Filler(verticalFillerDim, verticalFillerDim, verticalFillerDim));
         lowerContainer.add(ctrlBtnsContainer);
 
         // Add components to content pane
@@ -375,6 +381,12 @@ public class JoinPartnerSelectionDialog extends JDialog {
         getContentPane().add(lowerContainer, BorderLayout.SOUTH);
 
         setSize(INITIAL_SIZE);
+    }
+    
+    public static void main(String[] args) {
+        
+        JoinPartnerSelectionDialog diag = new JoinPartnerSelectionDialog();
+        diag.setVisible(true);
     }
 
     /**
