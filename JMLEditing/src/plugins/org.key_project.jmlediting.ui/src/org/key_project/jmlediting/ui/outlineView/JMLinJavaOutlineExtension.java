@@ -15,8 +15,8 @@ import org.key_project.javaeditor.util.LogUtil;
 public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
 
    
-   private static JMLASTCommentLocator comments = null;
-   private static IJavaElement root = null;
+   private JMLASTCommentLocator comments = null;
+   private IJavaElement root = null;
    
    @Override
    public Object[] modify(Object parent, Object[] currentChildren) {

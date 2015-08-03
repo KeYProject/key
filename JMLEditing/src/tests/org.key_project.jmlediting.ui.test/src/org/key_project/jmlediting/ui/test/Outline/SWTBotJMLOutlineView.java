@@ -155,7 +155,7 @@ public class SWTBotJMLOutlineView {
    @Test
    public void addMethodWithJML() {
       bot.activeEditor().toTextEditor().insertText(79, 0, textToAdd);
-      bot.sleep(1000);
+//      bot.sleep(1000);
       testbehavior("abcdtest() : void", "/*@ behavior\r\n   @ requires 1+1;\r\n   @*/", "behavior requires 1 + 1",true);
    }
    
