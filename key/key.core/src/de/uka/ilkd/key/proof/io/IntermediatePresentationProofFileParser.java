@@ -260,6 +260,11 @@ public class IntermediatePresentationProofFileParser implements
             ((BuiltinRuleInformation) ruleInfo).currJoinNodeId = Integer
                     .parseInt(str);
             break;
+            
+        case JOIN_DIST_FORMULA: // distinguishing formula for joins
+            ((BuiltinRuleInformation) ruleInfo).currDistFormula = str;
+            break;
+            
         default:
             break;
         }
@@ -358,7 +363,8 @@ public class IntermediatePresentationProofFileParser implements
                     new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
                             builtinInfo.currPosInTerm),
                     builtinInfo.currJoinNodeId, builtinInfo.currJoinProc,
-                    builtinInfo.currNrPartners, builtinInfo.currNewNames);
+                    builtinInfo.currNrPartners, builtinInfo.currNewNames,
+                    builtinInfo.currDistFormula);
         }
         else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
             result = new JoinPartnerAppIntermediate(builtinInfo.currRuleName,
@@ -454,6 +460,7 @@ public class IntermediatePresentationProofFileParser implements
         protected int currNrPartners = 0;
         protected int currCorrespondingJoinNodeId = 0;
         protected int currJoinNodeId = 0;
+        protected String currDistFormula = null;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);

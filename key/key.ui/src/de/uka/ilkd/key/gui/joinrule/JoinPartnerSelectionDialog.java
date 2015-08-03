@@ -295,7 +295,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
             @Override
             public void keyReleased(KeyEvent e) {
                 chosenDistForm =
-                        translate(txtDistForm.getText());
+                        JoinRuleUtils.translateToFormula(services, txtDistForm.getText());
                 
                 if (chosenDistForm == null || !isSuitableDistFormula()) {
                     txtDistForm.setForeground(Color.RED);
@@ -607,27 +607,6 @@ public class JoinPartnerSelectionDialog extends JDialog {
                 candidates.getFirst().second, txtPartner2);
 
         checkApplicable();
-    }
-    
-    /**
-     * Translates a String into a formula or to null if not applicable.
-     *
-     * @param services The services object.
-     * @param toTranslate The formula to be translated.
-     * @return The formula represented by the input or null if not applicable.
-     */
-    private Term translate(final String toTranslate) {
-        try {
-            final KeYParserF parser =
-                    new KeYParserF(ParserMode.TERM, new KeYLexerF(
-                            new StringReader(toTranslate), ""), services,
-                            services.getNamespaces());
-            final Term result = parser.term();
-            return result.sort() == Sort.FORMULA ? result : null;
-        }
-        catch (Throwable e) {
-            return null;
-        }
     }
 
     /**

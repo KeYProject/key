@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.util.joinrule;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -56,6 +57,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
+import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -120,6 +124,27 @@ public class JoinRuleUtils {
     ////////////////// GENERAL LOGIC //////////////////
     //////////////////   (Syntax)    //////////////////
     ///////////////////////////////////////////////////
+    
+    /**
+     * Translates a String into a formula or to null if not applicable.
+     *
+     * @param services The services object.
+     * @param toTranslate The formula to be translated.
+     * @return The formula represented by the input or null if not applicable.
+     */
+    public static Term translateToFormula(final Services services, final String toTranslate) {
+        try {
+            final KeYParserF parser =
+                    new KeYParserF(ParserMode.TERM, new KeYLexerF(
+                            new StringReader(toTranslate), ""), services,
+                            services.getNamespaces());
+            final Term result = parser.term();
+            return result.sort() == Sort.FORMULA ? result : null;
+        }
+        catch (Throwable e) {
+            return null;
+        }
+    }
 
     /**
      * @param u

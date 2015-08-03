@@ -81,6 +81,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.ProgramVariablesMatchVisitor;
 
 /**
@@ -242,14 +243,18 @@ public class IntermediateProofReplayer {
                         }
                         else {
                             try {
-                                JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) constructBuiltinApp(
-                                        joinAppInterm, currGoal);
+                                JoinRuleBuiltInRuleApp joinApp =
+                                        (JoinRuleBuiltInRuleApp) constructBuiltinApp(
+                                                joinAppInterm, currGoal);
                                 joinApp.setConcreteRule(JoinProcedure
                                         .getProcedureByName(joinAppInterm
                                                 .getJoinProc()));
+                                joinApp.setDistinguishingFormula(JoinRuleUtils.translateToFormula(
+                                        proof.getServices(), joinAppInterm
+                                                .getDistinguishingFormula()));
 
-                                ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = ImmutableSLList
-                                        .nil();
+                                ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
+                                        ImmutableSLList.nil();
                                 for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
                                     final Services services = currGoal.proof().getServices();
                                     
