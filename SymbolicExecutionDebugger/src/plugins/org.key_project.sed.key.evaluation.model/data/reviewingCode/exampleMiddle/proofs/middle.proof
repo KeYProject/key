@@ -39,8 +39,6 @@
 "
 }
 
-\bootclasspath "../stubs";
-
 \javaSource "";
 
 \proofObligation "#Proof Obligation Settings

@@ -5,6 +5,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -20,6 +23,8 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
    
    private IJavaProject javaProject;
    
+   private boolean originalShowLineNumbers;
+   
    public JavaProjectModifier(FileDefinition... files) {
       this.files = files;
    }
@@ -27,6 +32,7 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
    @Override
    public synchronized String modifyWorkbench() throws Exception {
       if (javaProject == null) {
+         setShowLineNumbers();
          String projectName = getPageInput().getFormInput().getEvaluationInput().getEvaluation().getName();
          IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
          int counter = 1;
@@ -36,27 +42,9 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
          }
          javaProject = JDTUtil.createJavaProject(project.getName(), BINARY_FOLDER_NAME, new String[] {SOURCE_FOLDER_NAME});
          for (FileDefinition definition : files) {
-            final IFile projectFile = javaProject.getProject().getFile(new Path(definition.getPathInProject()));
-            BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, definition.getPathInBundle(), projectFile);
-            if (definition.isOpen()) {
-               IRunnableWithException run = new AbstractRunnableWithException() {
-                  @Override
-                  public void run() {
-                     try {
-                        WorkbenchUtil.openEditor(projectFile);
-                     }
-                     catch (Exception e) {
-                        setException(e);
-                     }
-                  }
-               };
-               getShell().getDisplay().syncExec(run);
-               if (run.getException() != null) {
-                  throw run.getException();
-               }
-            }
-            fileCreated(definition, projectFile);
+            extractFileDefinition(definition);
          }
+         finalizeJavaProject(javaProject);
          return getCompletionMessage();
       }
       else {
@@ -65,8 +53,41 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
       }
    }
    
-   protected String getCompletionMessage() {
-      return null;
+   protected void finalizeJavaProject(IJavaProject javaProject) throws Exception {
+   }
+
+   protected void setShowLineNumbers() {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            originalShowLineNumbers = EditorsUI.getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER);
+            EditorsUI.getPreferenceStore().setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, true);
+         }
+      });
+   }
+   
+   protected IFile extractFileDefinition(FileDefinition definition) throws Exception {
+      final IFile projectFile = javaProject.getProject().getFile(new Path(definition.getPathInProject()));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, definition.getPathInBundle(), projectFile);
+      if (definition.isOpen()) {
+         IRunnableWithException run = new AbstractRunnableWithException() {
+            @Override
+            public void run() {
+               try {
+                  WorkbenchUtil.openEditor(projectFile);
+               }
+               catch (Exception e) {
+                  setException(e);
+               }
+            }
+         };
+         getShell().getDisplay().syncExec(run);
+         if (run.getException() != null) {
+            throw run.getException();
+         }
+      }
+      fileCreated(definition, projectFile);
+      return projectFile;
    }
 
    protected void fileCreated(FileDefinition definition, IFile projectFile) throws Exception {
@@ -76,6 +97,12 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
    public synchronized void cleanWorkbench() throws Exception {
       if (javaProject != null) {
          javaProject.getProject().delete(true, null);
+         Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               EditorsUI.getPreferenceStore().setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, originalShowLineNumbers);
+            }
+         });
          doAdditinalCleanup();
          javaProject = null;
       }
@@ -89,6 +116,10 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
 
    public IJavaProject getJavaProject() {
       return javaProject;
+   }
+   
+   protected String getCompletionMessage() {
+      return null;
    }
 
    public static class FileDefinition {
