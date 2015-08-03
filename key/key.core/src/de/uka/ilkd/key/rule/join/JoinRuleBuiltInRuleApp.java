@@ -2,19 +2,21 @@ package de.uka.ilkd.key.rule.join;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
 
+import java.util.HashMap;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
@@ -30,7 +32,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
 public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private Node joinNode = null;
-    private ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = null;
+    private ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = null;
     private JoinProcedure concreteRule = null;
     
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
@@ -106,15 +108,15 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     // GETTERS AND SETTERS //
 
-    public ImmutableList<Pair<Goal, PosInOccurrence>> getJoinPartners() {
+    public ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> getJoinPartners() {
         return joinPartners;
     }
     
-    public void setJoinPartners(ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners) {
+    public void setJoinPartners(ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners) {
         this.joinPartners = joinPartners;
         
         joinPartnerStates = ImmutableSLList.nil();
-        for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
+        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
             final Services services = joinPartner.first.proof().getServices();
             
             Triple<Term, Term, Term> partnerSEState =

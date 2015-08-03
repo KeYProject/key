@@ -22,7 +22,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.sed.ui;bundle-version="1.0.0",
  org.key_project.sed.ui.visualization.model;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.ui.visualization.execution_tree.editor,
  org.key_project.sed.ui.visualization.execution_tree.feature,

@@ -19,7 +19,7 @@ Require-Bundle: org.eclipse.ui,
  de.hentschel.visualdbc.generation.ui.test;bundle-version="1.0.0",
  de.hentschel.visualdbc.example;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.hentschel.visualdbc.example.test.suite,
  de.hentschel.visualdbc.example.test.suite.swtbot
 Bundle-Vendor: Martin Hentschel

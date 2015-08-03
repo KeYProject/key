@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +44,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
@@ -58,7 +60,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -603,34 +605,39 @@ public class Proof implements Named {
             });
 
 
-            // First, make a breadth first search, in order to find the leaf with the shortest distance
-            // to the cutting point and to remove the rule applications from the proof management system.
+            // First, make a breadth first search, in order to find the leaf
+            // with the shortest distance to the cutting point and to remove
+            // the rule applications from the proof management system.
             // Furthermore store the residual leaves.
             breadthFirstSearch(cuttingPoint, new ProofVisitor() {
                 @Override
                 public void visit(Proof proof, Node visitedNode) {
-                    if(visitedNode.leaf() && !visitedNode.isClosed()){
-                        if(firstLeaf == null) {
+                    if (visitedNode.leaf() && !visitedNode.isClosed()) {
+                        if (firstLeaf == null) {
                             firstLeaf = visitedNode;
-                        } else {
+                        }
+                        else {
                             residualLeaves.add(visitedNode);
                         }
 
                     }
 
                     if (initConfig != null && visitedNode.parent() != null) {
-                        Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
-                        for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()) {
-                            initConfig.getJustifInfo().removeJustificationFor(app.taclet());
+                        Proof.this.mgt().ruleUnApplied(
+                                visitedNode.parent().getAppliedRuleApp());
+                        for (final NoPosTacletApp app : visitedNode.parent()
+                                .getLocalIntroducedRules()) {
+                            initConfig.getJustifInfo().removeJustificationFor(
+                                    app.taclet());
                         }
                     }
-                    
+
                     // Join rule applications: Unlink all join partners.
                     if (visitedNode.getAppliedRuleApp() instanceof JoinRuleBuiltInRuleApp) {
                         final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) visitedNode
                                 .getAppliedRuleApp();
 
-                        for (Pair<Goal, PosInOccurrence> joinPartner : joinApp
+                        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinApp
                                 .getJoinPartners()) {
                             final Goal linkedGoal = joinPartner.first;
 
@@ -1141,4 +1148,22 @@ public class Proof implements Named {
        ProofSaver saver = new ProofSaver(this, file);
        saver.save();
     }
+    
+   /**
+    * Extracts java source directory from {@link #header()}, if it exists.
+    */
+   public File getJavaSourceLocation() {
+      String header = header();
+      int i = header.indexOf("\\javaSource");
+      if (i >= 0) {
+         int begin = header.indexOf('\"', i);
+         int end = header.indexOf('\"', begin + 1);
+         String sourceLocation = header.substring(begin + 1, end);
+         if (sourceLocation.length() > 0) {
+            return new File(sourceLocation);
+         }
+      }
+      return null;
+   }
+
 }

@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.key_project.sed.ui.visualization.model.od,
  org.key_project.sed.ui.visualization.model.od.impl,
  org.key_project.sed.ui.visualization.model.od.util

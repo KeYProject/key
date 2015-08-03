@@ -2,20 +2,20 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import java.util.List;
 
-public class OracleTermCall implements OracleTerm {
+public class OracleMethodCall implements OracleTerm {
 	
 	private OracleMethod method;
 	private List<? extends OracleTerm> args;
 	private OracleTerm caller;
 	
-	public OracleTermCall(OracleMethod method, List<? extends OracleTerm> args) {
+	public OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args) {
 	    super();
 	    this.method = method;
 	    this.args = args;
 	    caller = null;
     }
 	
-	public OracleTermCall(OracleMethod method, List<? extends OracleTerm> args, OracleTerm caller) {
+	public OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args, OracleTerm caller) {
 	    super();
 	    this.method = method;
 	    this.args = args;

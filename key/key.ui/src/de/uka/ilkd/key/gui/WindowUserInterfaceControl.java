@@ -442,7 +442,19 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       if (proofList != null) {
          getMediator().setProof(loader.getProof());
          if (result != null) {
-            getMediator().getSelectionModel().setSelectedNode(result.getNode());
+             if ("".equals(result.getStatus())) {
+                 this.resetStatus(this);
+              } else {
+                 this.reportStatus(this, result.getStatus());                         
+              }
+             getMediator().getSelectionModel().setSelectedNode(result.getNode());
+             if (result.hasErrors()) {
+                 throw new ProblemLoaderException(loader,
+                       "Proof could only be loaded partially.\n" +
+                             "In summary " + result.getErrorList().size() +
+                             " not loadable rule application(s) have been detected.\n" +
+                             "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
+             }
          } else {
             // should never happen as replay always returns a result object
              //TODO (DS): Why is it then there? If this happens, we will get\\
@@ -450,18 +462,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
          }
 
-         if ("".equals(result.getStatus())) {
-            this.resetStatus(this);
-         } else {
-            this.reportStatus(this, result.getStatus());                         
-         }
-         if (result.hasErrors()) {
-            throw new ProblemLoaderException(loader,
-                  "Proof could only be loaded partially.\n" +
-                        "In summary " + result.getErrorList().size() +
-                        " not loadable rule application(s) have been detected.\n" +
-                        "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
-         }
       }
         getMediator().resetNrGoalsClosedByHeuristics();
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {

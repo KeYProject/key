@@ -37,29 +37,34 @@ public final class NetworkUtils {
                 try {in.close();} catch (IOException e) {}
         }
     }
-    
-    /**
-     * Tries to read the latest stable version number of KeY
-     * from the KeY home page.
-     * It must be contained in file <a href="http://key-project.org/download/latest">
-     * download/latest</a> in a single line.
-     */
-    public static String getLatestVersion() {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(LATEST_VERSION_URL.openStream()));
-            // just read one single line
-            String version = in.readLine();
-            in.close();
-            return version;
-        } catch (IOException e) {
-            // something went wrong
-            if (in != null)
-                try {in.close();} catch (IOException e1) {}
-            return new String("0.0.0");
-        }
-    }
-    
+
+    // THIS METHOD PHONES HOME.
+    // 1) It makes KeY freeze if key-project.org is unavailable or
+    //    the line is busy. (That has happened)
+    // 2) It reveals information about who uses KeY (IP) though
+    //    we did not ask for permission.
+//    /**
+//     * Tries to read the latest stable version number of KeY
+//     * from the KeY home page.
+//     * It must be contained in file <a href="http://key-project.org/download/latest">
+//     * download/latest</a> in a single line.
+//     */
+//    public static String getLatestVersion() {
+//        BufferedReader in = null;
+//        try {
+//            in = new BufferedReader(new InputStreamReader(LATEST_VERSION_URL.openStream()));
+//            // just read one single line
+//            String version = in.readLine();
+//            in.close();
+//            return version;
+//        } catch (IOException e) {
+//            // something went wrong
+//            if (in != null)
+//                try {in.close();} catch (IOException e1) {}
+//            return new String("0.0.0");
+//        }
+//    }
+
     /**
      * Create an URL without raising {@link MalformedURLException},
      * but {@link AssertionError} instead. Use with care.

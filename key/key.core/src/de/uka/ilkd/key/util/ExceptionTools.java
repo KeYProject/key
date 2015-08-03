@@ -25,11 +25,16 @@ public final class ExceptionTools {
         assert exc != null;
     
         Location location = null;
-    
-        if  (exc instanceof antlr.RecognitionException) { 
-            location = new Location(((antlr.RecognitionException)exc).getFilename(),
-                            ((antlr.RecognitionException) exc).getLine(),
-                            ((antlr.RecognitionException) exc).getColumn());
+
+        /*
+         *  This must be before check for RecognitionException because currently
+         *  SLTranslationException is subtype of RecognitionException.
+         */
+        if (exc instanceof SLTranslationException) {
+           SLTranslationException ste = (SLTranslationException) exc;
+           location = new Location(ste.getFileName(), 
+                           ste.getLine(), 
+                           ste.getColumn());
         }
         else if  (exc instanceof org.antlr.runtime.RecognitionException) {
             org.antlr.runtime.RecognitionException recEx =
@@ -65,11 +70,6 @@ public final class ExceptionTools {
             } else {
                 location = new Location("", token.next.beginLine, token.next.beginColumn);
             }
-        } else if (exc instanceof SLTranslationException) {
-            SLTranslationException ste = (SLTranslationException) exc;
-            location = new Location(ste.getFileName(), 
-                            ste.getLine(), 
-                            ste.getColumn());
         } else if (exc instanceof SVInstantiationExceptionWithPosition) {	      
             location = new Location(null, 
                             ((SVInstantiationExceptionWithPosition)exc).getRow(),

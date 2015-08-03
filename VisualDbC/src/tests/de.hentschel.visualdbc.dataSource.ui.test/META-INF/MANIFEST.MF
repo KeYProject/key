@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.ui,
  de.hentschel.visualdbc.dataSource.test;bundle-version="1.0.0",
  de.hentschel.visualdbc.dataSource.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.hentschel.visualdbc.datasource.ui.test.dataSource,
  de.hentschel.visualdbc.datasource.ui.test.suite,
  de.hentschel.visualdbc.datasource.ui.test.suite.swtbot,

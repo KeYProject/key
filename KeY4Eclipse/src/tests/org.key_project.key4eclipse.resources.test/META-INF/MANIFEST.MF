@@ -17,9 +17,11 @@ Require-Bundle: org.eclipse.ui,
  org.key_project.core.symbolic_execution;bundle-version="1.0.0",
  org.key_project.ui;bundle-version="1.0.0",
  org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
- org.key_project.key4eclipse.resources;bundle-version="1.0.0"
+ org.key_project.key4eclipse.resources;bundle-version="1.0.0",
+ org.key_project.core.test,
+ org.key_project.key4eclipse.common.ui
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.resources.test.suite,
  org.key_project.key4eclipse.resources.test.testcase.junit,

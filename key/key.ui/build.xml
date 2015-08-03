@@ -17,7 +17,7 @@
 	  <path refid="key.ui.class.path"/>
 	</path>
 
-	<condition property="taclet.match" value="${taclet.match}" else="legacy">
+	<condition property="taclet.match" value="${taclet.match}" else="vm">
                 <isset property="taclet.match"/>
         </condition>
 

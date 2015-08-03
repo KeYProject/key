@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.Choice;
@@ -52,7 +51,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -152,6 +150,31 @@ public class JoinRuleUtils {
             throw new IllegalStateException("Update should be in normal form!");
 
         }
+    }
+
+    /**
+     * Returns all elementary updates of a parallel update.
+     * 
+     * @param u
+     *            Parallel update to get elementary updates from.
+     * @return Elementary updates of the supplied parallel update.
+     */
+    public static LinkedList<Term> getElementaryUpdates(Term u) {
+        LinkedList<Term> result = new LinkedList<Term>();
+
+        if (u.op() instanceof ElementaryUpdate) {
+            result.add(u);
+        }
+        else if (u.op() instanceof UpdateJunctor) {
+            for (Term sub : u.subs()) {
+                result.addAll(getElementaryUpdates(sub));
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Expected an update!");
+        }
+
+        return result;
     }
 
     /**
@@ -1073,8 +1096,6 @@ public class JoinRuleUtils {
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(
             Node node, PosInOccurrence pio, Services services) {
 
-        TermBuilder tb = services.getTermBuilder();
-
         ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent()
                 .asList());
@@ -1089,71 +1110,16 @@ public class JoinRuleUtils {
         }
 
         Term updateTerm = null;
-        ProgramElement programCounter = null;
-        Term postCondition = null;
-        Modality modality = null;
-
-        Term termAfterUpdate = null;
+        Term programCounter = null;
 
         if (selected.op() instanceof UpdateApplication) {
             updateTerm = selected.sub(0);
-            termAfterUpdate = selected.sub(1);
-        }
-        else {
-            termAfterUpdate = selected;
+            programCounter = selected.sub(1);
         }
 
-        if (termAfterUpdate.op() instanceof Modality) {
-            programCounter = termAfterUpdate.javaBlock().program();
-            postCondition = termAfterUpdate.sub(0);
-            modality = (Modality) termAfterUpdate.op();
-        }
-        else {
-            postCondition = termAfterUpdate;
-        }
-
-        // Note: We may not rename variables in the program counter that also
-        // occur in the post condition. Otherwise, we may render the goal
-        // unprovable.
-        
-        LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
-                node, getLocationVariables(postCondition, services));
-
-        // Replace location variables in program counter by their
-        // branch-unique versions
-        Term progCntAndPostCond = null;
-        if (programCounter != null) {
-            ProgVarReplaceVisitor replVisitor = new ProgVarReplaceVisitor(
-                    programCounter, replMap, services);
-            replVisitor.start();
-            programCounter = replVisitor.result();
-            progCntAndPostCond = services.getTermBuilder().prog(modality,
-                    JavaBlock.createJavaBlock((StatementBlock) programCounter),
-                    postCondition);
-        }
-        else {
-            progCntAndPostCond = postCondition;
-        }
-
-        // Replace location variables in update by branch-unique versions
-        ImmutableList<Term> newElementaries = ImmutableSLList.nil();
-
-        if (updateTerm != null) {
-            LinkedList<Term> elementaries = getElementaryUpdates(updateTerm);
-            for (Term elementary : elementaries) {
-                ElementaryUpdate upd = (ElementaryUpdate) elementary.op();
-                LocationVariable lhs = (LocationVariable) upd.lhs();
-
-                newElementaries = newElementaries.prepend(tb.elementary(
-                        (LocationVariable) (replMap.get(lhs)),
-                        elementary.sub(0)));
-            }
-        }
-
-        return new SymbolicExecutionStateWithProgCnt(
-                tb.parallel(newElementaries), // Update
+        return new SymbolicExecutionStateWithProgCnt(updateTerm, // Update
                 joinListToAndTerm(pathConditionSet, services), // Path Condition
-                progCntAndPostCond, // Program Counter and Post Condition
+                programCounter, // Program Counter and Post Condition
                 node); // CorrespondingNode
     }
 
@@ -1220,31 +1186,6 @@ public class JoinRuleUtils {
             return services.getTermBuilder().and(formulae.head().formula(),
                     joinListToAndTerm(formulae.tail(), services));
         }
-    }
-
-    /**
-     * Returns all elementary updates of a parallel update.
-     * 
-     * @param u
-     *            Parallel update to get elementary updates from.
-     * @return Elementary updates of the supplied parallel update.
-     */
-    private static LinkedList<Term> getElementaryUpdates(Term u) {
-        LinkedList<Term> result = new LinkedList<Term>();
-
-        if (u.op() instanceof ElementaryUpdate) {
-            result.add(u);
-        }
-        else if (u.op() instanceof UpdateJunctor) {
-            for (Term sub : u.subs()) {
-                result.addAll(getElementaryUpdates(sub));
-            }
-        }
-        else {
-            throw new IllegalArgumentException("Expected an update!");
-        }
-
-        return result;
     }
 
     /**
