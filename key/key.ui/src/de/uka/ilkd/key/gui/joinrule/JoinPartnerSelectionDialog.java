@@ -60,7 +60,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.WrapLayout;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
@@ -73,6 +77,7 @@ import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a join rule
@@ -292,7 +297,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
                 chosenDistForm =
                         translate(txtDistForm.getText());
                 
-                if (chosenDistForm == null) {
+                if (chosenDistForm == null || !isSuitableDistFormula()) {
                     txtDistForm.setForeground(Color.RED);
                 }
                 else {
@@ -440,7 +445,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
      *         generation of the distinguishing formula should be performed.
      */
     public Term getChosenDistinguishingFormula() {
-        return chosenDistForm;
+        return isSuitableDistFormula() ? chosenDistForm : null;
     }
 
     /**
@@ -485,6 +490,65 @@ public class JoinPartnerSelectionDialog extends JDialog {
         if (!txtDistForm.isEnabled()) {
             chosenDistForm = null;
         }
+    }
+    
+    /**
+     * Checks whether the selected distinguishable formula is actually suitable
+     * for this purpose.
+     * 
+     * @return true iff the chosen "distinguishing formula" is a distinguishing
+     *         formula.
+     */
+    private boolean isSuitableDistFormula() {
+        if (chosenDistForm == null) {
+            return false;
+        }
+        
+        // The formula should be provable for the first state
+        // whilst its complement should be provable for the second state.
+        
+        final TermBuilder tb = services.getTermBuilder();
+        
+        {
+            Semisequent antecedent = joinGoalPio.first.sequent().antecedent();
+
+            for (SequentFormula succedentFormula : joinGoalPio.first.sequent()
+                    .succedent()) {
+                antecedent = antecedent.insertFirst(new SequentFormula(tb
+                        .not(succedentFormula.formula()))).semisequent();
+            }
+
+            if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
+                    new Semisequent(new SequentFormula(chosenDistForm))),
+                    services, 1000)) {
+                return false;
+            }
+        }
+        
+        {
+            final Goal partnerGoal = candidates.size() == 1 ? candidates.getFirst().first :
+                (chosenGoals.size() == 1 ? chosenGoals.first().first : null);
+            
+            if (partnerGoal == null) {
+                return false;
+            }
+            
+            Semisequent antecedent = partnerGoal.sequent().antecedent();
+
+            for (SequentFormula succedentFormula : partnerGoal.sequent()
+                    .succedent()) {
+                antecedent = antecedent.insertFirst(new SequentFormula(tb
+                        .not(succedentFormula.formula()))).semisequent();
+            }
+
+            if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
+                    new Semisequent(new SequentFormula(tb.not(chosenDistForm)))),
+                    services, 1000)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /**

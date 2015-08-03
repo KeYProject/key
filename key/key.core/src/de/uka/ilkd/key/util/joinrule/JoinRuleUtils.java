@@ -675,6 +675,41 @@ public class JoinRuleUtils {
     }
 
     /**
+     * Tries to prove the given formula without splitting and returns whether
+     * the prove could be closed.
+     * 
+     * @param toProve
+     *            Sequent to prove.
+     * @param services
+     *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
+     * @return True iff the given formula has been successfully proven.
+     */
+    public static boolean isProvable(Sequent toProve, Services services, int timeout) {
+        return isProvable(toProve, services, false, timeout);
+    }
+
+    /**
+     * Tries to prove the given formula with splitting and returns whether the
+     * prove could be closed.
+     * 
+     * @param toProve
+     *            Sequent to prove.
+     * @param services
+     *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
+     * @return True iff the given formula has been successfully proven.
+     */
+    public static boolean isProvableWithSplitting(Sequent toProve,
+            Services services, int timeout) {
+        return isProvable(toProve, services, true, timeout);
+    }
+
+    /**
      * Tries to prove the equivalence of term1 and term2 and throws a
      * {@link RuntimeException} if the proof fails.
      * 
@@ -1255,6 +1290,30 @@ public class JoinRuleUtils {
      */
     private static ApplyStrategyInfo tryToProve(Term toProve,
             Services services, boolean doSplit, String sideProofName, int timeout) {
+        return tryToProve(Sequent.createSequent(
+                                    // Sequent to prove
+                                    Semisequent.EMPTY_SEMISEQUENT,
+                                    new Semisequent(new SequentFormula(toProve))),
+                          services, doSplit, sideProofName, timeout);
+    }
+
+    /**
+     * Tries to prove the given formula and returns the result.
+     * 
+     * @param toProve
+     *            Sequent to prove.
+     * @param services
+     *            The services object.
+     * @param doSplit
+     *            if true, splitting is allowed (normal mode).
+     * @param sideProofName
+     *            name for the generated side proof.
+     * @param timeout
+     *            A timeout for the proof in milliseconds.
+     * @return The proof result.
+     */
+    private static ApplyStrategyInfo tryToProve(Sequent toProve,
+            Services services, boolean doSplit, String sideProofName, int timeout) {
         final ProofEnvironment sideProofEnv = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
                         services.getProof(), // Parent Proof
@@ -1265,11 +1324,8 @@ public class JoinRuleUtils {
             ProofStarter proofStarter = SideProofUtil
                     .createSideProof(
                             sideProofEnv, // Proof environment
-                            Sequent.createSequent(
-                                    // Sequent to prove
-                                    Semisequent.EMPTY_SEMISEQUENT,
-                                    new Semisequent(new SequentFormula(toProve))),
-                                    sideProofName); // Proof name
+                            toProve,
+                            sideProofName); // Proof name
             
             proofStarter.setTimeout(timeout * 1000000);
 
@@ -1297,6 +1353,31 @@ public class JoinRuleUtils {
      * @return True iff the given formula has been successfully proven.
      */
     private static boolean isProvable(Term toProve, Services services,
+            boolean doSplit, int timeout) {
+
+        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check", timeout);
+        boolean result = proofResult.getProof().closed();
+
+        return result;
+
+    }
+
+    /**
+     * Tries to prove the given formula and returns whether the prove could be
+     * closed.
+     * 
+     * @param toProve
+     *            Sequent to prove.
+     * @param services
+     *            The services object.
+     * @param doSplit
+     *            if true, splitting is allowed (normal mode).
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
+     * @return True iff the given formula has been successfully proven.
+     */
+    private static boolean isProvable(Sequent toProve, Services services,
             boolean doSplit, int timeout) {
 
         ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check", timeout);
