@@ -18,7 +18,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    /**
     * The name of the {@link Tool} representing no tools.
     */
-   public static final String NO_TOOL_NAME = "No Tool";
+   public static final String NO_TOOL_NAME = "JDT Debugger";
 
    /**
     * The name of the {@link Tool} representing 'SED'.
@@ -104,7 +104,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       Tool noTool = new Tool(NO_TOOL_NAME, 
                              noToolURL, 
                              noToolURL, 
-                             isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
+                             isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JAVA_APPLICATION_LOGO) : null);
       Tool sed = new Tool(SED_TOOL_NAME, 
                           sedURL, 
                           sedURL, 

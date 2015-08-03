@@ -116,6 +116,11 @@ public final class EvaluationModelImages {
     public static final String SED_REACHED = "org.key_project.sed.key.evaluation.model.evaluation.sed.reachedSourceCode";
     
     /**
+     * The key for the Java application logo.
+     */
+    public static final String JAVA_APPLICATION_LOGO = "org.key_project.sed.key.evaluation.model.javaApplicationLogo";
+    
+    /**
      * Forbid instances.
      */
     private EvaluationModelImages() {
@@ -222,6 +227,9 @@ public final class EvaluationModelImages {
         }
         else if (SED_REACHED.equals(key)) {
            path = "data/understandingProofAttempts/icons/SED_Reached.png";
+        }
+        else if (JAVA_APPLICATION_LOGO.equals(key)) {
+           path = "data/reviewingCode/icons/java_app.gif";
         }
         // Load image if possible
         if (path != null) {
