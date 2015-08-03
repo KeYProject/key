@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui.joinrule;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -22,6 +23,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -45,6 +49,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.html.HTMLDocument;
 
@@ -55,7 +60,12 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.WrapLayout;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
+import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
@@ -94,6 +104,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
      */
     private static final Font TXT_AREA_FONT = new Font(Font.MONOSPACED,
             Font.PLAIN, 14);
+    
+    private final static MainWindow MAIN_WINDOW_INSTANCE = MainWindow.getInstance();
 
     /** Comparator for goals; sorts by serial nr. of the node */
     private static Comparator<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> GOAL_COMPARATOR =
@@ -116,12 +128,16 @@ public class JoinPartnerSelectionDialog extends JDialog {
 
     /** The chosen join method. */
     private JoinProcedure chosenRule = JoinProcedure.getJoinProcedures().head();
+    
+    /** The chosen distinguishing formula */
+    private Term chosenDistForm = null;
 
     private JEditorPane txtPartner1 = null;
     private JEditorPane txtPartner2 = null;
     private JComboBox<String> cmbCandidates = null;
     private JCheckBox cbSelectCandidate = null;
     private ButtonGroup bgJoinMethods = null;
+    private final JTextField txtDistForm;
 
     private JScrollPane scrpPartner1 = null;
     private JScrollPane scrpPartner2 = null;
@@ -130,10 +146,10 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private JButton chooseAllButton = null;
 
     private JoinPartnerSelectionDialog() {
-        super(MainWindow.getInstance(),
+        super(MAIN_WINDOW_INSTANCE,
                 "Select partner node for join operation", true);
 
-        setLocation(MainWindow.getInstance().getLocation());
+        setLocation(MAIN_WINDOW_INSTANCE.getLocation());
 
         // Text areas for goals to join
         txtPartner1 = new JEditorPane();
@@ -268,6 +284,34 @@ public class JoinPartnerSelectionDialog extends JDialog {
         joinRulesContainerTitle.setBorder(joinStateContainerTitle);
         joinRulesContainer.setBorder(joinRulesContainerTitle);
 
+        // Distinguishing method input field container
+        txtDistForm = new JTextField();
+        txtDistForm.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                chosenDistForm =
+                        translate(MAIN_WINDOW_INSTANCE.getMediator()
+                                .getServices(), txtDistForm.getText());
+                
+                if (chosenDistForm == null) {
+                    txtDistForm.setForeground(Color.RED);
+                }
+                else {
+                    txtDistForm.setForeground(Color.WHITE);
+                }
+            }
+        });
+        
+        JPanel distFormContainer = new JPanel();
+        distFormContainer.setLayout(new BorderLayout());
+        
+        distFormContainer.add(txtDistForm, BorderLayout.CENTER);
+        
+        TitledBorder distFormContainerTitle = BorderFactory
+                .createTitledBorder("Distinguishing formula (leave empty for automatic generation!)");
+        distFormContainerTitle.setTitleJustification(TitledBorder.LEFT);
+        distFormContainer.setBorder(distFormContainerTitle);
+        
         // Control buttons container: OK / Cancel
         okButton = new JButton("OK");
         chooseAllButton = new JButton("Choose All");
@@ -322,6 +366,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
         lowerContainer
                 .setLayout(new BoxLayout(lowerContainer, BoxLayout.Y_AXIS));
         lowerContainer.add(joinRulesContainer);
+        lowerContainer.add(distFormContainer);
         lowerContainer.add(ctrlBtnsContainer);
 
         // Add components to content pane
@@ -388,11 +433,23 @@ public class JoinPartnerSelectionDialog extends JDialog {
     public JoinProcedure getChosenJoinRule() {
         return chosenRule;
     }
+    
+    /**
+     * @return The chosen distinguishing formula. If null, an automatic
+     *         generation of the distinguishing formula should be performed.
+     */
+    public Term getChosenDistFormula() {
+        return chosenDistForm;
+    }
 
     /**
-     * TODO: Document.
+     * Checks whether the join rule is applicable for the given set of
+     * candidates.
      *
-     * @return
+     * @param theCandidates
+     *            Candidates to instantiate the join rule application with.
+     * @return true iff the join rule instance induced by the given set of
+     *         candidates is applicable.
      */
     private boolean isApplicableForCandidates(
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> theCandidates) {
@@ -412,7 +469,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
     }
 
     /**
-     * TODO: Document.
+     * Enables / disables the OK and Choose all button depending on whether or
+     * not the currently chosen join rule instance is applicable.
      */
     private void checkApplicable() {
         okButton.setEnabled(chosenGoals.size() > 0
@@ -478,6 +536,28 @@ public class JoinPartnerSelectionDialog extends JDialog {
                 candidates.getFirst().second, txtPartner2);
 
         checkApplicable();
+    }
+    
+    /**
+     * Translates a String into a formula to null if not applicable.
+     *
+     * @param services The services object.
+     * @param toTranslate The formula to be translated.
+     * @return The formula represented by the input or null if not applicable.
+     */
+    private static Term translate(final Services services, final String toTranslate) {
+        try {
+            final KeYParserF parser =
+                    new KeYParserF(ParserMode.TERM, new KeYLexerF(
+                            new StringReader(toTranslate), ""), services,
+                            services.getNamespaces());
+            final Term result = parser.term();
+            return result.op() == Sort.FORMULA ? result : null;
+        }
+        catch (Throwable e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
