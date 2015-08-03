@@ -6,10 +6,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
+import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.util.ServerSettings;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.sed.key.evaluation.server.random.RandomCompletionManager;
+import org.key_project.sed.key.evaluation.server.random.ReviewingCodeRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.server.report.HTMLReportEngine;
 import org.key_project.util.java.ArrayUtil;
@@ -51,8 +53,10 @@ public class SEDServer {
       this.port = port;
       // Index random completions
       System.out.println("Indexing random proof attempts completion.");
-      UnderstandingProofAttemptsRandomFormOrderComputer computer = new UnderstandingProofAttemptsRandomFormOrderComputer(storageLocation);
-      RandomCompletionManager.registerRandomCompletion(UnderstandingProofAttemptsEvaluation.RANDOM_COMPUTER_NAME, computer);
+      RandomCompletionManager.registerRandomCompletion(UnderstandingProofAttemptsEvaluation.RANDOM_COMPUTER_NAME,
+                                                       new UnderstandingProofAttemptsRandomFormOrderComputer(storageLocation));
+      RandomCompletionManager.registerRandomCompletion(ReviewingCodeEvaluation.RANDOM_COMPUTER_NAME,
+                                                       new ReviewingCodeRandomFormOrderComputer(storageLocation));
       // Print information about storage location
       System.out.println("Forms will be stored at " + storageLocation);
    }

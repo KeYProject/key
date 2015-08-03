@@ -2,25 +2,18 @@ package org.key_project.sed.key.evaluation.server.random;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
-import org.key_project.sed.key.evaluation.model.definition.Choice;
-import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
-import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
+import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
-import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
-import org.key_project.sed.key.evaluation.model.input.QuestionInput;
-import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.ToolPageInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
@@ -34,35 +27,34 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
- * The {@link IRandomCompletion} used by the {@link UnderstandingProofAttemptsEvaluation}.
+ * The {@link IRandomCompletion} used by the {@link ReviewingCodeEvaluation}.
  * @author Martin Hentschel
  */
-public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractRandomCompletion {
+public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompletion {
    /**
-    * The used {@link BalancingEntry} instances for balancing purpose.
+    * The used {@link BalancingEntry}.
     */
-   private final Map<String, BalancingEntry> balancingMap = new HashMap<String, BalancingEntry>();
+   private BalancingEntry balancingEntry;
 
    /**
     * Constructor.
     * @param storageLocation The storage location providing existing evaluation inputs.
     */
-   public UnderstandingProofAttemptsRandomFormOrderComputer(File storageLocation) {
-      String[] elements = {UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, 
-                           UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, 
-                           UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME, 
-                           UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME};
+   public ReviewingCodeRandomFormOrderComputer(File storageLocation) {
+      String[] elements = {ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME, 
+                           ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME, 
+                           ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME, 
+                           ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME, 
+                           ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME, 
+                           ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME};
       // Analyze existing documents
-      final Map<String, Map<String, IndexData>> existingDataMap = new HashMap<String, Map<String, IndexData>>();
-      File[] instructionFiles = FileStorage.listFormFiles(storageLocation, UnderstandingProofAttemptsEvaluation.INSTANCE.getName(), UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME);
+      final Map<String, IndexData> existingDataMap = new HashMap<String, IndexData>();
+      File[] instructionFiles = FileStorage.listFormFiles(storageLocation, ReviewingCodeEvaluation.INSTANCE.getName(), ReviewingCodeEvaluation.INTRODUCTION_FORM_NAME);
       if (!ArrayUtil.isEmpty(instructionFiles)) {
          for (File file : instructionFiles) {
             try {
                EvaluationInput evaluationInput = EvaluationInputReader.parse(new FileInputStream(file));
-               AbstractFormInput<?> introductionFormInput = evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME));
-               QuestionPageInput backgroundPageInput = (QuestionPageInput)introductionFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
-               QuestionInput keyInput = backgroundPageInput.getQuestionInput(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
-               RandomFormInput evaluationFormInput = (RandomFormInput)evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.EVALUATION_FORM_NAME));
+               RandomFormInput evaluationFormInput = (RandomFormInput)evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(ReviewingCodeEvaluation.EVALUATION_FORM_NAME));
                String permutationKey = null;
                List<Tool> toolOrder = new LinkedList<Tool>();
                if (evaluationFormInput.getPageOrder() != null) {
@@ -79,27 +71,20 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
                         }
                      }
                   }
-                  // Get keyExperience
-                  String keyExperience = keyInput.getValue();
                   // Get or create PermutationData
-                  Map<String, IndexData> existingMap = existingDataMap.get(keyExperience);
-                  if (existingMap == null) {
-                     existingMap = new HashMap<String, IndexData>();
-                     existingDataMap.put(keyExperience, existingMap);
-                  }
-                  IndexData data = existingMap.get(permutationKey);
+                  IndexData data = existingDataMap.get(permutationKey);
                   if (data == null) {
                      data = new IndexData();
-                     existingMap.put(permutationKey, data);
+                     existingDataMap.put(permutationKey, data);
                   }
                   // Update PermutationData
-                  if (isToolUsedFirst(toolOrder, UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME, UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME, 4)) {
-                     data.increaseKeYCount();
+                  if (isToolUsedFirst(toolOrder, ReviewingCodeEvaluation.NO_TOOL_NAME, ReviewingCodeEvaluation.SED_TOOL_NAME, 6)) {
+                     data.increaseNoToolCount();
                      if (isCompleted(storageLocation, evaluationInput)) {
-                        data.increaseKeYCompletedCount();
+                        data.increaseNoToolCompletedCount();
                      }
                   }
-                  else if (isToolUsedFirst(toolOrder, UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME, UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME, 4)) {
+                  else if (isToolUsedFirst(toolOrder, ReviewingCodeEvaluation.SED_TOOL_NAME, ReviewingCodeEvaluation.NO_TOOL_NAME, 6)) {
                      data.increaseSedCount();
                      if (isCompleted(storageLocation, evaluationInput)) {
                         data.increaseSedCompletedCount();
@@ -112,42 +97,30 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
             }
          }
       }
-      // Get possible experience values
-      AbstractForm introductionForm = UnderstandingProofAttemptsEvaluation.INSTANCE.getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME);
-      QuestionPage backgroundPage = (QuestionPage) introductionForm.getPage(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
-      RadioButtonsQuestion keyQuestion = (RadioButtonsQuestion) backgroundPage.getQuestion(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
       // Create balancing index instances
-      for (Choice choice : keyQuestion.getChoices()) {
-         final Map<String, IndexData> existingMap = existingDataMap.get(choice.getValue());
-         IDataFactory<String, IndexData> dataFactory = new IDataFactory<String, IndexData>() {
-            @Override
-            public IndexData createData(String[] permutation) {
-               if (existingMap != null) {
-                  String key = ArrayUtil.toString(permutation, ",");
-                  IndexData existingData =  existingMap.remove(key);
-                  if (existingData != null) {
-                     return existingData;
-                  }
-                  else {
-                     return new IndexData();
-                  }
-               }
-               else {
-                  return new IndexData();
-               }
+      IDataFactory<String, IndexData> dataFactory = new IDataFactory<String, IndexData>() {
+         @Override
+         public IndexData createData(String[] permutation) {
+            String key = ArrayUtil.toString(permutation, ",");
+            IndexData existingData =  existingDataMap.remove(key);
+            if (existingData != null) {
+               return existingData;
             }
-         };
-         IndexDataComparator dataComparator = new IndexDataComparator();
-         PermutationIndex<String, IndexData> permutationIndex = new PermutationIndex<String, IndexData>(elements, dataFactory, dataComparator);
-         int keyCountTotal = 0;
-         int sedCountTotal = 0;
-         for (Entry<String, IndexData> indexEntry : permutationIndex.getIndex()) {
-            IndexData indexData = indexEntry.getData();
-            keyCountTotal += indexData.getKeyCount();
-            sedCountTotal += indexData.getSedCount();
+            else {
+               return new IndexData();
+            }
          }
-         balancingMap.put(choice.getValue(), new BalancingEntry(permutationIndex, keyCountTotal, sedCountTotal));
+      };
+      IndexDataComparator dataComparator = new IndexDataComparator();
+      PermutationIndex<String, IndexData> permutationIndex = new PermutationIndex<String, IndexData>(elements, dataFactory, dataComparator);
+      int noToolCountTotal = 0;
+      int sedCountTotal = 0;
+      for (Entry<String, IndexData> indexEntry : permutationIndex.getIndex()) {
+         IndexData indexData = indexEntry.getData();
+         noToolCountTotal += indexData.getNoToolCount();
+         sedCountTotal += indexData.getSedCount();
       }
+      balancingEntry = new BalancingEntry(permutationIndex, noToolCountTotal, sedCountTotal);
    }
 
    /**
@@ -159,7 +132,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
     */
    protected boolean isCompleted(File storageLocation, EvaluationInput introductionInput) {
       try {
-         File evaluationFile = FileStorage.getFile(storageLocation, UnderstandingProofAttemptsEvaluation.INSTANCE.getName(), UnderstandingProofAttemptsEvaluation.EVALUATION_FORM_NAME, introductionInput.getUUID());
+         File evaluationFile = FileStorage.getFile(storageLocation, ReviewingCodeEvaluation.INSTANCE.getName(), ReviewingCodeEvaluation.EVALUATION_FORM_NAME, introductionInput.getUUID());
          if (evaluationFile != null) {
             EvaluationInput evaluationInput = EvaluationInputReader.parse(new FileInputStream(evaluationFile));
             return ObjectUtil.equals(evaluationInput.getUUID(), introductionInput.getUUID());
@@ -174,19 +147,11 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
    }
 
    /**
-    * Returns the used {@link BalancingEntry} for the given KeY experience.
+    * Returns the used {@link BalancingEntry}.
     * @return The used {@link BalancingEntry}.
     */
-   public BalancingEntry getBalancingEntry(String keyExperience) {
-      return balancingMap.get(keyExperience);
-   }
-
-   /**
-    * Returns the available {@link BalancingEntry} instances for balancing.
-    * @return The available {@link BalancingEntry} instances for balancing.
-    */
-   public Map<String, BalancingEntry> getBalancingMap() {
-      return Collections.unmodifiableMap(balancingMap);
+   public BalancingEntry getBalancingEntry() {
+      return balancingEntry;
    }
 
    /**
@@ -195,15 +160,11 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
    @Override
    public List<RandomFormInput> computeRandomValues(EvaluationInput evaluationInput, AbstractFormInput<?> currentForm) {
       try {
-         // Get KeY experience
-         QuestionPageInput backgroundPage = (QuestionPageInput) currentForm.getPageInput(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
-         QuestionInput keyExperienceInput = backgroundPage.getQuestionInput(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
-         BalancingEntry balancingEntry = balancingMap.get(keyExperienceInput.getValue());
          // Update index and compute which order should be returned.
          BalancingEntryUpdater updater = new BalancingEntryUpdater(balancingEntry);
          balancingEntry.getPermutationIndex().updateFirstEntry(updater);
          // Create order
-         return computeOrder(evaluationInput, currentForm, updater.getPermutation(), updater.isKeyFirst());
+         return computeOrder(evaluationInput, currentForm, updater.getPermutation(), updater.isNoToolFirst());
       }
       catch (Exception e) { // In case of an exception return a fixed order as fallback.
          e.printStackTrace();
@@ -227,9 +188,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       private String[] permutation;
 
       /**
-       * Use KeY first?
+       * Use NO_TOOL first?
        */
-      private boolean keyFirst;
+      private boolean noToolFirst;
       
       /**
        * Constructor.
@@ -248,21 +209,21 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
          IndexData indexData = firstEntry.getData();
          boolean indexUpdateRequired = false;
          // Completed count is ignored for simplicity.
-         if (indexData.getKeyCount() < indexData.getSedCount()) {
-            keyFirst = true;
+         if (indexData.getNoToolCount() < indexData.getSedCount()) {
+            noToolFirst = true;
             indexUpdateRequired = true;
          }
-         else if (indexData.getKeyCount() > indexData.getSedCount()) {
-            keyFirst = false;
+         else if (indexData.getNoToolCount() > indexData.getSedCount()) {
+            noToolFirst = false;
             indexUpdateRequired = true;
          }
          else {
-            keyFirst = balancingEntry.keyCountTotal < balancingEntry.sedCountTotal;
+            noToolFirst = balancingEntry.noToolCountTotal < balancingEntry.sedCountTotal;
          }
          // Update balancing entry
-         if (keyFirst) {
-            indexData.increaseKeYCount();
-            balancingEntry.keyCountTotal++;
+         if (noToolFirst) {
+            indexData.increaseNoToolCount();
+            balancingEntry.noToolCountTotal++;
          }
          else {
             indexData.increaseSedCount();
@@ -280,11 +241,11 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       }
 
       /**
-       * Checks if KeY should be used first.
-       * @return {@code true} KeY first, {@code false} SED first.
+       * Checks if NO_TOOL should be used first.
+       * @return {@code true} NO_TOOL first, {@code false} SED first.
        */
-      public boolean isKeyFirst() {
-         return keyFirst;
+      public boolean isNoToolFirst() {
+         return noToolFirst;
       }
    }
    
@@ -292,69 +253,75 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
     * Computes a single fixed order.
     * @param evaluationInput The {@link EvaluationInput}.
     * @param currentForm The current {@link AbstractFormInput}.
-    * @param keyFirst Use KeY as first tool?
+    * @param noToolFirst Use NO_TOOL as first tool?
     * @param reverseOrder Reverse fixed order?
     * @return The fixed order.
     */
    public static List<RandomFormInput> computeFixedOrder(EvaluationInput evaluationInput, 
                                                          AbstractFormInput<?> currentForm,
-                                                         boolean keyFirst,
+                                                         boolean noToolFirst,
                                                          boolean reverseOrder) {
       String[] order = reverseOrder ?
-                       new String[] {UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME} :
-                       new String[] {UnderstandingProofAttemptsEvaluation.PROOF_2_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_1_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_4_PAGE_NAME, UnderstandingProofAttemptsEvaluation.PROOF_3_PAGE_NAME};
-      return computeOrder(evaluationInput, currentForm, order, keyFirst);
+                       new String[] {ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME} :
+                       new String[] {ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME, ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME};
+      return computeOrder(evaluationInput, currentForm, order, noToolFirst);
    }
    
    /**
     * Computes the order.
     * @param evaluationInput The {@link EvaluationInput}.
     * @param currentForm The current {@link AbstractFormInput}.
-    * @param proofOrder The order of the proofs.
-    * @param keyFirst Use KeY as first tool?
+    * @param exampleOrder The order of the examples.
+    * @param noToolFirst Use no tool as first tool?
     * @return The computed order.
     */
    @SuppressWarnings("unchecked")
    public static List<RandomFormInput> computeOrder(EvaluationInput evaluationInput, 
                                                     AbstractFormInput<?> currentForm,
-                                                    String[] proofOrder,
-                                                    boolean keyFirst) {
+                                                    String[] exampleOrder,
+                                                    boolean noToolFirst) {
       // Get needed objects
-      RandomForm evaluationForm = ((UnderstandingProofAttemptsEvaluation) evaluationInput.getEvaluation()).getEvaluationForm();
+      RandomForm evaluationForm = ((ReviewingCodeEvaluation) evaluationInput.getEvaluation()).getEvaluationForm();
       RandomFormInput evaluationFormInput = (RandomFormInput) evaluationInput.getFormInput(evaluationForm);
-      AbstractPageInput<?> evaluationPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.EVALUATION_PAGE_NAME);
-      AbstractPageInput<?> jmlPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.JML_PAGE_NAME);
+      AbstractPageInput<?> evaluationPage = evaluationFormInput.getPageInput(ReviewingCodeEvaluation.EVALUATION_PAGE_NAME);
+      AbstractPageInput<?> jmlPage = evaluationFormInput.getPageInput(ReviewingCodeEvaluation.JML_PAGE_NAME);
       ToolPageInput tool1Page;
       ToolPageInput tool2Page;
-      if (keyFirst) {
-         tool1Page = (ToolPageInput) evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
-         tool2Page = (ToolPageInput) evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
+      if (noToolFirst) {
+         tool1Page = (ToolPageInput) evaluationFormInput.getPageInput(ReviewingCodeEvaluation.NO_TOOL_NAME);
+         tool2Page = (ToolPageInput) evaluationFormInput.getPageInput(ReviewingCodeEvaluation.SED_TOOL_NAME);
       }
       else {
-         tool1Page = (ToolPageInput) evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SED_TOOL_NAME);
-         tool2Page = (ToolPageInput) evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.KEY_TOOL_NAME);
+         tool1Page = (ToolPageInput) evaluationFormInput.getPageInput(ReviewingCodeEvaluation.SED_TOOL_NAME);
+         tool2Page = (ToolPageInput) evaluationFormInput.getPageInput(ReviewingCodeEvaluation.NO_TOOL_NAME);
       }
-      AbstractPageInput<?> proof1Page = evaluationFormInput.getPageInput(proofOrder[0]);
-      AbstractPageInput<?> proof2Page = evaluationFormInput.getPageInput(proofOrder[1]);
-      AbstractPageInput<?> proof3Page = evaluationFormInput.getPageInput(proofOrder[2]);
-      AbstractPageInput<?> proof4Page = evaluationFormInput.getPageInput(proofOrder[3]);
-      AbstractPageInput<?> feedbackPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.FEEDBACK_PAGE);
-      AbstractPageInput<?> sendPage = evaluationFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.SEND_EVALUATION_PAGE_NAME);
+      AbstractPageInput<?> proof1Page = evaluationFormInput.getPageInput(exampleOrder[0]);
+      AbstractPageInput<?> proof2Page = evaluationFormInput.getPageInput(exampleOrder[1]);
+      AbstractPageInput<?> proof3Page = evaluationFormInput.getPageInput(exampleOrder[2]);
+      AbstractPageInput<?> proof4Page = evaluationFormInput.getPageInput(exampleOrder[3]);
+      AbstractPageInput<?> proof5Page = evaluationFormInput.getPageInput(exampleOrder[4]);
+      AbstractPageInput<?> proof6Page = evaluationFormInput.getPageInput(exampleOrder[5]);
+      AbstractPageInput<?> feedbackPage = evaluationFormInput.getPageInput(ReviewingCodeEvaluation.FEEDBACK_PAGE);
+      AbstractPageInput<?> sendPage = evaluationFormInput.getPageInput(ReviewingCodeEvaluation.SEND_EVALUATION_PAGE_NAME);
       // Set order and tools
       evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, 
                                                              jmlPage, 
                                                              tool1Page, 
                                                              proof1Page, 
                                                              proof2Page, 
-                                                             tool2Page, 
                                                              proof3Page, 
+                                                             tool2Page, 
                                                              proof4Page, 
+                                                             proof5Page, 
+                                                             proof6Page, 
                                                              feedbackPage, 
                                                              sendPage));
       evaluationFormInput.setTool(proof1Page, tool1Page.getPage().getTool());
       evaluationFormInput.setTool(proof2Page, tool1Page.getPage().getTool());
-      evaluationFormInput.setTool(proof3Page, tool2Page.getPage().getTool());
+      evaluationFormInput.setTool(proof3Page, tool1Page.getPage().getTool());
       evaluationFormInput.setTool(proof4Page, tool2Page.getPage().getTool());
+      evaluationFormInput.setTool(proof5Page, tool2Page.getPage().getTool());
+      evaluationFormInput.setTool(proof6Page, tool2Page.getPage().getTool());
       return CollectionUtil.toList(evaluationFormInput);
    }
    
@@ -368,9 +335,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
        */
       @Override
       public int compare(IndexData o1, IndexData o2) {
-         // Compare balanced state (KeY use equal to SED use), completed count is ignored for simplicity
-         boolean o1balanced = o1.getKeyCount() == o1.getSedCount();
-         boolean o2balanced = o2.getKeyCount() == o2.getSedCount();
+         // Compare balanced state (NO_TOOL use equal to SED use), completed count is ignored for simplicity
+         boolean o1balanced = o1.getNoToolCount() == o1.getSedCount();
+         boolean o2balanced = o2.getNoToolCount() == o2.getSedCount();
          if (o1balanced && o2balanced) {
             return compareCounts(o1, o2); 
          }
@@ -386,21 +353,21 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       }
       
       /**
-       * Compares KeY and SED count.
+       * Compares NO_TOOL and SED count.
        * @param o1 The first {@link IndexData}.
        * @param o2 The second {@link IndexData}.
        * @return The comparison result.
        */
       protected int compareCounts(IndexData o1, IndexData o2) {
-         if (o1.getKeyCount() < o2.getKeyCount() && o1.getSedCount() < o2.getSedCount()) {
+         if (o1.getNoToolCount() < o2.getNoToolCount() && o1.getSedCount() < o2.getSedCount()) {
             return -1;
          }
-         else if (o1.getKeyCount() > o2.getKeyCount() && o1.getSedCount() > o2.getSedCount()) {
+         else if (o1.getNoToolCount() > o2.getNoToolCount() && o1.getSedCount() > o2.getSedCount()) {
             return 1;
          }
          else {
-            int o1max = Math.max(o1.getKeyCount(), o1.getSedCount());
-            int o2max = Math.max(o2.getKeyCount(), o2.getSedCount());
+            int o1max = Math.max(o1.getNoToolCount(), o1.getSedCount());
+            int o2max = Math.max(o2.getNoToolCount(), o2.getSedCount());
             if (o1max < o2max) {
                return -1;
             }
@@ -408,8 +375,8 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
                return 1;
             }
             else {
-               int o1min = Math.min(o1.getKeyCount(), o1.getSedCount());
-               int o2min = Math.min(o2.getKeyCount(), o2.getSedCount());
+               int o1min = Math.min(o1.getNoToolCount(), o1.getSedCount());
+               int o2min = Math.min(o2.getNoToolCount(), o2.getSedCount());
                if (o1min < o2min) {
                   return -1;
                }
@@ -430,9 +397,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
     */
    public static class IndexData {
       /**
-       * Counts how often KeY was used first.
+       * Counts how often NO_TOOL was used first.
        */
-      private int keyCount;
+      private int noToolCount;
 
       /**
        * Counts how often SED was used first.
@@ -440,9 +407,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       private int sedCount;
 
       /**
-       * Counts how often KeY is completed.
+       * Counts how often NO_TOOL is completed.
        */
-      private int keyCompletedCount;
+      private int noToolCompletedCount;
 
       /**
        * Counts how often SED is completed.
@@ -458,23 +425,23 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       
       /**
        * Constructor.
-       * @param keyCount The KeY used first counter.
+       * @param noToolCount The NO_TOOL used first counter.
        * @param sedCount The SED used first counter.
-       * @param keyCompletedCount The KeY completed counter.
+       * @param noToolCompletedCount The NO_TOOL completed counter.
        * @param sedCompletedCount The SED completed counter.
        */
-      public IndexData(int keyCount, int sedCount, int keyCompletedCount, int sedCompletedCount) {
-         this.keyCount = keyCount;
+      public IndexData(int noToolCount, int sedCount, int noToolCompletedCount, int sedCompletedCount) {
+         this.noToolCount = noToolCount;
          this.sedCount = sedCount;
-         this.keyCompletedCount = keyCompletedCount;
+         this.noToolCompletedCount = noToolCompletedCount;
          this.sedCompletedCount = sedCompletedCount;
       }
 
       /**
-       * Increases the KeY used first counter by {@code 1}.
+       * Increases the NO_TOOL used first counter by {@code 1}.
        */
-      protected void increaseKeYCount() {
-         keyCount++;
+      protected void increaseNoToolCount() {
+         noToolCount++;
       }
       
       /**
@@ -485,10 +452,10 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       }
       
       /**
-       * Increases the KeY completed counter by {@code 1}.
+       * Increases the NO_TOOL completed counter by {@code 1}.
        */
-      protected void increaseKeYCompletedCount() {
-         keyCompletedCount++;
+      protected void increaseNoToolCompletedCount() {
+         noToolCompletedCount++;
       }
       
       /**
@@ -499,11 +466,11 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       }
 
       /**
-       * Returns the KeY used first counter.
-       * @return The KeY used first counter.
+       * Returns the NO_TOOL used first counter.
+       * @return The NO_TOOL used first counter.
        */
-      public int getKeyCount() {
-         return keyCount;
+      public int getNoToolCount() {
+         return noToolCount;
       }
 
       /**
@@ -515,11 +482,11 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       }
 
       /**
-       * Returns the KeY completed counter.
-       * @return The KeY completed counter.
+       * Returns the NO_TOOL completed counter.
+       * @return The NO_TOOL completed counter.
        */
-      public int getKeyCompletedCount() {
-         return keyCompletedCount;
+      public int getNoToolCompletedCount() {
+         return noToolCompletedCount;
       }
 
       /**
@@ -535,8 +502,8 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
        */
       @Override
       public String toString() {
-         return "KeY Count = " + keyCount + 
-                 ", KeY Completed Count = " + keyCompletedCount +
+         return "NO_TOOL Count = " + noToolCount + 
+                 ", NO_TOOL Completed Count = " + noToolCompletedCount +
                  ", SED Count = " + sedCount +
                  ", SED Completed Count = " + sedCompletedCount;
       }
@@ -553,9 +520,9 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       private final PermutationIndex<String, IndexData> permutationIndex;
       
       /**
-       * The total amount of KeY count.
+       * The total amount of NO_TOOL count.
        */
-      private int keyCountTotal;
+      private int noToolCountTotal;
       
       /**
        * The total amount of SED count.
@@ -565,12 +532,12 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       /**
        * Constructor.
        * @param permutationIndex The used {@link PermutationIndex}.
-       * @param keyCountTotal The total amount of KeY count.
+       * @param noToolCountTotal The total amount of NO_TOOL count.
        * @param sedCountTotal The total amount of SED count.
        */
-      public BalancingEntry(PermutationIndex<String, IndexData> permutationIndex, int keyCountTotal, int sedCountTotal) {
+      public BalancingEntry(PermutationIndex<String, IndexData> permutationIndex, int noToolCountTotal, int sedCountTotal) {
          this.permutationIndex = permutationIndex;
-         this.keyCountTotal = keyCountTotal;
+         this.noToolCountTotal = noToolCountTotal;
          this.sedCountTotal = sedCountTotal;
       }
 
@@ -583,11 +550,11 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       }
 
       /**
-       * Returns the total amount of KeY count.
-       * @return The total amount of KeY count.
+       * Returns the total amount of NO_TOOL count.
+       * @return The total amount of NO_TOOL count.
        */
-      public int getKeyCountTotal() {
-         return keyCountTotal;
+      public int getNoToolCountTotal() {
+         return noToolCountTotal;
       }
 
       /**

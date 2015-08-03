@@ -41,6 +41,7 @@ public abstract class AbstractEvaluation {
 
    public static AbstractEvaluation[] getEvaluations() {
       return new AbstractEvaluation[] {UnderstandingProofAttemptsEvaluation.INSTANCE, 
+                                       ReviewingCodeEvaluation.INSTANCE,
                                        TestEvaluation.INSTANCE,
                                        BrowserExampleEvaluation.INSTANCE};
    }

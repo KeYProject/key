@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.FixedForm;
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
+import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.TestEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
@@ -24,6 +25,39 @@ import org.key_project.util.java.CollectionUtil;
  * @author Martin Hentschel
  */
 public class FormInputWriterAndReaderTest extends AbstractEvaluationModelTest {
+   /**
+    * Tests writing and reading of {@link ReviewingCodeEvaluation#INSTANCE}.
+    */
+   @Test
+   public void testReviewingCodeEvaluation() throws Exception {
+      AbstractEvaluation evaluation = ReviewingCodeEvaluation.INSTANCE;
+      EvaluationInput evaluationInput = new EvaluationInput(evaluation, "keyVersion123", "keyInternalVersionABC");
+      for (AbstractFormInput<?> formInput : evaluationInput.getFormInputs()) {
+         evaluationInput.setCurrentFormInput(formInput);
+         if (formInput.getForm().isCollectTimes()) {
+            for (int i = 0; i < formInput.countPageInputs(); i++) {
+               AbstractPageInput<?> pageInput = formInput.getPageInput(i);
+               if (!pageInput.getPage().isReadonly()) {
+                  pageInput.setShownTime(i);
+               }
+            }
+         }
+         // Convert to xml
+         String xml = EvaluationInputWriter.toFormAnswerXML(formInput);
+         // Parse xml
+         EvaluationInput parsedInput = EvaluationInputReader.parse(xml);
+         AbstractFormInput<?> parsedFormInput = parsedInput.getCurrentFormInput();
+         // Compare inputs
+         assertNotNull(parsedInput);
+         assertNotSame(evaluationInput, parsedInput);
+         assertNotNull(parsedFormInput);
+         assertNotSame(formInput, parsedFormInput);
+         assertFormInput(formInput, parsedFormInput, false);
+         // Test complete xml
+         doCompleteXmlTest(evaluationInput);
+      }
+   }
+   
    /**
     * Tests writing and reading of {@link UnderstandingProofAttemptsEvaluation#INSTANCE}.
     */

@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.key_project.sed.key.evaluation.model.util.EvaluationModelImages;
+import org.key_project.sed.key.evaluation.model.validation.FixedValueValidator;
 import org.key_project.sed.key.evaluation.model.validation.IValueValidator;
 import org.key_project.sed.key.evaluation.model.validation.NotUndefinedValueValidator;
 import org.key_project.util.java.CollectionUtil;
@@ -23,6 +24,71 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
     * The name of the {@link Tool} representing 'SED'.
     */
    public static final String SED_TOOL_NAME = "SED";
+
+   /**
+    * The name of the introduction form.
+    */
+   public static final String INTRODUCTION_FORM_NAME = "introductionForm";
+
+   /**
+    * The name of the used random order computer.
+    */
+   public static final String RANDOM_COMPUTER_NAME = "ReviewingCodeRandomFormOrderComputer";
+
+   /**
+    * Page name of the evaluation instruction page.
+    */
+   public static final String EVALUATION_PAGE_NAME = "evaluationInstructions";
+
+   /**
+    * Page name of the JML introduction page.
+    */
+   public static final String JML_PAGE_NAME = "JML";
+   
+   /**
+    * Page name of example 1.
+    */
+   public static final String EXAMPLE_1_PAGE_NAME = "ObservableArray";
+
+   /**
+    * Page name of example 2.
+    */
+   public static final String EXAMPLE_2_PAGE_NAME = "BankUtil";
+
+   /**
+    * Page name of example 3.
+    */
+   public static final String EXAMPLE_3_PAGE_NAME = "IntegerUtil";
+
+   /**
+    * Page name of example 4.
+    */
+   public static final String EXAMPLE_4_PAGE_NAME = "MathUtil";
+
+   /**
+    * Page name of example 5.
+    */
+   public static final String EXAMPLE_5_PAGE_NAME = "ValueSearch";
+
+   /**
+    * Page name of example 6.
+    */
+   public static final String EXAMPLE_6_PAGE_NAME = "Stack";
+
+   /**
+    * Page name of the send evaluation page.
+    */
+   public static final String SEND_EVALUATION_PAGE_NAME = "sendEvaluation";
+
+   /**
+    * The name of the evaluation form.
+    */
+   public static final String EVALUATION_FORM_NAME = "evaluationForm";
+
+   /**
+    * Page name of the summary page.
+    */
+   public static final String FEEDBACK_PAGE = "feedback";
    
    /**
     * Forbid additional instances.
@@ -48,17 +114,190 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 
    @Override
    protected List<AbstractForm> computeForms() {
-      FixedForm evaluationForm = new FixedForm("evaluationForm", 
-                                               true, 
-                                               createValueSearchQuestionPage("ValueSearch", "Review of class ValueSearch"),
-                                               createBankUtilQuestionPage("BankUtil", "Review of class BankUtil"),
-                                               createMathUtilQuestionPage("MathUtil", "Review of class MathUtil"),
-                                               createIntegerUtilQuestionPage("IntegerUtil", "Review of class IntegerUtil"),
-                                               createObservableArrayQuestionPage("ObservableArrayExample", "Review of cass ObservableArray"),
-                                               createStackQuestionPage("StackExample", "Review of class Stack"));
-      return CollectionUtil.toList((AbstractForm)evaluationForm);
+      // Create introduction form
+      URL conditionsURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/conditions.html") : null;
+      QuestionPage conditionsPage = new QuestionPage("conditionsPage", 
+                                                     "Introduction", 
+                                                     "Please read the information and conditions of the evaluation carefully.",
+                                                     false,
+                                                     false,
+                                                     null,
+                                                     new BrowserQuestion("conditions", conditionsURL),
+                                                     new RadioButtonsQuestion("acceptConditions",
+                                                                              null, 
+                                                                              true,
+                                                                              "no", 
+                                                                              new FixedValueValidator("yes", "Please read and accept the information and conditions of the evaluation."), 
+                                                                              false,
+                                                                              new Choice("I &accept the conditions", "yes"), 
+                                                                              new Choice("I do &not accept the conditions", "no")));
+      QuestionPage backgroundPage = new QuestionPage("backgroundPage", 
+                                                     "Background Knowledge", 
+                                                     "Please fill out the form with your background knowledge.",
+                                                     true,
+                                                     false,
+                                                     null,
+                                                     new RadioButtonsQuestion("experienceWithJava",
+                                                                              "Experience with Java", 
+                                                                              true,
+                                                                              null, 
+                                                                              new NotUndefinedValueValidator("Experience with Java not defined."), 
+                                                                              false,
+                                                                              new Choice("None", "None"), 
+                                                                              new Choice("< 2 years", "Less than 2 years"), 
+                                                                              new Choice(">= 2 years", "More than 2 years")),
+                                                     new RadioButtonsQuestion("experienceWithJML",
+                                                                              "Experience with JML", 
+                                                                              true,
+                                                                              null, 
+                                                                              new NotUndefinedValueValidator("Experience with JML not defined."), 
+                                                                              false,
+                                                                              new Choice("None", "None"), 
+                                                                              new Choice("< 2 years", "Less than 2 years"), 
+                                                                              new Choice(">= 2 years", "More than 2 years")),
+                                                     new RadioButtonsQuestion("experienceWithSymbolicExecution",
+                                                                              "Experience with symbolic execution (e.g. verification or test case generation)", 
+                                                                              true,
+                                                                              null, 
+                                                                              new NotUndefinedValueValidator("Experience with symbolic execution not defined."), 
+                                                                              false,
+                                                                              new Choice("None", "None"), 
+                                                                              new Choice("< 2 years", "Less than 2 years"), 
+                                                                              new Choice(">= 2 years", "More than 2 years")),
+                                                     new RadioButtonsQuestion("experienceWithSED",
+                                                                              "Experience with SED", 
+                                                                              true,
+                                                                              null, 
+                                                                              new NotUndefinedValueValidator("Experience with SED not defined."), 
+                                                                              false,
+                                                                              new Choice("None", "None"), 
+                                                                              new Choice("< 1 year", "Less than 1 year"), 
+                                                                              new Choice(">= 1 year", "More than 1 year")));
+      SendFormPage sendConditionsPage = new SendFormPage("sendConditions", 
+                                                         "Confirm Sending Background Knowledge (used to order proof attempts)", 
+                                                         "Optionally, inspect the answers to be sent.", 
+                                                         "Current date and time (nothing else!)");
+      FixedForm introductionForm = new FixedForm(INTRODUCTION_FORM_NAME, 
+                                                 false,
+                                                 RANDOM_COMPUTER_NAME,
+                                                 conditionsPage, 
+                                                 backgroundPage,
+                                                 sendConditionsPage);
+      // Create evaluation form
+      URL evaluationURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/EvaluationIntroduction-Screencast.html") : null;
+      URL jmlURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/JML.html") : null;
+      InstructionPage evaluationPage = new InstructionPage(EVALUATION_PAGE_NAME, "Evaluation Instructions", "Read the evaluation instructions carefully before continuing.", evaluationURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.EVALUATION) : null);
+      InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO) : null);
+      ToolPage noToolPage = new ToolPage(getTool(NO_TOOL_NAME),
+                                         null,
+                                         false);
+            
+      ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME),
+                                          null, // TODO: Provide example
+                                          false);
+      QuestionPage example1Page = createObservableArrayQuestionPage(EXAMPLE_1_PAGE_NAME, "Review of cass ObservableArray");
+      QuestionPage example2Page = createBankUtilQuestionPage(EXAMPLE_2_PAGE_NAME, "Review of class BankUtil");
+      QuestionPage example3Page = createIntegerUtilQuestionPage(EXAMPLE_3_PAGE_NAME, "Review of class IntegerUtil");
+      QuestionPage example4Page = createMathUtilQuestionPage(EXAMPLE_4_PAGE_NAME, "Review of class MathUtil");
+      QuestionPage example5Page = createValueSearchQuestionPage(EXAMPLE_5_PAGE_NAME, "Review of class ValueSearch");
+      QuestionPage example6Page = createStackQuestionPage(EXAMPLE_6_PAGE_NAME, "Review of class Stack");
+      QuestionPage feedbackPage = createFeedbackPage();
+      SendFormPage sendEvaluationPage = new SendFormPage(SEND_EVALUATION_PAGE_NAME, 
+                                                         "Confirm Sending Evaluation Answers", 
+                                                         "Optionally, inspect the answers to be sent.", 
+                                                         "Current date and time (nothing else!)");
+      RandomForm evaluationForm = new RandomForm(EVALUATION_FORM_NAME, true, evaluationPage, jmlPage, noToolPage, sedToolPage, example1Page, example2Page, example3Page, example4Page, example5Page, example6Page, feedbackPage, sendEvaluationPage);
+      // Create thanks form
+      QuestionPage thanksPage = new QuestionPage("thanksPage", 
+                                                 "Evaluation sucessfully completed", 
+                                                 "Thank you for participating in the evaluation.", 
+                                                 false, 
+                                                 false,
+                                                 null,
+                                                 new ImageQuestion("thanksImage", isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_THANKS, 25) : null));
+      FixedForm thanksForm = new FixedForm("thanksForm", false, thanksPage);
+      return CollectionUtil.toList(introductionForm, evaluationForm, thanksForm);
    }
 
+   
+   
+   
+   
+   
+   
+   private QuestionPage createFeedbackPage() {
+      List<Choice> choices = CollectionUtil.toList(new Choice("Very Helpful", "Very Helpful"), 
+                                                   new Choice("Helpful", "Helpful"), 
+                                                   new Choice("Little Helpful", "Little Helpful"), 
+                                                   new Choice("Not Helpful", "Not Helpful"), 
+                                                   new Choice("Never Used", "Never Used"));
+      // SED
+      String setTitle = "Shown symbolic execution tree";
+      RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
+                                                                  setTitle, 
+                                                                  isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_SET) : null,
+                                                                  false,
+                                                                  null, 
+                                                                  new NotUndefinedValueValidator("Question '" + setTitle + "' not answered."), 
+                                                                  false,
+                                                                  choices);
+      String reachedTitle = "Highlighting of source code reached during symbolic execution";
+      RadioButtonsQuestion reachedQuestion = new RadioButtonsQuestion("reachedSourceCode", 
+                                                                      reachedTitle, 
+                                                                      isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_REACHED) : null,
+                                                                      false,
+                                                                      null, 
+                                                                      new NotUndefinedValueValidator("Question '" + reachedTitle + "' not answered."), 
+                                                                      false,
+                                                                      choices);
+      String variablesTitle = "Shown variables of a node (view 'Variables')";
+      RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
+                                                                        variablesTitle, 
+                                                                        isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_VARIABLES) : null,
+                                                                        false,
+                                                                        null, 
+                                                                        new NotUndefinedValueValidator("Question '" + variablesTitle + "' not answered."), 
+                                                                        false,
+                                                                        choices);
+      String layoutTitle = "Visualization of memory layouts";
+      RadioButtonsQuestion layoutQuestion = new RadioButtonsQuestion("layouts", 
+                                                                     layoutTitle, 
+                                                                     isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_MEMORY_LAYOUTS) : null,
+                                                                     false,
+                                                                     null, 
+                                                                     new NotUndefinedValueValidator("Question '" + layoutTitle + "' not answered."), 
+                                                                     false,
+                                                                     choices);
+      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, reachedQuestion, variablesQuestion, layoutQuestion);
+      // NO_TOOL vs SED
+      String keyVsSedTitle = "I prefer to inspect source code";
+      RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion("toolPreference", 
+                                                                       keyVsSedTitle, 
+                                                                       true,
+                                                                       null, 
+                                                                       new NotUndefinedValueValidator("Question '" + keyVsSedTitle + "' not answered."), 
+                                                                       false,
+                                                                       new Choice("directly", "Directly"),
+                                                                       new Choice("directly and using SED, both are equally good", "DirectlyAndSEDequal"),
+                                                                       new Choice("directly and using SED, depending on the proof", "DirectlyAndSEDproof"),
+                                                                       new Choice("directly and using SED, both are equally bad and should be improved", "DirectlyAndSEDbad"),
+                                                                       new Choice("using SED", "SED"));
+      SectionQuestion keyVsSedSection = new SectionQuestion("KeYvsSED", "KeY vs SED", false, keyVsSedQuestion);
+      // Feedback
+      SectionQuestion feedbackSection = new SectionQuestion("feedback", 
+                                                            "Feedback", 
+                                                            true, 
+                                                            new TextQuestion("feedback", "Feedback about the tools or the evaluation (optional)", null, null, false));
+      return new QuestionPage(FEEDBACK_PAGE,
+                              "Feedback", 
+                              "Please answer the question to give us some feeback about the tools and the evaluation.", 
+                              false,
+                              false,
+                              null,
+                              sedSection,
+                              keyVsSedSection,
+                              feedbackSection);
+   }
    
    
    
@@ -958,5 +1197,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    protected String createExecutedQuestion(String startMethod) {
       return "Which statement(s) can be executed starting at " + startMethod + "?";
+   }
+   
+   public RandomForm getEvaluationForm() {
+      return (RandomForm) getForm(EVALUATION_FORM_NAME);
    }
 }

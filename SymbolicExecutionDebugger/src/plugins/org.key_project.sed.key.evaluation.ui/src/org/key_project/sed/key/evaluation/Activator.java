@@ -2,6 +2,7 @@ package org.key_project.sed.key.evaluation;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.key_project.sed.key.evaluation.handlers.ReviewingCodeHandler;
 import org.key_project.sed.key.evaluation.handlers.UnderstandingProofAttemptsHandler;
 import org.osgi.framework.BundleContext;
 
@@ -37,6 +38,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 	   UnderstandingProofAttemptsHandler.saveEvaluationInput();
+	   ReviewingCodeHandler.saveEvaluationInput();
 		plugin = null;
 		super.stop(context);
 	}

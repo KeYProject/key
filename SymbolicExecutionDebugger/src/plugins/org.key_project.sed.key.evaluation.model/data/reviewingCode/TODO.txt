@@ -1,2 +1,0 @@
-Example for
-- Dead code, maybe with complicated expressions

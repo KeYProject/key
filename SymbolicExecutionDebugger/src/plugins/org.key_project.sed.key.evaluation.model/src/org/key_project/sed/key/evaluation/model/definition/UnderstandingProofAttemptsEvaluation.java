@@ -256,7 +256,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    }
    
    public RandomForm getEvaluationForm() {
-      return (RandomForm) getForm("evaluationForm");
+      return (RandomForm) getForm(EVALUATION_FORM_NAME);
    }
 
    private QuestionPage createMyIntegerQuestionPage(String pageName, String title) {

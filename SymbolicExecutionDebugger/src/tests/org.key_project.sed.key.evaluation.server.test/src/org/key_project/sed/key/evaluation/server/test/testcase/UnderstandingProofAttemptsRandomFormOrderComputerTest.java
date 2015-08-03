@@ -256,7 +256,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
    /**
     * Checks if the given {@link AbstractPageInput} is a proof page.
     * @param input The {@link AbstractFormInput} to check.
-    * @return {@code true} is proof page, {@code false} is somethig else.
+    * @return {@code true} is proof page, {@code false} is something else.
     */
    protected boolean isProofPage(AbstractPageInput<?> input) {
       String name = input.getPage().getName();
@@ -682,14 +682,14 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
       Tool sed = new Tool("sed", null, null, null);
       Tool invalid = new Tool("invalidTool", null, null, null);
       // Perform tests
-      assertTrue(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed, sed), key.getName(), sed.getName()));
-      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(sed, sed, key, key), key.getName(), sed.getName()));
-      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, sed, key, sed), key.getName(), sed.getName()));
-      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(invalid, key, sed, sed), key.getName(), sed.getName()));
-      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, invalid, sed, sed), key.getName(), sed.getName()));
-      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, invalid, sed), key.getName(), sed.getName()));
-      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed, invalid), key.getName(), sed.getName()));
-      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed), key.getName(), sed.getName()));
-      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed, sed, sed), key.getName(), sed.getName()));
+      assertTrue(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed, sed), key.getName(), sed.getName(), 4));
+      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(sed, sed, key, key), key.getName(), sed.getName(), 4));
+      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, sed, key, sed), key.getName(), sed.getName(), 4));
+      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(invalid, key, sed, sed), key.getName(), sed.getName(), 4));
+      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, invalid, sed, sed), key.getName(), sed.getName(), 4));
+      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, invalid, sed), key.getName(), sed.getName(), 4));
+      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed, invalid), key.getName(), sed.getName(), 4));
+      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed), key.getName(), sed.getName(), 4));
+      assertFalse(UnderstandingProofAttemptsRandomFormOrderComputer.isToolUsedFirst(CollectionUtil.toList(key, key, sed, sed, sed), key.getName(), sed.getName(), 4));
    }
 }
