@@ -9,7 +9,11 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -69,7 +73,8 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     @Override
     public boolean complete() {
         return joinPartners != null && concreteRule != null && joinNode != null
-                && distinguishablePathConditionsRequirement();
+                && distinguishablePathConditionsRequirement()
+                && suitableDistinguishingFormulaRequirement();
     }
     
     private boolean distinguishablePathConditionsRequirement() {
@@ -106,6 +111,50 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         else {
             return true;
         }
+    }
+    
+    private boolean suitableDistinguishingFormulaRequirement() {
+        if (distForm == null) {
+            return true; // auto generation of dist. formula
+        }
+
+        if (joinPartnerStates.size() != 1) {
+            // One formula cannot separate more than two states;
+            // therefore, a distinguishing formula can only be
+            // suitable for one partner state.
+            return false;
+        }
+
+        // The distinguishing formula must easily be provable for
+        // the join state, whilst its complement must be provable
+        // for the partner state.
+        
+        final Services services = joinNode.proof().getServices();
+        final TermBuilder tb = services.getTermBuilder();
+
+        {
+            Sequent toProve =
+                    Sequent.createSequent(new Semisequent(new SequentFormula(
+                            thisSEState.getPathCondition())), new Semisequent(
+                            new SequentFormula(distForm)));
+            if (!JoinRuleUtils.isProvable(toProve, services, 1000)) {
+                return false;
+            }
+        }
+        
+        {
+            SymbolicExecutionState partnerState = joinPartnerStates.head();
+            
+            Sequent toProve =
+                    Sequent.createSequent(new Semisequent(new SequentFormula(
+                            partnerState.getPathCondition())), new Semisequent(
+                            new SequentFormula(tb.not(distForm))));
+            if (!JoinRuleUtils.isProvable(toProve, services, 1000)) {
+                return false;
+            }
+        }
+
+        return true;
     }
     
     // GETTERS AND SETTERS //
