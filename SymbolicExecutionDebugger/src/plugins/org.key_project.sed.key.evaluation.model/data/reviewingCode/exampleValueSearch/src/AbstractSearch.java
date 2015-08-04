@@ -5,11 +5,11 @@
 public abstract class AbstractSearch {
    /**
     * Performs a linear search without modifying the given array.
-    * @param array The array to search in.
+    * @param array The array in which the search is performed.
     * @return The index of the first found element or 
     *         {@code -1} if no element was found.
     */
-   public int search(int[] array) {
+   protected int search(int[] array) {
       /*@ loop_invariant i >= 0 && i <= array.length;
         @ decreasing array.length - i;
         @ assignable i;
@@ -23,10 +23,10 @@ public abstract class AbstractSearch {
    }
 
    /**
-    * Checks if an element is found.
-    * @param array The array in which the search is performed in.
+    * Checks whether the specified array location matches the search criteria.
+    * @param array The array in which the search is performed.
     * @param index The current array index to check.
-    * @return {@code true} element found, {@code false} element not found.
+    * @return {@code true} location matches search critiera, {@code false} otherwise.
     */
    protected abstract boolean accept(int[] array, int index);
 }

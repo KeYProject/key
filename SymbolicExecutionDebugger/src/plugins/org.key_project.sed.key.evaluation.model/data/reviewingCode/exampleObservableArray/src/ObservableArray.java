@@ -12,18 +12,19 @@ public class ObservableArray {
    private final /*@ non_null @*/ Object[] array;
    
    /**
-    * The optional available {@link ArrayListener}.
+    * The optional available {@link ArrayListener} instances.
     * <p>
     * If no listeners are available the array might be {@code null} or empty.
     */
    private /*@ nullable @*/ ArrayListener[] arrayListeners;
    
    /**
-    * Constructs an {@link ObservableArray} modifying the given array.
+    * Constructs an {@link ObservableArray} taking ownership of the given array.
     * <p>
     * In case that the given array is {@code null} an 
     * {@link IllegalArgumentException} will be thrown.
     * @param array The array to which all actions are delegated.
+    * @throws IllegalArgumentException if the given array is {@code null}.
     */
    public ObservableArray(Object[] array) {
       if (array == null) {
@@ -37,7 +38,7 @@ public class ObservableArray {
     * Sets the value at index to the given {@link Object} and
     * informs all available {@link ArrayListener} about the change.
     * <p>
-    * The change is represented as {@link ArrayEvent} which offers all
+    * The change is represented as {@link ArrayEvent} which contains all
     * details about the performed modification.
     * @param index The index in the array to modify.
     * @param element The element to set at the given index.
@@ -50,7 +51,7 @@ public class ObservableArray {
    /**
     * Informs all available {@link ArrayListener} about an array change
     * by calling {@link ArrayListener#elementChanged(ArrayEvent)}.
-    * @param e The {@link ArrayEvent} containing all event details.
+    * @param e The {@link ArrayEvent} to be passed to the {@link ArrayListener} instances.
     */
    private void fireElementChanged(ArrayEvent e) {
       if (arrayListeners != null) {
@@ -67,8 +68,8 @@ public class ObservableArray {
    }
 
    /**
-    * Sets the available {@link ArrayListener}.
-    * @param arrayListeners The new {@link ArrayListener}.
+    * Sets the available {@link ArrayListener} instances.
+    * @param arrayListeners The new {@link ArrayListener} instances.
     */
    public void setArrayListeners(ArrayListener[] arrayListeners) {
       this.arrayListeners = arrayListeners;

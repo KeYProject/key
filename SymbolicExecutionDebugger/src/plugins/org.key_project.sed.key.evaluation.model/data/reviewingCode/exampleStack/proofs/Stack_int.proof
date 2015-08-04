@@ -2,14 +2,14 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Fri Jul 31 14:14:30 CEST 2015
+#Tue Aug 04 16:21:01 CEST 2015
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
-[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_EXPAND
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
@@ -44,7 +44,7 @@
 \javaSource "";
 
 \proofObligation "#Proof Obligation Settings
-#Fri Jul 31 14:14:30 CEST 2015
+#Tue Aug 04 16:21:01 CEST 2015
 name=Stack(int)
 addSymbolicExecutionLabel=true
 addUninterpretedPredicate=true
@@ -55,7 +55,7 @@ method=Stack\\#Stack(int)
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "188200436")
+(autoModeTime "153442713")
 
 (branch "dummy ID"
 (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,SETAccumulate"))
@@ -70,7 +70,7 @@ method=Stack\\#Stack(int)
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "o_arr_1"))
 (rule "variableDeclarationAssign" (formula "2") (term "1"))
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "dim0"))
-(rule "assignment_read_attribute_this" (formula "2") (term "1"))
+(rule "assignment" (formula "2") (term "1"))
 (builtin "One Step Simplification" (formula "2"))
 (rule "ifUnfold" (formula "2") (term "1") (inst "#boolv=x"))
 (rule "variableDeclaration" (formula "2") (term "1") (newnames "x"))
@@ -260,13 +260,12 @@ method=Stack\\#Stack(int)
    (builtin "One Step Simplification" (formula "4"))
    (rule "andLeft" (formula "1"))
    (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "2"))
    (rule "notLeft" (formula "1"))
-   (rule "andLeft" (formula "1"))
    (rule "notLeft" (formula "1"))
-   (rule "eqSymm" (formula "1"))
-   (rule "applyEq" (formula "3") (term "0") (ifseqformula "1"))
-   (rule "arrayLengthNotNegative" (formula "1") (term "1"))
-   (rule "arrayLengthIsAnInt" (formula "1") (term "1"))
+   (rule "arrayLengthNotNegative" (formula "1") (term "0"))
+   (rule "applyEq" (formula "1") (term "0") (ifseqformula "2"))
+   (rule "arrayLengthIsAnInt" (formula "1") (term "0"))
    (builtin "One Step Simplification" (formula "1"))
    (rule "true_left" (formula "1"))
    (rule "blockEmpty" (formula "7") (term "1"))
@@ -288,6 +287,7 @@ method=Stack\\#Stack(int)
       (rule "polySimp_elimSub" (formula "7") (term "2,1,0,1,0"))
       (rule "mul_literals" (formula "7") (term "1,2,1,0,1,0"))
       (rule "polySimp_addComm0" (formula "7") (term "2,1,0,1,0"))
+      (rule "applyEq" (formula "7") (term "1,2,1,0,1,0") (ifseqformula "1"))
       (rule "methodCallEmpty" (formula "7") (term "1"))
       (rule "blockEmpty" (formula "7") (term "1"))
       (rule "assignment_write_attribute_this" (formula "7") (term "1"))

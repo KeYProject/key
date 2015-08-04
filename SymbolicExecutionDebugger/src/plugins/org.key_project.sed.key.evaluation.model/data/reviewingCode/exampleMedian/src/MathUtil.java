@@ -11,11 +11,11 @@ public class MathUtil {
     * <p>
     * In case that the number of array elements between start and end is even,
     * the median is the average of the two middle elements.
-    * @param array The sorted array to compute median for.
+    * @param array The sorted array for which to compute the median.
     * @param start A valid index in the array representing the lower bound.
     * @param end A valid index in the array representing the upper bound.
     * @return The median value of the array between start and end index.
-    * @throws IllegalArgumentException Occurred exception in case of illegal parameter.
+    * @throws IllegalArgumentException in case of illegal parameters.
     */
    public static int median(int[] array, int start, int end) {
       // Check parameters
@@ -26,7 +26,7 @@ public class MathUtil {
          throw new IllegalArgumentException("Start is not a valid array index.");
       }
       if (end < 0 || end >= array.length) {
-         throw new IllegalArgumentException("Start is not a valid array index.");
+         throw new IllegalArgumentException("End is not a valid array index.");
       }
       // Compute median
       int middle = (start + end) / 2;

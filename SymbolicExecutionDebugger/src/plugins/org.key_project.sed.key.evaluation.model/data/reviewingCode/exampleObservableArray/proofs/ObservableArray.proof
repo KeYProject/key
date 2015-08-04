@@ -2,14 +2,14 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Fri Jul 31 14:17:31 CEST 2015
+#Tue Aug 04 16:17:45 CEST 2015
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
-[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_EXPAND
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
@@ -42,7 +42,7 @@
 \javaSource "";
 
 \proofObligation "#Proof Obligation Settings
-#Fri Jul 31 14:17:31 CEST 2015
+#Tue Aug 04 16:17:45 CEST 2015
 name=ObservableArray(java.lang.Object[])
 addSymbolicExecutionLabel=true
 addUninterpretedPredicate=true
@@ -53,7 +53,7 @@ method=ObservableArray\\#ObservableArray(java.lang.Object[])
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "481023436")
+(autoModeTime "490634406")
 
 (branch "dummy ID"
 (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,SETAccumulate"))

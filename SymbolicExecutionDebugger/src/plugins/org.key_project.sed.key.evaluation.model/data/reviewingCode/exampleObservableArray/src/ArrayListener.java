@@ -16,5 +16,5 @@ public interface ArrayListener {
      @ ensures true;
      @ assignable \everything;
      @*/
-   public void elementChanged(ArrayEvent e);
+   public /*@ helper @*/ void elementChanged(ArrayEvent e);
 }

@@ -14,16 +14,20 @@ public class IntegerUtil {
 			if (x < y) {
 				return y;
 			}
-			else if (x < z) {
-				return y;
+			else {
+			   if (x < z) {
+				   return y;
+			   }
 			}
 		}
 		else {
 			if (x > y) {
 				return y;
 			}
-			else if (x > z) {
-				return x;
+			else {
+			   if (x > z) {
+				   return x;
+				}
 			}
 		}
 		return z;

@@ -263,16 +263,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                         new NotUndefinedValueValidator("Question '" + variablesTitle + "' not answered."), 
                                                                         false,
                                                                         choices);
-      String layoutTitle = "Visualization of memory layouts";
-      RadioButtonsQuestion layoutQuestion = new RadioButtonsQuestion("layouts", 
-                                                                     layoutTitle, 
-                                                                     isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_MEMORY_LAYOUTS) : null,
-                                                                     false,
-                                                                     null, 
-                                                                     new NotUndefinedValueValidator("Question '" + layoutTitle + "' not answered."), 
-                                                                     false,
-                                                                     choices);
-      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, reachedQuestion, variablesQuestion, layoutQuestion);
+      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, reachedQuestion, variablesQuestion);
       // NO_TOOL vs SED
       String keyVsSedTitle = "I prefer to inspect source code";
       RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion("toolPreference", 
@@ -283,7 +274,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                        false,
                                                                        new Choice("directly", "Directly"),
                                                                        new Choice("directly and using SED, both are equally good", "DirectlyAndSEDequal"),
-                                                                       new Choice("directly and using SED, depending on the proof", "DirectlyAndSEDproof"),
+                                                                       new Choice("directly and using SED, depending on the source code", "DirectlyAndSEDcodeBased"),
                                                                        new Choice("directly and using SED, both are equally bad and should be improved", "DirectlyAndSEDbad"),
                                                                        new Choice("using SED", "SED"));
       SectionQuestion keyVsSedSection = new SectionQuestion("KeYvsSED", "KeY vs SED", false, keyVsSedQuestion);
@@ -310,7 +301,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private QuestionPage createValueSearchQuestionPage(String pageName, String title) {
       String description = "find(int[], int) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -348,9 +339,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
                                                                new Choice("Line 20: return new ValueSearch().search(array)", "Line 20", true),
-                                                               new Choice("Line 31: if (index < 0 || index >= array.length)", "Line 31", true),
-                                                               new Choice("Line 32: return false", "Line 32"),
-                                                               new Choice("Line 35: return array[index] == value", "Line 35", true));
+                                                               new Choice("Line 30: if (index < 0 || index >= array.length)", "Line 30", true),
+                                                               new Choice("Line 31: return false", "Line 31"),
+                                                               new Choice("Line 34: return array[index] == value", "Line 34", true));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -366,8 +357,23 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               implementedAsDocumented,
                               createThrownExceptionsQuestion(description, true, false, false, false, false, false),
                               executedQuestion,
+                              createValueSearchLocationQuestion(description),
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
+   }
+
+   private CheckboxQuestion createValueSearchLocationQuestion(String description) {
+      String title = createChangedLocationTitle("ValueSearch");
+      return new CheckboxQuestion("changedLocations", 
+                                  title, 
+                                  description,
+                                  true,
+                                  null, 
+                                  new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
+                                  true,
+                                  new Choice("None", "None"),
+                                  new Choice("value", "value"),
+                                  new Choice("something else", "SomethingElse", createElseLocationSubQuestion(description)));
    }
 
    
@@ -376,9 +382,10 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
 
    
+
    private QuestionPage createBankUtilQuestionPage(String pageName, String title) {
       String description = "computeInsuranceRate(int) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -472,7 +479,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private QuestionPage createMathUtilQuestionPage(String pageName, String title) {
       String description = "median(int[], int, int) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -545,7 +552,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private QuestionPage createIntegerUtilQuestionPage(String pageName, String title) {
       String description = "middle(int, int, int) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -584,13 +591,13 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 13: if (y < z)", "Line 13", true),
                                                                new Choice("Line 14: if (x < y)", "Line 14", true),
                                                                new Choice("Line 15: return y", "Line 15", true),
-                                                               new Choice("Line 17: if (x < z)", "Line 17", true),
-                                                               new Choice("Line 18: return y", "Line 18", true),
-                                                               new Choice("Line 22: if (x > y)", "Line 22", true),
-                                                               new Choice("Line 23: return y", "Line 23", true),
-                                                               new Choice("Line 25: if (x > z)", "Line 25", true),
-                                                               new Choice("Line 26: return x", "Line 26", true),
-                                                               new Choice("Line 29: return z", "Line 29", true));
+                                                               new Choice("Line 18: if (x < z)", "Line 18", true),
+                                                               new Choice("Line 19: return y", "Line 19", true),
+                                                               new Choice("Line 24: if (x > y)", "Line 24", true),
+                                                               new Choice("Line 25: return y", "Line 25", true),
+                                                               new Choice("Line 28: if (x > z)", "Line 28", true),
+                                                               new Choice("Line 29: return x", "Line 29", true),
+                                                               new Choice("Line 33: return z", "Line 33", true));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -644,7 +651,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private TabQuestion createObservableArrayArrayTab() {
       String description = "ObservableArray(Object[]) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -694,7 +701,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private TabQuestion createSetTab() {
       String description = "set(int, Object) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -730,14 +737,14 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 49: array[index] = element", "Line 49", true),
-                                                               new Choice("Line 50: fireElementChanged(new ArrayEvent(this, index, element))", "Line 50", true),
-                                                               new Choice("Line 59: if (arrayListeners != null)", "Line 59", true),
-                                                               new Choice("Line 64: int i = 0", "Line 64 initial", true),
-                                                               new Choice("Line 64: i < arrayListeners.length", "Line 64 guard", true),
-                                                               new Choice("Line 64: i++", "Line 64 increment", true),
-                                                               new Choice("Line 65 if (arrayListeners[i] != null)", "Line 65", true),
-                                                               new Choice("Line 66 arrayListeners[i].elementChanged(e)", "Line 66", true));
+                                                               new Choice("Line 47: array[index] = element", "Line 47", true),
+                                                               new Choice("Line 48: fireElementChanged(new ArrayEvent(this, index, element))", "Line 48", true),
+                                                               new Choice("Line 57: if (arrayListeners != null)", "Line 57", true),
+                                                               new Choice("Line 62: int i = 0", "Line 62 initial", true),
+                                                               new Choice("Line 62: i < arrayListeners.length", "Line 62 guard", true),
+                                                               new Choice("Line 62: i++", "Line 62 increment", true),
+                                                               new Choice("Line 63: if (arrayListeners[i] != null)", "Line 63", true),
+                                                               new Choice("Line 64: arrayListeners[i].elementChanged(e)", "Line 64", true));
       return new TabQuestion("set", 
                              "set(int, Object)", 
                              false, 
@@ -752,7 +759,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private TabQuestion createSetArrayListenersTab() {
       String description = "setArrayListeners(ArrayListener[]) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -760,10 +767,10 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              null, 
                                                              createNotUndefinedValueValidator(methodProblemsTitle), 
                                                              true,
-                                                             new Choice("ArrayListener are replaced by the new once", "ArrayListenerReplaced"), 
-                                                             new Choice("ArrayListener are not replaced by the new once", "ArrayListenerNotReplaced"), 
+                                                             new Choice("ArrayListener are replaced by the new one", "ArrayListenerReplaced"), 
+                                                             new Choice("ArrayListener are not replaced by the new one", "ArrayListenerNotReplaced"), 
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -782,7 +789,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 74 this.arrayListeners = arrayListeners", "Line 74", true));
+                                                               new Choice("Line 75: this.arrayListeners = arrayListeners", "Line 75", true));
       return new TabQuestion("setArrayListeners", 
                              "setArrayListeners(ArrayListener[])", 
                              false, 
@@ -834,7 +841,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
 
    private CheckboxQuestion createObservableArrayLocationQuestion(String description, boolean expectedArray, boolean expectedArrayListeners, boolean expectedArrayAtIndex) {
-      String title = "Which location(s) of the initial state before method invocation might be changed during execution?";
+      String title = createChangedLocationTitle("ObservableArray");
       return new CheckboxQuestion("changedLocations", 
                                   title, 
                                   description,
@@ -905,7 +912,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private TabQuestion createStackIntTab() {
       String description = "Stack(int) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -953,7 +960,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private TabQuestion createStackStackTab() {
       String description = "Stack(Stack) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -963,12 +970,12 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              true,
                                                              new Choice("The created stack is empty", "StackEmpty"), 
                                                              new Choice("The created stack is not empty", "StackNotEmpty"), 
-                                                             new Choice("The created stack provides same content as the existing once", "SameContent"),
-                                                             new Choice("The created stack provides different content as the existing once", "DifferentContent"),
-                                                             new Choice("The created stack has same size as the existing once", "SameSize"),
-                                                             new Choice("The created stack has different size as the existing once", "DifferentSize"),
-                                                             new Choice("The created stack has same elements array as the existing once", "SameElements", true),
-                                                             new Choice("The created stack has different elements array as the existing once", "DifferentElements"),
+                                                             new Choice("The created stack provides same content as the existing one", "SameContent"),
+                                                             new Choice("The created stack provides different content as the existing one", "DifferentContent"),
+                                                             new Choice("The created stack has same size as the existing one", "SameSize"),
+                                                             new Choice("The created stack has different size as the existing one", "DifferentSize"),
+                                                             new Choice("The created stack has same elements array as the existing one", "SameElements", true),
+                                                             new Choice("The created stack has different elements array as the existing one", "DifferentElements"),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
@@ -1005,7 +1012,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private TabQuestion createPushTab() {
       String description = "push(Object) related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -1042,9 +1049,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 55: if (size < elements.length)", "Line 55", true),
-                                                               new Choice("Line 56: elements[size++] = e", "Line 56", true),
-                                                               new Choice("Line 59: throw new IllegalStateException(\"Stack is full.\")", "Line 59", true));
+                                                               new Choice("Line 53: if (size < elements.length)", "Line 53", true),
+                                                               new Choice("Line 54: elements[size++] = e", "Line 54", true),
+                                                               new Choice("Line 57: throw new IllegalStateException(\"Stack is full.\")", "Line 57", true));
       return new TabQuestion("push(Object)", 
                              "push(Object)", 
                              false, 
@@ -1059,7 +1066,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private TabQuestion createPopTab() {
       String description = "pop() related question.";
-      String methodProblemsTitle = "What is wrong?";
+      String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
                                                              description,
@@ -1108,9 +1115,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 71: if (size >= 1)", "Line 71", true),
-                                                               new Choice("Line 72: return elements[--size]", "Line 72", true),
-                                                               new Choice("Line 75: throw new IllegalStateException(\"Stack is empty.\")", "Line 75", true));
+                                                               new Choice("Line 67: if (size >= 1)", "Line 67", true),
+                                                               new Choice("Line 68: return elements[--size]", "Line 68", true),
+                                                               new Choice("Line 71: throw new IllegalStateException(\"Stack is empty.\")", "Line 71", true));
       return new TabQuestion("pop()", 
                              "pop()", 
                              false, 
@@ -1190,7 +1197,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
 
    private TextQuestion createElseWrongSubQuestion(String description) {
-      String title = "What is wrong?";
+      String title = "What else is wrong?";
       return new TextQuestion("whatsWrong", title, description, null, new NotUndefinedValueValidator("Question '" + title + "' not answered."), false);
    }
    
@@ -1231,7 +1238,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
 
    private CheckboxQuestion createStackLocationQuestion(String description, boolean expectedElements, boolean expectedSize, boolean expectedElementAtPlus1) {
-      String title = "Which location(s) of the initial state before method invocation might be changed during execution?";
+      String title = createChangedLocationTitle("Stack");
       return new CheckboxQuestion("changedLocations", 
                                   title, 
                                   description,
@@ -1308,6 +1315,15 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    protected String createExecutedQuestion(String startMethod) {
       return "Which statement(s) can be executed starting at " + startMethod + "?";
    }
+   
+   private String createWhatsWrongTitle() {
+      return "Which is the ovserved wrong behavior assuming that documented precondition holds?";
+   }
+   
+   private String createChangedLocationTitle(String className) {
+      return "Which locations of class '" + className + "' might be changed during execution of the source code? (Expressions are evaluated in the post state after method return.)";
+   }
+
    
    public RandomForm getEvaluationForm() {
       return (RandomForm) getForm(EVALUATION_FORM_NAME);

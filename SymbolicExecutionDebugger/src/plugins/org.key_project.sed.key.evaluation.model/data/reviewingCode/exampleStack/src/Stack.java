@@ -30,7 +30,7 @@ public final class Stack {
     * @param maximalSize The maximal stack size.
     */
    public Stack(int maximalSize) {
-      elements = new Object[size];
+      elements = new Object[maximalSize];
       size = 0;
    }
    
@@ -46,10 +46,8 @@ public final class Stack {
 
    /**
     * Adds the given {@link Object} to the stack.
-    * <p>
-    * In case that the maximal stack length has reached,
-    * an {@link IllegalStateException} will be thrown.
     * @param e The {@link Object} to add.
+    * @throws IllegalStateException if the stack is full.
     */
    public void push(Object e) {
       if (size < elements.length) {
@@ -62,10 +60,8 @@ public final class Stack {
 
    /**
     * Returns and removes the top entry from the stack.
-    * <p>
-    * In case that the stack is empty, 
-    * an {@link IllegalStateException} will be thrown.
     * @return The top stack entry which was removed from the stack.
+    * @throws IllegalStateException if the stack is empty.
     */
    public Object pop() {
       if (size >= 1) {

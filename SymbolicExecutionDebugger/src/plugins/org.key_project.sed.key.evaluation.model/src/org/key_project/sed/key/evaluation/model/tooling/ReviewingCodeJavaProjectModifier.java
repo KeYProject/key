@@ -66,12 +66,12 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
          if (ReviewingCodeEvaluation.NO_TOOL_NAME.equals(getTool().getName())) {
             return "The source code of '" + typeName + "' is shown in Eclipse.\n" +
                    "Please answer the questions shown in the evaluation wizard.\n" +
-                   "Do NOT symbolically execute the source code using SED!";
+                   "Do NOT symbolically debug the source code using SED!";
          }
          else if (ReviewingCodeEvaluation.SED_TOOL_NAME.equals(getTool().getName())) {
             return "The symbolic execution tree of the source code of '" + typeName + "' is shown in Eclipse.\n" +
                    "Please answer the questions shown in the evaluation wizard.\n" +
-                   "Do not execute or debug the source code using JDT!";
+                   "Do NOT write additional code to be able to execute or debug the source code (concrete execution)!";
          }
          else {
             return null;
