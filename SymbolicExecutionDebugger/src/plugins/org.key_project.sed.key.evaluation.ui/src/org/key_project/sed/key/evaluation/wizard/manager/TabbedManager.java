@@ -14,8 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.key_project.sed.key.evaluation.model.definition.IPageWithWorkbenchModifier;
 import org.key_project.sed.key.evaluation.model.definition.TabbedQuestion;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage.ICreateControlCallback;
@@ -29,6 +31,8 @@ public class TabbedManager extends AbstractQuestionInputManager {
    private final List<IQuestionInputManager> childManagers;
    
    private final QuestionInput questionInput;
+   
+   private final AbstractEvaluationWizardPage<?> wizardPage;
    
    private final PropertyChangeListener questionListener = new PropertyChangeListener() {
       @Override
@@ -44,6 +48,7 @@ public class TabbedManager extends AbstractQuestionInputManager {
                         TabbedQuestion question,
                         ICreateControlCallback callback) {
       this.questionInput = questionInput;
+      this.wizardPage = wizardPage;
       tabFolder = new CTabFolder(parent, SWT.NONE);
       tabFolder.addSelectionListener(new SelectionAdapter() {
          @Override
@@ -58,6 +63,8 @@ public class TabbedManager extends AbstractQuestionInputManager {
       childManagers = QuestionWizardPage.createQuestionControls(wizardPage, toolkit, tabFolder, questionInput.getChildInputs(), callback);
       questionInput.addPropertyChangeListener(QuestionInput.PROP_VALUE, questionListener);
       handleQuestionValueChanged();
+      // Inform modifier about the initial state
+      updateWorkbenchModifier();
    }
 
    @Override
@@ -73,6 +80,7 @@ public class TabbedManager extends AbstractQuestionInputManager {
    }
 
    protected void handleQuestionValueChanged() {
+      // Change UI selection
       CTabItem tabItem = ArrayUtil.search(tabFolder.getItems(), new IFilter<CTabItem>() {
          @Override
          public boolean select(CTabItem element) {
@@ -81,6 +89,18 @@ public class TabbedManager extends AbstractQuestionInputManager {
       });
       if (tabItem != null) {
          tabFolder.setSelection(tabItem);
+      }
+      // Inform modifier about the change
+      updateWorkbenchModifier();
+   }
+   
+   protected void updateWorkbenchModifier() {
+      if (wizardPage.getPageInput().getPage() instanceof IPageWithWorkbenchModifier) {
+         IPageWithWorkbenchModifier page = (IPageWithWorkbenchModifier) wizardPage.getPageInput().getPage();
+         IWorkbenchModifier modifier = page.getWorkbenchModifier();
+         if (modifier != null) {
+            modifier.selectedTabChanged(questionInput);
+         }
       }
    }
 

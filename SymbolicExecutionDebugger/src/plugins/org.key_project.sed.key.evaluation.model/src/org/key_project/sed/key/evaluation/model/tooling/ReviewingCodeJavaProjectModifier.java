@@ -6,17 +6,32 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
+import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
+import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.model.util.LogUtil;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
+import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 
 public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModifier {
    private final String typeName;
@@ -30,6 +45,8 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
    private final boolean showCompletionMessage;
    
    private final List<ILaunchConfiguration> launchConfigurations = new LinkedList<ILaunchConfiguration>();
+   
+   private String currentTab;
    
    public ReviewingCodeJavaProjectModifier(String typeName,
                                            boolean showCompletionMessage,
@@ -89,6 +106,11 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
             }
          }
       }
+      // Wait for jobs
+      Thread.sleep(1000); // Give the UI the chance to start Jobs
+      JobUtil.waitForJobs(100);
+      // Ensure that correct tab is selected.
+      selectProofOfTab();
    }
 
    @Override
@@ -134,6 +156,90 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
 
       public String[] getMethodParameters() {
          return methodParameters;
+      }
+   }
+
+   @Override
+   public void selectedTabChanged(QuestionInput questionInput) {
+      currentTab = questionInput.getValue();
+      selectProofOfTab();
+   }
+   
+   @SuppressWarnings({ "rawtypes", "unchecked" })
+   protected void selectProofOfTab() {
+      try {
+         if (currentTab != null && !launchConfigurations.isEmpty()) {
+            final List toSelect = new LinkedList();
+            ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+            for (ILaunch launch : launchManager.getLaunches()) {
+               final String targetName = launch.getDebugTarget().getName();
+               if (!launch.isTerminated() && launchConfigurations.contains(launch.getLaunchConfiguration())) {
+                  boolean found = false;
+                  if ("set(int, Object)".equals(currentTab) &&
+                      "set(int, java.lang.Object)".equals(targetName)) {
+                     found = true;
+                  }
+                  else if ("ObservableArray(Object[])".equals(currentTab) &&
+                           "ObservableArray(java.lang.Object[])".equals(targetName)) {
+                     found = true;
+                  }
+                  else if ("setArrayListeners(ArrayListener[])".equals(currentTab) &&
+                           "setArrayListeners(ArrayListener[])".equals(targetName)) {
+                     found = true;
+                  }
+                  else if ("Stack(int)".equals(currentTab) &&
+                           "Stack(int)".equals(targetName)) {
+                     found = true;
+                  }
+                  else if ("Stack(Stack)".equals(currentTab) &&
+                           "Stack(Stack)".equals(targetName)) {
+                     found = true;
+                  }
+                  else if ("push(Object)".equals(currentTab) &&
+                           "push(java.lang.Object)".equals(targetName)) {
+                     found = true;
+                  }
+                  else if ("pop()".equals(currentTab) &&
+                           "pop()".equals(targetName)) {
+                     found = true;
+                  }
+                  if (found) {
+                     IDebugTarget target = launch.getDebugTarget();
+                     toSelect.add(target);
+                     if (target instanceof ISEDDebugTarget) {
+                        CollectionUtil.addAll(toSelect, ((ISEDDebugTarget) target).getSymbolicThreads());
+                     }
+                     else {
+                        CollectionUtil.addAll(toSelect, target.getThreads());
+                     }
+                  }
+               }
+            }
+            if (!toSelect.isEmpty()) {
+               Display.getDefault().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                     IDebugView debugView = (IDebugView) WorkbenchUtil.getActivePage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
+                     if (debugView != null) {
+                        Object currentSelected = SWTUtil.getFirstElement(debugView.getSite().getSelectionProvider().getSelection());
+                        // Ensure that thread is selected, otherwise current selection is sticky, see AbstractSEDDebugNode#getAdapter() anonymous IModelSelectionPolicyFactory implementation
+                        if (currentSelected instanceof IDebugElement) {
+                           IDebugTarget currentTarget = ((IDebugElement) currentSelected).getDebugTarget();
+                           debugView.getSite().getSelectionProvider().setSelection(SWTUtil.createSelection(currentTarget)); // Parent elements
+                        }
+                        // Select new targets
+                        SEDUIUtil.selectInDebugView(debugView, debugView, toSelect);
+                     }
+                     else {
+                        System.out.println("No debug view");
+                     }
+                  }
+               });
+            }
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
       }
    }
 }

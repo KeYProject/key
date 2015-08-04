@@ -4,6 +4,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
+import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 
 public abstract class AbstractWorkbenchModifier implements IWorkbenchModifier {
    private IWorkbenchPage workbenchPage;
@@ -36,5 +37,9 @@ public abstract class AbstractWorkbenchModifier implements IWorkbenchModifier {
 
    public IWorkbenchPage getWorkbenchPage() {
       return workbenchPage;
+   }
+
+   @Override
+   public void selectedTabChanged(QuestionInput questionInput) {
    }
 }
