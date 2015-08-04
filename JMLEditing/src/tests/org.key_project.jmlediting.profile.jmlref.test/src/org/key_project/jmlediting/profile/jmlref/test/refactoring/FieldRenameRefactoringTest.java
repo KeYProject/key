@@ -25,7 +25,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class FieldRenameRefactoringTest<WaitForShell> {
+public class FieldRenameRefactoringTest {
     
     private static final String PROJECT_NAME = "JMLRefactoringRenameTest";
     //private static final String PACKAGE_NAME = "test";

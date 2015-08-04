@@ -69,7 +69,7 @@ public class JMLMoveParticipant extends MoveParticipant {
             // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
             fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
             fNewPackName = ((PackageFragment) getArguments().getDestination()).getElementName();  
-            // random comment
+            
             return true;
         }else{
             return false;
