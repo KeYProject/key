@@ -25,7 +25,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class FieldRenameRefactoringTest<WaitForShell> {
+public class FieldRenameRefactoringTest {
     
     private static final String PROJECT_NAME = "JMLRefactoringRenameTest";
     //private static final String PACKAGE_NAME = "test";
@@ -37,6 +37,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     private static IFolder oracleFolder;
     final String CLASS_NAME = "TestClass";
     final String CLASS_NAME_OTHER = "TestClassOther";
+    final String CLASS_NAME_MORE = "TestClassOtherMore";
 
     @BeforeClass
     public static void initProject() throws CoreException, InterruptedException {
@@ -326,11 +327,45 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("test").delete(true, null);
     }
     
-    //TODO: does not work yet
-    //@Test
-    public void test9Invariant() throws InterruptedException, CoreException {
+    @Test
+    public void test9NoJavaChangesInTwoOtherFile() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test9";
+        final String pathToTests = path + "\\src";
+        final String pathToOracle = path + "\\oracle";
+        
+        copyFiles(pathToTests, srcFolder);
+        copyFiles(pathToOracle, oracleFolder);
+        
+        String oracleString = getOracle(oracleFolder, CLASS_NAME);
+        String oracleStringOther = getOracle(oracleFolder, CLASS_NAME_OTHER);
+        String oracleStringMore = getOracle(oracleFolder, CLASS_NAME_MORE);
+        
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        
+        executeRenaming(CLASS_NAME, "balance : int", "aNewName");
+        
+        String afterRenaming = getContentAfterRefactoring();
+        
+        assertEquals(oracleString,afterRenaming);
+        
+        // no renaming done (just get content of active editor)s
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME_OTHER + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT)); 
+        String afterRenamingOther = getContentAfterRefactoring();     
+        assertEquals(oracleStringOther,afterRenamingOther);
+        
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME_MORE + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        String afterRenamingMore = getContentAfterRefactoring(); 
+        assertEquals(oracleStringMore,afterRenamingMore);
+        
+        srcFolder.getFolder("test").delete(true, null);
+    }
+    
+    //TODO: does not work yet
+    //@Test
+    public void test10Invariant() throws InterruptedException, CoreException {
+        
+        final String path = "data\\template\\refactoringRenameTest\\test10";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
         
@@ -350,11 +385,80 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         srcFolder.getFolder("test").delete(true, null);
     }
     
-    // TODO: does not work yet
-    //@Test
-     public void test10ManyMemberAccesses() throws InterruptedException, CoreException {
+    @Test
+    public void test11thisQualifierMethodFieldName() throws InterruptedException, CoreException {
+           
+           final String path = "data\\template\\refactoringRenameTest\\test11";
+           final String pathToTests = path + "\\src";
+           final String pathToOracle = path + "\\oracle";
+           
+           copyFiles(pathToTests, srcFolder);
+           copyFiles(pathToOracle, oracleFolder);
+           
+           String oracleString = getOracle(oracleFolder, CLASS_NAME);
+           
+           TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+           
+           executeRenaming(CLASS_NAME, "balance : TestClass", "newName");
+           
+           String afterRenaming = getContentAfterRefactoring();
+           
+           assertEquals(oracleString,afterRenaming);
+           
+           srcFolder.getFolder("test").delete(true, null);
+       }
+    
+    @Test
+    public void test12thisQualifierMethodFieldNameNested() throws InterruptedException, CoreException {
+           
+           final String path = "data\\template\\refactoringRenameTest\\test12";
+           final String pathToTests = path + "\\src";
+           final String pathToOracle = path + "\\oracle";
+           
+           copyFiles(pathToTests, srcFolder);
+           copyFiles(pathToOracle, oracleFolder);
+           
+           String oracleString = getOracle(oracleFolder, CLASS_NAME);
+           
+           TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+           
+           executeRenaming(CLASS_NAME, "balance : TestClass", "newName");
+           
+           String afterRenaming = getContentAfterRefactoring();
+           
+           assertEquals(oracleString,afterRenaming);
+           
+           srcFolder.getFolder("test").delete(true, null);
+       }
+    
+    @Test
+    public void test13thisQualifierMethodFieldNameNestedChangedOrder() throws InterruptedException, CoreException {
+           
+           final String path = "data\\template\\refactoringRenameTest\\test13";
+           final String pathToTests = path + "\\src";
+           final String pathToOracle = path + "\\oracle";
+           
+           copyFiles(pathToTests, srcFolder);
+           copyFiles(pathToOracle, oracleFolder);
+           
+           String oracleString = getOracle(oracleFolder, CLASS_NAME);
+           
+           TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+           
+           executeRenaming(CLASS_NAME, "balance : TestClass", "newName");
+           
+           String afterRenaming = getContentAfterRefactoring();
+           
+           assertEquals(oracleString,afterRenaming);
+           
+           srcFolder.getFolder("test").delete(true, null);
+       }
+    
+    
+     @Test
+     public void test14ManyMemberAccesses() throws InterruptedException, CoreException {
             
-            final String path = "data\\template\\refactoringRenameTest\\test10";
+            final String path = "data\\template\\refactoringRenameTest\\test14";
             final String pathToTests = path + "\\src";
             final String pathToOracle = path + "\\oracle";
             
@@ -365,7 +469,101 @@ public class FieldRenameRefactoringTest<WaitForShell> {
             
             TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
             
-            executeRenaming(CLASS_NAME, "test : TestClass", "newName");
+            executeRenaming(CLASS_NAME, "balance : TestClass", "newName");
+            
+            String afterRenaming = getContentAfterRefactoring();
+            
+            assertEquals(oracleString,afterRenaming);
+            
+            srcFolder.getFolder("test").delete(true, null);
+        }
+     
+     @Test
+     public void test15FieldRefAfterMethodCall() throws InterruptedException, CoreException {
+            
+            final String path = "data\\template\\refactoringRenameTest\\test15";
+            final String pathToTests = path + "\\src";
+            final String pathToOracle = path + "\\oracle";
+            
+            copyFiles(pathToTests, srcFolder);
+            copyFiles(pathToOracle, oracleFolder);
+            
+            String oracleString = getOracle(oracleFolder, CLASS_NAME);
+            
+            TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+            
+            executeRenaming(CLASS_NAME, "balance : int", "newName");
+            
+            String afterRenaming = getContentAfterRefactoring();
+            
+            assertEquals(oracleString,afterRenaming);
+            
+            srcFolder.getFolder("test").delete(true, null);
+        }
+     
+     // Problem with Resolver currently
+     //@Test
+     public void test16LikeTest15PlusMemberAccess() throws InterruptedException, CoreException {
+            
+            final String path = "data\\template\\refactoringRenameTest\\test16";
+            final String pathToTests = path + "\\src";
+            final String pathToOracle = path + "\\oracle";
+            
+            copyFiles(pathToTests, srcFolder);
+            copyFiles(pathToOracle, oracleFolder);
+            
+            String oracleString = getOracle(oracleFolder, CLASS_NAME);
+            
+            TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+            
+            executeRenaming(CLASS_NAME, "balance : String", "newName");
+            
+            String afterRenaming = getContentAfterRefactoring();
+            
+            assertEquals(oracleString,afterRenaming);
+            
+            srcFolder.getFolder("test").delete(true, null);
+        }
+     
+     // Problem with Resolver currently
+     //@Test
+     public void test17LikeTest16WithoutParentheses() throws InterruptedException, CoreException {
+            
+            final String path = "data\\template\\refactoringRenameTest\\test17";
+            final String pathToTests = path + "\\src";
+            final String pathToOracle = path + "\\oracle";
+            
+            copyFiles(pathToTests, srcFolder);
+            copyFiles(pathToOracle, oracleFolder);
+            
+            String oracleString = getOracle(oracleFolder, CLASS_NAME);
+            
+            TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+            
+            executeRenaming(CLASS_NAME, "balance : String", "newName");
+            
+            String afterRenaming = getContentAfterRefactoring();
+            
+            assertEquals(oracleString,afterRenaming);
+            
+            srcFolder.getFolder("test").delete(true, null);
+        }
+     
+     @Test
+     public void test18ManyMemberAccessesAndMethodCalls() throws InterruptedException, CoreException {
+            
+            final String path = "data\\template\\refactoringRenameTest\\test18";
+            final String pathToTests = path + "\\src";
+            final String pathToOracle = path + "\\oracle";
+            
+            copyFiles(pathToTests, srcFolder);
+            copyFiles(pathToOracle, oracleFolder);
+            
+            String oracleString = getOracle(oracleFolder, CLASS_NAME);
+            
+            TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+            
+            executeRenaming(CLASS_NAME+"<IJavaProject>", "balance : int", "newName");
             
             String afterRenaming = getContentAfterRefactoring();
             

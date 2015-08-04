@@ -1,13 +1,17 @@
 package test;
 
-class TestClass {
-    TestClass newName;
+public class TestClass {
+    public int aNewName = 5;
+    
+    //@ invariant aNewName == 5;
 
-    /*@
-      @ normal_behavior
-      @ ensures this.newName.newName == newName.newName.test().newName;
-      @*/
-    public TestClass test() {
-        return newName;
+    /*@ normal_behavior
+      @ assignable aNewName;
+      @*/ 
+    public void setBalance(int newBalance) {
+        if (newBalance == 5)
+            aNewName = newBalance;
+        else
+            aNewName = 5;
     }
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -11,8 +13,10 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -31,13 +35,13 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
+import org.key_project.jmlediting.core.resolver.ResolveResultType;
 import org.key_project.jmlediting.core.resolver.ResolverException;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
-import org.key_project.util.jdt.JDTUtil;
 
 /**
  * Class to participate in the rename refactoring of java fields.
@@ -47,6 +51,14 @@ import org.key_project.util.jdt.JDTUtil;
  * The changes are added to the scheduled java changes as the JDT takes care of 
  * moving offsets in the editor and preview when several changes are made to the same file.
  * 
+ * The class usually returns NULL because changes are added in-place to the Java changes except
+ * if changes to JML annotations to a class need to be made for which no Java changes are needed.
+ * 
+ * To reduce the number of times the resolver is used, the JML annotations are first taken
+ * in the form of StringNodes as filtered before the primary Nodes are computed which are 
+ * then taken to the Resolver. 
+ * 
+ * 
  * @author Robert Heimbach
  */
 public class JMLRenameParticipant extends RenameParticipant {
@@ -54,6 +66,7 @@ public class JMLRenameParticipant extends RenameParticipant {
     private IJavaElement fJavaElementToRename;
     private String fNewName;
     private String fOldName;
+    private IJavaProject fProject;
 
     /**
      * Name of this class. {@inheritDoc}
@@ -73,6 +86,7 @@ public class JMLRenameParticipant extends RenameParticipant {
 
         if (element instanceof IJavaElement) {
             fJavaElementToRename = (IJavaElement) element;
+            fProject = fJavaElementToRename.getJavaProject();
             fOldName = fJavaElementToRename.getElementName();
             return true;
         }
@@ -98,7 +112,10 @@ public class JMLRenameParticipant extends RenameParticipant {
     /**
      * Computes the changes which need to be done to the JML code and
      * add those to the changes to the java code which are already scheduled.
-     * Returns null to indicate that only shared text changes are made.
+     * 
+     * @return Returns null if only shared text changes are made. Otherwise
+     * returns a TextChange Object which gathered all the changes to JML annotations 
+     * in class which does not have any Java changes scheduled.
      * 
      *  {@inheritDoc}
      *
@@ -107,12 +124,32 @@ public class JMLRenameParticipant extends RenameParticipant {
     public Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
-        IJavaProject[] projects;
-        try {
-            projects = JDTUtil.getAllJavaProjects();
+        // Only non empty change objects will be added
+        ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
+        
+        // Find out the projects which need to be checked: active project plus all dependencies
+        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
+        projectsToCheck.add(fProject);
 
+        try {
+            //IJavaProject[] allProjects = JDTUtil.getAllJavaProjects();
+            
+            String[] requiredProjectNames = fProject.getRequiredProjectNames();
+            //System.out.println(fProject.getPath());
+            //System.out.println(requiredProjectNames.length);
+            
+            if (requiredProjectNames.length > 0) {
+                
+                IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+                
+                for (String requiredProject: requiredProjectNames){
+                    //System.out.println("required: "+requiredProject);
+                    projectsToCheck.add(JavaCore.create(workspaceRoot.getProject(requiredProject)));
+                }    
+            }
+            
             // Look through all source files in each package and project
-            for (final IJavaProject project : projects) {
+            for (final IJavaProject project : projectsToCheck) {
                 for (final IPackageFragment pac : project.getPackageFragments()) {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
@@ -131,25 +168,22 @@ public class JMLRenameParticipant extends RenameParticipant {
                             }
                         }
                         else {
-                            TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());
-                            
-                            // Gather all the edits to the text in a MultiTextEdit
-                            // and add those to the change object.
-                            MultiTextEdit allEdits = new MultiTextEdit();
-                            
-                            for (final ReplaceEdit edit: changesToJML) {
-                               allEdits.addChild(edit);
+                            // In case changes to the JML code needs to be done (but not to the java code)
+                            if (!changesToJML.isEmpty()){
+                                
+                                // Gather all the edits to the text (JML annotations) in a MultiTextEdit
+                                // and add those to a change object for the given file
+                                TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());                         
+                                MultiTextEdit allEdits = new MultiTextEdit();
+                                
+                                for (final ReplaceEdit edit: changesToJML) {
+                                   allEdits.addChild(edit);
+                                }
+
+                                tfChange.setEdit(allEdits);
+                                
+                                changesToFilesWithoutJavaChanges.add(tfChange);
                             }
-                            
-                            
-                            tfChange.setEdit(allEdits);
-                            
-                            // Do not return an empty change object.
-                            // The class will be shown in the rename preview despite no change occurs.
-                            if (allEdits.hasChildren())
-                                return tfChange;
-                            else
-                                return null;
                         }
                     }
                 }
@@ -158,7 +192,17 @@ public class JMLRenameParticipant extends RenameParticipant {
         catch (final JavaModelException e) {
             return null;
         }
-        return null;
+        
+        // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
+        if (changesToFilesWithoutJavaChanges.isEmpty())
+            return null;
+        else {
+            CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
+            for (TextFileChange change : changesToFilesWithoutJavaChanges){
+                allChangesToFilesWithoutJavaChanges.add(change);
+            }
+            return allChangesToFilesWithoutJavaChanges;
+        }
     }
 
     /**
@@ -224,7 +268,6 @@ public class JMLRenameParticipant extends RenameParticipant {
         final IJMLParser parser = activeProfile.createParser();
         IASTNode parseResult;
         try {
-            //System.out.println(source);
             parseResult = parser.parse(source, range);
             stringNodes = Nodes.getAllNodesOfType(parseResult, NodeTypes.STRING);
         }
@@ -232,13 +275,13 @@ public class JMLRenameParticipant extends RenameParticipant {
             return new ArrayList<IASTNode>();
         }
  
-        System.out.println("Unfiltered: "+stringNodes);
+        //System.out.println("Unfiltered: "+stringNodes);
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
-        System.out.println("Filtered: "+filtedStringNodes);
+        //System.out.println("Filtered: "+filtedStringNodes);
         
-        final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult);
+        final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
         
-        System.out.println("Primaries: " + primaries);
+        //System.out.println("Primaries: " + primaries);
         return primaries;
     }
 
@@ -262,17 +305,21 @@ public class JMLRenameParticipant extends RenameParticipant {
         return filteredList;
     }
 
-    private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult){
+    private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult, final boolean notKeYProfile){
         final List<IASTNode> primaries = new ArrayList<IASTNode>();
         
         for (final IStringNode stringNode: stringNodes) {       
-          final IASTNode primary = getPrimaryNode(parseResult, stringNode);
-          primaries.add(primary);  
+          final IASTNode primary = getPrimaryNode(parseResult, stringNode, notKeYProfile);
+          // nested expressions would add the same primary twice, e.g. if code looks like this:
+          // TestClass test;
+          // //@ ensures this.test.test
+          if (!primaries.contains(primary))
+              primaries.add(primary);  
         }
         return primaries;
     }
     
-    private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest) {
+    private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest, final boolean notKeYProfile) {
         return context.traverse(new INodeTraverser<IASTNode>() {
 
             @Override
@@ -287,7 +334,14 @@ public class JMLRenameParticipant extends RenameParticipant {
                         }
                     }
                 }
-                return existing;
+                // If the KeY Profile is not used, the primary node from the assignable node
+                // cannot be found. Resolver will still resolve the string node though.
+                if (notKeYProfile && existing == null){
+                    //System.out.println("primary found: null");
+                    return toTest;
+                }     
+                else
+                    return existing;
             }        
         }, null);
     }
@@ -305,8 +359,6 @@ public class JMLRenameParticipant extends RenameParticipant {
      *            to accumulate needed changes 
      */
     private void resolvePotentialReferences(final ICompilationUnit unit, final IASTNode node, final ArrayList<ReplaceEdit> changesToMake) {
-    
-        //System.out.println(node.prettyPrintAST());
         
         final IASTNode nodeToChange = node;
     
@@ -319,19 +371,38 @@ public class JMLRenameParticipant extends RenameParticipant {
             if (isReferencedElement(result)){
                 computeReplaceEdit(changesToMake, nodeToChange);
             }
+            
+            if (result == null)
+                i = 1;
                       
             while(resolver.hasNext()) { 
                  result = resolver.next();
-                 //System.out.println("resolver.next()");
-                 
-                 System.out.println(nodeToChange.prettyPrintAST());
                  
                  if (isReferencedElement(result)) {
-                     final IASTNode node2 = nodeToChange.getChildren().get(1).getChildren().get(i);
-                     
-                     computeReplaceEdit(changesToMake, node2);
-                 } 
-                 i = i + 1;
+                     // Access inner node which resolver checked by .next() method
+                    if (nodeToChange.getChildren().size() >= 1) {
+                         
+                        final IASTNode child = nodeToChange.getChildren().get(1);
+                         
+                        if (child.getChildren().size() >= i) {
+                             final IASTNode innerNode = nodeToChange.getChildren().get(1).getChildren().get(i);
+                             computeReplaceEdit(changesToMake, innerNode);
+                         }
+                    }    
+                 }
+                 // Go to the next expression in the list which need to be checked
+                 if (result != null && result.getResolveType().equals(ResolveResultType.METHOD)){
+                     // In case of a Method Call like in test().test, the whole method call takes two list entries. 
+                     // Thus we need to skip one more to resolve the <<test>> reference.
+                     // List[113-125]
+                     //    (MemberAccess[113-118](String[113-114](.),String[114-118](test)),
+                     //     MethodCall[118-120](None[118-120]()),
+                     //     MemberAccess[120-125](String[120-121](.),String[121-125](test)))
+                     i = i + 2;
+                 }
+                 else {
+                     i = i + 1;
+                 }
             }
         }
         catch (final ResolverException e) {
@@ -345,7 +416,6 @@ public class JMLRenameParticipant extends RenameParticipant {
         }
         
         final IJavaElement jElement = result.getBinding().getJavaElement();
-        System.out.println(jElement + " " + fJavaElementToRename);
         return jElement.equals(fJavaElementToRename);
     }
     
@@ -378,7 +448,6 @@ public class JMLRenameParticipant extends RenameParticipant {
                 length, fNewName);
 
         changesToMake.add(edit);
-        //System.out.println("Adding Replace Edit");
     }
     
 }
