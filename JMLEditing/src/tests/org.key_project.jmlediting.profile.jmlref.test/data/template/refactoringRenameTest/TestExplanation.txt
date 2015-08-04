@@ -20,6 +20,7 @@ Test6: the other class is additionally in another package and instead of returni
 Test7: more complex usage of balance. More than one member access.
 Test8: Changes to the JML code in the other class but no changes to the java code. Other class accesses the balance field
       from the main class by using getBalance() but refers to the field in the JML code.
-Test9: change within an invariant.
-Test10: lots of member accesses but of the same class.
+Test9: Like 8 but with 2 files without java changes.
+Test10: change within an invariant.
+Test11: lots of member accesses but of the same class.
 ...

@@ -1,17 +1,21 @@
 package test;
 
 public class TestClass {
-    public int aNewName = 5;
+    public int aNewName;
+    public TestClassOther otherClass = new TestClassOther();
     
-    //@ invariant aNewName == 5;
-
     /*@ normal_behavior
-      @ assignable aNewName;
-      @*/ 
-    public void setBalance(int newBalance) {
-        if (newBalance == 5)
-            aNewName = newBalance;
-        else
-            aNewName = 5;
+      @ 
+      @*/
+    public /*@ pure @*/ int getBalance() {
+        return aNewName;
+    }
+    
+    /*@ normal_behavior
+      @ ensures \result == otherClass.balance;
+      @ assignable \nothing;
+      @*/
+    public int accessBalanceFromOtherClass() {
+        return otherClass.balance;
     }
 }

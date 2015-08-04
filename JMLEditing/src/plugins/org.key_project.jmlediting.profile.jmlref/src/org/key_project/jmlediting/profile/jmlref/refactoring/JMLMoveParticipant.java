@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -14,6 +13,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.PackageFragment;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
@@ -45,13 +45,13 @@ import org.key_project.util.jdt.JDTUtil;
  * 
  * @author Maksim Melnik
  */
+@SuppressWarnings("restriction")
 public class JMLMoveParticipant extends MoveParticipant {
     private IJavaElement fToMove;        // file
-    private IPath destination;              // path of destination
-    private IPath source;                   // path to file
 
     private String fDocName;                // file name
     
+    private String fOldFullQualName;        // old fully qualified
     private String fOldPackName;            // old package name
     private String fNewPackName;            // new package name
 
@@ -61,15 +61,15 @@ public class JMLMoveParticipant extends MoveParticipant {
     @Override
     protected boolean initialize(Object element) {
         if(element instanceof IJavaElement){
-            fToMove=(IJavaElement) element;                                                  // get file element
-            source=fToMove.getPath();
-            destination=((IJavaElement)getArguments().getDestination()).getPath();              // get destination path
+            fToMove=(IJavaElement) element;
+            
             fDocName = fToMove.getElementName();
-            System.out.println(((IType) element).getFullyQualifiedName().substring(0)); 
-            // assume out source foulder is named src and packages lie directly in source foulder
-            fOldPackName=source.toString().substring(source.toString().indexOf("src/")+4, source.toString().lastIndexOf("/")).replaceAll("/", ".");
-            fNewPackName=destination.toString().substring(source.toString().indexOf("src/")+4).replaceAll("/", ".");
-                    
+            fOldFullQualName=((IType) element).getFullyQualifiedName();
+            
+            // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
+            fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
+            fNewPackName = ((PackageFragment) getArguments().getDestination()).getElementName();  
+            // random comment
             return true;
         }else{
             return false;
@@ -160,7 +160,7 @@ public class JMLMoveParticipant extends MoveParticipant {
         // Look through the JML comments and find the potential references which need to be renamed
         final String source = unit.getSource();
         // return no changes if source doesn't contain our package.filename
-        if(!source.contains(fOldPackName+"."+fDocName))return changesToMake;
+        if(!source.contains(fOldFullQualName))return changesToMake;
         
         final CommentLocator loc = new CommentLocator(source);
 
@@ -231,8 +231,8 @@ public class JMLMoveParticipant extends MoveParticipant {
         for (final IASTNode node: nodesList){
             final IStringNode stringNode = (IStringNode) node;
             nodeString=nodeString+stringNode.getString();
-            // if the node contains our old package and ends with the name of our class , then our element is 100% referenced
-            if (stringNode.getString().equals(fDocName) && nodeString.contains(fOldPackName)) {
+            // TODO: change mit contains, && statements resolved wrong
+            if (nodeString.equals(fOldFullQualName)) {
                 filteredList.add(stringNode);
             }
         }
