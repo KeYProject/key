@@ -92,13 +92,22 @@ public class SWTBotJMLOutlineUpdate {
       bot.saveAllEditors();
    }
    
+   public void addTextSeriell(int startLine, int startCol, String text) {
+      for (int i = 0; i < text.length(); i++ ){
+//         bot.activeEditor().toTextEditor().insertText(startLine, i+startCol, text.charAt(i));
+      }
+   }
+   
    @Test
-   public void outlineUpdateTest1(){
+   public void outlineUpdateTestOnInitialChange(){
       bot.activeEditor().toTextEditor().insertText(5, 0, textToAdd);
       //TODO: noch saven bzw sollte angezeigt werden da init change !! weitere test kein bock auf den rotz
       test(textToAdd, "invariant test", 1, 0);
    }
    
+   public void outlineUpdateTestOnSave() {
+ //     bot.activeEditor().toTextEditor().insertText(line, column, text);
+   }
    
    
 }
