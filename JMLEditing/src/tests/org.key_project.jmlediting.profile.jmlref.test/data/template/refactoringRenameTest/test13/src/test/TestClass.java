@@ -1,13 +1,13 @@
 package test;
 
 class TestClass {
-    TestClass newName;
+    TestClass balance;
 
     /*@
       @ normal_behavior
-      @ ensures this.balance() == newName;
+      @ ensures this.balance().balance == balance;
       @*/
     public TestClass balance() {
-        return newName;
+        return balance;
     }
 }
