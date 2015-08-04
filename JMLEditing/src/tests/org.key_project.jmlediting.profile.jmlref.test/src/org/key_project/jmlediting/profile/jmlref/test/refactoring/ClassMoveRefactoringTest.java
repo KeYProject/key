@@ -141,7 +141,6 @@ public class ClassMoveRefactoringTest{
         executeMoving(CLASS_NAME_MOVE, pathToTests+"\\test\\", pathToTests+"\\test2");
         
         String afterRenaming = getContentAfterRefactoring();
-        bot.sleep(20000);
         assertEquals(oracleString,afterRenaming);
         
         srcFolder.getFolder("test").delete(true, null);
