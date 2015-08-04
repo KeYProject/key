@@ -1,15 +1,16 @@
+package mainpack;
 public class Main {
     
     /*@
-      @ public invariant test.Settings.x<100;
+      @ public invariant test1p1.Settings.x<100;
       @*/
     int x=0;
     
     /*@ 
       @ normal_behavior
-      @ ensures test.Settings.x == 42;
+      @ ensures test1p1.Settings.x == 42;
       @*/
     public static void bla() {
-        test.Settings.x = 42;
+        test1p1.Settings.x = 42;
     }
 }

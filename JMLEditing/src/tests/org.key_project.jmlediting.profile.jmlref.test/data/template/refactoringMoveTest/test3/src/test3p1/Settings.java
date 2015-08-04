@@ -1,4 +1,4 @@
-package testpack.pack1;
+package test3p1;
 
 public class Settings {
     public static int x;
