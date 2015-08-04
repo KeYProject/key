@@ -847,7 +847,11 @@ public class GoalList extends JList<Goal> {
 
             if (value instanceof Goal) {
                 final Sequent seq = ((Goal) value).sequent();
-                valueStr = "(#" + ((Goal)value).node().serialNr() + ") " + seqToString(seq);
+                // (DS) Also add the serial of the corresponding node to the
+                // printed String for better transparency and quicker
+                // access to features like visual node diff.
+                valueStr = "(#" + ((Goal)value).node().serialNr() + ") "
+                        + seqToString(seq);
 
                 statusIcon =
                         ((Goal) value).isLinked() ? linkedGoalIcon
