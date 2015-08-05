@@ -26,6 +26,7 @@ import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.wizard.EvaluationWizard;
 import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
+import org.key_project.sed.key.evaluation.wizard.manager.TabbedManager;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
@@ -257,7 +258,7 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
       return errornousControl != null;
    }
    
-   public void performMessageClick() {
+   public final void performMessageClick() {
       String newTab = null;
       if (errornousControl != null) {
          Control current = errornousControl;
@@ -275,6 +276,9 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
                });
                if (!ObjectUtil.equals(tabFolder.getSelection(), tabItem)) {
                   tabFolder.setSelection(tabItem);
+                  if (tabFolder.getData() instanceof TabbedManager) {
+                     ((TabbedManager) tabFolder.getData()).handleSelectedTabChanged();
+                  }
                   newTab = tabItem.getText();
                }
             }

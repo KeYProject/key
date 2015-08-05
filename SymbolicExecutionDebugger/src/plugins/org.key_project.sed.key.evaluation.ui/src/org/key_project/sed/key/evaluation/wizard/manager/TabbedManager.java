@@ -50,10 +50,11 @@ public class TabbedManager extends AbstractQuestionInputManager {
       this.questionInput = questionInput;
       this.wizardPage = wizardPage;
       tabFolder = new CTabFolder(parent, SWT.NONE);
+      tabFolder.setData(this);
       tabFolder.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            handleSelectedTabChanged(e);
+            handleSelectedTabChanged();
          }
       });
       toolkit.adapt(tabFolder);
@@ -75,7 +76,7 @@ public class TabbedManager extends AbstractQuestionInputManager {
       }
    }
 
-   protected void handleSelectedTabChanged(SelectionEvent e) {
+   public void handleSelectedTabChanged() {
       questionInput.setValue(tabFolder.getSelection().getText());
    }
 
