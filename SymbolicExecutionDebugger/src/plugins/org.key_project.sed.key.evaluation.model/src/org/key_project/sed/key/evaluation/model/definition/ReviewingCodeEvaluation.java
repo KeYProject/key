@@ -104,14 +104,15 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    @Override
    protected List<Tool> computeTools() {
       URL noToolURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/NoTool.html") : null;
-      URL sedURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/SED.html") : null;
+      URL sedURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/SED-Screencast.html") : null;
+      URL sedWizardURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/SED-ScreencastWizard.html") : null;
       Tool noTool = new Tool(NO_TOOL_NAME, 
                              noToolURL, 
                              noToolURL, 
                              isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JAVA_APPLICATION_LOGO) : null);
       Tool sed = new Tool(SED_TOOL_NAME, 
                           sedURL, 
-                          sedURL, 
+                          sedWizardURL, 
                           isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);
       return CollectionUtil.toList(noTool, sed);
    }
@@ -197,7 +198,11 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                          false);
             
       ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME),
-                                          null, // TODO: Provide example
+                                          new ReviewingCodeJavaProjectModifier("Database", 
+                                                                               true, 
+                                                                               null,
+                                                                               new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/instructions-archived/instructionExample/accumulateDatabase.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/accumulateDatabase.proof", false, "Database", "accumulateDatabase", new String[] {"QAccumulator;"})},
+                                                                               new FileDefinition("data/reviewingCode/instructions-archived/instructionExample/Database.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Database.java", true)),
                                           false);
       QuestionPage example1Page = createObservableArrayQuestionPage(EXAMPLE_1_PAGE_NAME, "Review of cass ObservableArray");
       QuestionPage example2Page = createBankUtilQuestionPage(EXAMPLE_2_PAGE_NAME, "Review of class BankUtil");
