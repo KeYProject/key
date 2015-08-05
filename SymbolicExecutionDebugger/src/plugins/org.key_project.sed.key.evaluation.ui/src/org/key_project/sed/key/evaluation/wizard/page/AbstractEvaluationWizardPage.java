@@ -29,6 +29,7 @@ import org.key_project.sed.key.evaluation.wizard.dialog.EvaluationWizardDialog;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
 import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
@@ -257,6 +258,7 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
    }
    
    public void performMessageClick() {
+      String newTab = null;
       if (errornousControl != null) {
          Control current = errornousControl;
          // Ensure that control is visible
@@ -271,7 +273,10 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
                      return element.getControl() == controlOfTabItem;
                   }
                });
-               ((CTabFolder) parent).setSelection(tabItem);
+               if (!ObjectUtil.equals(tabFolder.getSelection(), tabItem)) {
+                  tabFolder.setSelection(tabItem);
+                  newTab = tabItem.getText();
+               }
             }
             else if (parent instanceof ScrolledComposite) {
                ((ScrolledComposite) parent).showControl(errornousControl);
@@ -281,6 +286,9 @@ public abstract class AbstractEvaluationWizardPage<P extends AbstractPageInput<?
          // Scroll to control
          if (form != null) {
             form.showControl(errornousControl);
+         }
+         if (newTab != null) {
+            MessageDialog.openInformation(getShell(), "Selected tab has changed", "Please answer the questions of tab '" + newTab + ".");
          }
       }
    }
