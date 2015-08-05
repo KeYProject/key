@@ -6,7 +6,6 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -16,6 +15,9 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
@@ -32,6 +34,8 @@ import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithException;
 
 public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModifier {
    private final String typeName;
@@ -168,6 +172,64 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
    @SuppressWarnings({ "rawtypes", "unchecked" })
    protected void selectProofOfTab() {
       try {
+         // Show source code
+         if (getJavaProject() != null) {
+            final IType type;
+            final IMethod method;
+            if ("set(int, Object)".equals(currentTab)) {
+               type = getJavaProject().findType("ObservableArray");
+               method = type.getMethod("set", new String[] {"I", "QObject;"});
+            }
+            else if ("ObservableArray(Object[])".equals(currentTab)) {
+               type = getJavaProject().findType("ObservableArray");
+               method = type.getMethod("ObservableArray", new String[] {"[QObject;"});
+            }
+            else if ("setArrayListeners(ArrayListener[])".equals(currentTab)) {
+               type = getJavaProject().findType("ObservableArray");
+               method = type.getMethod("setArrayListeners", new String[] {"[QArrayListener;"});
+            }
+            else if ("Stack(int)".equals(currentTab)) {
+               type = getJavaProject().findType("Stack");
+               method = type.getMethod("Stack", new String[] {"I"});
+            }
+            else if ("Stack(Stack)".equals(currentTab)) {
+               type = getJavaProject().findType("Stack");
+               method = type.getMethod("Stack", new String[] {"QStack;"});
+            }
+            else if ("push(Object)".equals(currentTab)) {
+               type = getJavaProject().findType("Stack");
+               method = type.getMethod("push", new String[] {"QObject;"});
+            }
+            else if ("pop()".equals(currentTab)) {
+               type = getJavaProject().findType("Stack");
+               method = type.getMethod("pop", new String[0]);
+            }
+            else {
+               type = null;
+               method = null;
+            }
+            IRunnableWithException run = new AbstractRunnableWithException() {
+               @Override
+               public void run() {
+                  try {
+                     if (method != null) {
+                        JavaUI.openInEditor(method, true, true);
+                     }
+                     else if (type != null) {
+                        JavaUI.openInEditor(type, true, true);
+                     }
+                  }
+                  catch (Exception e) {
+                     setException(e);
+                  }
+               }
+            };
+            Display.getDefault().syncExec(run);
+            if (run.getException() != null) {
+               throw run.getException();
+            }
+         }
+         // Select launch
          if (currentTab != null && !launchConfigurations.isEmpty()) {
             final List toSelect = new LinkedList();
             ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
@@ -238,7 +300,7 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
             }
          }
       }
-      catch (DebugException e) {
+      catch (Exception e) {
          LogUtil.getLogger().logError(e);
       }
    }
