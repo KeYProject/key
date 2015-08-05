@@ -318,8 +318,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Index of wrong array element might be returned", "WrongIndex", true), 
                                                              new Choice("array is modified during search", "ArrayModified"), 
                                                              new Choice("array is not modified during search", "ArrayNotModified"), 
+                                                             createThrownExceptionsQuestionChoice(description, true, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -355,7 +356,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    new FileDefinition("data/reviewingCode/exampleValueSearch/src/ValueSearch.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ValueSearch.java", true)),
                               new LabelQuestion("generalDescription", createGeneralClassDescription("ValueSearch")),
                               implementedAsDocumented,
-                              createThrownExceptionsQuestion(description, true, false, false, false, false, false),
                               executedQuestion,
                               createValueSearchLocationQuestion(description),
                               createSEDUsedQuestion(),
@@ -398,8 +398,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Wrong value returned in case age >= 19 and age < 21", "WrongLess21", createBankUtilReturnedValue(description, false)), 
                                                              new Choice("Wrong value returned in case age >= 21 and age < 35", "WrongLess35", createBankUtilReturnedValue(description, false)), 
                                                              new Choice("Wrong value returned in case age >= 35", "WrongGreaterOrEqual35", true, createBankUtilReturnedValue(description, true)), 
+                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -439,7 +440,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    new FileDefinition("data/reviewingCode/exampleInsuranceRate/src/BankUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/BankUtil.java", true)),
                               new LabelQuestion("generalDescription", createGeneralClassDescription("BankUtil")),
                               implementedAsDocumented,
-                              createThrownExceptionsQuestion(description, false, false, false, false, false, false),
                               executedQuestion,
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
@@ -496,8 +496,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("array is not modified during compuation", "ArrayNotModified"), 
                                                              new Choice("Exception is thrown instead of returning average", "ExceptionThrown"), 
                                                              new Choice("Value is returned instead of thrown exception", "ValueReturned"), 
+                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -538,7 +539,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    new FileDefinition("data/reviewingCode/exampleMedian/src/MathUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MathUtil.java", true)),
                               new LabelQuestion("generalDescription", createGeneralClassDescription("MathUtil")),
                               implementedAsDocumented,
-                              createThrownExceptionsQuestion(description, false, false, false, false, true, false),
                               executedQuestion,
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
@@ -568,8 +568,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("y returned instead of z", "yInsteadOfz"), 
                                                              new Choice("z returned instead of x", "zInsteadOfx"), 
                                                              new Choice("z returned instead of y", "zInsteadOfy"), 
+                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -610,7 +611,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    new FileDefinition("data/reviewingCode/exampleMiddle/src/IntegerUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/IntegerUtil.java", true)),
                               new LabelQuestion("generalDescription", createGeneralClassDescription("IntegerUtil")),
                               implementedAsDocumented,
-                              createThrownExceptionsQuestion(description, false, false, false, false, false, false),
                               executedQuestion,
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
@@ -663,8 +663,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Future calls of set(int, Object) will not modify the given array", "ArrayNotModified"), 
                                                              new Choice("ObservableArray is created instead of throwing an exception", "ExceptionMissing"), 
                                                              new Choice("Exception is thrown instead of creating an ObservableArray", "ExceptionThrown"), 
+                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(true);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -692,7 +693,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createObservableArrayClassInvariantQuestion(description, true),
-                             createThrownExceptionsQuestion(description, false, false, false, true, false, false),
                              executedQuestion,
                              createObservableArrayLocationQuestion(description, true, true, false),
                              createSEDUsedQuestion(),
@@ -717,8 +717,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("No ArrayEvent is created.", "ArrayEventNotCreated"), 
                                                              new Choice("The ArrayEvent contains all details about the modification.", "ArrayEventHasDetails"), 
                                                              new Choice("The ArrayEvent does not contains all details about the modification.", "ArrayEventDoesNotHaveDetails"), 
+                                                             createThrownExceptionsQuestionChoice(description, true, false, false, false, true, true),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -750,7 +751,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createObservableArrayClassInvariantQuestion(description, false),
-                             createThrownExceptionsQuestion(description, true, false, false, false, true, true),
                              executedQuestion,
                              createObservableArrayLocationQuestion(description, false, false, true),
                              createSEDUsedQuestion(),
@@ -769,8 +769,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              true,
                                                              new Choice("ArrayListener are replaced by the new one", "ArrayListenerReplaced"), 
                                                              new Choice("ArrayListener are not replaced by the new one", "ArrayListenerNotReplaced"), 
+                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -795,7 +796,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createObservableArrayClassInvariantQuestion(description, false),
-                             createThrownExceptionsQuestion(description, false, false, false, false, false, false),
                              executedQuestion,
                              createObservableArrayLocationQuestion(description, false, true, false),
                              createSEDUsedQuestion(),
@@ -924,8 +924,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("The created stack is not empty", "StackNotEmpty"), 
                                                              new Choice("The created stack can be filled up to maximal size", "StackSizeMaximal"),
                                                              new Choice("The created stack can not be filled up to maximal size", "StackSizeNotMaximal"),
+                                                             createThrownExceptionsQuestionChoice(description, false, true, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(true);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -951,7 +952,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createStackClassInvariantQuestion(description, true, false),
-                             createThrownExceptionsQuestion(description, false, true, false, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, true, true, false),
                              createSEDUsedQuestion(),
@@ -976,8 +976,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("The created stack has different size as the existing one", "DifferentSize"),
                                                              new Choice("The created stack has same elements array as the existing one", "SameElements", true),
                                                              new Choice("The created stack has different elements array as the existing one", "DifferentElements"),
+                                                             createThrownExceptionsQuestionChoice(description, true, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the constructor implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(true);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -1003,7 +1004,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createStackClassInvariantQuestion(description, true, false),
-                             createThrownExceptionsQuestion(description, true, false, false, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, true, true, false),
                              createSEDUsedQuestion(),
@@ -1029,8 +1029,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Exception is thrown instead of updating the stack", "ExceptionThrown"), 
                                                              new Choice("Stack is updated instead of throwing an exception", "ExceptionNOtThrown"), 
                                                              new Choice("Executing pop after push would not return the added element.", "PushPopBroken"), 
+                                                             createThrownExceptionsQuestionChoice(description, false, false, true, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -1057,7 +1058,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createStackClassInvariantQuestion(description, false, false),
-                             createThrownExceptionsQuestion(description, false, false, true, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, false, true, true),
                              createSEDUsedQuestion(),
@@ -1083,8 +1083,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Exception is thrown instead of returning the top element", "ExceptionThrown"), 
                                                              new Choice("Top element is returned instead of throwing an exception", "ExceptionNOtThrown"), 
                                                              new Choice("Executing pop twice would return the same element twice.", "PopPopBroken"), 
+                                                             createThrownExceptionsQuestionChoice(description, false, false, true, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = "Does the method implementation operates as specified by its JavaDoc comment?";
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -1123,7 +1124,6 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              false, 
                              implementedAsDocumented,
                              createStackClassInvariantQuestion(description, false, true),
-                             createThrownExceptionsQuestion(description, false, false, true, false, false, false),
                              executedQuestion,
                              createStackLocationQuestion(description, false, true, false),
                              returnValue,
@@ -1261,22 +1261,22 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       String locationTitle = "Which additional location(s) can be changed?";
       return new TextQuestion("elseLocation", locationTitle, description, null, new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), false);
    }
-   
-   private RadioButtonsQuestion createThrownExceptionsQuestion(String description, boolean expectedNPE, boolean expectedNASE, boolean expectedISE, boolean expectedIAE, boolean expectedAIOOBE, boolean expectedASE) {
-      String title = "Is it possible that an exception is thrown?";
-      return new RadioButtonsQuestion("exceptionThrown", 
-                                      title, 
-                                      description,
-                                      true, 
-                                      null, 
-                                      createNotUndefinedValueValidator(title), 
-                                      true,
-                                      new Choice("Yes", "Yes", !expectedNPE && !expectedNASE && !expectedISE, createThrownExceptionsSubQuestion(description, expectedNPE, expectedNASE, expectedISE, expectedIAE, expectedAIOOBE, expectedASE)), 
-                                      new Choice("No", "No"));
+
+   private Choice createThrownExceptionsQuestionChoice(String description, 
+                                                       boolean expectedNPE, 
+                                                       boolean expectedNASE, 
+                                                       boolean expectedISE, 
+                                                       boolean expectedIAE, 
+                                                       boolean expectedAIOOBE, 
+                                                       boolean expectedASE) {
+      return new Choice("A not documented exception might be thrown", 
+                        "unexpectedException", 
+                        expectedNPE || expectedNASE || expectedISE || expectedIAE || expectedAIOOBE || expectedASE,
+                        createThrownExceptionsSubQuestion(description, expectedNPE, expectedNASE, expectedISE, expectedIAE, expectedAIOOBE, expectedASE));
    }
-   
+
    private CheckboxQuestion createThrownExceptionsSubQuestion(String description, boolean expectedNPE, boolean expectedNASE, boolean expectedISE, boolean expectedIAE, boolean expectedAIOOBE, boolean expectedASE) {
-      String thrownExceptionTitle = "Which exception(s) might be thrown?";
+      String thrownExceptionTitle = "Which not documented exception(s) might be thrown?";
       CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsMightBeThrown", 
                                                                       thrownExceptionTitle, 
                                                                       description,
@@ -1322,6 +1322,15 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private String createChangedLocationTitle(String className) {
       return "Which locations of class '" + className + "' might be changed during execution of the source code? (Expressions are evaluated in the post state after method return.)";
+   }
+   
+   private String createImplementedAsDocumentedTitle(boolean constructor) {
+      if (constructor) {
+         return "Does the constructor implementation always behaves as specified by its JavaDoc comment assuming that documented preconditions hold?";
+      }
+      else {
+         return "Does the method implementation always behaves as specified by its JavaDoc comment assuming that documented preconditions hold?";
+      }
    }
 
    
