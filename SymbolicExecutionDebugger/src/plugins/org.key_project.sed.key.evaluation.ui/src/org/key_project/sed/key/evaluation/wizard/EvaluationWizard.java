@@ -282,7 +282,7 @@ public class EvaluationWizard extends Wizard {
       }
    }
    
-   protected boolean sendForm(final SendFormPageInput sendInput, final AbstractFormInput<?> formInput) {
+   public boolean sendForm(final SendFormPageInput sendInput, final AbstractFormInput<?> formInput) {
       try {
          sendInput.setSendingInProgress(true);
          IRunnableWithProgressAndResult<Boolean> run = new AbstractRunnableWithProgressAndResult<Boolean>() {

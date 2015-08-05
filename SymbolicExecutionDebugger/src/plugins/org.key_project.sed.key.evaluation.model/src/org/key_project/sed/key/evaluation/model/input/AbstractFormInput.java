@@ -112,4 +112,17 @@ public abstract class AbstractFormInput<F extends AbstractForm> extends Bean {
          pageInput.reset();
       }
    }
+   
+   /**
+    * Searches the first available {@link SendFormPageInput}.
+    * @return The first available {@link SendFormPageInput} or {@code null} if not available.
+    */
+   public SendFormPageInput searchSendFormPageInput() {
+      return (SendFormPageInput) CollectionUtil.search(pageInputs, new IFilter<AbstractPageInput<?>>() {
+         @Override
+         public boolean select(AbstractPageInput<?> element) {
+            return element.getPage() instanceof SendFormPage;
+         }
+      });
+   }
 }

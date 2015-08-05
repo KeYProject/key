@@ -11,6 +11,7 @@ import java.util.WeakHashMap;
 
 import org.eclipse.jface.dialogs.DialogTray;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -31,7 +32,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -46,6 +49,7 @@ import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.FixedFormInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.SendFormPageInput;
+import org.key_project.sed.key.evaluation.model.io.EvaluationInputWriter;
 import org.key_project.sed.key.evaluation.model.tooling.IWorkbenchModifier;
 import org.key_project.sed.key.evaluation.util.LogUtil;
 import org.key_project.sed.key.evaluation.util.SEDEvaluationImages;
@@ -55,9 +59,11 @@ import org.key_project.sed.key.evaluation.wizard.page.AbstractEvaluationWizardPa
 import org.key_project.sed.key.evaluation.wizard.page.QuestionWizardPage;
 import org.key_project.sed.key.evaluation.wizard.page.SendFormWizardPage;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.eclipse.swt.dialog.ControlMessageDialog;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 public class EvaluationWizardDialog extends WizardDialog {
@@ -506,6 +512,84 @@ public class EvaluationWizardDialog extends WizardDialog {
          wizardToClose = null;
       }
       return super.open();
+   }
+
+   @Override
+   protected boolean canHandleShellCloseEvent() {
+      return super.canHandleShellCloseEvent() && askForClosing();
+   }
+
+   @Override
+   protected void cancelPressed() {
+      if (askForClosing()) {
+         super.cancelPressed();
+      }
+   }
+   
+   protected boolean askForClosing() {
+      final AbstractPageInput<?> pageInput = getCurrentPage().getPageInput();
+      final AbstractFormInput<?> formInput = pageInput.getFormInput();
+      final SendFormPageInput sendInput = formInput.searchSendFormPageInput();
+      if (formInput == evaluationInput.getFormInput(1)) {
+         ControlMessageDialog.IControlCreator creator = new ControlMessageDialog.IControlCreator() {
+            @Override
+            public Control createControl(Composite parent) {
+               Composite composite = new Composite(parent, SWT.NONE);
+               composite.setLayout(new GridLayout(2, false));
+               // Content to send
+               Label label = new Label(composite, SWT.NONE);
+               label.setText("C&ontent to send");
+               label.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
+               Text contentText = new Text(composite, SWT.READ_ONLY | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+               contentText.setText(EvaluationInputWriter.toFormAnswerXML(formInput));
+               contentText.setLayoutData(new GridData(GridData.FILL_BOTH));
+               // Additional data stored on server
+               if (sendInput != null && !StringUtil.isTrimmedEmpty(sendInput.getPage().getAdditionalDataCollectedByServer())) {
+                  Label additionalLabel = new Label(composite, SWT.NONE);
+                  additionalLabel.setText("Additional &data");
+                  Text additionalText = new Text(composite, SWT.READ_ONLY | SWT.MULTI | SWT.BORDER);
+                  additionalText.setText(sendInput.getPage().getAdditionalDataCollectedByServer());
+                  additionalText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+               }
+               return composite;
+            }
+         };
+         ControlMessageDialog dialog = new ControlMessageDialog(getShell(), 
+                                                                "Cancel Evaluation?", 
+                                                                 null, 
+                                                                 "Please send intermediat results in case that you like to cancel the evaluation.", 
+                                                                 MessageDialog.NONE, 
+                                                                 new String[] {"&Send results and cancel evaluation", "C&ancel evaluation", "&Continue evaluation"}, 
+                                                                 2,
+                                                                 creator) {
+            @Override
+            protected void initializeBounds() {
+               super.initializeBounds();
+               Rectangle bounds = getShell().getBounds();
+               if (bounds.width > 700) {
+                  bounds.width = 700;
+               }
+               if (bounds.height > 600) {
+                  bounds.height= 600;
+               }
+               getShell().setBounds(bounds);
+               SWTUtil.centerOn(getParentShell(), getShell());
+            }
+         };
+         int result = dialog.open();
+         if (result == 0) {
+            return getWizard().sendForm(sendInput, formInput);
+         }
+         else if (result == 1) {
+            return true;
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return true;
+      }
    }
 
    @Override
