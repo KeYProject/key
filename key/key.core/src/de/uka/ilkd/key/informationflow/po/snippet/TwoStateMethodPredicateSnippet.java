@@ -6,6 +6,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -46,13 +47,14 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         final ImmutableList<Term> termList =
                 extractTermListForPredicate(pm, poVars, d.hasMby);
         final Function contApplPred =
-                generateContApplPredicate(nameString, termList, d.tb, d.services);
+                generateContApplPredicate(nameString, termList, pm, d.tb, d.services);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 
 
     private Function generateContApplPredicate(String nameString,
                                                ImmutableList<Term> termList,
+                                               IProgramMethod pm,
                                                TermBuilder tb,
                                                Services services) {
         final Name name = new Name(nameString);
@@ -61,10 +63,18 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
         if (pred == null) {
             Sort[] argSorts = new Sort[termList.size()];
+            ImmutableArray<Sort> pmSorts = pm.argSorts(); 
 
             int i = 0;
             for (final Term arg : termList) {
-                argSorts[i] = arg.sort();
+                // bugfix: Take the first argument sorts from the definition of 
+                // the method rather than from the actually provided arguments.
+                // aug 2015 SG + MU
+                if(i < pmSorts.size() - 1) {
+                    argSorts[i] = pmSorts.get(i+1);
+                } else {
+                    argSorts[i] = arg.sort();
+                }
                 i++;
             }
 

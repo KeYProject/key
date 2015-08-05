@@ -241,9 +241,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     renamedPostExpressions,
                                     renamedNewObjects));
             
-            changed |= (renamedPreExpressions == innerTerms.preExpressions &&
-                    renamedPostExpressions == innerTerms.postExpressions &&
-                    renamedNewObjects == innerTerms.newObjects);
+            changed |= !(renamedPreExpressions == innerTerms.preExpressions &&
+                         renamedPostExpressions == innerTerms.postExpressions &&
+                         renamedNewObjects == innerTerms.newObjects);
         }
         return changed ? res : terms;
     }
