@@ -28,24 +28,20 @@ public final class ExceptionTools {
     
         Location location = null;
 
-        /*
-         *  This must be before check for RecognitionException because currently
-         *  SLTranslationException is subtype of RecognitionException.
-         */
-        if (exc instanceof SLTranslationException) {
-           SLTranslationException ste = (SLTranslationException) exc;
-           location = new Location(ste.getFileName(), 
-                           ste.getLine(), 
-                           ste.getColumn());
-        }
-        else if  (exc instanceof RecognitionException) {
+        if  (exc instanceof RecognitionException) {
             RecognitionException recEx = (RecognitionException) exc;
             // ANTLR 3 - Recognition Exception.
-            if(exc instanceof KeYSemanticException) {
+            if (exc instanceof SLTranslationException) {
+               SLTranslationException ste = (SLTranslationException) exc;
+               location = new Location(ste.getFileName(), 
+                               ste.getLine(), 
+                               ste.getColumn());
+            }
+            else if(exc instanceof KeYSemanticException) {
                 KeYSemanticException kse = (KeYSemanticException) exc;
-                return new Location(kse.getFilename(), kse.getLine(), kse.getColumn());
+                location = new Location(kse.getFilename(), kse.getLine(), kse.getColumn());
             } else if(recEx.input != null) {
-                return new Location(recEx.input.getSourceName(),
+                location = new Location(recEx.input.getSourceName(),
                       recEx.line, recEx.charPositionInLine);
             }
         }
