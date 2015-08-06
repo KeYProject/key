@@ -39,10 +39,12 @@ public final class ExceptionTools {
             }
             else if(exc instanceof KeYSemanticException) {
                 KeYSemanticException kse = (KeYSemanticException) exc;
-                location = new Location(kse.getFilename(), kse.getLine(), kse.getColumn());
+             // ANTLR has 0-based column numbers, hence +1.
+                location = new Location(kse.getFilename(), kse.getLine(), kse.getColumn() + 1);
             } else if(recEx.input != null) {
+                // ANTLR has 0-based column numbers, hence +1.
                 location = new Location(recEx.input.getSourceName(),
-                      recEx.line, recEx.charPositionInLine);
+                      recEx.line, recEx.charPositionInLine + 1);
             }
         }
         else if (exc instanceof ParserException) {
@@ -64,6 +66,7 @@ public final class ExceptionTools {
             if(token == null) {
                 location = null;
             } else {
+                // JavaCC has 1-based column numbers
                 location = new Location("", token.next.beginLine, token.next.beginColumn);
             }
         } else if (exc instanceof SVInstantiationExceptionWithPosition) {	      

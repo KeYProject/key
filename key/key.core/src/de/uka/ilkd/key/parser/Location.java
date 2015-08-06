@@ -22,6 +22,9 @@ import org.antlr.runtime.RecognitionException;
  * null, if the file is unknown (e.g. standard input). The class is
  * mainly used for parser exceptions.
  *
+ * <p>Both line and column numbers are assumed to be 1-based.
+ * That is the first character is on line 1, column 1.
+ *
  * @author Hubert Schmid
  */
 
@@ -39,7 +42,8 @@ public final class Location {
     }
 
     public Location(RecognitionException re) {
-        this(re.input.getSourceName(), re.line, re.charPositionInLine);
+        // ANTLR starts lines in column 0, files in line 1.
+        this(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
     }
 
 
