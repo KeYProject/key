@@ -23,10 +23,10 @@ public class MathUtil {
          throw new IllegalArgumentException("Array is null.");
       }
       if (start < 0 || start >= array.length) {
-         throw new IllegalArgumentException("Start is not a valid array index.");
+         throw new IllegalArgumentException("Start is not within the array bounds.");
       }
       if (end < 0 || end >= array.length) {
-         throw new IllegalArgumentException("End is not a valid array index.");
+         throw new IllegalArgumentException("End is not within the array bounds.");
       }
       // Compute median
       int middle = (start + end) / 2;
