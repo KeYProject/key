@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
@@ -17,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
@@ -86,9 +88,14 @@ public class EditSourceFileAction extends AbstractAction {
          int columnNumber = 75;
 
          JTextArea parserMessage = new JTextArea();
-         parserMessage.setText(exception.getMessage());
+         String message = exception.getMessage();
+         parserMessage.setText(message);
          parserMessage.setEditable(false);
          parserMessage.setColumns(columnNumber);
+         // approximate # rows
+         parserMessage.setRows(message.length() / (columnNumber-10));
+         parserMessage.setLineWrap(true);
+         parserMessage.setWrapStyleWord(true);
          parserMessage.setBorder(new TitledBorder("Parser Message"));
          JScrollPane parserMessageScrollPane = new JScrollPane(parserMessage);
          parserMessageScrollPane
@@ -155,10 +162,12 @@ public class EditSourceFileAction extends AbstractAction {
          buttonPanel.add(reloadButton);
 
          Container container = dialog.getContentPane();
-         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-         container.add(parserMessageScrollPane);
-         container.add(textAreaScrollPane);
-         container.add(buttonPanel);
+         //container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+         splitPane.setTopComponent(parserMessageScrollPane);
+         splitPane.setBottomComponent(textAreaScrollPane);
+         container.add(splitPane, BorderLayout.CENTER);
+         container.add(buttonPanel, BorderLayout.SOUTH);
 
          dialog.pack();
          centerDialogRelativeToMainWindow(dialog);
