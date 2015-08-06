@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util;
 
+import org.antlr.runtime.RecognitionException;
+
 import de.uka.ilkd.key.java.ParseExceptionInFile;
 import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
@@ -36,18 +38,16 @@ public final class ExceptionTools {
                            ste.getLine(), 
                            ste.getColumn());
         }
-        else if  (exc instanceof org.antlr.runtime.RecognitionException) {
-            org.antlr.runtime.RecognitionException recEx =
-                            (org.antlr.runtime.RecognitionException) exc;
+        else if  (exc instanceof RecognitionException) {
+            RecognitionException recEx = (RecognitionException) exc;
             // ANTLR 3 - Recognition Exception.
-            String filename = "";
             if(exc instanceof KeYSemanticException) {
-                filename = ((KeYSemanticException)exc).getFilename();
+                KeYSemanticException kse = (KeYSemanticException) exc;
+                return new Location(kse.getFilename(), kse.getLine(), kse.getColumn());
             } else if(recEx.input != null) {
-                filename = recEx.input.getSourceName();
+                return new Location(recEx.input.getSourceName(),
+                      recEx.line, recEx.charPositionInLine);
             }
-    
-            location = new Location(filename, recEx.line, recEx.charPositionInLine);
         }
         else if (exc instanceof ParserException) {
             location = ((ParserException) exc).getLocation();
