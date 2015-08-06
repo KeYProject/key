@@ -55,19 +55,23 @@ public class EditSourceFileAction extends AbstractAction {
 
    private final ExceptionDialog parent;
    private final Throwable exception;
-
+   
    public EditSourceFileAction(final ExceptionDialog parent, final Throwable exception) {
       super("Edit Source File");
       this.parent = parent;
       this.exception = exception;
+   }
+   
+   public boolean isValidLocation(final Location location) {
+       return !(location == null || location.getFilename() == null
+              || location.getFilename().length() == 0);
    }
 
    @Override
    public void actionPerformed(ActionEvent arg0) {
       try {
          final Location location = ExceptionTools.getLocation(exception);
-         if (location == null || location.getFilename() == null
-               || location.getFilename().length() == 0) {
+         if (!isValidLocation(location)) {
             throw new IOException("Cannot recover file location from exception.");
          }
 
@@ -167,12 +171,13 @@ public class EditSourceFileAction extends AbstractAction {
    }
 
    static void centerDialogRelativeToMainWindow(final JDialog dialog) {
-      Rectangle bounds = dialog.getBounds();
-      Rectangle mainWindowBounds = MainWindow.getInstance().getBounds();
-      int x = Math.max(0, mainWindowBounds.x
-            + (mainWindowBounds.width - bounds.width) / 2);
-      int y = Math.max(0, mainWindowBounds.y
-            + (mainWindowBounds.height - bounds.height) / 2);
-      dialog.setBounds(x, y, bounds.width, bounds.height);
+       dialog.setLocationRelativeTo(MainWindow.getInstance());
+//      Rectangle bounds = dialog.getBounds();
+//      Rectangle mainWindowBounds = MainWindow.getInstance().getBounds();
+//      int x = Math.max(0, mainWindowBounds.x
+//            + (mainWindowBounds.width - bounds.width) / 2);
+//      int y = Math.max(0, mainWindowBounds.y
+//            + (mainWindowBounds.height - bounds.height) / 2);
+//      dialog.setBounds(x, y, bounds.width, bounds.height);
    }
 }

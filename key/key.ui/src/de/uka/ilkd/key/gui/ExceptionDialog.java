@@ -62,6 +62,9 @@ public class ExceptionDialog extends JDialog {
     private JScrollPane stScroll;
     private JTextArea stTextArea;
 
+    private Location location;
+    private Throwable exception;
+
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
             dlg.setVisible(true);
@@ -70,10 +73,12 @@ public class ExceptionDialog extends JDialog {
 
     private ExceptionDialog(Window parent, Throwable exception) {
         super(parent, "Parser Messages", Dialog.ModalityType.DOCUMENT_MODAL);
-        init(exception);
+        this.exception = exception;
+        this.location = ExceptionTools.getLocation(exception);
+        init();
     }
 
-    private JPanel createButtonPanel(Throwable exception) {
+    private JPanel createButtonPanel() {
         ActionListener closeListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,7 +122,11 @@ public class ExceptionDialog extends JDialog {
            bPanel.add(sendFeedbackButton);
 
         JButton editSourceFileButton = new JButton("Edit Source File");
-        editSourceFileButton.addActionListener(new EditSourceFileAction(this, exception));
+        EditSourceFileAction action = new EditSourceFileAction(this, exception);
+        editSourceFileButton.addActionListener(action);
+        if(!action.isValidLocation(location)) {
+            editSourceFileButton.setEnabled(false);
+        }
         bPanel.add(editSourceFileButton);
         
         bPanel.add(closeButton);
@@ -141,28 +150,28 @@ public class ExceptionDialog extends JDialog {
         return result;
     }
 
-    private void setStackTraceText(Throwable exc) {
+    private void setStackTraceText() {
         StringWriter sw = new StringWriter();
         // sw.append("(").append(exc.getClass().toString()).append(")\n");
         PrintWriter pw = new PrintWriter(sw);
-        exc.printStackTrace(pw);
+        exception.printStackTrace(pw);
         stTextArea.setText(sw.toString());
     }
 
-    private JScrollPane createExcTextAreaScroll(Throwable exc) {
+    private JScrollPane createExcTextAreaScroll() {
         JTextArea exTextArea = createStacktraceTextArea();
         Dimension textPaneDim = new Dimension(500, 200);
         exTextArea.setColumns(120);
         exTextArea.setLineWrap(true);
         exTextArea.setWrapStyleWord(true);
 
-        String orgMsg = exc.getMessage();
+        String orgMsg = exception.getMessage();
         if(orgMsg == null){
             orgMsg = "";
         }
         StringBuilder message = new StringBuilder(orgMsg);
 
-        Location loc = ExceptionTools.getLocation(exc);
+        Location loc = location;
         if(loc != null && loc.getFilename() != null && !"".equals(loc.getFilename())) {
             try {
                 List<String> lines = Files.readAllLines(
@@ -187,15 +196,15 @@ public class ExceptionDialog extends JDialog {
         exTextArea.setCaretPosition(0);
 
         JScrollPane scroll = new JScrollPane(exTextArea);
-        scroll.setBorder(new TitledBorder(exc.getClass().getName()));
+        scroll.setBorder(new TitledBorder(exception.getClass().getName()));
         scroll.setPreferredSize(textPaneDim);
 
         return scroll;
     }
 
     // returns null if no location can be extracted.
-    private JPanel createLocationPanel(Throwable exc) {
-	Location loc = ExceptionTools.getLocation(exc);
+    private JPanel createLocationPanel() {
+	Location loc = location;
 
 	if (loc == null) {
 	    return null;
@@ -216,7 +225,7 @@ public class ExceptionDialog extends JDialog {
 	    lPanel.add(fTextField);
 	}
 
-	if (exc instanceof SVInstantiationExceptionWithPosition) {
+	if (exception instanceof SVInstantiationExceptionWithPosition) {
 	    lTextField.setText("Row: " + loc.getLine());
 	} else {
 	    lTextField.setText("Line: " + loc.getLine());
@@ -230,17 +239,17 @@ public class ExceptionDialog extends JDialog {
 	return lPanel;
     }
 
-    private void init(Throwable exception) {
+    private void init() {
 
         Container cp = getContentPane();
         cp.setLayout(new GridBagLayout());
 
-        cp.add(createExcTextAreaScroll(exception),
+        cp.add(createExcTextAreaScroll(),
                     new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
                             0, 0, 0, 0), 0, 0));
 
-        JPanel locationPanel = createLocationPanel(exception);
+        JPanel locationPanel = createLocationPanel();
 
         if(locationPanel != null) {
             cp.add(locationPanel, new GridBagConstraints(0, 1, 1, 1, 1., 0.,
@@ -248,7 +257,7 @@ public class ExceptionDialog extends JDialog {
                             0, 0, 0, 0), 0, 0));
         }
 
-        JPanel buttonPanel = createButtonPanel(exception);
+        JPanel buttonPanel = createButtonPanel();
         cp.add(buttonPanel, new GridBagConstraints(0, 2, 1, 1, 1., 0.,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
                         0, 0, 0, 0), 0, 0));
@@ -256,7 +265,7 @@ public class ExceptionDialog extends JDialog {
         // not displayed, only created;
         stTextArea = createStacktraceTextArea();
         stScroll = createStacktraceTextAreaScroll();
-        setStackTraceText(exception);
+        setStackTraceText();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
