@@ -173,7 +173,7 @@ options {
          */
          result = result.prepend(p + " ");
       } else {
-        result = result.prependAndUpdatePosition(p);
+        result = result.prependAndUpdatePosition(p + " ");
       }
       return result;
     }
