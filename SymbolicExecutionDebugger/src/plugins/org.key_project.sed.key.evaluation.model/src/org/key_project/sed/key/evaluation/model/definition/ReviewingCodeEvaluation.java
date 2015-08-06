@@ -22,7 +22,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    /**
     * The name of the {@link Tool} representing no tools.
     */
-   public static final String NO_TOOL_NAME = "JDT Debugger";
+   public static final String NO_TOOL_NAME = "Direct Code Review";
 
    /**
     * The name of the {@link Tool} representing 'SED'.
@@ -103,12 +103,13 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    @Override
    protected List<Tool> computeTools() {
-      URL noToolURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/NoTool.html") : null;
+      URL noToolURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/NO_TOOLScreencast.html") : null;
+      URL noToolWizardURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/NO_TOOLScreencastWizard.html") : null;
       URL sedURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/SED-Screencast.html") : null;
       URL sedWizardURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/SED-ScreencastWizard.html") : null;
       Tool noTool = new Tool(NO_TOOL_NAME, 
                              noToolURL, 
-                             noToolURL, 
+                             noToolWizardURL, 
                              isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JAVA_APPLICATION_LOGO) : null);
       Tool sed = new Tool(SED_TOOL_NAME, 
                           sedURL, 
@@ -194,12 +195,16 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       InstructionPage evaluationPage = new InstructionPage(EVALUATION_PAGE_NAME, "Evaluation Instructions", "Read the evaluation instructions carefully before continuing.", evaluationURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.EVALUATION) : null);
       InstructionPage jmlPage = new InstructionPage(JML_PAGE_NAME, "JML", "Read the JML introduction carefully before continuing.", jmlURL, isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JML_LOGO) : null);
       ToolPage noToolPage = new ToolPage(getTool(NO_TOOL_NAME),
-                                         null,
+                                         new ReviewingCodeJavaProjectModifier("Database", 
+                                                                              false, 
+                                                                              null,
+                                                                              new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/instructions-archived/instructionExample/accumulateDatabase.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/accumulateDatabase.proof", false, "Database", "accumulateDatabase", new String[] {"QAccumulator;"})},
+                                                                              new FileDefinition("data/reviewingCode/instructions-archived/instructionExample/Database.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Database.java", true)),
                                          false);
             
       ToolPage sedToolPage = new ToolPage(getTool(SED_TOOL_NAME),
                                           new ReviewingCodeJavaProjectModifier("Database", 
-                                                                               true, 
+                                                                               false, 
                                                                                null,
                                                                                new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/instructions-archived/instructionExample/accumulateDatabase.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/accumulateDatabase.proof", false, "Database", "accumulateDatabase", new String[] {"QAccumulator;"})},
                                                                                new FileDefinition("data/reviewingCode/instructions-archived/instructionExample/Database.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Database.java", true)),
