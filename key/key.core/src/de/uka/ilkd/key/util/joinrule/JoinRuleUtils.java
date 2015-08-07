@@ -180,6 +180,51 @@ public class JoinRuleUtils {
 
         return result;
     }
+    
+    /**
+     * Returns all program variables in the given sequent.
+     * 
+     * @param sequent
+     *            The sequent to extract program variables from.
+     * @return All program variables of the given sequent.
+     */
+    public static HashSet<LocationVariable> getLocationVariablesHashSet(
+            Sequent sequent, Services services) {
+        HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+
+        for (SequentFormula f : sequent) {
+            result.addAll(getLocationVariablesHashSet(f.formula(), services));
+        }
+
+        return result;
+    } 
+
+    /**
+     * Returns all program variables in the given term.
+     * 
+     * @param term
+     *            The term to extract program variables from.
+     * @return All program variables of the given term.
+     */
+    public static HashSet<LocationVariable> getLocationVariablesHashSet(
+            Term term, Services services) {
+        HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+
+        if (term.op() instanceof LocationVariable) {
+            result.add((LocationVariable) term.op());
+        }
+        else {
+            if (!term.javaBlock().isEmpty()) {
+                result.addAll(getProgramLocationsHashSet(term, services));
+            }
+
+            for (Term sub : term.subs()) {
+                result.addAll(getLocationVariablesHashSet(sub, services));
+            }
+        }
+
+        return result;
+    }
 
     /**
      * Returns all Skolem constants in the given term.
@@ -1257,6 +1302,26 @@ public class JoinRuleUtils {
     }
 
     /**
+     * Returns all used program locations in the given term. The term must be of
+     * the form \<{ ... }\> phi (or \[{ ... }\] phi).
+     * 
+     * @param programCounterTerm
+     *            The term (program counter) to extract locations from.
+     * @param services
+     *            The Services object.
+     * @return The set of contained program locations.
+     */
+    private static HashSet<LocationVariable> getProgramLocationsHashSet(
+            Term programCounterTerm, Services services) {
+        CollectLocationVariablesVisitorHashSet visitor = new CollectLocationVariablesVisitorHashSet(
+                programCounterTerm.javaBlock().program(), true, services);
+
+        // Collect program variables in Java block
+        visitor.start();
+        return visitor.getLocationVariables();
+    }
+
+    /**
      * Joins a list of formulae to a conjunction.
      * 
      * @param elems
@@ -1591,6 +1656,36 @@ public class JoinRuleUtils {
          * @return All program locations in the given Java block.
          */
         public ImmutableSet<LocationVariable> getLocationVariables() {
+            return variables;
+        }
+
+    }
+
+    /**
+     * Visitor for collecting program locations in a Java block.
+     * 
+     * @author Dominic Scheurer
+     */
+    private static class CollectLocationVariablesVisitorHashSet extends
+            CreatingASTVisitor {
+        private HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
+
+        public CollectLocationVariablesVisitorHashSet(ProgramElement root,
+                boolean preservesPos, Services services) {
+            super(root, preservesPos, services);
+        }
+
+        @Override
+        public void performActionOnLocationVariable(LocationVariable x) {
+            variables.add(x);
+        }
+
+        /**
+         * Call start() before calling this method!
+         * 
+         * @return All program locations in the given Java block.
+         */
+        public HashSet<LocationVariable> getLocationVariables() {
             return variables;
         }
 
