@@ -93,32 +93,52 @@ public final class EvaluationModelImages {
     /**
      * The key for the evaluation image.
      */
-    public static final String SED_MEMORY_LAYOUTS = "org.key_project.sed.key.evaluation.model.evaluation.sed.memoryLayouts";
+    public static final String SED_UP_MEMORY_LAYOUTS = "org.key_project.sed.key.evaluation.model.evaluation.sed.understandingProofAttempts.memoryLayouts";
     
     /**
      * The key for the evaluation image.
      */
-    public static final String SED_SET = "org.key_project.sed.key.evaluation.model.evaluation.sed.set";
+    public static final String SED_UP_SET = "org.key_project.sed.key.evaluation.model.evaluation.sed.understandingProofAttempts.set";
     
     /**
      * The key for the evaluation image.
      */
-    public static final String SED_TRUTH = "org.key_project.sed.key.evaluation.model.evaluation.sed.truth";
+    public static final String SED_UP_TRUTH = "org.key_project.sed.key.evaluation.model.evaluation.sed.understandingProofAttempts.truth";
     
     /**
      * The key for the evaluation image.
      */
-    public static final String SED_VARIABLES = "org.key_project.sed.key.evaluation.model.evaluation.sed.variables";
+    public static final String SED_UP_VARIABLES = "org.key_project.sed.key.evaluation.model.evaluation.sed.understandingProofAttempts.variables";
     
     /**
      * The key for the evaluation image.
      */
-    public static final String SED_REACHED = "org.key_project.sed.key.evaluation.model.evaluation.sed.reachedSourceCode";
+    public static final String SED_UP_REACHED = "org.key_project.sed.key.evaluation.model.evaluation.sed.understandingProofAttempts.reachedSourceCode";
     
     /**
      * The key for the Java application logo.
      */
     public static final String JAVA_APPLICATION_LOGO = "org.key_project.sed.key.evaluation.model.javaApplicationLogo";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_RC_SET = "org.key_project.sed.key.evaluation.model.evaluation.sed.reviewingCode.set";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_RC_VARIABLES = "org.key_project.sed.key.evaluation.model.evaluation.sed.reviewingCode.variables";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_RC_REACHED = "org.key_project.sed.key.evaluation.model.evaluation.sed.reviewingCode.reachedSourceCode";
+    
+    /**
+     * The key for the evaluation image.
+     */
+    public static final String SED_RC_NODE_PROPERTIES = "org.key_project.sed.key.evaluation.model.evaluation.sed.reviewingCode.nodeProperties";
     
     /**
      * Forbid instances.
@@ -213,23 +233,35 @@ public final class EvaluationModelImages {
         else if (KEY_SEQUENT.equals(key)) {
            path = "data/understandingProofAttempts/icons/KeY_Sequent.png";
         }
-        else if (SED_MEMORY_LAYOUTS.equals(key)) {
+        else if (SED_UP_MEMORY_LAYOUTS.equals(key)) {
            path = "data/understandingProofAttempts/icons/SED_Memory_Layout.png";
         }
-        else if (SED_SET.equals(key)) {
+        else if (SED_UP_SET.equals(key)) {
            path = "data/understandingProofAttempts/icons/SED_SET.png";
         }
-        else if (SED_TRUTH.equals(key)) {
+        else if (SED_UP_TRUTH.equals(key)) {
            path = "data/understandingProofAttempts/icons/SED_Truth.png";
         }
-        else if (SED_VARIABLES.equals(key)) {
+        else if (SED_UP_VARIABLES.equals(key)) {
            path = "data/understandingProofAttempts/icons/SED_Variables.png";
         }
-        else if (SED_REACHED.equals(key)) {
+        else if (SED_UP_REACHED.equals(key)) {
            path = "data/understandingProofAttempts/icons/SED_Reached.png";
         }
         else if (JAVA_APPLICATION_LOGO.equals(key)) {
            path = "data/reviewingCode/icons/java_app.gif";
+        }
+        else if (SED_RC_SET.equals(key)) {
+           path = "data/reviewingCode/icons/SED_SET.png";
+        }
+        else if (SED_RC_NODE_PROPERTIES.equals(key)) {
+           path = "data/reviewingCode/icons/SED_Node_Properties.png";
+        }
+        else if (SED_RC_REACHED.equals(key)) {
+           path = "data/reviewingCode/icons/SED_Reached.png";
+        }
+        else if (SED_RC_VARIABLES.equals(key)) {
+           path = "data/reviewingCode/icons/SED_Variables.png";
         }
         // Load image if possible
         if (path != null) {

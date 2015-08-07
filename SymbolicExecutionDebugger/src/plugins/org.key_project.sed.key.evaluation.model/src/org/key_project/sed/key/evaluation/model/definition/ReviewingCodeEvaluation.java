@@ -249,16 +249,25 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       String setTitle = "Shown symbolic execution tree";
       RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
                                                                   setTitle, 
-                                                                  isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_SET) : null,
+                                                                  isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_RC_SET) : null,
                                                                   false,
                                                                   null, 
                                                                   new NotUndefinedValueValidator("Question '" + setTitle + "' not answered."), 
                                                                   false,
                                                                   choices);
+      String nodePropertiesTitle = "Properties of selected node";
+      RadioButtonsQuestion nodePropertiesQuestion = new RadioButtonsQuestion("nodeProperties", 
+                                                                             nodePropertiesTitle, 
+                                                                             isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_RC_NODE_PROPERTIES) : null,
+                                                                             false,
+                                                                             null, 
+                                                                             new NotUndefinedValueValidator("Question '" + nodePropertiesTitle + "' not answered."), 
+                                                                             false,
+                                                                             choices);
       String reachedTitle = "Highlighting of source code reached during symbolic execution";
       RadioButtonsQuestion reachedQuestion = new RadioButtonsQuestion("reachedSourceCode", 
                                                                       reachedTitle, 
-                                                                      isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_REACHED) : null,
+                                                                      isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_RC_REACHED) : null,
                                                                       false,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + reachedTitle + "' not answered."), 
@@ -267,13 +276,13 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       String variablesTitle = "Shown variables of a node (view 'Variables')";
       RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
                                                                         variablesTitle, 
-                                                                        isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_VARIABLES) : null,
+                                                                        isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_RC_VARIABLES) : null,
                                                                         false,
                                                                         null, 
                                                                         new NotUndefinedValueValidator("Question '" + variablesTitle + "' not answered."), 
                                                                         false,
                                                                         choices);
-      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, reachedQuestion, variablesQuestion);
+      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, nodePropertiesQuestion, reachedQuestion, variablesQuestion);
       // NO_TOOL vs SED
       String keyVsSedTitle = "I prefer to inspect source code";
       RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion("toolPreference", 
