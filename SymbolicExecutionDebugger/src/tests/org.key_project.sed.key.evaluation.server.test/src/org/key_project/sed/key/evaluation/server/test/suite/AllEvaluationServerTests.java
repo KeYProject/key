@@ -15,6 +15,7 @@ package org.key_project.sed.key.evaluation.server.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.sed.key.evaluation.server.test.testcase.AbstractRandomCompletionTest;
 import org.key_project.sed.key.evaluation.server.test.testcase.PermutationIndexTest;
 import org.key_project.sed.key.evaluation.server.test.testcase.ReviewingCodeRandomFormOrderComputerTest;
 import org.key_project.sed.key.evaluation.server.test.testcase.SEDServerTest;
@@ -26,6 +27,7 @@ import org.key_project.sed.key.evaluation.server.test.testcase.UnderstandingProo
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   AbstractRandomCompletionTest.class,
    PermutationIndexTest.class,
    ReviewingCodeRandomFormOrderComputerTest.class,
    SEDServerTest.class,

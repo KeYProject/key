@@ -159,13 +159,13 @@ public class PermutationIndexTest extends TestCase {
             return new Counter();
          }
       };
-      Comparator<Counter> dataComparator = new Comparator<Counter>() {
+      Comparator<Entry<E, Counter>> entryComparator = new Comparator<Entry<E, Counter>>() {
          @Override
-         public int compare(Counter o1, Counter o2) {
-            return o1.compareTo(o2);
+         public int compare(Entry<E, Counter> o1, Entry<E, Counter> o2) {
+            return o1.getData().compareTo(o2.getData());
          }
       };
-      return doInitialIndexTest(elements, dataFactory, dataComparator);
+      return doInitialIndexTest(elements, dataFactory, entryComparator);
    }
    
    /**
@@ -182,12 +182,13 @@ public class PermutationIndexTest extends TestCase {
        * {@inheritDoc}
        */
       @Override
-      public boolean updateFirstEntry(Entry<E, Counter> firstEntry) {
+      public Entry<E, Counter> updateEntry(List<Entry<E, Counter>> list) {
+         Entry<E, Counter> firstEntry = list.get(0);
          assertNull(this.modifiedEntry);
          assertNotNull(firstEntry);
          firstEntry.getData().increase();
          this.modifiedEntry = firstEntry;
-         return true;
+         return firstEntry;
       }
 
       /**
@@ -294,13 +295,13 @@ public class PermutationIndexTest extends TestCase {
             return ArrayUtil.toString(permutation);
          }
       };
-      Comparator<String> dataComparator = new Comparator<String>() {
+      Comparator<Entry<E, String>> entryComparator = new Comparator<Entry<E, String>>() {
          @Override
-         public int compare(String o1, String o2) {
-            return o1.compareTo(o2);
+         public int compare(Entry<E, String> o1, Entry<E, String> o2) {
+            return o1.getData().compareTo(o2.getData());
          }
       };
-      return doInitialIndexTest(elements, dataFactory, dataComparator);
+      return doInitialIndexTest(elements, dataFactory, entryComparator);
    }
    
    /**
@@ -308,12 +309,12 @@ public class PermutationIndexTest extends TestCase {
     * @param elements The available elements.
     * @return The created {@link PermutationIndex}.
     */
-   protected <E, D> PermutationIndex<E, D> doInitialIndexTest(E[] elements, IDataFactory<E, D> dataFactory, Comparator<D> dataComparator) {
+   protected <E, D> PermutationIndex<E, D> doInitialIndexTest(E[] elements, IDataFactory<E, D> dataFactory, Comparator<Entry<E, D>> dataComparator) {
       // Create index
       PermutationIndex<E, D> permutationIndex = new PermutationIndex<E, D>(elements, dataFactory, dataComparator);
       List<Entry<E, D>> index = permutationIndex.getIndex();
       // Test created index
-      assertSame(dataComparator, permutationIndex.getDataComparator());
+      assertSame(dataComparator, permutationIndex.getEntryComparator());
       for (Entry<E, D> entry : index) {
          assertEquals(dataFactory.createData(entry.getPermutation()), entry.getData());
       }
@@ -331,7 +332,7 @@ public class PermutationIndexTest extends TestCase {
     */
    protected <E, D> void assertPermutationIndexContent(E[] elements, PermutationIndex<E, D> permutationIndex) {
       List<Entry<E, D>> index = permutationIndex.getIndex();
-      Comparator<D> dataComparator = permutationIndex.getDataComparator();
+      Comparator<Entry<E, D>> entryComparator = permutationIndex.getEntryComparator();
       // Test elements
       E[][] permutations = ArrayUtil.generatePermutations(elements);
       assertEquals(IntegerUtil.factorial(elements.length), index.size());
@@ -344,7 +345,7 @@ public class PermutationIndexTest extends TestCase {
       Entry<E, D> previousEntry = null;
       for (Entry<E, D> entry : index) {
          if (previousEntry != null) {
-            assertTrue(dataComparator.compare(previousEntry.getData(), entry.getData()) <= 0);
+            assertTrue(entryComparator.compare(previousEntry, entry) <= 0);
          }
          assertTrue(remainingPermutations.remove(ArrayUtil.toString(entry.getPermutation())));
          previousEntry = entry;

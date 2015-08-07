@@ -1,8 +1,8 @@
 package org.key_project.sed.key.evaluation.server.index;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.util.java.ArrayUtil;
@@ -26,37 +26,36 @@ public class PermutationIndex<E, D> {
    /**
     * The indexed {@link Entry} instances.
     */
-   private final List<Entry<E, D>> index = Collections.synchronizedList(new LinkedList<Entry<E, D>>());
-   
-   /**
-    * The used {@link Comparator} to compare data objects.
-    */
-   private final Comparator<D> dataComparator;
+   private final List<Entry<E, D>> index;
    
    /**
     * The used {@link Comparator} to compare {@link Entry} instances.
     */
-   private final Comparator<Entry<E, D>> entryComparator = new Comparator<Entry<E, D>>() {
-      @Override
-      public int compare(Entry<E, D> o1, Entry<E, D> o2) {
-         return dataComparator.compare(o1.getData(), o2.getData());
-      }
-   };
+   private final Comparator<Entry<E, D>> entryComparator;
    
    /**
     * Constructor.
     * @param elements The elements to index its permutations.
     * @param dataFactory The {@link IDataFactory} to use to create initial data objects.
-    * @param dataComparator The {@link Comparator} to use to compare data objects.
+    * @param entryComparator The {@link Comparator} to compare {@link Entry} instances.
     */
-   public PermutationIndex(E[] elements, IDataFactory<E, D> dataFactory, Comparator<D> dataComparator) {
-      this.dataComparator = dataComparator;
+   public PermutationIndex(E[] elements, IDataFactory<E, D> dataFactory, Comparator<Entry<E, D>> entryComparator) {
+      this.entryComparator = entryComparator;
       E[][] permutations = ArrayUtil.generatePermutations(elements);
+      this.index = Collections.synchronizedList(new ArrayList<Entry<E, D>>(permutations.length));
       for (E[] permutation : permutations) {
          D data = dataFactory.createData(permutation);
          Entry<E, D> entry = new Entry<E, D>(permutation, data);
          CollectionUtil.binaryInsert(index, entry, entryComparator);
       }
+   }
+
+   /**
+    * Returns the used {@link Comparator} to compare {@link Entry} instances.
+    * @return The used {@link Comparator} to compare {@link Entry} instances.
+    */
+   public Comparator<Entry<E, D>> getEntryComparator() {
+      return entryComparator;
    }
 
    /**
@@ -76,26 +75,18 @@ public class PermutationIndex<E, D> {
    }
    
    /**
-    * Returns the used data {@link Comparator}.
-    * @return The used data {@link Comparator}.
-    */
-   public Comparator<D> getDataComparator() {
-      return dataComparator;
-   }
-   
-   /**
     * Allows to modify the data object of the first {@link Entry} in the
     * index thread save. The index is updated after modification.
     * @param updater The {@link IEntryUpdater} to perform.
     */
    public void updateFirstEntry(IEntryUpdater<E, D> updater) {
       synchronized (index) {
-         Entry<E, D> entry = index.get(0);
-         if (updater.updateFirstEntry(entry)) {
-            if (!index.remove(entry)) {
-               throw new IllegalStateException("First entry is not available.");
+         Entry<E, D> updatedEntry = updater.updateEntry(index);
+         if (updatedEntry != null) {
+            if (!index.remove(updatedEntry)) {
+               throw new IllegalStateException("Entry is not conained in index.");
             }
-            CollectionUtil.binaryInsert(index, entry, entryComparator);
+            CollectionUtil.binaryInsert(index, updatedEntry, entryComparator);
          }
       }
    }
@@ -116,11 +107,11 @@ public class PermutationIndex<E, D> {
     */
    public static interface IEntryUpdater<E, D> {
       /**
-       * Modifies the given {@link Entry}.
-       * @param firstEntry The given {@link Entry} to modify.
-       * @return {@code true} index needs to be updated, {@code false} index should stay as it is.
+       * Modifies an {@link Entry} of the given {@link List}.
+       * @param list The sorted {@link List} with the available {@link Entry}s.
+       * @return The updated {@link Entry} or {@code null} if no {@link Entry} was updated.
        */
-      public boolean updateFirstEntry(Entry<E, D> firstEntry);
+      public Entry<E, D> updateEntry(List<Entry<E, D>> list);
    }
 
    /**

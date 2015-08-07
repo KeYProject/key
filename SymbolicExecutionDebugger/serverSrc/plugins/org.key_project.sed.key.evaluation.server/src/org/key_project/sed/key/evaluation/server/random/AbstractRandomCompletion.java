@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.key_project.sed.key.evaluation.model.definition.Tool;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * Provides the basic functionality of {@link IRandomCompletion}s.
@@ -42,5 +43,25 @@ public abstract class AbstractRandomCompletion implements IRandomCompletion {
       else {
          return false;
       }
+   }
+   
+   /**
+    * Computes the difference of the given two permutations.
+    * @param p1 The first permutation.
+    * @param p2 The second permutation.
+    * @return The computed difference which is {@code 0} if p1 and p2 are the same permutation.
+    */
+   public static int computePermutationDifference(String[] p1, String[] p2) {
+      int difference = 0;
+      for (int i = 0; i < p1.length; i++) {
+         int otherIndex = ArrayUtil.indexOf(p2, p1[i]);
+         if (i < otherIndex) {
+            difference += otherIndex - i;
+         }
+         else if (i > otherIndex) {
+            difference += i - otherIndex;
+         }
+      }
+      return difference;
    }
 }

@@ -2,10 +2,12 @@ package org.key_project.sed.key.evaluation.server.random;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.key_project.sed.key.evaluation.model.definition.RandomForm;
@@ -35,7 +37,7 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
     * The used {@link BalancingEntry}.
     */
    private BalancingEntry balancingEntry;
-
+   
    /**
     * Constructor.
     * @param storageLocation The storage location providing existing evaluation inputs.
@@ -111,8 +113,8 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
             }
          }
       };
-      IndexDataComparator dataComparator = new IndexDataComparator();
-      PermutationIndex<String, IndexData> permutationIndex = new PermutationIndex<String, IndexData>(elements, dataFactory, dataComparator);
+      IndexEntryComparator entryComparator = new IndexEntryComparator();
+      PermutationIndex<String, IndexData> permutationIndex = new PermutationIndex<String, IndexData>(elements, dataFactory, entryComparator);
       int noToolCountTotal = 0;
       int sedCountTotal = 0;
       for (Entry<String, IndexData> indexEntry : permutationIndex.getIndex()) {
@@ -176,7 +178,7 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
     * An {@link IEntryUpdater} used to update a {@link BalancingEntry}.
     * @author Martin Hentschel
     */
-   protected static class BalancingEntryUpdater implements IEntryUpdater<String, IndexData> {
+   public static class BalancingEntryUpdater implements IEntryUpdater<String, IndexData> {
       /**
        * The {@link BalancingEntry} to modify.
        */
@@ -204,18 +206,16 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
        * {@inheritDoc}
        */
       @Override
-      public boolean updateFirstEntry(Entry<String, IndexData> firstEntry) {
-         permutation = firstEntry.getPermutation();
-         IndexData indexData = firstEntry.getData();
-         boolean indexUpdateRequired = false;
+      public Entry<String, IndexData> updateEntry(List<Entry<String, IndexData>> list) {
+         Entry<String, IndexData> entryToModify = searchEntryToModify(list);
+         permutation = entryToModify.getPermutation();
+         IndexData indexData = entryToModify.getData();
          // Completed count is ignored for simplicity.
          if (indexData.getNoToolCount() < indexData.getSedCount()) {
             noToolFirst = true;
-            indexUpdateRequired = true;
          }
          else if (indexData.getNoToolCount() > indexData.getSedCount()) {
             noToolFirst = false;
-            indexUpdateRequired = true;
          }
          else {
             noToolFirst = balancingEntry.noToolCountTotal < balancingEntry.sedCountTotal;
@@ -229,7 +229,65 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
             indexData.increaseSedCount();
             balancingEntry.sedCountTotal++;
          }
-         return indexUpdateRequired;
+         return entryToModify;
+      }
+      
+      public Entry<String, IndexData> searchEntryToModify(List<Entry<String, IndexData>> list) {
+         Entry<String, IndexData> firstEntry = list.get(0);
+         if (firstEntry.getData().getNoToolCount() != firstEntry.getData().getSedCount()) {
+            // First entry is unbalanced and should be updated.
+            return firstEntry;
+         }
+         else {
+            // First entry is balanced, return entry with maximal difference to the last entry.
+            Entry<String, IndexData> lastEntry = list.get(list.size() - 1);
+            int firstNoToolCount = firstEntry.getData().getNoToolCount();
+            if (lastEntry.getData().getNoToolCount() == firstNoToolCount) {
+               // First and last entry have same tool count, first entry can be done next.
+               return firstEntry;
+            }
+            else {
+               // Search entries with higher tool count
+               ListIterator<Entry<String, IndexData>> reverseIter = list.listIterator(list.size());
+               List<Entry<String, IndexData>> higherEntries = new ArrayList<Entry<String,IndexData>>(list.size());
+               boolean goOn = true;
+               while (goOn && reverseIter.hasPrevious()) {
+                  Entry<String, IndexData> previous = reverseIter.previous();
+                  if (previous.getData().getNoToolCount() > firstNoToolCount) {
+                     if (higherEntries.size() < 20) { // Consider at most 20 entries for performance reasons (needed time decreases by the number of entries in the list)
+                        higherEntries.add(previous);
+                     }
+                  }
+                  else {
+                     goOn = false;
+                  }
+               }
+               // Search entry with maximal difference to the higher entries.
+               Entry<String, IndexData> maxEntry = firstEntry;
+               int maxDifference = computeMinDifference(firstEntry, higherEntries);
+               while (reverseIter.hasPrevious()) {
+                  Entry<String, IndexData> entry = reverseIter.previous();
+                  int difference = computeMinDifference(entry, higherEntries);
+                  if (difference > maxDifference) {
+                     maxDifference = difference;
+                     maxEntry = entry;
+                  }
+               }
+               return maxEntry;
+            }
+         }
+      }
+      
+      protected int computeMinDifference(Entry<String, IndexData> entry, List<Entry<String, IndexData>> higherEntries) {
+         String[] entryPermutation = entry.getPermutation();
+         int minDifference = Integer.MAX_VALUE;
+         for (Entry<String, IndexData> higherEntry : higherEntries) {
+            int difference = computePermutationDifference(entryPermutation, higherEntry.getPermutation());
+            if (difference < minDifference) {
+               minDifference = difference;
+            }
+         }
+         return minDifference;
       }
 
       /**
@@ -326,20 +384,22 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
    }
    
    /**
-    * The {@link Comparator} used to compare {@link IndexData} instances.
+    * The {@link Comparator} used to compare {@link Entry} instances.
     * @author Martin Hentschel
     */
-   public static class IndexDataComparator implements Comparator<IndexData> {
+   public static class IndexEntryComparator implements Comparator<Entry<String, IndexData>> {
       /**
        * {@inheritDoc}
        */
       @Override
-      public int compare(IndexData o1, IndexData o2) {
+      public int compare(Entry<String, IndexData> e1, Entry<String, IndexData> e2) {
+         IndexData id1 = e1.getData();
+         IndexData id2 = e2.getData();
          // Compare balanced state (NO_TOOL use equal to SED use), completed count is ignored for simplicity
-         boolean o1balanced = o1.getNoToolCount() == o1.getSedCount();
-         boolean o2balanced = o2.getNoToolCount() == o2.getSedCount();
+         boolean o1balanced = id1.getNoToolCount() == id1.getSedCount();
+         boolean o2balanced = id2.getNoToolCount() == id2.getSedCount();
          if (o1balanced && o2balanced) {
-            return compareCounts(o1, o2); 
+            return compareCounts(id1, id2); 
          }
          else if (!o1balanced && o2balanced) {
             return -1;
@@ -348,7 +408,7 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
             return 1;
          }
          else {
-            return compareCounts(o1, o2); 
+            return compareCounts(id1, id2); 
          }
       }
       
@@ -564,5 +624,36 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
       public int getSedCountTotal() {
          return sedCountTotal;
       }
+   }
+
+   /**
+    * A counter which can be stepwise increased.
+    * @author Martin Hentschel
+    */
+   public static class Counter {
+      /**
+       * The current value.
+       */
+      private int value = 0;
+      
+      /**
+       * Increases the current value by {@code 1}.
+       */
+      public void increase() {
+         value++;
+      }
+
+      /**
+       * Retruns the current value.
+       * @return The current value.
+       */
+      public int getValue() {
+         return value;
+      }
+   }
+
+   public int computeDifference(String[] permutation, String[] permutation2) {
+      // TODO Auto-generated method stub
+      return 0;
    }
 }

@@ -137,8 +137,8 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
                }
             }
          };
-         IndexDataComparator dataComparator = new IndexDataComparator();
-         PermutationIndex<String, IndexData> permutationIndex = new PermutationIndex<String, IndexData>(elements, dataFactory, dataComparator);
+         IndexEntryComparator entryComparator = new IndexEntryComparator();
+         PermutationIndex<String, IndexData> permutationIndex = new PermutationIndex<String, IndexData>(elements, dataFactory, entryComparator);
          int keyCountTotal = 0;
          int sedCountTotal = 0;
          for (Entry<String, IndexData> indexEntry : permutationIndex.getIndex()) {
@@ -243,7 +243,8 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
        * {@inheritDoc}
        */
       @Override
-      public boolean updateFirstEntry(Entry<String, IndexData> firstEntry) {
+      public Entry<String, IndexData> updateEntry(List<Entry<String, IndexData>> list) {
+         Entry<String, IndexData> firstEntry = list.get(0);
          permutation = firstEntry.getPermutation();
          IndexData indexData = firstEntry.getData();
          boolean indexUpdateRequired = false;
@@ -268,7 +269,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
             indexData.increaseSedCount();
             balancingEntry.sedCountTotal++;
          }
-         return indexUpdateRequired;
+         return indexUpdateRequired ? firstEntry : null;
       }
 
       /**
@@ -359,20 +360,22 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
    }
    
    /**
-    * The {@link Comparator} used to compare {@link IndexData} instances.
+    * The {@link Comparator} used to compare {@link Entry} instances.
     * @author Martin Hentschel
     */
-   public static class IndexDataComparator implements Comparator<IndexData> {
+   public static class IndexEntryComparator implements Comparator<Entry<String, IndexData>> {
       /**
        * {@inheritDoc}
        */
       @Override
-      public int compare(IndexData o1, IndexData o2) {
+      public int compare(Entry<String, IndexData> e1, Entry<String, IndexData> e2) {
+         IndexData id1 = e1.getData();
+         IndexData id2 = e2.getData();
          // Compare balanced state (KeY use equal to SED use), completed count is ignored for simplicity
-         boolean o1balanced = o1.getKeyCount() == o1.getSedCount();
-         boolean o2balanced = o2.getKeyCount() == o2.getSedCount();
+         boolean o1balanced = id1.getKeyCount() == id1.getSedCount();
+         boolean o2balanced = id2.getKeyCount() == id2.getSedCount();
          if (o1balanced && o2balanced) {
-            return compareCounts(o1, o2); 
+            return compareCounts(id1, id2); 
          }
          else if (!o1balanced && o2balanced) {
             return -1;
@@ -381,7 +384,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
             return 1;
          }
          else {
-            return compareCounts(o1, o2); 
+            return compareCounts(id1, id2); 
          }
       }
       

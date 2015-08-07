@@ -20,7 +20,7 @@ import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.sed.key.evaluation.server.random.ReviewingCodeRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.server.random.ReviewingCodeRandomFormOrderComputer.BalancingEntry;
 import org.key_project.sed.key.evaluation.server.random.ReviewingCodeRandomFormOrderComputer.IndexData;
-import org.key_project.sed.key.evaluation.server.random.ReviewingCodeRandomFormOrderComputer.IndexDataComparator;
+import org.key_project.sed.key.evaluation.server.random.ReviewingCodeRandomFormOrderComputer.IndexEntryComparator;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
@@ -107,7 +107,8 @@ public class ReviewingCodeRandomFormOrderComputerTest extends TestCase {
             // Compute new expected values for next loop iteration.
             expectedNoToolFirst = !expectedNoToolFirst;
             if (i % 2 == 1) { // The expected first entry changes only each 2 iterations
-               firstEntry = balancingEntry.getPermutationIndex().getIndex().get(0);
+               ReviewingCodeRandomFormOrderComputer.BalancingEntryUpdater updater = new ReviewingCodeRandomFormOrderComputer.BalancingEntryUpdater(balancingEntry);
+               firstEntry = updater.searchEntryToModify(balancingEntry.getPermutationIndex().getIndex());
             }
             firstEntryBackup = new EntryBackup(firstEntry);
          }
@@ -241,7 +242,7 @@ public class ReviewingCodeRandomFormOrderComputerTest extends TestCase {
    }
    
    /**
-    * Tests {@link IndexDataComparator}.
+    * Tests {@link IndexEntryComparator}.
     */
    @Test
    public void testIndexDataComparator() {
@@ -354,16 +355,18 @@ public class ReviewingCodeRandomFormOrderComputerTest extends TestCase {
    }
    
    /**
-    * Compares the given {@link IndexData} using an {@link IndexDataComparator}.
+    * Compares the given {@link IndexData} using an {@link IndexEntryComparator}.
     * The comparison is also performed in reverse order.
     * @param first The first {@link IndexData}.
     * @param second The second {@link IndexData}.
     * @param expectedOutcome The expected outcome.
     */
    protected void doComparisionTest(IndexData first, IndexData second, int expectedOutcome) {
-      IndexDataComparator c = new IndexDataComparator();
-      assertEquals(expectedOutcome, c.compare(first, second));
-      assertEquals(expectedOutcome * -1, c.compare(second, first)); // Test reverse order
+      Entry<String, IndexData> firstEntry = new Entry<String, IndexData>(new String[] {"first"}, first);
+      Entry<String, IndexData> secondEntry = new Entry<String, IndexData>(new String[] {"second"}, second);
+      IndexEntryComparator c = new IndexEntryComparator();
+      assertEquals(expectedOutcome, c.compare(firstEntry, secondEntry));
+      assertEquals(expectedOutcome * -1, c.compare(secondEntry, firstEntry)); // Test reverse order
    }
    
    /**

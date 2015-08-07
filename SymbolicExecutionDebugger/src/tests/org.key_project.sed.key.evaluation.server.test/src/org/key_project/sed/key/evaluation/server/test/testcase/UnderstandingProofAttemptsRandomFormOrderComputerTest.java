@@ -26,7 +26,7 @@ import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.BalancingEntry;
 import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.IndexData;
-import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.IndexDataComparator;
+import org.key_project.sed.key.evaluation.server.random.UnderstandingProofAttemptsRandomFormOrderComputer.IndexEntryComparator;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
@@ -267,7 +267,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
    }
    
    /**
-    * Tests {@link IndexDataComparator}.
+    * Tests {@link IndexEntryComparator}.
     */
    @Test
    public void testIndexDataComparator() {
@@ -380,16 +380,18 @@ public class UnderstandingProofAttemptsRandomFormOrderComputerTest extends TestC
    }
    
    /**
-    * Compares the given {@link IndexData} using an {@link IndexDataComparator}.
+    * Compares the given {@link IndexData} using an {@link IndexEntryComparator}.
     * The comparison is also performed in reverse order.
     * @param first The first {@link IndexData}.
     * @param second The second {@link IndexData}.
     * @param expectedOutcome The expected outcome.
     */
    protected void doComparisionTest(IndexData first, IndexData second, int expectedOutcome) {
-      IndexDataComparator c = new IndexDataComparator();
-      assertEquals(expectedOutcome, c.compare(first, second));
-      assertEquals(expectedOutcome * -1, c.compare(second, first)); // Test reverse order
+      Entry<String, IndexData> firstEntry = new Entry<String, IndexData>(new String[] {"first"}, first);
+      Entry<String, IndexData> secondEntry = new Entry<String, IndexData>(new String[] {"second"}, second);
+      IndexEntryComparator c = new IndexEntryComparator();
+      assertEquals(expectedOutcome, c.compare(firstEntry, secondEntry));
+      assertEquals(expectedOutcome * -1, c.compare(secondEntry, firstEntry)); // Test reverse order
    }
    
    /**
