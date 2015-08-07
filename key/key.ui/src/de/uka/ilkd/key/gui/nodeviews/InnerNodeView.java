@@ -314,7 +314,14 @@ public class InnerNodeView extends SequentView {
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, filter);
         Range r = posTable.rangeForPath(path);
-        getHighlighter().addHighlight(r.start(), r.end(), light);
+        
+        // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
+        // fix for a shift of highlighted areas to the left that occurred after the
+        // change to HTML documents in the JEditorPane (previous JTextArea). If
+        // something concerning highlighting does not work in the future, here could
+        // be a starting place to find the mistake.
+        getHighlighter().addHighlight(r.start() + 1, r.end() + 1, light);
+        
         return r;
     }
 
@@ -325,10 +332,9 @@ public class InnerNodeView extends SequentView {
 
     @Override
     public final synchronized void printSequent() {
-
         setLineWidth(computeLineWidth());
         getLogicPrinter().update(filter, getLineWidth());
-        setText(getLogicPrinter().toString());
+        setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
 
         RuleApp app = node.getAppliedRuleApp();

@@ -22,11 +22,12 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import javax.swing.JTextArea;
+import javax.swing.JEditorPane;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
+import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -43,11 +44,7 @@ import de.uka.ilkd.key.util.Debug;
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
-public abstract class SequentView extends JTextArea {
-    
-    /**
-     *
-     */
+public abstract class SequentView extends JEditorPane {
     private static final long serialVersionUID = 5012937393965787981L;
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
@@ -82,6 +79,7 @@ public abstract class SequentView extends JTextArea {
     private final ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
     private SequentViewLogicPrinter printer;
+    private HTMLSyntaxHighlighter syntaxHighlighter;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
@@ -104,6 +102,9 @@ public abstract class SequentView extends JTextArea {
 
     SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
+        
+        setContentType("text/html");
+        syntaxHighlighter = new HTMLSyntaxHighlighter((HTMLDocument)getDocument());
 
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
@@ -132,6 +133,7 @@ public abstract class SequentView extends JTextArea {
     public final void setFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (myFont != null) {
+            putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             setFont(myFont);
         } else {
             Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
@@ -256,6 +258,15 @@ public abstract class SequentView extends JTextArea {
     protected void setLogicPrinter(SequentViewLogicPrinter p) {
         printer = p;
     }
+    
+    /**
+     * TODO: Document.
+     *
+     * @return
+     */
+    protected HTMLSyntaxHighlighter getSyntaxHighlighter() {
+        return syntaxHighlighter;
+    }
 
     public String getHighlightedText(PosInSequent pos) {
         if (pos == null) {
@@ -295,7 +306,16 @@ public abstract class SequentView extends JTextArea {
                 = getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
         int characterIndex = viewToModel(new Point((int) p.getX() - (previousCharacterWidth / 2),
                 (int) p.getY()));
-        return characterIndex;
+        
+        // NOTE (DS): The below subtraction of 1 to the beginning is a
+        // quick-and-dirty fix for the problem that the mouse pointer
+        // has to point to the element one position left of the actual
+        // element that should be highlighted (occurred after the
+        // change to HTML documents in the JEditorPane (previous JTextArea)). If
+        // something concerning highlighting does not work in the future, here
+        // could be a starting place to find the mistake.
+        
+        return characterIndex - 1;
     }
 
     /**
@@ -357,7 +377,16 @@ public abstract class SequentView extends JTextArea {
         String seqText = getText();
         if (seqText.length() > 0) {
             int characterIndex = correctedViewToModel(p);
-            return printer.getInitialPositionTable().rangeForIndex(characterIndex);
+            
+            // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
+            // fix for a shift of highlighted areas to the left that occurred after the
+            // change to HTML documents in the JEditorPane (previous JTextArea). If
+            // something concerning highlighting does not work in the future, here could
+            // be a starting place to find the mistake.
+            Range result = printer.getInitialPositionTable().rangeForIndex(characterIndex);
+            result = new Range(result.start() + 1, result.start() + 1 + result.length());
+            
+            return result;
         } else {
             return null;
         }
@@ -369,8 +398,7 @@ public abstract class SequentView extends JTextArea {
      * if there is no java block there.
      */
     protected synchronized Range getFirstStatementRange(Point p) {
-        String seqText = getText();
-        if (seqText.length() > 0) {
+        if (getDocument().getLength() > 0) {
             int characterIndex = correctedViewToModel(p);
             return printer.getInitialPositionTable().
                     firstStatementRangeForIndex(characterIndex);
