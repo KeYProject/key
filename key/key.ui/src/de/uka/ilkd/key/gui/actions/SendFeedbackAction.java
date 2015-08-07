@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.Window;
@@ -14,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +36,6 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
@@ -58,8 +59,6 @@ public class SendFeedbackAction extends AbstractAction {
      * This is the email address to which feedback will be sent.
      */
     private static final String FEEDBACK_RECIPIENT = "feedback@key-project.org";
-
-    private static final String BUG_REPORT_FILENAME = "BugReport.zip";
 
     private static String serializeStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
@@ -328,6 +327,10 @@ public class SendFeedbackAction extends AbstractAction {
     }
 
     private class SendAction implements ActionListener {
+        private static final String MAIL_BODY =
+                "Please attach the file %s with the chosen metadata to this mail and send it.%%0a%%0a" +
+                "Thanks for your feedack, %%0athe KeY team";
+
         JDialog dialog;
         JTextArea message;
 
@@ -338,29 +341,38 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            int confirmed = JOptionPane.showConfirmDialog(
-                                        parent,
-                                        "A zip archive containing the selected metadata will be created.\n"
-                                                + "Please send an e-Mail containing this zip file as attachment to:\n"
-                                                + FEEDBACK_RECIPIENT, "Send Bug Report",
-                                                JOptionPane.OK_CANCEL_OPTION);
-            if (confirmed == JOptionPane.OK_OPTION) {
-                KeYFileChooser fileChooser = KeYFileChooser
-                        .getFileChooser("Save Zip File");
-                File zipFile = new File(fileChooser.getCurrentDirectory(),
-                        BUG_REPORT_FILENAME);
-                boolean fileSelectionConfirmed = fileChooser.showSaveDialog(parent, zipFile);
-                if (fileSelectionConfirmed) {
-                    zipFile = fileChooser.getSelectedFile();
-                    try {
-                        saveMetaDataToFile(zipFile, message.getText());
+
+            try {
+                File reportFile = File.createTempFile("key-bugreport", ".zip");
+
+                int confirmed = JOptionPane.showConfirmDialog(
+                        parent,
+                        "A zip archive containing the selected data will be created.\n"
+                                + "A new e-mail client window will open.\n"
+                                + "Please attach the file " + reportFile +
+                                " to the mail and send it.", "Send Bug Report",
+                                JOptionPane.OK_CANCEL_OPTION);
+
+                if (confirmed == JOptionPane.OK_OPTION) {
+                    saveMetaDataToFile(reportFile, message.getText());
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop desktop = Desktop.getDesktop();
+                        URI uriMailTo = new URI("mailto:" + FEEDBACK_RECIPIENT + "?" +
+                                "subject=KeY%20feedback&body=" +
+                                String.format(MAIL_BODY, reportFile).replace(" ", "%20"));
+                        desktop.mail(uriMailTo);
+                    } else {
+                        JOptionPane.showMessageDialog(parent,
+                                "A mail window cannot be automatically opened on your system.\n"+
+                                "Please send the file " + reportFile + " to address " +
+                                FEEDBACK_RECIPIENT);
                     }
-                    catch (IOException e) {
-                        JOptionPane.showMessageDialog(parent, e.getMessage());
-                    }
-                    dialog.dispose();
                 }
+            } catch (Exception e) {
+                ExceptionDialog.showDialog(parent, e);
             }
+
+            dialog.dispose();
         }
     }
 
