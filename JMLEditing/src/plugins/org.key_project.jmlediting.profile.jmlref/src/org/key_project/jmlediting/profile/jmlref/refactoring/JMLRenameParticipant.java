@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -13,7 +11,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
@@ -42,6 +39,7 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * Class to participate in the rename refactoring of java fields.
@@ -66,7 +64,7 @@ public class JMLRenameParticipant extends RenameParticipant {
     private IJavaElement fJavaElementToRename;
     private String fNewName;
     private String fOldName;
-    private IJavaProject fProject;
+    private IJavaProject fProject;  // the project which has the fields to be renamed
 
     /**
      * Name of this class. {@inheritDoc}
@@ -78,7 +76,8 @@ public class JMLRenameParticipant extends RenameParticipant {
 
     /**
      * {@inheritDoc} Saves the new name to change to. Saves the old name and the
-     * field to be changed as a IJavaElement to search for references to it.
+     * field to be changed as a IJavaElement to search for references to it. Saves
+     * the active Project, i.e. the project which contains the class which field changes.
      */
     @Override
     protected final boolean initialize(final Object element) {
@@ -132,20 +131,30 @@ public class JMLRenameParticipant extends RenameParticipant {
         projectsToCheck.add(fProject);
 
         try {
-            //IJavaProject[] allProjects = JDTUtil.getAllJavaProjects();
+            // Iterate through all java projects and check for projects which require the active project
+            IJavaProject[] allProjects = JDTUtil.getAllJavaProjects();
             
-            String[] requiredProjectNames = fProject.getRequiredProjectNames();
-            //System.out.println(fProject.getPath());
-            //System.out.println(requiredProjectNames.length);
-            
-            if (requiredProjectNames.length > 0) {
+            for (IJavaProject project: allProjects){
+                String[] requiredProjectNames = project.getRequiredProjectNames();
                 
-                IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+                //System.out.println(project.getPath());
+                //System.out.println(requiredProjectNames.length);
                 
-                for (String requiredProject: requiredProjectNames){
-                    //System.out.println("required: "+requiredProject);
-                    projectsToCheck.add(JavaCore.create(workspaceRoot.getProject(requiredProject)));
-                }    
+                if (requiredProjectNames.length > 0) {
+                    
+                    // To create an IJavaProject from the project's name
+                    //IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+                    
+                    for (String requiredProject: requiredProjectNames){
+                        //System.out.println("required: "+requiredProject);
+                        //System.out.println("project's name: "+fProject.getElementName());
+                        
+                        if (requiredProject.equals(fProject.getElementName())) {
+                            //projectsToCheck.add(JavaCore.create(workspaceRoot.getProject(project)));
+                            projectsToCheck.add(project);
+                        }
+                    } 
+                }
             }
             
             // Look through all source files in each package and project

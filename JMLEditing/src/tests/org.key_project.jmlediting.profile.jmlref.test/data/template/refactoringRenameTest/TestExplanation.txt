@@ -31,4 +31,5 @@ Test15: field reference after a MethodCall: get("someClass").balance
 (Resolver problem) Test17: test16 without the parentheses
 Test18: many MemberAccesses and MethodCalls plus distinguishing between String and field: 
          project.getClass().getDeclaredField("balance").equals(balance)
+Test19: Test with 2 Projects. One Project (referencingProject) references the balance-field of another project (referencedProject)
 ...
