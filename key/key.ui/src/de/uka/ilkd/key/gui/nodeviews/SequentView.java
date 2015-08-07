@@ -260,9 +260,7 @@ public abstract class SequentView extends JEditorPane {
     }
     
     /**
-     * TODO: Document.
-     *
-     * @return
+     * @return The HTML syntax highlighter used for this sequent view.
      */
     protected HTMLSyntaxHighlighter getSyntaxHighlighter() {
         return syntaxHighlighter;
