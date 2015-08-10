@@ -10,6 +10,8 @@ Run a renaming and compare the editor content to a given oracle, i.e. the result
 
 What is tested:
 
+Tested in file FieldRenameRefactoringTest:
+
 Test1: one occurrence in a simple assignable clause
 Test2: additional occurrences in requires and ensures clauses
 Test3: local variable with the same name (balance) and use of this qualifier
@@ -31,5 +33,8 @@ Test15: field reference after a MethodCall: get("someClass").balance
 (Resolver problem) Test17: test16 without the parentheses
 Test18: many MemberAccesses and MethodCalls plus distinguishing between String and field: 
          project.getClass().getDeclaredField("balance").equals(balance)
+
+Tests with several projects: Run in file FieldRenameRefactoringTestSeveralProjects:
+
 Test19: Test with 2 Projects. One Project (referencingProject) references the balance-field of another project (referencedProject)
-...
+Test20: Additional to test19, the referencingProject has an own field called balance.

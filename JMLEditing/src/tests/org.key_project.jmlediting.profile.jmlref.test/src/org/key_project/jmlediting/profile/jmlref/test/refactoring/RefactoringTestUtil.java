@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -12,8 +14,10 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.profile.jmlref.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -36,7 +40,7 @@ public class RefactoringTestUtil {
      * @return the content of the file as a String.
      * @throws CoreException if the file could not be found.
      */
-    protected String getOracle(IFolder oracleFolder, String oracleFileName) throws CoreException {
+    public static String getOracle(IFolder oracleFolder, String oracleFileName) throws CoreException {
         
         IFile fileToRead;
         
@@ -58,7 +62,7 @@ public class RefactoringTestUtil {
      * @param folderToCopyInto target in workspace to copy into.
      * @throws CoreException
      */
-    protected void copyFiles(String copyFrom, IFolder folderToCopyInto) throws CoreException{
+    public static void copyFiles(String copyFrom, IFolder folderToCopyInto) throws CoreException{
         
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, copyFrom, folderToCopyInto);
         
@@ -73,7 +77,7 @@ public class RefactoringTestUtil {
      * @param bot SWTWorkbenchBot to access the active editor from.
      * @return the content of the active text editor as a String.
      */
-    protected String getContentAfterRefactoring(SWTWorkbenchBot bot){
+    public static String getContentAfterRefactoring(SWTWorkbenchBot bot){
         SWTBotEclipseEditor editor = bot.activeEditor().toTextEditor();
         
         String content = editor.getText();
@@ -95,7 +99,7 @@ public class RefactoringTestUtil {
      * @param newName the new name to change the field's name to.
      * @param bot SWTWorkbenchBot to select the outline view from.
      */
-    protected void executeRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot){
+    public static void executeRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot){
         
         TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
@@ -127,7 +131,7 @@ public class RefactoringTestUtil {
      * @param newNameField the name to change the field to.
      * @throws CoreException
      */
-    protected void runFieldRenameTestBasic(String path, IFolder srcFolder, IFolder oracleFolder, 
+    public static void runFieldRenameTestBasic(String path, IFolder srcFolder, IFolder oracleFolder, 
             SWTWorkbenchBot bot, String className, String packageName, String fieldDescription, String newNameField) throws CoreException {
         
         copyFiles(path + "\\src", srcFolder);
@@ -142,7 +146,7 @@ public class RefactoringTestUtil {
      * Runs the basic renaming test on the classNameWithRenaming class and additionally compares
      * the classNameWithoutRenaming as well to its oracle.
      */
-    protected void runFieldRenameTestTwoFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
+    public static void runFieldRenameTestTwoFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
             SWTWorkbenchBot bot, String classNameWithRenaming, String packageRenaming, String classNameWithoutRenaming, 
             String packageWithoutRenaming, String fieldDescription, String newNameField) throws CoreException {
         
@@ -163,7 +167,7 @@ public class RefactoringTestUtil {
      * Runs the basic renaming test on the classNameWithRenaming class and additionally compares
      * the classNameWithoutRenaming1 and classNameWithoutRenaming2 to its oracle.
      */
-    protected void runFieldRenameTestThreeFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
+    public static void runFieldRenameTestThreeFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
             SWTWorkbenchBot bot, String classNameWithRenaming, String packageRenaming, String classNameWithoutRenaming1, 
             String packageWithoutRenaming1, String classNameWithoutRenaming2, String packageWithoutRenaming2, String fieldDescription, String newNameField) throws CoreException {
         
@@ -187,5 +191,56 @@ public class RefactoringTestUtil {
             srcFolder.getFolder(packageWithoutRenaming2).delete(true, null);
         }
     }
+    
+    /**
+     * Adds the projects in referencedProjects to the java build path of project.
+     */
+    public static void setProjectReferences(String project, String[] referencedProjects, SWTWorkbenchBot bot) {
+        // select the referencingProject in the package explorer
+        SWTBotTreeItem projectToAddReferences = TestUtilsUtil.selectInProjectExplorer(bot, "referencingProject");
+        projectToAddReferences.select().pressShortcut(SWT.ALT, SWT.CR);
+        
+        // select the build path "Java Build Path" and "Projects" tab
+        SWTBotShell propertiesDialog = bot.shell("Properties for "+project);      
+        TestUtilsUtil.selectInTree(propertiesDialog.bot().tree(), "Java Build Path").click();
+    
+        SWTBot propertiesDialogBot = propertiesDialog.bot();
+        propertiesDialogBot.tabItem("Projects").activate();
+        propertiesDialogBot.button("Add...").click();
+        
+        SWTBotShell projectSelection = bot.shell("Required Project Selection");
+        SWTBot projectSelectionBot = projectSelection.bot();
+         
+       SWTBotTable table = projectSelectionBot.table(0);
+       for (String p : referencedProjects){
+           table.doubleClick(table.indexOf(p), 0);
+           table.pressShortcut(0 , SWT.SPACE);
+       }
+       
+        projectSelectionBot.button(IDialogConstants.OK_LABEL).click();
+        propertiesDialogBot.waitUntil(Conditions.shellCloses(projectSelection));
+        
+        propertiesDialogBot.button(IDialogConstants.OK_LABEL).click();
+        bot.waitUntil(Conditions.shellCloses(propertiesDialog));    
+    }
 
+    public static IProject createProject(String projectName) throws CoreException, InterruptedException {
+        final IJavaProject javaProject = TestUtilsUtil.createJavaProject(projectName);
+        final IProject project = javaProject.getProject();
+        TestUtilsUtil.createFolder(project,"oracle");
+        JMLPreferencesHelper.setProjectJMLProfile(project, JMLPreferencesHelper.getDefaultJMLProfile());
+        return project;
+    }
+    
+    public static IProject createProjectWithFiles (String projectName, String path) throws CoreException, InterruptedException {
+        final IProject project = createProject(projectName);
+
+        String pathToTests = path + "\\src";
+        String pathToOracle = path + "\\oracle";
+        
+        RefactoringTestUtil.copyFiles(pathToTests, project.getFolder(JDTUtil.getSourceFolderName()));
+        RefactoringTestUtil.copyFiles(pathToOracle, project.getFolder("oracle"));
+        
+        return project;
+    }
 }
