@@ -56,6 +56,7 @@ public class JMLRenameParticipantLocalVars extends RenameParticipant {
     @Override
     protected boolean initialize(Object element) {
         fNewName = getArguments().getNewName();
+        System.out.println("activated local variables renaming");
         fLocalVar = (ILocalVariable) element;
         if (fLocalVar.getDeclaringMember().getElementType() == IJavaElement.METHOD
                 && !(fLocalVar.getDeclaringMember().getCompilationUnit() == null)) {
