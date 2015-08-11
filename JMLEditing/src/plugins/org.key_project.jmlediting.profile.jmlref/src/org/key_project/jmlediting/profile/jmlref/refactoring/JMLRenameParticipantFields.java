@@ -50,7 +50,7 @@ import org.key_project.util.jdt.JDTUtil;
  * 
  * @author Robert Heimbach
  */
-public class JMLRenameParticipant extends RenameParticipant {
+public class JMLRenameParticipantFields extends RenameParticipant {
 
     private IJavaElement fJavaElementToRename;
     private String fNewName;
@@ -80,7 +80,6 @@ public class JMLRenameParticipant extends RenameParticipant {
         else {
             return false;
         }
-
     }
 
     /**

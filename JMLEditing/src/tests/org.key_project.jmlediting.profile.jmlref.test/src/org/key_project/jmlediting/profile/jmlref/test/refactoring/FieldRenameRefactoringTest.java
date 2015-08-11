@@ -1,21 +1,26 @@
 package org.key_project.jmlediting.profile.jmlref.test.refactoring;
 
+<<<<<<< HEAD
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.resources.IFile;
+=======
+>>>>>>> 6e0ea5b6c8993bd3a90fcaa34f701ee4f63ae3fe
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+<<<<<<< HEAD
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+=======
+import org.junit.After;
+>>>>>>> 6e0ea5b6c8993bd3a90fcaa34f701ee4f63ae3fe
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
@@ -25,7 +30,11 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+<<<<<<< HEAD
 public class FieldRenameRefactoringTest<WaitForShell> {
+=======
+public class FieldRenameRefactoringTest {
+>>>>>>> 6e0ea5b6c8993bd3a90fcaa34f701ee4f63ae3fe
     
     private static final String PROJECT_NAME = "JMLRefactoringRenameTest";
     //private static final String PACKAGE_NAME = "test";
@@ -52,6 +61,7 @@ public class FieldRenameRefactoringTest<WaitForShell> {
     }
     
     
+<<<<<<< HEAD
     // Get the String representation of the file named oracleName from oracleFolder
     private String getOracle(IFolder oracleFolder, String fileName) throws CoreException {
         
@@ -199,9 +209,65 @@ public class FieldRenameRefactoringTest<WaitForShell> {
         assertEquals(oracleStringOther,afterRenamingOther);
         
         srcFolder.getFolder("test").delete(true, null);
+=======
+    @Test
+    public void test1SimpleAssignableClause() throws InterruptedException, CoreException {   
+        RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "balance : int", "aVeryLongNewName");
+    }
+    
+    @Test
+    public void test2AssignableRequiresAndEnsures() throws InterruptedException, CoreException { 
+        RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "balance : int", "tiny");
+    }
+    
+    @Test
+    public void test3ThisQualifier() throws InterruptedException, CoreException {  
+        RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "balance : int", "aNewName");
+    }
+    
+    @Test
+    public void test4TwoFilesSamePackageNoChangeInFileTwo() throws InterruptedException, CoreException { 
+        RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "TestClassOther", "test", "balance : int", "aNewName");
+    }
+    
+    @Test
+    public void test5TwoFilesSamePackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
+        RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "TestClassOther", "test", "balance : int", "aNewName");
+    }
+    
+    @Test
+    public void test6TwoFilesOtherPackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {  
+        RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "TestClassOther", "otherPackage", "balance : int", "aNewName");
+    }
+    
+    @Test
+    public void test7TwoFilesMemberAccess() throws InterruptedException, CoreException {  
+        RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test7", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "TestClassOther", "test", "balance : int", "aNewName");
+    }
+    
+    @Test
+    public void test8NoJavaChangesInOtherFile() throws InterruptedException, CoreException {
+        RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test8", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "TestClassOther", "test", "balance : int", "aNewName");
+    }
+    
+    @Test
+    public void test9NoJavaChangesInTwoOtherFile() throws InterruptedException, CoreException {
+        RefactoringTestUtil.runFieldRenameTestThreeFiles(TESTPATH+"\\test9", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "TestClassOther", "test", "TestClassOtherMore", "test", 
+                "balance : int", "aNewName");
+>>>>>>> 6e0ea5b6c8993bd3a90fcaa34f701ee4f63ae3fe
     }
     
     //@Test
+<<<<<<< HEAD
     public void test5TwoFilesSamePackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
         
         final String path = "data\\template\\refactoringRenameTest\\test5";
@@ -407,5 +473,60 @@ public class FieldRenameRefactoringTest<WaitForShell> {
             assertEquals(oracleString,afterRenaming);
             
             srcFolder.getFolder("test").delete(true, null);
+=======
+    public void test10Invariant() throws InterruptedException, CoreException {
+        RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test10", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "balance : int", "aNewName");
+    }
+    
+    @Test
+    public void test11thisQualifierMethodFieldName() throws InterruptedException, CoreException {
+        RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test11", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "balance : TestClass", "newName");
+    }
+    
+    @Test
+    public void test12thisQualifierMethodFieldNameNested() throws InterruptedException, CoreException {
+        RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test12", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "balance : TestClass", "newName");
+    }
+    
+    @Test
+    public void test13thisQualifierMethodFieldNameNestedChangedOrder() throws InterruptedException, CoreException {
+        RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test13", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "balance : TestClass", "newName");
+    }
+      
+     @Test
+     public void test14ManyMemberAccesses() throws InterruptedException, CoreException {
+         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test14", srcFolder, oracleFolder, bot, 
+                 "TestClass", "test", "balance : TestClass", "newName");  
+     }
+     
+     @Test
+     public void test15FieldRefAfterMethodCall() throws InterruptedException, CoreException {
+         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test15", srcFolder, oracleFolder, bot, 
+                 "TestClass", "test", "balance : int", "newName");   
+     }
+     
+     // TODO: Problem with Resolver currently
+     //@Test
+     public void test16LikeTest15PlusMemberAccess() throws InterruptedException, CoreException {
+         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test16", srcFolder, oracleFolder, bot, 
+                 "TestClass", "test", "balance : String", "newName");
+     }
+     
+     // TODO:  Problem with Resolver currently
+     //@Test
+     public void test17LikeTest16WithoutParentheses() throws InterruptedException, CoreException {
+         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test17", srcFolder, oracleFolder, bot, 
+                 "TestClass", "test", "balance : String", "newName");      
+     }
+     
+     @Test
+     public void test18ManyMemberAccessesAndMethodCalls() throws InterruptedException, CoreException {
+         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test18", srcFolder, oracleFolder, bot, 
+                 "TestClass", "test", "balance : TestClass<IJavaProject>", "newName"); 
+>>>>>>> 6e0ea5b6c8993bd3a90fcaa34f701ee4f63ae3fe
         }
 }

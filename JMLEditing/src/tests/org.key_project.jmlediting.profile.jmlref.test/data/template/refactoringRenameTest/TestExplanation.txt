@@ -4,11 +4,13 @@ Run a renaming and compare the editor content to a given oracle, i.e. the result
 
 1) Each test in its own folder. Separated in src and oracle.
 2) First files are copied and oracle string is generated.
-3) Renaming is done.
+3) Renaming is done (usually of the field named balance).
 4) Comparison of editor after renaming to oracle.
 
 
 What is tested:
+
+Tested in file FieldRenameRefactoringTest:
 
 Test1: one occurrence in a simple assignable clause
 Test2: additional occurrences in requires and ensures clauses
@@ -21,6 +23,18 @@ Test7: more complex usage of balance. More than one member access.
 Test8: Changes to the JML code in the other class but no changes to the java code. Other class accesses the balance field
       from the main class by using getBalance() but refers to the field in the JML code.
 Test9: Like 8 but with 2 files without java changes.
-Test10: change within an invariant.
-Test11: lots of member accesses but of the same class.
-...
+(Resolver problem) Test10: change within an invariant.
+Test11: combination of this qualifier and method with same name as the field.
+Test12: test11 plus a nested field call: TestClass balance; this.balance.balance()
+Test13: test12 with changed order: this.balance().balance
+Test14: test11/12 with more nesting: this.balance.balance == test.balance.balance().balance
+Test15: field reference after a MethodCall: get("someClass").balance
+(Resolver problem) Test16: test15 with another call afterwards: (classes.get(0)).balance.equals("5")
+(Resolver problem) Test17: test16 without the parentheses
+Test18: many MemberAccesses and MethodCalls plus distinguishing between String and field: 
+         project.getClass().getDeclaredField("balance").equals(balance)
+
+Tests with several projects: Run in file FieldRenameRefactoringTestSeveralProjects:
+
+Test19: Test with 2 Projects. One Project (referencingProject) references the balance-field of another project (referencedProject)
+Test20: Additional to test19, the referencingProject has an own field called balance.
