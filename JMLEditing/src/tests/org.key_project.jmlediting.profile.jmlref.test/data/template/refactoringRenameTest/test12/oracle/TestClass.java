@@ -5,7 +5,7 @@ class TestClass {
 
     /*@
       @ normal_behavior
-      @ ensures this.balance() == newName;
+      @ ensures this.newName.balance() == newName;
       @*/
     public TestClass balance() {
         return newName;

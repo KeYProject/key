@@ -21,9 +21,6 @@ public class FieldRenameRefactoringTest {
     private static IFolder srcFolder;
     private static IProject project;
     private static IFolder oracleFolder;
-    final String CLASS_NAME = "TestClass";
-    final String CLASS_NAME_OTHER = "TestClassOther";
-    final String CLASS_NAME_MORE = "TestClassOtherMore";
     final String TESTPATH = "data\\template\\refactoringRenameTest";
 
     @BeforeClass

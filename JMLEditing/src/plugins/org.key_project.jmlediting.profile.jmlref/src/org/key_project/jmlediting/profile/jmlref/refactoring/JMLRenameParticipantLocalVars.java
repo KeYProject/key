@@ -10,8 +10,12 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.ILocalVariable;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.util.IAnnotation;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -43,21 +47,24 @@ import org.key_project.util.jdt.JDTUtil;
 
 public class JMLRenameParticipantLocalVars extends RenameParticipant {
 
-    private IJavaElement fJavaElementToRename;
     private String fNewName;
     private String fOldName;
-    private IJavaProject fProject;  // the project which has the local variable to be renamed
+    private ICompilationUnit fCompUnit;
+    private ILocalVariable fLocalVar;
+    private IJavaProject fProject;
     
     @Override
     protected boolean initialize(Object element) {
         fNewName = getArguments().getNewName();
-        if (element instanceof IJavaElement) {
-            fJavaElementToRename = (IJavaElement) element;
-            fProject = fJavaElementToRename.getJavaProject();
-            fOldName = fJavaElementToRename.getElementName();
-            
+        fLocalVar = (ILocalVariable) element;
+        if (fLocalVar.getDeclaringMember().getElementType() == IJavaElement.METHOD
+                && !(fLocalVar.getDeclaringMember().getCompilationUnit() == null)) {
+            fOldName = fLocalVar.getElementName();
+            fProject = fLocalVar.getJavaProject();
+            fCompUnit = fLocalVar.getDeclaringMember().getCompilationUnit();
+
             return true;
-        }
+            }
         else {
             return false;
         }
@@ -95,65 +102,21 @@ public class JMLRenameParticipantLocalVars extends RenameParticipant {
     public Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
-        // Only non empty change objects will be added
-        ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
+        final ArrayList<ReplaceEdit> changesToJML = computeNeededChangesToJML(
+                fCompUnit, fProject);
         
-        // Find out the projects which need to be checked: active project plus all dependencies
-        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
-        projectsToCheck.add(fProject);
-           
-        
-            // Look through all source files in each package and project
-            for (final IJavaProject project : projectsToCheck) {
-                for (final IPackageFragment pac : project.getPackageFragments()) {
-                    for (final ICompilationUnit unit : pac
-                            .getCompilationUnits()) {
-                         
-                        final ArrayList<ReplaceEdit> changesToJML = computeNeededChangesToJML(
-                                unit, project);
+        // Get scheduled changes to the java code from the rename processor
+        final TextChange changesToJavaCode = getTextChange(fCompUnit);
 
-                        // Get scheduled changes to the java code from the rename processor
-                        final TextChange changesToJavaCode = getTextChange(unit);
-
-                        // add our edits to the java changes
-                        // JDT will compute the shifts and the preview
-                        if (changesToJavaCode != null) {
-                            for (final ReplaceEdit edit : changesToJML) {
-                                changesToJavaCode.addEdit(edit);
-                            }
-                        }
-                        else {
-                            // In case changes to the JML code needs to be done (but not to the java code)
-                            if (!changesToJML.isEmpty()){
-                                
-                                // Gather all the edits to the text (JML annotations) in a MultiTextEdit
-                                // and add those to a change object for the given file
-                                TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());                         
-                                MultiTextEdit allEdits = new MultiTextEdit();
-                                
-                                for (final ReplaceEdit edit: changesToJML) {
-                                   allEdits.addChild(edit);
-                                }
-
-                                tfChange.setEdit(allEdits);
-                                
-                                changesToFilesWithoutJavaChanges.add(tfChange);
-                            }
-                        }
-                    }
-                }
+        // add our edits to the java changes
+        // JDT will compute the shifts and the preview
+        if (changesToJavaCode != null) {
+            for (final ReplaceEdit edit : changesToJML) {
+                changesToJavaCode.addEdit(edit);
             }
-        
-        // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
-        if (changesToFilesWithoutJavaChanges.isEmpty())
-            return null;
-        else {
-            CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
-            for (TextFileChange change : changesToFilesWithoutJavaChanges){
-                allChangesToFilesWithoutJavaChanges.add(change);
-            }
-            return allChangesToFilesWithoutJavaChanges;
         }
+        
+        return null;
     }
 
     /**
@@ -367,7 +330,7 @@ public class JMLRenameParticipantLocalVars extends RenameParticipant {
         }
         
         final IJavaElement jElement = result.getBinding().getJavaElement();
-        return jElement.equals(fJavaElementToRename);
+        return jElement.equals(fLocalVar);
     }
     
 
