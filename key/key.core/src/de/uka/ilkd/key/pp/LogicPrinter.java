@@ -1223,7 +1223,7 @@ public class LogicPrinter {
                     Term object = t.sub(1);
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
                     if (obs.isStatic()
-                            || javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType)) {
+                            || ((obs instanceof IProgramMethod) && javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType))) {
                         layouter.print(fieldName);
                     } else {
                         layouter.print("(" + t.op() + ")");
