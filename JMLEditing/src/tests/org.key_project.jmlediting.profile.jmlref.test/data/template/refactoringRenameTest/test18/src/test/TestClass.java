@@ -1,8 +1,7 @@
 package test;
 
-public class TestClass<IJavaProject> {
+public class TestClass {
     public int balance;
-    IJavaProject project;
     
     /*@ normal_behavior
       @ ensures Integer.toString(balance).equals("5") ==> \result == 0;
@@ -13,14 +12,14 @@ public class TestClass<IJavaProject> {
         if (Integer.toString(balance).equals("5"))
             return 0;
         else
-        	return 1;
+            return 1;
     }
     
     /*@ normal_behavior
-      @ ensures \result == project.getClass().getDeclaredField("balance").equals(balance);
+      @ ensures \result == this.getClass().getDeclaredField("balance").equals(balance);
       @*/
     public boolean doSomething() throws NoSuchFieldException, SecurityException{
-    	
-    	return (project.getClass().getDeclaredField("balance").equals(balance));
+        
+        return (this.getClass().getDeclaredField("balance").equals(balance));
     }
 }

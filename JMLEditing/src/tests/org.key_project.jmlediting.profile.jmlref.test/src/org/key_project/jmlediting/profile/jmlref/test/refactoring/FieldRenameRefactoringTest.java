@@ -148,6 +148,6 @@ public class FieldRenameRefactoringTest {
      @Test
      public void test18ManyMemberAccessesAndMethodCalls() throws InterruptedException, CoreException {
          RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test18", srcFolder, oracleFolder, bot, 
-                 "TestClass", "test", "balance : TestClass<IJavaProject>", "newName"); 
+                 "TestClass", "test", "balance", "newName"); 
         }
 }

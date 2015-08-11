@@ -104,6 +104,7 @@ public class RefactoringTestUtil {
         TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
         // select the fieldToChange in the outline view of the bot
+        bot.sleep(15000);
         SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree(); 
         SWTBotTreeItem fieldToRename = TestUtilsUtil.selectInTree(tree, className, fieldToChange);
         fieldToRename.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
