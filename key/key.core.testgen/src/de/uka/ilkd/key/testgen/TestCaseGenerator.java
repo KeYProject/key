@@ -854,6 +854,7 @@ public class TestCaseGenerator {
 
 						if(junitFormat && isInPrestate(prestate, o)){
 							
+
 							if(isInPrestate(prestate, val) && !val.equals("null")){
 								val = getPreName(val);
 							}
