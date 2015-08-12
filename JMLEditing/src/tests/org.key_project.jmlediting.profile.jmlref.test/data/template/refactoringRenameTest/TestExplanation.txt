@@ -10,6 +10,8 @@ Run a renaming and compare the editor content to a given oracle, i.e. the result
 
 What is tested:
 
+***** Testing Field Renaming *****
+
 Tested in file FieldRenameRefactoringTest:
 
 Test1: one occurrence in a simple assignable clause
@@ -38,3 +40,6 @@ Tests with several projects: Run in file FieldRenameRefactoringTestSeveralProjec
 
 Test19: Test with 2 Projects. One Project (referencingProject) references the balance-field of another project (referencedProject)
 Test20: Additional to test19, the referencingProject has an own field called balance.
+
+
+****** Testing Local Variable Renaming *****

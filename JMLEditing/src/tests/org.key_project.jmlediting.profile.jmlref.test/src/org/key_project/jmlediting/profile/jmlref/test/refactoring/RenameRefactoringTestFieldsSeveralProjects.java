@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class FieldRenameRefactoringTestSeveralProjects {
+public class RenameRefactoringTestFieldsSeveralProjects {
 
     private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
        
@@ -23,13 +23,13 @@ public class FieldRenameRefactoringTestSeveralProjects {
     @Test
     public void test19BasicReferencing() throws InterruptedException, CoreException {
         // Create projects and set references
-       final IProject referencedProject = RefactoringTestUtil.createProjectWithFiles("referencedProject", "data\\template\\refactoringRenameTest\\test19\\referencedProject");
-       final IProject referencingProject = RefactoringTestUtil.createProjectWithFiles("referencingProject", "data\\template\\refactoringRenameTest\\test19\\referencingProject");
+       final IProject referencedProject = RefactoringTestUtil.createProjectWithFiles("referencedProject", "data\\template\\refactoringRenameTest\\fields\\test19\\referencedProject");
+       final IProject referencingProject = RefactoringTestUtil.createProjectWithFiles("referencingProject", "data\\template\\refactoringRenameTest\\fields\\test19\\referencingProject");
        RefactoringTestUtil.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
        
        // Execute Renaming and Check
        TestUtilsUtil.openEditor(referencedProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencedClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-       RefactoringTestUtil.executeRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
+       RefactoringTestUtil.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
        assertEquals(RefactoringTestUtil.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),RefactoringTestUtil.getContentAfterRefactoring(bot));
        
        TestUtilsUtil.openEditor(referencingProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -43,13 +43,13 @@ public class FieldRenameRefactoringTestSeveralProjects {
     @Test
     public void test20BasicPlusOwnField() throws InterruptedException, CoreException {
         // Create projects and set references
-       final IProject referencedProject = RefactoringTestUtil.createProjectWithFiles("referencedProject", "data\\template\\refactoringRenameTest\\test20\\referencedProject");
-       final IProject referencingProject = RefactoringTestUtil.createProjectWithFiles("referencingProject", "data\\template\\refactoringRenameTest\\test20\\referencingProject");
+       final IProject referencedProject = RefactoringTestUtil.createProjectWithFiles("referencedProject", "data\\template\\refactoringRenameTest\\fields\\test20\\referencedProject");
+       final IProject referencingProject = RefactoringTestUtil.createProjectWithFiles("referencingProject", "data\\template\\refactoringRenameTest\\fields\\test20\\referencingProject");
        RefactoringTestUtil.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
        
        // Execute Renaming and Check
        TestUtilsUtil.openEditor(referencedProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencedClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-       RefactoringTestUtil.executeRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
+       RefactoringTestUtil.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
        assertEquals(RefactoringTestUtil.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),RefactoringTestUtil.getContentAfterRefactoring(bot));
        
        TestUtilsUtil.openEditor(referencingProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));

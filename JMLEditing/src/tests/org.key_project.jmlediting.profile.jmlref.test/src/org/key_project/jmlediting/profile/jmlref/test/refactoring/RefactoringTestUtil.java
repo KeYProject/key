@@ -12,11 +12,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.utils.Position;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IEditorPart;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.profile.jmlref.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
@@ -99,18 +102,67 @@ public class RefactoringTestUtil {
      * @param newName the new name to change the field's name to.
      * @param bot SWTWorkbenchBot to select the outline view from.
      */
-    public static void executeRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot){
+    public static void selectFieldAndExecuteRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot){
         
         TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
         // select the fieldToChange in the outline view of the bot
-        bot.sleep(15000);
         SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree(); 
         SWTBotTreeItem fieldToRename = TestUtilsUtil.selectInTree(tree, className, fieldToChange);
+        
         fieldToRename.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
                 
         // Change variable name in rename dialog
         SWTBotShell renameDialog = bot.shell("Rename Field");      
+        setNewElementName(newName, bot, renameDialog);
+    }
+    
+    /**
+     * Renames a local variable by selecting the method which uses the local variable, called methodName,
+     * in the outline and then moving offset to the right in the text editor to select the local 
+     * variable / parameter to be renamed. 
+     * 
+     * @param methodName the method's name which uses the local variable.
+     * @param className the class the field is in (without .java file ending).
+     * @param packageName name of the package the class is in.
+     * @param srcFolder sourceFolder of the class className.
+     * @param newName the new name to change the local variable's name to.
+     * @param bot SWTWorkbenchBot to select the outline view from.
+     * @param offset move offset to the right to select the local variable in the text editor.
+     */
+    public static void selectLocalVariableAndExecuteRenaming(String methodName, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot, int offset){
+        
+        TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        
+        // select the method which uses the local variable in the outline view of the bot
+        SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree(); 
+        SWTBotTreeItem methodUsingLocalVar = TestUtilsUtil.selectInTree(tree, className, methodName);
+        methodUsingLocalVar.doubleClick();
+        
+        // Switch to the editor, the method should be highlighted and the cursor behind the last character
+        SWTBotEclipseEditor editor = bot.activeEditor().toTextEditor();
+        Position positionMethod = editor.cursorPosition();
+
+        editor.navigateTo(positionMethod.line, positionMethod.column + offset);
+        
+        //editor.selectRange(positionMethod.line, positionMethod.column, 1);
+        
+                
+        // Change variable name in rename dialog
+        
+        SWTBotShell renameDialog = bot.shell("Rename Field");      
+        setNewElementName(newName, bot, renameDialog);
+    }
+
+
+    /**
+     * Sets the new element's name to newName in the renaming dialog.
+     * @param newName the element's new name.
+     * @param bot the workbench bot, used to wait for the shell to close.
+     * @param renameDialog the rename dialog / shell.
+     */
+    public static void setNewElementName(String newName, SWTWorkbenchBot bot,
+            SWTBotShell renameDialog) {
         SWTBot renameDialogBot = renameDialog.bot();
         renameDialogBot.textWithLabel("New name:").setText(newName);
      
@@ -120,7 +172,7 @@ public class RefactoringTestUtil {
     }
     
     /**
-     * Runs a basic rename test. That is, only one project, one file and renaming of one field.
+     * Runs a basic field rename test. That is, only one project, one file and renaming of one field.
      * 
      * @param path the path of the test files with the sub folders \src and \oracle. 
      * @param srcFolder the folder of the source files to load into eclipse.
@@ -138,13 +190,13 @@ public class RefactoringTestUtil {
         copyFiles(path + "\\src", srcFolder);
         copyFiles(path + "\\oracle", oracleFolder);
         
-        executeRenaming(fieldDescription, className, packageName, srcFolder, newNameField, bot);
+        selectFieldAndExecuteRenaming(fieldDescription, className, packageName, srcFolder, newNameField, bot);
         
         assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
     
     /**
-     * Runs the basic renaming test on the classNameWithRenaming class and additionally compares
+     * Runs the basic field renaming test on the classNameWithRenaming class and additionally compares
      * the classNameWithoutRenaming as well to its oracle.
      */
     public static void runFieldRenameTestTwoFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
@@ -243,5 +295,30 @@ public class RefactoringTestUtil {
         RefactoringTestUtil.copyFiles(pathToOracle, project.getFolder("oracle"));
         
         return project;
+    }
+    
+    /**
+     * Runs a local variable rename test.
+     * 
+     * @param path the path of the test files with the sub folders \src and \oracle. 
+     * @param srcFolder the folder of the source files to load into eclipse.
+     * @param oracleFolder the folder of the oracle.
+     * @param bot workbench bot.
+     * @param className the class the field to be renamed is in.
+     * @param packageName name of the package the class is in.
+     * @param methodName how the method which uses the local variable to be renamed appears in the outline.
+     * @param newName the local variable's new name.
+     * @param offset how much in the text editor to move to the right to select the local variable when the methodName is selected.
+     * @throws CoreException
+     */
+    public static void runLocalVariableRename(String path, IFolder srcFolder, IFolder oracleFolder, 
+            SWTWorkbenchBot bot, String className, String packageName, String methodName, String newName, int offset) throws CoreException {
+        
+        copyFiles(path + "\\src", srcFolder);
+        copyFiles(path + "\\oracle", oracleFolder);
+        
+        selectLocalVariableAndExecuteRenaming(methodName, className, packageName, srcFolder, newName, bot, offset);
+        
+        assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
 }

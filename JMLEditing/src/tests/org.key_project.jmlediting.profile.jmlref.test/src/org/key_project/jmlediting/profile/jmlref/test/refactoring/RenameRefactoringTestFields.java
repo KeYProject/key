@@ -12,16 +12,16 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class FieldRenameRefactoringTest {
+public class RenameRefactoringTestFields {
     
-    private static final String PROJECT_NAME = "JMLRefactoringRenameTest";
+    private static final String PROJECT_NAME = "JMLRefactoringRenameTestFields";
 
     private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
        
     private static IFolder srcFolder;
     private static IProject project;
     private static IFolder oracleFolder;
-    final String TESTPATH = "data\\template\\refactoringRenameTest";
+    final String TESTPATH = "data\\template\\refactoringRenameTest\\fields";
 
     @BeforeClass
     public static void initProject() throws CoreException, InterruptedException {
