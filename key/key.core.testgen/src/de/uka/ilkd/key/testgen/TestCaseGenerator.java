@@ -827,9 +827,12 @@ public class TestCaseGenerator {
 
 					if(junitFormat && isInPrestate(prestate, o)){
 						//if value that is pointed to is object and in prestate then use prestate object
-						if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val)){
+						if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
 							val = getPreName(val);
-						}					
+						}
+						
+						
+						
 						assignments
 						.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName), val));
 					}
@@ -850,6 +853,11 @@ public class TestCaseGenerator {
 						//assignments.add(new Assignment("",new RefArrayEx("","",name,""+i), val));
 
 						if(junitFormat && isInPrestate(prestate, o)){
+							
+							if(isInPrestate(prestate, val)){
+								val = getPreName(val);
+							}
+							
 							assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));
 						}
 
