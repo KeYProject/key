@@ -30,6 +30,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
    public OutlineContentProviderWrapper(ITreeContentProvider originalProvider) {
       this.originalProvider = originalProvider;
    }
+   
 
    /**
     * {@inheritDoc}

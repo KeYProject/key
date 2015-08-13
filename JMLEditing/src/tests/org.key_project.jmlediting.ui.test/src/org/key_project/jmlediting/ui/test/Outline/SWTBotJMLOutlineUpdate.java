@@ -94,7 +94,7 @@ public class SWTBotJMLOutlineUpdate {
    
    public void addTextSeriell(int startLine, int startCol, String text) {
       for (int i = 0; i < text.length(); i++ ){
-//         bot.activeEditor().toTextEditor().insertText(startLine, i+startCol, text.charAt(i));
+         bot.activeEditor().toTextEditor().insertText(startLine, i+startCol, String.valueOf(text.charAt(i)));
       }
    }
    
