@@ -291,14 +291,16 @@ public class Resolver implements IResolver {
             if(currentTask.isMethod) {
                 context = getDeclaringClass();
                 
-                final IType type = (IType) ((TypeDeclaration)context).resolveBinding().getJavaElement();                
-                                
+                final IType type = (IType) ((TypeDeclaration)context).resolveBinding().getJavaElement();
+                
+                //System.out.println(type.getFullyQualifiedName());
                 final IMethod method = type.getMethod(currentTask.resolveString, createParameterSignatures(currentTask.parameters));
                 
-                return findMethodWithKey(context, method);
+                //TODO .. problem still exists
+                type.findMethods(method);
                 
-                // type.getTypeParameterSignatures();
-                //type.getMethod(name, parameterTypeSignatures)
+                return findIMethod(context, method);
+                
                 
                 //final List<ASTNode> resultList = new LinkedList<ASTNode>();
                 //findMethod(context, currentTask.resolveString, resultList);
@@ -322,19 +324,33 @@ public class Resolver implements IResolver {
         return jdtNode;
     }
 
-    private ASTNode findMethodWithKey(final ASTNode context, final IMethod method) {
+    private ASTNode findIMethod(final ASTNode context, final IMethod method) {
         final LinkedList<MethodDeclaration> result = new LinkedList<MethodDeclaration>();
         
-        final String key = method.getKey();
-        final String subkey2 = key.substring(key.indexOf("(")+1, key.indexOf(")"));
+        //final String key = method.getKey();
+        
+        final String[] expectedParameterKeys = Signature.getParameterTypes(method.getKey());
+        //final String subkey2 = key.substring(key.indexOf("(")+1, key.indexOf(")"));
+        
                 
         context.accept(new ASTVisitor() {
+            
             @Override
             public boolean visit(final MethodDeclaration node) {
                 if(node.getName().getIdentifier().equals(method.getElementName())) {
-                    final String key = node.resolveBinding().getKey();
-                    final String subkey = key.substring(key.indexOf("(")+1, key.indexOf(")"));
-                    if(subkey.equals(subkey2)) {
+                    final String[] actualParameterKeys = Signature.getParameterTypes(node.resolveBinding().getKey());
+                    //final String key = node.resolveBinding().getKey();
+                    //final String subkey = key.substring(key.indexOf("(")+1, key.indexOf(")"));
+                    if(actualParameterKeys.length == expectedParameterKeys.length) {
+
+                        for(int i = 0; i < actualParameterKeys.length; i++) {
+                            if(!actualParameterKeys[i].equals(expectedParameterKeys[i])) {
+                                return true;
+                            } else {
+                                continue;
+                            }
+                        }
+
                         result.add(node);
                         return false;
                     }
@@ -345,6 +361,12 @@ public class Resolver implements IResolver {
         return result.poll();
     }
 
+    /** Uses the TypeComputer to find out what the ITypeBinding of the parameters are then creates the Signature of those Bindings.
+     * 
+     * @param parameters the List of the parameters
+     * @return a String array containing the signatures of the parameter types in the same order.
+     * @throws ResolverException if the TypeComputer can not compute the parameter type.
+     */
     private String[] createParameterSignatures(final List<IASTNode> parameters) throws ResolverException {
         if(parameters.size() == 0) {
             return new String[0];
@@ -444,7 +466,18 @@ public class Resolver implements IResolver {
         } else {
             IType type = null;
             try {
-                type = compilationUnit.getJavaProject().findType(typeBinding.getQualifiedName());
+                if(typeBinding.isParameterizedType()) {
+                    final ITypeBinding newTypeBinding = typeBinding.getErasure();
+                    System.out.println(newTypeBinding.getQualifiedName());
+                    type = compilationUnit.getJavaProject().findType(newTypeBinding.getQualifiedName());
+                } else if(typeBinding.isWildcardType()) {
+                    final ITypeBinding newTypeBinding = typeBinding.getGenericTypeOfWildcardType();
+                    System.out.println(newTypeBinding.getQualifiedName());
+                    type = compilationUnit.getJavaProject().findType(newTypeBinding.getQualifiedName());
+                } else {
+                    System.out.println(typeBinding.getQualifiedName());
+                    type = compilationUnit.getJavaProject().findType(typeBinding.getQualifiedName());
+                }
             }
             catch (final JavaModelException e) {
                 LogUtil.getLogger().logError(e);
@@ -618,7 +651,7 @@ public class Resolver implements IResolver {
                         return result;
                     }
                 }
-            }        
+            }
         //SingleVariableDeclaration
         } else if(context instanceof SingleVariableDeclaration) {
             if(((SingleVariableDeclaration) context).getName().getIdentifier().equals(name)) {
@@ -634,7 +667,7 @@ public class Resolver implements IResolver {
      * @param name is the name of the identifier we are searching for
      * @return the {@link ASTNode} corresponding to the name in the given context
      */
-    private void findMethod(final ASTNode context, final String name, final List<ASTNode> resultList) {
+    /*private void findMethod(final ASTNode context, final String name, final List<ASTNode> resultList) {
         
         if(context == null || name == null) {
             return;
@@ -657,7 +690,7 @@ public class Resolver implements IResolver {
             }
         }
         return;
-    }
+    }*/
 
     /** Check the {@link MethodDeclaration} whether it matches the one we are searching for.
      * <br>This method assumes, that the names are already matching and only checks if the types of the parameters are of the same type.
@@ -667,7 +700,7 @@ public class Resolver implements IResolver {
      * @param resultList the list we add our result to, if it matches the specification
      * @return the {@link ASTNode} given as context, if all the parameter types match, else it returns null
      */
-    private void checkMethodDeclaration(final MethodDeclaration context, final List<ASTNode> resultList) {
+    /*private void checkMethodDeclaration(final MethodDeclaration context, final List<ASTNode> resultList) {
         
         // if the parameter count differs.. this method can not be the one we are searching for.
         if(currentTask.parameters.size() != context.parameters().size()) {
@@ -702,14 +735,13 @@ public class Resolver implements IResolver {
         }
         resultList.add(context);
         return;
-    }
+    }*/
     
     /**
      * Resolves the binding of the given {@link ASTNode} if possible.
      * @param jdtNode - the {@link ASTNode} we try to resolve the binding for
      * @return the {@link IBinding} if it was possible to be resolved, null otherwise
      */
-
     private IBinding resolveBinding(final ASTNode jdtNode) {
         IBinding binding = null;
 
@@ -762,7 +794,7 @@ public class Resolver implements IResolver {
                 // for labels in assignable clause
             } else if(isPrimaryExpr(jmlNode)) {
                 // for any expression in an ensures and so on
-            } else if(isCast(jmlNode)) {
+                //} else if(isCast(jmlNode)) {
                 // expression that is cast to another type
             } else {
                 throw new ResolverException("Given IASTNode is not resolvable.");
@@ -835,13 +867,13 @@ public class Resolver implements IResolver {
         return result;
     }
     
-    protected boolean isCast(final IASTNode node) {
-        // TODO: Not sure yet.. if this should be here.
+    /*protected boolean isCast(final IASTNode node) {
+        // Not sure yet.. if this should be here.
         boolean result = false;
         result = true;
         //System.out.println("[Cast]");
         return result;
-    }
+    }*/
 
     /**
      * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 

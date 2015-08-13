@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -41,25 +42,7 @@ import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 import org.key_project.util.jdt.JDTUtil;
 
-/**
- * Class to participate in the rename refactoring of java fields.
- * 
- * It uses the {@link CommentLocator} to get a list of all JML comments and 
- * the {@link Resolver} to determine if the field to be renamed is referenced.
- * The changes are added to the scheduled java changes as the JDT takes care of 
- * moving offsets in the editor and preview when several changes are made to the same file.
- * 
- * The class usually returns NULL because changes are added in-place to the Java changes except
- * if changes to JML annotations to a class need to be made for which no Java changes are needed.
- * 
- * To reduce the number of times the resolver is used, the JML annotations are first taken
- * in the form of StringNodes as filtered before the primary Nodes are computed which are 
- * then taken to the Resolver. 
- * 
- * 
- * @author Robert Heimbach
- */
-public class JMLRenameParticipantFields extends RenameParticipant {
+public class JMLRenameParticipantClass extends RenameParticipant {
 
     private IJavaElement fJavaElementToRename;
     private String fNewName;
@@ -71,7 +54,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
      */
     @Override
     public final String getName() {
-        return "JML Field Refactoring Rename Participant";
+        return "JML Class Refactoring Rename Participant";
     }
 
     /**
@@ -82,7 +65,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
     @Override
     protected final boolean initialize(final Object element) {
         fNewName = getArguments().getNewName();
-
+        System.out.println("activated");
         if (element instanceof IJavaElement) {
             fJavaElementToRename = (IJavaElement) element;
             fProject = fJavaElementToRename.getJavaProject();
@@ -167,7 +150,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
 
                         // Get scheduled changes to the java code from the rename processor
                         final TextChange changesToJavaCode = getTextChange(unit);
-
+                       
                         // add our edits to the java changes
                         // JDT will compute the shifts and the preview
                         if (changesToJavaCode != null) {
@@ -176,6 +159,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
                             }
                         }
                         else {
+                            System.out.println("no changes to Java code for "+unit);
                             // In case changes to the JML code needs to be done (but not to the java code)
                             if (!changesToJML.isEmpty()){
                                 
