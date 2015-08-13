@@ -252,6 +252,10 @@ public class ResolverTest {
     public void resolveMemberAccessTest9() throws ResolverException {
         test("field3", "getThis", 1, 0, 11, ResolveResultType.METHOD);
     }
+    @Test
+    public void resolvePackageImportType1() throws ResolverException {
+        test("field4", "containsKey", 0, 0, 1, ResolveResultType.METHOD);
+    }
 
     //TODO: write tests, that are meant to fail.
 
