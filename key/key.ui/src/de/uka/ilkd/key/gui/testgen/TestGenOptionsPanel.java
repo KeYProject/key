@@ -220,7 +220,7 @@ class TestGenOptionsPanel extends TablePanel{
 			removePostCondition = addCheckBox("Remove PostCondition", infoRemovePostcondition, settings.removePostCondition(), new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.setInvariantForAll(removePostCondition.isSelected());
+					settings.setRemovePostCondition(removePostCondition.isSelected());
 					settings.fireSettingsChanged();
 				}
 			});			
