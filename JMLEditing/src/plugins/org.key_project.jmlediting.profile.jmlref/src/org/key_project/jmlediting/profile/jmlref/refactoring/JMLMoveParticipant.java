@@ -1,9 +1,12 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -12,9 +15,11 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.PackageFragment;
 import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -50,7 +55,7 @@ public class JMLMoveParticipant extends MoveParticipant {
     private IJavaElement fToMove;        // file
 
     private String fDocName;                // file name
-    
+
     private String fOldFullQualName;        // old fully qualified
     private String fOldPackName;            // old package name
     private String fNewPackName;            // new package name
@@ -62,14 +67,14 @@ public class JMLMoveParticipant extends MoveParticipant {
     protected boolean initialize(Object element) {
         if(element instanceof IJavaElement){
             fToMove=(IJavaElement) element;
-            
+
             fDocName = fToMove.getElementName();
             fOldFullQualName=((IType) element).getFullyQualifiedName();
-            
+
             // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
             fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
             fNewPackName = ((PackageFragment) getArguments().getDestination()).getElementName();  
-            // random comment
+
             return true;
         }else{
             return false;
@@ -87,44 +92,52 @@ public class JMLMoveParticipant extends MoveParticipant {
         return new RefactoringStatus();
     }
 
-    @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
+    public Change createChange(final IProgressMonitor pm) throws CoreException,
     OperationCanceledException {
 
-        IJavaProject[] projects;
-        try {
-            projects = JDTUtil.getAllJavaProjects();
+        // Only non empty change objects will be added
+        ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
 
+        // Find out the projects which need to be checked: active project plus all dependencies
+        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>(Arrays.asList(JDTUtil.getAllJavaProjects()));
+
+        try {
             // Look through all source files in each package and project
-            for (final IJavaProject project : projects) {
+            for (final IJavaProject project : projectsToCheck) {
                 for (final IPackageFragment pac : project.getPackageFragments()) {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
-                        // compute a change for each document 
+
                         final ArrayList<ReplaceEdit> changesToJML = computeNeededChangesToJML(
                                 unit, project);
 
                         // Get scheduled changes to the java code from the rename processor
                         final TextChange changesToJavaCode = getTextChange(unit);
 
-                        // add our edits to the java changes (computes the
-                        // shifts of the words and the preview)
+                        // add our edits to the java changes
+                        // JDT will compute the shifts and the preview
                         if (changesToJavaCode != null) {
                             for (final ReplaceEdit edit : changesToJML) {
                                 changesToJavaCode.addEdit(edit);
                             }
                         }
                         else {
-                            TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());
-                            MultiTextEdit allEdits = new MultiTextEdit();
+                            // In case changes to the JML code needs to be done (but not to the java code)
+                            if (!changesToJML.isEmpty()){
 
-                            for (final ReplaceEdit edit: changesToJML) {
-                                allEdits.addChild(edit);
+                                // Gather all the edits to the text (JML annotations) in a MultiTextEdit
+                                // and add those to a change object for the given file
+                                TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());                         
+                                MultiTextEdit allEdits = new MultiTextEdit();
+
+                                for (final ReplaceEdit edit: changesToJML) {
+                                    allEdits.addChild(edit);
+                                }
+
+                                tfChange.setEdit(allEdits);
+
+                                changesToFilesWithoutJavaChanges.add(tfChange);
                             }
-
-                            tfChange.setEdit(allEdits);
-
-                            return tfChange;
                         }
                     }
                 }
@@ -133,10 +146,21 @@ public class JMLMoveParticipant extends MoveParticipant {
         catch (final JavaModelException e) {
             return null;
         }
-        return null;
+
+        // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
+        if (changesToFilesWithoutJavaChanges.isEmpty())
+            return null;
+        else {
+            CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
+            for (TextFileChange change : changesToFilesWithoutJavaChanges){
+                allChangesToFilesWithoutJavaChanges.add(change);
+            }
+            return allChangesToFilesWithoutJavaChanges;
+        }
     }
-    
-    
+
+
+
     /**
      * Computes the text changes which need to be done to JML code by finding
      * all JML comments in the file and asking the resolver if it references the
@@ -153,15 +177,14 @@ public class JMLMoveParticipant extends MoveParticipant {
      */
     private ArrayList<ReplaceEdit> computeNeededChangesToJML(
             final ICompilationUnit unit, final IJavaProject project)
-            throws JavaModelException {
-        
+                    throws JavaModelException {
+
         final ArrayList<ReplaceEdit> changesToMake = new ArrayList<ReplaceEdit>();
 
         // Look through the JML comments and find the potential references which need to be renamed
         final String source = unit.getSource();
         // return no changes if source doesn't contain our package.filename
-        if(!source.contains(fOldFullQualName))return changesToMake;
-        
+
         final CommentLocator loc = new CommentLocator(source);
 
         for (final CommentRange range : loc.findJMLCommentRanges()) {
@@ -174,7 +197,7 @@ public class JMLMoveParticipant extends MoveParticipant {
         }
         return changesToMake;
     }
-    
+
     /**
      * Searches through a given CommentRange in a source file and returns 
      * all JML comments as a potentially empty List.
@@ -194,7 +217,7 @@ public class JMLMoveParticipant extends MoveParticipant {
             throws JavaModelException {
 
         List<IASTNode> stringNodes = new ArrayList<IASTNode>();
-        
+
         final IJMLProfile activeProfile = JMLPreferencesHelper
                 .getProjectActiveJMLProfile(project.getProject());
         final IJMLParser parser = activeProfile.createParser();
@@ -206,17 +229,17 @@ public class JMLMoveParticipant extends MoveParticipant {
         catch (final ParserException e) {
             return new ArrayList<IASTNode>();
         }
- 
+
         //System.out.println("Unfiltered: "+stringNodes);
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
         //System.out.println("Filtered: "+filtedStringNodes);
-        
+
         final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult);
-        
+
         //System.out.println("Primaries: " + primaries);
         return primaries;
     }
-    
+
     /**
      * Filters a list of {@link IASTNode} for those which potentially reference 
      * the element to be renamed by comparing the name.
@@ -224,33 +247,33 @@ public class JMLMoveParticipant extends MoveParticipant {
      * @return filtered list
      */
     private ArrayList<IStringNode> filterStringNodes(final List<IASTNode> nodesList) {
-        
         final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
         String nodeString="";
-        
+
         for (final IASTNode node: nodesList){
             final IStringNode stringNode = (IStringNode) node;
-            nodeString=nodeString+stringNode.getString();
+            if(fOldFullQualName.contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
+            else nodeString="";
             // TODO: change mit contains, && statements resolved wrong
             if (nodeString.equals(fOldFullQualName)) {
                 filteredList.add(stringNode);
             }
         }
-        
+
         return filteredList;
     }
-    
-    
+
+
     private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult){
         final List<IASTNode> primaries = new ArrayList<IASTNode>();
-        
+
         for (final IStringNode stringNode: stringNodes) {       
-          final IASTNode primary = getPrimaryNode(parseResult, stringNode);
-          primaries.add(primary);  
+            final IASTNode primary = getPrimaryNode(parseResult, stringNode);
+            primaries.add(primary);  
         }
         return primaries;
     }
-    
+
     private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest) {
         return context.traverse(new INodeTraverser<IASTNode>() {
 
@@ -270,7 +293,7 @@ public class JMLMoveParticipant extends MoveParticipant {
             }        
         }, null);
     }
-    
+
     /**
      * Creates the text change and adds it to changesToMake.
      * 
@@ -283,7 +306,7 @@ public class JMLMoveParticipant extends MoveParticipant {
         IASTNode changeThisNode = node;
         // WIRD IMMER ALS PRIMARY GESEHEN
         changeThisNode = node.getChildren().get(0).getChildren().get(0);
-        
+
         final int startOffset = changeThisNode.getStartOffset();
         final int length = fOldPackName.length();
 
