@@ -36,7 +36,13 @@ import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 
-public class JMLRenameParticipantLocalVars extends RenameParticipant {
+/**
+ * Renaming of method parameters
+ * 
+ * @author Robert Heimbach
+ *
+ */
+public class JMLRenameParticipantParameters extends RenameParticipant {
 
     private String fNewName;
     private String fOldName;
@@ -47,9 +53,11 @@ public class JMLRenameParticipantLocalVars extends RenameParticipant {
     @Override
     protected boolean initialize(Object element) {
         fNewName = getArguments().getNewName();
-        System.out.println("activated local variables renaming");
         fLocalVar = (ILocalVariable) element;
-        if (fLocalVar.getDeclaringMember().getElementType() == IJavaElement.METHOD
+        
+        // check if it is a method parameter
+        // has a declaring method and a compilation unit
+        if (fLocalVar.isParameter() && fLocalVar.getDeclaringMember().getElementType() == IJavaElement.METHOD
                 && !(fLocalVar.getDeclaringMember().getCompilationUnit() == null)) {
             fOldName = fLocalVar.getElementName();
             fProject = fLocalVar.getJavaProject();
