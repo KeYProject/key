@@ -2,7 +2,6 @@ package org.key_project.jmlediting.ui.outlineView;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Comment;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;

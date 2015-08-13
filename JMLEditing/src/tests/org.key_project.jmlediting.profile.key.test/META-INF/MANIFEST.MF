@@ -8,7 +8,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.junit,
  org.key_project.jmlediting.core;bundle-version="1.0.0",
  org.key_project.jmlediting.core.test;bundle-version="1.0.0",
- org.key_project.jmlediting.ui;bundle-version="1.0.0",
  org.key_project.jmlediting.profile.key;bundle-version="1.0.0",
  org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0",
  org.key_project.jmlediting.profile.jmlref.test;bundle-version="1.0.0"

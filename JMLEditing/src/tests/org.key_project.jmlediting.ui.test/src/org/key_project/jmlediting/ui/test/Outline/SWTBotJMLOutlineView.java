@@ -3,8 +3,6 @@ package org.key_project.jmlediting.ui.test.Outline;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -33,7 +31,6 @@ public class SWTBotJMLOutlineView {
    private static final String PROJECT_NAME = "OutlineTest";
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineTestClass";
-   private static final List<String> KEYWORD_LIST = new LinkedList<String>();
    
    private static SWTBotTree tree;
    
@@ -54,16 +51,11 @@ public class SWTBotJMLOutlineView {
       
       SWTBotView view = bot.viewByTitle("Outline");
        bot.menu("Window").click().menu("Show View").click().menu("Outline").click();
-       bot.sleep(1000);
        view.show();
        tree = view.bot().tree();
-       initKeywords();
+       
    }
    
-   private static void initKeywords() {
-      KEYWORD_LIST.add("invariant");
-      
-   }
 
    @AfterClass
    public static void closeEditor() {
@@ -148,7 +140,7 @@ public class SWTBotJMLOutlineView {
    }
    
    @Test 
-   public void behaviorTest1() {
+   public void behaviorTest1Normal() {
       testbehavior("a() : void","/*@ normal_behavior\r\n   @  requires x > y;\r\n   @*/","normal_behavior requires x > y",false);
    }
    @Test 
@@ -156,14 +148,14 @@ public class SWTBotJMLOutlineView {
       testbehavior("ab() : void","/*@ behavior\r\n   @ requires x > y;\r\n   @*/","behavior requires x > y",false);
    }
    @Test 
-   public void behaviorTest3() {
+   public void behaviorTest3Exceptional() {
       testbehavior("acb() : void","/*@ exceptional_behavior\r\n   @ requires x > y;\r\n   @*/","exceptional_behavior requires x > y",false);
    }
    
    @Test
    public void addMethodWithJML() {
       bot.activeEditor().toTextEditor().insertText(79, 0, textToAdd);
-      bot.sleep(1000);
+//      bot.sleep(1000);
       testbehavior("abcdtest() : void", "/*@ behavior\r\n   @ requires 1+1;\r\n   @*/", "behavior requires 1 + 1",true);
    }
    
