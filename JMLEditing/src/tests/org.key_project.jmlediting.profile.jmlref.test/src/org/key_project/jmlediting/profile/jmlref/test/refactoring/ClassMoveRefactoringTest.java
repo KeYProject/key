@@ -190,7 +190,7 @@ public class ClassMoveRefactoringTest{
         String oracleString = getOracle(oracleFolder, REF_CLASS_NAME);
 
         TestUtilsUtil.openEditor(srcFolder.getFolder("mainpack").getFile(REF_CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        executeMoving(CLASS_NAME_MOVE, "test4p2.complex","test4p2");
+        executeMoving(CLASS_NAME_MOVE, "test4p2.complex","test4p1");
 
         String afterRenaming = getContentAfterRefactoring();
         assertEquals(oracleString,afterRenaming);
