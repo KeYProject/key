@@ -1,14 +1,14 @@
 package test;
 
-public class TestClass {
+public class OutlineUpdateTest {
    
    
    
    public static void main(String[] args) throws Exception {
       System.out.println("//@Hello  World!@//");
       int x;
-      Char c= 'a';
    }
+   
    
    public void a(){
       int x;

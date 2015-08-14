@@ -31,9 +31,11 @@ public class SWTBotJMLOutlineUpdate {
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineUpdateTest";
   
-   private static String textToAdd = "//@ invariant test;\n";
+   private static String textToAdd = "//@ invariant test;";
+   private static String textToAdd2 = "//@ invariant a < b;";
+   private static String textToAddMethod = "\t//@behavior";
    
-   private static String textToAdd2 = "//@ invariant a < b;\n";
+   
    
    private static SWTBotTree tree;
    
@@ -94,18 +96,23 @@ public class SWTBotJMLOutlineUpdate {
       }
    }
    
-//   @Test
-//   public void outlineUpdateTestOnInitialChange(){
-//      bot.activeEditor().toTextEditor().insertText(5+offset++, 1, textToAdd);
-//      //test(textToAdd, "invariant test", 1, 0);
-//      
-//   }
+   @Test
+   public void outlineUpdateTestOnEnter(){
+      bot.activeEditor().toTextEditor().insertText(5, 1, textToAdd);
+      //test(textToAdd, "invariant test", 1, offset++);
+      
+   }
    
    @Test
-   public void outlineUpdateTestOnSave() {
+   public void outlineUpdateTestSeriell() {
      addTextSeriell(6, 0, textToAdd2);
-     //bot.sleep(10000);
-     System.out.println(bot.activeEditor().toTextEditor().getText());
+     //test(textToAdd2, "//@ invariant a < b", 1, offset++);
+   }
+   
+   @Test
+   public void outlineUpdateMethod() {
+      addTextSeriell(11, 0, textToAddMethod);
+
    }
    
    

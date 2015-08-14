@@ -37,6 +37,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
@@ -50,6 +52,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
+import org.eclipse.ui.internal.handlers.WidgetMethodHandler;
 import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
@@ -60,6 +63,7 @@ import org.key_project.javaeditor.outline.OutlineLableWrapper;
 import org.key_project.javaeditor.util.ExtendableConfigurationUtil;
 import org.key_project.javaeditor.util.LogUtil;
 import org.key_project.javaeditor.util.PreferenceUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -364,7 +368,7 @@ public final class JavaEditorManager {
    private static void updateOutline(IPage outlinePage) throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
       if (outlinePage instanceof JavaOutlinePage) {
          
-         JavaOutlinePage joutline = (JavaOutlinePage) outlinePage; 
+         final JavaOutlinePage joutline = (JavaOutlinePage) outlinePage; 
     
          final TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
          final ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
@@ -384,15 +388,16 @@ public final class JavaEditorManager {
                   
                   @Override
                   public void elementChanged(ElementChangedEvent event) {
+                     //only update if it is extendable in props
                      if(PreferenceUtil.isExtensionsEnabled()){
-                        if (event.getDelta().getElement() instanceof ICompilationUnit){
+                        if (event.getDelta().getElement() instanceof ICompilationUnit){//update only if change is in ICompilationUnit and all of the changes happend to a comment
                            if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0){
-                               if (Display.getDefault() != null){
+                               if (Display.getDefault() != null && !Display.getDefault().isDisposed()){
                                  Display.getDefault().asyncExec(new Runnable() {
                                     
                                     @Override
                                     public void run() {
-                                       if (outlineViewer != null & contentProvider != null){
+                                       if (outlineViewer != null && joutline.getControl() != null){
                                           //refresh outline with Content
                                           outlineViewer.refresh(true);
                                        }
