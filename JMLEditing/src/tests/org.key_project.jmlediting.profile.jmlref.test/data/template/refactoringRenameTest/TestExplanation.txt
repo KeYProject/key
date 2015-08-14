@@ -42,4 +42,4 @@ Test19: Test with 2 Projects. One Project (referencingProject) references the ba
 Test20: Additional to test19, the referencingProject has an own field called balance.
 
 
-****** Testing Local Variable Renaming *****
+****** Testing Parameter Renaming *****

@@ -12,7 +12,7 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class RenameRefactoringTestLocalVariables {
+public class RenameRefactoringTestParameters {
     private static final String PROJECT_NAME = "JMLRefactoringRenameTestLocalVariables";
 
     private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -20,7 +20,7 @@ public class RenameRefactoringTestLocalVariables {
     private static IFolder srcFolder;
     private static IProject project;
     private static IFolder oracleFolder;
-    final String TESTPATH = "data\\template\\refactoringRenameTest\\localVars";
+    final String TESTPATH = "data\\template\\refactoringRenameTest\\parameters";
 
     @BeforeClass
     public static void initProject() throws CoreException, InterruptedException {
@@ -39,8 +39,20 @@ public class RenameRefactoringTestLocalVariables {
     }
     
     @Test
-    public void test1Simple() throws InterruptedException, CoreException {   
+    public void test1OneParameter() throws InterruptedException, CoreException {   
         RefactoringTestUtil.runLocalVariableRename(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
-                "TestClass", "test", "setBalance(int) : void", "aNewName", 5);
+                "TestClass", "test", "setBalance(int) : void", "aNewName", 6);
+    }
+    
+    @Test
+    public void test2TwoParametersFirst() throws InterruptedException, CoreException {   
+        RefactoringTestUtil.runLocalVariableRename(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "setBalance(int, boolean) : void", "aNewName", 7);
+    }
+    
+    @Test
+    public void test3TwoParametersSecond() throws InterruptedException, CoreException {   
+        RefactoringTestUtil.runLocalVariableRename(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
     }
 }
