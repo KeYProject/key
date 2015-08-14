@@ -31,12 +31,13 @@ public class SWTBotJMLOutlineUpdate {
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineUpdateTest";
   
-   private static String textToAdd = "//@ invariant test;";
+   private static String textToAdd = "//@ invariant test;\n";
    
-//   private static String textToAdd2 = "/*@ behavior\r\n     @ requires 1+1;\r\n     @*/\r\n   /**\r\n    * javadoc\r\n    */\r\n";
+   private static String textToAdd2 = "//@ invariant a < b;\n";
    
    private static SWTBotTree tree;
    
+   private int offset = 0;
    
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
@@ -86,11 +87,6 @@ public class SWTBotJMLOutlineUpdate {
    public static void closeEditor() {
       editor.close();
    }
-
-   
-   public void saveUpdate() {
-      bot.saveAllEditors();
-   }
    
    public void addTextSeriell(int startLine, int startCol, String text) {
       for (int i = 0; i < text.length(); i++ ){
@@ -98,15 +94,18 @@ public class SWTBotJMLOutlineUpdate {
       }
    }
    
-   @Test
-   public void outlineUpdateTestOnInitialChange(){
-      bot.activeEditor().toTextEditor().insertText(5, 0, textToAdd);
-      //TODO: noch saven bzw sollte angezeigt werden da init change !! weitere test kein bock auf den rotz
-      test(textToAdd, "invariant test", 1, 0);
-   }
+//   @Test
+//   public void outlineUpdateTestOnInitialChange(){
+//      bot.activeEditor().toTextEditor().insertText(5+offset++, 1, textToAdd);
+//      //test(textToAdd, "invariant test", 1, 0);
+//      
+//   }
    
+   @Test
    public void outlineUpdateTestOnSave() {
- //     bot.activeEditor().toTextEditor().insertText(line, column, text);
+     addTextSeriell(6, 0, textToAdd2);
+     //bot.sleep(10000);
+     System.out.println(bot.activeEditor().toTextEditor().getText());
    }
    
    

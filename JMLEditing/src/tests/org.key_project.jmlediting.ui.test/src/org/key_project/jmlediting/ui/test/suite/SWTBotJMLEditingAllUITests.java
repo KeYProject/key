@@ -3,6 +3,7 @@ package org.key_project.jmlediting.ui.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.key_project.jmlediting.ui.test.Outline.JMLOutlineAllTestSuit;
 import org.key_project.jmlediting.ui.test.completion.SWTBotJMLCompletionProposalComputerTest;
 import org.key_project.jmlediting.ui.test.completion.SWTBotStoreRefKeywordProposalsTest;
 import org.key_project.jmlediting.ui.test.formatter.SWTBotFormatterTest;
@@ -44,7 +45,10 @@ import org.key_project.jmlediting.ui.test.preferencepages.SWTBotProfilePropertie
    SWTBotJMLKeywordWizardTest.class,
    SWTBotJMLProfileWizardTest.class,
    SWTBotProfilePropertiesTest.class,
-   SWTBotProfilePropertiesTest2.class
+   SWTBotProfilePropertiesTest2.class,
+   // outline
+   JMLOutlineAllTestSuit.class
+  
 })
 public class SWTBotJMLEditingAllUITests {
 

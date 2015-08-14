@@ -15,6 +15,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.Position;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -137,20 +138,22 @@ public class RefactoringTestUtil {
         // select the method which uses the local variable in the outline view of the bot
         SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree(); 
         SWTBotTreeItem methodUsingLocalVar = TestUtilsUtil.selectInTree(tree, className, methodName);
+        methodUsingLocalVar.click();
         methodUsingLocalVar.doubleClick();
         
         // Switch to the editor, the method should be highlighted and the cursor behind the last character
         SWTBotEclipseEditor editor = bot.activeEditor().toTextEditor();
-        Position positionMethod = editor.cursorPosition();
-
-        editor.navigateTo(positionMethod.line, positionMethod.column + offset);
+        Position pos = editor.cursorPosition();
         
-        //editor.selectRange(positionMethod.line, positionMethod.column, 1);
+        int newPosition = pos.column + methodName.substring(0, methodName.indexOf('(')).length() + offset;
         
+        editor.navigateTo(pos.line, newPosition);
+        
+        editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
+        editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
                 
         // Change variable name in rename dialog
-        
-        SWTBotShell renameDialog = bot.shell("Rename Field");      
+        SWTBotShell renameDialog = bot.shell("Rename Local Variable");      
         setNewElementName(newName, bot, renameDialog);
     }
 
