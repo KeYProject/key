@@ -23,10 +23,17 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
@@ -503,7 +510,7 @@ public class TestCaseGenerator {
 		}
 	}
 
-	public String generateJUnitTestCase(Model m) throws IOException { // TODO: Method is never used, remove
+	public String generateJUnitTestCase(Model m, Node n) throws IOException { // TODO: Method is never used, remove
 		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
 		String mut = getMUTCall();
 		if (mut == null) {
@@ -515,8 +522,12 @@ public class TestCaseGenerator {
 		testCase.append(getFilePrefix(fileName, null) + NEW_LINE);
 		testCase.append(getMainMethod(fileName, 1) + NEW_LINE + NEW_LINE);
 		testCase.append(getTestMethodSignature(0) + "{" + NEW_LINE);
+		Map<String, Sort> typeInfMap = null;
+		if(n!=null){
+		    typeInfMap = generateTypeInferenceMap(n);
+		}
 		testCase.append("   //Test preamble: creating objects and intializing test data"
-				+ generateTestCase(m) + NEW_LINE + NEW_LINE);
+				+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
 		testCase.append("   //Calling the method under test   " + NEW_LINE + mut
 				+ NEW_LINE);
 		testCase.append("}" + NEW_LINE + "}");
@@ -594,18 +605,20 @@ public class TestCaseGenerator {
 		for (final SMTSolver solver : problemSolvers) {
 			try {
 				final StringBuffer testMethod = new StringBuffer();
-				final String originalNodeName = solver.getProblem().getGoal()
+				final String originalNodeName = solver.getProblem().getGoal()  /*TODO:Warning this is wrong if we generate a test from an inner node (e.g. closed proof tree), because goals are mutable. A Node should be used here instead. */
 						.proof().name().toString();
 				boolean success = false;
 				if (solver.getSocket().getQuery() != null) {
 					final Model m = solver.getSocket().getQuery().getModel();
 					if (TestCaseGenerator.modelIsOK(m)) {
 						logger.writeln("Generate: " + originalNodeName);
+						Map<String, Sort> typeInfMap = generateTypeInferenceMap(solver.getProblem().getGoal().node());
+						
 						testMethod.append("  //" + originalNodeName + NEW_LINE);
 						testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
 						testMethod
 						.append("   //Test preamble: creating objects and intializing test data"
-								+ generateTestCase(m) + NEW_LINE + NEW_LINE);
+								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
 
 						Set<Term> vars = new HashSet<Term>();
 						info.getProgramVariables(info.getPO(), vars);         	  
@@ -657,9 +670,107 @@ public class TestCaseGenerator {
 
 		testSuite.append(NEW_LINE + "}");
 		return testSuite;
-}
+	}
+	
+	protected String inferSort(Map<String, Sort> typeInfMap, String progVar){
+	    if(typeInfMap.containsKey(progVar)){
+	        return typeInfMap.get(progVar).name().toString();	        
+	    }
+	    System.out.println("inferSort did not find:"+progVar);
+	    return "NOTYPE";
+	}
 
-	private String getRemainingConstants(Collection<String> existingConstants, Collection<Term> newConstants){
+    protected Map<String, Sort>  generateTypeInferenceMap(Node n){
+        HashMap<String,Sort> typeInfMap = new HashMap<String,Sort>();
+        Iterator<SequentFormula> formIter = n.sequent().iterator();
+        System.out.println("\n---------------------------------------");
+        while(formIter.hasNext()){
+            Term t = formIter.next().formula();
+            generateTypeInferenceMapHelper(t,typeInfMap);
+        }
+        return typeInfMap;
+    }
+
+    private void generateTypeInferenceMapHelper(Term t, Map<String, Sort> map){
+        Operator op = t.op();
+        if(op instanceof ProgramVariable){
+            ProgramVariable pv = (ProgramVariable)t.op();
+            final String name = pv.name().toString();
+            if(map.containsKey(name)){
+                if(map.get(name)!=pv.sort()){
+                    System.out.println("ProgramVariable "+name+" is AMBIGUOUS.");                    
+                }
+            }else{
+                System.out.println("PV "+name+"  Sort: "+pv.sort()+ " KeYJavaType: "+pv.getKeYJavaType().toString());
+                map.put(name, pv.sort());
+            }
+        }/*  ObserverFunctions are query methods and ObsFunc java.lang.Object::<inv>
+        else if(op instanceof ObserverFunction){
+            ObserverFunction func = (ObserverFunction)t.op();
+            final String name = func.name().toString();
+            if(map.containsKey(name)){
+                if(map.get(name)!=func.sort()){
+                    System.out.println("ObsFunction "+name+" is AMBIGUOUS.");
+                }
+            }else{
+                System.out.println("ObsFunc "+name+"  KeYJavaType: "+func.getType());                
+                map.put(name, func.sort());
+            }
+        }*/
+        else if(op instanceof Function && !(op instanceof ObserverFunction)){
+            //This case collects fields of classes. The function itself has 
+            // sort "Field" because it is just the name of the field. To get
+            // the actual class of the field
+            Function func = (Function)t.op();
+            String name = func.name().toString();
+            Sort sort = func.sort();
+            HeapLDT hLDT = services.getTypeConverter().getHeapLDT();
+            if(sort==hLDT.getFieldSort()){
+                String fieldSort = HeapLDT.getClassName(func);
+                ProgramVariable pv = getProgramVariable(t);
+
+                if(pv!=null){
+                    name = name.replace("::$", "::");
+
+                    if(map.containsKey(name)){
+                        if(map.get(name)!=pv.sort()){
+                            System.out.println("Function "+name+" is AMBIGUOUS.");
+                        }
+                    }else{
+                        System.out.println("Func "+name+"  Sort: "+func.sort()+ 
+                                " FieldSort:"+fieldSort + "  PV.sort:"+pv.sort());                
+                        map.put(name, pv.sort());
+                    }  
+                }else{
+                    System.out.println("program variable could not be inferred:"+t.toString());
+                }
+            }
+        } 
+        
+        for(int i = 0; i<t.arity(); i++){
+            generateTypeInferenceMapHelper(t.sub(i),map);
+        }
+    }
+    
+    private ProgramVariable getProgramVariable(Term locationTerm) {
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        ProgramVariable result = null;
+        if (locationTerm.op() instanceof Function) {
+            Function function = (Function)locationTerm.op();
+            // Make sure that the function is not an array
+            if (heapLDT.getArr() != function) {
+                String typeName = HeapLDT.getClassName(function);
+                KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
+                if (type != null) {
+                    String fieldName = HeapLDT.getPrettyFieldName(function);
+                    result = services.getJavaInfo().getAttribute(fieldName, type);
+                }
+            }
+        }
+        return result;
+    }
+
+    private String getRemainingConstants(Collection<String> existingConstants, Collection<Term> newConstants){
 		String result = "";
 
 		for(Term c : newConstants){
@@ -674,9 +785,9 @@ public class TestCaseGenerator {
 					init = "false";
 				}
 
-				result += NEW_LINE +TAB+ NULLABLE+ " "+c.sort().name() + " " + c + " = " + init + ";";
+				result += NEW_LINE +TAB+ NULLABLE+ " "+ getSafeType(c.sort()) + " " + c + " = " + init + ";";
 				if(junitFormat){
-					result += NEW_LINE+TAB+ NULLABLE+ " "+c.sort().name() + " " + getPreName(c.toString()) + " = " + init + ";";
+				result += NEW_LINE+TAB+ NULLABLE+ " "+ getSafeType(c.sort()) + " " + getPreName(c.toString()) + " = " + init + ";";
 				}
 
 
@@ -718,7 +829,7 @@ public class TestCaseGenerator {
 		return res.toString();
 	}
 
-	public String generateTestCase(Model m) {
+	public String generateTestCase(Model m, Map<String, Sort> typeInfMap) {
 		/*		if(useRFL){
 			for(Sort s:m.getTypes().getJavaSorts()){
 				System.out.println("Adding sort:"+s.name());
@@ -733,7 +844,7 @@ public class TestCaseGenerator {
 		final List<Assignment> assignments = new LinkedList<Assignment>();
 		Heap heap = null;
 		for (final Heap h : m.getHeaps()) {
-			if (h.getName().equals("heap")) {
+			if (h.getName().equals(HeapLDT.BASE_HEAP_NAME.toString())) {
 				heap = h;
 				break;
 			}
@@ -754,7 +865,7 @@ public class TestCaseGenerator {
 				if (type.endsWith("[]")) {
 					right = "new " + type.substring(0, type.length() - 2) + "["
 							+ o.getLength() + "]";
-				}else if(o.getSort() == null || o.getSort().equals("Null")){
+				}else if(o.getSort() == null || o.getSort().toString().equals("Null")){
 					right = "null";
 				}else {
 					if(useRFL){
@@ -778,10 +889,15 @@ public class TestCaseGenerator {
 		for (final String c : m.getConstants().keySet()) {
 			String val = m.getConstants().get(c);
 			if (filterVal(val) && !c.equals("null")) {
+			    boolean isObject = false;
 				String type = "int";
+				String declType = "int";
 				if (val.equals("true") || val.equals("false")) {
 					type = "boolean";
 				} else if (val.startsWith("#o")) {
+				    isObject = true;
+				    type = this.inferSort(typeInfMap, c);
+				    /*
 					final ObjectVal o = getObject(heap, val);
 					if (o != null) {
 						if (val.equals("#o0")
@@ -789,17 +905,24 @@ public class TestCaseGenerator {
 							type = m.getTypes().getOriginalConstantType(c)
 									.name().toString();
 						} else {
-							type = o.getSort().name().toString();
+							type = getSafeType(o.getSort()); //o.getSort().name().toString();
 						}
 					} else {
 						type = "Object";
 					}
-					type = NULLABLE +" "+ type;
+					*/
+                    
+				}
+				if(isObject){
+                    declType = NULLABLE +" "+type;
+				}
+				else{
+                    declType = type;				    
 				}
 				val = translateValueExpression(val);
-				assignments.add(new Assignment(type, c, val));
-				if(junitFormat && type.startsWith(NULLABLE) && isInPrestate(prestate, val)){
-					assignments.add(new Assignment(type, getPreName(c), getPreName(val)));
+				assignments.add(new Assignment(declType, c, "("+type+")"+val));
+				if(junitFormat && isObject && isInPrestate(prestate, val)){
+					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
 				}
 			}
 		}
@@ -817,13 +940,15 @@ public class TestCaseGenerator {
 					String fieldName = f.substring(f.lastIndexOf(":") + 1);
 					fieldName = fieldName.replace("|", "");
 					String val = o.getFieldvalues().get(f);
-					final String vType = getTypeOfValue(heap, m, val);
+					//final String vType = getTypeOfValue(heap, m, val);
+                    String fieldName2 = f.replace("|","");
+					final String vType = this.inferSort(typeInfMap, fieldName2); //getTypeOfValue(heap, m, val);
 					rflCreator.addSort(vType); //possible bug if vType represents an abstract type or an interface. See: getSafeType.
 					//System.out.println("Added sort (init fields):"+vType);
 					val = translateValueExpression(val);
 					final String rcObjType = getSafeType(o.getSort());
 					assignments
-					.add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), val));
+					.add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), "("+vType+")"+val));
 
 					if(junitFormat && isInPrestate(prestate, o)){
 						//if value that is pointed to is object and in prestate then use prestate object
@@ -834,7 +959,7 @@ public class TestCaseGenerator {
 						
 						
 						assignments
-						.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName), val));
+						.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName),"("+vType+")"+ val));
 					}
 
 				}
@@ -1046,7 +1171,7 @@ public class TestCaseGenerator {
 
 
 	public String getSafeType(Sort sort) {
-		if (sort == null || sort.name().equals("Null")) {
+		if (sort == null || sort.name().toString().equals("Null")) {
 			return "java.lang.Object"; // TODO:Hopefully this is correct
 		} else if (sort.isAbstract()) {
 			return buildDummyClassForAbstractSort(sort);
