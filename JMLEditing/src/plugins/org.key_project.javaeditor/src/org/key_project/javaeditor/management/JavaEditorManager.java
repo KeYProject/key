@@ -74,9 +74,6 @@ public final class JavaEditorManager {
     */
    public static final JavaEditorManager instance = new JavaEditorManager();
      
-   private static TreeViewer outlineViewer = null;
-   private static ITreeContentProvider contentProvider = null;
-
    /**
     * Listens for changes on {@link PreferenceUtil#getStore()}.
     */
@@ -199,7 +196,6 @@ public final class JavaEditorManager {
    public void start() {
       if (PreferenceUtil.isExtensionsEnabled()) {
          IWorkbench workbench = PlatformUI.getWorkbench();
-//         JavaCore.addElementChangedListener(elementListener);
          workbench.addWindowListener(windowListener);
          for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
             init(window);
@@ -370,10 +366,11 @@ public final class JavaEditorManager {
          
          JavaOutlinePage joutline = (JavaOutlinePage) outlinePage; 
     
-         outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
-         contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
+         final TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
+         final ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
          
-         outlineViewer.setLabelProvider(new OutlineLableWrapper(new AppearanceAwareLabelProvider())); //Set new LableProvider to an extended one with overwritten getImage method
+         //Set new LableProvider to an extended one with overwritten getImage method
+         outlineViewer.setLabelProvider(new OutlineLableWrapper(new AppearanceAwareLabelProvider()));
          if (contentProvider instanceof OutlineContentProviderWrapper) {
             if (!PreferenceUtil.isExtensionsEnabled()) { // Restore input if required
                outlineViewer.setContentProvider(((OutlineContentProviderWrapper) contentProvider).getOriginalProvider());
@@ -381,7 +378,8 @@ public final class JavaEditorManager {
          }
          else {
             if (PreferenceUtil.isExtensionsEnabled()) { // Change input if required
-//               outlineViewer.setContentProvider(new OutlineContentProviderWrapper(contentProvider));
+               outlineViewer.setContentProvider(new OutlineContentProviderWrapper(contentProvider));
+               //add Listener That gets called to ElementChanges in ICompilationunits
                JavaCore.addElementChangedListener(new IElementChangedListener() {
                   
                   @Override
@@ -390,12 +388,13 @@ public final class JavaEditorManager {
                         if (event.getDelta().getElement() instanceof ICompilationUnit){
                            if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0){
                                if (Display.getDefault() != null){
-                                 Display.getDefault().syncExec(new Runnable() {
+                                 Display.getDefault().asyncExec(new Runnable() {
                                     
                                     @Override
                                     public void run() {
                                        if (outlineViewer != null & contentProvider != null){
-                                          outlineViewer.setContentProvider(new OutlineContentProviderWrapper(contentProvider));  
+                                          //refresh outline with Content
+                                          outlineViewer.refresh(true);
                                        }
                                     }
                                  });
