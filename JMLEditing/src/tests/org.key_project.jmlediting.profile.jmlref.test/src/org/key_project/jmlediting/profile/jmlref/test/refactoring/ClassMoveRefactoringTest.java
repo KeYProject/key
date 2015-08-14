@@ -113,7 +113,7 @@ public class ClassMoveRefactoringTest{
     @Test
     public void test1SimpleMove() throws InterruptedException, CoreException {
 
-        final String path = "data\\template\\refactoringMoveTest\\test1";
+        final String path = "data\\template\\refactoringMoveTest\\moveClassTest\\test1";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
 
@@ -136,7 +136,7 @@ public class ClassMoveRefactoringTest{
     @Test
     public void test2MoveComplexPackage() throws InterruptedException, CoreException {
         
-        final String path = "data\\template\\refactoringMoveTest\\test2";
+        final String path = "data\\template\\refactoringMoveTest\\moveClassTest\\test2";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
 
@@ -158,7 +158,7 @@ public class ClassMoveRefactoringTest{
     @Test
     public void test3MoveUseOps() throws InterruptedException, CoreException {
         
-        final String path = "data\\template\\refactoringMoveTest\\test3";
+        final String path = "data\\template\\refactoringMoveTest\\moveClassTest\\test3";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
 
@@ -180,7 +180,7 @@ public class ClassMoveRefactoringTest{
     @Test
     public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
         
-        final String path = "data\\template\\refactoringMoveTest\\test4";
+        final String path = "data\\template\\refactoringMoveTest\\moveClassTest\\test4";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
 
