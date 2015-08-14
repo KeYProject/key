@@ -34,9 +34,9 @@
      <extension
    point="org.eclipse.ltk.core.refactoring.renameParticipants">
 <renameParticipant
-      class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLRenameParticipantLocalVars"
-      id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantLocalVars"
-      name="%renameJMLParticipantLocalVars">
+      class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLRenameParticipantParameters"
+      id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantParameters"
+      name="%renameJMLParticipantParameters">
       <enablement>
         <with variable="affectedNatures">
           <iterate operator="or">

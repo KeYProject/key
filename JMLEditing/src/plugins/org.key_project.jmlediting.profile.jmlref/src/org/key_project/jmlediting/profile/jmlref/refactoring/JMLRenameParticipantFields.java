@@ -289,7 +289,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
         
         final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
         
-        System.out.println("Primaries: " + primaries);
+        //System.out.println("Primaries: " + primaries);
         return primaries;
     }
 

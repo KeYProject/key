@@ -13,7 +13,7 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class RenameRefactoringTestParameters {
-    private static final String PROJECT_NAME = "JMLRefactoringRenameTestLocalVariables";
+    private static final String PROJECT_NAME = "JMLRefactoringRenameTestParameters";
 
     private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
        
@@ -53,6 +53,12 @@ public class RenameRefactoringTestParameters {
     @Test
     public void test3TwoParametersSecond() throws InterruptedException, CoreException {   
         RefactoringTestUtil.runLocalVariableRename(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
+    }
+    
+    @Test
+    public void test4FieldAndOtherMethodUsingSameName() throws InterruptedException, CoreException {   
+        RefactoringTestUtil.runLocalVariableRename(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
     }
 }
