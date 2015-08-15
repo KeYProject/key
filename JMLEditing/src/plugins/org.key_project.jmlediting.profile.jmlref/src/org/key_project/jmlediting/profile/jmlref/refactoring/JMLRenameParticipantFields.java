@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
@@ -136,20 +137,11 @@ public class JMLRenameParticipantFields extends RenameParticipant {
             for (IJavaProject project: allProjects){
                 String[] requiredProjectNames = project.getRequiredProjectNames();
                 
-                //System.out.println(project.getPath());
-                //System.out.println(requiredProjectNames.length);
-                
                 if (requiredProjectNames.length > 0) {
                     
-                    // To create an IJavaProject from the project's name
-                    //IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-                    
                     for (String requiredProject: requiredProjectNames){
-                        //System.out.println("required: "+requiredProject);
-                        //System.out.println("project's name: "+fProject.getElementName());
                         
                         if (requiredProject.equals(fProject.getElementName())) {
-                            //projectsToCheck.add(JavaCore.create(workspaceRoot.getProject(project)));
                             projectsToCheck.add(project);
                         }
                     } 
@@ -158,9 +150,8 @@ public class JMLRenameParticipantFields extends RenameParticipant {
             
             // Look through all source files in each package and project
             for (final IJavaProject project : projectsToCheck) {
-                for (final IPackageFragment pac : project.getPackageFragments()) {
-                    for (final ICompilationUnit unit : pac
-                            .getCompilationUnits()) {
+                for (final IPackageFragment pac : getAllPackageFragmentsContainingSources(project)) {
+                    for (final ICompilationUnit unit : pac.getCompilationUnits()) {
                          
                         final ArrayList<ReplaceEdit> changesToJML = computeNeededChangesToJML(
                                 unit, project);
@@ -283,13 +274,10 @@ public class JMLRenameParticipantFields extends RenameParticipant {
             return new ArrayList<IASTNode>();
         }
  
-        //System.out.println("Unfiltered: "+stringNodes);
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
-        //System.out.println("Filtered: "+filtedStringNodes);
         
         final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
         
-        //System.out.println("Primaries: " + primaries);
         return primaries;
     }
 
@@ -345,7 +333,6 @@ public class JMLRenameParticipantFields extends RenameParticipant {
                 // If the KeY Profile is not used, the primary node from the assignable node
                 // cannot be found. Resolver will still resolve the string node though.
                 if (notKeYProfile && existing == null){
-                    //System.out.println("primary found: null");
                     return toTest;
                 }     
                 else
@@ -457,5 +444,26 @@ public class JMLRenameParticipantFields extends RenameParticipant {
 
         changesToMake.add(edit);
     }
+    
+    private ArrayList<IPackageFragment> getAllPackageFragmentsContainingSources(IJavaProject project) throws JavaModelException {
+        
+        ArrayList<IPackageFragment> allFragments = new ArrayList<IPackageFragment>();
+        
+        IPackageFragmentRoot[] roots = project.getPackageFragmentRoots();
+        
+        // Checks each roots if it contains source/class files and adds those to the arraylist.
+        for (IPackageFragmentRoot root: roots){
+            if (!root.isArchive()) {
+                IJavaElement[] children = root.getChildren();            
+                for (IJavaElement child: children){
+                    if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT)
+                        allFragments.add((IPackageFragment)child);
+                }
+            }
+        }
+        
+        return allFragments;
+    }
+
     
 }
