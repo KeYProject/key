@@ -40,12 +40,15 @@ import org.key_project.util.jdt.JDTUtil;
 @SuppressWarnings("restriction")
 public class JMLMoveParticipantSMethod extends MoveParticipant {
 
-    private SourceMethod methodToMove;        // file
+    private SourceMethod methodToMove;
     private String methName;
     
-    private String oldClassFullQualName;                // file name
+    private String oldClassFullQualName;        // fully qualified names of old and new classes
     private String newClassFullQualName;
     
+    /**
+     * {@inheritDoc} Initializes the source and destination paths, aswell as the method to move itself.
+     */
     @Override
     protected boolean initialize(Object element) {
         if(element instanceof SourceMethod){
@@ -59,11 +62,19 @@ public class JMLMoveParticipantSMethod extends MoveParticipant {
         }
     }
 
+    /**
+     * Name of this class. {@inheritDoc}
+     */
     @Override
     public String getName() {
-        return "JML Field Move Participant";
+        return "JML Method Move Participant";
     }
 
+    /**
+     * Do nothing.
+     *
+     * {@inheritDoc}
+     */
     @Override
     public RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
@@ -271,6 +282,12 @@ public class JMLMoveParticipantSMethod extends MoveParticipant {
         }, null);
     }
     
+    /**
+     * Creates the text change and adds it to changesToMake.
+     * 
+     * @param changesToMake
+     * @param node
+     */
     private void computeReplaceEdit(final ArrayList<ReplaceEdit> changesToMake,
             final IASTNode node) {
 

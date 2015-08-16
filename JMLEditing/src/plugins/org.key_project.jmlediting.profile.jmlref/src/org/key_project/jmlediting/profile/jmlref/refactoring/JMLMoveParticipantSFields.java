@@ -37,14 +37,26 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 import org.key_project.util.jdt.JDTUtil;
 
+/**
+ * Class to participate in the move refactoring of static fields.
+ * 
+ * It uses the {@link CommentLocator} to get a list of all JML comments.
+ * The changes are added to the scheduled java changes as the JDT takes care of 
+ * moving offsets in the editor and preview when several changes are made to the same file.
+ * 
+ * @author Maksim Melnik
+ */
 public class JMLMoveParticipantSFields extends MoveParticipant {
 
-    private IJavaElement fieldToMove;        // file
+    private IJavaElement fieldToMove;        // field
     private String fieldName;
     
-    private String oldClassFullQualName;                // file name
+    private String oldClassFullQualName;                // fully qualified name of the old class
     private String newClassFullQualName;
     
+    /**
+     * {@inheritDoc} Initializes the source and destination paths, aswell as the field to move itself.
+     */
     @Override
     protected boolean initialize(Object element) {
         if(element instanceof IJavaElement){
@@ -58,11 +70,19 @@ public class JMLMoveParticipantSFields extends MoveParticipant {
         }
     }
 
+    /**
+     * Name of this class. {@inheritDoc}
+     */
     @Override
     public String getName() {
         return "JML Field Move Participant";
     }
 
+    /**
+     * Do nothing.
+     *
+     * {@inheritDoc}
+     */
     @Override
     public RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
@@ -161,8 +181,7 @@ public class JMLMoveParticipantSFields extends MoveParticipant {
 
         // Look through the JML comments and find the potential references which need to be renamed
         final String source = unit.getSource();
-        // return no changes if source doesn't contain our package.filename
-
+       
         final CommentLocator loc = new CommentLocator(source);
 
         for (final CommentRange range : loc.findJMLCommentRanges()) {
@@ -208,13 +227,10 @@ public class JMLMoveParticipantSFields extends MoveParticipant {
             return new ArrayList<IASTNode>();
         }
 
-        //System.out.println("Unfiltered: "+stringNodes);
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
-        //System.out.println("Filtered: "+filtedStringNodes);
 
         final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult);
 
-        //System.out.println("Primaries: " + primaries);
         return primaries;
     }
     
@@ -270,6 +286,12 @@ public class JMLMoveParticipantSFields extends MoveParticipant {
         }, null);
     }
     
+    /**
+     * Creates the text change and adds it to changesToMake.
+     * 
+     * @param changesToMake
+     * @param node
+     */
     private void computeReplaceEdit(final ArrayList<ReplaceEdit> changesToMake,
             final IASTNode node) {
 

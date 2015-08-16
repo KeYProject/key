@@ -39,7 +39,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
 import org.key_project.util.jdt.JDTUtil;
 
 /**
- * Class to participate in the move refactoring of java fields.
+ * Class to participate in the move refactoring of java classes.
  * 
  * It uses the {@link CommentLocator} to get a list of all JML comments.
  * The changes are added to the scheduled java changes as the JDT takes care of 
@@ -78,17 +78,36 @@ public class JMLMoveParticipantClass extends MoveParticipant {
         }
     }
 
+    /**
+     * Name of this class. {@inheritDoc}
+     */
     @Override
     public String getName() {
         return "JML Field Move Participant";
     }
 
+    /**
+     * Do nothing.
+     *
+     * {@inheritDoc}
+     */
     @Override
     public RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
         return new RefactoringStatus();
     }
 
+    /**
+     * Computes the changes which need to be done to the JML code and
+     * add those to the changes to the java code which are already scheduled.
+     * 
+     * @return Returns null if only shared text changes are made. Otherwise
+     * returns a TextChange Object which gathered all the changes to JML annotations 
+     * in class which does not have any Java changes scheduled.
+     * 
+     *  {@inheritDoc}
+     *
+     */
     public Change createChange(final IProgressMonitor pm) throws CoreException,
     OperationCanceledException {
 
@@ -181,7 +200,8 @@ public class JMLMoveParticipantClass extends MoveParticipant {
         // Look through the JML comments and find the potential references which need to be renamed
         final String source = unit.getSource();
         // return no changes if source doesn't contain our package.filename
-
+        if(!source.contains(fOldFullQualName))return changesToMake;
+        
         final CommentLocator loc = new CommentLocator(source);
 
         for (final CommentRange range : loc.findJMLCommentRanges()) {
@@ -227,13 +247,10 @@ public class JMLMoveParticipantClass extends MoveParticipant {
             return new ArrayList<IASTNode>();
         }
 
-        //System.out.println("Unfiltered: "+stringNodes);
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
-        //System.out.println("Filtered: "+filtedStringNodes);
-
+       
         final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult);
 
-        //System.out.println("Primaries: " + primaries);
         return primaries;
     }
 
@@ -251,7 +268,6 @@ public class JMLMoveParticipantClass extends MoveParticipant {
             final IStringNode stringNode = (IStringNode) node;
             if(fOldFullQualName.contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
             else nodeString="";
-            // TODO: change mit contains, && statements resolved wrong
             if (nodeString.equals(fOldFullQualName)) {
                 filteredList.add(stringNode);
             }
@@ -301,7 +317,6 @@ public class JMLMoveParticipantClass extends MoveParticipant {
             final IASTNode node) {
 
         IASTNode changeThisNode = node;
-        // WIRD IMMER ALS PRIMARY GESEHEN
         changeThisNode = node.getChildren().get(0).getChildren().get(0);
 
         final int startOffset = changeThisNode.getStartOffset();
