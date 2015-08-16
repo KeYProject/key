@@ -48,7 +48,7 @@ import org.key_project.util.jdt.JDTUtil;
  * @author Maksim Melnik
  */
 @SuppressWarnings("restriction")
-public class JMLMoveParticipant extends MoveParticipant {
+public class JMLMoveParticipantClass extends MoveParticipant {
     private IJavaElement fToMove;        // file
 
     private String fDocName;                // file name

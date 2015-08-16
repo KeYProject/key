@@ -70,9 +70,9 @@
      <extension
 point="org.eclipse.ltk.core.refactoring.moveParticipants">
 <moveParticipant
-     id="org.eclipse.jdt.junit.moveTypeParticipant"
-     name="Test Move Participant"
-class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipant">
+     id="org.eclipse.jdt.junit.moveClassParticipant"
+     name="JML Move Participant Class"
+class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipantClass">
      <enablement>
        <with variable="affectedNatures">
          <iterate operator="or">
@@ -88,9 +88,9 @@ class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipant"
      <extension
            point="org.eclipse.ltk.core.refactoring.moveParticipants">
         <moveParticipant
-              class="org.key_project.jmlediting.profile.jmlref.refactoring.MoveParticipantSMethod"
-              id="org.key_project.jmlediting.profile.jmlref.moveParticipantMethods"
-              name="Move Participant Static Methods">
+              class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipantSMethod"
+              id="org.key_project.jmlediting.profile.jmlref.moveSMethodParticipant"
+              name="JML Move Participant Static Methods">
            <enablement>
            <with variable="affectedNatures">
          <iterate operator="or">
@@ -101,6 +101,24 @@ class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipant"
          <instanceof value="org.eclipse.jdt.core.IMethod"/>
        </with>
            </enablement>
+        </moveParticipant>
+     </extension>
+     <extension
+           point="org.eclipse.ltk.core.refactoring.moveParticipants">
+        <moveParticipant
+              class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipantSFields"
+              id="org.key_project.jmlediting.profile.jmlref.moveSFieldParticipant1"
+              name="JML Move Participant Static Fields">
+           <enablement>
+           <with variable="affectedNatures">
+                <iterate operator="or">
+                  <equals value="org.eclipse.jdt.core.javanature"/>
+                </iterate>
+              </with>
+              <with variable="element">
+                <instanceof value="org.eclipse.jdt.core.IField"/>
+              </with>
+              </enablement>
         </moveParticipant>
      </extension>
 </plugin>

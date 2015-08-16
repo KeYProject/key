@@ -9,11 +9,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.core.SourceMethod;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -37,21 +37,20 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 import org.key_project.util.jdt.JDTUtil;
 
-@SuppressWarnings("restriction")
-public class MoveParticipantSMethod extends MoveParticipant {
+public class JMLMoveParticipantSFields extends MoveParticipant {
 
-    private SourceMethod methodToMove;        // file
-    private String methName;
+    private IJavaElement fieldToMove;        // file
+    private String fieldName;
     
     private String oldClassFullQualName;                // file name
     private String newClassFullQualName;
     
     @Override
     protected boolean initialize(Object element) {
-        if(element instanceof SourceMethod){
-            methodToMove=(SourceMethod) element;
-            methName=methodToMove.getElementName();
-            oldClassFullQualName=((IType) methodToMove.getParent()).getFullyQualifiedName();
+        if(element instanceof IJavaElement){
+            fieldToMove=(IJavaElement) element;
+            fieldName=fieldToMove.getElementName();
+            oldClassFullQualName=((IType) fieldToMove.getParent()).getFullyQualifiedName();
             newClassFullQualName=((IType) getArguments().getDestination()).getFullyQualifiedName();
             return true;
         }else{
@@ -231,9 +230,9 @@ public class MoveParticipantSMethod extends MoveParticipant {
 
         for (final IASTNode node: nodesList){
             final IStringNode stringNode = (IStringNode) node;
-            if((oldClassFullQualName+"."+methName).contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
+            if((oldClassFullQualName+"."+fieldName).contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
             else nodeString="";
-            if (nodeString.equals(oldClassFullQualName+"."+methName)) {
+            if (nodeString.equals(oldClassFullQualName+"."+fieldName)) {
                 filteredList.add(stringNode);
             }
         }
