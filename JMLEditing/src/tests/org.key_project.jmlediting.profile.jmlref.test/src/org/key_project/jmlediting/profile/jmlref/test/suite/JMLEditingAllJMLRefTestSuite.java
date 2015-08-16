@@ -16,6 +16,7 @@ import org.key_project.jmlediting.profile.jmlref.test.parser.SpecificationStatem
 import org.key_project.jmlediting.profile.jmlref.test.parser.SpecificationStatementTest;
 import org.key_project.jmlediting.profile.jmlref.test.parser.StoreRefParserTest;
 import org.key_project.jmlediting.profile.jmlref.test.profile.JMLRefDerivedProfileTest;
+import org.key_project.jmlediting.profile.jmlref.test.refactoring.TestSuiteRenameRefactoring;
 
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -33,7 +34,9 @@ import org.key_project.jmlediting.profile.jmlref.test.profile.JMLRefDerivedProfi
    SpecificationStatementTest.class,
    StoreRefParserTest.class,
    // profile
-   JMLRefDerivedProfileTest.class
+   JMLRefDerivedProfileTest.class,
+   // rename refactoring
+   TestSuiteRenameRefactoring.class
 })
 public class JMLEditingAllJMLRefTestSuite {
 

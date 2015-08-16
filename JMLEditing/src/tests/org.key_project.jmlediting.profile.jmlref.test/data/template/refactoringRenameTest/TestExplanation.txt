@@ -43,3 +43,7 @@ Test20: Additional to test19, the referencingProject has an own field called bal
 
 
 ****** Testing Parameter Renaming *****
+Test1: One method, one parameter.
+Test2: One method, two parameters, renamed parameter is first.
+Test3: One method, two parameters, renamed parameter is second.
+Test4: Field with same name. Other method (constructor) using parameter with same name.

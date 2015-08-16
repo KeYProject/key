@@ -189,13 +189,10 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
             return new ArrayList<IASTNode>();
         }
  
-        //System.out.println("Unfiltered: "+stringNodes);
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
-        //System.out.println("Filtered: "+filtedStringNodes);
         
         final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
-        
-        //System.out.println("Primaries: " + primaries);
+
         return primaries;
     }
 
@@ -251,7 +248,6 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
                 // If the KeY Profile is not used, the primary node from the assignable node
                 // cannot be found. Resolver will still resolve the string node though.
                 if (notKeYProfile && existing == null){
-                    //System.out.println("primary found: null");
                     return toTest;
                 }     
                 else
