@@ -12,6 +12,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.JavaModel;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -89,6 +90,12 @@ public class JMLRenameParticipantClass extends RenameParticipant {
         return new RefactoringStatus();
     }
 
+    @Override
+    public Change createChange(final IProgressMonitor pm) {
+        System.out.println("computing a change");
+        return null;
+    }
+    
     /**
      * Computes the changes which need to be done to the JML code and
      * add those to the changes to the java code which are already scheduled.
@@ -101,8 +108,10 @@ public class JMLRenameParticipantClass extends RenameParticipant {
      *
      */
     @Override
-    public Change createChange(final IProgressMonitor pm) throws CoreException,
+    public Change createPreChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
+        
+        System.out.println("computing a pre change");
 
         // Only non empty change objects will be added
         ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
@@ -110,7 +119,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
         // Find out the projects which need to be checked: active project plus all dependencies
         ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
         projectsToCheck.add(fProject);
-
+        
         try {
             // Iterate through all java projects and check for projects which require the active project
             IJavaProject[] allProjects = JDTUtil.getAllJavaProjects();
@@ -149,6 +158,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
 
                         // Get scheduled changes to the java code from the rename processor
                         final TextChange changesToJavaCode = getTextChange(unit);
+                        
                        
                         // add our edits to the java changes
                         // JDT will compute the shifts and the preview
@@ -172,7 +182,6 @@ public class JMLRenameParticipantClass extends RenameParticipant {
                                 }
 
                                 tfChange.setEdit(allEdits);
-                                
                                 changesToFilesWithoutJavaChanges.add(tfChange);
                             }
                         }
@@ -192,7 +201,10 @@ public class JMLRenameParticipantClass extends RenameParticipant {
             for (TextFileChange change : changesToFilesWithoutJavaChanges){
                 allChangesToFilesWithoutJavaChanges.add(change);
             }
+   
+            //allChangesToFilesWithoutJavaChanges.perform(pm);
             return allChangesToFilesWithoutJavaChanges;
+            //return null;
         }
     }
 
