@@ -20,6 +20,11 @@ import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 
+/**
+ * 
+ * @author Robert Heimbach, Maksim Melnik
+ *
+ */
 public abstract class DefaultMoveRefactoringComputer implements
         IRefactoringComputer {
 
@@ -51,8 +56,6 @@ public abstract class DefaultMoveRefactoringComputer implements
 
         // Look through the JML comments and find the potential references which need to be renamed
         final String source = unit.getSource();
-        // return no changes if source doesn't contain our package.filename
-        //if(!source.contains(fOldFullQualName))return changesToMake;  // only for Class
         
         final CommentLocator loc = new CommentLocator(source);
 

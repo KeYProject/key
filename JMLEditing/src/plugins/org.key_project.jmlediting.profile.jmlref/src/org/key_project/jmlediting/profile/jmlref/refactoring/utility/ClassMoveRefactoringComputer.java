@@ -28,7 +28,6 @@ public class ClassMoveRefactoringComputer extends
         this.fOldFullQualName = fOldFullQualName;
     }
 
-    @Override
     protected List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
         final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
         String nodeString="";

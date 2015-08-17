@@ -23,7 +23,6 @@ public class FieldMoveRefactoringComputer extends
         this.fieldName = fieldName;
     }
 
-    @Override
     protected List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
         final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
         String nodeString="";
