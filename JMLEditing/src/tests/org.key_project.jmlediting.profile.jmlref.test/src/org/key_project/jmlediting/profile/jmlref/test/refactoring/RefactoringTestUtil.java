@@ -116,19 +116,18 @@ public class RefactoringTestUtil {
     }
     
     /**
-     * Renames a local variable by selecting the method which uses the local variable, called methodName,
-     * in the outline and then moving offset to the right in the text editor to select the local 
-     * variable / parameter to be renamed. 
+     * Renames a parameter by selecting the method which uses the parameter, called methodName,
+     * in the outline and then moving offset to the right in the text editor to select the parameter to be renamed. 
      * 
-     * @param methodName the method's name which uses the local variable.
+     * @param methodName the method's name which uses the parameter.
      * @param className the class the field is in (without .java file ending).
      * @param packageName name of the package the class is in.
      * @param srcFolder sourceFolder of the class className.
      * @param newName the new name to change the local variable's name to.
      * @param bot SWTWorkbenchBot to select the outline view from.
-     * @param offset move offset to the right to select the local variable in the text editor.
+     * @param offset move offset to the right to select the parameter in the text editor.
      */
-    public static void selectLocalVariableAndExecuteRenaming(String methodName, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot, int offset){
+    public static void selectParameterAndExecuteRenaming(String methodName, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot, int offset){
         
         TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
@@ -298,7 +297,7 @@ public class RefactoringTestUtil {
     }
     
     /**
-     * Runs a local variable rename test.
+     * Runs a parameter rename test.
      * 
      * @param path the path of the test files with the sub folders \src and \oracle. 
      * @param srcFolder the folder of the source files to load into eclipse.
@@ -307,17 +306,17 @@ public class RefactoringTestUtil {
      * @param className the class the field to be renamed is in.
      * @param packageName name of the package the class is in.
      * @param methodName how the method which uses the local variable to be renamed appears in the outline.
-     * @param newName the local variable's new name.
-     * @param offset how much in the text editor to move to the right to select the local variable when the methodName is selected.
+     * @param newName the parameter's new name.
+     * @param offset how much in the text editor to move to the right to select the parameter when the methodName is selected.
      * @throws CoreException
      */
-    public static void runLocalVariableRename(String path, IFolder srcFolder, IFolder oracleFolder, 
+    public static void runParameterRename(String path, IFolder srcFolder, IFolder oracleFolder, 
             SWTWorkbenchBot bot, String className, String packageName, String methodName, String newName, int offset) throws CoreException {
         
         copyFiles(path + "\\src", srcFolder);
         copyFiles(path + "\\oracle", oracleFolder);
         
-        selectLocalVariableAndExecuteRenaming(methodName, className, packageName, srcFolder, newName, bot, offset);
+        selectParameterAndExecuteRenaming(methodName, className, packageName, srcFolder, newName, bot, offset);
         
         assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
