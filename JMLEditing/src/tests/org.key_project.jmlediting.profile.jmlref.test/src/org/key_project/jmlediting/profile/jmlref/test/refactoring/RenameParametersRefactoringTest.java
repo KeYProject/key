@@ -12,7 +12,7 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class RenameRefactoringTestParameters {
+public class RenameParametersRefactoringTest {
     private static final String PROJECT_NAME = "JMLRefactoringRenameTestParameters";
 
     private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();

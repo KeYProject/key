@@ -73,7 +73,6 @@ public class JMLRenameParticipantClass extends RenameParticipant {
 
     @Override
     public Change createChange(final IProgressMonitor pm) {
-        System.out.println("computing a change");
         return null;
     }
     
@@ -91,8 +90,6 @@ public class JMLRenameParticipantClass extends RenameParticipant {
     @Override
     public Change createPreChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
-        
-        System.out.println("computing a pre change");
 
         // Only non empty change objects will be added
         ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
@@ -133,8 +130,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
 
                         // Get scheduled changes to the java code from the rename processor
                         final TextChange changesToJavaCode = getTextChange(unit);
-                        
-                       
+                                 
                         // add our edits to the java changes
                         // JDT will compute the shifts and the preview
                         if (changesToJavaCode != null) {
@@ -143,7 +139,6 @@ public class JMLRenameParticipantClass extends RenameParticipant {
                             }
                         }
                         else {
-                            System.out.println("no changes to Java code for "+unit);
                             // In case changes to the JML code needs to be done (but not to the java code)
                             if (!changesToJML.isEmpty()){
                                 
@@ -177,9 +172,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
                 allChangesToFilesWithoutJavaChanges.add(change);
             }
    
-            //allChangesToFilesWithoutJavaChanges.perform(pm);
             return allChangesToFilesWithoutJavaChanges;
-            //return null;
         }
     }
     

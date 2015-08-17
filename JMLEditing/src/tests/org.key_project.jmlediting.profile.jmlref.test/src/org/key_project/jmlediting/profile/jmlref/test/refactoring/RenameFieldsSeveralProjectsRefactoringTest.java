@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class RenameRefactoringTestFieldsSeveralProjects {
+public class RenameFieldsSeveralProjectsRefactoringTest {
 
     private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
        

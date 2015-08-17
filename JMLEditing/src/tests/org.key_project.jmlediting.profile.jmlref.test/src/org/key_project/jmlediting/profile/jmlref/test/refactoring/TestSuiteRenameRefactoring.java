@@ -6,9 +6,10 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    RenameRefactoringTestFields.class,
-    RenameRefactoringTestFieldsSeveralProjects.class,
-    RenameRefactoringTestParameters.class
+    RenameFieldsRefactoringTest.class,
+    RenameFieldsSeveralProjectsRefactoringTest.class,
+    RenameParametersRefactoringTest.class,
+    RenameClassesRefactoringTest.class
 })
 
 public class TestSuiteRenameRefactoring {
