@@ -100,7 +100,7 @@ public class RefactoringTestUtil {
      * @param newName the new name to change the field's name to.
      * @param bot SWTWorkbenchBot to select the outline view from.
      */
-    public static void selectFieldAndExecuteRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot){
+    static void selectFieldAndExecuteRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot){
         
         TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
@@ -127,7 +127,7 @@ public class RefactoringTestUtil {
      * @param bot SWTWorkbenchBot to select the outline view from.
      * @param offset move offset to the right to select the parameter in the text editor.
      */
-    public static void selectParameterAndExecuteRenaming(String methodName, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot, int offset){
+    static void selectParameterAndExecuteRenaming(String methodName, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot, int offset){
         
         TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
@@ -151,6 +151,39 @@ public class RefactoringTestUtil {
         // Change variable name in rename dialog
         SWTBotShell renameDialog = bot.shell("Rename Local Variable");      
         setNewElementName(newName, bot, renameDialog);
+    }
+
+
+    /**
+     * Selects the class named className in the outline view of the SWTWorkbenchBot bot and
+     * activates renaming to newClassName.
+     * 
+     * @param className the class the field is in (without .java file ending).
+     * @param packageName name of the package the class is in.
+     * @param srcFolder sourceFolder of the class className.
+     * @param newClassName the new name of the class
+     * @param bot SWTWorkbenchBot to select the outline view from.
+     */
+    static void selectClassAndExecuteRenaming(String className,
+            String packageName, IFolder srcFolder, String newClassName,
+            SWTWorkbenchBot bot) {
+        
+        TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        
+        // select the fieldToChange in the outline view of the bot
+        SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree(); 
+        SWTBotTreeItem fieldToRename = TestUtilsUtil.selectInTree(tree, className);
+        
+        fieldToRename.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
+                
+        // Change variable name in rename dialog
+        SWTBotShell renameDialog = bot.shell("Rename Type");      
+        SWTBot renameDialogBot = renameDialog.bot();
+        renameDialogBot.textWithLabel("New name:").setText(newClassName);
+    
+        // start renaming and wait till finished
+        renameDialogBot.button(IDialogConstants.FINISH_LABEL).click();
+        bot.waitUntil(Conditions.shellCloses(renameDialog));  
     }
 
 
@@ -190,6 +223,29 @@ public class RefactoringTestUtil {
         copyFiles(path + "\\oracle", oracleFolder);
         
         selectFieldAndExecuteRenaming(fieldDescription, className, packageName, srcFolder, newNameField, bot);
+        
+        assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
+    }
+    
+    /**
+     * Runs a basic class rename test. That is, only one project and one class.
+     * 
+     * @param path the path of the test files with the sub folders \src and \oracle. 
+     * @param srcFolder the folder of the source files to load into eclipse.
+     * @param oracleFolder the folder of the oracle.
+     * @param bot workbench bot.
+     * @param className the class the field to be renamed is in.
+     * @param packageName name of the package the class is in.
+     * @param newClassName the name to change the field to.
+     * @throws CoreException
+     */
+    public static void runClassRenameTestBasic(String path, IFolder srcFolder, IFolder oracleFolder, 
+            SWTWorkbenchBot bot, String className, String packageName, String newClassName) throws CoreException {
+        
+        copyFiles(path + "\\src", srcFolder);
+        copyFiles(path + "\\oracle", oracleFolder);
+        
+        selectClassAndExecuteRenaming(className, packageName, srcFolder, newClassName, bot);
         
         assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
@@ -245,9 +301,35 @@ public class RefactoringTestUtil {
     }
     
     /**
+     * Runs a parameter rename test.
+     * 
+     * @param path the path of the test files with the sub folders \src and \oracle. 
+     * @param srcFolder the folder of the source files to load into eclipse.
+     * @param oracleFolder the folder of the oracle.
+     * @param bot workbench bot.
+     * @param className the class the field to be renamed is in.
+     * @param packageName name of the package the class is in.
+     * @param methodName how the method which uses the local variable to be renamed appears in the outline.
+     * @param newName the parameter's new name.
+     * @param offset how much in the text editor to move to the right to select the parameter when the methodName is selected.
+     * @throws CoreException
+     */
+    public static void runParameterRenameTest(String path, IFolder srcFolder, IFolder oracleFolder, 
+            SWTWorkbenchBot bot, String className, String packageName, String methodName, String newName, int offset) throws CoreException {
+        
+        copyFiles(path + "\\src", srcFolder);
+        copyFiles(path + "\\oracle", oracleFolder);
+        
+        selectParameterAndExecuteRenaming(methodName, className, packageName, srcFolder, newName, bot, offset);
+        
+        assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
+    }
+
+
+    /**
      * Adds the projects in referencedProjects to the java build path of project.
      */
-    public static void setProjectReferences(String project, String[] referencedProjects, SWTWorkbenchBot bot) {
+    static void setProjectReferences(String project, String[] referencedProjects, SWTWorkbenchBot bot) {
         // select the referencingProject in the package explorer
         SWTBotTreeItem projectToAddReferences = TestUtilsUtil.selectInProjectExplorer(bot, "referencingProject");
         projectToAddReferences.select().pressShortcut(SWT.ALT, SWT.CR);
@@ -294,30 +376,5 @@ public class RefactoringTestUtil {
         RefactoringTestUtil.copyFiles(pathToOracle, project.getFolder("oracle"));
         
         return project;
-    }
-    
-    /**
-     * Runs a parameter rename test.
-     * 
-     * @param path the path of the test files with the sub folders \src and \oracle. 
-     * @param srcFolder the folder of the source files to load into eclipse.
-     * @param oracleFolder the folder of the oracle.
-     * @param bot workbench bot.
-     * @param className the class the field to be renamed is in.
-     * @param packageName name of the package the class is in.
-     * @param methodName how the method which uses the local variable to be renamed appears in the outline.
-     * @param newName the parameter's new name.
-     * @param offset how much in the text editor to move to the right to select the parameter when the methodName is selected.
-     * @throws CoreException
-     */
-    public static void runParameterRename(String path, IFolder srcFolder, IFolder oracleFolder, 
-            SWTWorkbenchBot bot, String className, String packageName, String methodName, String newName, int offset) throws CoreException {
-        
-        copyFiles(path + "\\src", srcFolder);
-        copyFiles(path + "\\oracle", oracleFolder);
-        
-        selectParameterAndExecuteRenaming(methodName, className, packageName, srcFolder, newName, bot, offset);
-        
-        assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
 }

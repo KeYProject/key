@@ -40,25 +40,25 @@ public class RenameParametersRefactoringTest {
     
     @Test
     public void test1OneParameter() throws InterruptedException, CoreException {   
-        RefactoringTestUtil.runParameterRename(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
+        RefactoringTestUtil.runParameterRenameTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "setBalance(int) : void", "aNewName", 6);
     }
     
     @Test
     public void test2TwoParametersFirst() throws InterruptedException, CoreException {   
-        RefactoringTestUtil.runParameterRename(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
+        RefactoringTestUtil.runParameterRenameTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "setBalance(int, boolean) : void", "aNewName", 7);
     }
     
     @Test
     public void test3TwoParametersSecond() throws InterruptedException, CoreException {   
-        RefactoringTestUtil.runParameterRename(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+        RefactoringTestUtil.runParameterRenameTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
     }
     
     @Test
     public void test4FieldAndOtherMethodUsingSameName() throws InterruptedException, CoreException {   
-        RefactoringTestUtil.runParameterRename(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
+        RefactoringTestUtil.runParameterRenameTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
     }
 }
