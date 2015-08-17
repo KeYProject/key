@@ -15,7 +15,9 @@ package de.uka.ilkd.key.core;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.key_project.util.java.IOUtil;
@@ -194,7 +196,7 @@ public final class Main {
             evaluateOptions(cl);
             fileArguments = cl.getFileArguments();
             AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
-            preProcessInput(userInterface);
+            fileArguments = preProcessInput(fileArguments);
             loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
             System.err.println("D'oh! It seems that KeY was not built properly!");
@@ -592,19 +594,30 @@ public final class Main {
      * Perform necessary actions before loading any problem files.
      * Currently only performs RIFL to JML transformation.
      */
-    private static void preProcessInput (UserInterface ui) {
+    private static List<File> preProcessInput (List<File> filesOnStartup) {
+        List<File> result = new ArrayList<File>();
         // RIFL to JML transformation
         if (riflFileName != null) {
-            if (fileNameOnStartUp == null) {
+            if (filesOnStartup.isEmpty()) {
                 System.out.println("[RIFL] No Java file to load from.");
                 System.exit (-130826);
             }
+            // only use one input file
+            String fileNameOnStartUp = null;
+			try {
+				fileNameOnStartUp = filesOnStartup.get(0).getCanonicalPath();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 //            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
             RIFLTransformer.transform(riflFileName, fileNameOnStartUp);
             fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
             if (verbosity > Verbosity.SILENT)
                 System.out.println("[RIFL] Writing transformed Java files to "+fileNameOnStartUp+" ...");
+            result.add(new File(fileNameOnStartUp));
         }
+        return result;
     }
 
     public static String getExamplesDir() {
