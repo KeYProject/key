@@ -40,55 +40,55 @@ public class RenameFieldsRefactoringTest {
     }
     
     @Test
-    public void test1SimpleAssignableClause() throws InterruptedException, CoreException {   
+    public void test1SimpleAssignableClause() throws CoreException {   
         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "balance : int", "aVeryLongNewName");
     }
     
     @Test
-    public void test2AssignableRequiresAndEnsures() throws InterruptedException, CoreException { 
+    public void test2AssignableRequiresAndEnsures() throws CoreException { 
         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "balance : int", "tiny");
     }
     
     @Test
-    public void test3ThisQualifier() throws InterruptedException, CoreException {  
+    public void test3ThisQualifier() throws CoreException {  
         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "balance : int", "aNewName");
     }
     
     @Test
-    public void test4TwoFilesSamePackageNoChangeInFileTwo() throws InterruptedException, CoreException { 
+    public void test4TwoFilesSamePackageNoChangeInFileTwo() throws CoreException { 
         RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "TestClassOther", "test", "balance : int", "aNewName");
     }
     
     @Test
-    public void test5TwoFilesSamePackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {
+    public void test5TwoFilesSamePackageFileTwoAccessingMainClass() throws CoreException {
         RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "TestClassOther", "test", "balance : int", "aNewName");
     }
     
     @Test
-    public void test6TwoFilesOtherPackageFileTwoAccessingMainClass() throws InterruptedException, CoreException {  
+    public void test6TwoFilesOtherPackageFileTwoAccessingMainClass() throws CoreException {  
         RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "TestClassOther", "otherPackage", "balance : int", "aNewName");
     }
     
     @Test
-    public void test7TwoFilesMemberAccess() throws InterruptedException, CoreException {  
+    public void test7TwoFilesMemberAccess() throws CoreException {  
         RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test7", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "TestClassOther", "test", "balance : int", "aNewName");
     }
     
     @Test
-    public void test8NoJavaChangesInOtherFile() throws InterruptedException, CoreException {
+    public void test8NoJavaChangesInOtherFile() throws CoreException {
         RefactoringTestUtil.runFieldRenameTestTwoFiles(TESTPATH+"\\test8", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "TestClassOther", "test", "balance : int", "aNewName");
     }
     
     @Test
-    public void test9NoJavaChangesInTwoOtherFile() throws InterruptedException, CoreException {
+    public void test9NoJavaChangesInTwoOtherFile() throws CoreException {
         RefactoringTestUtil.runFieldRenameTestThreeFiles(TESTPATH+"\\test9", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "TestClassOther", "test", "TestClassOtherMore", "test", 
                 "balance : int", "aNewName");
@@ -96,57 +96,57 @@ public class RenameFieldsRefactoringTest {
     
     //TODO: does not work yet
     //@Test
-    public void test10Invariant() throws InterruptedException, CoreException {
+    public void test10Invariant() throws CoreException {
         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test10", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "balance : int", "aNewName");
     }
     
     @Test
-    public void test11thisQualifierMethodFieldName() throws InterruptedException, CoreException {
+    public void test11thisQualifierMethodFieldName() throws CoreException {
         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test11", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "balance : TestClass", "newName");
     }
     
     @Test
-    public void test12thisQualifierMethodFieldNameNested() throws InterruptedException, CoreException {
+    public void test12thisQualifierMethodFieldNameNested() throws CoreException {
         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test12", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "balance : TestClass", "newName");
     }
     
     @Test
-    public void test13thisQualifierMethodFieldNameNestedChangedOrder() throws InterruptedException, CoreException {
+    public void test13thisQualifierMethodFieldNameNestedChangedOrder() throws CoreException {
         RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test13", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "balance : TestClass", "newName");
     }
       
      @Test
-     public void test14ManyMemberAccesses() throws InterruptedException, CoreException {
+     public void test14ManyMemberAccesses() throws CoreException {
          RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test14", srcFolder, oracleFolder, bot, 
                  "TestClass", "test", "balance : TestClass", "newName");  
      }
      
      @Test
-     public void test15FieldRefAfterMethodCall() throws InterruptedException, CoreException {
+     public void test15FieldRefAfterMethodCall() throws CoreException {
          RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test15", srcFolder, oracleFolder, bot, 
                  "TestClass", "test", "balance : int", "newName");   
      }
      
      // TODO: Problem with Resolver currently
      //@Test
-     public void test16LikeTest15PlusMemberAccess() throws InterruptedException, CoreException {
+     public void test16LikeTest15PlusMemberAccess() throws CoreException {
          RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test16", srcFolder, oracleFolder, bot, 
                  "TestClass", "test", "balance : String", "newName");
      }
      
      // TODO:  Problem with Resolver currently
      //@Test
-     public void test17LikeTest16WithoutParentheses() throws InterruptedException, CoreException {
+     public void test17LikeTest16WithoutParentheses() throws CoreException {
          RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test17", srcFolder, oracleFolder, bot, 
                  "TestClass", "test", "balance : String", "newName");      
      }
      
      @Test
-     public void test18ManyMemberAccessesAndMethodCalls() throws InterruptedException, CoreException {
+     public void test18ManyMemberAccessesAndMethodCalls() throws CoreException {
          RefactoringTestUtil.runFieldRenameTestBasic(TESTPATH+"\\test18", srcFolder, oracleFolder, bot, 
                  "TestClass", "test", "balance : int", "newName"); 
         }

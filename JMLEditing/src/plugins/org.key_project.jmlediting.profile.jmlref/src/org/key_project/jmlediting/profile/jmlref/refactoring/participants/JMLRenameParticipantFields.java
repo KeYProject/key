@@ -10,7 +10,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
@@ -23,6 +22,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -134,7 +134,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
             
             // Look through all source files in each package and project
             for (final IJavaProject project : projectsToCheck) {
-                for (final IPackageFragment pac : getAllPackageFragmentsContainingSources(project)) {
+                for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac.getCompilationUnits()) {
                         
                         DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fOldName, fJavaElementToRename, fNewName);
@@ -180,6 +180,10 @@ public class JMLRenameParticipantFields extends RenameParticipant {
         // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
         if (changesToFilesWithoutJavaChanges.isEmpty())
             return null;
+        else if (changesToFilesWithoutJavaChanges.size() == 1){
+            return changesToFilesWithoutJavaChanges.get(0);
+        }
+        // Create a composite change to gather all the changes (effect in preview: a tree item above without preview)
         else {
             CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
             for (TextFileChange change : changesToFilesWithoutJavaChanges){
@@ -190,25 +194,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
     }
 
     
-    private ArrayList<IPackageFragment> getAllPackageFragmentsContainingSources(IJavaProject project) throws JavaModelException {
-        
-        ArrayList<IPackageFragment> allFragments = new ArrayList<IPackageFragment>();
-        
-        IPackageFragmentRoot[] roots = project.getPackageFragmentRoots();
-        
-        // Checks each roots if it contains source/class files and adds those to the arraylist.
-        for (IPackageFragmentRoot root: roots){
-            if (!root.isArchive()) {
-                IJavaElement[] children = root.getChildren();            
-                for (IJavaElement child: children){
-                    if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT)
-                        allFragments.add((IPackageFragment)child);
-                }
-            }
-        }
-        
-        return allFragments;
-    }
+
 
     
 }

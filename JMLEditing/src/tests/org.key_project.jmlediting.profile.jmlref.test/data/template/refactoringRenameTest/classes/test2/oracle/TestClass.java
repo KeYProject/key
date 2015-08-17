@@ -5,6 +5,7 @@ public class NewClassName {
     
     /*@ normal_behavior
       @ ensures NewClassName.balance = newBalance;
+      @ assignable NewClassName.balance;
       @*/
     void setBalance(int newBalance){
         this.balance = newBalance;
