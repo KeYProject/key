@@ -24,7 +24,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class ClassMoveRefactoringTest{
+public class MoveClassRefactoringTest{
 
     private static final String PROJECT_NAME = "JMLRefactoringMoveTest";
     //private static final String PACKAGE_NAME = "test";

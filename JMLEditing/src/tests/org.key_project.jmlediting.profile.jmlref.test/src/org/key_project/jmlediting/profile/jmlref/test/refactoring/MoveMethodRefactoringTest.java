@@ -71,32 +71,18 @@ public class MoveMethodRefactoringTest {
     }
 
     // selects className and outlineString in the outline tree, starts renaming and changes field's name to newName
-    private void executeMovingMethod(String destclass, String destpackage){
-
-        //SWTBotTree tree = TestUtilsUtil.getProjectExplorer(bot).bot().tree(); 
+    private void executeMovingMethod(String fromclass, String destclass, String destpackage){
         SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree(); 
-        //bot.sleep(20000);
-        SWTBotTreeItem fieldToMove = TestUtilsUtil.selectInTree(tree, CLASS_NAME_MOVE_FROM, METH_TO_MOVE+"() : void");
-        //TestUtilsUtil.selectInTree(tree, "src");
-        //TestUtilsUtil.selectInTree(tree, "test1");
-        //SWTBotTreeItem fieldToMove = TestUtilsUtil.selectInTree(tree, "");
-        //System.out.println(fieldToMove.getText());
+        SWTBotTreeItem fieldToMove = TestUtilsUtil.selectInTree(tree, fromclass, METH_TO_MOVE+"() : void");
         
         fieldToMove.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'V');
-
-        // Change variable name in rename dialog
         SWTBotShell moveDialog = bot.shell("Move Static Members"); 
         SWTBot moveDialogBot = moveDialog.bot();
-        //moveDialogBot.textWithLabel("Destination type for'go()':").setText("blablabla");
-        
-        //moveDialog.pressShortcut("test1p2.Params");
-        //TestUtilsUtil.selectInTree(moveTree, "JMLRefactoringMoveTest","src",moveTo);
-
-        // start renaming and wait till finished
-        
-        //moveDialogBot.button(IDialogConstants.OK_LABEL).click();
+        moveDialogBot.comboBox().setText(destpackage+"."+destclass);
+        moveDialogBot.button(IDialogConstants.OK_LABEL).click();
         bot.waitUntil(Conditions.shellCloses(moveDialog));
     }
+    
     // Gets the content from active editor and replaces \n with \r\n 
     // because oracle files were created with windows 
     private String getContentAfterRefactoring(){
@@ -122,9 +108,9 @@ public class MoveMethodRefactoringTest {
 
         String oracleString = getOracle(oracleFolder, REF_CLASS_NAME);
 
-        //TestUtilsUtil.openEditor(srcFolder.getFolder("mainpack").getFile(REF_CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         TestUtilsUtil.openEditor(srcFolder.getFolder("test1p1").getFile(CLASS_NAME_MOVE_FROM + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        executeMovingMethod(CLASS_NAME_MOVE_TO, "test1p2");
+        bot.sleep(2000);
+        executeMovingMethod(CLASS_NAME_MOVE_FROM, CLASS_NAME_MOVE_TO, "test1p2");
         TestUtilsUtil.openEditor(srcFolder.getFolder("mainpack").getFile(REF_CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
         String afterRenaming = getContentAfterRefactoring();
@@ -134,11 +120,11 @@ public class MoveMethodRefactoringTest {
         oracleFolder.delete(true, null);
         
     }
-    /**
+   
     @Test
     public void test2MoveComplexPackage() throws InterruptedException, CoreException {
         
-        final String path = "data\\template\\refactoringMoveTest\\test2";
+        final String path = "data\\template\\refactoringMoveTest\\moveMethodTest\\test2";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
 
@@ -146,21 +132,22 @@ public class MoveMethodRefactoringTest {
         copyFiles(pathToOracle, oracleFolder);
 
         String oracleString = getOracle(oracleFolder, REF_CLASS_NAME);
-
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test2p1").getFile(CLASS_NAME_MOVE_FROM + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        bot.sleep(2000);
+        executeMovingMethod(CLASS_NAME_MOVE_FROM, CLASS_NAME_MOVE_TO, "test2p2.complex");
         TestUtilsUtil.openEditor(srcFolder.getFolder("mainpack").getFile(REF_CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        executeMoving(CLASS_NAME_MOVE, "test2p1","test2p2.complex");
-
+        
         String afterRenaming = getContentAfterRefactoring();
         assertEquals(oracleString,afterRenaming);
 
         srcFolder.delete(true, null);
         oracleFolder.delete(true, null);
     }
-
+    
     @Test
     public void test3MoveUseOps() throws InterruptedException, CoreException {
         
-        final String path = "data\\template\\refactoringMoveTest\\test3";
+        final String path = "data\\template\\refactoringMoveTest\\moveMethodTest\\test3";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
 
@@ -168,10 +155,10 @@ public class MoveMethodRefactoringTest {
         copyFiles(pathToOracle, oracleFolder);
 
         String oracleString = getOracle(oracleFolder, REF_CLASS_NAME);
-
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test3p1").getFile(CLASS_NAME_MOVE_FROM + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        executeMovingMethod(CLASS_NAME_MOVE_FROM, CLASS_NAME_MOVE_TO, "test3p2");
         TestUtilsUtil.openEditor(srcFolder.getFolder("mainpack").getFile(REF_CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        executeMoving(CLASS_NAME_MOVE, "test3p1","test3p2");
-
+        
         String afterRenaming = getContentAfterRefactoring();
         assertEquals(oracleString,afterRenaming);
 
@@ -181,7 +168,7 @@ public class MoveMethodRefactoringTest {
     
     @Test
     public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
-        
+
         final String path = "data\\template\\refactoringMoveTest\\moveMethodTest\\test4";
         final String pathToTests = path + "\\src";
         final String pathToOracle = path + "\\oracle";
@@ -190,14 +177,16 @@ public class MoveMethodRefactoringTest {
         copyFiles(pathToOracle, oracleFolder);
 
         String oracleString = getOracle(oracleFolder, REF_CLASS_NAME);
-
+        
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test4p2\\complex").getFile(CLASS_NAME_MOVE_TO + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        bot.sleep(2000);
+        executeMovingMethod(CLASS_NAME_MOVE_TO, CLASS_NAME_MOVE_FROM, "test4p1");
         TestUtilsUtil.openEditor(srcFolder.getFolder("mainpack").getFile(REF_CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        executeMoving(CLASS_NAME_MOVE, "test4p2.complex","test4p1");
-
+        
         String afterRenaming = getContentAfterRefactoring();
         assertEquals(oracleString,afterRenaming);
 
         srcFolder.delete(true, null);
         oracleFolder.delete(true, null);
-    }**/
+    }
 }
