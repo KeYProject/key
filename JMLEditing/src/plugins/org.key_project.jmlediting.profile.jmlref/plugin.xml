@@ -16,7 +16,7 @@
         <extension
          point="org.eclipse.ltk.core.refactoring.renameParticipants">
       <renameParticipant
-            class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLRenameParticipantFields"
+            class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLRenameParticipantFields"
             id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantFields"
             name="%renameJMLParticipantFields">
             <enablement>
@@ -34,7 +34,7 @@
      <extension
    point="org.eclipse.ltk.core.refactoring.renameParticipants">
 <renameParticipant
-      class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLRenameParticipantParameters"
+      class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLRenameParticipantParameters"
       id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantParameters"
       name="%renameJMLParticipantParameters">
       <enablement>
@@ -52,7 +52,7 @@
      <extension
    point="org.eclipse.ltk.core.refactoring.renameParticipants">
 <renameParticipant
-      class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLRenameParticipantClass"
+      class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLRenameParticipantClass"
       id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantClass"
       name="%renameJMLParticipantClass">
       <enablement>
@@ -72,7 +72,7 @@ point="org.eclipse.ltk.core.refactoring.moveParticipants">
 <moveParticipant
      id="org.eclipse.jdt.junit.moveClassParticipant"
      name="JML Move Participant Class"
-class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipantClass">
+class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLMoveParticipantClass">
      <enablement>
        <with variable="affectedNatures">
          <iterate operator="or">
@@ -88,7 +88,7 @@ class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipantC
      <extension
            point="org.eclipse.ltk.core.refactoring.moveParticipants">
         <moveParticipant
-              class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipantSMethod"
+              class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLMoveParticipantSMethod"
               id="org.key_project.jmlediting.profile.jmlref.moveSMethodParticipant"
               name="JML Move Participant Static Methods">
            <enablement>
@@ -106,7 +106,7 @@ class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipantC
      <extension
            point="org.eclipse.ltk.core.refactoring.moveParticipants">
         <moveParticipant
-              class="org.key_project.jmlediting.profile.jmlref.refactoring.JMLMoveParticipantSFields"
+              class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLMoveParticipantSFields"
               id="org.key_project.jmlediting.profile.jmlref.moveSFieldParticipant1"
               name="JML Move Participant Static Fields">
            <enablement>

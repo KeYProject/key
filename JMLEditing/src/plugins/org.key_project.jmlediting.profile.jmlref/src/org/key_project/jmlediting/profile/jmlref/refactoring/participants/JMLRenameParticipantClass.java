@@ -1,21 +1,25 @@
-package org.key_project.jmlediting.profile.jmlref.refactoring;
+package org.key_project.jmlediting.profile.jmlref.refactoring.participants;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.ILocalVariable;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
+import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
@@ -35,44 +39,41 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
+import org.key_project.util.jdt.JDTUtil;
 
-/**
- * Renaming of method parameters
- * 
- * @author Robert Heimbach
- *
- */
-public class JMLRenameParticipantParameters extends RenameParticipant {
+public class JMLRenameParticipantClass extends RenameParticipant {
 
+    private IJavaElement fJavaElementToRename;
     private String fNewName;
     private String fOldName;
-    private ICompilationUnit fCompUnit;
-    private ILocalVariable fLocalVar;
-    private IJavaProject fProject;
-    
-    @Override
-    protected boolean initialize(Object element) {
-        fNewName = getArguments().getNewName();
-        fLocalVar = (ILocalVariable) element;
-        
-        // check if it is a method parameter
-        // has a declaring method and a compilation unit
-        if (fLocalVar.isParameter() && fLocalVar.getDeclaringMember().getElementType() == IJavaElement.METHOD
-                && !(fLocalVar.getDeclaringMember().getCompilationUnit() == null)) {
-            fOldName = fLocalVar.getElementName();
-            fProject = fLocalVar.getJavaProject();
-            fCompUnit = fLocalVar.getDeclaringMember().getCompilationUnit();
+    private IJavaProject fProject;  // the project which has the fields to be renamed
 
+    /**
+     * Name of this class. {@inheritDoc}
+     */
+    @Override
+    public final String getName() {
+        return "JML Class Refactoring Rename Participant";
+    }
+
+    /**
+     * {@inheritDoc} Saves the new name to change to. Saves the old name and the
+     * field to be changed as a IJavaElement to search for references to it. Saves
+     * the active Project, i.e. the project which contains the class which field changes.
+     */
+    @Override
+    protected final boolean initialize(final Object element) {
+        fNewName = getArguments().getNewName();
+        System.out.println("activated");
+        if (element instanceof IJavaElement) {
+            fJavaElementToRename = (IJavaElement) element;
+            fProject = fJavaElementToRename.getJavaProject();
+            fOldName = fJavaElementToRename.getElementName();
             return true;
-            }
+        }
         else {
             return false;
         }
-    }
-
-    @Override
-    public String getName() {
-        return "JML Local Variables Refactoring Rename Participant";
     }
 
     /**
@@ -81,10 +82,17 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
      * {@inheritDoc}
      */
     @Override
-    public RefactoringStatus checkConditions(IProgressMonitor pm,
-            CheckConditionsContext context) throws OperationCanceledException {
-        
+    public final RefactoringStatus checkConditions(final IProgressMonitor pm,
+            final CheckConditionsContext context)
+            throws OperationCanceledException {
+
         return new RefactoringStatus();
+    }
+
+    @Override
+    public Change createChange(final IProgressMonitor pm) {
+        System.out.println("computing a change");
+        return null;
     }
     
     /**
@@ -99,24 +107,104 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
      *
      */
     @Override
-    public Change createChange(final IProgressMonitor pm) throws CoreException,
+    public Change createPreChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
-
-        final ArrayList<ReplaceEdit> changesToJML = computeNeededChangesToJML(
-                fCompUnit, fProject);
         
-        // Get scheduled changes to the java code from the rename processor
-        final TextChange changesToJavaCode = getTextChange(fCompUnit);
+        System.out.println("computing a pre change");
 
-        // add our edits to the java changes
-        // JDT will compute the shifts and the preview
-        if (changesToJavaCode != null) {
-            for (final ReplaceEdit edit : changesToJML) {
-                changesToJavaCode.addEdit(edit);
+        // Only non empty change objects will be added
+        ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
+        
+        // Find out the projects which need to be checked: active project plus all dependencies
+        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
+        projectsToCheck.add(fProject);
+        
+        try {
+            // Iterate through all java projects and check for projects which require the active project
+            IJavaProject[] allProjects = JDTUtil.getAllJavaProjects();
+            
+            for (IJavaProject project: allProjects){
+                String[] requiredProjectNames = project.getRequiredProjectNames();
+                
+                //System.out.println(project.getPath());
+                //System.out.println(requiredProjectNames.length);
+                
+                if (requiredProjectNames.length > 0) {
+                    
+                    // To create an IJavaProject from the project's name
+                    //IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+                    
+                    for (String requiredProject: requiredProjectNames){
+                        //System.out.println("required: "+requiredProject);
+                        //System.out.println("project's name: "+fProject.getElementName());
+                        
+                        if (requiredProject.equals(fProject.getElementName())) {
+                            //projectsToCheck.add(JavaCore.create(workspaceRoot.getProject(project)));
+                            projectsToCheck.add(project);
+                        }
+                    } 
+                }
+            }
+            
+            // Look through all source files in each package and project
+            for (final IJavaProject project : projectsToCheck) {
+                for (final IPackageFragment pac : project.getPackageFragments()) {
+                    for (final ICompilationUnit unit : pac
+                            .getCompilationUnits()) {
+                         
+                        final ArrayList<ReplaceEdit> changesToJML = computeNeededChangesToJML(
+                                unit, project);
+
+                        // Get scheduled changes to the java code from the rename processor
+                        final TextChange changesToJavaCode = getTextChange(unit);
+                        
+                       
+                        // add our edits to the java changes
+                        // JDT will compute the shifts and the preview
+                        if (changesToJavaCode != null) {
+                            for (final ReplaceEdit edit : changesToJML) {
+                                changesToJavaCode.addEdit(edit);
+                            }
+                        }
+                        else {
+                            System.out.println("no changes to Java code for "+unit);
+                            // In case changes to the JML code needs to be done (but not to the java code)
+                            if (!changesToJML.isEmpty()){
+                                
+                                // Gather all the edits to the text (JML annotations) in a MultiTextEdit
+                                // and add those to a change object for the given file
+                                TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());                         
+                                MultiTextEdit allEdits = new MultiTextEdit();
+                                
+                                for (final ReplaceEdit edit: changesToJML) {
+                                   allEdits.addChild(edit);
+                                }
+
+                                tfChange.setEdit(allEdits);
+                                changesToFilesWithoutJavaChanges.add(tfChange);
+                            }
+                        }
+                    }
+                }
             }
         }
+        catch (final JavaModelException e) {
+            return null;
+        }
         
-        return null;
+        // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
+        if (changesToFilesWithoutJavaChanges.isEmpty())
+            return null;
+        else {
+            CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
+            for (TextFileChange change : changesToFilesWithoutJavaChanges){
+                allChangesToFilesWithoutJavaChanges.add(change);
+            }
+   
+            //allChangesToFilesWithoutJavaChanges.perform(pm);
+            return allChangesToFilesWithoutJavaChanges;
+            //return null;
+        }
     }
 
     /**
@@ -189,10 +277,13 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
             return new ArrayList<IASTNode>();
         }
  
+        //System.out.println("Unfiltered: "+stringNodes);
         final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
+        //System.out.println("Filtered: "+filtedStringNodes);
         
         final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
-
+        
+        //System.out.println("Primaries: " + primaries);
         return primaries;
     }
 
@@ -248,6 +339,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
                 // If the KeY Profile is not used, the primary node from the assignable node
                 // cannot be found. Resolver will still resolve the string node though.
                 if (notKeYProfile && existing == null){
+                    //System.out.println("primary found: null");
                     return toTest;
                 }     
                 else
@@ -326,7 +418,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
         }
         
         final IJavaElement jElement = result.getBinding().getJavaElement();
-        return jElement.equals(fLocalVar);
+        return jElement.equals(fJavaElementToRename);
     }
     
 
@@ -359,4 +451,5 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
 
         changesToMake.add(edit);
     }
+    
 }
