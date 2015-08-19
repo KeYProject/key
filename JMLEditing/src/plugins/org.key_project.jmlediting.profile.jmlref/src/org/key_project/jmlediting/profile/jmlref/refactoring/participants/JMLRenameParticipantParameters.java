@@ -53,7 +53,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
 
     @Override
     public String getName() {
-        return "JML Local Variables Refactoring Rename Participant";
+        return "JML Parameters Refactoring Rename Participant";
     }
 
     /**
