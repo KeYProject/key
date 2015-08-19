@@ -22,7 +22,6 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
-import org.key_project.util.jdt.JDTUtil;
 
 public class JMLRenameParticipantClass extends RenameParticipant {
 
@@ -99,22 +98,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
         projectsToCheck.add(fProject);
         
         try {
-            // Iterate through all java projects and check for projects which require the active project
-            IJavaProject[] allProjects = JDTUtil.getAllJavaProjects();
-            
-            for (IJavaProject project: allProjects){
-                String[] requiredProjectNames = project.getRequiredProjectNames();
-                
-                if (requiredProjectNames.length > 0) {
-                    
-                    for (String requiredProject: requiredProjectNames){
-                        
-                        if (requiredProject.equals(fProject.getElementName())) {
-                            projectsToCheck.add(project);
-                        }
-                    } 
-                }
-            }
+            RefactoringUtilities.getAllProjectsToCheck(projectsToCheck, fProject);
             
             // Look through all source files in each package and project
             for (final IJavaProject project : projectsToCheck) {
