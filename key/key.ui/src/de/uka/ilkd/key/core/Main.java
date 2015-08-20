@@ -616,8 +616,10 @@ public final class Main {
             if (verbosity > Verbosity.SILENT)
                 System.out.println("[RIFL] Writing transformed Java files to "+fileNameOnStartUp+" ...");
             result.add(new File(fileNameOnStartUp));
+            return result;
         }
-        return result;
+        // nothing to do, pass the original files
+        return filesOnStartup;
     }
 
     public static String getExamplesDir() {
