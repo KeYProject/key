@@ -25,14 +25,11 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * disjoin two variable conditions
  * @author bruns
  */
-public final class AlternativeVariableCondition
-    <U extends VariableConditionAdapter, V extends VariableConditionAdapter> 
-    extends VariableConditionAdapter {
+public final class AlternativeVariableCondition extends VariableConditionAdapter {
 
-	private final U delegate0;
-	private final V delegate1;
+	private final VariableConditionAdapter delegate0, delegate1;
 
-    public AlternativeVariableCondition (U delegate0, V delegate1) {
+    public AlternativeVariableCondition (VariableConditionAdapter delegate0, VariableConditionAdapter delegate1) {
     	this.delegate0 = delegate0;
     	this.delegate1 = delegate1;
     }
