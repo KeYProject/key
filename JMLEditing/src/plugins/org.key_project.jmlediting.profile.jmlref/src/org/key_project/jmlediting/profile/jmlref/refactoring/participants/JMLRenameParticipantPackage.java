@@ -20,90 +20,66 @@ import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
-import org.key_project.jmlediting.core.utilities.CommentLocator;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.ClassMoveRefactoringComputer;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
-import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 
 /**
- * Class to participate in the rename refactoring of java fields.
+ * Conceptually this is a move of all classes in the renamed package to the 
+ * newly created package.
  * 
- * It uses the {@link CommentLocator} to get a list of all JML comments and 
- * the {@link Resolver} to determine if the field to be renamed is referenced.
- * The changes are added to the scheduled java changes as the JDT takes care of 
- * moving offsets in the editor and preview when several changes are made to the same file.
- * 
- * The class usually returns NULL because changes are added in-place to the Java changes except
- * if changes to JML annotations to a class need to be made for which no Java changes are needed.
- * 
- * To reduce the number of times the resolver is used, the JML annotations are first taken
- * in the form of StringNodes as filtered before the primary Nodes are computed which are 
- * then taken to the Resolver. 
- * 
+ * Get all classes in the package and, in case "rename subpackages" was activated, also subpackages.
+ * Search through all classes in the project if the use package.subpackage.Classname in JML.
  * 
  * @author Robert Heimbach
+ *
  */
-public class JMLRenameParticipantFields extends RenameParticipant {
+public class JMLRenameParticipantPackage extends RenameParticipant {
 
-    private IJavaElement fJavaElementToRename;
+    private IPackageFragment fPackageToRename;
     private String fNewName;
+    private IJavaElement fJavaElementToRename;
     private String fOldName;
-    private IJavaProject fProject;  // the project which has the fields to be renamed
+    private ArrayList<String> fAllQualifiedNamesToSearchFor;
+    private IJavaProject fProject;
 
     /**
      * Name of this class. {@inheritDoc}
      */
     @Override
     public final String getName() {
-        return "JML Field Refactoring Rename Participant";
+        return "JML Package Refactoring Rename Participant";
     }
-
-    /**
-     * {@inheritDoc} Saves the new name to change to. Saves the old name and the
-     * field to be changed as a IJavaElement to search for references to it. Saves
-     * the active Project, i.e. the project which contains the class which field changes.
-     */
+    
     @Override
-    protected final boolean initialize(final Object element) {
+    protected boolean initialize(Object element) { 
+        System.out.println("activated");
+        
+        fJavaElementToRename = (IJavaElement) element;
+        fOldName = fJavaElementToRename.getElementName();
+        fProject = fJavaElementToRename.getJavaProject();
         fNewName = getArguments().getNewName();
-
-        if (element instanceof IJavaElement) {
-            fJavaElementToRename = (IJavaElement) element;
-            fProject = fJavaElementToRename.getJavaProject();
-            fOldName = fJavaElementToRename.getElementName();
-            return true;
-        }
-        else {
-            return false;
+        fPackageToRename = (IPackageFragment) element;
+        
+        try {
+            fAllQualifiedNamesToSearchFor = RefactoringUtilities.getAllQualifiedNamesOfClasses(fPackageToRename);
+            System.out.println(fAllQualifiedNamesToSearchFor);
+            
+            // Only something to change to JML if the package contains Java resources.
+            return (fAllQualifiedNamesToSearchFor.size() > 0);
+        } // If there were any problems accessing the folder structure and the classes therein.
+        catch (JavaModelException e) {
+           return false;
         }
     }
 
-    /**
-     * Do nothing.
-     *
-     * {@inheritDoc}
-     */
     @Override
-    public final RefactoringStatus checkConditions(final IProgressMonitor pm,
-            final CheckConditionsContext context)
-            throws OperationCanceledException {
-
+    public RefactoringStatus checkConditions(IProgressMonitor pm,
+            CheckConditionsContext context) throws OperationCanceledException {
         return new RefactoringStatus();
     }
 
-    /**
-     * Computes the changes which need to be done to the JML code and
-     * add those to the changes to the java code which are already scheduled.
-     * 
-     * @return Returns null if only shared text changes are made. Otherwise
-     * returns a TextChange Object which gathered all the changes to JML annotations 
-     * in class which does not have any Java changes scheduled.
-     * 
-     *  {@inheritDoc}
-     *
-     */
     @Override
-    public Change createChange(final IProgressMonitor pm) throws CoreException,
+    public Change createChange(IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         // Only non empty change objects will be added
@@ -121,7 +97,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
                 for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac.getCompilationUnits()) {
                         
-                        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fOldName, fJavaElementToRename, fNewName);
+                        ClassMoveRefactoringComputer changesComputer = new ClassMoveRefactoringComputer(fOldName, fNewName, fAllQualifiedNamesToSearchFor.get(0));
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
                                 unit, project);
 
@@ -176,4 +152,5 @@ public class JMLRenameParticipantFields extends RenameParticipant {
             return allChangesToFilesWithoutJavaChanges;
         }
     }
+
 }

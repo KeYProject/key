@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -254,12 +253,11 @@ public class DefaultRenameRefactoringComputer implements IRefactoringComputer {
     }
     
     private Boolean isReferencedElement(final ResolveResult result){
-        if (result == null) {
+        if (result == null || result.getBinding() == null) {
             return false;
         }
-        
-        final IJavaElement jElement = result.getBinding().getJavaElement();
-        return jElement.equals(fJavaElementToRename);
+        else
+            return result.getBinding().getJavaElement().equals(fJavaElementToRename);
     }
     
 

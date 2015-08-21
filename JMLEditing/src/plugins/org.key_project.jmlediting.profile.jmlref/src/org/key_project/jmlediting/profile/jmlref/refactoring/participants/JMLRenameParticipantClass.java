@@ -21,7 +21,7 @@ import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
-import org.key_project.util.jdt.JDTUtil;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 
 public class JMLRenameParticipantClass extends RenameParticipant {
 
@@ -46,7 +46,6 @@ public class JMLRenameParticipantClass extends RenameParticipant {
     @Override
     protected final boolean initialize(final Object element) {
         fNewName = getArguments().getNewName();
-        System.out.println("activated");
         if (element instanceof IJavaElement) {
             fJavaElementToRename = (IJavaElement) element;
             fProject = fJavaElementToRename.getJavaProject();
@@ -99,26 +98,11 @@ public class JMLRenameParticipantClass extends RenameParticipant {
         projectsToCheck.add(fProject);
         
         try {
-            // Iterate through all java projects and check for projects which require the active project
-            IJavaProject[] allProjects = JDTUtil.getAllJavaProjects();
-            
-            for (IJavaProject project: allProjects){
-                String[] requiredProjectNames = project.getRequiredProjectNames();
-                
-                if (requiredProjectNames.length > 0) {
-                    
-                    for (String requiredProject: requiredProjectNames){
-                        
-                        if (requiredProject.equals(fProject.getElementName())) {
-                            projectsToCheck.add(project);
-                        }
-                    } 
-                }
-            }
+            RefactoringUtilities.getAllProjectsToCheck(projectsToCheck, fProject);
             
             // Look through all source files in each package and project
             for (final IJavaProject project : projectsToCheck) {
-                for (final IPackageFragment pac : project.getPackageFragments()) {
+                for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
                         
@@ -166,12 +150,14 @@ public class JMLRenameParticipantClass extends RenameParticipant {
         // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
         if (changesToFilesWithoutJavaChanges.isEmpty())
             return null;
+        else if (changesToFilesWithoutJavaChanges.size() == 1){
+            return changesToFilesWithoutJavaChanges.get(0);
+        }
         else {
             CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
             for (TextFileChange change : changesToFilesWithoutJavaChanges){
                 allChangesToFilesWithoutJavaChanges.add(change);
             }
-   
             return allChangesToFilesWithoutJavaChanges;
         }
     }

@@ -39,15 +39,34 @@ public class RenameClassesRefactoringTest {
     }
     
     @Test
-    public void test1JavaAndJMLOneClass() throws InterruptedException, CoreException {   
+    public void test1JavaAndJMLOneClass() throws CoreException {   
         RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "NewClassName");
     }
     
     @Test
-    public void test2NoJavaOneClass() throws InterruptedException, CoreException {   
+    public void test2NoJavaOneClass() throws CoreException {   
         RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "NewClassName");
+    }
+    
+    @Test
+    public void test3TwoClassesSamePackage() throws CoreException {
+        RefactoringTestUtil.runClassRenameTestTwoFiles(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "OtherClass", "test", "NewClassName");
+    }
+    
+    @Test
+    public void test4TwoClassesSamePackageNoJavaChanges() throws CoreException {
+        RefactoringTestUtil.runClassRenameTestTwoFiles(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "OtherClass", "test", "NewClassName");
+    }
+    
+    // TODO: import Statements a problem with current Resolver status.
+    //@Test
+    public void test5TwoClassesDifferentPackage() throws CoreException {
+        RefactoringTestUtil.runClassRenameTestTwoFiles(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "OtherClass", "otherPackage", "NewClassName");
     }
 
 }

@@ -272,6 +272,27 @@ public class RefactoringTestUtil {
     }
     
     /**
+     * Runs the basic class renaming test on the classNameWithRenaming class and additionally compares
+     * the classNameWithoutRenaming as well to its oracle.
+     */
+    public static void runClassRenameTestTwoFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
+            SWTWorkbenchBot bot, String classNameWithRenaming, String packageRenaming, String classNameWithoutRenaming, 
+            String packageWithoutRenaming, String newClassName) throws CoreException {
+        
+        runClassRenameTestBasic(path, srcFolder,oracleFolder, 
+                bot,classNameWithRenaming, packageRenaming, newClassName);
+      
+        TestUtilsUtil.openEditor(srcFolder.getFolder(packageWithoutRenaming).getFile(classNameWithoutRenaming + 
+                JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        
+        assertEquals(getOracle(oracleFolder, classNameWithoutRenaming),getContentAfterRefactoring(bot));
+
+        if (!packageRenaming.equals(packageWithoutRenaming)){
+            srcFolder.getFolder(packageWithoutRenaming).delete(true, null);
+        }
+    }
+    
+    /**
      * Runs the basic renaming test on the classNameWithRenaming class and additionally compares
      * the classNameWithoutRenaming1 and classNameWithoutRenaming2 to its oracle.
      */

@@ -50,6 +50,7 @@ Test4: Field with same name. Other method (constructor) using parameter with sam
 
 ****** Testing Class Renaming *****
 Test1: One class, one method which uses the class in java code and JML.
-Test2: One class, one method which only references the class in JML, i.e. no java text changes recorded for that class.
-Test3:
-Test4:
+Test2: One class, one method which only references the class in JML (twice!), i.e. no java text changes recorded for that class
+Test3: Two classes, same package. OtherClass initializes TestClass.
+Test4: like Test3 but without any reference to TestClass in OtherClass, thus no java changes in that class.
+(Resolver problem) Test5: Two classes, different package.

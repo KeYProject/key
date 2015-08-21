@@ -53,7 +53,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
 
     @Override
     public String getName() {
-        return "JML Local Variables Refactoring Rename Participant";
+        return "JML Parameters Refactoring Rename Participant";
     }
 
     /**
@@ -76,6 +76,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
      * returns a TextChange Object which gathered all the changes to JML annotations 
      * in class which does not have any Java changes scheduled.
      * 
+     * !! checks only active class. will surely have java changes.
      *  {@inheritDoc}
      *
      */

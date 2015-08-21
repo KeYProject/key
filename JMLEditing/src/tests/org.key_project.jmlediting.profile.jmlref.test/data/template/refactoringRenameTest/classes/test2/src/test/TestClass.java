@@ -5,6 +5,7 @@ public class TestClass {
     
     /*@ normal_behavior
       @ ensures TestClass.balance = newBalance;
+      @ assignable TestClass.balance;
       @*/
     void setBalance(int newBalance){
         this.balance = newBalance;
