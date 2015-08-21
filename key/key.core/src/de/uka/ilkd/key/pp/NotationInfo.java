@@ -305,6 +305,13 @@ public final class NotationInfo {
         
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+    	
+    	tbl.put(integerLDT.getJavaCastByte(), new Notation.Prefix("(byte)", PRIORITY_CAST, PRIORITY_BOTTOM));
+    	tbl.put(integerLDT.getJavaCastShort(), new Notation.Prefix("(short)", PRIORITY_CAST, PRIORITY_BOTTOM));
+    	tbl.put(integerLDT.getJavaCastChar(), new Notation.Prefix("(char)", PRIORITY_CAST, PRIORITY_BOTTOM));
+    	tbl.put(integerLDT.getJavaCastInt(), new Notation.Prefix("(int)", PRIORITY_CAST, PRIORITY_BOTTOM));
+    	tbl.put(integerLDT.getJavaCastLong(), new Notation.Prefix("(long)", PRIORITY_CAST, PRIORITY_BOTTOM));
+    	
 //        tbl.put(Junctor.TRUE ,new Notation.Constant(""+UnicodeHelper.TOP, PRIORITY_ATOM));
 //        tbl.put(Junctor.FALSE,new Notation.Constant(""+UnicodeHelper.BOT, PRIORITY_ATOM));
         tbl.put(Junctor.NOT,new Notation.Prefix(""+UnicodeHelper.NEG ,PRIORITY_NEGATION,PRIORITY_NEGATION));
