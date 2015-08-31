@@ -225,6 +225,22 @@ public abstract class SequentView extends JEditorPane {
     }
 
     public abstract String getTitle();
+    
+    /* (non-Javadoc)
+     * @see javax.swing.JEditorPane#getText()
+     */
+    /**
+     * Returns the plain text of this sequent view.
+     */
+    @Override
+    public String getText() {
+        try {
+            return getDocument().getText(0, getDocument().getLength());
+        }
+        catch (BadLocationException e) {
+            return super.getText(); // shouldn't happen
+        }
+    }
 
     /**
      * Get a PosInSequent object for a given coordinate of the displayed
