@@ -114,7 +114,12 @@ public class HTMLSyntaxHighlighter {
             programVariables = new HashSet<ProgramVariable>();
         }
 
-        return addSyntaxHighlighting(toHTML(plainTextString), programVariables).replaceAll("<br>", "<br>\n");
+        // We use div-s instead of br-s because this preserves the line
+        // breaks in JEditorPane's plain text.
+        return "<div>"
+                + addSyntaxHighlighting(toHTML(plainTextString),
+                        programVariables).replaceAll("<br>", "</div><div>")
+                + "</div>";
 
     }
 
