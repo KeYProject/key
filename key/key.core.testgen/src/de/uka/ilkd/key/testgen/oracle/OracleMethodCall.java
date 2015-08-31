@@ -19,7 +19,7 @@ public class OracleMethodCall implements OracleTerm {
 	    super();
 	    this.method = method;
 	    this.args = args;
-	    caller = null;
+	    this.caller = caller;
     } 
 	
 	public String toString(){

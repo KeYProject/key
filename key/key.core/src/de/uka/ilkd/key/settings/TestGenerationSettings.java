@@ -172,6 +172,10 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		this.removeDuplicates = removeDuplicates;
 	}
 
+	public void setRemovePostCondition(boolean removePostCondition) {
+		this.removePostCondition = removePostCondition;
+	}
+	
 	public void setRFL(boolean useRFL) {
 		this.useRFL = useRFL;
 	}
