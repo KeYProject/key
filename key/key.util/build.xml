@@ -16,6 +16,7 @@
 		       destdir="${build.dir}" 
 		       includeantruntime="false" 
 		       source="1.7" 
+		       target="1.7"
 		       deprecation="off" 
 		       debug="on" 
 		       depend="${build.depend}" 

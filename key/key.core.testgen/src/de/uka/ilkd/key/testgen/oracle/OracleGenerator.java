@@ -192,6 +192,7 @@ public class OracleGenerator {
 		return constants;
 	}
 
+    /* TODO: The argument t is never used?*/
 	private List<OracleVariable> getMethodArgs(Term t){
 		
 		List<OracleVariable> result = new LinkedList<OracleVariable>();
@@ -468,17 +469,35 @@ public class OracleGenerator {
 		
 		List<OracleTerm> params = new LinkedList<OracleTerm>();
 		
-		for(int i = 2; i < term.subs().size(); i++){
+		for(int i = pm.isStatic()?1:2 ; i < term.subs().size(); i++){
 			OracleTerm param = generateOracle(term.subs().get(i), initialSelect);
 			params.add(param);
-		}		
+		}
 		
-		return new OracleMethodCall(m,params);
+		System.out.print("pm="+pm.name()+" ");
+        for(int i = 0; i < term.arity(); i++){
+            System.out.print("(i="+i+"):"+term.sub(i)+" ");
+        }
+		
+		if(pm.isStatic()){
+		    System.out.println(" isstatic ");
+		    return new OracleMethodCall(m,params);
+		}else{
+		    OracleTerm caller = generateOracle(term.sub(1),false /*TODO: what does this parameter mean?*/);
+            System.out.println(" non-static caller="+caller);
+		    return new OracleMethodCall(m,params, caller);
+		}
 	}
 
 	private OracleMethod createDummyOracleMethod(ProgramMethod pm) {
 		String body = "";
-		String methodame = pm.getName();
+		String methodName = "";
+		if(pm.isStatic()){
+		    methodName = pm.name().toString();
+		    methodName = methodName.replace("::",".");
+		}else{
+	        methodName = pm.getName(); 
+		}
 		Sort returnType = pm.getReturnType().getSort();
 		
 		List<OracleVariable> args = new LinkedList<OracleVariable>();
@@ -492,7 +511,7 @@ public class OracleGenerator {
 			
 		
 		
-		OracleMethod m = new OracleMethod(methodame, args, body, returnType);
+		OracleMethod m = new OracleMethod(methodName, args, body, returnType);
 		return m;
 	}
 	

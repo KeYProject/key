@@ -16,10 +16,9 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 public class InfoTreeNode extends DefaultMutableTreeNode {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4367487307094588140L;
+	private static final long serialVersionUID = 4187650510339169399L;
+	// the original taclet name
+    private final String altName;
     private final String description;
 
     /*
@@ -28,6 +27,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
      */
     InfoTreeNode() {
         super("root node");
+        altName = null;
         description = "This is the root node of InfoTreeModel. It should not be visible.";
     }
 
@@ -38,6 +38,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     InfoTreeNode(String title, Properties explanations) {
         super(title);
 
+        altName = null;
         String desc = explanations.getProperty(title);
 
         if (desc == null) {
@@ -50,6 +51,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
 
     InfoTreeNode(Taclet taclet) {
         super(taclet.displayName());
+        altName = taclet.name().toString();
         LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(taclet);
         description = lp.toString();
@@ -57,11 +59,20 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
 
     InfoTreeNode(String title, String description) {
         super(title);
+        altName = null;
         this.description = description;
     }
 
     String getTitle() {
         return (String) getUserObject();
+    }
+    
+    /**
+     * switch title to alternative name (i.e., internal taclet name)
+     */
+    void setTitleToAltName() {
+    	assert altName != null;
+    	userObject = altName;
     }
 
     String getDescription() {
