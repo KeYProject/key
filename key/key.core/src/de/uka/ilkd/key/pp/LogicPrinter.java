@@ -2116,7 +2116,7 @@ public class LogicPrinter {
                  sb.append("&#059;");
                  break;
              case '\n':
-                 sb.append(escapeWhitespace ? "<br>\n" : c);
+                 sb.append(escapeWhitespace ? "<br>" : c);
                  break;
              case ' ':
              	 sb.append(escapeWhitespace ? "&nbsp;" : c);

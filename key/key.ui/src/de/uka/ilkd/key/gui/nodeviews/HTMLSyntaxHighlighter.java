@@ -114,7 +114,7 @@ public class HTMLSyntaxHighlighter {
             programVariables = new HashSet<ProgramVariable>();
         }
 
-        return addSyntaxHighlighting(toHTML(plainTextString), programVariables);
+        return addSyntaxHighlighting(toHTML(plainTextString), programVariables).replaceAll("<br>", "<br>\n");
 
     }
 
