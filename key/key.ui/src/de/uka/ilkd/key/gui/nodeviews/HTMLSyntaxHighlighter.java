@@ -33,7 +33,7 @@ public class HTMLSyntaxHighlighter {
     // syntax highlighting for program variables should be realized
     // or not (can be very expensive).
     private static final int NUM_FORMULAE_IN_SEQ_THRESHOLD = 25;
-    private static final int NUM_PROGVAR_THRESHOLD = 30;
+    private static final int NUM_PROGVAR_THRESHOLD = 10;
 
     // NOTE: Spaces in this definition have been added on purpose.
     private final static String[] PROP_LOGIC_KEYWORDS = { "<->", "->", "&",
@@ -85,7 +85,6 @@ public class HTMLSyntaxHighlighter {
      *         highlighting.
      */
     public String process(String plainTextString, Node displayedNode) {
-
         
         // NOTE: Highlighting program variables is the most expensive operation.
         // There are at least to options to do this:
@@ -97,7 +96,9 @@ public class HTMLSyntaxHighlighter {
         //    Pro: No overhead for nonexisting variables.
         //    Con: May take quite long to get these variables for big sequents.
         // None of these option works sufficiently well for large sequents.
-        // We probably turn location variable highlighting off for those.
+        // We therefore turn location variable highlighting off in case that
+        // there are a lot of registered globals AND the number of formulae
+        // in the sequent is big.
         
         Iterable<? extends ProgramVariable> programVariables;
         
