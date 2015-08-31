@@ -398,8 +398,14 @@ public abstract class SequentView extends JEditorPane {
     protected synchronized Range getFirstStatementRange(Point p) {
         if (getDocument().getLength() > 0) {
             int characterIndex = correctedViewToModel(p);
-            return printer.getInitialPositionTable().
+            Range result = printer.getInitialPositionTable().
                     firstStatementRangeForIndex(characterIndex);
+            if (result == null) {
+                return null;
+            }
+            else {
+                return new Range(result.start() + 1, result.end() + 1);
+            }
         } else {
             return null;
         }
