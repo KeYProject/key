@@ -64,7 +64,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         final ProofMacro macro = getProofMacro();
         while (getNumberSteps() > 0 && getCondition() && macro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
-                    new ProofMacroListener(this, listener);
+                    new ProofMacroListener(getName(), listener);
             pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
             synchronized(macro) {
                 // wait for macro to terminate
@@ -81,7 +81,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         final ProofMacro altMacro = getAltProofMacro();
         if (steps > 0 && altMacro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
-                    new ProofMacroListener(this, listener);
+                    new ProofMacroListener(getName(), listener);
             pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, altMacro.getName(), 0));
             info = altMacro.applyTo(uic, proof, goals, posInOcc, pml);
             synchronized(altMacro) {

@@ -108,7 +108,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 }
             }
             applicable = applicable || applicableOnNodeAtPos.get(goal.node()) != null;
-        }        
+        }
         return applicable;
     }
 
@@ -135,7 +135,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             PosInOccurrence applicableAt = applicableOnNodeAtPos.get(goal.node());
             if (applicableAt != null) {
                 final ProverTaskListener pml =
-                        new ProofMacroListener(macro, listener);
+                        new ProofMacroListener(macro.getName(), listener);
                 pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, getName(), 0));
                 synchronized(macro) {
                     // wait for macro to terminate

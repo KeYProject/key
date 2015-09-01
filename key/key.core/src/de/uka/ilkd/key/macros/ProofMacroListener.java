@@ -18,12 +18,12 @@ import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
  * @author Michael Kirsten
  */
 public class ProofMacroListener implements ProverTaskListener {
-    private ProofMacro macro;
     private int numOfInvokedMacros;
     private ProverTaskListener superordinateListener;
+    private String macroName;
 
-    public ProofMacroListener(ProofMacro macro, ProverTaskListener listener) {
-        this.macro = macro;
+    public ProofMacroListener(String macroName, ProverTaskListener listener) {
+        this.macroName = macroName;
         this.numOfInvokedMacros = 0;
         this.superordinateListener = listener;
     }
@@ -31,9 +31,8 @@ public class ProofMacroListener implements ProverTaskListener {
     @Override
     public void taskStarted(TaskStartedInfo info) {
         numOfInvokedMacros++;
-        final String macroName = getMacro().getName();
         if (superordinateListener != null) {
-            superordinateListener.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, 
+            superordinateListener.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
                                             macroName
                                             + (macroName.length() == 0
                                                 ? "" : " -- ")
@@ -54,10 +53,6 @@ public class ProofMacroListener implements ProverTaskListener {
         if (superordinateListener != null) {
             superordinateListener.taskFinished(info);
         }
-    }
-
-    public ProofMacro getMacro() {
-        return this.macro;
     }
 
     public int getLevel() {

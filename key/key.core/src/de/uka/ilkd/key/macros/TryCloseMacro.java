@@ -43,9 +43,15 @@ public class TryCloseMacro extends AbstractProofMacro {
 
         private int notClosedGoals = 0;
 
-        private TryCloseProgressBarListener(ProofMacro macro, int numberGoals, int numberSteps, ProverTaskListener l) {
-            super(macro, numberGoals, numberSteps, l);
+        private TryCloseProgressBarListener(String name, int numberGoals, int numberSteps, ProverTaskListener l) {
+            super(name, numberGoals, numberSteps, l);
         }
+
+        public TryCloseProgressBarListener(int numberGoals, int numberSteps, ProverTaskListener listener) {
+            super(numberGoals, numberSteps, listener);
+        }
+
+
 
         @Override
         protected String getMessageSuffix() {
@@ -118,7 +124,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     public boolean isApplicableWithoutPosition() {
         return true;
     }
-    
+
     /*
      * Run the automation on the goal. Retreat if not successful.
      */
@@ -141,18 +147,8 @@ public class TryCloseMacro extends AbstractProofMacro {
         // assert: all goals have the same proof
 
         //
-        // set the max number of steps if given
-       
-        final ProofMacro macroAdapter = new SkipMacro() {
-            @Override
-            public String getName() { return ""; }
-            @Override
-            public String getDescription() { return "Anonymous macro"; }
-        };
-        macroAdapter.setNumberSteps(getNumberSteps());
-        //
         // The observer to handle the progress bar
-        final TryCloseProgressBarListener pml =  new TryCloseProgressBarListener(macroAdapter, goals.size(),
+        final TryCloseProgressBarListener pml =  new TryCloseProgressBarListener(goals.size(),
                                                                 getNumberSteps(), listener);
         final ImmutableList<Goal> ignoredOpenGoals =
                 setDifference(proof.openGoals(), goals);
@@ -169,8 +165,8 @@ public class TryCloseMacro extends AbstractProofMacro {
             for (final Goal goal : goals) {
                 Node node = goal.node();
                 int maxSteps = getNumberSteps() > 0 ? getNumberSteps() : proof.getSettings().getStrategySettings().getMaxSteps();
-                final ApplyStrategyInfo result = 
-                      applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal), 
+                final ApplyStrategyInfo result =
+                      applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal),
                             maxSteps, -1, false);
                 //final Goal closedGoal;
 

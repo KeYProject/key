@@ -56,7 +56,7 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 /**
  * Finishes symbolic execution while taking JML join specifications into
  * account: Branches are joined at defined points during the execution.
- * 
+ *
  * @author Dominic Scheurer
  * @see FinishSymbolicExecutionMacro
  */
@@ -101,22 +101,8 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         final ImmutableList<Goal> ignoredOpenGoals = setDifference(
                 proof.openGoals(), goals);
 
-        final ProofMacro macroAdapter = new SkipMacro() {
-            @Override
-            public String getName() {
-                return "";
-            }
-
-            @Override
-            public String getDescription() {
-                return "Anonymous macro";
-            }
-        };
-
-        macroAdapter.setNumberSteps(getNumberSteps());
-
         // The observer to handle the progress bar
-        final ProofMacroListener pml = new ProgressBarListener(macroAdapter,
+        final ProofMacroListener pml = new ProgressBarListener(
                 goals.size(), getNumberSteps(), listener);
         applyStrategy.addProverTaskObserver(pml);
 
@@ -218,7 +204,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
     /**
      * Returns true iff there is a modality in the sequent of the given node.
-     * 
+     *
      * @param node
      *            Node to check.
      * @return True iff there is a modality in the sequent of the given node.
@@ -236,7 +222,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
     /**
      * Recursive check for existence of modality.
-     * 
+     *
      * @param term
      *            The term to check.
      * @return True iff there is a modality in the sequent of the given term.
@@ -311,7 +297,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             final StatementBlock innerMostMethodFrameBody =
                     JavaTools.getInnermostMethodFrame(
                             JavaBlock.createJavaBlock(sb), services).getBody();
-            
+
             if (innerMostMethodFrameBody.getBody().size() > 0 &&
                     innerMostMethodFrameBody.getBody().get(0) instanceof Try) {
                 return ((Try) innerMostMethodFrameBody.getBody().get(0)).getBody();
@@ -533,7 +519,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         /**
          * Returns a set of join points for the given statement block. Join
          * points are directly registered once they are found.
-         * 
+         *
          * @param toSearch
          *            The statement block to search for join points.
          * @param goal
@@ -615,7 +601,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             for (SequentFormula formula : succedent.asList()) {
                 JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
                         formula.formula());
-                
+
                 StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program(), services);
 
                 if (blockWithoutMethodFrame.isEmpty()) {
@@ -632,7 +618,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
 
             return null;
         }
-        
+
         /**
          * @param succedent
          *            Succedent of a sequent.
@@ -661,30 +647,30 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
             for (SequentFormula formula : succedent.asList()) {
                 JavaBlock javaBlock = JoinRuleUtils.getJavaBlockRecursive(
                         formula.formula());
-                
+
                 StatementBlock blockWithoutMethodFrame = stripMethodFrame((StatementBlock) javaBlock.program(), services);
-                
+
                 if (blockWithoutMethodFrame.isEmpty()) {
                     continue;
                 }
-                
+
                 SourceElement activeStatement = null;
                 do {
                     final SourceElement oldActiveStatement = activeStatement;
                     activeStatement = JavaTools
                             .getActiveStatement(javaBlock);
-                    
+
                     if (oldActiveStatement != null && oldActiveStatement.equals(activeStatement)) {
                         break;
                     }
-                    
+
                     try {
                         javaBlock = JavaTools.removeActiveStatement(javaBlock, services);
                     } catch (IndexOutOfBoundsException e) {
                         // No more statement to check
                         break;
                     }
-                    
+
                     if (activeStatement instanceof Statement
                             && pred.holdsFor((Statement) activeStatement)) {
                         return true;
@@ -696,7 +682,7 @@ public class FinishSymbolicExecutionWithSpecJoinsMacro extends
         }
 
     }
-    
+
     private static interface Predicate<T> {
         boolean holdsFor(T arg);
     }
