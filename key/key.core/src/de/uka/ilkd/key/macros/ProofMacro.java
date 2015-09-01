@@ -72,10 +72,6 @@ import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
  */
 public interface ProofMacro {
 
-    public void setNumberSteps(int numberSteps);
-
-    public int getNumberSteps();
-
     /**
      * Gets the name of this macro.
      *

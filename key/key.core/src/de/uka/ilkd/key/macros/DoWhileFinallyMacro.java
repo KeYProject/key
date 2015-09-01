@@ -59,10 +59,9 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException, Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
-        setMaxSteps(proof);
-        int steps = getNumberSteps();
+        int steps = getMaxSteps(proof);
         final ProofMacro macro = getProofMacro();
-        while (getNumberSteps() > 0 && getCondition() && macro.canApplyTo(proof, goals, posInOcc)) {
+        while (steps > 0 && getCondition() && macro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
                     new ProofMacroListener(getName(), listener);
             pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
@@ -72,7 +71,6 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
             }
             pml.taskFinished(info);
             steps -= info.getAppliedRules();
-            setNumberSteps(steps);
             info = new ProofMacroFinishedInfo(this, info);
             goals = info.getGoals();
             proof = info.getProof();
@@ -108,23 +106,4 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     protected abstract ProofMacro getAltProofMacro();
 
     protected abstract boolean getCondition();
-
-    /**
-     * Sets the maximum number of rule applications allowed for
-     * this macro. The default implementation is the maximum amount
-     * of proof steps for automatic mode.
-     * @return the maximum number of rule applications allowed for
-     * this macro
-     */
-    protected void setMaxSteps(Proof proof) {
-        final int steps;
-        if (proof != null) {
-            steps = proof.getSettings()
-                         .getStrategySettings().getMaxSteps();
-        } else {
-            steps = ProofSettings.DEFAULT_SETTINGS
-                    .getStrategySettings().getMaxSteps();
-        }
-        setNumberSteps(steps);
-    }
 }
