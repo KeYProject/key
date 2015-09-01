@@ -36,7 +36,7 @@ public class HTMLSyntaxHighlighter {
     private static final int NUM_PROGVAR_THRESHOLD = 10;
 
     // NOTE: Spaces in this definition have been added on purpose.
-    private final static String[] PROP_LOGIC_KEYWORDS = { "<->", "->", "&",
+    private final static String[] PROP_LOGIC_KEYWORDS = { "<->", "->", " & ",
             " | ", "!", "true", "false", };
     
     private final static String[] DYNAMIC_LOGIC_KEYWORDS = { "\\forall",
