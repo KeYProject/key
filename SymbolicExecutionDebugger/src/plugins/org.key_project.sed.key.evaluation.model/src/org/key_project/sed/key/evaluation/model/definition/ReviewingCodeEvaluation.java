@@ -320,7 +320,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 
    
    private QuestionPage createValueSearchQuestionPage(String pageName, String title) {
-      String description = "find(int[], int) related question.";
+      String method = "find(int[], int)";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -340,7 +341,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("array is not modified during search", "ArrayNotModified"), 
                                                              createThrownExceptionsQuestionChoice(description, true, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -350,7 +351,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String executedTitle = createExecutedQuestion("find(int[], int)");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -377,13 +378,13 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               createGeneralClassDescriptionQuestion("ValueSearch"),
                               implementedAsDocumented,
                               executedQuestion,
-                              createValueSearchLocationQuestion(description),
+                              createValueSearchLocationQuestion(description, method),
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
    }
 
-   private CheckboxQuestion createValueSearchLocationQuestion(String description) {
-      String title = createChangedLocationTitle("ValueSearch");
+   private CheckboxQuestion createValueSearchLocationQuestion(String description, String method) {
+      String title = createChangedLocationTitle("ValueSearch", method);
       return new CheckboxQuestion("changedLocations", 
                                   title, 
                                   description,
@@ -404,7 +405,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
 
    private QuestionPage createBankUtilQuestionPage(String pageName, String title) {
-      String description = "computeInsuranceRate(int) related question.";
+      String method = "computeInsuranceRate(int)";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -420,7 +422,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Wrong value returned in case age >= 35", "WrongGreaterOrEqual35", true, createBankUtilReturnedValue(description, true)), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -430,7 +432,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String executedTitle = createExecutedQuestion("computeInsuranceRate(int)");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -498,7 +500,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 
    
    private QuestionPage createMathUtilQuestionPage(String pageName, String title) {
-      String description = "median(int[], int, int) related question.";
+      String method = "median(int[], int, int)";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -518,7 +521,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Value is returned instead of thrown exception", "ValueReturned"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -528,7 +531,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = createExecutedQuestion("median(int[], int, int)");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -571,7 +574,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 
    
    private QuestionPage createIntegerUtilQuestionPage(String pageName, String title) {
-      String description = "middle(int, int, int) related question.";
+      String method = "middle(int, int, int)";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -590,7 +594,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("z returned instead of y", "zInsteadOfy"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -600,7 +604,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String executedTitle = createExecutedQuestion("middle(int, int, int)");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -670,7 +674,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
    
    private TabQuestion createObservableArrayArrayTab() {
-      String description = "ObservableArray(Object[]) related question.";
+      String method = "ObservableArray(Object[])";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -685,7 +690,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Exception is thrown instead of creating an ObservableArray", "ExceptionThrown"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(true);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, true);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -695,7 +700,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = createExecutedQuestion("ObservableArray(Object[])");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -709,18 +714,19 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 33: this.array = array", "Line 33", true),
                                                                new Choice("Line 34: this.arrayListeners = null", "Line 34", true));
       return new TabQuestion("ObservableArray", 
-                             "ObservableArray(Object[])", 
+                             method, 
                              false, 
                              implementedAsDocumented,
-                             createObservableArrayClassInvariantQuestion(description, true),
+                             createObservableArrayClassInvariantQuestion(description, method, true),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, true, true, false),
+                             createObservableArrayLocationQuestion(description, method, true, true, false),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
    
    private TabQuestion createSetTab() {
-      String description = "set(int, Object) related question.";
+      String method = "set(int, Object)";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -739,7 +745,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("The ArrayEvent does not contains all details about the modification.", "ArrayEventDoesNotHaveDetails"), 
                                                              createThrownExceptionsQuestionChoice(description, true, false, false, false, true, true),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -749,7 +755,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = createExecutedQuestion("set(int, Object)");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -767,18 +773,19 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 63: if (arrayListeners[i] != null)", "Line 63", true),
                                                                new Choice("Line 64: arrayListeners[i].elementChanged(e)", "Line 64", true));
       return new TabQuestion("set", 
-                             "set(int, Object)", 
+                             method, 
                              false, 
                              implementedAsDocumented,
-                             createObservableArrayClassInvariantQuestion(description, false),
+                             createObservableArrayClassInvariantQuestion(description, method, false),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, false, false, true),
+                             createObservableArrayLocationQuestion(description, method, false, false, true),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
    
    private TabQuestion createSetArrayListenersTab() {
-      String description = "setArrayListeners(ArrayListener[]) related question.";
+      String method = "setArrayListeners(ArrayListener[])";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -791,7 +798,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("ArrayListener are not replaced by the new one", "ArrayListenerNotReplaced"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -801,7 +808,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = createExecutedQuestion("setArrayListeners(ArrayListener[])");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -812,17 +819,17 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("None of the statements can be executed", "None"),
                                                                new Choice("Line 75: this.arrayListeners = arrayListeners", "Line 75", true));
       return new TabQuestion("setArrayListeners", 
-                             "setArrayListeners(ArrayListener[])", 
+                             method, 
                              false, 
                              implementedAsDocumented,
-                             createObservableArrayClassInvariantQuestion(description, false),
+                             createObservableArrayClassInvariantQuestion(description, method, false),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, false, true, false),
+                             createObservableArrayLocationQuestion(description, method, false, true, false),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
    
-   private RadioButtonsQuestion createObservableArrayClassInvariantQuestion(String description, boolean constructor) {
+   private RadioButtonsQuestion createObservableArrayClassInvariantQuestion(String description, String method, boolean constructor) {
       String problemsTitle = "What is wrong?";
       CheckboxQuestion problems = new CheckboxQuestion("classInvariantProblems", 
                                                        problemsTitle, 
@@ -847,8 +854,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                        new Choice("arrayListeners might contain an Object as element", "ArrayarrayListenersContainsObject"), 
                                                        createElseWrongChoice(description));
       String title = constructor ?
-                     "Is the class invariant established?" :
-                     "Is the class invariant preserved?";
+                     "Is the class invariant established by " + method + "?" :
+                     "Is the class invariant preserved by " + method + "?";
       return new RadioButtonsQuestion("classInvariant", 
                                       title, 
                                       description,
@@ -860,8 +867,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                       new Choice("No", "No", problems));
    }
 
-   private CheckboxQuestion createObservableArrayLocationQuestion(String description, boolean expectedArray, boolean expectedArrayListeners, boolean expectedArrayAtIndex) {
-      String title = createChangedLocationTitle("ObservableArray");
+   private CheckboxQuestion createObservableArrayLocationQuestion(String description, String method, boolean expectedArray, boolean expectedArrayListeners, boolean expectedArrayAtIndex) {
+      String title = createChangedLocationTitle("ObservableArray", method);
       return new CheckboxQuestion("changedLocations", 
                                   title, 
                                   description,
@@ -931,7 +938,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
    
    private TabQuestion createStackIntTab() {
-      String description = "Stack(int) related question.";
+      String method = "Stack(int)";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -946,7 +954,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("The created stack can not be filled up to maximal size", "StackSizeNotMaximal"),
                                                              createThrownExceptionsQuestionChoice(description, false, true, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(true);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, true);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -956,7 +964,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = createExecutedQuestion("Stack(int)");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -968,18 +976,19 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 33: elements = new Object[maximalSize]", "Line 33", true),
                                                                new Choice("Line 34: size = 0", "Line 34", true));
       return new TabQuestion("Stack_int", 
-                             "Stack(int)", 
+                             method, 
                              false, 
                              implementedAsDocumented,
-                             createStackClassInvariantQuestion(description, true, false),
+                             createStackClassInvariantQuestion(description, method, true, false),
                              executedQuestion,
-                             createStackLocationQuestion(description, true, true, false),
+                             createStackLocationQuestion(description, method, true, true, false),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
    
    private TabQuestion createStackStackTab() {
-      String description = "Stack(Stack) related question.";
+      String method = "Stack(Stack)";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -998,7 +1007,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("The created stack has different elements array as the existing one", "DifferentElements"),
                                                              createThrownExceptionsQuestionChoice(description, true, false, false, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(true);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, true);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -1008,7 +1017,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String executedTitle = createExecutedQuestion("Stack(Stack)");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -1020,18 +1029,19 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 43: this.elements = existingStack.elements", "Line 43", true),
                                                                new Choice("Line 44: this.size = existingStack.size", "Line 44", true));
       return new TabQuestion("Stack_Stack", 
-                             "Stack(Stack)", 
+                             method, 
                              false, 
                              implementedAsDocumented,
-                             createStackClassInvariantQuestion(description, true, false),
+                             createStackClassInvariantQuestion(description, method, true, false),
                              executedQuestion,
-                             createStackLocationQuestion(description, true, true, false),
+                             createStackLocationQuestion(description, method, true, true, false),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
    
    private TabQuestion createPushTab() {
-      String description = "push(Object) related question.";
+      String method = "push(Object)";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -1051,7 +1061,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Executing pop after push would not return the added element.", "PushPopBroken"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, true, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -1061,7 +1071,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes", true), 
                                                                               new Choice("No", "No", methodProblems));
-      String executedTitle = createExecutedQuestion("push(Object)");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -1074,18 +1084,19 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 54: elements[size++] = e", "Line 54", true),
                                                                new Choice("Line 57: throw new IllegalStateException(\"Stack is full.\")", "Line 57", true));
       return new TabQuestion("push(Object)", 
-                             "push(Object)", 
+                             method, 
                              false, 
                              implementedAsDocumented,
-                             createStackClassInvariantQuestion(description, false, false),
+                             createStackClassInvariantQuestion(description, method, false, false),
                              executedQuestion,
-                             createStackLocationQuestion(description, false, true, true),
+                             createStackLocationQuestion(description, method, false, true, true),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
    
    private TabQuestion createPopTab() {
-      String description = "pop() related question.";
+      String method = "pop()";
+      String description = method + " related question.";
       String methodProblemsTitle = createWhatsWrongTitle();
       CheckboxQuestion methodProblems = new CheckboxQuestion("methodProblems", 
                                                              methodProblemsTitle, 
@@ -1105,7 +1116,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Executing pop twice would return the same element twice.", "PopPopBroken"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, true, false, false, false),
                                                              createElseWrongChoice(description));
-      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(false);
+      String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
                                                                               implementedAsDocumentedTitle, 
                                                                               description,
@@ -1127,7 +1138,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                           new Choice("An object might be returned", "ObjectReturned", true),
                                                           new Choice("Element at index size is returned", "ElementAtSizeReturned"),
                                                           new Choice("Element at index size - 1 is returned", "ElementAtSizePlusOneReturned", true));
-      String executedTitle = createExecutedQuestion("pop()");
+      String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
                                                                description,
@@ -1140,12 +1151,12 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 68: return elements[--size]", "Line 68", true),
                                                                new Choice("Line 71: throw new IllegalStateException(\"Stack is empty.\")", "Line 71", true));
       return new TabQuestion("pop()", 
-                             "pop()", 
+                             method, 
                              false, 
                              implementedAsDocumented,
-                             createStackClassInvariantQuestion(description, false, true),
+                             createStackClassInvariantQuestion(description, method, false, true),
                              executedQuestion,
-                             createStackLocationQuestion(description, false, true, false),
+                             createStackLocationQuestion(description, method, false, true, false),
                              returnValue,
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
@@ -1223,7 +1234,10 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       return new TextQuestion("whatsWrong", title, description, null, new NotUndefinedValueValidator("Question '" + title + "' not answered."), false, 400, -1);
    }
    
-   private RadioButtonsQuestion createStackClassInvariantQuestion(String description, boolean constructor, boolean expectedMemoryLeak) {
+   private RadioButtonsQuestion createStackClassInvariantQuestion(String description, 
+                                                                  String method,
+                                                                  boolean constructor, 
+                                                                  boolean expectedMemoryLeak) {
       String problemsTitle = "What is wrong?";
       CheckboxQuestion problems = new CheckboxQuestion("classInvariantProblems", 
                                                        problemsTitle, 
@@ -1246,8 +1260,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                        new Choice("size might be > elements.length", "SizeGreaterArrayLength"), 
                                                        createElseWrongChoice(description));
       String title = constructor ?
-                     "Is the class invariant established?" :
-                     "Is the class invariant preserved?";
+                     "Is the class invariant established by " + method + "?" :
+                     "Is the class invariant preserved by " + method + "?";
       return new RadioButtonsQuestion("classInvariant", 
                                       title, 
                                       description,
@@ -1259,8 +1273,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                       new Choice("No", "No", expectedMemoryLeak, problems));
    }
 
-   private CheckboxQuestion createStackLocationQuestion(String description, boolean expectedElements, boolean expectedSize, boolean expectedElementAtPlus1) {
-      String title = createChangedLocationTitle("Stack");
+   private CheckboxQuestion createStackLocationQuestion(String description, String method, boolean expectedElements, boolean expectedSize, boolean expectedElementAtPlus1) {
+      String title = createChangedLocationTitle("Stack", method);
       return new CheckboxQuestion("changedLocations", 
                                   title, 
                                   description,
@@ -1344,16 +1358,16 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       return "Which is the ovserved wrong behavior?";
    }
    
-   private String createChangedLocationTitle(String className) {
-      return "Which locations of class '" + className + "' might be changed during execution of the source code? (Expressions are evaluated in the post state after method return.)";
+   private String createChangedLocationTitle(String className, String method) {
+      return "Which locations of class '" + className + "' might be changed during execution of " + method + "? (Expressions are evaluated in the post state after method return.)";
    }
    
-   private String createImplementedAsDocumentedTitle(boolean constructor) {
+   private String createImplementedAsDocumentedTitle(String method, boolean constructor) {
       if (constructor) {
-         return "Does the constructor implementation always behaves as specified by its JavaDoc comment assuming that documented preconditions hold?";
+         return "Does the constructor implementation of " + method + " always behaves as specified by its JavaDoc comment?";
       }
       else {
-         return "Does the method implementation always behaves as specified by its JavaDoc comment assuming that documented preconditions hold?";
+         return "Does the method implementation of " + method + "  always behaves as specified by its JavaDoc comment?";
       }
    }
 
