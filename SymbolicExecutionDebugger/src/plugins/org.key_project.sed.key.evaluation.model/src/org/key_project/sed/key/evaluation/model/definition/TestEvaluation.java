@@ -42,7 +42,7 @@ public class TestEvaluation extends AbstractEvaluation {
                                                       new CheckboxQuestion("checkboxQuestion", "checkboxQuestionLabel", false, "option1", new FixedValueValidator("option2", "errorMessage"), true, new Choice("option2", "option2", yesSubQuestion), new Choice("option1", "option1")),
                                                       new LabelQuestion("labelQuestion", "labelQuestionLabel"),
                                                       new SectionQuestion("sectionQuestion", "sectionQuestionLabel", false, yesSubQuestion),
-                                                      new TextQuestion("textQuestion", "textQuestionLabel", null, null, false));
+                                                      new TextQuestion("textQuestion", "textQuestionLabel", null, null, false, -1, -1));
          SendFormPage sendFixedPage = new SendFormPage("sendFixedPage", "sendFixedPageTitle", "sendFixedPageMessage", "additionalDataCollectedByServer");
          FixedForm fixedForm = new FixedForm("fixedForm", false, questionPage, sendFixedPage);
          InstructionPage instructionPage = new InstructionPage("instructionPage", "instructionPageTitle", "instructionPageMessage", new URL("http://key-project.org/"), null);

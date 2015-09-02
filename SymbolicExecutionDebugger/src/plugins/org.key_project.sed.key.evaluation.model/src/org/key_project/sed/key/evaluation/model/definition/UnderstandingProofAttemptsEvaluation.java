@@ -637,18 +637,18 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String reasonTitle = "What is the reason?";
       return new Choice("Something else is the reason why the proof is still open", 
                         "Something else", 
-                        new TextQuestion("reason", reasonTitle, null, new NotUndefinedValueValidator("Question '" + reasonTitle + "' not answered."), false));
+                        new TextQuestion("reason", reasonTitle, null, new NotUndefinedValueValidator("Question '" + reasonTitle + "' not answered."), false, 400, -1));
    }
    
    private TextQuestion createElseLocationSubQuestion() {
       String locationTitle = "Which location(s) have changed?";
-      return new TextQuestion("changedLocation", locationTitle, null, new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), false);
+      return new TextQuestion("changedLocation", locationTitle, null, new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), false, 400, -1);
    }
    
 
    private TextQuestion createElseExceptionSubQuestion() {
       String exceptionTitle = "Which exception is thrown?";
-      return new TextQuestion("thrownException", exceptionTitle, null, new NotUndefinedValueValidator("Question '" + exceptionTitle + "' not answered."), false);
+      return new TextQuestion("thrownException", exceptionTitle, null, new NotUndefinedValueValidator("Question '" + exceptionTitle + "' not answered."), false, 400, -1);
    }
 
    private Choice createBugfreeChoice() {
@@ -846,7 +846,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       SectionQuestion feedbackSection = new SectionQuestion("feedback", 
                                                             "Feedback", 
                                                             true, 
-                                                            new TextQuestion("feedback", "Feedback about the tools or the evaluation (optional)", null, null, false));
+                                                            new TextQuestion("feedback", "Feedback about the tools or the evaluation (optional)", null, null, false, 400, 200));
       return new QuestionPage(FEEDBACK_PAGE,
                               "Feedback", 
                               "Please answer the question to give us some feeback about the tools and the evaluation.", 

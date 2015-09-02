@@ -302,7 +302,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       SectionQuestion feedbackSection = new SectionQuestion("feedback", 
                                                             "Feedback", 
                                                             true, 
-                                                            new TextQuestion("feedback", "Feedback about the tools or the evaluation (optional)", null, null, false));
+                                                            new TextQuestion("feedback", "Feedback about the tools or the evaluation (optional)", null, null, false, 400, 200));
       return new QuestionPage(FEEDBACK_PAGE,
                               "Feedback", 
                               "Please answer the question to give us some feeback about the tools and the evaluation.", 
@@ -1189,7 +1189,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                           null, 
                                                           null, 
                                                           false,
-                                                          new Tool[] {getTool(NO_TOOL_NAME)});
+                                                          new Tool[] {getTool(NO_TOOL_NAME)},
+                                                          400, 
+                                                          200);
       String title = "Have you executed/debugged the source code to answer the questions?";
       return new RadioButtonsQuestion("codeExecuted", 
                                       title, 
@@ -1209,7 +1211,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 
    private TextQuestion createElseReturnedSubQuestion(String description) {
       String title = "What is returned?";
-      return new TextQuestion("whatsReturned", title, description, null, new NotUndefinedValueValidator("Question '" + title + "' not answered."), false);
+      return new TextQuestion("whatsReturned", title, description, null, new NotUndefinedValueValidator("Question '" + title + "' not answered."), false, 400, -1);
    }
 
    private Choice createElseWrongChoice(String description) {
@@ -1218,7 +1220,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 
    private TextQuestion createElseWrongSubQuestion(String description) {
       String title = "What else is wrong?";
-      return new TextQuestion("whatsWrong", title, description, null, new NotUndefinedValueValidator("Question '" + title + "' not answered."), false);
+      return new TextQuestion("whatsWrong", title, description, null, new NotUndefinedValueValidator("Question '" + title + "' not answered."), false, 400, -1);
    }
    
    private RadioButtonsQuestion createStackClassInvariantQuestion(String description, boolean constructor, boolean expectedMemoryLeak) {
@@ -1279,7 +1281,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private TextQuestion createElseLocationSubQuestion(String description) {
       String locationTitle = "Which additional location(s) can be changed?";
-      return new TextQuestion("elseLocation", locationTitle, description, null, new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), false);
+      return new TextQuestion("elseLocation", locationTitle, description, null, new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), false, 400, -1);
    }
 
    private Choice createThrownExceptionsQuestionChoice(String description, 
@@ -1317,7 +1319,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 
    private TextQuestion createElseExceptionSubQuestion(String description) {
       String exceptionTitle = "Which exception is thrown?";
-      return new TextQuestion("thrownException", exceptionTitle, description, null, new NotUndefinedValueValidator("Question '" + exceptionTitle + "' not answered."), false);
+      return new TextQuestion("thrownException", exceptionTitle, description, null, new NotUndefinedValueValidator("Question '" + exceptionTitle + "' not answered."), false, 400, -1);
    }
    
    private IValueValidator createNotUndefinedValueValidator(String questionTitle) {

@@ -38,7 +38,14 @@ public class TextManager extends AbstractEditableQuestionInputManager {
       composite.setLayout(new GridLayout(1, false));
       createSection(toolkit, composite, question);
       text = toolkit.createText(composite, questionInput.getValue(), SWT.MULTI | SWT.V_SCROLL);
-      text.setLayoutData(new GridData(GridData.FILL_BOTH));
+      GridData textData = new GridData(GridData.FILL_BOTH);
+      if (question.getWidthHint() > 0) {
+         textData.widthHint = question.getWidthHint();
+      }
+      if (question.getHeightHint() > 0) {
+         textData.heightHint = question.getHeightHint();
+      }
+      text.setLayoutData(textData);
       text.addModifyListener(new ModifyListener() {
          @Override
          public void modifyText(ModifyEvent e) {
