@@ -1339,7 +1339,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
    
    private String createWhatsWrongTitle() {
-      return "Which is the ovserved wrong behavior assuming that documented precondition holds?";
+      return "Which is the ovserved wrong behavior?";
    }
    
    private String createChangedLocationTitle(String className) {

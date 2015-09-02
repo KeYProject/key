@@ -26,7 +26,7 @@ public abstract class AbstractSearch {
     * Checks whether the specified array location matches the search criteria.
     * @param array The array in which the search is performed.
     * @param index The current array index to check.
-    * @return {@code true} location matches search critiera, {@code false} otherwise.
+    * @return {@code true} location matches search criteria, {@code false} otherwise.
     */
    protected abstract boolean accept(int[] array, int index);
 }

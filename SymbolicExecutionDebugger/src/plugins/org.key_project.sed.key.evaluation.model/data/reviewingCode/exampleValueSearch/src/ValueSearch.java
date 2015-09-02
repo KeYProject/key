@@ -24,7 +24,7 @@ public class ValueSearch extends AbstractSearch {
     * Checks whether the specified location is equal to {@link #value}.
     * @param array The array in which the search is performed.
     * @param index The current array index to check.
-    * @return {@code true} location matches search critiera, {@code false} otherwise.
+    * @return {@code true} location matches search criteria, {@code false} otherwise.
     */
    protected boolean accept(int[] array, int index) {
       if (index < 0 || index >= array.length) {
