@@ -11,6 +11,7 @@ import org.key_project.sed.key.evaluation.model.definition.Tool;
 
 public class RandomFormInput extends AbstractFormInput<RandomForm> {
    public static final String PROP_PAGE_ORDER = "pageOrder";
+   public static final String PROP_PAGE_TOOL_MAP = "pageToolMap";
 
    private List<AbstractPageInput<?>> pageOrder;
    
@@ -51,7 +52,9 @@ public class RandomFormInput extends AbstractFormInput<RandomForm> {
    }
    
    public void setTool(AbstractPageInput<?> page, Tool tool) {
+      Map<AbstractPageInput<?>, Tool> oldValue = new HashMap<AbstractPageInput<?>, Tool>(pageToolMap);
       pageToolMap.put(page, tool);
+      firePropertyChange(PROP_PAGE_ORDER, oldValue, pageToolMap);
    }
 
    @Override

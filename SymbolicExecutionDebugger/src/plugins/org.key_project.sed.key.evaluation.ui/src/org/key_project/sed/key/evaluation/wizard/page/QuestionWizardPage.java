@@ -130,7 +130,7 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
                manager = createCheckboxes(wizardPage, toolkit, parent, questionInput, (CheckboxQuestion) questionInput.getQuestion(), callback);
             }
             else if (questionInput.getQuestion() instanceof LabelQuestion) {
-               manager = createLabel(toolkit, parent, (LabelQuestion) questionInput.getQuestion());
+               manager = createLabel(toolkit, parent, questionInput, (LabelQuestion) questionInput.getQuestion());
             }
             else if (questionInput.getQuestion() instanceof ImageQuestion) {
                manager = createImage(toolkit, parent, (ImageQuestion) questionInput.getQuestion());
@@ -169,8 +169,8 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       return new CheckboxManager(wizardPage, toolkit, parent, questionInput, question, callback);
    }
 
-   public static LabelManager createLabel(FormToolkit toolkit, Composite parent, LabelQuestion question) {
-      return new LabelManager(toolkit, parent, question);
+   public static LabelManager createLabel(FormToolkit toolkit, Composite parent, QuestionInput questionInput, LabelQuestion question) {
+      return new LabelManager(toolkit, parent, questionInput, question);
    }
 
    public static ImageManager createImage(FormToolkit toolkit, Composite parent, ImageQuestion question) {

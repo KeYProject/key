@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.model.definition;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier;
@@ -373,7 +374,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleValueSearch/proofs/find.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/find.proof", false, "ValueSearch", "find", new String[] {"[I", "I"})},
                                                                    new FileDefinition("data/reviewingCode/exampleValueSearch/src/AbstractSearch.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/AbstractSearch.java", true),
                                                                    new FileDefinition("data/reviewingCode/exampleValueSearch/src/ValueSearch.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ValueSearch.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralClassDescription("ValueSearch")),
+                              createGeneralClassDescriptionQuestion("ValueSearch"),
                               implementedAsDocumented,
                               executedQuestion,
                               createValueSearchLocationQuestion(description),
@@ -457,7 +458,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    null,
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleInsuranceRate/proofs/computeInsuranceRate.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/computeInsuranceRate.proof", false, "BankUtil", "computeInsuranceRate", new String[] {"I"})},
                                                                    new FileDefinition("data/reviewingCode/exampleInsuranceRate/src/BankUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/BankUtil.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralClassDescription("BankUtil")),
+                              createGeneralClassDescriptionQuestion("BankUtil"),
                               implementedAsDocumented,
                               executedQuestion,
                               createSEDUsedQuestion(),
@@ -556,7 +557,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    null,
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleMedian/proofs/median.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/median.proof", false, "MathUtil", "median", new String[] {"[I", "I", "I"})},
                                                                    new FileDefinition("data/reviewingCode/exampleMedian/src/MathUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MathUtil.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralClassDescription("MathUtil")),
+                              createGeneralClassDescriptionQuestion("MathUtil"),
                               implementedAsDocumented,
                               executedQuestion,
                               createSEDUsedQuestion(),
@@ -628,7 +629,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    null,
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleMiddle/proofs/middle.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/middle.proof", false, "IntegerUtil", "middle", new String[] {"I", "I", "I"})},
                                                                    new FileDefinition("data/reviewingCode/exampleMiddle/src/IntegerUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/IntegerUtil.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralClassDescription("IntegerUtil")),
+                              createGeneralClassDescriptionQuestion("IntegerUtil"),
                               implementedAsDocumented,
                               executedQuestion,
                               createSEDUsedQuestion(),
@@ -664,7 +665,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    new FileDefinition("data/reviewingCode/exampleObservableArray/src/ArrayEvent.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayEvent.java", true),
                                                                    new FileDefinition("data/reviewingCode/exampleObservableArray/src/ArrayListener.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayListener.java", true),
                                                                    new FileDefinition("data/reviewingCode/exampleObservableArray/src/ObservableArray.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ObservableArray.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralClassDescription("ObservableArray")),
+                              createGeneralClassDescriptionQuestion("ObservableArray"),
                               tabbedQuestion);
    }
    
@@ -925,7 +926,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                                                   new ProofFileFileDefinition("data/reviewingCode/exampleStack/proofs/push.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/push.proof", false, "Stack", "push", new String[] {"QObject;"}),
                                                                                                   new ProofFileFileDefinition("data/reviewingCode/exampleStack/proofs/pop.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/pop.proof", false, "Stack", "pop", new String[] {})},
                                                                    new FileDefinition("data/reviewingCode/exampleStack/src/Stack.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Stack.java", true)),
-                              new LabelQuestion("generalDescription", createGeneralClassDescription("Stack")),
+                              createGeneralClassDescriptionQuestion("Stack"),
                               tabbedQuestion);
    }
    
@@ -1322,9 +1323,11 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    private IValueValidator createNotUndefinedValueValidator(String questionTitle) {
       return new NotUndefinedValueValidator("Question '" + questionTitle + "' not answered.");
    }
-
-   private String createGeneralClassDescription(String className) {
-      return "Please inspect the current source code of class '" + className + "' carefully and answer the following questions about it as best as possible.";
+   
+   private LabelQuestion createGeneralClassDescriptionQuestion(String className) {
+      return new LabelQuestion("generalDescription", 
+                               "Please inspect the current source code of class '" + className + "' carefully and answer the following questions about it as best as possible.",
+                               Collections.singletonMap(getTool(SED_TOOL_NAME), "Please inspect the the current symbolic execution tree and the source code of class '" + className + "' carefully and answer the following questions about it as best as possible."));
    }
 
    protected String createQuestionPageMessage() {
