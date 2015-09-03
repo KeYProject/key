@@ -519,7 +519,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("array is not modified during compuation", "ArrayNotModified"), 
                                                              new Choice("Exception is thrown instead of returning average", "ExceptionThrown"), 
                                                              new Choice("Value is returned instead of thrown exception", "ValueReturned"), 
-                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
+                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, true, false),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
@@ -529,8 +529,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               null, 
                                                                               createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
                                                                               true,
-                                                                              new Choice("Yes", "Yes", true), 
-                                                                              new Choice("No", "No", methodProblems));
+                                                                              new Choice("Yes", "Yes"), 
+                                                                              new Choice("No", "No", true, methodProblems));
       String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
@@ -540,16 +540,16 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 22: if (array == null)", "Line 22", true),
-                                                               new Choice("Line 23: throw new IllegalArgumentException(\"Array is null.\")", "Line 23", true),
-                                                               new Choice("Line 25: if (start < 0 || start >= array.length)", "Line 25", true),
-                                                               new Choice("Line 26: throw new IllegalArgumentException(\"Start is not within the array bounds.\")", "Line 26", true),
-                                                               new Choice("Line 28: if (end < 0 || end >= array.length)", "Line 28", true),
-                                                               new Choice("Line 29: throw new IllegalArgumentException(\"Start is not within the array bounds.\")", "Line 29", true),
-                                                               new Choice("Line 32: int middle = (start + end) / 2", "Line 32", true),
-                                                               new Choice("Line 33:  if ((start + end) % 2 == 0)", "Line 33", true),
-                                                               new Choice("Line 34: return array[middle]", "Line 34", true),
-                                                               new Choice("Line 37: return (array[middle] + array[middle + 1]) / 2", "Line 37", true));
+                                                               new Choice("Line 24: if (array == null)", "Line 22", true),
+                                                               new Choice("Line 25: throw new IllegalArgumentException(\"Array is null.\")", "Line 23", true),
+                                                               new Choice("Line 27: if (start < 0 || start >= array.length)", "Line 25", true),
+                                                               new Choice("Line 28: throw new IllegalArgumentException(\"Start is not within the array bounds.\")", "Line 26", true),
+                                                               new Choice("Line 30: if (end < 0 || end >= array.length)", "Line 28", true),
+                                                               new Choice("Line 31: throw new IllegalArgumentException(\"Start is not within the array bounds.\")", "Line 29", true),
+                                                               new Choice("Line 34: int middle = (start + end) / 2", "Line 32", true),
+                                                               new Choice("Line 35: if ((start + end) % 2 == 0)", "Line 33", true),
+                                                               new Choice("Line 36: return array[middle]", "Line 34", true),
+                                                               new Choice("Line 39: return (array[middle] + array[middle + 1]) / 2", "Line 37", true));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -753,8 +753,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               null, 
                                                                               createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
                                                                               true,
-                                                                              new Choice("Yes", "Yes", true), 
-                                                                              new Choice("No", "No", methodProblems));
+                                                                              new Choice("Yes", "Yes"), 
+                                                                              new Choice("No", "No", true, methodProblems));
       String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
@@ -962,8 +962,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               null, 
                                                                               createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
                                                                               true,
-                                                                              new Choice("Yes", "Yes", true), 
-                                                                              new Choice("No", "No", methodProblems));
+                                                                              new Choice("Yes", "Yes"), 
+                                                                              new Choice("No", "No", true, methodProblems));
       String executedTitle = createExecutedQuestion(method);
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
@@ -1059,7 +1059,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Exception is thrown instead of updating the stack", "ExceptionThrown"), 
                                                              new Choice("Stack is updated instead of throwing an exception", "ExceptionNOtThrown"), 
                                                              new Choice("Executing pop after push would not return the added element.", "PushPopBroken"), 
-                                                             createThrownExceptionsQuestionChoice(description, false, false, true, false, false, false),
+                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
@@ -1108,13 +1108,13 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("size is decreased by 1", "SizeDecrease"), 
                                                              new Choice("size is not updated", "SizeNotUpdated"), 
                                                              new Choice("elements is replaced by a different array", "ElementsChanged"), 
-                                                             new Choice("elements is not updated", "ElementsNotUpdated"), 
+                                                             new Choice("elements is not updated", "ElementsNotUpdated", true), 
                                                              new Choice("Element at index size is returned", "ElementAtSizeReturned"), 
                                                              new Choice("Element at index size - 1 is returned", "ElementAtSizePlusOneReturned"), 
                                                              new Choice("Exception is thrown instead of returning the top element", "ExceptionThrown"), 
                                                              new Choice("Top element is returned instead of throwing an exception", "ExceptionNOtThrown"), 
                                                              new Choice("Executing pop twice would return the same element twice.", "PopPopBroken"), 
-                                                             createThrownExceptionsQuestionChoice(description, false, false, true, false, false, false),
+                                                             createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
       RadioButtonsQuestion implementedAsDocumented = new RadioButtonsQuestion("implementedAsDocumented", 
@@ -1124,8 +1124,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               null, 
                                                                               createNotUndefinedValueValidator(implementedAsDocumentedTitle), 
                                                                               true,
-                                                                              new Choice("Yes", "Yes", true), 
-                                                                              new Choice("No", "No", methodProblems));
+                                                                              new Choice("Yes", "Yes"), 
+                                                                              new Choice("No", "No", true, methodProblems));
       String returnValueTitle = "Which claims about the returned value are true?";
       CheckboxQuestion returnValue = new CheckboxQuestion("returnValue", 
                                                           returnValueTitle, 
