@@ -61,7 +61,7 @@ public class UpdateSimplificationMacro extends
 
 	@Override
 	protected boolean allowOSS() {
-		return false;
+		return true;
 	}
 
 }
