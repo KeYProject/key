@@ -23,6 +23,11 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 
+/**
+ * 
+ * @author Robert Heimbach
+ *
+ */
 public class JMLRenameParticipantClass extends RenameParticipant {
 
     private IJavaElement fJavaElementToRename;
@@ -106,7 +111,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
                         
-                        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fOldName, fJavaElementToRename, fNewName);
+                        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fJavaElementToRename, fOldName, fNewName);
 
                         
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(

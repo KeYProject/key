@@ -5,8 +5,10 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -154,6 +156,25 @@ public class RefactoringTestUtil {
     }
 
 
+    static void selectPackageAndExecuteRenaming(String projectName,
+            String packageName, IFolder srcFolder, String newPackageName,
+            SWTWorkbenchBot bot, Boolean renameSubpackages) {
+                
+        SWTBotTreeItem packageToRename = TestUtilsUtil.selectInProjectExplorer(bot, projectName, "src", packageName);
+        
+        packageToRename.pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
+        
+        SWTBotShell renameDialog = bot.shell("Rename Package");      
+        
+        // activate "Rename subpackages" option if needed
+        if (renameSubpackages) {
+            SWTBot renameBot = renameDialog.bot();
+            renameBot.checkBox("Rename subpackages").click();
+        }
+        
+        setNewElementName(newPackageName, bot, renameDialog); 
+    }
+    
     /**
      * Selects the class named className in the outline view of the SWTWorkbenchBot bot and
      * activates renaming to newClassName.
@@ -214,17 +235,19 @@ public class RefactoringTestUtil {
      * @param packageName name of the package the class is in.
      * @param fieldDescription how the field to be renamed appears in the outline.
      * @param newNameField the name to change the field to.
+     * @param javaProject TODO
      * @throws CoreException
      */
-    public static void runFieldRenameTestBasic(String path, IFolder srcFolder, IFolder oracleFolder, 
-            SWTWorkbenchBot bot, String className, String packageName, String fieldDescription, String newNameField) throws CoreException {
+    public static void runFieldRenameTest(String path, IFolder srcFolder, IFolder oracleFolder, 
+            SWTWorkbenchBot bot, String className, String packageName, String fieldDescription, String newNameField, IJavaProject javaProject) throws CoreException {
         
         copyFiles(path + "\\src", srcFolder);
         copyFiles(path + "\\oracle", oracleFolder);
         
         selectFieldAndExecuteRenaming(fieldDescription, className, packageName, srcFolder, newNameField, bot);
         
-        assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
+        compareAllFilesInProjectToOracle(javaProject, oracleFolder, bot);
+        //assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
     
     /**
@@ -240,85 +263,14 @@ public class RefactoringTestUtil {
      * @throws CoreException
      */
     public static void runClassRenameTestBasic(String path, IFolder srcFolder, IFolder oracleFolder, 
-            SWTWorkbenchBot bot, String className, String packageName, String newClassName) throws CoreException {
+            SWTWorkbenchBot bot, String className, String packageName, String newClassName, IJavaProject javaProject) throws CoreException {
         
         copyFiles(path + "\\src", srcFolder);
         copyFiles(path + "\\oracle", oracleFolder);
         
         selectClassAndExecuteRenaming(className, packageName, srcFolder, newClassName, bot);
-        
-        assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
-    }
-    
-    /**
-     * Runs the basic field renaming test on the classNameWithRenaming class and additionally compares
-     * the classNameWithoutRenaming as well to its oracle.
-     */
-    public static void runFieldRenameTestTwoFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
-            SWTWorkbenchBot bot, String classNameWithRenaming, String packageRenaming, String classNameWithoutRenaming, 
-            String packageWithoutRenaming, String fieldDescription, String newNameField) throws CoreException {
-        
-        runFieldRenameTestBasic(path, srcFolder,oracleFolder, 
-                bot,classNameWithRenaming, packageRenaming, fieldDescription, newNameField);
-      
-        TestUtilsUtil.openEditor(srcFolder.getFolder(packageWithoutRenaming).getFile(classNameWithoutRenaming + 
-                JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        
-        assertEquals(getOracle(oracleFolder, classNameWithoutRenaming),getContentAfterRefactoring(bot));
-
-        if (!packageRenaming.equals(packageWithoutRenaming)){
-            srcFolder.getFolder(packageWithoutRenaming).delete(true, null);
-        }
-    }
-    
-    /**
-     * Runs the basic class renaming test on the classNameWithRenaming class and additionally compares
-     * the classNameWithoutRenaming as well to its oracle.
-     */
-    public static void runClassRenameTestTwoFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
-            SWTWorkbenchBot bot, String classNameWithRenaming, String packageRenaming, String classNameWithoutRenaming, 
-            String packageWithoutRenaming, String newClassName) throws CoreException {
-        
-        runClassRenameTestBasic(path, srcFolder,oracleFolder, 
-                bot,classNameWithRenaming, packageRenaming, newClassName);
-      
-        TestUtilsUtil.openEditor(srcFolder.getFolder(packageWithoutRenaming).getFile(classNameWithoutRenaming + 
-                JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        
-        assertEquals(getOracle(oracleFolder, classNameWithoutRenaming),getContentAfterRefactoring(bot));
-
-        if (!packageRenaming.equals(packageWithoutRenaming)){
-            srcFolder.getFolder(packageWithoutRenaming).delete(true, null);
-        }
-    }
-    
-    /**
-     * Runs the basic renaming test on the classNameWithRenaming class and additionally compares
-     * the classNameWithoutRenaming1 and classNameWithoutRenaming2 to its oracle.
-     */
-    public static void runFieldRenameTestThreeFiles(String path, IFolder srcFolder, IFolder oracleFolder, 
-            SWTWorkbenchBot bot, String classNameWithRenaming, String packageRenaming, String classNameWithoutRenaming1, 
-            String packageWithoutRenaming1, String classNameWithoutRenaming2, String packageWithoutRenaming2, String fieldDescription, String newNameField) throws CoreException {
-        
-        runFieldRenameTestBasic(path, srcFolder,oracleFolder, 
-                bot,classNameWithRenaming, packageRenaming, fieldDescription, newNameField);
-      
-        TestUtilsUtil.openEditor(srcFolder.getFolder(packageWithoutRenaming1).getFile(classNameWithoutRenaming1 + 
-                JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        
-        assertEquals(getOracle(oracleFolder, classNameWithoutRenaming1),getContentAfterRefactoring(bot));
-        
-        TestUtilsUtil.openEditor(srcFolder.getFolder(packageWithoutRenaming2).getFile(classNameWithoutRenaming2 + 
-                JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-        
-        assertEquals(getOracle(oracleFolder, classNameWithoutRenaming2),getContentAfterRefactoring(bot));
-
-        if (!packageRenaming.equals(packageWithoutRenaming1)){
-            srcFolder.getFolder(packageWithoutRenaming1).delete(true, null);
-        }
-        if (!packageRenaming.equals(packageWithoutRenaming2) && !packageWithoutRenaming1.equals(packageWithoutRenaming2)){
-            srcFolder.getFolder(packageWithoutRenaming2).delete(true, null);
-        }
+       
+        compareAllFilesInProjectToOracle(javaProject, oracleFolder, bot);
     }
     
     /**
@@ -345,8 +297,35 @@ public class RefactoringTestUtil {
         
         assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
+    
+    public static void runPackageRenameTest(String path, IFolder srcFolder, IFolder oracleFolder, 
+            SWTWorkbenchBot bot, String packageName, String newPackageName, IJavaProject project, Boolean renameSubpackages) throws CoreException {
+        
+        copyFiles(path + "\\src", srcFolder);
+        copyFiles(path + "\\oracle", oracleFolder);
+        
+        selectPackageAndExecuteRenaming(project.getElementName(), packageName, srcFolder, newPackageName, bot, renameSubpackages);
+        
+        compareAllFilesInProjectToOracle(project, oracleFolder, bot);
+    }
 
-
+    /**
+     * 
+     * @param project
+     * @param oracleFolder
+     * @param bot
+     * @throws CoreException
+     */
+    static void compareAllFilesInProjectToOracle(IJavaProject project, IFolder oracleFolder, SWTWorkbenchBot bot) throws CoreException {
+        for (IPackageFragment fragment : project.getPackageFragments()) {
+            if (fragment instanceof IFile) {
+                TestUtilsUtil.openEditor((IFile) fragment);
+                assertEquals(getOracle(oracleFolder, fragment.getElementName()), getContentAfterRefactoring(bot));
+            }
+        }
+    }
+    
+    
     /**
      * Adds the projects in referencedProjects to the java build path of project.
      */
@@ -379,6 +358,13 @@ public class RefactoringTestUtil {
         bot.waitUntil(Conditions.shellCloses(propertiesDialog));    
     }
 
+    /**
+     * 
+     * @param projectName
+     * @return
+     * @throws CoreException
+     * @throws InterruptedException
+     */
     public static IProject createProject(String projectName) throws CoreException, InterruptedException {
         final IJavaProject javaProject = TestUtilsUtil.createJavaProject(projectName);
         final IProject project = javaProject.getProject();
@@ -387,6 +373,14 @@ public class RefactoringTestUtil {
         return project;
     }
     
+    /**
+     * 
+     * @param projectName
+     * @param path
+     * @return
+     * @throws CoreException
+     * @throws InterruptedException
+     */
     public static IProject createProjectWithFiles (String projectName, String path) throws CoreException, InterruptedException {
         final IProject project = createProject(projectName);
 
@@ -397,5 +391,18 @@ public class RefactoringTestUtil {
         RefactoringTestUtil.copyFiles(pathToOracle, project.getFolder("oracle"));
         
         return project;
+    }
+    
+    /**
+     * 
+     * @param folder
+     * @throws CoreException
+     */
+    public static void deleteAllPackagesFromFolder(IFolder folder) throws CoreException {
+        for (IResource member : folder.members()) {
+            if (member instanceof IFolder) {
+                folder.getFolder(member.getName()).delete(true, null);
+            }
+        }
     }
 }

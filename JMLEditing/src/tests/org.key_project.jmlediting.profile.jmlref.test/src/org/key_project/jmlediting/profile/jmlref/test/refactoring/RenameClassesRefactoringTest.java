@@ -20,13 +20,14 @@ public class RenameClassesRefactoringTest {
     private static IFolder srcFolder;
     private static IProject project;
     private static IFolder oracleFolder;
+    private static IJavaProject javaProject;
     final String TESTPATH = "data\\template\\refactoringRenameTest\\classes";
     
     @BeforeClass
     public static void initProject() throws CoreException, InterruptedException {
         TestUtilsUtil.closeWelcomeView();
         
-        final IJavaProject javaProject = TestUtilsUtil.createJavaProject(PROJECT_NAME);
+        javaProject = TestUtilsUtil.createJavaProject(PROJECT_NAME);
         project = javaProject.getProject();
         srcFolder = project.getFolder(JDTUtil.getSourceFolderName());      
         oracleFolder = TestUtilsUtil.createFolder(project, "oracle");
@@ -35,38 +36,38 @@ public class RenameClassesRefactoringTest {
     }
     
     @After public void deleteTestPackage() throws CoreException {
-        srcFolder.getFolder("test").delete(true, null);
+        RefactoringTestUtil.deleteAllPackagesFromFolder(srcFolder);
     }
     
     @Test
     public void test1JavaAndJMLOneClass() throws CoreException {   
         RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
-                "TestClass", "test", "NewClassName");
+                "TestClass", "test", "NewClassName", javaProject);
     }
     
     @Test
     public void test2NoJavaOneClass() throws CoreException {   
         RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
-                "TestClass", "test", "NewClassName");
+                "TestClass", "test", "NewClassName", javaProject);
     }
     
     @Test
     public void test3TwoClassesSamePackage() throws CoreException {
-        RefactoringTestUtil.runClassRenameTestTwoFiles(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
-                "TestClass", "test", "OtherClass", "test", "NewClassName");
+        RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "NewClassName", javaProject);
     }
     
     @Test
     public void test4TwoClassesSamePackageNoJavaChanges() throws CoreException {
-        RefactoringTestUtil.runClassRenameTestTwoFiles(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
-                "TestClass", "test", "OtherClass", "test", "NewClassName");
+        RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "NewClassName", javaProject);
     }
     
     // TODO: import Statements a problem with current Resolver status.
     //@Test
     public void test5TwoClassesDifferentPackage() throws CoreException {
-        RefactoringTestUtil.runClassRenameTestTwoFiles(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
-                "TestClass", "test", "OtherClass", "otherPackage", "NewClassName");
+        RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "NewClassName", javaProject);
     }
 
 }

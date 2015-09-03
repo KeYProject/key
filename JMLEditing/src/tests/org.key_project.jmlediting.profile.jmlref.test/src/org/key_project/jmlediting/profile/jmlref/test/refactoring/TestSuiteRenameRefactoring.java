@@ -9,7 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
     RenameFieldsRefactoringTest.class,
     RenameFieldsSeveralProjectsRefactoringTest.class,
     RenameParametersRefactoringTest.class,
-    RenameClassesRefactoringTest.class
+    RenameClassesRefactoringTest.class,
+    RenamePackagesRefactoringTest.class
 })
 
 public class TestSuiteRenameRefactoring {

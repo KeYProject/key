@@ -12,6 +12,11 @@ import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 
+/**
+ * 
+ * @author Robert Heimbach, Maksim Melnik
+ *
+ */
 public class ClassMoveRefactoringComputer extends
         DefaultMoveRefactoringComputer {
 

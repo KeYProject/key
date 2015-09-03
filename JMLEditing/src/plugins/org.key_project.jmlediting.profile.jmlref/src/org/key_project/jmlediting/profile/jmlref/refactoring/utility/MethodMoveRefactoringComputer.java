@@ -6,6 +6,11 @@ import java.util.List;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 
+/**
+ * 
+ * @author Robert Heimbach, Maksim Melnik
+ *
+ */
 public class MethodMoveRefactoringComputer extends
         DefaultMoveRefactoringComputer {
 

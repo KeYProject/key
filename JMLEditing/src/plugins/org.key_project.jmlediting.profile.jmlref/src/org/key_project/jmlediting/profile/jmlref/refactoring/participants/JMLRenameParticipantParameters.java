@@ -84,7 +84,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     public Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
-        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fOldName, fLocalVar, fNewName);
+        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fLocalVar, fOldName, fNewName);
 
         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
                 fCompUnit, fProject);

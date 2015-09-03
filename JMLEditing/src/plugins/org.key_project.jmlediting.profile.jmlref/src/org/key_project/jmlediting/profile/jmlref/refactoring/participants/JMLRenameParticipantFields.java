@@ -121,7 +121,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
                 for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac.getCompilationUnits()) {
                         
-                        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fOldName, fJavaElementToRename, fNewName);
+                        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fJavaElementToRename, fOldName, fNewName);
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
                                 unit, project);
 
