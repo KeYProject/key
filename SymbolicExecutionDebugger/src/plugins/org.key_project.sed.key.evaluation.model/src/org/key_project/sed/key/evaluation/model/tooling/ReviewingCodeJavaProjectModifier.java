@@ -33,6 +33,7 @@ import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
@@ -43,6 +44,8 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
    private final ProofFileFileDefinition[] proofFileDefinitions;
    
    private final FileDefinition bootClassPathDefinition;
+   
+   private final FileDefinition[] noToolFiles;
    
    private IPerspectiveDescriptor originalPerspective;
    
@@ -56,12 +59,29 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
                                            boolean showCompletionMessage,
                                            FileDefinition bootClassPathDefinition,
                                            ProofFileFileDefinition[] proofFileDefinitions, 
+                                           FileDefinition[] noToolFiles,
                                            FileDefinition... files) {
       super(files);
       this.typeName = typeName;
       this.bootClassPathDefinition = bootClassPathDefinition;
       this.showCompletionMessage = showCompletionMessage;
       this.proofFileDefinitions = proofFileDefinitions;
+      this.noToolFiles = noToolFiles;
+   }
+
+   @Override
+   protected FileDefinition[] getFilesToExtract() {
+      if (ReviewingCodeEvaluation.NO_TOOL_NAME.equals(getTool().getName())) {
+         if (!ArrayUtil.isEmpty(noToolFiles)) {
+            return noToolFiles;
+         }
+         else {
+            return super.getFilesToExtract();
+         }
+      }
+      else {
+         return super.getFilesToExtract();
+      }
    }
 
    @Override

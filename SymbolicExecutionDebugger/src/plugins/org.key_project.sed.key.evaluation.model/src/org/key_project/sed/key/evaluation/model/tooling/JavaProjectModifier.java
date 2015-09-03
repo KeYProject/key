@@ -41,7 +41,7 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
             counter++;
          }
          javaProject = JDTUtil.createJavaProject(project.getName(), BINARY_FOLDER_NAME, new String[] {SOURCE_FOLDER_NAME});
-         for (FileDefinition definition : files) {
+         for (FileDefinition definition : getFilesToExtract()) {
             extractFileDefinition(definition);
          }
          finalizeJavaProject(javaProject);
@@ -51,6 +51,10 @@ public class JavaProjectModifier extends AbstractWorkbenchModifier {
          // Workspace was already modified, nothing to do.
          return null;
       }
+   }
+   
+   protected FileDefinition[] getFilesToExtract() {
+      return files;
    }
    
    protected void finalizeJavaProject(IJavaProject javaProject) throws Exception {

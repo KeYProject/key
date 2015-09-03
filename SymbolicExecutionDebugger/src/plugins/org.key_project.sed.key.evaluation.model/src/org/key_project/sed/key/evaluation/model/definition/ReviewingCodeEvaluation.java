@@ -200,6 +200,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               false, 
                                                                               null,
                                                                               new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/instructions-archived/instructionExample/accumulateDatabase.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/accumulateDatabase.proof", false, "Database", "accumulateDatabase", new String[] {"QAccumulator;"})},
+                                                                              null,
                                                                               new FileDefinition("data/reviewingCode/instructions-archived/instructionExample/Database.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Database.java", true)),
                                          false);
             
@@ -208,6 +209,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                                false, 
                                                                                null,
                                                                                new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/instructions-archived/instructionExample/accumulateDatabase.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/accumulateDatabase.proof", false, "Database", "accumulateDatabase", new String[] {"QAccumulator;"})},
+                                                                               null,
                                                                                new FileDefinition("data/reviewingCode/instructions-archived/instructionExample/Database.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Database.java", true)),
                                           false);
       QuestionPage example1Page = createObservableArrayQuestionPage(EXAMPLE_1_PAGE_NAME, "Review of cass ObservableArray");
@@ -373,6 +375,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    true,  
                                                                    null,
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleValueSearch/proofs/find.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/find.proof", false, "ValueSearch", "find", new String[] {"[I", "I"})},
+                                                                   new FileDefinition[] {new FileDefinition("data/reviewingCode/exampleValueSearch/src/AbstractSearch.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/AbstractSearch.java", true), 
+                                                                                         new FileDefinition("data/reviewingCode/exampleValueSearch/srcWithMain/ValueSearch.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ValueSearch.java", true)},
                                                                    new FileDefinition("data/reviewingCode/exampleValueSearch/src/AbstractSearch.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/AbstractSearch.java", true),
                                                                    new FileDefinition("data/reviewingCode/exampleValueSearch/src/ValueSearch.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ValueSearch.java", true)),
                               createGeneralClassDescriptionQuestion("ValueSearch"),
@@ -459,6 +463,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    true,  
                                                                    null,
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleInsuranceRate/proofs/computeInsuranceRate.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/computeInsuranceRate.proof", false, "BankUtil", "computeInsuranceRate", new String[] {"I"})},
+                                                                   new FileDefinition[] {new FileDefinition("data/reviewingCode/exampleInsuranceRate/srcWithMain/BankUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/BankUtil.java", true)},
                                                                    new FileDefinition("data/reviewingCode/exampleInsuranceRate/src/BankUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/BankUtil.java", true)),
                               createGeneralClassDescriptionQuestion("BankUtil"),
                               implementedAsDocumented,
@@ -559,6 +564,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    true,  
                                                                    null,
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleMedian/proofs/median.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/median.proof", false, "MathUtil", "median", new String[] {"[I", "I", "I"})},
+                                                                   new FileDefinition[] {new FileDefinition("data/reviewingCode/exampleMedian/srcWithMain/MathUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MathUtil.java", true)},
                                                                    new FileDefinition("data/reviewingCode/exampleMedian/src/MathUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/MathUtil.java", true)),
                               createGeneralClassDescriptionQuestion("MathUtil"),
                               implementedAsDocumented,
@@ -632,6 +638,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    true,  
                                                                    null,
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleMiddle/proofs/middle.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/middle.proof", false, "IntegerUtil", "middle", new String[] {"I", "I", "I"})},
+                                                                   new FileDefinition[] {new FileDefinition("data/reviewingCode/exampleMiddle/srcWithMain/IntegerUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/IntegerUtil.java", true)},
                                                                    new FileDefinition("data/reviewingCode/exampleMiddle/src/IntegerUtil.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/IntegerUtil.java", true)),
                               createGeneralClassDescriptionQuestion("IntegerUtil"),
                               implementedAsDocumented,
@@ -666,6 +673,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                    new ProofFileFileDefinition[] {new ProofFileFileDefinition("data/reviewingCode/exampleObservableArray/proofs/ObservableArray.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ObservableArray.proof", false, "ObservableArray", "ObservableArray", new String[] {"[QObject;"}),
                                                                                                   new ProofFileFileDefinition("data/reviewingCode/exampleObservableArray/proofs/set.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/set.proof", false, "ObservableArray", "set", new String[] {"I", "QObject;"}),
                                                                                                   new ProofFileFileDefinition("data/reviewingCode/exampleObservableArray/proofs/setArrayListeners.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/setArrayListeners.proof", false, "ObservableArray", "setArrayListeners", new String[] {"[QArrayListener;"})},
+                                                                   new FileDefinition[] {new FileDefinition("data/reviewingCode/exampleObservableArray/src/ArrayEvent.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayEvent.java", true), 
+                                                                                         new FileDefinition("data/reviewingCode/exampleObservableArray/src/ArrayListener.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayListener.java", true),
+                                                                                         new FileDefinition("data/reviewingCode/exampleObservableArray/srcWithMain/ObservableArray.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ObservableArray.java", true)},
                                                                    new FileDefinition("data/reviewingCode/exampleObservableArray/src/ArrayEvent.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayEvent.java", true),
                                                                    new FileDefinition("data/reviewingCode/exampleObservableArray/src/ArrayListener.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ArrayListener.java", true),
                                                                    new FileDefinition("data/reviewingCode/exampleObservableArray/src/ObservableArray.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/ObservableArray.java", true)),
@@ -932,6 +942,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                                                   new ProofFileFileDefinition("data/reviewingCode/exampleStack/proofs/Stack_Stack.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Stack_Stack.proof", false, "Stack", "Stack", new String[] {"QStack;"}),
                                                                                                   new ProofFileFileDefinition("data/reviewingCode/exampleStack/proofs/push.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/push.proof", false, "Stack", "push", new String[] {"QObject;"}),
                                                                                                   new ProofFileFileDefinition("data/reviewingCode/exampleStack/proofs/pop.proof", JavaProjectModifier.SOURCE_FOLDER_NAME + "/pop.proof", false, "Stack", "pop", new String[] {})},
+                                                                   new FileDefinition[] {new FileDefinition("data/reviewingCode/exampleStack/srcWithMain/Stack.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Stack.java", true)},
                                                                    new FileDefinition("data/reviewingCode/exampleStack/src/Stack.java", JavaProjectModifier.SOURCE_FOLDER_NAME + "/Stack.java", true)),
                               createGeneralClassDescriptionQuestion("Stack"),
                               tabbedQuestion);
