@@ -366,6 +366,22 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 30: if (index < 0 || index >= array.length)", "Line 30", true),
                                                                new Choice("Line 31: return false", "Line 31"),
                                                                new Choice("Line 34: return array[index] == value", "Line 34", true));
+      String returnValueTitle = "Which claims about the returned value of " + method + " are true?";
+      CheckboxQuestion returnValue = new CheckboxQuestion("returnValue", 
+                                                          returnValueTitle, 
+                                                          description,
+                                                          true,
+                                                          null, 
+                                                          new NotUndefinedValueValidator("Question '" + returnValueTitle + "' not answered."), 
+                                                          true,
+                                                          new Choice("An integer < -1 might be returned", "LessMinusOne"),
+                                                          new Choice("-1 is returned if no element was found", "MinusOneNotFound", true),
+                                                          new Choice("-1 might be retruned if an element was found", "MinusOneFound"),
+                                                          new Choice("0 might be returned", "NullReturned", true),
+                                                          new Choice("array.length - 1 might be returned", "LengthMinusOneReturned", true),
+                                                          new Choice("array.length might be returned", "LengthReturned"),
+                                                          new Choice("An integer within array bounds might be retruned if no element was found", "IndexNotFoundReturned"),
+                                                          new Choice("An integer within array bounds is retruned if an element was found", "IndexFoundReturned", true));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -383,6 +399,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               implementedAsDocumented,
                               executedQuestion,
                               createValueSearchLocationQuestion(description, method),
+                              returnValue,
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
    }
@@ -454,6 +471,23 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 24: return insuranceRates[ageLevel]", "Line 24", true),
                                                                new Choice("Line 26: ageLevel++", "Line 26", true),
                                                                new Choice("Line 28: return insuranceRate", "Line 28", true));
+      String returnValueTitle = "Which claims about the returned value of " + method + " are true?";
+      CheckboxQuestion returnValue = new CheckboxQuestion("returnValue", 
+                                                          returnValueTitle, 
+                                                          description,
+                                                          true,
+                                                          null, 
+                                                          new NotUndefinedValueValidator("Question '" + returnValueTitle + "' not answered."), 
+                                                          true,
+                                                          new Choice("A negative integer might be returned", "Negative"),
+                                                          new Choice("0 might be returned", "Null"),
+                                                          new Choice("Length of ageLimits might be returned", "AgeLimitsLength"),
+                                                          new Choice("An integer contained in ageLimits might be returned", "ContainedInAgeLimits"),
+                                                          new Choice("An integer not contained in ageLimits might be returned", "NotContainedInAgeLimits", true),
+                                                          new Choice("Length of insuranceRates might be returned", "InsuranceRatesLength"),
+                                                          new Choice("An integer contained in insuranceRates might be returned", "ContainedInInsuranceRates", true),
+                                                          new Choice("An integer not contained in insuranceRates might be returned", "NotContainedInInsuranceRates", true),
+                                                          new Choice("A positive integer might be returned", "Positive", true));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -468,6 +502,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               createGeneralClassDescriptionQuestion("BankUtil"),
                               implementedAsDocumented,
                               executedQuestion,
+                              returnValue,
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
    }
@@ -555,6 +590,19 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 35: if ((start + end) % 2 == 0)", "Line 33", true),
                                                                new Choice("Line 36: return array[middle]", "Line 34", true),
                                                                new Choice("Line 39: return (array[middle] + array[middle + 1]) / 2", "Line 37", true));
+      String returnValueTitle = "Which claims about the returned value of " + method + " are true?";
+      CheckboxQuestion returnValue = new CheckboxQuestion("returnValue", 
+                                                          returnValueTitle, 
+                                                          description,
+                                                          true,
+                                                          null, 
+                                                          new NotUndefinedValueValidator("Question '" + returnValueTitle + "' not answered."), 
+                                                          true,
+                                                          new Choice("A negative integer might be returned", "Negative", true),
+                                                          new Choice("0 might be returned", "Null", true),
+                                                          new Choice("A positive integer might be returned", "Positive", true),
+                                                          new Choice("An integer contained in array might be returned", "InArray", true),
+                                                          new Choice("An integer not contained in array might be returned", "NotInArray", true));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -569,6 +617,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               createGeneralClassDescriptionQuestion("MathUtil"),
                               implementedAsDocumented,
                               executedQuestion,
+                              returnValue,
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
    }
@@ -629,6 +678,21 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 28: if (x > z)", "Line 28", true),
                                                                new Choice("Line 29: return x", "Line 29", true),
                                                                new Choice("Line 33: return z", "Line 33", true));
+      String returnValueTitle = "Which claims about the returned value of " + method + " are true?";
+      CheckboxQuestion returnValue = new CheckboxQuestion("returnValue", 
+                                                          returnValueTitle, 
+                                                          description,
+                                                          true,
+                                                          null, 
+                                                          new NotUndefinedValueValidator("Question '" + returnValueTitle + "' not answered."), 
+                                                          true,
+                                                          new Choice("A negative integer might be returned", "Negative", true),
+                                                          new Choice("0 might be returned", "Null", true),
+                                                          new Choice("A positive integer might be returned", "Positive", true),
+                                                          new Choice("x might be returned", "x", true),
+                                                          new Choice("y might be returned", "y", true),
+                                                          new Choice("z might be returned", "z", true),
+                                                          new Choice("An integer which is not x, y or z might be returned", "notXYZ"));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -643,6 +707,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                               createGeneralClassDescriptionQuestion("IntegerUtil"),
                               implementedAsDocumented,
                               executedQuestion,
+                              returnValue,
                               createSEDUsedQuestion(),
                               createCodeExecutedQuestion());
    }
@@ -1137,7 +1202,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String returnValueTitle = "Which claims about the returned value are true?";
+      String returnValueTitle = "Which claims about the returned value of " + method + " are true?";
       CheckboxQuestion returnValue = new CheckboxQuestion("returnValue", 
                                                           returnValueTitle, 
                                                           description,
