@@ -37,6 +37,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
@@ -283,7 +284,7 @@ public class TacletMenu extends JMenu {
         }
 
     private void createDelayedCutJoinMenu(MenuControl control) {
-        if (JoinMenuItem.FEATURE.active()) {
+        if (Main.isExperimentalMode()) {
             List<ProspectivePartner> partner = JoinIsApplicable.INSTANCE
                     .isApplicable(mediator.getSelectedGoal(),
                             pos.getPosInOccurrence());
@@ -300,7 +301,7 @@ public class TacletMenu extends JMenu {
      * nodes to join nodes.
      */
     private void createDefocusingJoinMenu() {
-        if (JoinRuleMenuItem.FEATURE.active()) {
+        if (Main.isExperimentalMode()) {
             if (JoinRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
                     pos.getPosInOccurrence(), false)) {
                 JMenuItem item = new JoinRuleMenuItem(
