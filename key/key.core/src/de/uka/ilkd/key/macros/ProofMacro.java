@@ -82,6 +82,18 @@ public interface ProofMacro {
     public String getName();
 
     /**
+     * Gets a unique short name for this macro that can be used in proof
+     * scripts.
+     *
+     * If <code>null</code> is returned, the macro cannot be addressed from
+     * within scripts.
+     *
+     * @return <code>null</code> if not supported, or a non-<code>null</code>
+     *         constant string as the short name
+     */
+    public String getScriptCommandName();
+
+    /**
      * Gets the category of this macro.
      *
      * Used as name of the menu under which the macro is sorted.

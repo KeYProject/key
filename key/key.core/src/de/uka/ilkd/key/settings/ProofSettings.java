@@ -281,4 +281,17 @@ public class ProofSettings {
     public static boolean isChoiceSettingInitialised() {
        return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
     }
+
+    /**
+     * Update the proof settings according to the entries on the properties.
+     *
+     * @param p
+     *            a non-<code>null</code> object with KeY properties.
+     */
+    public void update(Properties props) {
+        for (int i = settings.length-1; i>=0 ;i--) {
+            settings[i].readSettings(this, props);
+        }
+    }
+
 }

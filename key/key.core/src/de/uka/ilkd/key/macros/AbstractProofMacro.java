@@ -47,6 +47,17 @@ public abstract class AbstractProofMacro implements ProofMacro {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * By default, proof macros do not support scripts, thus <code>null</code>
+     * is returned.
+     */
+    @Override
+    public String getScriptCommandName() {
+        return null;
+    }
+
     @Override
     public boolean canApplyTo(Node node,
                               PosInOccurrence posInOcc) {

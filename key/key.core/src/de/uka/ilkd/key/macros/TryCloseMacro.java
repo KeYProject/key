@@ -54,8 +54,6 @@ public class TryCloseMacro extends AbstractProofMacro {
             super(numberGoals, numberSteps, listener);
         }
 
-
-
         @Override
         protected String getMessageSuffix() {
             if(notClosedGoals == 0)
@@ -102,6 +100,14 @@ public class TryCloseMacro extends AbstractProofMacro {
     @Override
     public String getName() {
         return "Close provable goals below";
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.macros.AbstractProofMacro#getScriptCommandName()
+     */
+    @Override
+    public String getScriptCommandName() {
+        return "tryclose";
     }
 
     /*

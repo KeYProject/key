@@ -27,7 +27,6 @@ import org.key_project.util.reflection.ClassLoaderUtil;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ProofScriptAction;
-import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -131,9 +130,9 @@ public class ProofMacroMenu extends JMenu {
             }
         }
 
-        /*        if(Main.isExperimentalMode()) {
+        if(Main.isExperimentalMode()) {
             add(new JMenuItem(new ProofScriptAction(mediator)));
-            }*/
+        }
 
         mediator.enableWhenProofLoaded(this);
         this.numberOfMacros = count;
