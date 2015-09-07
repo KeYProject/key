@@ -288,7 +288,13 @@ public abstract class SequentView extends JEditorPane {
         }
         String s = "";
         try {
-            s = getText(pos.getBounds().start(),
+            // NOTE (DS): The below addition of 1 to the beginning is a
+            // quick-and-dirty fix for the problem that the copied text
+            // was one position shifted to the left (occurred after the
+            // change to HTML documents in the JEditorPane (previous JTextArea)). If
+            // something concerning highlighting does not work in the future, here
+            // could be a starting place to find the mistake.
+            s = getText(pos.getBounds().start() + 1,
                     pos.getBounds().length());
         } catch (BadLocationException e) {
             e.printStackTrace();
@@ -398,7 +404,7 @@ public abstract class SequentView extends JEditorPane {
             // something concerning highlighting does not work in the future, here could
             // be a starting place to find the mistake.
             Range result = printer.getInitialPositionTable().rangeForIndex(characterIndex);
-            result = new Range(result.start() + 1, result.start() + 1 + result.length());
+            result = new Range(result.start() + 1, result.end() + 1);
             
             return result;
         } else {
