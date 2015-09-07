@@ -7,14 +7,18 @@ public class ObservableArray {
    /**
     * The array to which all actions are delegated.
     * <p>
-    * The array is never {@code null}.
+    * The array is never {@code null},
+    * but the value at an array index might be {@code null}.
     */
-   private final /*@ non_null @*/ Object[] array;
+   /*@ invariant array != null;
+     @*/
+   private final /*@ nullable @*/ Object[] array;
    
    /**
     * The optional available {@link ArrayListener} instances.
     * <p>
     * If no listeners are available the array might be {@code null} or empty.
+    * Also the value at an array index might be {@code null}.
     */
    private /*@ nullable @*/ ArrayListener[] arrayListeners;
    

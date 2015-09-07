@@ -784,10 +784,10 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 30: if (array == null)", "Line 30", true),
-                                                               new Choice("Line 31: throw new IllegalArgumentException(\"Array is null.\")", "Line 31", true),
-                                                               new Choice("Line 33: this.array = array", "Line 33", true),
-                                                               new Choice("Line 34: this.arrayListeners = null", "Line 34", true));
+                                                               new Choice("Line 34: if (array == null)", "Line 30", true),
+                                                               new Choice("Line 35: throw new IllegalArgumentException(\"Array is null.\")", "Line 31", true),
+                                                               new Choice("Line 37: this.array = array", "Line 33", true),
+                                                               new Choice("Line 38: this.arrayListeners = null", "Line 34", true));
       return new TabQuestion("ObservableArray", 
                              method, 
                              false, 
@@ -839,14 +839,14 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 47: array[index] = element", "Line 47", true),
-                                                               new Choice("Line 48: fireElementChanged(new ArrayEvent(this, index, element))", "Line 48", true),
-                                                               new Choice("Line 57: if (arrayListeners != null)", "Line 57", true),
-                                                               new Choice("Line 62: int i = 0", "Line 62 initial", true),
-                                                               new Choice("Line 62: i < arrayListeners.length", "Line 62 guard", true),
-                                                               new Choice("Line 62: i++", "Line 62 increment", true),
-                                                               new Choice("Line 63: if (arrayListeners[i] != null)", "Line 63", true),
-                                                               new Choice("Line 64: arrayListeners[i].elementChanged(e)", "Line 64", true));
+                                                               new Choice("Line 51: array[index] = element", "Line 47", true),
+                                                               new Choice("Line 52: fireElementChanged(new ArrayEvent(this, index, element))", "Line 48", true),
+                                                               new Choice("Line 61: if (arrayListeners != null)", "Line 57", true),
+                                                               new Choice("Line 66: int i = 0", "Line 62 initial", true),
+                                                               new Choice("Line 66: i < arrayListeners.length", "Line 62 guard", true),
+                                                               new Choice("Line 66: i++", "Line 62 increment", true),
+                                                               new Choice("Line 67: if (arrayListeners[i] != null)", "Line 63", true),
+                                                               new Choice("Line 68: arrayListeners[i].elementChanged(e)", "Line 64", true));
       return new TabQuestion("set", 
                              method, 
                              false, 
@@ -892,7 +892,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 75: this.arrayListeners = arrayListeners", "Line 75", true));
+                                                               new Choice("Line 79: this.arrayListeners = arrayListeners", "Line 75", true));
       return new TabQuestion("setArrayListeners", 
                              method, 
                              false, 
@@ -1435,7 +1435,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
    
    private String createChangedLocationTitle(String className, String method) {
-      return "Which locations of class '" + className + "' might be changed during execution of " + method + "? (Expressions are evaluated in the post state after method return.)";
+      return "Which locations of class '" + className + "' might be changed during execution of " + method + "? (Expressions are evaluated in the pre state before method call.)";
    }
    
    private String createImplementedAsDocumentedTitle(String method, boolean constructor) {
