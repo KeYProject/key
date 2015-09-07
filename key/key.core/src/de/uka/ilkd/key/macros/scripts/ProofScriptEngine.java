@@ -37,9 +37,8 @@ public class ProofScriptEngine {
 
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
-        Reader reader = new FileReader(file);
 
-        ScriptLineParser mlp = new ScriptLineParser(reader);
+        ScriptLineParser mlp = new ScriptLineParser(file.getAbsolutePath());
 
         while(true) {
 
@@ -79,7 +78,8 @@ public class ProofScriptEngine {
                 throw ie;
             } catch (Exception e) {
                 throw new ScriptException("Error while executing script: " + e.getMessage() +
-                        "\n\nCommand:" + argMap.get(ScriptLineParser.LITERAL_KEY), e);
+                        "\n\nCommand:" + argMap.get(ScriptLineParser.LITERAL_KEY),
+                        file.getAbsolutePath(), mlp.getLine(), mlp.getColumn(), e);
             }
         }
     }

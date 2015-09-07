@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -35,12 +37,14 @@ class ScriptLineParser {
     /**
      * current line number
      */
-    private int line;
+    private int line = 1;
 
     /**
      * number of characters read so far
      */
     private int readChars;
+
+    private String file;
 
     /**
      * The state of the regular expression parser.
@@ -62,9 +66,15 @@ class ScriptLineParser {
 
     public ScriptLineParser(Reader reader) {
         this.reader = reader;
+        this.file = null;
     }
 
-    public Map<String, String> parseCommand() throws IOException {
+    public ScriptLineParser(String filename) throws IOException {
+        this.reader = new FileReader(filename);
+        this.file = filename;
+    }
+
+    public Map<String, String> parseCommand() throws IOException, ScriptException {
         Map<String, String> result = new HashMap<String, String>();
 
         StringBuilder cmdBuilder = new StringBuilder();
@@ -87,7 +97,8 @@ class ScriptLineParser {
             switch(c) {
             case -1:
                 if(sb.length() > 0 || key != null || !result.isEmpty()) {
-                    throw new IOException("Trailing characters at end of script (missing ';'?)");
+                    throw new ScriptException("Trailing characters at end of script (missing ';'?)",
+                            file, line, col);
                 }
                 return null;
             case '=':
@@ -174,8 +185,9 @@ class ScriptLineParser {
         return Character.isLetterOrDigit(c) || ADMISSIBLE_CHARS.indexOf((char)c) > -1;
     }
 
-    private void exc(int c) throws IOException {
-        throw new IOException("Unexpected char '" + (char)c + "' at " + line + ":" + col);
+    private void exc(int c) throws ScriptException {
+        throw new ScriptException("Unexpected char '" + (char)c + "' at " + line + ":" + col,
+                file, line, col);
     }
 
     // TODO make this a testcase
@@ -202,6 +214,14 @@ class ScriptLineParser {
      */
     public int getReadChars() {
         return readChars;
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public int getColumn() {
+        return col;
     }
 
 }
