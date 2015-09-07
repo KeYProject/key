@@ -37,7 +37,8 @@ public final class Stack {
    /**
     * Constructor for cloning purpose which creates an independent stack
     * with the content of the given {@link Stack}.
-    * @param existingStack The existing {@link Stack} which provides the initial content.
+    * @param existingStack The existing {@link Stack} fulfilling its class invariant
+    *                      which provides the initial content.
     */
    public Stack(Stack existingStack) {
       this.elements = existingStack.elements;

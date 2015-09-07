@@ -1111,8 +1111,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 43: this.elements = existingStack.elements", "Line 43", true),
-                                                               new Choice("Line 44: this.size = existingStack.size", "Line 44", true));
+                                                               new Choice("Line 44: this.elements = existingStack.elements", "Line 43", true),
+                                                               new Choice("Line 45: this.size = existingStack.size", "Line 44", true));
       return new TabQuestion("Stack_Stack", 
                              method, 
                              false, 
@@ -1165,9 +1165,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 53: if (size < elements.length)", "Line 53", true),
-                                                               new Choice("Line 54: elements[size++] = e", "Line 54", true),
-                                                               new Choice("Line 57: throw new IllegalStateException(\"Stack is full.\")", "Line 57", true));
+                                                               new Choice("Line 54: if (size < elements.length)", "Line 53", true),
+                                                               new Choice("Line 55: elements[size++] = e", "Line 54", true),
+                                                               new Choice("Line 58: throw new IllegalStateException(\"Stack is full.\")", "Line 57", true));
       return new TabQuestion("push(Object)", 
                              method, 
                              false, 
@@ -1232,9 +1232,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
-                                                               new Choice("Line 67: if (size >= 1)", "Line 67", true),
-                                                               new Choice("Line 68: return elements[--size]", "Line 68", true),
-                                                               new Choice("Line 71: throw new IllegalStateException(\"Stack is empty.\")", "Line 71", true));
+                                                               new Choice("Line 68: if (size >= 1)", "Line 67", true),
+                                                               new Choice("Line 69: return elements[--size]", "Line 68", true),
+                                                               new Choice("Line 72: throw new IllegalStateException(\"Stack is empty.\")", "Line 71", true));
       return new TabQuestion("pop()", 
                              method, 
                              false, 
