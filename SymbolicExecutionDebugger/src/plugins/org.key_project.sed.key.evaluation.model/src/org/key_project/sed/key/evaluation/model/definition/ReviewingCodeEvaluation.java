@@ -794,7 +794,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              implementedAsDocumented,
                              createObservableArrayClassInvariantQuestion(description, method, true),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, method, true, true, false),
+                             createObservableArrayLocationQuestion(description, method, true, true, false, false),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
@@ -853,7 +853,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              implementedAsDocumented,
                              createObservableArrayClassInvariantQuestion(description, method, false),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, method, false, false, true),
+                             createObservableArrayLocationQuestion(description, method, false, true, true, true),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
@@ -899,7 +899,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                              implementedAsDocumented,
                              createObservableArrayClassInvariantQuestion(description, method, false),
                              executedQuestion,
-                             createObservableArrayLocationQuestion(description, method, false, true, false),
+                             createObservableArrayLocationQuestion(description, method, false, true, false, false),
                              createSEDUsedQuestion(),
                              createCodeExecutedQuestion());
    }
@@ -942,7 +942,12 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                       new Choice("No", "No", problems));
    }
 
-   private CheckboxQuestion createObservableArrayLocationQuestion(String description, String method, boolean expectedArray, boolean expectedArrayListeners, boolean expectedArrayAtIndex) {
+   private CheckboxQuestion createObservableArrayLocationQuestion(String description, 
+                                                                  String method, 
+                                                                  boolean expectedArray, 
+                                                                  boolean expectedArrayListeners, 
+                                                                  boolean expectedAllArrayIndices,
+                                                                  boolean expectedAllArrayListenerIndices) {
       String title = createChangedLocationTitle("ObservableArray", method);
       return new CheckboxQuestion("changedLocations", 
                                   title, 
@@ -953,16 +958,13 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                   true,
                                   new Choice("None", "None"),
                                   new Choice("array", "array", expectedArray),
-                                  new Choice("array[index - 1]", "array[index - 1]"),
-                                  new Choice("array[index]", "array[index]", expectedArrayAtIndex),
-                                  new Choice("array[index + 1]", "array[index + 1]"),
-                                  new Choice("array[*]", "array[*]"),
+                                  new Choice("array[index - 1]", "array[index - 1]", expectedAllArrayIndices),
+                                  new Choice("array[index]", "array[index]", expectedAllArrayIndices),
+                                  new Choice("array[index + 1]", "array[index + 1]", expectedAllArrayIndices),
+                                  new Choice("array[*]", "array[*]", expectedAllArrayIndices),
                                   new Choice("array.length", "array.length"),
                                   new Choice("arrayListeners", "arrayListeners", expectedArrayListeners),
-                                  new Choice("arrayListeners[i - 1]", "arrayListeners[i - 1]"),
-                                  new Choice("arrayListeners[i]", "arrayListeners[i]"),
-                                  new Choice("arrayListeners[i + 1]", "arrayListeners[i + 1]"),
-                                  new Choice("arrayListeners[*]", "arrayListeners[*]"),
+                                  new Choice("arrayListeners[*]", "arrayListeners[*]", expectedAllArrayListenerIndices),
                                   new Choice("arrayListeners.length", "arrayListeners.length"),
                                   new Choice("something else", "SomethingElse", createElseExceptionSubQuestion(description)));
    }

@@ -40,7 +40,7 @@ public class ObservableArray {
 
    /**
     * Sets the value at index to the given {@link Object} and
-    * informs all available {@link ArrayListener} about the change.
+    * informs all at call time available {@link ArrayListener} about the change.
     * <p>
     * The change is represented as {@link ArrayEvent} which contains all
     * details about the performed modification.
@@ -53,7 +53,7 @@ public class ObservableArray {
    }
 
    /**
-    * Informs all available {@link ArrayListener} about an array change
+    * Informs all at call time available {@link ArrayListener} about an array change
     * by calling {@link ArrayListener#elementChanged(ArrayEvent)}.
     * @param e The {@link ArrayEvent} to be passed to the {@link ArrayListener} instances.
     */
