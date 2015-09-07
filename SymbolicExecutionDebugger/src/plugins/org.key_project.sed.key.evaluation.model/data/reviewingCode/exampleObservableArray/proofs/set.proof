@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Mon Sep 07 11:45:45 CEST 2015
+#Mon Sep 07 13:31:12 CEST 2015
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
@@ -42,7 +42,7 @@
 \javaSource "";
 
 \proofObligation "#Proof Obligation Settings
-#Mon Sep 07 11:45:45 CEST 2015
+#Mon Sep 07 13:31:12 CEST 2015
 name=set(int, java.lang.Object)
 addSymbolicExecutionLabel=true
 addUninterpretedPredicate=true
@@ -54,7 +54,7 @@ method=ObservableArray\\#set(int, java.lang.Object)
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "2144271061")
+(autoModeTime "2324612804")
 
 (branch "dummy ID"
 (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,SETAccumulate,LayoutPredicate"))
