@@ -69,5 +69,10 @@ public class RenameClassesRefactoringTest {
         RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "NewClassName", javaProject);
     }
-
+    
+    @Test
+    public void test6FullyQualifiedClassAccess() throws CoreException {
+        RefactoringTestUtil.runClassRenameTestBasic(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "NewClassName", javaProject);
+    }
 }

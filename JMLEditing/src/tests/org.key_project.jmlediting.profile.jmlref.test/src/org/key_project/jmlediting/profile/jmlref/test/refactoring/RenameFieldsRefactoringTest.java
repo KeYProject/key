@@ -150,4 +150,12 @@ public class RenameFieldsRefactoringTest {
          RefactoringTestUtil.runFieldRenameTest(TESTPATH+"\\test18", srcFolder, oracleFolder, bot, 
                  "TestClass", "test", "balance : int", "newName", javaProject); 
         }
+     
+     // Test 19 and 20 can be found in {@link RenameFieldsSeveralProjectsRefactoringTest}.
+     
+     @Test
+     public void test21FullyQualifiedAccessOfField() throws CoreException {
+         RefactoringTestUtil.runFieldRenameTest(TESTPATH+"\\test21", srcFolder, oracleFolder, bot, 
+                 "TestClass", "test", "balance : int", "newName", javaProject);   
+     }
 }

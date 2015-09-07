@@ -8,7 +8,7 @@ import org.key_project.jmlediting.core.dom.IStringNode;
 
 /**
  * 
- * @author Robert Heimbach, Maksim Melnik
+ * @author Maksim Melnik
  *
  */
 public class FieldMoveRefactoringComputer extends

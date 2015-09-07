@@ -21,6 +21,17 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 
 /**
+ * Abstract class with the common behavior of refactoring computers which
+ * participant in the move refactoring. 
+ * <p>
+ * Usually, the move refactoring, does not need to use the resolver. Thus, 
+ * in contrast to {@link DefaultRenameRefactoringComputer} changes are directly
+ * done to the found and filtered JML nodes and easier to compute. </p>
+ * <p>
+ * See {@link #computeNeededChangesToJML(ICompilationUnit, IJavaProject)} for an explanation
+ * about the behavior of the refactoring computer. </p>
+ * <p>
+ * Note that {@link #filterStringNodes(List)} needs to be implemented. </p>
  * 
  * @author Robert Heimbach, Maksim Melnik
  *
@@ -30,7 +41,12 @@ public abstract class DefaultMoveRefactoringComputer implements
 
     String oldClassFullQualName;
     String newClassFullQualName;
-    
+
+    /**
+     * Constructor which saves the old and the new name. Usually in a fully qualified form.
+     * @param oldClassFullQualName old name of the element to be moved.
+     * @param newClassFullQualName new name of the element to be moved.
+     */
     DefaultMoveRefactoringComputer(String oldClassFullQualName, String newClassFullQualName){
         this.oldClassFullQualName = oldClassFullQualName;
         this.newClassFullQualName = newClassFullQualName;
@@ -38,17 +54,17 @@ public abstract class DefaultMoveRefactoringComputer implements
     
     /**
      * Computes the text changes which need to be done to JML code by finding
-     * all JML comments in the file and asking the resolver if it references the
-     * java element which is to be renamed.
+     * all JML comments in the file, filtering those and compute the changes
+     * for the nodes which are still left.
      * 
      * @param unit
-     *            ICompilation unit for which to create the changes
+     *            {@link ICompilationUnit} for which to create the changes.
      * @param project
-     *            Project of the compilation unit
+     *            Project of the compilation unit.
      * @return List of edits which need to be done
      * @throws JavaModelException
      *             Thrown when the source file cannot be loaded from
-     *             ICompilationUnit or he JMLcomments could not be received
+     *             {@link ICompilationUnit} or he JMLcomments could not be received.
      */
     public ArrayList<ReplaceEdit> computeNeededChangesToJML(
             ICompilationUnit unit, IJavaProject project) throws JavaModelException {
@@ -73,15 +89,17 @@ public abstract class DefaultMoveRefactoringComputer implements
     /**
      * Creates the text change and adds it to changesToMake.
      * 
-     * @param changesToMake
-     * @param node
+     * @param changesToMake list to add the {@link ReplaceEdit}s to.
+     * @param node {@link IASTNode} to compute the change for.
      */
     protected void computeReplaceEdit(ArrayList<ReplaceEdit> changesToMake,
             IASTNode node) {
 
         IASTNode changeThisNode = node;
-        changeThisNode = node.getChildren().get(0).getChildren().get(0);
+        // all nodes of primary expression type. (no complicated member accesses or such)
+        //changeThisNode = node.getChildren().get(0).getChildren().get(0);
 
+        // compute the location of the text edit.
         final int startOffset = changeThisNode.getStartOffset();
         final int length = oldClassFullQualName.length();
 
@@ -90,17 +108,17 @@ public abstract class DefaultMoveRefactoringComputer implements
     }
 
     /**
-     * Searches through a given CommentRange in a source file and returns 
-     * all JML comments as a potentially empty List.
+     * Searches through a given {@link CommentRange} in a source file and returns 
+     * all JML comments as a list which is potentially empty.
      * 
      * @param project
-     *            IJavaProject the unit resides in. Needed to get active JMLProfile for
-     *            parser
+     *            {@link IJavaProject} the source file resides in. 
+     *            Needed to get the project specific active JMLProfile on which a {@link IJMLParser} is created.
      * @param source
-     *            String representation of the source file to be used in the {@link IJMLParser}
+     *            String representation of the source file to be used in the {@link IJMLParser}.
      * @param range
-     *            CommentRange to be parsed
-     * @return List of found JML comments
+     *            CommentRange to be parsed. Specifies the location in the source file to be checked for JML comments.
+     * @return List of found JML comments, represented as {@link IASTNode}s. Potentially empty if a ParserException was thrown or no comment could be found.
      * @throws JavaModelException
      *             Could not access source of given ICompilationUnit
      */
@@ -108,11 +126,13 @@ public abstract class DefaultMoveRefactoringComputer implements
             String source, CommentRange range) {
         List<IASTNode> stringNodes = new ArrayList<IASTNode>();
 
+        // Get the project specific active JML profile and create a jml parser for it.
         final IJMLProfile activeProfile = JMLPreferencesHelper
                 .getProjectActiveJMLProfile(project.getProject());
         final IJMLParser parser = activeProfile.createParser();
         IASTNode parseResult;
         try {
+            // Get the jml comments in the given range as string nodes.
             parseResult = parser.parse(source, range);
             stringNodes = Nodes.getAllNodesOfType(parseResult, NodeTypes.STRING);
         }
@@ -120,9 +140,11 @@ public abstract class DefaultMoveRefactoringComputer implements
             return new ArrayList<IASTNode>();
         }
 
-        final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
-
-        final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult);
+        // Filter the nodes (exact way needs to be specified by implementing the abstract method)
+        final List<IStringNode> filteredStringNodes =  filterStringNodes(stringNodes);
+        
+        // For those occurrences left, find the primary nodes.
+        final List<IASTNode> primaries = getPrimaryNodes(filteredStringNodes, parseResult);
 
         return primaries;
     }

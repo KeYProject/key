@@ -41,6 +41,8 @@ Tests with several projects: Run in file FieldRenameRefactoringTestSeveralProjec
 Test19: Test with 2 Projects. One Project (referencingProject) references the balance-field of another project (referencedProject)
 Test20: Additional to test19, the referencingProject has an own field called balance.
 
+Tests with only one project:
+Test21: Accessing a field using a fully qualified class name.
 
 ****** Testing Parameter Renaming *****
 Test1: One method, one parameter.
@@ -48,12 +50,13 @@ Test2: One method, two parameters, renamed parameter is first.
 Test3: One method, two parameters, renamed parameter is second.
 Test4: Field with same name. Other method (constructor) using parameter with same name.
 
-****** Testing Class Renaming *****
+****** Testing Class Renaming (oracle file has the name of the original class name) *****
 Test1: One class, one method which uses the class in java code and JML.
 Test2: One class, one method which only references the class in JML (twice!), i.e. no java text changes recorded for that class
 Test3: Two classes, same package. OtherClass initializes TestClass.
 Test4: like Test3 but without any reference to TestClass in OtherClass, thus no java changes in that class.
 (Resolver problem) Test5: Two classes, different package.
+Test6: Accessing a class using the fully qualified class name.
 
 ****** Testing Package Renaming *****
 Test1: One class, one package reference in JML.

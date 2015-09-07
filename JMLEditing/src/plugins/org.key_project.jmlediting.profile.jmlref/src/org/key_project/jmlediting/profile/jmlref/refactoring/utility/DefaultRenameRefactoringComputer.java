@@ -43,6 +43,7 @@ public class DefaultRenameRefactoringComputer implements IRefactoringComputer {
      * Constructor of the refactoring computer. It needs to know the old and new name of
      * the element which is renamed and a reference to the element itself as a comparison
      * to check which elements in the JML annotations really refer to this element.
+     * 
      * @param fJavaElementToRename Element which is renamed.
      * @param fOldName Old name of the element which is renamed.
      * @param fNewName New name of the element which is renamed.
@@ -131,10 +132,10 @@ public class DefaultRenameRefactoringComputer implements IRefactoringComputer {
         }
         
         // Filter the nodes by finding all strings which match the old name of the element to be renamed.
-        final List<IStringNode> filtedStringNodes =  filterStringNodes(stringNodes);
+        final List<IStringNode> filteredStringNodes =  filterStringNodes(stringNodes);
         
         // For those occurrences left, find the primary nodes which provide the needed context for resolving.
-        final List<IASTNode> primaries = getPrimaryNodes(filtedStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
+        final List<IASTNode> primaries = getPrimaryNodes(filteredStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
         
         return primaries;
     }
@@ -250,8 +251,8 @@ public class DefaultRenameRefactoringComputer implements IRefactoringComputer {
             // to make the change / text edit.
             int i = 0;
             
-            if (result == null)
-                i = 1;
+            //if (result == null)
+            //    i = 1;
                       
             while(resolver.hasNext()) { 
                  result = resolver.next();
@@ -315,11 +316,12 @@ public class DefaultRenameRefactoringComputer implements IRefactoringComputer {
             changeThisNode = node.getChildren().get(0).getChildren().get(0);
         }
         
-        // Keep the . when it is a member access like this.field
+        // Keep the . when it is a member access like "this.field" instead of replacing it.
         if (node.getType() == ExpressionNodeTypes.MEMBER_ACCESS){
             changeThisNode = node.getChildren().get(1);
         }
         
+        // compute the text location which needs to change.
         final int startOffset = changeThisNode.getStartOffset();
         final int length = changeThisNode.getEndOffset()
                 - changeThisNode.getStartOffset();

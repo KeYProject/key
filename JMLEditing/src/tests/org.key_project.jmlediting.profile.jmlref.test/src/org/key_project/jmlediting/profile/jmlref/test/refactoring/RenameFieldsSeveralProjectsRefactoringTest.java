@@ -13,8 +13,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 public class RenameFieldsSeveralProjectsRefactoringTest {
 
     private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
-       
-    
+        
     @BeforeClass
     public static void initProject() throws CoreException, InterruptedException {
         TestUtilsUtil.closeWelcomeView();    
@@ -28,7 +27,6 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
        RefactoringTestUtil.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
        
        // Execute Renaming and Check
-       TestUtilsUtil.openEditor(referencedProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencedClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
        RefactoringTestUtil.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
        assertEquals(RefactoringTestUtil.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),RefactoringTestUtil.getContentAfterRefactoring(bot));
        
@@ -48,7 +46,6 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
        RefactoringTestUtil.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
        
        // Execute Renaming and Check
-       TestUtilsUtil.openEditor(referencedProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencedClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
        RefactoringTestUtil.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
        assertEquals(RefactoringTestUtil.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),RefactoringTestUtil.getContentAfterRefactoring(bot));
        

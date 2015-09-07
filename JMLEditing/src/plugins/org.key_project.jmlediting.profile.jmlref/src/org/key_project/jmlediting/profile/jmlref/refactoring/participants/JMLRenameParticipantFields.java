@@ -27,19 +27,18 @@ import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 
 /**
  * Class to participate in the rename refactoring of java fields.
- * 
+ * <p>
  * It uses the {@link CommentLocator} to get a list of all JML comments and 
  * the {@link Resolver} to determine if the field to be renamed is referenced.
  * The changes are added to the scheduled java changes as the JDT takes care of 
- * moving offsets in the editor and preview when several changes are made to the same file.
- * 
+ * moving offsets in the editor and preview when several changes are made to the same file. </p>
+ * <p>
  * The class usually returns NULL because changes are added in-place to the Java changes except
- * if changes to JML annotations to a class need to be made for which no Java changes are needed.
- * 
+ * if changes to JML annotations to a class need to be made for which no Java changes are needed. </p>
+ * <p>
  * To reduce the number of times the resolver is used, the JML annotations are first taken
  * in the form of StringNodes as filtered before the primary Nodes are computed which are 
- * then taken to the Resolver. 
- * 
+ * then taken to the Resolver. </p>
  * 
  * @author Robert Heimbach
  */

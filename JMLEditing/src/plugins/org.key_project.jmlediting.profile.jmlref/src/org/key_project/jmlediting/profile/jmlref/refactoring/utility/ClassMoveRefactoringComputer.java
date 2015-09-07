@@ -14,7 +14,7 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 
 /**
  * 
- * @author Robert Heimbach, Maksim Melnik
+ * @author Maksim Melnik
  *
  */
 public class ClassMoveRefactoringComputer extends

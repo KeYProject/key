@@ -18,7 +18,14 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
 
 /**
- * Renaming of method parameters
+ * Participant to take part in the renaming of method parameters.
+ * <p>
+ * As the scope of method parameters is just the method itself, any 
+ * JML annotation using the renamed method parameter only makes sense above that
+ * particular method. Thus this participant, unlike the others, only needs to check
+ * the active class for changes to make. </p>
+ * <p>
+ * See {@link JMLRenameParticipantFields} for additional information.
  * 
  * @author Robert Heimbach
  *
@@ -28,37 +35,43 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     private String fNewName;
     private String fOldName;
     private ICompilationUnit fCompUnit;
-    private ILocalVariable fLocalVar;
+    private ILocalVariable fmethodParameter;
     private IJavaProject fProject;
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean initialize(Object element) {
-        fNewName = getArguments().getNewName();
-        fLocalVar = (ILocalVariable) element;
+        fmethodParameter = (ILocalVariable) element;
         
         // check if it is a method parameter
-        // has a declaring method and a compilation unit
-        if (fLocalVar.isParameter() && fLocalVar.getDeclaringMember().getElementType() == IJavaElement.METHOD
-                && !(fLocalVar.getDeclaringMember().getCompilationUnit() == null)) {
-            fOldName = fLocalVar.getElementName();
-            fProject = fLocalVar.getJavaProject();
-            fCompUnit = fLocalVar.getDeclaringMember().getCompilationUnit();
+        // That is, it has a declaring method and a non-null compilation unit
+        if (fmethodParameter.isParameter() && fmethodParameter.getDeclaringMember().getElementType() == IJavaElement.METHOD
+                && !(fmethodParameter.getDeclaringMember().getCompilationUnit() == null)) {
+            fOldName = fmethodParameter.getElementName();
+            fNewName = getArguments().getNewName();
+            fProject = fmethodParameter.getJavaProject();
+            fCompUnit = fmethodParameter.getDeclaringMember().getCompilationUnit();
 
             return true;
-            }
+        }
         else {
             return false;
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         return "JML Parameters Refactoring Rename Participant";
     }
 
     /**
-     * Do nothing.
-     *
+     * No condition checking. Changes are done direcly (or not at all).
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -69,22 +82,20 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     }
     
     /**
-     * Computes the changes which need to be done to the JML code and
-     * add those to the changes to the java code which are already scheduled.
+     * Computes the changes which need to be done to the JML code of the active class and
+     * add those to the changes to the java code which are already scheduled. Note
+     * that those certainly exist, because the method using the parameter is in the active class.
      * 
-     * @return Returns null if only shared text changes are made. Otherwise
-     * returns a TextChange Object which gathered all the changes to JML annotations 
-     * in class which does not have any Java changes scheduled.
+     * @return Returns null, since changes to JML are directly added to the already
+     * scheduled java changes.
      * 
-     * !! checks only active class. will surely have java changes.
      *  {@inheritDoc}
-     *
      */
     @Override
     public Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
-        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fLocalVar, fOldName, fNewName);
+        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fmethodParameter, fOldName, fNewName);
 
         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
                 fCompUnit, fProject);

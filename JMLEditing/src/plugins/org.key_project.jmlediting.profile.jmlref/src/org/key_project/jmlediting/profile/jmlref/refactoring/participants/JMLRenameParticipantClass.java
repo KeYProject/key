@@ -24,6 +24,17 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRena
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 
 /**
+ * Class to participate in the renaming of classes.
+ * <p>
+ * Note that this participant uses {{@link #createPreChange(IProgressMonitor)} to 
+ * avoid synchronization problems. Any returned changes (that is, changes not added
+ * to the scheduled java changes) are done before the java changes. This is needed,
+ * whenever the renamed class does not have any scheduled changes to the java source code
+ * (Renaming of the compilation unit is not a text change). In such a case, the JML changes
+ * raised an exception, because the file they were defined on was not in sync with the file system
+ * anymore (renamed before). </p>
+ * <p>
+ * See {@link JMLRenameParticipantFields} if additional information is needed.
  * 
  * @author Robert Heimbach
  *
@@ -36,7 +47,9 @@ public class JMLRenameParticipantClass extends RenameParticipant {
     private IJavaProject fProject;  // the project which has the fields to be renamed
 
     /**
-     * Name of this class. {@inheritDoc}
+     * Name of this class. 
+     * <p>
+     * {@inheritDoc}
      */
     @Override
     public final String getName() {
@@ -44,9 +57,11 @@ public class JMLRenameParticipantClass extends RenameParticipant {
     }
 
     /**
-     * {@inheritDoc} Saves the new name to change to. Saves the old name and the
-     * field to be changed as a IJavaElement to search for references to it. Saves
-     * the active Project, i.e. the project which contains the class which field changes.
+     * Saves the new name to change to. Saves the old name and the
+     * class to be changed as a {@link IJavaElement} to search for references to it. Saves
+     * the active Project, i.e. the project which contains the renamed class.
+     * <p>
+     * {@inheritDoc}
      */
     @Override
     protected final boolean initialize(final Object element) {
@@ -63,8 +78,8 @@ public class JMLRenameParticipantClass extends RenameParticipant {
     }
 
     /**
-     * Do nothing.
-     *
+     * Do nothing. Changes are done directly.
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -75,19 +90,23 @@ public class JMLRenameParticipantClass extends RenameParticipant {
         return new RefactoringStatus();
     }
 
+    /**
+     * Returns null. That is, no changes.
+     * <p>
+     * createPreChange is used instead to avoid synchronization problems.
+     */
     @Override
     public Change createChange(final IProgressMonitor pm) {
         return null;
     }
     
     /**
-     * Computes the changes which need to be done to the JML code and
-     * add those to the changes to the java code which are already scheduled.
-     * 
+     * Computes the changes which need to be done to the JML code.
+     * <p>
      * @return Returns null if only shared text changes are made. Otherwise
      * returns a TextChange Object which gathered all the changes to JML annotations 
-     * in class which does not have any Java changes scheduled.
-     * 
+     * in class which does not have any Java changes scheduled. </p>
+     * <p>
      *  {@inheritDoc}
      *
      */

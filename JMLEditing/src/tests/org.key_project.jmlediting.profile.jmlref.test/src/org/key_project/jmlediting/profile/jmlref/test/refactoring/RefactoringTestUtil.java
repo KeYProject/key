@@ -247,7 +247,6 @@ public class RefactoringTestUtil {
         selectFieldAndExecuteRenaming(fieldDescription, className, packageName, srcFolder, newNameField, bot);
         
         compareAllFilesInProjectToOracle(javaProject, oracleFolder, bot);
-        //assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
     
     /**
