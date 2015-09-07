@@ -8,14 +8,14 @@ public class MathUtil {
     * is not important. This means that the median is computed in case that
     * {@code start <= end} holds but also in case that {@code start > end} holds.
     * <p>
-    * In case that the number of array elements between start and end is uneven,
+    * In case that the number of array elements between start and end is odd (uneven),
     * the median is the value of the array element in the middle of start and end.
     * <p>
     * In case that the number of array elements between start and end is even,
     * the median is the average of the two middle elements.
     * @param array The sorted array for which to compute the median.
-    * @param start A valid index in the array representing the lower bound.
-    * @param end A valid index in the array representing the upper bound.
+    * @param start A valid index in the array.
+    * @param end A valid index in the array.
     * @return The median value of the array between start and end index.
     * @throws IllegalArgumentException in case of illegal parameters.
     */
