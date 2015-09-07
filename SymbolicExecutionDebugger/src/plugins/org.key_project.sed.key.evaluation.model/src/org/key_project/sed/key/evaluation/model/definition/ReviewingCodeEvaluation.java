@@ -335,7 +335,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("All array elements are considered during search in case that an element was found", "AllConsideredFound"), 
                                                              new Choice("All array elements are considered during search in case that no element was found", "AllConsideredNotFound"), 
                                                              new Choice("Not all array elements are considered during search in case that an element was found", "NotAllConsideredFound"), 
-                                                             new Choice("Not all array elements are considered during search i case that no element was found", "NotAllConsideredNotFound"), 
+                                                             new Choice("Not all array elements are considered during search in case that no element was found", "NotAllConsideredNotFound"), 
                                                              new Choice("Index of first matching array element is returned", "FirstFoundReturned"),
                                                              new Choice("Not the index of first matching array element is returned", "NotFirstFoundReturned"), 
                                                              new Choice("-1 is returned instead of found index", "MinusOneReturned"), 
