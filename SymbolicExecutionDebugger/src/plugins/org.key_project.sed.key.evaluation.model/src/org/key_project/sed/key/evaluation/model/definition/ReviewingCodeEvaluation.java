@@ -332,13 +332,20 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              null, 
                                                              createNotUndefinedValueValidator(methodProblemsTitle), 
                                                              true,
-                                                             new Choice("All array elements are considered during search", "AllConsidered"), 
-                                                             new Choice("Not all array elements are considered during search", "NotAllConsidered"), 
-                                                             new Choice("First matching array element is returned", "FirstFoundReturned"), 
-                                                             new Choice("Not the first matching array element is returned", "NotFirstFoundReturned"), 
+                                                             new Choice("All array elements are considered during search in case that an element was found", "AllConsideredFound"), 
+                                                             new Choice("All array elements are considered during search in case that no element was found", "AllConsideredNotFound"), 
+                                                             new Choice("Not all array elements are considered during search in case that an element was found", "NotAllConsideredFound"), 
+                                                             new Choice("Not all array elements are considered during search i case that no element was found", "NotAllConsideredNotFound"), 
+                                                             new Choice("Index of first matching array element is returned", "FirstFoundReturned"),
+                                                             new Choice("Not the index of first matching array element is returned", "NotFirstFoundReturned"), 
                                                              new Choice("-1 is returned instead of found index", "MinusOneReturned"), 
-                                                             new Choice("Found index is retruned instead of -1", "FoundReturned"), 
-                                                             new Choice("Index of wrong array element might be returned", "WrongIndex", true), 
+                                                             new Choice("0 is returned instead of found index", "ZeroReturned"), 
+                                                             new Choice("Found index is retruned instead of -1", "FoundReturnedMinusOne"), 
+                                                             new Choice("Found index is retruned instead of 0", "FoundReturnedZero"), 
+                                                             new Choice("Found value is returned instead of array index.", "ValueInsteadIndex"), 
+                                                             new Choice("Found array index is returned instead of value at the array index.", "IndexInsteadValue"), 
+                                                             new Choice("Value at returned array index might not be equal to the value to search", "WrongIndex", true), 
+                                                             new Choice("Returned value might not be equal to the value to search", "WrongValue"), 
                                                              new Choice("array is modified during search", "ArrayModified"), 
                                                              new Choice("array is not modified during search", "ArrayNotModified"), 
                                                              createThrownExceptionsQuestionChoice(description, true, false, false, false, false, false),
@@ -1437,7 +1444,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
    
    private String createChangedLocationTitle(String className, String method) {
-      return "Which locations of class '" + className + "' might be changed during execution of " + method + "? (Expressions are evaluated in the pre state before method call.)";
+      return "Which locations of class '" + className + "' might be assigned during execution of " + method + "? (Expressions are evaluated in the pre state before method call.)";
    }
    
    private String createImplementedAsDocumentedTitle(String method, boolean constructor) {
