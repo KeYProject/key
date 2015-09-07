@@ -1431,7 +1431,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    }
    
    private String createWhatsWrongTitle() {
-      return "Which is the ovserved wrong behavior?";
+      return "Which is the observed wrong behavior?";
    }
    
    private String createChangedLocationTitle(String className, String method) {
