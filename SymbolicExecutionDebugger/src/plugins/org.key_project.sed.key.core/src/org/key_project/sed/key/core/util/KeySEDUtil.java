@@ -782,6 +782,7 @@ public final class KeySEDUtil {
     * @param showSignatureOnMethodReturnNodes The new value to set.
     * @param higlightReachedSourceCode The new value to set.
     * @param truthValueEvaluationEnabled The new value to set.
+    * @param variablesAreComputedFromUpdates The new value to set.
     * @return The updated {@link ILaunchConfiguration}.
     * @throws CoreException Occurred Exception.
     */
@@ -796,7 +797,8 @@ public final class KeySEDUtil {
                                                                 Boolean usePrettyPrinting,
                                                                 Boolean showSignatureOnMethodReturnNodes,
                                                                 Boolean higlightReachedSourceCode,
-                                                                Boolean truthValueEvaluationEnabled) throws CoreException {
+                                                                Boolean truthValueEvaluationEnabled,
+                                                                Boolean variablesAreComputedFromUpdates) throws CoreException {
       ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
       if (useExistingContract != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
@@ -840,6 +842,9 @@ public final class KeySEDUtil {
       }
       if (truthValueEvaluationEnabled != null) {
          wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
+      }
+      if (variablesAreComputedFromUpdates != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, variablesAreComputedFromUpdates);
       }
       config = wc.doSave();
       return config;

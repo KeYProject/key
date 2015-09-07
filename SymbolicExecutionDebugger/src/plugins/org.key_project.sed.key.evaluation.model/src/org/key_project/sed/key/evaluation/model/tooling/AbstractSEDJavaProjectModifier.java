@@ -44,7 +44,7 @@ public abstract class AbstractSEDJavaProjectModifier extends JavaProjectModifier
                                    null;
                   ILaunchConfiguration launchConfiguration = KeySEDUtil.createConfiguration(projectFile, method);
                   setResult(launchConfiguration);
-                  launchConfiguration = KeySEDUtil.updateLaunchConfiguration(launchConfiguration, null, null, true, true, false, false, false, true, true, true, true);
+                  launchConfiguration = KeySEDUtil.updateLaunchConfiguration(launchConfiguration, null, null, true, true, false, false, false, true, true, true, true, areVariablesAreComputedFromUpdates());
                   DebugUIPlugin.launchInForeground(launchConfiguration, KeySEDUtil.MODE);
                }
                catch (CoreException e) {
@@ -67,6 +67,10 @@ public abstract class AbstractSEDJavaProjectModifier extends JavaProjectModifier
          }
       }
       return launchConfiguration;
+   }
+
+   protected Boolean areVariablesAreComputedFromUpdates() {
+      return null;
    }
 
    protected void performLazyWork(ILaunch launch) {

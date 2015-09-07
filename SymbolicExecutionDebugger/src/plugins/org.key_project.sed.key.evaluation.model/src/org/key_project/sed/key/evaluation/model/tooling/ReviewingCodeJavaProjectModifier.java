@@ -138,6 +138,11 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
    }
 
    @Override
+   protected Boolean areVariablesAreComputedFromUpdates() {
+      return Boolean.TRUE;
+   }
+
+   @Override
    protected void doAdditinalCleanup() throws Exception {
       super.doAdditinalCleanup();
       for (ILaunchConfiguration launchConfiguration : launchConfigurations) {
