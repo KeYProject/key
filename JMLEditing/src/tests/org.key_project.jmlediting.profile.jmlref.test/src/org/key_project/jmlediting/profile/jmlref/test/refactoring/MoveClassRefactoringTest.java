@@ -63,7 +63,7 @@ public class MoveClassRefactoringTest{
     // Extracts files from copyFrom into folderToCopyInto 
     private void copyFiles(String copyFrom, IFolder folderToCopyInto) throws CoreException{
 
-        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, copyFrom, folderToCopyInto);
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, copyFrom, folderToCopyInto, true);
 
         TestUtilsUtil.waitForBuild(); 
     }
@@ -73,10 +73,6 @@ public class MoveClassRefactoringTest{
 
         SWTBotTree tree = TestUtilsUtil.getProjectExplorer(bot).bot().tree(); 
         SWTBotTreeItem fieldToMove = TestUtilsUtil.selectInTree(tree, "JMLRefactoringMoveTest","src",moveFrom,className+".java");
-        //TestUtilsUtil.selectInTree(tree, "src");
-        //TestUtilsUtil.selectInTree(tree, "test1");
-        //SWTBotTreeItem fieldToMove = TestUtilsUtil.selectInTree(tree, "");
-        //System.out.println(fieldToMove.getText());
 
         fieldToMove.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'V');
 
@@ -106,7 +102,7 @@ public class MoveClassRefactoringTest{
 
         editor.close();
 
-        return content.replaceAll("(\n)", "\r\n");
+        return content;
     }
 
 

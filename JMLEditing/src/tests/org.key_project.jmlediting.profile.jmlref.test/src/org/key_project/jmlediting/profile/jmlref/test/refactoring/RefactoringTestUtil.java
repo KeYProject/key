@@ -60,6 +60,7 @@ public class RefactoringTestUtil {
     
     /**
      * Copies the files from copyFrom into folderToCopyInto with waiting for the build to finish afterwards.
+     * Unifies line breaks when copying.
      * 
      * @param copyFrom the path as a string to a folder in a bundle with the content to copy.
      * @param folderToCopyInto target in workspace to copy into.
@@ -67,7 +68,7 @@ public class RefactoringTestUtil {
      */
     public static void copyFiles(String copyFrom, IFolder folderToCopyInto) throws CoreException{
         
-        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, copyFrom, folderToCopyInto);
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, copyFrom, folderToCopyInto, true);
         
         TestUtilsUtil.waitForBuild(); 
     }
@@ -87,7 +88,7 @@ public class RefactoringTestUtil {
         
         editor.close();
         
-        return content.replaceAll("(\n)", "\r\n");
+        return content;
     }
     
     

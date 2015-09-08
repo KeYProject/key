@@ -11,19 +11,19 @@ import org.eclipse.core.runtime.Platform;
 import org.key_project.javaeditor.outline.IOutlineModifier;
 
 /**
- * Util to call all Extensions of the {@link IOutlineModifier}
+ * Util to call all Extensions of the {@link IOutlineModifier}.
  * @author Martin Hentschel, Timm Lippert
  *
  */
 
-public class ExtendableOutlineUtil {
+public final class ExtendableOutlineUtil {
     /**
-     * ID of extensino point which provides {@link IOutlineModifier} implementations.
+     * ID of extension point which provides {@link IOutlineModifier} implementations.
      */
     private static final String JAVA_OUTLINE_EXTENSION_POINT = "org.key_project.javaeditor.javaOutlineExtension";
 
     /**
-     * No instances allowed
+     * No instances allowed.
      */
     private ExtendableOutlineUtil() {
     }
