@@ -25,7 +25,10 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.eclipse.jdt.internal.ui.javaeditor.SemanticHighlightingManager;
+import org.eclipse.jdt.internal.ui.model.JavaModelLabelProvider;
 import org.eclipse.jdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
+import org.eclipse.jdt.internal.ui.viewsupport.DecoratingJavaLabelProvider;
+import org.eclipse.jdt.internal.ui.viewsupport.JavaUILabelProvider;
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -34,6 +37,8 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
@@ -373,8 +378,10 @@ public final class JavaEditorManager {
          final TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
          final ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
          
-         //Set new LableProvider to an extended one with overwritten getImage method
-         outlineViewer.setLabelProvider(new OutlineLableWrapper(new AppearanceAwareLabelProvider()));
+         //Set new LableProvider to an extended one with overwritten getImage method and the old AppearanceAwareLableProvier
+         OutlineLableWrapper wrapper =  new OutlineLableWrapper((AppearanceAwareLabelProvider)((DecoratingJavaLabelProvider)outlineViewer.getLabelProvider()).getStyledStringProvider());
+         outlineViewer.setLabelProvider(wrapper);
+         
          if (contentProvider instanceof OutlineContentProviderWrapper) {
             if (!PreferenceUtil.isExtensionsEnabled()) { // Restore input if required
                outlineViewer.setContentProvider(((OutlineContentProviderWrapper) contentProvider).getOriginalProvider());

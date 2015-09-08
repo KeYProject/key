@@ -1,12 +1,22 @@
 package org.key_project.jmlediting.ui.test.Outline;
 
+import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.locks.Condition;
+
+import javax.swing.SwingUtilities;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPageLayout;
@@ -17,6 +27,8 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject.SaveGuarantee;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.SwingUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotJMLOutlineUpdate {
@@ -40,6 +52,13 @@ public class SWTBotJMLOutlineUpdate {
    private static SWTBotTree tree;
    
    private int offset = 0;
+   private int firstMeth = 5;//test where actual methods are
+   private int secMethod = 7;
+   
+   
+   
+   
+   
    
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
@@ -59,6 +78,18 @@ public class SWTBotJMLOutlineUpdate {
        
    }
    
+   
+   private int getLine(String s){
+      int i = 0;
+      for(String linestr : editor.getLines()){
+         if (linestr.contains(s)) {
+            return i;
+         } else i++;
+      }
+      return -1;
+   }
+   
+   
    public void test(String itemSource, String itemName, int it1, int it2) {
       int i = 0;
       for (SWTBotTreeItem item : tree.getAllItems()) {
@@ -71,7 +102,7 @@ public class SWTBotJMLOutlineUpdate {
                   item2.click();
                   item2.select().click();
                   if (item2.getText().equals(itemName)) {
-                     assertEquals(itemSource, editor.getSelection());
+                     assertEquals(itemSource.trim(), editor.getSelection().trim());
                      assertEquals(itemName, item2.getText());
                   } else {
                      assertTrue(false);
@@ -82,6 +113,31 @@ public class SWTBotJMLOutlineUpdate {
             }
          }
       }assertTrue("Failed at : " +itemName , false);
+   }
+   
+   
+   public void testbehavior(String method, String itemSource, String itemName,boolean reloadtree){
+      if (reloadtree){
+         tree = bot.viewByTitle("Outline").bot().tree();
+      }
+      for (SWTBotTreeItem item : tree.getAllItems()) {
+         if(item.getItems() != null){
+            for (SWTBotTreeItem item2 : item.getItems() ){
+               if(item2.getText().equals(method)) {
+                  item2.expand();
+                  item2.getItems()[0].select().click();;
+                  assertEquals(itemName.trim(), item2.getItems()[0].getText().trim());
+                  assertEquals(itemSource.trim(), editor.getSelection().trim());
+                  return;
+               }
+            }
+         }
+        
+         
+      }
+      assertTrue(method+ ": No Method Found", false);
+      
+      
    }
    
    
@@ -96,23 +152,35 @@ public class SWTBotJMLOutlineUpdate {
       }
    }
    
-   @Test
-   public void outlineUpdateTestOnEnter(){
-      bot.activeEditor().toTextEditor().insertText(5, 1, textToAdd);
-      //test(textToAdd, "invariant test", 1, offset++);
-      
-   }
    
    @Test
-   public void outlineUpdateTestSeriell() {
+   public void outlineUpdateInvariant() {
      addTextSeriell(6, 0, textToAdd2);
-     //test(textToAdd2, "//@ invariant a < b", 1, offset++);
+     bot.sleep(1000);
+     test(textToAdd2, "invariant a < b", 1, 0);
+     
+     
    }
    
    @Test
    public void outlineUpdateMethod() {
-      addTextSeriell(11, 0, textToAddMethod);
-
+      addTextSeriell(getLine("public void ab")-1, 0, textToAddMethod);
+      bot.sleep(1000);
+      testbehavior("ab() : void", "//@behavior", "behavior", true);
+   }
+   
+   @Test
+   public void outlinePureType() {
+      addTextSeriell(getLine("public void a"), 9, " /*@pure@*/");
+      bot.sleep(1000);
+      testbehavior("a() : void", "/*@pure@*/", "pure", true);
+   }
+   
+   @Test
+   public void outlineSpecType() {
+      addTextSeriell(getLine("private int i"), 10, "/*@spec_public@*/ ");
+      bot.sleep(10000);
+      testbehavior("i : int", "/*@spec_public@*/", "spec_public", true);
    }
    
    

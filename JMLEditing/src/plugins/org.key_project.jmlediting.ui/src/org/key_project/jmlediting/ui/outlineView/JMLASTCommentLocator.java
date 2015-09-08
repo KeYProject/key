@@ -53,6 +53,7 @@ public class JMLASTCommentLocator {
    final List<int[]> methodStartEndoffsets = new ArrayList<int[]>();
    final List<int[]> fieldStartToEnd = new ArrayList<int[]>();
    
+   
    List<Comment> comments;
    String[] methodKeyWords = { "normal_behavior", "normal_behaviour","behavior","behaviour","exceptional_behaviour","exceptional_behavior" };
   
@@ -68,7 +69,6 @@ public class JMLASTCommentLocator {
 
    @SuppressWarnings("unchecked")
    public JMLASTCommentLocator(ICompilationUnit icu) {
-      CompilationUnit cu;
       String source = null;
       IASTNode node = null;
       List<IASTNode> listofIAST;
@@ -81,23 +81,23 @@ public class JMLASTCommentLocator {
       }
       // get all resources needed
       final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(icu);
-      cu = (CompilationUnit) jdtAST;
+      CompilationUnit cu = (CompilationUnit) jdtAST;
       comments = cu.getCommentList();
       // return indext in list
       sourceOffsetToCommentOffset = new HashMap<Integer, Integer>();
       fieldDeclarationMap = new HashMap<Integer, JMLComments>();
       methoddDeclarationMap = new HashMap<Integer, JMLComments>();
+
       jdtAST.accept(new ASTVisitor() {
          
          @Override
          public boolean visit(FieldDeclaration node) {
             int [] a = {node.getStartPosition(),node.getLength()};
-            fieldStartToEnd.add(a);
-            
+            fieldStartToEnd.add(a); 
+
             return super.visit(node);
-            
-            
          }
+         
 
          @Override
          public boolean visit(MethodDeclaration node) {
@@ -193,7 +193,7 @@ public class JMLASTCommentLocator {
    private boolean commentInField(int startPosition, Comment com, String text) {
       for (int[] i : fieldStartToEnd){
          if (startPosition >= i[0] && startPosition <= (i[1]+i[0])){
-            fieldDeclarationMap.put(i[0], new JMLComments(text, com, "Field"));
+            fieldDeclarationMap.put(i[0]+i[1], new JMLComments(text, com, "Field"));
             return true;
          }
       }

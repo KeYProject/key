@@ -3,7 +3,10 @@ package org.key_project.jmlediting.ui.outlineView;
 
 
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
@@ -89,8 +92,11 @@ public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
             IField field = (IField) javaParent;
             JMLComments toAdd = null;
             Object [] newarray;
+            
+            
+            
             try {
-               toAdd = comments.getFieldJMLComm(field.getSourceRange().getOffset());
+               toAdd = comments.getFieldJMLComm(field.getSourceRange().getLength()+field.getSourceRange().getOffset());
             }
             catch (JavaModelException e) {
                LogUtil.getLogger().logError(e);

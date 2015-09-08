@@ -4,16 +4,16 @@ public class OutlineUpdateTest {
    
    
    
-   public static void main(String[] args) throws Exception {
-      System.out.println("//@Hello  World!@//");
-      int x;
-   }
    
+   
+   private int i = 0;
    
    public void a(){
       int x;
       
    }
+   
+   
    public void ab(){
       
    }
