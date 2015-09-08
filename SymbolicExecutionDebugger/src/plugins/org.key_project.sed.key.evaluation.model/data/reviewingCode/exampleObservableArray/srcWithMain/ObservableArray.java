@@ -81,5 +81,14 @@ public class ObservableArray {
    
    public static void main(String[] args) {
       // TODO: Write executable code here if appropriate.
+      //ArrayListener arrayListener = new ArrayListener() {
+      //   @Override
+      //   public void elementChanged(ArrayEvent e) {
+      //      // TODO Auto-generated method stub
+      //   }
+      //};
+      //ObservableArray observableArray = new ObservableArray(new Object[] {arrayElementsSeparatedByComma});
+      //observableArray.setArrayListeners(new ArrayListener[] {arrayElementsSeparatedByComma});
+      //observableArray.set(index, element);
    }
 }

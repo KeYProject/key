@@ -75,5 +75,9 @@ public final class Stack {
    
    public static void main(String[] args) {
       // TODO: Write executable code here if appropriate.
+      //Stack stack = new Stack(maximalSize);
+      //Stack clone = new Stack(stack);
+      //stack.push(e);
+      //System.out.println(stack.pop());
    }
 }

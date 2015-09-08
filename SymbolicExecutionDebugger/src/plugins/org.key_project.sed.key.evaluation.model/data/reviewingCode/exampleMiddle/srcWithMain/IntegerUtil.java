@@ -35,5 +35,6 @@ public class IntegerUtil {
    
    public static void main(String[] args) {
       // TODO: Write executable code here if appropriate.
+      //System.out.println(middle(x, y, z));
    }
 }
