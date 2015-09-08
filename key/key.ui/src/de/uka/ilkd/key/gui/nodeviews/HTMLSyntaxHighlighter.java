@@ -48,6 +48,9 @@ public class HTMLSyntaxHighlighter {
             "while", "return", "break", "switch", "case", "continue", "try",
             "catch", "finally", "assert", "null", "throw", "this", "true",
             "false", "int", "char", "long", "short", "boolean" };
+    
+    private final static String JAVA_KEYWORDS_REGEX =
+            concat("|", JAVA_KEYWORDS);
 
     /**
      * Creates a new {@link HTMLSyntaxHighlighter} for this HTMLDocument.
@@ -116,10 +119,10 @@ public class HTMLSyntaxHighlighter {
 
         // We use div-s instead of br-s because this preserves the line
         // breaks in JEditorPane's plain text.
-        return "<div>"
-                + addSyntaxHighlighting(toHTML(plainTextString),
-                        programVariables).replaceAll("<br>", "</div><div>")
-                + "</div>";
+        return concat("<div>",
+                addSyntaxHighlighting(toHTML(plainTextString),
+                        programVariables).replaceAll("<br>", "</div><div>"),
+                "</div>");
 
     }
 
@@ -137,32 +140,35 @@ public class HTMLSyntaxHighlighter {
 
         // NOTE: \Q(...)\E escapes the String in (...)
 
-        final String delimitersRegex = "([\\Q{}[]=*/.!,:<>\\E]|"
-                        + "\\Q&#040;\\E|" // (
-                        + "\\Q&#041;\\E|" // )
-                        + "\\Q&#059;\\E|" // ;
-                        + "\\Q&#043;\\E|" // +
-                        + "\\Q&#045;\\E|" // -
-                        + "\\Q&nbsp;\\E|" // " "
-                        + "\\Q<br>\\E|"   // \n
-                        + "\\Q<br/>\\E|"  // \n
-                        + "\\Q&lt;\\E|"   // <
-                        + "\\Q&gt;\\E)";  // >
+        final String delimitersRegex = concat(
+                        "([\\Q{}[]=*/.!,:<>\\E]|",
+                        "\\Q&#040;\\E|", // (
+                        "\\Q&#041;\\E|", // )
+                        "\\Q&#059;\\E|", // ;
+                        "\\Q&#043;\\E|", // +
+                        "\\Q&#045;\\E|", // -
+                        "\\Q&nbsp;\\E|", // " "
+                        "\\Q<br>\\E|",   // \n
+                        "\\Q<br/>\\E|",  // \n
+                        "\\Q&lt;\\E|",   // <
+                        "\\Q&gt;\\E)");  // >
 
         for (String keyword : PROP_LOGIC_KEYWORDS) {
             keyword = toHTML(keyword);
             htmlString =
-                    htmlString.replace(keyword,
-                            "<span class=\"prop_logic_highlight\">" + keyword
-                                    + "</span>");
+                    htmlString.replace(
+                            keyword,
+                            concat("<span class=\"prop_logic_highlight\">",
+                                    keyword, "</span>"));
         }
 
         for (String keyword : DYNAMIC_LOGIC_KEYWORDS) {
             keyword = toHTML(keyword);
             htmlString =
-                    htmlString.replace(keyword,
-                            "<span class=\"dynamic_logic_highlight\">" + keyword
-                                    + "</span>");
+                    htmlString.replace(
+                            keyword,
+                            concat("<span class=\"dynamic_logic_highlight\">",
+                                    keyword, "</span>"));
         }
 
         Matcher modalityMatcher =
@@ -170,14 +176,12 @@ public class HTMLSyntaxHighlighter {
                         htmlString);
         while (modalityMatcher.find()) {
             String modality = modalityMatcher.group();
-            for (String keyword : JAVA_KEYWORDS) {
-                modality =
-                        modality.replaceAll(delimitersRegex + keyword
-                                + delimitersRegex,
-                                "$1<span class=\"java_highlight\">" + keyword
-                                        + "</span>$2");
-            }
-            
+            modality =
+                    modality.replaceAll(
+                            concat(delimitersRegex, "(", JAVA_KEYWORDS_REGEX,
+                                    ")", delimitersRegex),
+                            "$1<span class=\"java_highlight\">$2</span>$3");
+
             htmlString = htmlString.replace(modalityMatcher.group(), modality);
         }
 
@@ -185,10 +189,10 @@ public class HTMLSyntaxHighlighter {
             String name = toHTML(progVar.name().toString());
             htmlString =
                     htmlString.replaceAll(
-                            delimitersRegex + Pattern.quote(name)
-                                    + delimitersRegex,
-                            "$1<span class=\"progvar_highlight\">" + name
-                                    + "</span>$2");
+                            concat(delimitersRegex, Pattern.quote(name),
+                                    delimitersRegex),
+                            concat("$1<span class=\"progvar_highlight\">",
+                                    name, "</span>$2"));
         }
 
         return htmlString;
@@ -202,8 +206,43 @@ public class HTMLSyntaxHighlighter {
      *            The String to transform.
      * @return A HTML-compatible version of plainTextString.
      */
-    private String toHTML(String plainTextString) {
+    private static String toHTML(String plainTextString) {
         return LogicPrinter.escapeHTML(plainTextString, true);
+    }
+    
+    /**
+     * Concatenates the given String array where the elements are separated by
+     * the given delimiter in the result String.
+     *
+     * @param delim
+     *            Delimiter for the elements in the array.
+     * @param strings
+     *            Strings to concatenate.
+     * @return The concatenated array, elements separated by the given
+     *         delimiter.
+     */
+    private static String concat(String delim, String[] strings) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : strings) {
+            sb.append(str);
+            sb.append(delim);
+        }
+        return sb.substring(0, sb.length() - delim.length());
+    }
+    
+    /**
+     * Concatenates the given Strings using a {@link StringBuilder}.
+     *
+     * @param strings
+     *            Strings to concatenate.
+     * @return The concatenated Strings.
+     */
+    private static String concat(String... strings) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : strings) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 
 }
