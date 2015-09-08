@@ -38,7 +38,7 @@ public class MoveFieldRefactoringTest {
     final String REF_CLASS_NAME = "Main";
     final String CLASS_NAME_MOVE_FROM = "Settings";
     final String CLASS_NAME_MOVE_TO = "Params";
-    final String FIELD_TO_MOVE="x";
+    final String FIELD_TO_MOVE="x : int";
 
     @BeforeClass
     public static void initProject() throws CoreException, InterruptedException {
@@ -65,7 +65,7 @@ public class MoveFieldRefactoringTest {
     // Extracts files from copyFrom into folderToCopyInto 
     private void copyFiles(String copyFrom, IFolder folderToCopyInto) throws CoreException{
 
-        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, copyFrom, folderToCopyInto);
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, copyFrom, folderToCopyInto, true);
 
         TestUtilsUtil.waitForBuild(); 
     }
@@ -92,7 +92,7 @@ public class MoveFieldRefactoringTest {
 
         editor.close();
 
-        return content.replaceAll("(\n)", "\r\n");
+        return content;
     }
 
 
