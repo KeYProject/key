@@ -654,6 +654,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("y returned instead of z", "yInsteadOfz"), 
                                                              new Choice("z returned instead of x", "zInsteadOfx"), 
                                                              new Choice("z returned instead of y", "zInsteadOfy"), 
+                                                             new Choice("No value might be returned", "NoReturn"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
@@ -965,9 +966,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                   true,
                                   new Choice("None", "None"),
                                   new Choice("array", "array", expectedArray),
-                                  new Choice("array[index - 1]", "array[index - 1]", expectedAllArrayIndices),
                                   new Choice("array[index]", "array[index]", expectedAllArrayIndices),
-                                  new Choice("array[index + 1]", "array[index + 1]", expectedAllArrayIndices),
                                   new Choice("array[*]", "array[*]", expectedAllArrayIndices),
                                   new Choice("array.length", "array.length"),
                                   new Choice("arrayListeners", "arrayListeners", expectedArrayListeners),

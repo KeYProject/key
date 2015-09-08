@@ -45,7 +45,7 @@ public class ObservableArray {
     * The change is represented as {@link ArrayEvent} which contains all
     * details about the performed modification.
     * @param index The index in the array to modify.
-    * @param element The element to set at the given index.
+    * @param element The element to set at the given index which might be {@code null}.
     */
    public void set(int index, Object element) {
       array[index] = element;
@@ -73,7 +73,7 @@ public class ObservableArray {
 
    /**
     * Sets the available {@link ArrayListener} instances.
-    * @param arrayListeners The new {@link ArrayListener} instances.
+    * @param arrayListeners The new {@link ArrayListener} instances which might be {@code null}.
     */
    public void setArrayListeners(ArrayListener[] arrayListeners) {
       this.arrayListeners = arrayListeners;
