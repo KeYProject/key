@@ -448,6 +448,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Wrong value returned in case age >= 19 and age < 21", "WrongLess21", createBankUtilReturnedValue(description, false)), 
                                                              new Choice("Wrong value returned in case age >= 21 and age < 35", "WrongLess35", createBankUtilReturnedValue(description, false)), 
                                                              new Choice("Wrong value returned in case age >= 35", "WrongGreaterOrEqual35", true, createBankUtilReturnedValue(description, true)), 
+                                                             new Choice("No value might be returned", "NoReturn"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
@@ -559,13 +560,13 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              true,
                                                              new Choice("The returned value is contained in the array", "ContainedInArray"), 
                                                              new Choice("The returned value is not contained in the array", "NotContainedInArray"), 
-                                                             new Choice("Middle value returned instead of average", "MiddleInsteadOfAverage"), 
-                                                             new Choice("Average returned instead of middle value", "AverageInsteadOfMiddle"), 
+                                                             new Choice("Middle value is returned instead of the average", "MiddleInsteadOfAverage"), 
+                                                             new Choice("Average is returned instead of the middle value", "AverageInsteadOfMiddle"), 
                                                              new Choice("Average is computed wrongly", "WrongAverage"), 
                                                              new Choice("array is modified during compuation", "ArrayModified"), 
                                                              new Choice("array is not modified during compuation", "ArrayNotModified"), 
-                                                             new Choice("Exception is always thrown instead of returning average", "ExceptionThrown"), 
-                                                             new Choice("Value is always returned instead of thrown exception", "ValueReturned"), 
+                                                             new Choice("A documented exception might be thrown instead of returning median value", "ExceptionThrown"), 
+                                                             new Choice("Media value might be returned instead of throwing a documented exception", "ValueReturned"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, true, false),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
@@ -769,8 +770,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              true,
                                                              new Choice("Future calls of set(int, Object) will modify the given array", "ArrayModified"), 
                                                              new Choice("Future calls of set(int, Object) will not modify the given array", "ArrayNotModified"), 
-                                                             new Choice("ObservableArray is always created instead of throwing an exception", "ExceptionMissing"), 
-                                                             new Choice("Exception is always thrown instead of creating an ObservableArray", "ExceptionThrown"), 
+                                                             new Choice("ObservableArray might be created instead of throwing a documented exception", "ExceptionMissing"), 
+                                                             new Choice("A document exception might be thrown instead of creating an ObservableArray", "ExceptionThrown"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, true);
@@ -1140,8 +1141,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("elements is not updated", "ElementsNotUpdated"), 
                                                              new Choice("Element at index size is replaced", "ElementAtSizeReplaced"), 
                                                              new Choice("Element at index size + 1 is replaced", "ElementAtSizePlusOneReplaced"), 
-                                                             new Choice("Exception is always thrown instead of updating the stack", "ExceptionThrown"), 
-                                                             new Choice("Stack is always updated instead of throwing an exception", "ExceptionNOtThrown"), 
+                                                             new Choice("A documented exception might be thrown instead of updating the stack", "ExceptionThrown"), 
+                                                             new Choice("Stack might be updated instead of throwing a documented exception", "ExceptionNOtThrown"), 
                                                              new Choice("Executing pop after push would not return the added element.", "PushPopBroken"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
@@ -1195,8 +1196,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("elements is not updated", "ElementsNotUpdated", true), 
                                                              new Choice("Element at index size is returned", "ElementAtSizeReturned"), 
                                                              new Choice("Element at index size - 1 is returned", "ElementAtSizePlusOneReturned"), 
-                                                             new Choice("Exception is always thrown instead of returning the top element", "ExceptionThrown"), 
-                                                             new Choice("Top element is always returned instead of throwing an exception", "ExceptionNOtThrown"), 
+                                                             new Choice("A documented exception might be thrown instead of returning the top element", "ExceptionThrown"), 
+                                                             new Choice("Top element might be returned instead of throwing a documented exception", "ExceptionNOtThrown"), 
                                                              new Choice("Executing pop twice would return the same element twice.", "PopPopBroken"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, false, false),
                                                              createElseWrongChoice(description));
@@ -1345,7 +1346,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                        createElseWrongChoice(description));
       String title = constructor ?
                      "Is the class invariant established by " + method + " in case of normal termination?" :
-                     "Is the class invariant preserved by " + method + " in case of normal termination?";
+                     "Is the class invariant preserved by " + method + "?";
       return new RadioButtonsQuestion("classInvariant", 
                                       title, 
                                       description,
