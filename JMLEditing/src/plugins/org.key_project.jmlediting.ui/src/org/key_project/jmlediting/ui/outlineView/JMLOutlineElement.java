@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.jmlediting.core.dom.IASTNode;
 
 /**
- * JML Outline Element canbe used as a child to reaturn and get shown in the Outline
+ * JML Outline Element can be used as a child to return and get shown in the Outline
  * 
  * @author Timm Lippert
  *
