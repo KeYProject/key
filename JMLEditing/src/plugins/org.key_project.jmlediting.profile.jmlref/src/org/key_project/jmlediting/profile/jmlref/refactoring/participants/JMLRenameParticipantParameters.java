@@ -15,7 +15,7 @@ import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.ReplaceEdit;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefactoringComputer;
 
 /**
  * Participant to take part in the renaming of method parameters.
@@ -99,7 +99,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     public final Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
-        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fmethodParameter, fOldName, fNewName);
+        RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(fmethodParameter, fOldName, fNewName);
 
         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
                 fCompUnit, fProject);

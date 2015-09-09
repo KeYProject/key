@@ -55,8 +55,7 @@ public class MoveFieldRefactoringTest {
     public void test1SimpleMove() throws InterruptedException, CoreException {
         
         RefactoringTestUtil.runMoveOutlineElementTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
-                CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, CLASS_NAME_MOVE_TO, "test1p2", javaProject);
-        
+                CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, CLASS_NAME_MOVE_TO, "test1p2", javaProject); 
     }
    
     @Test

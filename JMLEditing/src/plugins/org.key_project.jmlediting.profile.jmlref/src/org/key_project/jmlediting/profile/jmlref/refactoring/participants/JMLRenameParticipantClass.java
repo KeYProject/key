@@ -20,7 +20,7 @@ import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefactoringComputer;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 
 /**
@@ -130,7 +130,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
                         
-                        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fJavaElementToRename, fOldName, fNewName);
+                        RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(fJavaElementToRename, fOldName, fNewName);
 
                         
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(

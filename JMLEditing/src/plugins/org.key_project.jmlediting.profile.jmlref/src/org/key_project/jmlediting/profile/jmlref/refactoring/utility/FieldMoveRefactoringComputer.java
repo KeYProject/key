@@ -34,14 +34,13 @@ public class FieldMoveRefactoringComputer extends
 
         for (final IASTNode node: nodesList){
             final IStringNode stringNode = (IStringNode) node;
-            if((getOldClassFullQualName()+"."+fieldName).contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
+            if((getOldFullQualName()+"."+fieldName).contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
             else nodeString="";
-            if (nodeString.equals(getOldClassFullQualName()+"."+fieldName)) {
+            if (nodeString.equals(getOldFullQualName()+"."+fieldName)) {
                 filteredList.add(stringNode);
             }
         }
 
         return filteredList;
     }
-
 }

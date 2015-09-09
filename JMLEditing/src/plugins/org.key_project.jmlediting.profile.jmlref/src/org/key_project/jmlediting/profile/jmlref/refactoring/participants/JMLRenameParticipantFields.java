@@ -21,7 +21,7 @@ import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefactoringComputer;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 
@@ -120,7 +120,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
                 for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac.getCompilationUnits()) {
                         
-                        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fJavaElementToRename, fOldName, fNewName);
+                        RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(fJavaElementToRename, fOldName, fNewName);
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
                                 unit, project);
 
