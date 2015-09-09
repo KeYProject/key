@@ -21,30 +21,33 @@ import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
- * Copy a term that is currently selected (i.e., under the mouse cursor)
- * in the current goal view to the default system clip board.
+ * Copy a term that is currently selected (i.e., under the mouse cursor) in the
+ * current goal view to the default system clip board.
+ * 
  * @author bruns
  */
 public class CopyToClipboardAction extends MainWindowAction {
-    
+
     private static final long serialVersionUID = -6193181877353785015L;
 
     public CopyToClipboardAction(MainWindow mainWindow) {
-	super(mainWindow);
+        super(mainWindow);
         setName("Copy to clipboard");
-        setTooltip("Copy a selected sequent term into your default clipboard.\n" +
-        		"This functionality may depend on your window manager or installed clipboard managers.\n" +
-        		"The default clipboard is not the 'middle click clipboard' on X window systems.");
+        setTooltip("Copy a selected sequent term into your default clipboard.\n"
+                + "This functionality may depend on your window manager or installed clipboard managers.\n"
+                + "The default clipboard is not the 'middle click clipboard' on X window systems.");
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         CurrentGoalView goalView = mainWindow.getGoalView();
-        if (goalView == null) return;
+        if (goalView == null)
+            return;
         PosInSequent pis = goalView.getMousePosInSequent();
-        if (pis == null) return;
+        if (pis == null)
+            return;
         String s = goalView.getHighlightedText(pis);
-        java.awt.datatransfer.StringSelection ss = 
+        java.awt.datatransfer.StringSelection ss =
                 new java.awt.datatransfer.StringSelection(s);
         java.awt.Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(ss, ss);
