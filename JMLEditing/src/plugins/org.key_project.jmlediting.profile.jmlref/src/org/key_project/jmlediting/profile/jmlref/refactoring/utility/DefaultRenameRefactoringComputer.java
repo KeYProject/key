@@ -250,9 +250,6 @@ public class DefaultRenameRefactoringComputer implements IRefactoringComputer {
             // Needed to move through the node to inner nodes to get to the right place
             // to make the change / text edit.
             int i = 0;
-            
-            //if (result == null)
-            //    i = 1;
                       
             while(resolver.hasNext()) { 
                  result = resolver.next();

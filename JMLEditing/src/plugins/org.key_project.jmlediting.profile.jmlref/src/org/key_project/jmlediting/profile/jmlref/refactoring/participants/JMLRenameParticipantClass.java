@@ -96,7 +96,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
      * createPreChange is used instead to avoid synchronization problems.
      */
     @Override
-    public Change createChange(final IProgressMonitor pm) {
+    public final Change createChange(final IProgressMonitor pm) {
         return null;
     }
     
@@ -104,14 +104,14 @@ public class JMLRenameParticipantClass extends RenameParticipant {
      * Computes the changes which need to be done to the JML code.
      * <p>
      * @return Returns null if only shared text changes are made. Otherwise
-     * returns a TextChange Object which gathered all the changes to JML annotations 
-     * in class which does not have any Java changes scheduled. </p>
+     *          returns a TextChange Object which gathered all the changes to JML annotations 
+     *          in class which does not have any Java changes scheduled. </p>
      * <p>
      *  {@inheritDoc}
      *
      */
     @Override
-    public Change createPreChange(final IProgressMonitor pm) throws CoreException,
+    public final Change createPreChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         // Only non empty change objects will be added

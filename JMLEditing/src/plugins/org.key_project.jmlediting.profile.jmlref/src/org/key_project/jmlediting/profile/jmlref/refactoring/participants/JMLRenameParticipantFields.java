@@ -95,14 +95,14 @@ public class JMLRenameParticipantFields extends RenameParticipant {
      * add those to the changes to the java code which are already scheduled.
      * 
      * @return Returns null if only shared text changes are made. Otherwise
-     * returns a TextChange Object which gathered all the changes to JML annotations 
-     * in class which does not have any Java changes scheduled.
+     *      returns a TextChange Object which gathered all the changes to JML annotations 
+     *      in class which does not have any Java changes scheduled.
      * 
      *  {@inheritDoc}
      *
      */
     @Override
-    public Change createChange(final IProgressMonitor pm) throws CoreException,
+    public final Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         // Only non empty change objects will be added

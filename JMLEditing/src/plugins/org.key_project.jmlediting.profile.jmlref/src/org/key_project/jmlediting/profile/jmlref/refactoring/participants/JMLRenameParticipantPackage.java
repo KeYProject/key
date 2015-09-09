@@ -58,7 +58,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
     }
     
     @Override
-    protected boolean initialize(Object element) { 
+    protected final boolean initialize(Object element) { 
         
         fJavaElementToRename = (IJavaElement) element;
         fOldName = fJavaElementToRename.getElementName();
@@ -86,7 +86,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
      * {@inheritDoc}
      */
     @Override
-    public RefactoringStatus checkConditions(IProgressMonitor pm,
+    public final RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
         return new RefactoringStatus();
     }
@@ -103,7 +103,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
      * {@inheritDoc}
      */
     @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
+    public final Change createChange(IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         // To accumulate all changes to files without java (text) changes.

@@ -39,10 +39,12 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     private IJavaProject fProject;
     
     /**
+     * Initializes the refactoring participant with the needed information.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    protected boolean initialize(Object element) {
+    protected final boolean initialize(Object element) {
         fmethodParameter = (ILocalVariable) element;
         
         // check if it is a method parameter
@@ -62,20 +64,22 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName() {
-        return "JML Parameters Refactoring Rename Participant";
-    }
-
-    /**
-     * No condition checking. Changes are done direcly (or not at all).
+     * Name of this participant.
      * <p>
      * {@inheritDoc}
      */
     @Override
-    public RefactoringStatus checkConditions(IProgressMonitor pm,
+    public final String getName() {
+        return "JML Parameters Refactoring Rename Participant";
+    }
+
+    /**
+     * No condition checking. Changes are done directly (or not at all).
+     * <p>
+     * {@inheritDoc}
+     */
+    @Override
+    public final RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
         
         return new RefactoringStatus();
@@ -87,12 +91,12 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
      * that those certainly exist, because the method using the parameter is in the active class.
      * 
      * @return Returns null, since changes to JML are directly added to the already
-     * scheduled java changes.
+     *          scheduled java changes.
      * 
      *  {@inheritDoc}
      */
     @Override
-    public Change createChange(final IProgressMonitor pm) throws CoreException,
+    public final Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fmethodParameter, fOldName, fNewName);
