@@ -22,7 +22,9 @@ import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
@@ -169,6 +171,10 @@ public class HTMLSyntaxHighlighter {
      *         highlighting.
      */
     public String process(String plainTextString, Node displayedNode) {
+        
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseSyntaxHighlighting()) {
+            return toHTML(plainTextString);
+        }
         
         // NOTE: Highlighting program variables is the most expensive operation.
         // There are at least to options to do this:
