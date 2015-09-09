@@ -12,9 +12,9 @@ import org.key_project.jmlediting.core.dom.IStringNode;
  *
  */
 public class FieldMoveRefactoringComputer extends
-        DefaultMoveRefactoringComputer {
+        AbstractMoveRefactoringComputer {
 
-    String fieldName;
+    private String fieldName;
     
     /**
      * 
@@ -28,15 +28,15 @@ public class FieldMoveRefactoringComputer extends
         this.fieldName = fieldName;
     }
 
-    protected List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
+    protected final List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
         final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
         String nodeString="";
 
         for (final IASTNode node: nodesList){
             final IStringNode stringNode = (IStringNode) node;
-            if((oldClassFullQualName+"."+fieldName).contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
+            if((getOldClassFullQualName()+"."+fieldName).contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
             else nodeString="";
-            if (nodeString.equals(oldClassFullQualName+"."+fieldName)) {
+            if (nodeString.equals(getOldClassFullQualName()+"."+fieldName)) {
                 filteredList.add(stringNode);
             }
         }

@@ -71,7 +71,7 @@ public class DefaultRenameRefactoringComputer implements IRefactoringComputer {
      *             Thrown when the source file cannot be loaded from the compilation unit.
      */
     @Override
-    public ArrayList<ReplaceEdit> computeNeededChangesToJML(
+    public final ArrayList<ReplaceEdit> computeNeededChangesToJML(
             ICompilationUnit unit, IJavaProject project)
             throws JavaModelException {
         
@@ -169,7 +169,7 @@ public class DefaultRenameRefactoringComputer implements IRefactoringComputer {
      * @param stringNodes list of {@link IStringNode}s for which the corresponding primary nodes should be returned.
      * @param parseResult An {@link IASTNode} containing the parse result, i.e. the JML comments in the compilation unit. 
      * @param notKeYProfile boolean: true if the KeY-JML Profile is no used.
-     * @return list of {@IASTNode}s of primary node type.
+     * @return list of {@link IASTNode}s of primary node type.
      */
     private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult, final boolean notKeYProfile){
         final List<IASTNode> primaries = new ArrayList<IASTNode>();

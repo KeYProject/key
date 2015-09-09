@@ -36,19 +36,19 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
  * @author Robert Heimbach, Maksim Melnik
  *
  */
-public abstract class DefaultMoveRefactoringComputer implements
+public abstract class AbstractMoveRefactoringComputer implements
         IRefactoringComputer {
 
-    String oldClassFullQualName;
-    String newClassFullQualName;
+    private String oldClassFullQualName;
+    private String newClassFullQualName;
 
     /**
      * Constructor which saves the old and the new name. Usually in a fully qualified form.
      * @param oldClassFullQualName old name of the element to be moved.
      * @param newClassFullQualName new name of the element to be moved.
      */
-    DefaultMoveRefactoringComputer(String oldClassFullQualName, String newClassFullQualName){
-        this.oldClassFullQualName = oldClassFullQualName;
+    AbstractMoveRefactoringComputer(String oldClassFullQualName, String newClassFullQualName){
+        this.setOldClassFullQualName(oldClassFullQualName);
         this.newClassFullQualName = newClassFullQualName;
     }
     
@@ -66,7 +66,7 @@ public abstract class DefaultMoveRefactoringComputer implements
      *             Thrown when the source file cannot be loaded from
      *             {@link ICompilationUnit} or he JMLcomments could not be received.
      */
-    public ArrayList<ReplaceEdit> computeNeededChangesToJML(
+    public final ArrayList<ReplaceEdit> computeNeededChangesToJML(
             ICompilationUnit unit, IJavaProject project) throws JavaModelException {
         final ArrayList<ReplaceEdit> changesToMake = new ArrayList<ReplaceEdit>();
 
@@ -92,7 +92,7 @@ public abstract class DefaultMoveRefactoringComputer implements
      * @param changesToMake list to add the {@link ReplaceEdit}s to.
      * @param node {@link IASTNode} to compute the change for.
      */
-    protected void computeReplaceEdit(ArrayList<ReplaceEdit> changesToMake,
+    private final void computeReplaceEdit(ArrayList<ReplaceEdit> changesToMake,
             IASTNode node) {
 
         IASTNode changeThisNode = node;
@@ -101,7 +101,7 @@ public abstract class DefaultMoveRefactoringComputer implements
 
         // compute the location of the text edit.
         final int startOffset = changeThisNode.getStartOffset();
-        final int length = oldClassFullQualName.length();
+        final int length = getOldClassFullQualName().length();
 
         changesToMake.add(new ReplaceEdit(startOffset, length, newClassFullQualName));
         
@@ -122,7 +122,7 @@ public abstract class DefaultMoveRefactoringComputer implements
      * @throws JavaModelException
      *             Could not access source of given ICompilationUnit
      */
-    protected List<IASTNode> getReferencesInJMLcomments(IJavaProject project,
+    private final List<IASTNode> getReferencesInJMLcomments(IJavaProject project,
             String source, CommentRange range) {
         List<IASTNode> stringNodes = new ArrayList<IASTNode>();
 
@@ -149,7 +149,7 @@ public abstract class DefaultMoveRefactoringComputer implements
         return primaries;
     }
 
-    protected List<IASTNode> getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult) {
+    private final List<IASTNode> getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult) {
         final List<IASTNode> primaries = new ArrayList<IASTNode>();
         
         for (final IStringNode stringNode: stringNodes) {       
@@ -159,7 +159,7 @@ public abstract class DefaultMoveRefactoringComputer implements
         return primaries;
     }
 
-    protected IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest) {
+    private final IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest) {
         return context.traverse(new INodeTraverser<IASTNode>() {
 
             @Override
@@ -186,5 +186,13 @@ public abstract class DefaultMoveRefactoringComputer implements
      * @return filtered list
      */
     protected abstract List<IStringNode> filterStringNodes(final List<IASTNode> nodesList);
+
+    public final String getOldClassFullQualName() {
+        return oldClassFullQualName;
+    }
+
+    public final void setOldClassFullQualName(String oldClassFullQualName) {
+        this.oldClassFullQualName = oldClassFullQualName;
+    }
 
 }

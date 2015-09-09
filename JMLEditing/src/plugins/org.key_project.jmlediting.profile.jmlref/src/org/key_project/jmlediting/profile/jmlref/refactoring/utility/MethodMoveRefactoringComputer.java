@@ -12,7 +12,7 @@ import org.key_project.jmlediting.core.dom.IStringNode;
  *
  */
 public class MethodMoveRefactoringComputer extends
-        DefaultMoveRefactoringComputer {
+        AbstractMoveRefactoringComputer {
 
     String methName;
     
@@ -28,15 +28,15 @@ public class MethodMoveRefactoringComputer extends
         this.methName = methName;
     }
 
-    protected List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
+    protected final List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
         final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
         String nodeString="";
 
         for (final IASTNode node: nodesList){
             final IStringNode stringNode = (IStringNode) node;
-            if((oldClassFullQualName+"."+methName).contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
+            if((getOldClassFullQualName()+"."+methName).contains(stringNode.getString()))nodeString=nodeString+stringNode.getString();
             else nodeString="";
-            if (nodeString.equals(oldClassFullQualName+"."+methName)) {
+            if (nodeString.equals(getOldClassFullQualName()+"."+methName)) {
                 filteredList.add(stringNode);
             }
         }
