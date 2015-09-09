@@ -37,6 +37,14 @@ public class CheckboxQuestion extends AbstractButtonsQuestion {
    public CheckboxQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, List<Choice> choices) {
       super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, choices);
    }
+   
+   public CheckboxQuestion(String name, String label, String description, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, boolean enabled, Choice... choices) {
+      this(name, label, description, null, vertical, defaultChoice, validator, askForTrust, enabled, choices);
+   }
+
+   public CheckboxQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, boolean enabled, Choice... choices) {
+      super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, enabled, choices);
+   }
 
    @Override
    public boolean isMultiValued() {

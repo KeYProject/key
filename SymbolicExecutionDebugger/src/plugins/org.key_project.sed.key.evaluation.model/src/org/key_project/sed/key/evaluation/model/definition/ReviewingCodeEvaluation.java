@@ -16,6 +16,11 @@ import org.key_project.util.java.CollectionUtil;
 
 public class ReviewingCodeEvaluation extends AbstractEvaluation {
    /**
+    * If this flag is true the evaluation will ask for changed locations.
+    */
+   public static final boolean ASK_FOR_CHANGED_LOCATIONS = false;
+   
+   /**
     * The only instance of this class.
     */
    public static final ReviewingCodeEvaluation INSTANCE = new ReviewingCodeEvaluation();
@@ -420,6 +425,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  ASK_FOR_CHANGED_LOCATIONS,
                                   new Choice("None", "None"),
                                   new Choice("value", "value"),
                                   new Choice("something else", "SomethingElse", createElseLocationSubQuestion(description)));
@@ -965,6 +971,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  ASK_FOR_CHANGED_LOCATIONS,
                                   new Choice("None", "None"),
                                   new Choice("array", "array", expectedArray),
                                   new Choice("array[index]", "array[index]", expectedAllArrayIndices),
@@ -1367,6 +1374,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  ASK_FOR_CHANGED_LOCATIONS,
                                   new Choice("None", "None"),
                                   new Choice("elements", "elements", expectedElements),
                                   new Choice("elements[size - 1]", "elements[size - 1]"),

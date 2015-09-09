@@ -100,7 +100,7 @@ public class EvaluationAnswers {
     * @param questionInput The {@link QuestionInput} to analyze.
     */
    protected void addQuestionInput(QuestionInput questionInput) {
-      if (questionInput.getQuestion().isEditable()) {
+      if (questionInput.getQuestion().isEditable() && questionInput.getQuestion().isEnabled()) {
          List<QuestionInput> answers = questionMap.get(questionInput.getQuestion());
          if (answers == null) {
             answers = new LinkedList<QuestionInput>();

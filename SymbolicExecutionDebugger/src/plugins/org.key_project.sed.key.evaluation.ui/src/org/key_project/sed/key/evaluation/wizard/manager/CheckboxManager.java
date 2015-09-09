@@ -49,7 +49,6 @@ public class CheckboxManager extends AbstractButtonsManager<CheckboxQuestion> {
          }
          questionInput.setValue(value);
          updateValueSetAt(questionInput);
-         updateChoiceChildrenEnabled();
       }
       else {
          String value = questionInput.getValue();
@@ -64,6 +63,10 @@ public class CheckboxManager extends AbstractButtonsManager<CheckboxQuestion> {
          }
          questionInput.setValue(valuesList.isEmpty() ? null : CollectionUtil.toString(valuesList, CheckboxQuestion.VALUE_SEPARATOR));
          updateValueSetAt(questionInput);
+      }
+      updateChoiceChildrenEnabled();
+      if (choice.countChildQuestions() >= 1) {
+         getWizardPage().reflow();
       }
    }
 }

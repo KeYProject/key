@@ -93,7 +93,7 @@ public class Statistics {
     * @param question The current {@link AbstractQuestion}.
     */
    private void initQuestion(FilteredStatistics filteredStatistics, EvaluationAnswers answer, AbstractQuestion question) {
-      if (question.isEditable()) {
+      if (question.isEditable() && question.isEnabled()) {
          List<QuestionInput> questionInputs = answer.getQuestionInputs(question);
          if (!CollectionUtil.isEmpty(questionInputs)) {
             if (questionInputs.size() > 1) {

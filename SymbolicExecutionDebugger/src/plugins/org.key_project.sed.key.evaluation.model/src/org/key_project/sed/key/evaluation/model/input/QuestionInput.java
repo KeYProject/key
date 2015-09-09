@@ -199,8 +199,9 @@ public class QuestionInput extends Bean {
    }
 
    public String validate(Tool currentTool) {
-      if (!question.isToolRelated() ||
-          ArrayUtil.contains(question.getRelatedTools(), currentTool)) {
+      if (question.isEnabled() &&
+          (!question.isToolRelated() ||
+           ArrayUtil.contains(question.getRelatedTools(), currentTool))) {
          // Validate input
          String errorMessage = validateValue();
          if (errorMessage == null && question.isAskForTrust()) {

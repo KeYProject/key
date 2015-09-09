@@ -17,6 +17,8 @@ public abstract class AbstractQuestion {
    private final boolean askForTrust;
    
    private final Tool[] relatedTools;
+   
+   private final boolean enabled;
 
    public AbstractQuestion(String name) {
       this(name, null, null, null, null, false, null);
@@ -27,6 +29,10 @@ public abstract class AbstractQuestion {
    }
 
    public AbstractQuestion(String name, String label, String description, String defaultValue, IValueValidator validator, boolean askForTrust, Tool[] relatedTools) {
+      this(name, label, description, defaultValue, validator, askForTrust, relatedTools, true);
+   }
+
+   public AbstractQuestion(String name, String label, String description, String defaultValue, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled) {
       this.name = name;
       this.label = label;
       this.description = description;
@@ -34,6 +40,7 @@ public abstract class AbstractQuestion {
       this.validator = validator;
       this.askForTrust = askForTrust;
       this.relatedTools = relatedTools;
+      this.enabled = enabled;
    }
 
    public String getName() {
@@ -75,6 +82,10 @@ public abstract class AbstractQuestion {
 
    public boolean isEditable() {
       return true;
+   }
+
+   public boolean isEnabled() {
+      return enabled;
    }
 
    @Override

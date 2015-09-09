@@ -69,7 +69,7 @@ public class TabManager extends AbstractQuestionInputManager implements IReflowP
 
    @Override
    public void reflow() {
-      tabContent.layout();
+      tabContent.layout(true, true);
       tabContent.setMinSize(tabContent.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
    }
 }

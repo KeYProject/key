@@ -52,7 +52,7 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
       for (Object object : questionOrder) {
          if (object instanceof AbstractQuestion) {
             AbstractQuestion question = (AbstractQuestion) object;
-            if (question.isEditable()) {
+            if (question.isEditable() && question.isEnabled()) {
                if (question instanceof AbstractChoicesQuestion) {
                   AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
                   Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
@@ -359,7 +359,7 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
     */
    protected int appendReceivedAnswersQuestionHeader(AbstractQuestion question, StringBuffer sb, List<Object> questionOrder) {
       int questionCount = 0;
-      if (question.isEditable()) {
+      if (question.isEditable() && question.isEnabled()) {
          questionOrder.add(question);
          sb.append("<td><b>");
          sb.append(question.getName());

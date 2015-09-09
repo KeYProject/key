@@ -117,8 +117,9 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
       List<IQuestionInputManager> managers = new LinkedList<IQuestionInputManager>();
       for (QuestionInput questionInput : questionInputs) {
          callback.handleQuestionInput(questionInput);
-         if (!questionInput.getQuestion().isToolRelated() ||
-             ArrayUtil.contains(questionInput.getQuestion().getRelatedTools(), wizardPage.getCurrentTool())) {
+         if (questionInput.getQuestion().isEnabled() &&
+             (!questionInput.getQuestion().isToolRelated() ||
+              ArrayUtil.contains(questionInput.getQuestion().getRelatedTools(), wizardPage.getCurrentTool()))) {
             IQuestionInputManager manager;
             if (questionInput.getQuestion() instanceof BrowserQuestion) {
                manager = createBrowser(toolkit, parent, (BrowserQuestion) questionInput.getQuestion());
@@ -278,8 +279,9 @@ public class QuestionWizardPage extends AbstractEvaluationWizardPage<QuestionPag
    }
    
    protected boolean isInputErrornous(QuestionInput questionInput, Tool currentTool) {
-      if (!questionInput.getQuestion().isToolRelated() ||
-          ArrayUtil.contains(questionInput.getQuestion().getRelatedTools(), currentTool)) {
+      if (questionInput.getQuestion().isEnabled() &&
+          (!questionInput.getQuestion().isToolRelated() ||
+           ArrayUtil.contains(questionInput.getQuestion().getRelatedTools(), currentTool))) {
          return questionInput.validateValue() != null || 
                 (questionInput.getQuestion().isAskForTrust() && questionInput.validateTrust() != null);
       }

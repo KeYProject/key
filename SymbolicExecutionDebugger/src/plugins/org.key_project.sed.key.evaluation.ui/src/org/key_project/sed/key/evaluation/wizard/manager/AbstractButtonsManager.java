@@ -41,6 +41,8 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
    
    private final Map<Choice, CompositePair> choiceCompositesMap = new HashMap<Choice, CompositePair>();
    
+   private final Q question;
+   
    public AbstractButtonsManager(AbstractEvaluationWizardPage<?> wizardPage,
                                  FormToolkit toolkit, 
                                  Composite parent, 
@@ -48,6 +50,7 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
                                  Q question,
                                  ICreateControlCallback callback) {
       super(wizardPage, questionInput);
+      this.question = question;
       if (questionInput.hasChoiceInputs()) {
          createwithChildQuestionControls(toolkit, parent, question, callback);
       }
@@ -187,6 +190,12 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
       }
       updateChoiceChildrenEnabled();
       updateButtonDecorations();
+      Choice oldChoice = question.getChoice(ObjectUtil.toString(evt.getOldValue()));
+      Choice newChoice = question.getChoice(ObjectUtil.toString(evt.getNewValue()));
+      if (oldChoice != null && oldChoice.countChildQuestions() >= 1 ||
+          newChoice != null && newChoice.countChildQuestions() >= 1) {
+         getWizardPage().reflow();
+      }
    }
 
    protected void updateValueSetAt(QuestionInput questionInput) {
@@ -237,7 +246,6 @@ public abstract class AbstractButtonsManager<Q extends AbstractButtonsQuestion> 
             else {
                pair.getStackLayout().topControl = null;
             }
-            getWizardPage().reflow();
          }
       }
    }

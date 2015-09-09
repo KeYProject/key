@@ -422,8 +422,8 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
          if (choiceQuestion.hasChildQuestions()) {
             for (Choice choice : choiceQuestion.getChoices()) {
                if (choice.countChildQuestions() > 0) {
-                  for (AbstractQuestion cildQuestion : choice.getChildQuestions()) {
-                     questionCount += countStatistics(statistics, cildQuestion);
+                  for (AbstractQuestion childQuestion : choice.getChildQuestions()) {
+                     questionCount += countStatistics(statistics, childQuestion);
                   }
                }
             }
@@ -432,8 +432,8 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
       else if (question instanceof IQuestionWithCildren) {
          IQuestionWithCildren withChildrenQuestion = (IQuestionWithCildren) question;
          if (withChildrenQuestion.countChildQuestions() > 0) {
-            for (AbstractQuestion cildQuestion : withChildrenQuestion.getChildQuestions()) {
-               questionCount += countStatistics(statistics, cildQuestion);
+            for (AbstractQuestion childQuestion : withChildrenQuestion.getChildQuestions()) {
+               questionCount += countStatistics(statistics, childQuestion);
             }
          }
       }

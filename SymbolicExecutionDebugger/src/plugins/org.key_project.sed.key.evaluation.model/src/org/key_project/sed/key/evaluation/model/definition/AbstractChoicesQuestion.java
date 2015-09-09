@@ -8,6 +8,7 @@ import java.util.Set;
 import org.key_project.sed.key.evaluation.model.validation.IValueValidator;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 public abstract class AbstractChoicesQuestion extends AbstractQuestion {
    public static final String VALUE_SEPARATOR = ",";
@@ -27,7 +28,11 @@ public abstract class AbstractChoicesQuestion extends AbstractQuestion {
    }
 
    public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, List<Choice> choices) {
-      super(name, label, description, defaultChoice, validator, askForTrust, relatedTools);
+      this(name, label, description, defaultChoice, validator, askForTrust, relatedTools, true, choices);
+   }
+
+   public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled, List<Choice> choices) {
+      super(name, label, description, defaultChoice, validator, askForTrust, relatedTools, enabled);
       this.choices = choices;
       validateChocies(choices);
    }
@@ -68,6 +73,15 @@ public abstract class AbstractChoicesQuestion extends AbstractQuestion {
 
    public Choice[] getChoices() {
       return choices.toArray(new Choice[choices.size()]);
+   }
+   
+   public Choice getChoice(final String value) {
+      return CollectionUtil.search(choices, new IFilter<Choice>() {
+         @Override
+         public boolean select(Choice element) {
+            return ObjectUtil.equals(value, element.getValue());
+         }
+      });
    }
 
    public int countChoices() {
