@@ -12,7 +12,7 @@ public class ValueSearch extends AbstractSearch {
     * Performs a linear search to find the first array index 
     * containing the given value. The array is not modified by the search.
     * @param array The array in which the search is performed.
-    * @param value The value to search.
+    * @param value The value to search (search criteria).
     * @return The index of the first found element or 
     *         {@code -1} if no element was found.
     */
@@ -21,10 +21,10 @@ public class ValueSearch extends AbstractSearch {
    }
    
    /**
-    * Checks whether the specified location is equal to {@link #value}.
+    * Accepts an array index if it's value is equal to {@link #value}.
     * @param array The array in which the search is performed.
     * @param index The current array index to check.
-    * @return {@code true} location matches search criteria, {@code false} otherwise.
+    * @return {@code true} value at {@code array[index]} is equal to {@link #value}, {@code false} otherwise.
     */
    protected boolean accept(int[] array, int index) {
       if (index < 0 || index >= array.length) {
