@@ -11,8 +11,13 @@ import java.util.Map;
 
 
 
+
+
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Comment;
@@ -31,7 +36,7 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.jmlediting.core.dom.NodePrinter;
 
 /**
- * Locates JML Comments for the given JDT AST
+ * Locates JML Comments for the given JDT AST.
  * 
  * @author Timm Lippert
  *
@@ -87,7 +92,7 @@ public class JMLASTCommentLocator {
       sourceOffsetToCommentOffset = new HashMap<Integer, Integer>();
       fieldDeclarationMap = new HashMap<Integer, JMLComments>();
       methoddDeclarationMap = new HashMap<Integer, JMLComments>();
-
+      //iterate over Field and method declarations to get all start and legth offsets
       jdtAST.accept(new ASTVisitor() {
          
          @Override
@@ -259,7 +264,7 @@ public class JMLASTCommentLocator {
    }
 
    /**
-    * make pretty string
+    * make pretty string.
     */
    private String removeJMLComm(String text, boolean isblock) {
       // remove useless space for outline
@@ -289,7 +294,7 @@ public class JMLASTCommentLocator {
    
 
    /**
-    * Gets the matching comment for the method
+    * Gets the matching comment for the method.
     * 
     * @param offset
     *           offset of {@link IMethod} which the comment should be found for
@@ -316,8 +321,14 @@ public class JMLASTCommentLocator {
       return retlist;
    }
    
-   public JMLComments getFieldJMLComm(int start) {
-         return fieldDeclarationMap.get(start);
+   /**
+    * Gets the matching Comments for a given @ {@link IFile}'s {@link ISourceRange}'s offset + length.
+    * 
+    * @param offset Should be {@link IFile}'s {@link ISourceRange} offset + legth. 
+    * @return  Thr {@link JMLComments} for the given offset.
+    */
+   public JMLComments getFieldJMLComm(int offset) {
+         return fieldDeclarationMap.get(offset);
    }
    
 }

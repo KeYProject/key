@@ -8,7 +8,7 @@ import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
 
 /**
- * Contains {@link IASTNode} with a Read able string that should be shown in the Outline
+ * Contains {@link IASTNode} with a Read able string that should be shown in the Outline.
  * 
  * @author Timm Lippert
  *
@@ -22,9 +22,9 @@ public class JMLComments implements IASTNode {
    
    /**
     * 
-    * @param commenttext </br>The Text That should be shown in the Outline
-    * @param node </br>The Comments {@link IASTNode}
-    * @param type </br>type of the Comment for example type
+    * @param commenttext </br>The Text That should be shown in the Outline.
+    * @param node </br>The Comments {@link IASTNode}.
+    * @param type </br>type of the Comment for example type.
     */
    
    public JMLComments(String commenttext,Comment node,String type) {
