@@ -13,6 +13,8 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
+import static de.uka.ilkd.key.util.UnicodeHelper.*;
+
 /**
  * Performs a simple pattern-based syntax highlighting for KeY sequents by
  * adding styled HTML tags.
@@ -38,7 +40,8 @@ public class HTMLSyntaxHighlighter {
 
     // NOTE: Spaces in this definition have been added on purpose.
     private final static String[] PROP_LOGIC_KEYWORDS = { "<->", "->", " & ",
-            " | ", "!", "true", "false", };
+            " | ", "!", "true", "false", "" + EQV, "" + IMP, "" + AND, "" + OR,
+            "" + NEG, "" + TOP, "" + BOT };
     
     private final static String PROP_LOGIC_KEYWORDS_REGEX =
             concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS), new StringTransformer() {
@@ -51,7 +54,8 @@ public class HTMLSyntaxHighlighter {
     private final static String[] DYNAMIC_LOGIC_KEYWORDS = { "\\forall",
             "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum",
             "bsum", "\\in", "exactInstance", "wellFormed", "measuredByEmpty",
-            "method-frame", "<created>", "<inv>", "\\cup" };
+            "method-frame", "<created>", "<inv>", "\\cup",
+            ""+FORALL, ""+EXISTS, ""+IN, ""+EMPTY};
     
     private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
             concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), new StringTransformer() {

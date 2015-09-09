@@ -172,7 +172,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 // change to HTML documents in the JEditorPane (previous JTextArea). If
                 // something concerning highlighting does not work in the future, here could
                 // be a starting place to find the mistake.
-                range = new Range(range.start() + 1, range.start() + 1 + range.length());
+                range = new Range(range.start() + 1, range.end() + 1);
                 
                 Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
                 updateHighlights.add(tag);
