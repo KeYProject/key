@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,10 +40,26 @@ public class HTMLSyntaxHighlighter {
     private final static String[] PROP_LOGIC_KEYWORDS = { "<->", "->", " & ",
             " | ", "!", "true", "false", };
     
+    private final static String PROP_LOGIC_KEYWORDS_REGEX =
+            concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS), new StringTransformer() {
+                @Override
+                public String transform(Object input) {
+                    return Pattern.quote((String) input);
+                }
+            });
+    
     private final static String[] DYNAMIC_LOGIC_KEYWORDS = { "\\forall",
             "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum",
             "bsum", "\\in", "exactInstance", "wellFormed", "measuredByEmpty",
             "method-frame", "<created>", "<inv>", "\\cup" };
+    
+    private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
+            concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), new StringTransformer() {
+                @Override
+                public String transform(Object input) {
+                    return Pattern.quote((String) input);
+                }
+            });
 
     private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
             "while", "return", "break", "switch", "case", "continue", "try",
@@ -50,7 +67,7 @@ public class HTMLSyntaxHighlighter {
             "false", "int", "char", "long", "short", "boolean" };
     
     private final static String JAVA_KEYWORDS_REGEX =
-            concat("|", JAVA_KEYWORDS);
+            concat("|", Arrays.asList(JAVA_KEYWORDS));
 
     /**
      * Creates a new {@link HTMLSyntaxHighlighter} for this HTMLDocument.
@@ -152,24 +169,16 @@ public class HTMLSyntaxHighlighter {
                         "\\Q<br/>\\E|",  // \n
                         "\\Q&lt;\\E|",   // <
                         "\\Q&gt;\\E)");  // >
-
-        for (String keyword : PROP_LOGIC_KEYWORDS) {
-            keyword = toHTML(keyword);
-            htmlString =
-                    htmlString.replace(
-                            keyword,
-                            concat("<span class=\"prop_logic_highlight\">",
-                                    keyword, "</span>"));
-        }
-
-        for (String keyword : DYNAMIC_LOGIC_KEYWORDS) {
-            keyword = toHTML(keyword);
-            htmlString =
-                    htmlString.replace(
-                            keyword,
-                            concat("<span class=\"dynamic_logic_highlight\">",
-                                    keyword, "</span>"));
-        }
+        
+        htmlString =
+                htmlString.replaceAll(
+                        concat("(", PROP_LOGIC_KEYWORDS_REGEX, ")"),
+                        "<span class=\"prop_logic_highlight\">$1</span>");
+        
+        htmlString =
+                htmlString.replaceAll(
+                        concat("(", DYNAMIC_LOGIC_KEYWORDS_REGEX, ")"),
+                        "<span class=\"dynamic_logic_highlight\">$1</span>");
 
         Matcher modalityMatcher =
                 Pattern.compile("\\\\(\\[|&lt;).*?\\\\(\\]|&gt;)").matcher(
@@ -184,15 +193,24 @@ public class HTMLSyntaxHighlighter {
 
             htmlString = htmlString.replace(modalityMatcher.group(), modality);
         }
+        
+        StringTransformer progVarTransformer = new StringTransformer() {
+            @Override
+            public String transform(Object input) {
+                ProgramVariable progVar = (ProgramVariable) input;
+                return Pattern.quote(toHTML(progVar.name().toString()));
+            }
+        };
 
-        for (ProgramVariable progVar : programVariables) {
-            String name = toHTML(progVar.name().toString());
+        final String concatenatedProgVars =
+                concat("|", programVariables, progVarTransformer);
+
+        if (!concatenatedProgVars.isEmpty()) {
             htmlString =
                     htmlString.replaceAll(
-                            concat(delimitersRegex, Pattern.quote(name),
-                                    delimitersRegex),
-                            concat("$1<span class=\"progvar_highlight\">",
-                                    name, "</span>$2"));
+                            concat(delimitersRegex, "(", concatenatedProgVars,
+                                    ")", delimitersRegex),
+                            "$1<span class=\"progvar_highlight\">$2</span>$3");
         }
 
         return htmlString;
@@ -221,13 +239,38 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated array, elements separated by the given
      *         delimiter.
      */
-    private static String concat(String delim, String[] strings) {
+    private static String concat(String delim, Iterable<? extends Object> strings) {
+        return concat(delim, strings, new StringTransformer() {
+            @Override
+            public String transform(Object input) {
+                return input.toString();
+            }
+        });
+    }
+
+    /**
+     * Concatenates the given String array where the elements are separated by
+     * the given delimiter in the result String.
+     *
+     * @param delim
+     *            Delimiter for the elements in the array.
+     * @param strings
+     *            Strings to concatenate.
+     * @param strTransformer
+     *            Transformation applied to the input Strings before
+     *            the concatenation is performed.
+     * @return The concatenated array, elements separated by the given
+     *         delimiter.
+     */
+    private static String concat(String delim, Iterable<? extends Object> strings, StringTransformer strTransformer) {        
         StringBuilder sb = new StringBuilder();
-        for (String str : strings) {
-            sb.append(str);
+        boolean loopEntered = false;
+        for (Object str : strings) {
+            sb.append(strTransformer.transform(str));
             sb.append(delim);
+            loopEntered = true;
         }
-        return sb.substring(0, sb.length() - delim.length());
+        return loopEntered ? sb.substring(0, sb.length() - delim.length()) : "";
     }
     
     /**
@@ -238,11 +281,20 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated Strings.
      */
     private static String concat(String... strings) {
-        StringBuilder sb = new StringBuilder();
-        for (String str : strings) {
-            sb.append(str);
-        }
-        return sb.toString();
+        return concat("", Arrays.asList(strings), new StringTransformer() {
+            @Override
+            public String transform(Object input) {
+                return (String) input;
+            }
+        });
+    }
+    
+    /**
+     * Simple interface as a replacement for a lambda realizing a String
+     * transformation.
+     */
+    private static interface StringTransformer {
+        public String transform(Object input);
     }
 
 }
