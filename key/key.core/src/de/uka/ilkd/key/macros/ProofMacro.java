@@ -72,10 +72,6 @@ import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
  */
 public interface ProofMacro {
 
-    public void setNumberSteps(int numberSteps);
-
-    public int getNumberSteps();
-
     /**
      * Gets the name of this macro.
      *
@@ -84,6 +80,18 @@ public interface ProofMacro {
      * @return a non-<code>null</code> constant string
      */
     public String getName();
+
+    /**
+     * Gets a unique short name for this macro that can be used in proof
+     * scripts.
+     *
+     * If <code>null</code> is returned, the macro cannot be addressed from
+     * within scripts.
+     *
+     * @return <code>null</code> if not supported, or a non-<code>null</code>
+     *         constant string as the short name
+     */
+    public String getScriptCommandName();
 
     /**
      * Gets the category of this macro.
@@ -144,7 +152,7 @@ public interface ProofMacro {
      */
     public boolean canApplyTo(Node node,
                               PosInOccurrence posInOcc);
-    
+
     /**
      * Can this macro be applied with no {@link PosInOccurrence} given?
      * This method is necessary because we need to check global applicability
@@ -233,18 +241,23 @@ public interface ProofMacro {
         private int numberSteps;
         private int completedGoals;
 
-        ProgressBarListener(ProofMacro macro, int numberGoals,
+        ProgressBarListener(String name, int numberGoals,
                             int numberSteps, ProverTaskListener l) {
-            super(macro, l);
+            super(name, l);
             this.numberGoals = numberGoals;
             this.numberSteps = numberSteps;
+        }
+
+        public ProgressBarListener(int size, int numberSteps,
+                ProverTaskListener listener) {
+            this("", size, numberSteps, listener);
         }
 
         @Override
         public void taskStarted(TaskStartedInfo info) {
             //assert size == numberSteps;
             String suffix = getMessageSuffix();
-            super.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, 
+            super.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
                   info.getMessage() + suffix, numberGoals * numberSteps));
             super.taskProgress(completedGoals * numberSteps);
         }

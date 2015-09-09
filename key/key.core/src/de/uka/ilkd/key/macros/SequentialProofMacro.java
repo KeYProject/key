@@ -108,7 +108,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
             for (Node initNode : initNodes) {
                 if (macro.canApplyTo(initNode, posInOcc)) {
                     final ProverTaskListener pml =
-                            new ProofMacroListener(macro, listener);
+                            new ProofMacroListener(macro.getName(), listener);
                     pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
                     synchronized(macro) {
                         // wait for macro to terminate

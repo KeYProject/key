@@ -28,8 +28,6 @@ import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
-import de.uka.ilkd.key.gui.join.JoinMenuItem;
-import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -46,10 +44,7 @@ import de.uka.ilkd.key.ui.Verbosity;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExperimentalFeature;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
 /**
@@ -88,7 +83,7 @@ public final class Main {
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
     private static final String VERBOSITY = "--verbose";
-    
+
     /**
      * The {@link KeYDesktop} used by KeY. The default implementation is
      * replaced in Eclipse. For this reason the {@link Desktop} should never
@@ -141,7 +136,7 @@ public final class Main {
      * flag whether recent loaded file should be loaded on startup
      */
     private static boolean loadRecentFile=false;
-    
+
     /**
      * The file names provided on the command line
      */
@@ -151,8 +146,7 @@ public final class Main {
      * Lists all features currently marked as experimental. Unless invoked with
      * command line option --experimental , those will be deactivated.
      */
-    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES = {
-            JoinMenuItem.FEATURE, JoinRuleMenuItem.FEATURE };
+    private static boolean experimentalMode;
 
     /**
      * Path to a RIFL specification file.
@@ -187,7 +181,7 @@ public final class Main {
             verbosity = Verbosity.DEBUG;
         }
 
-        // does no harm on non macs        
+        // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true");
 
         try {
@@ -226,7 +220,7 @@ public final class Main {
             ui.openExamples();
         }
     }
-    
+
 
     /**
      * Register commandline options with command line object
@@ -291,7 +285,7 @@ public final class Main {
         if (verbosity > Verbosity.SILENT) {
             printHeader();
         }
-        
+
         if (cl.isSet(SHOW_PROPERTIES)) {
             try {
                 java.util.Properties props = System.getProperties();
@@ -438,17 +432,12 @@ public final class Main {
 
     /** Deactivate experimental features. */
     public static void setEnabledExperimentalFeatures (boolean state) {
-        if(state) {
-            for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
-                feature.activate();
-            }
-        } else {
-        for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES) {
-            feature.deactivate();
-    }
-    }
+        experimentalMode = state;
     }
 
+    public static boolean isExperimentalMode() {
+        return experimentalMode;
+    }
 
     /** Print a header text on to the console. */
     private static void printHeader() {
@@ -495,7 +484,7 @@ public final class Main {
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();
-            
+
             if (loadRecentFile) {
                 RecentFileEntry mostRecent =
                         mainWindow.getRecentFiles().getMostRecent();
@@ -514,10 +503,10 @@ public final class Main {
         }
 
     }
-    
+
     public static void ensureExamplesAvailable() {
-       File examplesDir = getExamplesDir() == null ? 
-                          ExampleChooser.lookForExamples() : 
+       File examplesDir = getExamplesDir() == null ?
+                          ExampleChooser.lookForExamples() :
                           new File(getExamplesDir());
        if (!examplesDir.exists()) {
           setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
@@ -613,8 +602,9 @@ public final class Main {
 //            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
             RIFLTransformer.transform(riflFileName, fileNameOnStartUp);
             fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
-            if (verbosity > Verbosity.SILENT)
+            if (verbosity > Verbosity.SILENT) {
                 System.out.println("[RIFL] Writing transformed Java files to "+fileNameOnStartUp+" ...");
+            }
             result.add(new File(fileNameOnStartUp));
             return result;
         }

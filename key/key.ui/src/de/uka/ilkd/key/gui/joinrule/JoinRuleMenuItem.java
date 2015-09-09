@@ -26,8 +26,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
-import de.uka.ilkd.key.util.DefaultExperimentalFeature;
-import de.uka.ilkd.key.util.ExperimentalFeature;
 
 /**
  * The menu item for the "defocusing" join rule.
@@ -37,12 +35,6 @@ import de.uka.ilkd.key.util.ExperimentalFeature;
  */
 public class JoinRuleMenuItem extends JMenuItem {
     private static final long serialVersionUID = -8509570987542243690L;
-
-    /**
-     * Controls whether joining is available to the user. WARNING: You may
-     * refresh your GUI elements after (de-)activation.
-     */
-    public static final ExperimentalFeature FEATURE = new DefaultExperimentalFeature();
 
     /**
      * Creates a new menu item for the join rule.

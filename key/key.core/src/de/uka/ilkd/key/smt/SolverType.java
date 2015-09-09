@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.smt;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
@@ -122,9 +125,6 @@ public interface SolverType  {
 	 */
 	public boolean supportHasBeenChecked();
 
-   
-
-	
 	/**
      * Class for the Z3 solver. It makes use of the SMT2-format.
      */
@@ -547,7 +547,13 @@ public interface SolverType  {
 
 
 	};
-
+	public static List<SolverType> ALL_SOLVERS =
+                Collections.unmodifiableList(Arrays.asList(
+                        Z3_SOLVER,
+                        CVC3_SOLVER,
+                        SIMPLIFY_SOLVER,
+                        YICES_SOLVER
+                        ));
 }
 
 abstract class AbstractSolverType implements SolverType {

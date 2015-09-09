@@ -50,6 +50,11 @@ public class UpdateSimplificationMacro extends
 	}
 
 	@Override
+	public String getScriptCommandName() {
+	    return "simp-upd";
+	}
+
+	@Override
 	public String getDescription() {
 		return "Applies only update simplification rules";
 	}
@@ -61,7 +66,7 @@ public class UpdateSimplificationMacro extends
 
 	@Override
 	protected boolean allowOSS() {
-		return false;
+		return true;
 	}
 
 }

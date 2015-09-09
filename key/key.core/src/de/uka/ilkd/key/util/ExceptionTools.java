@@ -3,6 +3,7 @@ package de.uka.ilkd.key.util;
 import org.antlr.runtime.RecognitionException;
 
 import de.uka.ilkd.key.java.ParseExceptionInFile;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
@@ -73,6 +74,9 @@ public final class ExceptionTools {
             location = new Location(null, 
                             ((SVInstantiationExceptionWithPosition)exc).getRow(),
                             ((SVInstantiationExceptionWithPosition)exc).getColumn());
+        } else if (exc instanceof ScriptException) {
+            // may still be null ...
+            location = ((ScriptException)exc).getLocation();
         } 
     
         if (location == null && exc.getCause() != null) {

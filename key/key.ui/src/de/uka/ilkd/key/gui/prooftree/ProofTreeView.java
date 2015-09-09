@@ -68,6 +68,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
@@ -907,8 +908,9 @@ public class ProofTreeView extends JPanel {
 	            }
 	        }
 	    }
-	    if (JoinMenuItem.FEATURE.active())
+	    if (Main.isExperimentalMode()) {
 	        this.add(delayedCut);
+        }
 
 	    // modifying the node
         this.add(new JSeparator());

@@ -48,6 +48,11 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     @Override
+    public String getScriptCommandName() {
+        return "symbex";
+    }
+
+    @Override
     public String getDescription() {
         return "Continue automatic strategy application until no more modality is on the sequent.";
     }

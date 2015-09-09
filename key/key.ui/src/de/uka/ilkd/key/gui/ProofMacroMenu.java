@@ -25,7 +25,8 @@ import javax.swing.KeyStroke;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
+import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.gui.actions.ProofScriptAction;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -86,7 +87,7 @@ public class ProofMacroMenu extends JMenu {
 
         // Macros are group according to their category.
         // Store the submenus in this map.
-        Map<String, JMenu> submenus = new HashMap<>();
+        Map<String, JMenu> submenus = new HashMap<String, JMenu>();
         
         int count = 0;
         Node node = mediator.getSelectedNode();
@@ -104,7 +105,7 @@ public class ProofMacroMenu extends JMenu {
                     // if the feature is currently active.
                     // TODO (DS): Remove below check related to the exp. \\
             // feature once JoinRule is considered stable.
-            if (!JoinRuleMenuItem.FEATURE.active()
+            if (!Main.isExperimentalMode()
                     && macro.getName().contains("join")) {
                 applicable = false;
                 }
@@ -127,6 +128,10 @@ public class ProofMacroMenu extends JMenu {
                 submenu.add(menuItem);
                 count++;
             }
+        }
+
+        if(Main.isExperimentalMode()) {
+            add(new JMenuItem(new ProofScriptAction(mediator)));
         }
 
         mediator.enableWhenProofLoaded(this);

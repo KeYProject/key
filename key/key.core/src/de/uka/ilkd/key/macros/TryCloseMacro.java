@@ -33,6 +33,9 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
  * This uses the code provided by Michael Kirsten in
  * {@link InteractiveProver$AutoWorker}.
  *
+ * Unlike many macros, this macros has got a parameter ({@link #numberSteps}), such
+ * that several instances of the class may exist with different semantics.
+ *
  * The number of autosteps may be temporarily altered for this macro.
  *
  * @author mattias ulbrich
@@ -43,8 +46,12 @@ public class TryCloseMacro extends AbstractProofMacro {
 
         private int notClosedGoals = 0;
 
-        private TryCloseProgressBarListener(ProofMacro macro, int numberGoals, int numberSteps, ProverTaskListener l) {
-            super(macro, numberGoals, numberSteps, l);
+        private TryCloseProgressBarListener(String name, int numberGoals, int numberSteps, ProverTaskListener l) {
+            super(name, numberGoals, numberSteps, l);
+        }
+
+        public TryCloseProgressBarListener(int numberGoals, int numberSteps, ProverTaskListener listener) {
+            super(numberGoals, numberSteps, listener);
         }
 
         @Override
@@ -62,10 +69,19 @@ public class TryCloseMacro extends AbstractProofMacro {
     }
 
     /**
+     * The max number of steps to be applied.
+     * A value of -1 means no changes.
+     *
+     * This value may differ between instances of this class;
+     */
+    private final int numberSteps;
+
+    /**
      * Instantiates a new try close macro.
      * No changes to the max number of steps.
      */
     public TryCloseMacro() {
+        this(-1);
     }
 
     /**
@@ -75,7 +91,7 @@ public class TryCloseMacro extends AbstractProofMacro {
      *            the max number of steps. -1 means no change.
      */
     public TryCloseMacro(int numberSteps) {
-        setNumberSteps(numberSteps);
+        this.numberSteps = numberSteps;
     }
 
     /* (non-Javadoc)
@@ -84,6 +100,14 @@ public class TryCloseMacro extends AbstractProofMacro {
     @Override
     public String getName() {
         return "Close provable goals below";
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.macros.AbstractProofMacro#getScriptCommandName()
+     */
+    @Override
+    public String getScriptCommandName() {
+        return "tryclose";
     }
 
     /*
@@ -118,7 +142,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     public boolean isApplicableWithoutPosition() {
         return true;
     }
-    
+
     /*
      * Run the automation on the goal. Retreat if not successful.
      */
@@ -141,19 +165,9 @@ public class TryCloseMacro extends AbstractProofMacro {
         // assert: all goals have the same proof
 
         //
-        // set the max number of steps if given
-       
-        final ProofMacro macroAdapter = new SkipMacro() {
-            @Override
-            public String getName() { return ""; }
-            @Override
-            public String getDescription() { return "Anonymous macro"; }
-        };
-        macroAdapter.setNumberSteps(getNumberSteps());
-        //
         // The observer to handle the progress bar
-        final TryCloseProgressBarListener pml =  new TryCloseProgressBarListener(macroAdapter, goals.size(),
-                                                                getNumberSteps(), listener);
+        final TryCloseProgressBarListener pml =  new TryCloseProgressBarListener(goals.size(),
+                                                                numberSteps, listener);
         final ImmutableList<Goal> ignoredOpenGoals =
                 setDifference(proof.openGoals(), goals);
         applyStrategy.addProverTaskObserver(pml);
@@ -168,9 +182,9 @@ public class TryCloseMacro extends AbstractProofMacro {
         try {
             for (final Goal goal : goals) {
                 Node node = goal.node();
-                int maxSteps = getNumberSteps() > 0 ? getNumberSteps() : proof.getSettings().getStrategySettings().getMaxSteps();
-                final ApplyStrategyInfo result = 
-                      applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal), 
+                int maxSteps = numberSteps > 0 ? numberSteps : proof.getSettings().getStrategySettings().getMaxSteps();
+                final ApplyStrategyInfo result =
+                      applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal),
                             maxSteps, -1, false);
                 //final Goal closedGoal;
 
