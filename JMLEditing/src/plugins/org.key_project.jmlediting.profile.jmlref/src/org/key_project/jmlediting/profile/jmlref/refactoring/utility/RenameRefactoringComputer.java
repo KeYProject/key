@@ -21,9 +21,14 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
  * The refactoring computer to compute changes to the JML annotations when a 
  * renaming was done by calling the method {@link #computeNeededChangesToJML(ICompilationUnit, IJavaProject)}.
  * <p>
- * It uses the {@link Resolver}.</p>
- *  
- * 
+ * The list of {@link IStringNode}s is filtered by comparing the Strings to the name of 
+ * the element which is refactored. Filtering is important to reduce the number of times
+ * the Resolver is called. </p>
+ * <p>
+ * The {@link ReplaceEdit}s are created by calling the {@link Resolver} and finding out if 
+ * the JML expression / the {@link IASTNode} refers to the element to be refactored. Complex
+ * expressions need to call the {@link Resolver.#next()} method and mimick the way the Resolver
+ * traverses the expression. </p>
  * 
  * @author Robert Heimbach
  */
@@ -98,8 +103,11 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                 createEditAndAddToList(changesToMake, nodeToChange);
             }
             
-            // Needed to move through the node to inner nodes to get to the right place
-            // to make the change / text edit.
+            // Complex expressions (e.g. method calls or member accesses) need to call 
+            // the .next() method of the Resolver to move through the node to the inner node 
+            // which is less complex
+            
+            // To move to the right place in the expression; usually saved as a list.
             int i = 0;
                       
             while(resolver.hasNext()) { 
@@ -117,7 +125,7 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                          }
                     }    
                  }
-                 // Go to the next expression in the list which need to be checked
+                 // Change i to have the correct starting place for the next call of resolver.next()
                  if (result != null && result.getResolveType().equals(ResolveResultType.METHOD)){
                      // In case of a Method Call like in test().test, the whole method call has two list entries
                      // in the node. One for the name of the method and one for the arguments.
@@ -160,6 +168,7 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
 
         IASTNode changeThisNode = node;
         
+        // Get the place to be edited in the JML comment / the node.
         if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
             changeThisNode = node.getChildren().get(0).getChildren().get(0);
         }

@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring.participants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -25,7 +24,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.ClassMoveRefactoringComputer;
-import org.key_project.util.jdt.JDTUtil;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 
 /**
  * Class to participate in the move refactoring of java classes.
@@ -46,17 +45,23 @@ public class JMLMoveParticipantClass extends MoveParticipant {
     private String fOldPackName;            // old package name
     private String fNewPackName;            // new package name
 
+    private IJavaProject fProject;
+
     /**
-     * {@inheritDoc} Initializes the source and destination paths, aswell as the file to move itself.
+     * Initializes the source and destination paths, as well as the file to move itself.
+     * <p>
+     * {@inheritDoc} 
      */
     @Override
-    protected boolean initialize(Object element) {
+    protected final boolean initialize(Object element) {
         if(element instanceof IJavaElement){
             fToMove=(IJavaElement) element;
 
             fDocName = fToMove.getElementName();
             fOldFullQualName=((IType) element).getFullyQualifiedName();
 
+            fProject = fToMove.getJavaProject();
+            
             // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
             fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
             fNewPackName = ((PackageFragment) getArguments().getDestination()).getElementName();  
@@ -68,20 +73,22 @@ public class JMLMoveParticipantClass extends MoveParticipant {
     }
 
     /**
-     * Name of this class. {@inheritDoc}
+     * Name of this class. 
+     * <p>
+     * {@inheritDoc}
      */
     @Override
-    public String getName() {
+    public final String getName() {
         return "JML Field Move Participant";
     }
 
     /**
      * Do nothing.
-     *
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public RefactoringStatus checkConditions(IProgressMonitor pm,
+    public final RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
         return new RefactoringStatus();
     }
@@ -91,25 +98,26 @@ public class JMLMoveParticipantClass extends MoveParticipant {
      * add those to the changes to the java code which are already scheduled.
      * 
      * @return Returns null if only shared text changes are made. Otherwise
-     * returns a TextChange Object which gathered all the changes to JML annotations 
-     * in class which does not have any Java changes scheduled.
-     * 
-     *  {@inheritDoc}
+     *      returns a TextChange Object which gathered all the changes to JML annotations 
+     *      in class which does not have any Java changes scheduled.
      *
      */
-    public Change createChange(final IProgressMonitor pm) throws CoreException,
+    public final Change createChange(final IProgressMonitor pm) throws CoreException,
     OperationCanceledException {
 
         // Only non empty change objects will be added
         ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
 
         // Find out the projects which need to be checked: active project plus all dependencies
-        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>(Arrays.asList(JDTUtil.getAllJavaProjects()));
+        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
+        projectsToCheck.add(fProject);
 
         try {
+            RefactoringUtilities.getAllProjectsToCheck(projectsToCheck, fProject);
+            
             // Look through all source files in each package and project
             for (final IJavaProject project : projectsToCheck) {
-                for (final IPackageFragment pac : project.getPackageFragments()) {
+                for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
 
@@ -156,7 +164,11 @@ public class JMLMoveParticipantClass extends MoveParticipant {
         // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
         if (changesToFilesWithoutJavaChanges.isEmpty())
             return null;
+        else if (changesToFilesWithoutJavaChanges.size() == 1){
+            return changesToFilesWithoutJavaChanges.get(0);
+        }
         else {
+         // Create a composite change to gather all the changes (effect in preview: a tree item one level higher without preview is added)
             CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
             for (TextFileChange change : changesToFilesWithoutJavaChanges){
                 allChangesToFilesWithoutJavaChanges.add(change);

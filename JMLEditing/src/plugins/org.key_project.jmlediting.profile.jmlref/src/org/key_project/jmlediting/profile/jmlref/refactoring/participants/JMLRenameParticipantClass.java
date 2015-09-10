@@ -33,8 +33,6 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
  * (Renaming of the compilation unit is not a text change). In such a case, the JML changes
  * raised an exception, because the file they were defined on was not in sync with the file system
  * anymore (renamed before). </p>
- * <p>
- * See {@link JMLRenameParticipantFields} if additional information is needed.
  * 
  * @author Robert Heimbach
  *
@@ -106,9 +104,6 @@ public class JMLRenameParticipantClass extends RenameParticipant {
      * @return Returns null if only shared text changes are made. Otherwise
      *          returns a TextChange Object which gathered all the changes to JML annotations 
      *          in class which does not have any Java changes scheduled. </p>
-     * <p>
-     *  {@inheritDoc}
-     *
      */
     @Override
     public final Change createPreChange(final IProgressMonitor pm) throws CoreException,
@@ -170,6 +165,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
         catch (final JavaModelException e) {
             return null;
         }
+        // After iterating through all needed projects and source files, determine what needs to be returned:
         
         // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
         if (changesToFilesWithoutJavaChanges.isEmpty())
@@ -178,6 +174,7 @@ public class JMLRenameParticipantClass extends RenameParticipant {
             return changesToFilesWithoutJavaChanges.get(0);
         }
         else {
+         // Create a composite change to gather all the changes (effect in preview: a tree item one level higher without preview is added)
             CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
             for (TextFileChange change : changesToFilesWithoutJavaChanges){
                 allChangesToFilesWithoutJavaChanges.add(change);

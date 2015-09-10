@@ -55,6 +55,7 @@ public class RefactoringUtilities {
      */
     public static void getAllProjectsToCheck(ArrayList<IJavaProject> projectsToCheck, IJavaProject refactoringStartingProject)
             throws JavaModelException {
+        
         // Iterate through all java projects and check for projects which require the active project
         IJavaProject[] allProjects = JDTUtil.getAllJavaProjects();
         
@@ -64,6 +65,8 @@ public class RefactoringUtilities {
             
             if (requiredProjectNames.length > 0) {
                 
+                // check if the active project is in the list of the required projects of the project
+                // in the current iteration.
                 for (String requiredProject: requiredProjectNames){
                     
                     if (requiredProject.equals(refactoringStartingProject.getElementName())) {

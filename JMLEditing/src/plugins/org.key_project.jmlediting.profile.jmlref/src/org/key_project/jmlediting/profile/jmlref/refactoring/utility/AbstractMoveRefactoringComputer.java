@@ -8,7 +8,7 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 
 /**
  * 
- * @author Maksim Melnik, Robert Heimbach
+ * @author Maksim Melnik
  *
  */
 public abstract class AbstractMoveRefactoringComputer extends AbstractRefactoringComputer {

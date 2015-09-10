@@ -22,18 +22,18 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
 
 /**
  * Abstract class with the common behavior of refactoring computers which
- * participant in the move refactoring. 
+ * participant in the move or rename refactoring. 
  * <p>
- * Usually, the move refactoring, does not need to use the resolver. Thus, 
- * in contrast to {@link RenameRefactoringComputer} changes are directly
- * done to the found and filtered JML nodes and easier to compute. </p>
+ * Changes to the JML annotations of a given java source file can be computed by
+ * calling the {@link #computeNeededChangesToJML(ICompilationUnit, IJavaProject)} method, 
+ * which uses a {@link CommentLocator} to find all JML comments, filters those using the abstract
+ * {@link #filterStringNodes(List)} and creates the list of {@link ReplaceEdit}s by 
+ * calling the abstract method {@link #computeReplaceEdit(ICompilationUnit, ArrayList, IASTNode)}. </p>
  * <p>
- * See {@link #computeNeededChangesToJML(ICompilationUnit, IJavaProject)} for an explanation
- * about the behavior of the refactoring computer. </p>
- * <p>
- * Note that {@link #filterStringNodes(List)} and {@link #computeReplaceEdit(ICompilationUnit, ArrayList, IASTNode)} needs to be implemented. </p>
+ * By implementing both abstract methods, one can define the exact behavior of the refactoring computer.
+ * For example, one can define if the {@link Resolver} is called or not. </p>
  * 
- * @author Robert Heimbach, Maksim Melnik
+ * @author Robert Heimbach
  *
  */
 public abstract class AbstractRefactoringComputer implements
@@ -69,7 +69,7 @@ public abstract class AbstractRefactoringComputer implements
                     source, range);
 
             for (final IASTNode node : foundReferences) {
-
+                // this method is abstract to allow different ways to compute the edits.
                 computeReplaceEdit(unit, changesToMake, node);
             }
         }
@@ -96,9 +96,8 @@ public abstract class AbstractRefactoringComputer implements
      *            String representation of the source file to be used in the {@link IJMLParser}.
      * @param range
      *            CommentRange to be parsed. Specifies the location in the source file to be checked for JML comments.
-     * @return List of found JML comments, represented as {@link IASTNode}s. Potentially empty if a ParserException was thrown or no comment could be found.
-     * @throws JavaModelException
-     *             Could not access source of given ICompilationUnit
+     * @return List of found JML comments, represented as {@link IASTNode}s. 
+     *          Potentially empty if a ParserException was thrown or no comment could be found.
      */
     private final List<IASTNode> getReferencesInJMLcomments(IJavaProject project,
             String source, CommentRange range) {

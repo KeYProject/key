@@ -25,7 +25,7 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefac
  * particular method. Thus this participant, unlike the others, only needs to check
  * the active class for changes to make. </p>
  * <p>
- * See {@link JMLRenameParticipantFields} for additional information.
+ * The class uses the {@link RenameRefactoringComputer} to compute the needed changes.</p>
  * 
  * @author Robert Heimbach
  *
@@ -92,8 +92,6 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
      * 
      * @return Returns null, since changes to JML are directly added to the already
      *          scheduled java changes.
-     * 
-     *  {@inheritDoc}
      */
     @Override
     public final Change createChange(final IProgressMonitor pm) throws CoreException,

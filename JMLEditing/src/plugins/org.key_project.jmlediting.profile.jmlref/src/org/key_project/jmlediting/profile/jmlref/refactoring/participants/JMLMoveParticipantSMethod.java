@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring.participants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -23,9 +22,14 @@ import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.MethodMoveRefactoringComputer;
-import org.key_project.util.jdt.JDTUtil;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 
-@SuppressWarnings("restriction")
+/**
+ * 
+ * @author Maksim Melnik
+ *
+ */
+@SuppressWarnings("restriction") // SourceMethod accessed.
 public class JMLMoveParticipantSMethod extends MoveParticipant {
 
     private SourceMethod methodToMove;
@@ -33,15 +37,17 @@ public class JMLMoveParticipantSMethod extends MoveParticipant {
     
     private String oldClassFullQualName;        // fully qualified names of old and new classes
     private String newClassFullQualName;
+    private IJavaProject fProject;
     
     /**
      * {@inheritDoc} Initializes the source and destination paths, aswell as the method to move itself.
      */
     @Override
-    protected boolean initialize(Object element) {
+    protected final boolean initialize(Object element) {
         if(element instanceof SourceMethod){
             methodToMove=(SourceMethod) element;
             methName=methodToMove.getElementName();
+            fProject = methodToMove.getJavaProject();
             oldClassFullQualName=((IType) methodToMove.getParent()).getFullyQualifiedName();
             newClassFullQualName=((IType) getArguments().getDestination()).getFullyQualifiedName();
             return true;
@@ -54,7 +60,7 @@ public class JMLMoveParticipantSMethod extends MoveParticipant {
      * Name of this class. {@inheritDoc}
      */
     @Override
-    public String getName() {
+    public final String getName() {
         return "JML Method Move Participant";
     }
 
@@ -64,27 +70,26 @@ public class JMLMoveParticipantSMethod extends MoveParticipant {
      * {@inheritDoc}
      */
     @Override
-    public RefactoringStatus checkConditions(IProgressMonitor pm,
+    public final RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
         return new RefactoringStatus();
     }
 
     @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
+    public final Change createChange(IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         // Only non empty change objects will be added
         ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
 
         // Find out the projects which need to be checked: active project plus all dependencies
-        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>(Arrays.asList(JDTUtil.getAllJavaProjects()));
-        
-        //TODO: IF METHOD IS NOT STATIC RETURN EMPTY LIST
+        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
+        projectsToCheck.add(fProject);
         
         try {
             // Look through all source files in each package and project
             for (final IJavaProject project : projectsToCheck) {
-                for (final IPackageFragment pac : project.getPackageFragments()) {
+                for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
 
@@ -130,7 +135,11 @@ public class JMLMoveParticipantSMethod extends MoveParticipant {
         // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
         if (changesToFilesWithoutJavaChanges.isEmpty())
             return null;
+        else if (changesToFilesWithoutJavaChanges.size() == 1){
+            return changesToFilesWithoutJavaChanges.get(0);
+        }
         else {
+         // Create a composite change to gather all the changes (effect in preview: a tree item one level higher without preview is added)
             CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
             for (TextFileChange change : changesToFilesWithoutJavaChanges){
                 allChangesToFilesWithoutJavaChanges.add(change);

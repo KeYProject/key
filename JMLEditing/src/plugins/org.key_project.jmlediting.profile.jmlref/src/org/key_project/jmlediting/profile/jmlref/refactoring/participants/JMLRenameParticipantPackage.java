@@ -34,8 +34,6 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
  * <p>
  * Note that JDT takes care of the "Rename subpackages" option by calling this participant
  * on each subpackage which needs to be renamed. </p>
- * <p>
- * Some additional information can be found in {@link JMLRenameParticipantFields}.
  * 
  * @author Robert Heimbach
  *

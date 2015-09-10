@@ -20,25 +20,18 @@ import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
-import org.key_project.jmlediting.core.utilities.CommentLocator;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefactoringComputer;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
-import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefactoringComputer;
 
 /**
  * Class to participate in the rename refactoring of java fields.
  * <p>
- * It uses the {@link CommentLocator} to get a list of all JML comments and 
- * the {@link Resolver} to determine if the field to be renamed is referenced.
- * The changes are added to the scheduled java changes as the JDT takes care of 
+ * It uses the {@link RenameRefactoringComputer} to compute the changes which need to be done.
+ * The changes are then added to the scheduled java changes as the JDT takes care of 
  * moving offsets in the editor and preview when several changes are made to the same file. </p>
  * <p>
  * The class usually returns NULL because changes are added in-place to the Java changes except
  * if changes to JML annotations to a class need to be made for which no Java changes are needed. </p>
- * <p>
- * To reduce the number of times the resolver is used, the JML annotations are first taken
- * in the form of StringNodes as filtered before the primary Nodes are computed which are 
- * then taken to the Resolver. </p>
  * 
  * @author Robert Heimbach
  */
@@ -58,9 +51,10 @@ public class JMLRenameParticipantFields extends RenameParticipant {
     }
 
     /**
-     * {@inheritDoc} Saves the new name to change to. Saves the old name and the
+     * {@inheritDoc} 
+     * <p> Saves the new name to change to. Saves the old name and the
      * field to be changed as a IJavaElement to search for references to it. Saves
-     * the active Project, i.e. the project which contains the class which field changes.
+     * the active Project, i.e. the project which contains the class which field changes.</p>
      */
     @Override
     protected final boolean initialize(final Object element) {
@@ -79,7 +73,7 @@ public class JMLRenameParticipantFields extends RenameParticipant {
 
     /**
      * Do nothing.
-     *
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -97,8 +91,6 @@ public class JMLRenameParticipantFields extends RenameParticipant {
      * @return Returns null if only shared text changes are made. Otherwise
      *      returns a TextChange Object which gathered all the changes to JML annotations 
      *      in class which does not have any Java changes scheduled.
-     * 
-     *  {@inheritDoc}
      *
      */
     @Override
@@ -160,13 +152,15 @@ public class JMLRenameParticipantFields extends RenameParticipant {
             return null;
         }
         
+        // After iterating through all needed projects and source files, determine what needs to be returned:
+        
         // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
         if (changesToFilesWithoutJavaChanges.isEmpty())
             return null;
         else if (changesToFilesWithoutJavaChanges.size() == 1){
             return changesToFilesWithoutJavaChanges.get(0);
         }
-        // Create a composite change to gather all the changes (effect in preview: a tree item above without preview)
+        // Create a composite change to gather all the changes (effect in preview: a tree item one level higher without preview is added)
         else {
             CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
             for (TextFileChange change : changesToFilesWithoutJavaChanges){
