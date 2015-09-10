@@ -43,7 +43,7 @@ public class MoveFieldRefactoringTest {
     }
     
     @After public void deleteTestPackage() throws CoreException {
-        RefactoringTestUtil.deleteAllPackagesFromFolder(srcFolder);
+        TestUtilsRefactoring.deleteAllPackagesFromFolder(srcFolder);
     }
 
     @AfterClass
@@ -54,28 +54,28 @@ public class MoveFieldRefactoringTest {
     @Test
     public void test1SimpleMove() throws InterruptedException, CoreException {
         
-        RefactoringTestUtil.runMoveOutlineElementTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
                 CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, CLASS_NAME_MOVE_TO, "test1p2", javaProject); 
     }
    
     @Test
     public void test2MoveComplexPackage() throws InterruptedException, CoreException {
         
-        RefactoringTestUtil.runMoveOutlineElementTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
                 CLASS_NAME_MOVE_FROM, "test2p1", FIELD_TO_MOVE, CLASS_NAME_MOVE_TO, "test2p2.complex", javaProject);
     }
     
     @Test
     public void test3MoveUseOps() throws InterruptedException, CoreException {
         
-        RefactoringTestUtil.runMoveOutlineElementTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
                 CLASS_NAME_MOVE_FROM, "test3p1", FIELD_TO_MOVE, CLASS_NAME_MOVE_TO, "test3p2", javaProject);
     } 
     
     @Test
     public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
 
-        RefactoringTestUtil.runMoveOutlineElementTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                 CLASS_NAME_MOVE_TO, "test4p2\\complex", FIELD_TO_MOVE, CLASS_NAME_MOVE_FROM, "test4p1", javaProject);
     }
 }

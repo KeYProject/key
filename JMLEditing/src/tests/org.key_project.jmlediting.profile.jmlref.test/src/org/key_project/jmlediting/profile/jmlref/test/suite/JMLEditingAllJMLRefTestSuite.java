@@ -16,7 +16,7 @@ import org.key_project.jmlediting.profile.jmlref.test.parser.SpecificationStatem
 import org.key_project.jmlediting.profile.jmlref.test.parser.SpecificationStatementTest;
 import org.key_project.jmlediting.profile.jmlref.test.parser.StoreRefParserTest;
 import org.key_project.jmlediting.profile.jmlref.test.profile.JMLRefDerivedProfileTest;
-import org.key_project.jmlediting.profile.jmlref.test.refactoring.TestSuiteRefactoring;
+import org.key_project.jmlediting.profile.jmlref.test.refactoring.suite.TestSuiteRefactoring;
 
 @RunWith(Suite.class)
 @SuiteClasses({

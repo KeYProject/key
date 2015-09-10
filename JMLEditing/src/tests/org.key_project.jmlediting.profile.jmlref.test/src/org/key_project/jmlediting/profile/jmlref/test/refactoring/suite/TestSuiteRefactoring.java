@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.profile.jmlref.test.refactoring;
+package org.key_project.jmlediting.profile.jmlref.test.refactoring.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

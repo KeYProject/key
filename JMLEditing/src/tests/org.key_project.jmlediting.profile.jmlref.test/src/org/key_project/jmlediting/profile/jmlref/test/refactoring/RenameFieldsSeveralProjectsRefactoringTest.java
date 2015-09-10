@@ -22,16 +22,16 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
     @Test
     public void test19BasicReferencing() throws InterruptedException, CoreException {
         // Create projects and set references
-       final IProject referencedProject = RefactoringTestUtil.createProjectWithFiles("referencedProject", "data\\template\\refactoringRenameTest\\fields\\test19\\referencedProject");
-       final IProject referencingProject = RefactoringTestUtil.createProjectWithFiles("referencingProject", "data\\template\\refactoringRenameTest\\fields\\test19\\referencingProject");
-       RefactoringTestUtil.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
+       final IProject referencedProject = TestUtilsRefactoring.createProjectWithFiles("referencedProject", "data\\template\\refactoringRenameTest\\fields\\test19\\referencedProject");
+       final IProject referencingProject = TestUtilsRefactoring.createProjectWithFiles("referencingProject", "data\\template\\refactoringRenameTest\\fields\\test19\\referencingProject");
+       TestUtilsRefactoring.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
        
        // Execute Renaming and Check
-       RefactoringTestUtil.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
-       assertEquals(RefactoringTestUtil.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),RefactoringTestUtil.getContentAfterRefactoring(bot));
+       TestUtilsRefactoring.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
+       assertEquals(TestUtilsRefactoring.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
        
        TestUtilsUtil.openEditor(referencingProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-       assertEquals(RefactoringTestUtil.getOracle(referencingProject.getFolder("oracle"), "ReferencingClass"),RefactoringTestUtil.getContentAfterRefactoring(bot));
+       assertEquals(TestUtilsRefactoring.getOracle(referencingProject.getFolder("oracle"), "ReferencingClass"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
        
        // Delete projects because of test specific java build path settings
        referencedProject.delete(true, null);
@@ -41,16 +41,16 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
     @Test
     public void test20BasicPlusOwnField() throws InterruptedException, CoreException {
         // Create projects and set references
-       final IProject referencedProject = RefactoringTestUtil.createProjectWithFiles("referencedProject", "data\\template\\refactoringRenameTest\\fields\\test20\\referencedProject");
-       final IProject referencingProject = RefactoringTestUtil.createProjectWithFiles("referencingProject", "data\\template\\refactoringRenameTest\\fields\\test20\\referencingProject");
-       RefactoringTestUtil.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
+       final IProject referencedProject = TestUtilsRefactoring.createProjectWithFiles("referencedProject", "data\\template\\refactoringRenameTest\\fields\\test20\\referencedProject");
+       final IProject referencingProject = TestUtilsRefactoring.createProjectWithFiles("referencingProject", "data\\template\\refactoringRenameTest\\fields\\test20\\referencingProject");
+       TestUtilsRefactoring.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
        
        // Execute Renaming and Check
-       RefactoringTestUtil.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
-       assertEquals(RefactoringTestUtil.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),RefactoringTestUtil.getContentAfterRefactoring(bot));
+       TestUtilsRefactoring.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
+       assertEquals(TestUtilsRefactoring.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
        
        TestUtilsUtil.openEditor(referencingProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-       assertEquals(RefactoringTestUtil.getOracle(referencingProject.getFolder("oracle"), "ReferencingClass"),RefactoringTestUtil.getContentAfterRefactoring(bot));
+       assertEquals(TestUtilsRefactoring.getOracle(referencingProject.getFolder("oracle"), "ReferencingClass"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
        
        // Delete projects because of test specific java build path settings
        referencedProject.delete(true, null);

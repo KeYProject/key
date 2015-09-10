@@ -47,34 +47,34 @@ public class MoveClassRefactoringTest{
     }
     
     @After public void deleteTestPackage() throws CoreException {
-        RefactoringTestUtil.deleteAllPackagesFromFolder(srcFolder);
+        TestUtilsRefactoring.deleteAllPackagesFromFolder(srcFolder);
     }
 
     @Test
     public void test1SimpleMove() throws InterruptedException, CoreException {
 
-        RefactoringTestUtil.runMoveClassTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
+        TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
         
     }
 
     @Test
     public void test2MoveComplexPackage() throws InterruptedException, CoreException {
         
-        RefactoringTestUtil.runMoveClassTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test2p1", "test2p2.complex", javaProject);
+        TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test2p1", "test2p2.complex", javaProject);
       
     }
 
     @Test
     public void test3MoveUseOps() throws InterruptedException, CoreException {
         
-        RefactoringTestUtil.runMoveClassTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test3p1", "test3p2", javaProject);
+        TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test3p1", "test3p2", javaProject);
        
         } 
     
     @Test
     public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
         
-        RefactoringTestUtil.runMoveClassTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test4p2.complex", "test4p2", javaProject);
+        TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test4p2.complex", "test4p2", javaProject);
         
     }
 }

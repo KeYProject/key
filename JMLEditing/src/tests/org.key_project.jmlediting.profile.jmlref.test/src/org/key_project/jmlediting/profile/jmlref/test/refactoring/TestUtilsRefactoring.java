@@ -21,7 +21,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.profile.jmlref.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.jdt.JDTUtil;
@@ -33,7 +32,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Robert Heimbach
  *
  */
-public class RefactoringTestUtil {
+public class TestUtilsRefactoring {
 
     /**
      * Reads the content of a java file from a given folder into a String.
@@ -68,7 +67,7 @@ public class RefactoringTestUtil {
      */
     public static void copyFiles(String copyFrom, IFolder folderToCopyInto) throws CoreException{
         
-        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, copyFrom, folderToCopyInto, true);
+        BundleUtil.extractFromBundleToWorkspace(org.key_project.jmlediting.profile.jmlref.test.Activator.PLUGIN_ID, copyFrom, folderToCopyInto, true);
         
         TestUtilsUtil.waitForBuild(); 
     }
@@ -351,6 +350,18 @@ public class RefactoringTestUtil {
         assertEquals(getOracle(oracleFolder, className), getContentAfterRefactoring(bot));
     }
     
+    /**
+     * 
+     * @param path
+     * @param srcFolder
+     * @param oracleFolder
+     * @param bot
+     * @param packageName
+     * @param newPackageName
+     * @param project
+     * @param renameSubpackages
+     * @throws CoreException
+     */
     public static void runPackageRenameTest(String path, IFolder srcFolder, IFolder oracleFolder, 
             SWTWorkbenchBot bot, String packageName, String newPackageName, IJavaProject project, Boolean renameSubpackages) throws CoreException {
         
@@ -412,11 +423,12 @@ public class RefactoringTestUtil {
     }
     
     /**
+     * Compares all files of a given project to the files in a given folder of oracle files.
      * 
-     * @param project
-     * @param oracleFolder
-     * @param bot
-     * @throws CoreException
+     * @param project project which files should be compared.
+     * @param oracleFolder folder which contains the oracle files.
+     * @param bot {@link SWTWorkbenchBot} to make the actions.
+     * @throws CoreException thrown if the packages of the project could not be accessed.
      */
     public static void compareAllFilesInProjectToOracle(IJavaProject project, IFolder oracleFolder, SWTWorkbenchBot bot) throws CoreException {
         for (IPackageFragment fragment : project.getPackageFragments()) {
@@ -430,17 +442,17 @@ public class RefactoringTestUtil {
     /**
      * Adds the projects in referencedProjects to the java build path of project.
      * 
-     * @param project
-     * @param referencedProjects
-     * @param bot
+     * @param projectToAddTo project which build path needs additional entries.
+     * @param referencedProjects other projects to add to the build path of projectToAddTo.
+     * @param bot {@link SWTWorkbenchBot} to make the required UI actions.
      */
-    public static void setProjectReferences(String project, String[] referencedProjects, SWTWorkbenchBot bot) {
+    public static void setProjectReferences(String projectToAddTo, String[] referencedProjects, SWTWorkbenchBot bot) {
         // select the referencingProject in the package explorer
         SWTBotTreeItem projectToAddReferences = TestUtilsUtil.selectInProjectExplorer(bot, "referencingProject");
         projectToAddReferences.select().pressShortcut(SWT.ALT, SWT.CR);
         
         // select the build path "Java Build Path" and "Projects" tab
-        SWTBotShell propertiesDialog = bot.shell("Properties for "+project);      
+        SWTBotShell propertiesDialog = bot.shell("Properties for "+projectToAddTo);      
         TestUtilsUtil.selectInTree(propertiesDialog.bot().tree(), "Java Build Path").click();
     
         SWTBot propertiesDialogBot = propertiesDialog.bot();
@@ -449,13 +461,15 @@ public class RefactoringTestUtil {
         
         SWTBotShell projectSelection = bot.shell("Required Project Selection");
         SWTBot projectSelectionBot = projectSelection.bot();
-         
-       SWTBotTable table = projectSelectionBot.table(0);
-       for (String p : referencedProjects){
-           table.doubleClick(table.indexOf(p), 0);
-           table.pressShortcut(0 , SWT.SPACE);
-       }
+        
+        // select the projects to add in the shown table 
+        SWTBotTable table = projectSelectionBot.table(0);
+        for (String p : referencedProjects){
+            table.doubleClick(table.indexOf(p), 0);
+            table.pressShortcut(0 , SWT.SPACE);
+        }
        
+        // finish the process.
         projectSelectionBot.button(IDialogConstants.OK_LABEL).click();
         propertiesDialogBot.waitUntil(Conditions.shellCloses(projectSelection));
         
@@ -464,13 +478,14 @@ public class RefactoringTestUtil {
     }
 
     /**
+     * Creates a project, sets the JML profile to the default JML profile and creates a folder called "oracle".
      * 
-     * @param projectName
-     * @return
-     * @throws CoreException
-     * @throws InterruptedException
+     * @param projectName name of the project to create.
+     * @return the created {@link IProject}.
+     * @throws CoreException thrown if the project could not be created.
+     * @throws InterruptedException thrown if the creation of the project is interrupted.
      */
-    public static IProject createProject(String projectName) throws CoreException, InterruptedException {
+    public static IProject setupProjectAndOracle(String projectName) throws CoreException, InterruptedException {
         final IJavaProject javaProject = TestUtilsUtil.createJavaProject(projectName);
         final IProject project = javaProject.getProject();
         TestUtilsUtil.createFolder(project,"oracle");
@@ -479,29 +494,32 @@ public class RefactoringTestUtil {
     }
     
     /**
+     * Creates a project with a folder called "oracle" and copies the needed files for testing
+     * into the "src" and "oracle" folder of the project.
      * 
-     * @param projectName
-     * @param path
-     * @return
-     * @throws CoreException
-     * @throws InterruptedException
+     * @param projectName name of the project to create.
+     * @param path path of the file system where the files to copy are. Expects a "src" and "oracle" folder.
+     * @return the created {@link IProject}.
+     * @throws CoreException thrown when the project could not be created.
+     * @throws InterruptedException thrown if the project creation was interrupted.
      */
     public static IProject createProjectWithFiles (String projectName, String path) throws CoreException, InterruptedException {
-        final IProject project = createProject(projectName);
+        final IProject project = setupProjectAndOracle(projectName);
 
         String pathToTests = path + "\\src";
         String pathToOracle = path + "\\oracle";
         
-        RefactoringTestUtil.copyFiles(pathToTests, project.getFolder(JDTUtil.getSourceFolderName()));
-        RefactoringTestUtil.copyFiles(pathToOracle, project.getFolder("oracle"));
+        TestUtilsRefactoring.copyFiles(pathToTests, project.getFolder(JDTUtil.getSourceFolderName()));
+        TestUtilsRefactoring.copyFiles(pathToOracle, project.getFolder("oracle"));
         
         return project;
     }
     
     /**
+     * Deletes all packages (and subpackages) and thus also all files from a given folder.
      * 
-     * @param folder
-     * @throws CoreException
+     * @param folder given {@link IFolder} to delete the files from.
+     * @throws CoreException thrown if the packages could not be accessed.
      */
     public static void deleteAllPackagesFromFolder(IFolder folder) throws CoreException {
         for (IResource member : folder.members()) {
