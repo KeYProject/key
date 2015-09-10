@@ -68,10 +68,13 @@ public class SWTBotJMLoutlineSpecPure {
             for (SWTBotTreeItem item2 : item.getItems() ){
                if(item2.getText().equals(varName)) {
                   item2.expand();
-                  item2.getItems()[0].select().click();;
-                  assertEquals(itemName, item2.getItems()[0].getText());
-                  assertEquals(itemSource, editor.getSelection());
-                  return;
+                  for(SWTBotTreeItem lastitm : item2.getItems())
+                  if (lastitm.getText().equals(itemName)){
+                      lastitm.select().click();
+                      assertEquals(itemName, lastitm.getText());
+                      assertEquals(itemSource, editor.getSelection());
+                      return;
+                  }
                }
             }
          }

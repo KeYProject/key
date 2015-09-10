@@ -1,22 +1,12 @@
 package org.key_project.jmlediting.ui.test.Outline;
 
-import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.locks.Condition;
-
-import javax.swing.SwingUtilities;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
-import org.eclipse.swtbot.swt.finder.waits.ICondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPageLayout;
@@ -27,13 +17,9 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject.SaveGuarantee;
-import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.SwingUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotJMLOutlineUpdate {
-   
-   
    
    private static SWTWorkbenchBot bot = new SWTWorkbenchBot();
    private static TestProject testProject;
@@ -43,22 +29,10 @@ public class SWTBotJMLOutlineUpdate {
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineUpdateTest";
   
-   private static String textToAdd = "//@ invariant test;";
    private static String textToAdd2 = "//@ invariant a < b;";
    private static String textToAddMethod = "\t//@behavior";
-   
-   
-   
+
    private static SWTBotTree tree;
-   
-   private int offset = 0;
-   private int firstMeth = 5;//test where actual methods are
-   private int secMethod = 7;
-   
-   
-   
-   
-   
    
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
@@ -74,10 +48,8 @@ public class SWTBotJMLOutlineUpdate {
       SWTBotView view = bot.viewByTitle("Outline");
        bot.menu("Window").click().menu("Show View").click().menu("Outline").click();
        view.show();
-       tree = view.bot().tree();
-       
+       tree = view.bot().tree();   
    }
-   
    
    private int getLine(String s){
       int i = 0;
@@ -88,7 +60,6 @@ public class SWTBotJMLOutlineUpdate {
       }
       return -1;
    }
-   
    
    public void test(String itemSource, String itemName, int it1, int it2) {
       int i = 0;
@@ -115,7 +86,6 @@ public class SWTBotJMLOutlineUpdate {
       }assertTrue("Failed at : " +itemName , false);
    }
    
-   
    public void testbehavior(String method, String itemSource, String itemName,boolean reloadtree){
       if (reloadtree){
          tree = bot.viewByTitle("Outline").bot().tree();
@@ -131,9 +101,7 @@ public class SWTBotJMLOutlineUpdate {
                   return;
                }
             }
-         }
-        
-         
+         } 
       }
       assertTrue(method+ ": No Method Found", false);
       
@@ -157,9 +125,7 @@ public class SWTBotJMLOutlineUpdate {
    public void outlineUpdateInvariant() {
      addTextSeriell(6, 0, textToAdd2);
      bot.sleep(1000);
-     test(textToAdd2, "invariant a < b", 1, 0);
-     
-     
+     test(textToAdd2, "invariant a < b", 1, 0);  
    }
    
    @Test

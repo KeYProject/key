@@ -14,16 +14,12 @@ import org.eclipse.swt.graphics.Image;
 @SuppressWarnings("restriction")
 public class OutlineLableWrapper extends DecoratingJavaLabelProvider  {
 
-
-
-
    public OutlineLableWrapper(JavaUILabelProvider labelProvider) {
       super(labelProvider);
-      // TODO Auto-generated constructor stub
    }
 
    @Override
-   public Image getImage(Object element) {
+   public final Image getImage(Object element) {
       if(((IJavaElement) element).getElementType() == 100){
          return OutlineJMLPicture.getimage();
       }else
