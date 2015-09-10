@@ -1,12 +1,13 @@
 package org.key_project.jmlediting.ui.outlineView;
 
 import java.util.List;
+
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
-import org.key_project.javaeditor.outline.DefaultOutlineModifiyer;
+import org.key_project.javaeditor.outline.IOutlineModifier;
 import org.key_project.javaeditor.util.LogUtil;
 
 /**
@@ -15,12 +16,11 @@ import org.key_project.javaeditor.util.LogUtil;
  * @author Timm Lippert
  *
  */
-public class JMLinJavaOutlineExtension extends DefaultOutlineModifiyer {
+public class JMLinJavaOutlineExtension implements IOutlineModifier {
 
    private JMLASTCommentLocator comments = null;
    private IJavaElement root = null;
    
-   @Override
    public final Object[] modify(Object parent, Object[] currentChildren) {
       
       if(!(parent instanceof IJavaElement)){

@@ -7,8 +7,6 @@ import org.eclipse.jdt.core.IJavaElement;
  * @author Timm Lippert
  *
  */
-
-
 public interface IOutlineModifier {
    
    /**

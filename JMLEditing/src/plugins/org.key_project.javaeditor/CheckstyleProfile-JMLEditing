@@ -19,7 +19,6 @@
     <module name="JavadocStyle"/>
     <module name="NonEmptyAtclauseDescription"/>
     <module name="JavadocTagContinuationIndentation"/>
-    <module name="SummaryJavadoc"/>
     <module name="AtclauseOrder"/>
     <module name="JavadocParagraph">
       <property name="severity" value="ignore"/>
