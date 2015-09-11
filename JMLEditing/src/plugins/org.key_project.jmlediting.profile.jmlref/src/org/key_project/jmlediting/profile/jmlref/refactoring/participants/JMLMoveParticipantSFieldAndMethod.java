@@ -7,11 +7,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.core.SourceMethod;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -21,34 +21,38 @@ import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.MethodMoveRefactoringComputer;
+import org.key_project.jmlediting.core.utilities.CommentLocator;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.FieldAndMethodMoveRefactoringComputer;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 
 /**
+ * Class to participate in the move refactoring of static fields.
+ * 
+ * It uses the {@link CommentLocator} to get a list of all JML comments.
+ * The changes are added to the scheduled java changes as the JDT takes care of 
+ * moving offsets in the editor and preview when several changes are made to the same file.
  * 
  * @author Maksim Melnik
- *
  */
-@SuppressWarnings("restriction") // SourceMethod accessed.
-public class JMLMoveParticipantSMethod extends MoveParticipant {
+public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
 
-    private SourceMethod methodToMove;
-    private String methName;
+    private IJavaElement elementToMove;        // field
+    private String elementName;
     
-    private String oldClassFullQualName;        // fully qualified names of old and new classes
+    private String oldClassFullQualName;                // fully qualified name of the old class
     private String newClassFullQualName;
     private IJavaProject fProject;
     
     /**
-     * {@inheritDoc} Initializes the source and destination paths, aswell as the method to move itself.
+     * {@inheritDoc} Initializes the source and destination paths, aswell as the field to move itself.
      */
     @Override
     protected final boolean initialize(Object element) {
-        if(element instanceof SourceMethod){
-            methodToMove=(SourceMethod) element;
-            methName=methodToMove.getElementName();
-            fProject = methodToMove.getJavaProject();
-            oldClassFullQualName=((IType) methodToMove.getParent()).getFullyQualifiedName();
+        if(element instanceof IJavaElement){
+            elementToMove=(IJavaElement) element;
+            fProject = elementToMove.getJavaProject();
+            elementName=elementToMove.getElementName();
+            oldClassFullQualName=((IType) elementToMove.getParent()).getFullyQualifiedName();
             newClassFullQualName=((IType) getArguments().getDestination()).getFullyQualifiedName();
             return true;
         }else{
@@ -61,7 +65,7 @@ public class JMLMoveParticipantSMethod extends MoveParticipant {
      */
     @Override
     public final String getName() {
-        return "JML Method Move Participant";
+        return "JML Field and Method Move Participant";
     }
 
     /**
@@ -93,7 +97,7 @@ public class JMLMoveParticipantSMethod extends MoveParticipant {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
 
-                        MethodMoveRefactoringComputer changesComputer = new MethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, methName);
+                        FieldAndMethodMoveRefactoringComputer changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName);
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
 
                         // Get scheduled changes to the java code from the rename processor

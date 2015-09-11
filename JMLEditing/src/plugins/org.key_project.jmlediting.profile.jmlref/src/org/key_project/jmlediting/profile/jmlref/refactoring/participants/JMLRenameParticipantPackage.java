@@ -55,6 +55,14 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
         return "JML Package Refactoring Rename Participant";
     }
     
+    
+    /**
+     * {@inheritDoc} <p>
+     * Extract and save all the information we need to carry out the package renaming.
+     * In particular, a list of the fully qualified names of all classes which are located
+     * in the package to be renamed is created because occurrences of those Strings need
+     * to be replaced in the JML annotations.
+     */
     @Override
     protected final boolean initialize(Object element) { 
         
