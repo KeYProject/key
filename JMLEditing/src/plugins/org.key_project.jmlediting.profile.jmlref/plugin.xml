@@ -17,8 +17,8 @@
          point="org.eclipse.ltk.core.refactoring.renameParticipants">
       <renameParticipant
             class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLRenameParticipantFieldAndMethod"
-            id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantFields"
-            name="%JMLRenameParticipantFields">
+            id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantFieldAndMethod"
+            name="%JMLRenameParticipantFieldAndMethod">
             <enablement>
               <with variable="affectedNatures">
                 <iterate operator="or">
@@ -27,7 +27,7 @@
               </with>
                <or>
                  <with variable="element">
-                     <instanceof value="org.eclipse.jdt.core.IMember"/>
+                     <instanceof value="org.eclipse.jdt.core.IMethod"/>
                  </with>
                   <with variable="element">
                      <instanceof value="org.eclipse.jdt.core.IField"/>

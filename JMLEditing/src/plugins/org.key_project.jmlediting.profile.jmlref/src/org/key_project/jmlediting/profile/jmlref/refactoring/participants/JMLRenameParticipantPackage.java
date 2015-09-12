@@ -65,7 +65,6 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
      */
     @Override
     protected final boolean initialize(Object element) { 
-        
         fJavaElementToRename = (IJavaElement) element;
         fOldName = fJavaElementToRename.getElementName();
         fProject = fJavaElementToRename.getJavaProject();

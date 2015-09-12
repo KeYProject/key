@@ -122,7 +122,7 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                         if (child.getChildren().size() >= i) {
                              final IASTNode innerNode = nodeToChange.getChildren().get(1).getChildren().get(i);
                              createEditAndAddToList(changesToMake, innerNode);
-                         }
+                        }
                     }    
                  }
                  // Change i to have the correct starting place for the next call of resolver.next()

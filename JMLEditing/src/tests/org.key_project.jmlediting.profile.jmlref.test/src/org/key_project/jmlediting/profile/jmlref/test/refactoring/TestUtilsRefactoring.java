@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -21,6 +22,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.jdt.JDTUtil;
@@ -101,8 +103,9 @@ public class TestUtilsRefactoring {
      * @param srcFolder sourceFolder of the class className.
      * @param newName the new name to change the field's name to.
      * @param bot SWTWorkbenchBot to select the outline view from.
+     * @param nameOfShell TODO
      */
-    public static void selectFieldAndExecuteRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot){
+    public static void selectElementInOutlineAndExecuteRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot, String nameOfShell){
         
         TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
@@ -113,8 +116,8 @@ public class TestUtilsRefactoring {
         fieldToRename.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
                 
         // Change variable name in rename dialog
-        SWTBotShell renameDialog = bot.shell("Rename Field");      
-        setNewElementName(newName, bot, renameDialog);
+        SWTBotShell renameDialog = bot.shell(nameOfShell);  
+            setNewElementName(newName, bot, renameDialog);
     }
     
     /**
@@ -286,18 +289,43 @@ public class TestUtilsRefactoring {
      * @param bot workbench bot.
      * @param className the class the field to be renamed is in.
      * @param packageName name of the package the class is in.
-     * @param fieldDescription how the field to be renamed appears in the outline.
-     * @param newNameField the name to change the field to.
+     * @param outlineAppearance how the field to be renamed appears in the outline.
+     * @param newName the new name to change to.
      * @param javaProject project the classes are in.
      * @throws CoreException
      */
     public static void runFieldRenameTest(String path, IFolder srcFolder, IFolder oracleFolder, 
-            SWTWorkbenchBot bot, String className, String packageName, String fieldDescription, String newNameField, IJavaProject javaProject) throws CoreException {
+            SWTWorkbenchBot bot, String className, String packageName, String outlineAppearance, String newName, IJavaProject javaProject) throws CoreException {
         
         copyFiles(path + "\\src", srcFolder);
         copyFiles(path + "\\oracle", oracleFolder);
         
-        selectFieldAndExecuteRenaming(fieldDescription, className, packageName, srcFolder, newNameField, bot);
+        selectElementInOutlineAndExecuteRenaming(outlineAppearance, className, packageName, srcFolder, newName, bot, "Rename Field");
+        
+        compareAllFilesInProjectToOracle(javaProject, oracleFolder, bot);
+    }
+    
+    /**
+     * Runs a basic method rename test. That is, only one project, one file and renaming of one field.
+     * 
+     * @param path the path of the test files with the sub folders \src and \oracle. 
+     * @param srcFolder the folder of the source files to load into eclipse.
+     * @param oracleFolder the folder of the oracle.
+     * @param bot workbench bot.
+     * @param className the class the method to be renamed is in.
+     * @param packageName name of the package the class is in.
+     * @param outlineAppearance how the method to be renamed appears in the outline.
+     * @param newName the new name to change to.
+     * @param javaProject project the classes are in.
+     * @throws CoreException
+     */
+    public static void runMethodRenameTest(String path, IFolder srcFolder, IFolder oracleFolder, 
+            SWTWorkbenchBot bot, String className, String packageName, String outlineAppearance, String newName, IJavaProject javaProject) throws CoreException {
+        
+        copyFiles(path + "\\src", srcFolder);
+        copyFiles(path + "\\oracle", oracleFolder);
+        
+        selectElementInOutlineAndExecuteRenaming(outlineAppearance, className, packageName, srcFolder, newName, bot, "Rename Method");
         
         compareAllFilesInProjectToOracle(javaProject, oracleFolder, bot);
     }
@@ -321,7 +349,7 @@ public class TestUtilsRefactoring {
         copyFiles(path + "\\oracle", oracleFolder);
         
         selectClassAndExecuteRenaming(className, packageName, srcFolder, newClassName, bot);
-       
+        
         compareAllFilesInProjectToOracle(javaProject, oracleFolder, bot);
     }
     
@@ -395,7 +423,7 @@ public class TestUtilsRefactoring {
         
         selectAndMoveElementInOutline(srcFolder, classNameMoveFrom, packageName, classNameMoveTo, packageTo, elementDescription, bot);
         
-        compareAllFilesInProjectToOracle(javaProject, oracleFolder, bot);
+        compareFileToOracle(srcFolder, oracleFolder, "mainpack", "Main", bot);
     }
     
     /**
@@ -419,8 +447,15 @@ public class TestUtilsRefactoring {
         
         selectClassAndMove(javaProject.getElementName(), classNameMoveFrom, packageFrom, packageTo, bot);
         
-        compareAllFilesInProjectToOracle(javaProject, oracleFolder, bot);
+        compareFileToOracle(srcFolder, oracleFolder, "mainpack", "Main", bot);
     }
+    
+    public static void compareFileToOracle(IFolder srcFolder, IFolder oracleFolder, String packageName, String classNameToCompare, SWTWorkbenchBot bot) throws CoreException{
+        
+        TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(classNameToCompare + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        assertEquals(getOracle(oracleFolder, classNameToCompare), getContentAfterRefactoring(bot));
+    }
+    
     
     /**
      * Compares all files of a given project to the files in a given folder of oracle files.
@@ -431,10 +466,9 @@ public class TestUtilsRefactoring {
      * @throws CoreException thrown if the packages of the project could not be accessed.
      */
     public static void compareAllFilesInProjectToOracle(IJavaProject project, IFolder oracleFolder, SWTWorkbenchBot bot) throws CoreException {
-        for (IPackageFragment fragment : project.getPackageFragments()) {
-            if (fragment instanceof IFile) {
-                TestUtilsUtil.openEditor((IFile) fragment);
-                assertEquals(getOracle(oracleFolder, fragment.getElementName()), getContentAfterRefactoring(bot));
+        for (IPackageFragment fragment : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
+            for (ICompilationUnit unit : fragment.getCompilationUnits()) {
+                assertEquals(getOracle(oracleFolder, unit.getElementName()), unit.getSource());
             }
         }
     }

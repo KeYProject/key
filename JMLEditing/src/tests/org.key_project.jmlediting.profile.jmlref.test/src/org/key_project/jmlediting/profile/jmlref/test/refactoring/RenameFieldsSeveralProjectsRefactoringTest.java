@@ -27,7 +27,7 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
        TestUtilsRefactoring.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
        
        // Execute Renaming and Check
-       TestUtilsRefactoring.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
+       TestUtilsRefactoring.selectElementInOutlineAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot, "Rename Field");
        assertEquals(TestUtilsRefactoring.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
        
        TestUtilsUtil.openEditor(referencingProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -46,7 +46,7 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
        TestUtilsRefactoring.setProjectReferences("referencingProject", new String[]{"referencedProject"}, bot);
        
        // Execute Renaming and Check
-       TestUtilsRefactoring.selectFieldAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot);
+       TestUtilsRefactoring.selectElementInOutlineAndExecuteRenaming("balance : int", "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot, "Rename Field");
        assertEquals(TestUtilsRefactoring.getOracle(referencedProject.getFolder("oracle"), "ReferencedClass"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
        
        TestUtilsUtil.openEditor(referencingProject.getFolder(JDTUtil.getSourceFolderName()).getFolder("test").getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));

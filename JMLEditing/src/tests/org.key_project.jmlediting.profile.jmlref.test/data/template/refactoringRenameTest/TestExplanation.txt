@@ -30,7 +30,7 @@ Test11: combination of this qualifier and method with same name as the field.
 Test12: test11 plus a nested field call: TestClass balance; this.balance.balance()
 Test13: test12 with changed order: this.balance().balance
 Test14: test11/12 with more nesting: this.balance.balance == test.balance.balance().balance
-Test15: field reference after a MethodCall: get("someClass").balance
+(Resolver problem) Test15: field reference after a MethodCall: get("someClass").balance
 (Resolver problem) Test16: test15 with another call afterwards: (classes.get(0)).balance.equals("5")
 (Resolver problem) Test17: test16 without the parentheses
 Test18: many MemberAccesses and MethodCalls plus distinguishing between String and field: 
@@ -68,3 +68,7 @@ Test5: Like test4 but package to be renamed is a sub folder.
 Test6: One references class is in parent package and one referenced class is in sub package, which is to be renamed. 
 Test7: Like test6 but parent package is renamed with "rename subpackages" option activated.
 Test8: Like test7 but option is not activated.
+
+****** Testing Method Renaming *****
+Test1: One class, one method calling another method in that class. No other method with same name in that class.
+Test2: Additionally to test1, one other method with same name but different signature in class.

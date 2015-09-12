@@ -74,7 +74,7 @@ public class MoveClassRefactoringTest{
     @Test
     public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
         
-        TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test4p2.complex", "test4p2", javaProject);
+        TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test4p2.complex", "test4p1", javaProject);
         
     }
 }

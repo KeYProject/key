@@ -14,7 +14,7 @@ public class NewClassName {
       @ ensures \result == NewClassName.balance;
       @ assignable \nothing;
       @*/
-    int getBalance() {
-        return this.balance;
+    static int getBalance() {
+        return NewClassName.balance;
     }
 }

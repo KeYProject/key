@@ -14,7 +14,7 @@ public class TestClass {
       @ ensures \result == TestClass.balance;
       @ assignable \nothing;
       @*/
-    int getBalance() {
-        return this.balance;
+    static int getBalance() {
+        return TestClass.balance;
     }
 }
