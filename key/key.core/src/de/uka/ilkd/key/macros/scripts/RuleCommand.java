@@ -59,7 +59,22 @@ public class RuleCommand extends AbstractCommand {
         TacletApp theApp = findTacletApp(proof, p);
         assert theApp != null;
 
+
+        ImmutableList<TacletApp> assumesCandidates =
+                theApp.findIfFormulaInstantiations(getFirstOpenGoal(proof).sequent(), proof.getServices());
+
+        if(assumesCandidates.size() != 1) {
+            throw new ScriptException("Not a unique \\assumes instantiation");
+        }
+
+        theApp = assumesCandidates.head();
+
+        // instantiate remaining symbols
         theApp = theApp.tryToInstantiate(proof.getServices());
+
+        if(theApp == null) {
+            throw new ScriptException("Cannot instantiate this rule");
+        }
 
         Goal g = getFirstOpenGoal(proof);
         g.apply(theApp);

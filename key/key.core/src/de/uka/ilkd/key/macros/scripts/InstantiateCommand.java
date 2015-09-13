@@ -185,7 +185,7 @@ public class InstantiateCommand extends AbstractCommand {
 
         for(SequentFormula form : seq.succedent().asList()) {
             Term term = form.formula();
-            if(term.op() == Quantifier.ALL) {
+            if(term.op() == Quantifier.EX) {
                 String varName = term.boundVars().get(0).name().toString();
                 if(params.var.equals(varName)) {
                     occ --;
