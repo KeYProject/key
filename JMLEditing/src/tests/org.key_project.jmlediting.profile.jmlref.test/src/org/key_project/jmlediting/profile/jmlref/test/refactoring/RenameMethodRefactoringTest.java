@@ -124,4 +124,17 @@ public class RenameMethodRefactoringTest {
         TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test14", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
     }
+    
+    @Test
+    public void test15TwoClassesSamePackageStatic() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test15", srcFolder, oracleFolder, bot, 
+                "TestClassOther", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    // TODO: Resolver returns null but no Exception.
+    //@Test
+    public void test16TwoClassesDifferentPackageStatic() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test16", srcFolder, oracleFolder, bot, 
+                "TestClassOther", "otherPackage", "getBalance() : int", "newMethodName", javaProject);
+    }
 }

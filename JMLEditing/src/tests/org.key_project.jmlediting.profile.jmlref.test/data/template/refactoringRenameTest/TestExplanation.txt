@@ -84,3 +84,5 @@ Test11: Successive method calls: like 11 but within another method call, i.e. as
 Test12: Successive method calls: three method calls and getBalance() in the middle.
 (Resolver problem) test13: Successive method calls: like test 10 but the first method call is (unnecessarily) in a parenthesis.
 test14: Successive method calls: the first method call has two arguments.
+test15: Two classes, same package and getBalance() static.
+(Resolver problem) test16: Two classes, different packages and getBalance() static.
