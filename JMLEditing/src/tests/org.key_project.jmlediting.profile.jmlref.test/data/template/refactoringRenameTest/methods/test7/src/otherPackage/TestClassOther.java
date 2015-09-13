@@ -1,4 +1,4 @@
-package test;
+package otherPackage;
 
 public class TestClassOther {
     public int balance;
@@ -6,7 +6,7 @@ public class TestClassOther {
     /*@ normal_behavior
       @ ensures \result == balance;
       @*/
-    public /*@ pure @*/ int newMethodName() {
+    public /*@ pure @*/ int getBalance() {
         return balance;
     }
 

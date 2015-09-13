@@ -1,14 +1,14 @@
 package test;
 
 public class TestClass {
-    public int balance;
+
     public TestClassOther otherClass = new TestClassOther();
-    
+
     /*@ normal_behavior
-      @ ensures \result == otherClass.balance;
+      @ ensures \result == otherClass.getBalance();
       @ assignable \nothing;
       @*/
     public int accessBalanceFromOtherClass() {
-        return otherClass.balance;
+        return otherClass.getBalance();
     }
 }

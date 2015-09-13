@@ -117,11 +117,20 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                      // Access inner node which resolver checked by .next() method.
                     if (nodeToChange.getChildren().size() >= 1) {
                          
-                        final IASTNode child = nodeToChange.getChildren().get(1);
+                        final List<IASTNode> nodesToSelectFrom = nodeToChange.getChildren().get(1).getChildren();                      
                          
-                        if (child.getChildren().size() >= i) {
-                             final IASTNode innerNode = nodeToChange.getChildren().get(1).getChildren().get(i);
-                             createEditAndAddToList(changesToMake, innerNode);
+                        if (nodesToSelectFrom.size() > i) {
+                             IASTNode selection = nodesToSelectFrom.get(i);
+                             
+                             // If it is a method call, get the next list item.
+                             if (selection.getType() == ExpressionNodeTypes.METHOD_CALL_PARAMETERS){
+                                 if (nodesToSelectFrom.size() > i+1)
+                                     selection = nodesToSelectFrom.get(i+1);
+                                 else {
+                                     continue; // correct selection not possible
+                                 }
+                             }
+                             createEditAndAddToList(changesToMake, selection);
                         }
                     }    
                  }

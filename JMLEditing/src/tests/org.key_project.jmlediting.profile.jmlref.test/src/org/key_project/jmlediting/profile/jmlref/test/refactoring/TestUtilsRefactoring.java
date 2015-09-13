@@ -17,6 +17,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.Position;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -161,7 +162,7 @@ public class TestUtilsRefactoring {
 
     public static void selectPackageAndExecuteRenaming(String projectName,
             String packageName, IFolder srcFolder, String newPackageName,
-            SWTWorkbenchBot bot, Boolean renameSubpackages) {
+            SWTWorkbenchBot bot, Boolean activateSubpackageOption) {
                 
         SWTBotTreeItem packageToRename = TestUtilsUtil.selectInProjectExplorer(bot, projectName, "src", packageName);
         
@@ -169,10 +170,14 @@ public class TestUtilsRefactoring {
         
         SWTBotShell renameDialog = bot.shell("Rename Package");      
         
-        // activate "Rename subpackages" option if needed
-        if (renameSubpackages) {
-            SWTBot renameBot = renameDialog.bot();
-            renameBot.checkBox("Rename subpackages").click();
+        // Check if the "Rename subpackages" option if correctly set
+        SWTBot renameBot = renameDialog.bot();
+        SWTBotCheckBox checkBox = renameBot.checkBox("Rename subpackages");
+        
+        // activate if needed but not set || deactivate if wrongly set
+        if ((activateSubpackageOption && !checkBox.isChecked()) 
+                || (!activateSubpackageOption && checkBox.isChecked()) ) {
+            checkBox.click();
         }
         
         setNewElementName(newPackageName, bot, renameDialog); 

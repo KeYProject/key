@@ -45,4 +45,83 @@ public class RenameMethodRefactoringTest {
         TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
     }
+    
+    @Test
+    public void test2SameClassOtherMethodWithSameNamePresent() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test3SameClassOtherMethodWithSameNamePresentCheck() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance(boolean) : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test4SameClassOtherTwoMethodsWithSameName() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance(boolean) : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test5TwoClassesSamePackage() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
+                "TestClassOther", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test6TwoClassesSamePackageTrueNegativeCheck() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
+                "TestClassOther", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test7TwoClassesDifferentPackage() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test7", srcFolder, oracleFolder, bot, 
+                "TestClassOther", "otherPackage", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test8NestedCallsMethodFromClass() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test8", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test9NestedCallsStringValueOf() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test9", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test10SuccessiveMethodCalls() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test10", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test11SuccessiveMethodCallsAsArgument() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test11", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test12ThreeSuccessiveMethodCalls() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test12", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance() : String", "newMethodName", javaProject);
+    }
+    
+    // TODO: Resolver NullPointerException
+    //@Test
+    public void test13SuccessiveMethodCallsWithExtraParenthesis() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test13", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
+    
+    @Test
+    public void test14SuccessiveMethodCallsWithArguments() throws CoreException {   
+        TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test14", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
+    }
 }

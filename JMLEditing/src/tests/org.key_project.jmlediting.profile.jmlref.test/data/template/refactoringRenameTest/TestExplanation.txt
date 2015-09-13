@@ -66,9 +66,21 @@ Test4: Two classes in the package which will be renamed. One class in otherPacka
 - Tests with sub folders:
 Test5: Like test4 but package to be renamed is a sub folder.
 Test6: One references class is in parent package and one referenced class is in sub package, which is to be renamed. 
-Test7: Like test6 but parent package is renamed with "rename subpackages" option activated.
-Test8: Like test7 but option is not activated.
+Test7: Like test6 but parent package is renamed. The "rename subpackages" option activated.
+Test8: Like test7 but option is deactivated - only the parent package is renamed.
 
-****** Testing Method Renaming *****
+****** Testing Method Renaming (usually renaming of getBalance() *****
 Test1: One class, one method calling another method in that class. No other method with same name in that class.
 Test2: Additionally to test1, one other method with same name but different signature in class.
+Test3: Like test2 but the method with the other signature, getBalance(boolean), is renamed. Check if getBalance() gets not replaced.
+Test4: Like test3 but with getBalance(int) to test differentiating and a getBalance(true) call which needs to change.
+Test5: Two classes. TestClass is calling a method from TestClassOther which gets renamed. Same package.
+Test6: Two classes. TestClass is calling an own method with the same name and signature like the method which is renamed in TestClassOther.
+Test7: Like test4 but TestClassOther is in a different package.
+Test8: Nested method calls: getBalance() argument of some other method.
+Test9: Nested method calls. getBalance() is argument to another method, valueOf(int).
+Test10: Successive method calls: method().getBalance()
+Test11: Successive method calls: like 11 but within another method call, i.e. as an argument to another method call.
+Test12: Successive method calls: three method calls and getBalance() in the middle.
+(Resolver problem) test13: Successive method calls: like test 10 but the first method call is (unnecessarily) in a parenthesis.
+test14: Successive method calls: the first method call has two arguments.

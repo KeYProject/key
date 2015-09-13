@@ -41,37 +41,37 @@ public class RenamePackagesRefactoringTest {
         TestUtilsRefactoring.deleteAllPackagesFromFolder(srcFolder);
     }
     
-    @Test
+    //@Test
     public void test1OneClassInOnePackage() throws CoreException {   
         TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
     
-    @Test
+    //@Test
     public void test2TwoClassesInSamePackage() throws CoreException {   
         TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
     
-    @Test
+    //@Test
     public void test3TwoClassesInSamePackageMoreReferences() throws CoreException {   
         TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
     
-    @Test
+    //@Test
     public void test4TwoPackagesTwoClassesInRenamedPackage() throws CoreException {   
         TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
     
-    @Test
+    //@Test
     public void test5RenamingOfSubpackage() throws CoreException {   
         TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
                  "test.subpackage", "test.newPackageName", javaProject, false);
     }
     
-    @Test
+    //@Test
     public void test6RenamingOfSubpackageAndReferenceToClassInParentPackage() throws CoreException {   
         TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
                  "test.subpackage", "test.newPackageName", javaProject, false);

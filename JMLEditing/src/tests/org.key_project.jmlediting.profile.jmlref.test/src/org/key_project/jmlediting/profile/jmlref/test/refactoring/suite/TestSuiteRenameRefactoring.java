@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.key_project.jmlediting.profile.jmlref.test.refactoring.RenameClassesRefactoringTest;
 import org.key_project.jmlediting.profile.jmlref.test.refactoring.RenameFieldsRefactoringTest;
 import org.key_project.jmlediting.profile.jmlref.test.refactoring.RenameFieldsSeveralProjectsRefactoringTest;
+import org.key_project.jmlediting.profile.jmlref.test.refactoring.RenameMethodRefactoringTest;
 import org.key_project.jmlediting.profile.jmlref.test.refactoring.RenamePackagesRefactoringTest;
 import org.key_project.jmlediting.profile.jmlref.test.refactoring.RenameParametersRefactoringTest;
 
@@ -15,7 +16,8 @@ import org.key_project.jmlediting.profile.jmlref.test.refactoring.RenameParamete
     RenameFieldsSeveralProjectsRefactoringTest.class,
     RenameParametersRefactoringTest.class,
     RenameClassesRefactoringTest.class,
-    RenamePackagesRefactoringTest.class
+    RenamePackagesRefactoringTest.class,
+    RenameMethodRefactoringTest.class
 })
 
 public class TestSuiteRenameRefactoring {

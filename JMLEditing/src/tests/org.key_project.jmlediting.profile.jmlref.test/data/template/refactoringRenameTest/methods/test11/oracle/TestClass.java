@@ -14,10 +14,15 @@ public class TestClass {
         return this.balance;
     }
     
-    public int getBalance(boolean b) {
-        if (b)
-            return 5;
-        else
-            return this.balance;
+    public TestClass returnMe() {
+        return this;
+    }
+    
+    /*@ 
+      @ normal_behavior
+      @ ensures balance == addToBalance(returnMe().newMethodName());
+      @*/
+    public void doubleBalance() {
+        balance = addToBalance(returnMe().newMethodName());
     }
 }
