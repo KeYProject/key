@@ -10,7 +10,7 @@ public class SetCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException,
+            Map<String, String> args, Map<String, Object> state) throws ScriptException,
             InterruptedException {
 
         if(!args.containsKey("key")) {

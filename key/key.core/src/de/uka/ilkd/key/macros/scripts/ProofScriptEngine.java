@@ -40,6 +40,7 @@ public class ProofScriptEngine {
 
         ScriptLineParser mlp = new ScriptLineParser(file.getAbsolutePath());
 
+        Map<String, Object> stateMap = new HashMap<String, Object>();
         while(true) {
 
             if(Thread.interrupted()) {
@@ -73,7 +74,7 @@ public class ProofScriptEngine {
                     throw new ScriptException("Unknown command " + name);
                 }
 
-                command.execute(uiControl, proof, argMap);
+                command.execute(uiControl, proof, argMap, stateMap);
             } catch(InterruptedException ie) {
                 throw ie;
             } catch (Exception e) {

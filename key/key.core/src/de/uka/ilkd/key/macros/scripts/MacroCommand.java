@@ -20,7 +20,7 @@ public class MacroCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException, InterruptedException {
+            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
         String macroName = args.get("#2");
 
@@ -31,7 +31,7 @@ public class MacroCommand extends AbstractCommand {
             throw new ScriptException("Macro '" + macroName + "' not found");
         }
 
-        Goal g = getFirstOpenGoal(proof);
+        Goal g = getFirstOpenGoal(proof, state);
         try {
             macro.applyTo(uiControl, g.node(), null, uiControl);
         } catch (Exception e) {

@@ -150,7 +150,7 @@ class ScriptLineParser {
                 case IN_UNQUOTE: result.put(key, sb.toString()); break;
                 default: exc(c);
                 }
-                if(state != State.IN_COMMENT) {
+                if(state != State.IN_COMMENT && state != State.IN_QUOTE) {
                     result.put(LITERAL_KEY, cmdBuilder.toString().trim());
                     return result;
                 }
@@ -197,6 +197,7 @@ class ScriptLineParser {
                 "command ; \n\n" +
                 "# some comment\n" +
                 "multiline #comment internal\n command \n with=\"line breaks in \n values\"; \n" +
+                "select formula=\"a;b\"; \n" +
                 "hyphened-command;\n" +
                 "ignored ";
 

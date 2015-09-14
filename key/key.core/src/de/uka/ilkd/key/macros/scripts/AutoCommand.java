@@ -21,7 +21,7 @@ public class AutoCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException, InterruptedException {
+            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
         Profile profile = proof.getServices().getProfile();
 
@@ -36,7 +36,7 @@ public class AutoCommand extends AbstractCommand {
         if(args.containsKey("all")) {
             goals = proof.openGoals();
         } else {
-            goals = ImmutableSLList.<Goal>nil().prepend(getFirstOpenGoal(proof));
+            goals = ImmutableSLList.<Goal>nil().prepend(getFirstOpenGoal(proof, state));
         }
 
         //

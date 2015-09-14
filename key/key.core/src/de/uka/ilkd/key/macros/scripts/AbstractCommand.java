@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.StringReader;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -19,10 +20,19 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 public abstract class AbstractCommand implements ProofScriptCommand {
 
+    public static final String GOAL_KEY = "goal";
     private static DefaultTermParser PARSER = new DefaultTermParser();
     private static AbbrevMap EMPTY_MAP = new AbbrevMap();
 
-    final protected Goal getFirstOpenGoal(Proof proof) throws ScriptException {
+    final protected Goal getFirstOpenGoal(Proof proof, Map<String, Object> state) throws ScriptException {
+
+        Object fixedGoal = state.get(GOAL_KEY);
+        if(fixedGoal instanceof Node) {
+            Goal g = getGoal(proof.openGoals(), (Node)fixedGoal);
+            if(g != null) {
+                return g;
+            }
+        }
 
         Node node = proof.root();
 
@@ -78,13 +88,13 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         return formula;
     }
 
-    private static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
+    protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
             if(goal.node() == node) {
                 return goal;
             }
         }
-        throw new Error("unreachable");
+        return null;
     }
 
     final protected static int getMaxAutomaticSteps(Proof proof) {

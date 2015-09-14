@@ -12,7 +12,7 @@ public class TryCloseCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException, InterruptedException {
+            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
         String stepsStr = args.get("steps");
         TryCloseMacro macro;
