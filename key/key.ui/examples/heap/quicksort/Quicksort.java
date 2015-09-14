@@ -17,7 +17,7 @@ class Quicksort {
       @  requires 0<=to && to < array.length;
       @  requires from > 0 ==> (\forall int x; from<=x && x<=to; array[x] > array[from-1]);
       @  requires to < array.length-1 ==> (\forall int x; from<=x && x<=to; array[x] <= array[to+1]);
-      @  //ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
+      @  ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
       @  ensures (\forall int i; from<=i && i<to; array[i] <= array[i+1]);
       @  ensures from > 0 ==> (\forall int x; from<=x && x<=to; array[x] > array[from-1]);
       @  ensures to < array.length-1 ==> (\forall int x; from<=x && x<=to; array[x] <= array[to+1]);
@@ -60,7 +60,7 @@ class Quicksort {
           @ loop_invariant (\forall int k; from <= k && k < i; array[k] <= pivot);
           @ loop_invariant (\forall int l; i <= l && l < j; array[l] > pivot);
           @ loop_invariant from > 0 ==> (\forall int x; from<=x && x<=to; array[from-1] < array[x]);
-          @ loop_invariant to < array.length-1 ==> (\forall int y; from<=y && y<=to; array[y] <= array[to]);
+          @ loop_invariant to < array.length-1 ==> (\forall int y; from<=y && y<=to; array[y] <= array[to+1]);
           @ decreases to + to - j - i + 2;
           @ assignable array[from..to-1];
           @*/
