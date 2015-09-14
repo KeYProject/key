@@ -44,11 +44,12 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
     @Override
     protected final boolean initialize(Object element) {
         if(element instanceof IJavaElement){
-            elementToMove=(IJavaElement) element;           
+            elementToMove = (IJavaElement) element;           
             fProject = elementToMove.getJavaProject();
-            elementName=elementToMove.getElementName();
-            oldClassFullQualName=((IType) elementToMove.getParent()).getFullyQualifiedName();
-            newClassFullQualName=((IType) getArguments().getDestination()).getFullyQualifiedName();
+            elementName = elementToMove.getElementName();
+            oldClassFullQualName = ((IType) elementToMove.getParent()).getFullyQualifiedName();
+            IType destination = (IType) getArguments().getDestination();
+            newClassFullQualName = destination.getFullyQualifiedName();
             return true;
         }else{
             return false;
@@ -127,16 +128,25 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
                             IRegion regionJML = jmlEditsCombined.getRegion();
                             
                             TextEdit presetRootEdit = changesToJavaCode.getEdit();
-                            IRegion presetRootRegion = presetRootEdit.getRegion();
                             
-                            if (RefactoringUtil.isCovering(presetRootRegion, regionJML)) {
-                                // The root can only cover the combined JML edits if its child is covering that region.
-                                // -> JML edits cannot be added to root as child -> add to the child.
-                                (presetRootEdit.getChildren())[0].addChild(jmlEditsCombined);
+                            TextEdit[] children = presetRootEdit.getChildren();
+                            
+                            // check if some child completely covers the JML region. Add it then.
+                            // Otherwise add it as a separate child
+                            boolean overlap = false;
+                            boolean jmlAdded = false;
+                            for (TextEdit child : children) {
+                                if (RefactoringUtil.isCovering(child.getRegion(), regionJML)) {
+                                    child.addChild(jmlEditsCombined);
+                                    jmlAdded = true;
+                                    break;
+                                }
+                                if (RefactoringUtil.isOverlapping(child.getRegion(), regionJML)){
+                                    overlap = true;
+                                }
                             }
-                            else if (!RefactoringUtil.isOverlapping(presetRootRegion, regionJML)){
-                                // JML edit region is neither covered nor overlapped, that is completed different region
-                                // add as an additional child to the root
+                            
+                            if(!jmlAdded && !overlap){
                                 presetRootEdit.addChild(jmlEditsCombined);
                             }
                         }

@@ -160,13 +160,11 @@ public class RefactoringUtil {
     }    
     
     /**
-     * 
-     * @param editsToCombine
-     * @return
-     * @throws JavaModelException
+     * Combines a list of {@link TextEdit}s into a {@link MultiTextEdit}.
+     * @param editsToCombine The list of edits to combine.
+     * @return The multitextedit which combined all the edits in the given list.
      */
-    public static MultiTextEdit combineEditsToMultiEdit(final ArrayList<ReplaceEdit> editsToCombine)
-            throws JavaModelException {
+    public static MultiTextEdit combineEditsToMultiEdit(final ArrayList<ReplaceEdit> editsToCombine){
         // Gather all the edits to the text (JML annotations) in a MultiTextEdit
         MultiTextEdit allEdits = new MultiTextEdit();
         
@@ -180,9 +178,9 @@ public class RefactoringUtil {
     /**
      * Checks if a given region is covering another given region.
      * 
-     * @param region
-     * @param other
-     * @return
+     * @param region The first of the given regions.
+     * @param other The other region.
+     * @return True if region is covering the other.
      */
     public static Boolean isCovering (final IRegion region, final IRegion other){
         
@@ -201,9 +199,9 @@ public class RefactoringUtil {
     /**
      * Checks if a given region is overlapping another given region. 
      * 
-     * @param region
-     * @param other
-     * @return
+     * @param region First of the given regions.
+     * @param other The other one.
+     * @return True if the regions are overlapping.
      */
     public static Boolean isOverlapping (final IRegion region, final IRegion other){
         
@@ -213,8 +211,8 @@ public class RefactoringUtil {
         int startOther = other.getOffset();
         int endOther = startOther + other.getLength();
         
-        if (((start <= startOther) && (end < endOther)) || // region ends too early. other is longer.
-            ((start < startOther) && (end >= endOther)))   // region starts too late.
+        if (((start <= startOther) && (end >= startOther) && (end < endOther)) || // region ends too early. other is longer.
+            ((start > startOther) && (start < endOther) && (end >= endOther)))   // region starts too late.
             return true;
         else 
             return false;

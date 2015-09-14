@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.IStringNode;
 
 /**
  * Class which defines a constructor for the move refactoring computer which saves
@@ -39,14 +40,21 @@ public abstract class AbstractMoveRefactoringComputer extends AbstractRefactorin
     protected final void computeReplaceEdit(ICompilationUnit unit, ArrayList<ReplaceEdit> changesToMake,
             IASTNode node) {
 
-        IASTNode changeThisNode = node;
-        // all nodes of primary expression type. (no complicated member accesses or such)
-        // compute the location of the text edit.
-        final int startOffset = changeThisNode.getStartOffset();
-        final int length = oldClassFullQualName.length();
-
-        changesToMake.add(new ReplaceEdit(startOffset, length, newClassFullQualName));
+        final int startOffset = node.getStartOffset();
         
+        // check if it is fully qualified
+        String newClassName = newClassFullQualName.substring(newClassFullQualName.lastIndexOf('.')+1);
+        String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
+
+        IASTNode innerNode = node.getChildren().get(0).getChildren().get(0);
+        if (innerNode instanceof IStringNode && 
+                ((IStringNode) innerNode).getString().equals(oldClassName)) {
+            changesToMake.add(new ReplaceEdit(startOffset, oldClassName.length(), newClassName));
+        }
+        else {
+            final int length = oldClassFullQualName.length();
+            changesToMake.add(new ReplaceEdit(startOffset, length, newClassFullQualName));
+        }
     }
     
     /**

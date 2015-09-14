@@ -56,6 +56,34 @@ public class FieldAndMethodMoveRefactoringComputer extends
                 filteredList.add(stringNode);
             }
         }
+        
+        // check for not fully qualified access but access via import statement
+        String oldClassName = getOldFullQualName().substring(getOldFullQualName().lastIndexOf('.')+1);
+        
+        nodeString = "";
+        for (final IASTNode node: nodesList) {
+            final IStringNode stringNode = (IStringNode) node;
+         
+            // combine the string nodes
+            if((oldClassName+"."+elementName).contains(stringNode.getString()))
+                nodeString=nodeString+stringNode.getString();
+            // reset
+            else nodeString="";
+            
+            if (nodeString.equals(oldClassName+"."+elementName)) {
+                int start = stringNode.getStartOffset();
+                
+                boolean isContained = false;
+                for (IStringNode n : filteredList){
+                    if (n.containsOffset(start))
+                        isContained = true;
+                }
+                if (!isContained)
+                    filteredList.add(stringNode);
+            }
+            
+        }
+        
         return filteredList;
     }
 }
