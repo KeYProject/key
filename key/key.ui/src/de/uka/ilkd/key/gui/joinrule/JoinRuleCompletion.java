@@ -1,16 +1,20 @@
 package de.uka.ilkd.key.gui.joinrule;
 
+import java.util.HashMap;
+
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * This class completes the instantiation for a join rule application.
@@ -36,11 +40,12 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
         JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) app;
         PosInOccurrence pio = joinApp.posInOccurrence();
         
-        ImmutableList<Pair<Goal,PosInOccurrence>> candidates =
+        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates =
                 JoinRule.findPotentialJoinPartners(goal, pio);
         
-        ImmutableList<Pair<Goal,PosInOccurrence>> chosenCandidates = null;
+        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> chosenCandidates = null;
         JoinProcedure chosenRule = null;
+        Term chosenDistForm = null; // null is admissible standard ==> auto generation
         
         if (forced) {
             chosenCandidates = candidates;
@@ -51,6 +56,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
             dialog.setVisible(true);
             chosenCandidates = dialog.getChosenCandidates();
             chosenRule = dialog.getChosenJoinRule();
+            chosenDistForm = dialog.getChosenDistinguishingFormula();
         }
         
         if (chosenCandidates == null || chosenCandidates.size() < 1) {
@@ -60,6 +66,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
         JoinRuleBuiltInRuleApp result = new JoinRuleBuiltInRuleApp(app.rule(), pio);
         result.setJoinPartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
+        result.setDistinguishingFormula(chosenDistForm);
         result.setJoinNode(goal.node());
         
         return result;

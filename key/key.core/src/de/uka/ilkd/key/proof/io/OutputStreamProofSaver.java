@@ -357,6 +357,10 @@ public class OutputStreamProofSaver {
         	tree.append(" (joinId \"");
         	tree.append(joinApp.getJoinNode().serialNr());
             tree.append("\")");
+            
+            tree.append(" (distFormula \"");
+            tree.append(joinApp.getDistinguishingFormula());
+            tree.append("\")");
         }
         
         if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
