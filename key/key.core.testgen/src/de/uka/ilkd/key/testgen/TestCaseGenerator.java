@@ -737,8 +737,7 @@ public class TestCaseGenerator {
                             System.out.println("Warning: Function "+name+" is ambiguous.");
                         }
                     }else{
-                        System.out.println("Func "+name+"  Sort: "+func.sort()+ 
-                                " FieldSort:"+fieldSort + "  PV.sort:"+pv.sort());                
+                        //System.out.println("Func "+name+"  Sort: "+func.sort()+ " FieldSort:"+fieldSort + "  PV.sort:"+pv.sort());                
                         map.put(name, pv.sort());
                     }  
                 }else{

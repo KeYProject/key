@@ -22,6 +22,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private FileChooserPanel objenesisPanel;
 	private JTextField maxProcesses;
 	private JTextField maxUnwinds;
+    private JCheckBox symbolicEx;
 	private JCheckBox useJUnit;
 	private JCheckBox invariantForAll;
 	private JCheckBox includePostCondition;
@@ -30,6 +31,7 @@ class TestGenOptionsPanel extends TablePanel{
 
 	private int minWidthOfTitle;
 	
+	private static final String infoApplySymbolicEx = "Performs bounded symbolic execution on the current proof tree. More precisely, the TestGen Macro is executed which the user can also manually execute by right-clicking on the proof tree and selecting Strategy Macros->TestGen.";
 	private static final String infoSaveTo = "Choose the folder where the test case files will be written.";
 	private static final String infoMaxProcesses = "Maximal number of SMT processes that are allowed to run concurrently.";
 	private static final String infoUseJunit = "Generate a JUnit 4 test suite and a test oracle from the postcondition. Disable this option when using a JML runtime checker since the generated code may be too complicated for the runtime checker or may not comply with JML requirements.";
@@ -57,6 +59,7 @@ class TestGenOptionsPanel extends TablePanel{
 	
 	@Override
     protected void createComponents() {
+	   getSymbolicEx();
        getMaxUnwinds();
        getInvariantForall();
        getIncludePostCondition();
@@ -201,6 +204,19 @@ class TestGenOptionsPanel extends TablePanel{
 		return checkboxRFL;
 	}
 
+    public JCheckBox getSymbolicEx(){      
+        if(symbolicEx == null){            
+            symbolicEx = addCheckBox("Apply symbolic execution", infoApplySymbolicEx, settings.getApplySymbolicExecution(), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    settings.setApplySymbolicExecution(symbolicEx.isSelected());
+                    settings.fireSettingsChanged();
+                }
+            });         
+        }       
+        return symbolicEx;     
+    }
+	
 	public JCheckBox getInvariantForall(){		
 		if(invariantForAll == null){			
 			invariantForAll = addCheckBox("Require invariant for all objects", infoInvariantForAll, settings.invaraiantForAll(), new ActionListener() {
