@@ -560,7 +560,7 @@ public class TestCaseGenerator {
 		oracleMethods.add(oracle);
 		oracleMethods.addAll(oracleGenerator.getOracleMethods());
 
-		System.out.println("Modifier Set: "+oracleGenerator.getOracleLocationSet(info.getAssignable()));
+		//System.out.println("Modifier Set: "+oracleGenerator.getOracleLocationSet(info.getAssignable()));
 
 
 		return "assertTrue("+oracleCall.toString()+");";
@@ -676,14 +676,14 @@ public class TestCaseGenerator {
 	    if(typeInfMap.containsKey(progVar)){
 	        return typeInfMap.get(progVar).name().toString();	        
 	    }
-	    System.out.println("inferSort did not find:"+progVar);
+	    System.out.println("Warning: inferSort did not find:"+progVar);
 	    return "NOTYPE";
 	}
 
     protected Map<String, Sort>  generateTypeInferenceMap(Node n){
         HashMap<String,Sort> typeInfMap = new HashMap<String,Sort>();
         Iterator<SequentFormula> formIter = n.sequent().iterator();
-        System.out.println("\n---------------------------------------");
+        //System.out.println("\n---------------------------------------");
         while(formIter.hasNext()){
             Term t = formIter.next().formula();
             generateTypeInferenceMapHelper(t,typeInfMap);
@@ -698,10 +698,10 @@ public class TestCaseGenerator {
             final String name = pv.name().toString();
             if(map.containsKey(name)){
                 if(map.get(name)!=pv.sort()){
-                    System.out.println("ProgramVariable "+name+" is AMBIGUOUS.");                    
+                    System.out.println("Warning: ProgramVariable "+name+" is ambiguous.");                    
                 }
             }else{
-                System.out.println("PV "+name+"  Sort: "+pv.sort()+ " KeYJavaType: "+pv.getKeYJavaType().toString());
+                //System.out.println("PV "+name+"  Sort: "+pv.sort()+ " KeYJavaType: "+pv.getKeYJavaType().toString());
                 map.put(name, pv.sort());
             }
         }/*  ObserverFunctions are query methods and ObsFunc java.lang.Object::<inv>
@@ -734,7 +734,7 @@ public class TestCaseGenerator {
 
                     if(map.containsKey(name)){
                         if(map.get(name)!=pv.sort()){
-                            System.out.println("Function "+name+" is AMBIGUOUS.");
+                            System.out.println("Warning: Function "+name+" is ambiguous.");
                         }
                     }else{
                         System.out.println("Func "+name+"  Sort: "+func.sort()+ 
@@ -742,7 +742,8 @@ public class TestCaseGenerator {
                         map.put(name, pv.sort());
                     }  
                 }else{
-                    System.out.println("program variable could not be inferred:"+t.toString());
+                    //TODO:
+                    //System.out.println("Program variable could not be determined:"+t.toString());
                 }
             }
         } 
