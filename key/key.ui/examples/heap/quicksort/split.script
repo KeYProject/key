@@ -1,4 +1,4 @@
-macro autopilot;
+macro autopilot-prep;
 
 # the power of autopilot is not enough. run another 10000 on open goals
 tryclose;

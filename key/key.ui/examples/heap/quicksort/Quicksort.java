@@ -1,6 +1,5 @@
 class Quicksort {
 
-
     /*@ public normal_behaviour
       @  ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
       @  ensures (\forall int i; 0<=i && i<array.length-1; array[i] <= array[i+1]);
