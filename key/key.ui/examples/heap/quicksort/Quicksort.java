@@ -3,35 +3,47 @@ class Quicksort {
 
     /*@ public normal_behaviour
       @  ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
-      @  ensures (\forall int i; 0<=i && i<array.length; a[i] <= a[i+1]);
+      @  ensures (\forall int i; 0<=i && i<array.length-1; array[i] <= array[i+1]);
       @  assignable array[*];
       @*/
     public void sort(int[] array) {
-        sort(array, 0, array.length-1);
+        if(array.length > 0) {
+            sort(array, 0, array.length-1);
+        }
     }
 
     /*@ public normal_behaviour
       @  requires 0<=from && from < array.length;
       @  requires 0<=to && to < array.length;
-      @  ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
-      @  ensures (\forall int i; from<=i && i<to; a[i] <= a[i+1]);
+      @  requires from > 0 ==> (\forall int x; from<=x && x<to; array[x] > array[from-1]);
+      @  requires to < array.length-1 ==> (\forall int x; from<=x && x<to; array[x] <= array[to]);
+      @  //ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
+      @  ensures (\forall int i; from<=i && i<to; array[i] <= array[i+1]);
       @  assignable array[from..to];
       @  measured_by to - from + 1;
       @*/
     private void sort(int[] array, int from, int to) {
         if(from < to) {
             int splitPoint = split(array, from, to);
-            sort(array, from, splitPoint-1);
-            sort(array, splitPoint+1, to);
+            if(splitPoint != from) {
+                sort(array, from, splitPoint-1);
+            }
+            if(splitPoint != to) {
+                sort(array, splitPoint+1, to);
+            }
         }
     }
 
     /*@ public normal_behaviour
       @  requires 0 <= from && from < to && to <= array.length-1;
+      @  requires from > 0 ==> (\forall int x; from<=x && x<=to; array[from-1] < array[x]);
+      @  requires to < array.length-1 ==> (\forall int y; from<=x && y<to; array[y] < array[to]);
       @  ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
       @  ensures from <= \result && \result <= to;
       @  ensures (\forall int m; from <= m && m <= \result; array[m] <= array[\result]);
       @  ensures (\forall int n; \result < n && n <= to; array[n] > array[\result]);
+      @  ensures from > 0 ==> (\forall int x; from<=x && x<=to; array[from-1] < array[x]);
+      @  ensures to < array.length-1 ==> (\forall int y; from<=x && y<to; array[y] < array[to]);
       @  assignable array[from..to];
       @*/
     private int split(int[] array, int from, int to) {
