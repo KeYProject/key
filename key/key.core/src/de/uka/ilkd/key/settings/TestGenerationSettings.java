@@ -18,7 +18,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final boolean DEFAULT_INVARIANTFORALL = true;
 	private static final String DEFAULT_OPENJMLPATH = ".";
 	private static final String DEFAULT_OBJENESISPATH = ".";
-	private static final boolean DEFAULT_REMOVEPOSTCONDITION = true;
+	private static final boolean DEFAULT_INCLUDEPOSTCONDITION = false;
 	// Option fields
 	private int maxUnwinds;
 	private String outputPath;
@@ -29,7 +29,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private boolean useJunit;
 	private int concurrentProcesses;
 	private boolean invariantForAll;
-	private boolean removePostCondition;
+	private boolean includePostCondition;
 	
 	private final Collection<SettingsListener> listeners;
 	// Property name
@@ -42,7 +42,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String propInvariantForAll = "[TestGenSettings]InvariantForAll";
 	private static final String propOpenjmlPath = "[TestGenSettings]OpenJMLPath";
 	private static final String propObjenesisPath = "[TestGenSettings]ObjenesisPath";
-	private static final String propRemovePostCondition = "[TestGenSettings]RemovePostCondition";
+	private static final String propIncludePostCondition = "[TestGenSettings]IncludePostCondition";
 	
 	
 	public TestGenerationSettings() {
@@ -56,7 +56,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		invariantForAll = TestGenerationSettings.DEFAULT_INVARIANTFORALL;
 		openjmlPath = DEFAULT_OPENJMLPATH;
 		objenesisPath = DEFAULT_OBJENESISPATH;
-		removePostCondition  =DEFAULT_REMOVEPOSTCONDITION;
+		includePostCondition  =DEFAULT_INCLUDEPOSTCONDITION;
 	}
 
 	public TestGenerationSettings(TestGenerationSettings data) {
@@ -73,7 +73,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		invariantForAll = data.invariantForAll;
 		openjmlPath = data.openjmlPath;
 		objenesisPath  = data.objenesisPath;
-		removePostCondition = data.removePostCondition;
+		includePostCondition = data.includePostCondition;
 		
 	}
 
@@ -108,8 +108,8 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		return invariantForAll;
 	}
 	
-	public boolean removePostCondition(){
-		return removePostCondition;
+	public boolean includePostCondition(){
+		return includePostCondition;
 	}
 
 	@Override
@@ -143,9 +143,9 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		        TestGenerationSettings.propObjenesisPath,
 		        TestGenerationSettings.DEFAULT_OBJENESISPATH);
 		
-		removePostCondition = SettingsConverter.read(props,
-				TestGenerationSettings.propRemovePostCondition,
-				TestGenerationSettings.DEFAULT_REMOVEPOSTCONDITION);
+		includePostCondition = SettingsConverter.read(props,
+				TestGenerationSettings.propIncludePostCondition,
+				TestGenerationSettings.DEFAULT_INCLUDEPOSTCONDITION);
 	}
 
 	public boolean removeDuplicates() {
@@ -172,8 +172,8 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		this.removeDuplicates = removeDuplicates;
 	}
 
-	public void setRemovePostCondition(boolean removePostCondition) {
-		this.removePostCondition = removePostCondition;
+	public void setIncludePostCondition(boolean includePostCondition) {
+		this.includePostCondition = includePostCondition;
 	}
 	
 	public void setRFL(boolean useRFL) {
@@ -236,7 +236,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		        openjmlPath);
 		SettingsConverter.store(props, TestGenerationSettings.propObjenesisPath,
 		        objenesisPath);
-		SettingsConverter.store(props, TestGenerationSettings.propRemovePostCondition,
-				removePostCondition);
+		SettingsConverter.store(props, TestGenerationSettings.propIncludePostCondition,
+				includePostCondition);
 	}
 }
