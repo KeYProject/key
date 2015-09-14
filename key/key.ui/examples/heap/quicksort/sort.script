@@ -1,0 +1,37 @@
+macro autopilot-prep;
+
+#
+# proof obligation for seqPerm after 3 method calls
+select formula="{heapAtPre:=heap || exc:=null || heap:=heapAfter_sort_0}
+   seqPerm(seqDef{int u;}(0, array.length, any::select(heap, array, arr(u))),
+           seqDef{int u;}(0, array.length, any::select(heapAtPre, array, arr(u))))";
+
+macro simp-upd;
+
+rule seqPermSym 
+  formula="seqPerm(seqDef{int u;}(0, array.length, any::select(heapAfter_split, array, arr(u))),
+                   seqDef{int u;}(0, array.length, array[u]))";
+
+rule seqPermSym
+  formula="seqPerm(seqDef{int u;}(0, array.length, any::select(heapAfter_sort, array, arr(u))),
+                   seqDef{int u;}(0, array.length, any::select(heapAfter_split, array, arr(u))))";
+
+rule seqPermSym
+  formula="seqPerm(seqDef{int u;}(0, array.length, any::select(heapAfter_sort_0, array, arr(u))),
+                   seqDef{int u;}(0, array.length, any::select(heapAfter_sort, array, arr(u))))";
+
+rule seqPermTrans
+  formula="seqPerm(seqDef{int u;}(0, array.length, array[u]),
+                   seqDef{int u;}(0, array.length, any::select(heapAfter_split, array, arr(u))))";
+
+rule seqPermTrans
+  formula="seqPerm(seqDef{int u;}(0, array.length, array[u]),
+                   seqDef{int u;}(0, array.length, any::select(heapAfter_sort, array, arr(u))))";
+
+rule seqPermSym
+  formula="seqPerm(seqDef{int u;}(0, array.length, array[u]),
+                   seqDef{int u;}(0, array.length, any::select(heapAfter_sort_0, array, arr(u))))";
+
+# Now, the power of autopilot is enough. 
+# Run another 10000 on each open goal.
+tryclose;

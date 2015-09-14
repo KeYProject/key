@@ -13,8 +13,8 @@ class Quicksort {
     }
 
     /*@ public normal_behaviour
-      @  requires 0<=from && from < array.length;
-      @  requires 0<=to && to < array.length;
+      @  requires 0 <= from;
+      @  requires to < array.length;
       @  requires from > 0 ==> (\forall int x; from<=x && x<=to; array[x] > array[from-1]);
       @  requires to < array.length-1 ==> (\forall int x; from<=x && x<=to; array[x] <= array[to+1]);
       @  ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
@@ -27,12 +27,8 @@ class Quicksort {
     private void sort(int[] array, int from, int to) {
         if(from < to) {
             int splitPoint = split(array, from, to);
-            if(splitPoint != from) {
-                sort(array, from, splitPoint-1);
-            }
-            if(splitPoint != to) {
-                sort(array, splitPoint+1, to);
-            }
+            sort(array, from, splitPoint-1);
+            sort(array, splitPoint+1, to);
         }
     }
 
