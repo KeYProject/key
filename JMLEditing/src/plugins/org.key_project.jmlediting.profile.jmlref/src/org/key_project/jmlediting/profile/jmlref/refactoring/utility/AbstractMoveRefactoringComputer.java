@@ -7,6 +7,9 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 
 /**
+ * Class which defines a constructor for the move refactoring computer which saves
+ * the old and new fully qualified name of the element to be moved and how changes, 
+ * in particular {@link ReplaceEdit}s, are computed.
  * 
  * @author Maksim Melnik
  *
@@ -38,8 +41,6 @@ public abstract class AbstractMoveRefactoringComputer extends AbstractRefactorin
 
         IASTNode changeThisNode = node;
         // all nodes of primary expression type. (no complicated member accesses or such)
-        //changeThisNode = node.getChildren().get(0).getChildren().get(0);
-
         // compute the location of the text edit.
         final int startOffset = changeThisNode.getStartOffset();
         final int length = oldClassFullQualName.length();

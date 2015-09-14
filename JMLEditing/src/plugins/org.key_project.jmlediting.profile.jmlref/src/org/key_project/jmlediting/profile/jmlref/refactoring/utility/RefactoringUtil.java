@@ -2,12 +2,19 @@ package org.key_project.jmlediting.profile.jmlref.refactoring.utility;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
+import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.util.jdt.JDTUtil;
 
 /**
@@ -15,7 +22,7 @@ import org.key_project.util.jdt.JDTUtil;
  * 
  * @author Robert Heimbach
  */
-public class RefactoringUtilities {
+public class RefactoringUtil {
 
     /**
      * Returns all {@link IPackageFragment}s containing java source files from a given {@link IJavaProject}.
@@ -53,7 +60,7 @@ public class RefactoringUtilities {
      * @throws JavaModelException Thrown if either the list of all Java Projects cannot be returned or the required project 
      *          names cannot be accessed for any project.
      */
-    public static void getAllProjectsToCheck(ArrayList<IJavaProject> projectsToCheck, IJavaProject refactoringStartingProject)
+    public static ArrayList<IJavaProject> getAllProjectsToCheck(ArrayList<IJavaProject> projectsToCheck, IJavaProject refactoringStartingProject)
             throws JavaModelException {
         
         // Iterate through all java projects and check for projects which require the active project
@@ -75,6 +82,8 @@ public class RefactoringUtilities {
                 } 
             }
         }
+        
+        return projectsToCheck;
     }
 
     /**
@@ -103,5 +112,111 @@ public class RefactoringUtilities {
         }
         
         return allQualifiedNames;
+    }
+    
+    /**
+     * Given a possible empty list of changes, the return object for the refactoring participants 
+     * is determined and returned.
+     * 
+     * @param textFileChanges A potentially empty list of {@link TextFileChange}s.
+     * @return null if the list is empty. One change object if the list has one element or a 
+     *      {@link CompositeChange} comprising all the elements in the list.
+     */
+    public static Change assembleChangeObject(ArrayList<TextFileChange> textFileChanges) {
+        // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
+        if (textFileChanges.isEmpty())
+            return null;
+        else if (textFileChanges.size() == 1){
+            return textFileChanges.get(0);
+        }
+        // Create a composite change to gather all the changes (effect in preview: a tree item one level higher without preview is added)
+        else {
+            CompositeChange compositeChange = new CompositeChange("Changes to JML");
+            for (TextFileChange change : textFileChanges){
+                compositeChange.add(change);
+            }
+            return compositeChange;
+        }
+    }
+    
+
+    /**
+     * Combines a list of {@link ReplaceEdit}s to a {@link TextFileChange} for a given {@link IFile}.
+     * @param unit {@link ICompilationUnit} defining the file for which the change is.
+     * @param editsToCombine list of edits.
+     * @return the {@link TextFileChange} comprising all the {@link ReplaceEdit}s of the given list.
+     * @throws JavaModelException thrown if the resource corresponding to the compilation unit could not be found.
+     */
+    public static TextFileChange combineEditsToChange(final ICompilationUnit unit,
+            final ArrayList<ReplaceEdit> editsToCombine)
+            throws JavaModelException {
+        TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());                         
+        
+        // Gather all the edits to the text (JML annotations) in a MultiTextEdit
+        MultiTextEdit allEdits = combineEditsToMultiEdit(editsToCombine);
+
+        tfChange.setEdit(allEdits);
+        return tfChange;
+    }    
+    
+    /**
+     * 
+     * @param editsToCombine
+     * @return
+     * @throws JavaModelException
+     */
+    public static MultiTextEdit combineEditsToMultiEdit(final ArrayList<ReplaceEdit> editsToCombine)
+            throws JavaModelException {
+        // Gather all the edits to the text (JML annotations) in a MultiTextEdit
+        MultiTextEdit allEdits = new MultiTextEdit();
+        
+        for (final ReplaceEdit edit: editsToCombine) {
+           allEdits.addChild(edit);
+        }
+    
+        return allEdits;
+    }
+    
+    /**
+     * Checks if a given region is covering another given region.
+     * 
+     * @param region
+     * @param other
+     * @return
+     */
+    public static Boolean isCovering (final IRegion region, final IRegion other){
+        
+        int start = region.getOffset();
+        int end = start + region.getLength();
+        
+        int startOther = other.getOffset();
+        int endOther = startOther + other.getLength();
+        
+        if ((start <= startOther) && (end >= endOther))
+            return true;
+        else 
+            return false;
+    }
+    
+    /**
+     * Checks if a given region is overlapping another given region. 
+     * 
+     * @param region
+     * @param other
+     * @return
+     */
+    public static Boolean isOverlapping (final IRegion region, final IRegion other){
+        
+        int start = region.getOffset();
+        int end = start + region.getLength();
+        
+        int startOther = other.getOffset();
+        int endOther = startOther + other.getLength();
+        
+        if (((start <= startOther) && (end < endOther)) || // region ends too early. other is longer.
+            ((start < startOther) && (end >= endOther)))   // region starts too late.
+            return true;
+        else 
+            return false;
     }
 }

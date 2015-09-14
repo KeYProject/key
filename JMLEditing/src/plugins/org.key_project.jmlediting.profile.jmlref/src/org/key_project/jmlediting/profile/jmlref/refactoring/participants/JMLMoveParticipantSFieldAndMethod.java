@@ -2,7 +2,6 @@ package org.key_project.jmlediting.profile.jmlref.refactoring.participants;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -12,8 +11,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -21,22 +20,18 @@ import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
-import org.key_project.jmlediting.core.utilities.CommentLocator;
+import org.eclipse.text.edits.TextEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.FieldAndMethodMoveRefactoringComputer;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtil;
 
 /**
- * Class to participate in the move refactoring of static fields.
- * 
- * It uses the {@link CommentLocator} to get a list of all JML comments.
- * The changes are added to the scheduled java changes as the JDT takes care of 
- * moving offsets in the editor and preview when several changes are made to the same file.
+ * Class to participate in the move refactoring of static fields and methods.
  * 
  * @author Maksim Melnik
  */
 public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
 
-    private IJavaElement elementToMove;        // field
+    private IJavaElement elementToMove;        
     private String elementName;
     
     private String oldClassFullQualName;                // fully qualified name of the old class
@@ -49,7 +44,7 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
     @Override
     protected final boolean initialize(Object element) {
         if(element instanceof IJavaElement){
-            elementToMove=(IJavaElement) element;
+            elementToMove=(IJavaElement) element;           
             fProject = elementToMove.getJavaProject();
             elementName=elementToMove.getElementName();
             oldClassFullQualName=((IType) elementToMove.getParent()).getFullyQualifiedName();
@@ -60,17 +55,21 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
         }
     }
 
+    
     /**
-     * Name of this class. {@inheritDoc}
+     * Name of this class. 
+     * <p>
+     * {@inheritDoc}
      */
     @Override
     public final String getName() {
         return "JML Field and Method Move Participant";
     }
 
+    
     /**
      * Do nothing.
-     *
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -79,12 +78,27 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
         return new RefactoringStatus();
     }
 
+    
+    /**
+     * Computes the changes which need to be done to the JML code and
+     * add those to the changes to the java code which are already scheduled.
+     * Note that the moving of methods and fields creates {@link TextEdit}s 
+     * which are covering a large Region and thus the adding to the given java 
+     * code changes needs to be done carefully.
+     * 
+     * @return Returns null if only shared text changes are made. Otherwise
+     *      returns a TextChange Object which gathered all the changes to JML annotations 
+     *      in class which does not have any Java changes scheduled.
+     *
+     */
     @Override
     public final Change createChange(IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         // Only non empty change objects will be added
         ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
+        
+        FieldAndMethodMoveRefactoringComputer changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName);
 
         // Find out the projects which need to be checked: active project plus all dependencies
         ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
@@ -92,12 +106,11 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
         
         try {
             // Look through all source files in each package and project
-            for (final IJavaProject project : projectsToCheck) {
-                for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
+            for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck, fProject)) {
+                for (final IPackageFragment pac : RefactoringUtil.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
 
-                        FieldAndMethodMoveRefactoringComputer changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName);
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
 
                         // Get scheduled changes to the java code from the rename processor
@@ -106,26 +119,33 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
                         // add our edits to the java changes
                         // JDT will compute the shifts and the preview
                         if (changesToJavaCode != null) {
-                            for (final ReplaceEdit edit : changesToJML) {
-                                changesToJavaCode.addEdit(edit);
+                            
+                            MultiTextEdit jmlEditsCombined = RefactoringUtil.combineEditsToMultiEdit(changesToJML);
+   
+                            // Choose the right place in the tree to add the JML edits.
+                            // changesToJavaCode is a MultiTextEdit (as a root) consisting of a MultiTextEdit consisting of Edits
+                            IRegion regionJML = jmlEditsCombined.getRegion();
+                            
+                            TextEdit presetRootEdit = changesToJavaCode.getEdit();
+                            IRegion presetRootRegion = presetRootEdit.getRegion();
+                            
+                            if (RefactoringUtil.isCovering(presetRootRegion, regionJML)) {
+                                // The root can only cover the combined JML edits if its child is covering that region.
+                                // -> JML edits cannot be added to root as child -> add to the child.
+                                (presetRootEdit.getChildren())[0].addChild(jmlEditsCombined);
+                            }
+                            else if (!RefactoringUtil.isOverlapping(presetRootRegion, regionJML)){
+                                // JML edit region is neither covered nor overlapped, that is completed different region
+                                // add as an additional child to the root
+                                presetRootEdit.addChild(jmlEditsCombined);
                             }
                         }
                         else {
                             // In case changes to the JML code needs to be done (but not to the java code)
                             if (!changesToJML.isEmpty()){
 
-                                // Gather all the edits to the text (JML annotations) in a MultiTextEdit
-                                // and add those to a change object for the given file
-                                TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());                         
-                                MultiTextEdit allEdits = new MultiTextEdit();
-
-                                for (final ReplaceEdit edit: changesToJML) {
-                                    allEdits.addChild(edit);
-                                }
-
-                                tfChange.setEdit(allEdits);
-
-                                changesToFilesWithoutJavaChanges.add(tfChange);
+                                changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
+                                        unit, changesToJML));
                             }
                         }
                     }
@@ -136,19 +156,7 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
             return null;
         }
 
-        // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
-        if (changesToFilesWithoutJavaChanges.isEmpty())
-            return null;
-        else if (changesToFilesWithoutJavaChanges.size() == 1){
-            return changesToFilesWithoutJavaChanges.get(0);
-        }
-        else {
-         // Create a composite change to gather all the changes (effect in preview: a tree item one level higher without preview is added)
-            CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
-            for (TextFileChange change : changesToFilesWithoutJavaChanges){
-                allChangesToFilesWithoutJavaChanges.add(change);
-            }
-            return allChangesToFilesWithoutJavaChanges;
-        }
+        // After iterating through all needed projects and source files, determine what needs to be returned.    
+        return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
     }
 }

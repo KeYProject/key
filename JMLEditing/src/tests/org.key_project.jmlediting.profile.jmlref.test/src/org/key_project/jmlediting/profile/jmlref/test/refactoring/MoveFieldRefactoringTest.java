@@ -78,4 +78,11 @@ public class MoveFieldRefactoringTest {
         TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                 CLASS_NAME_MOVE_TO, "test4p2\\complex", FIELD_TO_MOVE, CLASS_NAME_MOVE_FROM, "test4p1", javaProject);
     }
+    
+    @Test
+    public void test5MoveIntoClassWithReferences() throws InterruptedException, CoreException {
+        
+        TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
+                CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, "Main", "mainpack", javaProject); 
+    }
 }

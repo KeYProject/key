@@ -23,7 +23,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.jdt.JDTUtil;
@@ -104,7 +104,7 @@ public class TestUtilsRefactoring {
      * @param srcFolder sourceFolder of the class className.
      * @param newName the new name to change the field's name to.
      * @param bot SWTWorkbenchBot to select the outline view from.
-     * @param nameOfShell TODO
+     * @param nameOfShell either "Rename Field" or "Rename Method" expected.
      */
     public static void selectElementInOutlineAndExecuteRenaming(String fieldToChange, String className, String packageName, IFolder srcFolder, String newName, SWTWorkbenchBot bot, String nameOfShell){
         
@@ -232,7 +232,6 @@ public class TestUtilsRefactoring {
         
         SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree(); 
         SWTBotTreeItem fieldToMove = TestUtilsUtil.selectInTree(tree, fromclass, elementDescription);
-        
         fieldToMove.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'V');
         SWTBotShell moveDialog = bot.shell("Move Static Members"); 
         SWTBot moveDialogBot = moveDialog.bot();
@@ -428,7 +427,10 @@ public class TestUtilsRefactoring {
         
         selectAndMoveElementInOutline(srcFolder, classNameMoveFrom, packageName, classNameMoveTo, packageTo, elementDescription, bot);
         
-        compareFileToOracle(srcFolder, oracleFolder, "mainpack", "Main", bot);
+        TestUtilsUtil.openEditor(srcFolder.getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        
+        // Movements of the JDT will result in added tabs in front of the method / field to get the right indentation 
+        assertEquals(getOracle(oracleFolder, "Main"), getContentAfterRefactoring(bot).replace("\t","    "));
     }
     
     /**
@@ -458,6 +460,8 @@ public class TestUtilsRefactoring {
     public static void compareFileToOracle(IFolder srcFolder, IFolder oracleFolder, String packageName, String classNameToCompare, SWTWorkbenchBot bot) throws CoreException{
         
         TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(classNameToCompare + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        
+        // Movements of the JDT will result in added tabs in front of the method / field to get the right indentation .replace("\t","    ")
         assertEquals(getOracle(oracleFolder, classNameToCompare), getContentAfterRefactoring(bot));
     }
     
@@ -471,7 +475,7 @@ public class TestUtilsRefactoring {
      * @throws CoreException thrown if the packages of the project could not be accessed.
      */
     public static void compareAllFilesInProjectToOracle(IJavaProject project, IFolder oracleFolder, SWTWorkbenchBot bot) throws CoreException {
-        for (IPackageFragment fragment : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
+        for (IPackageFragment fragment : RefactoringUtil.getAllPackageFragmentsContainingSources(project)) {
             for (ICompilationUnit unit : fragment.getCompilationUnits()) {
                 assertEquals(getOracle(oracleFolder, unit.getElementName()), unit.getSource());
             }
