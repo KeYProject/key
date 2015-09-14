@@ -388,24 +388,28 @@ public class Node  {
 	return -1;
     }
 
-    public StringBuffer getUniqueTacletId() {
-        StringBuffer id = new StringBuffer();
-        int c = 0;
-        Node n = this;
-
-        while (n != null) {
-            c += n.localIntroducedRules.size();
-                      
-            if (n.parent != null && n.parent.childrenCount() > 1) {
-               id.append(n.siblingNr);
-            }
-            
-            n = n.parent;
-        }    
+    public CharSequence getUniqueTacletId() {
+//// I replaced the old implemenation since at times it came up with the same
+//// identifier in more than one case. M.U. sep 2015.
         
-        id.append("_").append(c);
-        
-        return id;
+//        StringBuffer id = new StringBuffer();
+//        int c = 0;
+//        Node n = this;
+//
+//        while (n != null) {
+//            c += n.localIntroducedRules.size();
+//
+//            if (n.parent != null && n.parent.childrenCount() > 1) {
+//               id.append(n.siblingNr);
+//            }
+//
+//            n = n.parent;
+//        }
+//
+//        id.append("_").append(c);
+//
+//        return id;
+        return "_" + serialNr + "_" + localIntroducedRules.size();
     }
 
     
