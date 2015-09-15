@@ -176,7 +176,7 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
 
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            if (TaskStartedInfo.TaskKind.Macro.equals(info.getKind())) {
+            if (TaskStartedInfo.TaskKind.Macro == info.getKind()) {
                 macroStarted(info);
             }
         }
