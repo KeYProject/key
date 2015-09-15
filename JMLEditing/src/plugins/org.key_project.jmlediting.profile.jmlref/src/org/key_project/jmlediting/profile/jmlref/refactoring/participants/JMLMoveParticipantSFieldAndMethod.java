@@ -27,7 +27,7 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
 /**
  * Class to participate in the move refactoring of static fields and methods.
  * 
- * @author Maksim Melnik
+ * @author Maksim Melnik, Robert Heimbach
  */
 public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
 

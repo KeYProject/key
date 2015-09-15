@@ -16,9 +16,14 @@ import org.key_project.jmlediting.core.dom.IStringNode;
 /**
  * Class to compute the changes which needs to be done to the JML annotations 
  * if a static field or method is moved. In particular, it specifies how the list of nodes is 
- * filtered, i.e. how the JML expression to be replaced is found.
+ * filtered, i.e. how the JML expression to be replaced is found. 
+ * <p> 
+ * Note that {@link #filterStringNodes(List)} in this class is considerably more complex 
+ * than in {@link ClassMoveRefactoringComputer} because static fields and methods
+ * can be accessed in a non fully qualified way, i.e. Classname.field, additionally
+ * to the fully qualified way of package.subpackage.Classname.field.</p>
  * 
- * @author Maksim Melnik
+ * @author Maksim Melnik, Robert Heimbach
  *
  */
 public class FieldAndMethodMoveRefactoringComputer extends
@@ -31,11 +36,13 @@ public class FieldAndMethodMoveRefactoringComputer extends
     
     /**
      * Constructor. Saves the fully qualified name of the classes the field/method should be moved from and moved
-     * to as well as the name of the field/method to be moved.
+     * to as well as the name of the field/method to be moved and the compilation unit for
+     * which the JML changes should be computed for.
      *  
-     * @param oldClassFullQualName fully qualified name of the class the field/method is in.
-     * @param newClassFullQualName fully qualified name of the class the field/method should be moved to.
-     * @param elementName name of the field/method to be moved.
+     * @param oldClassFullQualName Fully qualified name of the class the field/method is in.
+     * @param newClassFullQualName Fully qualified name of the class the field/method should be moved to.
+     * @param elementName Name of the field/method to be moved.
+     * @param unit {@link ICompilationUnit} for which the changes are computed for.
      */
     public FieldAndMethodMoveRefactoringComputer(String oldClassFullQualName,
             String newClassFullQualName, String elementName, ICompilationUnit unit) {
@@ -46,8 +53,10 @@ public class FieldAndMethodMoveRefactoringComputer extends
     }
 
     /**
-     * Filters a list of {@link IASTNode} to exclude JML expression which does not need to be changed.
-     * 
+     * Filters a list of {@link IASTNode} to exclude JML expressions which does 
+     * not need to be changed. First, all fully qualified references are searched
+     * and then the non fully qualified ones.
+     *  
      * @param nodesList a list to be filtered. {@link IStringNode}s are expected.
      * @return list of filtered {@link IStringNode}s.
      */
@@ -55,10 +64,12 @@ public class FieldAndMethodMoveRefactoringComputer extends
         final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
         String nodeString="";
 
+        // Note that StringNodes are single words or even dots. They need to be combined.
+        // Search for fully qualified references
         for (final IASTNode node: nodesList){
             final IStringNode stringNode = (IStringNode) node;
             
-            // combine the string nodes
+            // sequentially, add string nodes as long as it could be a fully qualified reference
             if((oldClassFullQualName+"."+elementName).contains(stringNode.getString()))
                 nodeString=nodeString+stringNode.getString();
             // reset
@@ -69,11 +80,13 @@ public class FieldAndMethodMoveRefactoringComputer extends
             }
         }
         
-        // check for not fully qualified access but access via import statement
+        // Check for non fully qualified access. Only classname.element is needed.
+        // Only needed in certain cases.
         if (checkForNonFullyQualified()) {
-            String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
             
+            String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
             nodeString = "";
+            
             for (final IASTNode node: nodesList) {
                 final IStringNode stringNode = (IStringNode) node;
              
@@ -84,11 +97,14 @@ public class FieldAndMethodMoveRefactoringComputer extends
                 else nodeString="";
                 
                 if (nodeString.equals(oldClassName+"."+elementName)) {
-                    int start = stringNode.getStartOffset();
+                    
+                    // Add the node with the non fully qualified access only if 
+                    // it was not already added before as part of a fully qualified access.
+                    int startNodeToAdd = stringNode.getStartOffset();
                     
                     boolean isContained = false;
-                    for (IStringNode n : filteredList){
-                        if (n.containsOffset(start))
+                    for (IStringNode nodeAlreadyInList : filteredList){
+                        if (nodeAlreadyInList.containsOffset(startNodeToAdd))
                             isContained = true;
                     }
                     if (!isContained)
@@ -184,10 +200,12 @@ public class FieldAndMethodMoveRefactoringComputer extends
 
         final int startOffset = node.getStartOffset();
         
-        // check if it is fully qualified
+        // check which type of access it is. The type determines the length of the replace edit and the new content
+        
         String newClassName = newClassFullQualName.substring(newClassFullQualName.lastIndexOf('.')+1);
         String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
-
+        
+        // Check how the access string starts. Non fully qualified if it starts with class name instead of package name.
         IASTNode innerNode = node.getChildren().get(0).getChildren().get(0);
         if (innerNode instanceof IStringNode && 
                 ((IStringNode) innerNode).getString().equals(oldClassName)) {

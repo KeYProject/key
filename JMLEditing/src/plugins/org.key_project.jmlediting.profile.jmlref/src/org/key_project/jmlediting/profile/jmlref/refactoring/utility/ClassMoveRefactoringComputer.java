@@ -13,7 +13,7 @@ import org.key_project.jmlediting.core.dom.IStringNode;
  * if a class is moved. In particular, it specifies how the list of nodes is 
  * filtered, i.e. how the JML expression to be replaced is found.
  * 
- * @author Maksim Melnik
+ * @author Maksim Melnik, Robert Heimbach
  *
  */
 public class ClassMoveRefactoringComputer extends

@@ -25,7 +25,7 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
 /**
  * Class to participate in the move refactoring of java classes.
  * 
- * @author Maksim Melnik
+ * @author Maksim Melnik, Robert Heimbach
  */
 @SuppressWarnings("restriction")
 public class JMLMoveParticipantClass extends MoveParticipant {
