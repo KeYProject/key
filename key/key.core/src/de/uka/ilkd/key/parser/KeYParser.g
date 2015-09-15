@@ -1501,6 +1501,26 @@ options {
         return result;
     }
 
+    private String unescapeString(String string) {
+      char[] chars = string.toCharArray();
+      StringBuilder sb = new StringBuilder();
+      for(int i = 0; i < chars.length; i++) {
+         if(chars[i] == '\\' && i < chars.length - 1) {
+          switch(chars[i+1]) {
+            case 'n': sb.append("\n"); break;
+            case 'f': sb.append("\r"); break;
+            case 'r': sb.append("\f"); break;
+            case 'b': sb.append("\b"); break;
+            case '\\': sb.append("\\"); i++; break;
+            default: sb.append(chars[i+1]); break;
+          }
+        } else {
+          sb.append(chars[i]);
+        }
+      }
+      return sb.toString();
+    }
+
     /* ---- antlr stuff ---- (Exception handling) */
 
     @Override
@@ -1852,7 +1872,7 @@ prog_var_decls
 string_literal returns [String lit = null]
    :
      id=STRING_LITERAL {
-       lit = id.getText();
+       lit = unescapeString(id.getText());
        lit = lit.substring(1,lit.length()-1);
        stringLiteralLine = id.getLine();
      }
@@ -3094,7 +3114,8 @@ atom returns [Term _atom = null]
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
         {
-            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
+            String s = unescapeString(literal.getText());
+            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(s));
         }   
     ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().addLabel(a, labels);} } RGUILLEMETS)?
     ;
