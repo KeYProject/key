@@ -90,14 +90,16 @@ public class RuleCommand extends AbstractCommand {
             throw new ScriptException("No matching applications.");
         }
 
-        if(p.occ == -1) {
+        if(p.occ < 0) {
             if(matchingApps.size() > 1)  {
                 throw new ScriptException("More than one applicable occurrence");
             }
             return matchingApps.get(0);
         } else {
-            if(p.occ < 0 || p.occ >= matchingApps.size()) {
-                throw new ScriptException("message TODO");
+            if(p.occ >= matchingApps.size()) {
+                throw new ScriptException("Occurence " + p.occ
+                        + " has been specified, but there only "
+                        + matchingApps.size() + " hits.");
             }
             return matchingApps.get(p.occ);
         }

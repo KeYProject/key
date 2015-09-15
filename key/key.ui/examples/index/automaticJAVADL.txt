@@ -281,6 +281,12 @@ group removeDups {
 
 provable ./heap/saddleback_search/Saddleback_search.key
 
+group quicksort {
+   provable ./heap/quicksort/toplevel.key
+   provable ./heap/quicksort/sort.key
+   provable ./heap/quicksort/split.key
+}
+
 /*
  * These are simpler regression tests that show a certain feature works
  * fine.
