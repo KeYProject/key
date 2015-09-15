@@ -125,6 +125,7 @@ class ScriptLineParser {
                 break;
             case '\r': break;
             case '"':
+            case '\'':
                 switch(state) {
                 case INIT: state = State.IN_QUOTE; key = "#" + (impCounter++); break;
                 case AFTER_EQ: state = State.IN_QUOTE; break;
@@ -223,6 +224,11 @@ class ScriptLineParser {
 
     public int getColumn() {
         return col;
+    }
+
+    public void setLocation(int line, int column) {
+        this.line = line;
+        this.col = column;
     }
 
 }

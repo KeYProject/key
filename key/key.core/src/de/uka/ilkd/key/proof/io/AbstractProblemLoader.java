@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,9 +29,13 @@ import java.util.Properties;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.KeYLexer;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -49,6 +55,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -265,7 +272,7 @@ public abstract class AbstractProblemLoader {
                 
                 if (proof != null) {
                  OneStepSimplifier.refreshOSS(proof);
-                 result = replayProof(proof);
+                 result = replayProofOrScript(proof);
                 }
                                       
                 // this message is propagated to the top level in console mode
@@ -487,7 +494,51 @@ public abstract class AbstractProblemLoader {
         return proofList;
     }
 
-    protected ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
+    private ReplayResult replayProofOrScript(Proof proof) throws ProofInputException, ProblemLoaderException {
+        if (envInput instanceof KeYUserProblemFile) {
+            KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+            if(kupf.hasProofScript()) {
+                return replayProofScript(proof);
+            } else {
+                return replayProof(proof);
+            }
+        } else {
+            return new ReplayResult("", Collections.<Throwable>emptyList(), proof.root());
+        }
+    }
+
+    private ReplayResult replayProofScript(Proof proof) {
+
+        assert envInput instanceof KeYUserProblemFile;
+        KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+
+        final boolean isOSSActivated =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+        try {
+            Triple<String, Integer, Integer> script = kupf.readProofScript();
+            ProofScriptEngine pse = new ProofScriptEngine(script.first,
+                    new Location(kupf.getInitialFile().getAbsolutePath(), script.second, script.third));
+
+            // For loading, we generally turn on one step simplification to be
+            // able to load proofs that used it even if the user has currently
+            // turned OSS off.
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+            OneStepSimplifier.refreshOSS(proof);
+
+            // TODO get rid of that ugly cast which is true for all implementations (till now ...)
+            pse.execute((AbstractUserInterfaceControl) control, proof);
+
+            return new ReplayResult("Proof script successfully applied",
+                    Collections.<Throwable>emptyList(), proof.root());
+        } catch(Exception e) {
+            // get better last touched element
+            return new ReplayResult(e.getMessage(), Arrays.<Throwable>asList(e), proof.root());
+        } finally {
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
+        }
+    }
+
+    private ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
@@ -501,7 +552,7 @@ public abstract class AbstractProblemLoader {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
         ReplayResult result;
         try {
-        	if (envInput instanceof KeYUserProblemFile) {
+        	assert envInput instanceof KeYUserProblemFile;
         	    
                 parser = new IntermediatePresentationProofFileParser(proof);
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
@@ -517,7 +568,7 @@ public abstract class AbstractProblemLoader {
                 replayResult = replayer.replay();
                 
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
-        	}
+
         } catch (Exception e) {
         	if (parser == null || parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
         	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
