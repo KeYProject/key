@@ -1,5 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.test.refactoring;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -84,5 +86,85 @@ public class MoveFieldRefactoringTest {
         
         TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
                 CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, "Main", "mainpack", javaProject); 
+    }
+    
+    @Test
+    public void test6MoveIntoAnotherProjectFromSamePackageNoImport() throws InterruptedException, CoreException {
+       // Create projects and set references
+       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc", "data\\template\\refactoringMoveTest\\moveFieldTest\\test6\\projectSrc");
+       
+       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest", "data\\template\\refactoringMoveTest\\moveFieldTest\\test6\\projectDest");
+       
+       TestUtilsRefactoring.setProjectReferences("projectSrc", new String[]{"projectDest"}, bot);
+       
+       // Execute Move and Check
+       TestUtilsRefactoring.selectElementInOutlineAndMove(projectSrc.getFolder(JDTUtil.getSourceFolderName()), "Other", "mainpack", "Dest", "destPackage", "balance : int", bot);
+       
+       TestUtilsUtil.openEditor(projectSrc.getFolder(JDTUtil.getSourceFolderName()).getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+
+       assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
+
+       projectSrc.delete(true, null);
+       projectDest.delete(true, null);
+    }
+    
+    @Test
+    public void test7TwoProjectsMoveFieldNotReferences() throws InterruptedException, CoreException {
+       // Create projects and set references
+       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc", "data\\template\\refactoringMoveTest\\moveFieldTest\\test7\\projectSrc");
+       
+       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest", "data\\template\\refactoringMoveTest\\moveFieldTest\\test7\\projectDest");
+       
+       TestUtilsRefactoring.setProjectReferences("projectSrc", new String[]{"projectDest"}, bot);
+       
+       // Execute Move and Check
+       TestUtilsRefactoring.selectElementInOutlineAndMove(projectSrc.getFolder(JDTUtil.getSourceFolderName()), "Other", "mainpack", "Dest", "destPackage", "balance : int", bot);
+       
+       TestUtilsUtil.openEditor(projectSrc.getFolder(JDTUtil.getSourceFolderName()).getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+
+       assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
+
+       projectSrc.delete(true, null);
+       projectDest.delete(true, null);
+    }
+    
+    @Test
+    public void test8TwoProjectsClassImportedMovedIntoOtherFolder() throws InterruptedException, CoreException {
+       // Create projects and set references
+       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc", "data\\template\\refactoringMoveTest\\moveFieldTest\\test8\\projectSrc");
+       
+       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest", "data\\template\\refactoringMoveTest\\moveFieldTest\\test8\\projectDest");
+       
+       TestUtilsRefactoring.setProjectReferences("projectSrc", new String[]{"projectDest"}, bot);
+       
+       // Execute Move and Check
+       TestUtilsRefactoring.selectElementInOutlineAndMove(projectDest.getFolder(JDTUtil.getSourceFolderName()), "Other", "destPackage", "Dest", "destPackage", "balance : int", bot);
+       
+       TestUtilsUtil.openEditor(projectSrc.getFolder(JDTUtil.getSourceFolderName()).getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+
+       assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
+
+       projectSrc.delete(true, null);
+       projectDest.delete(true, null);
+    }
+    
+    @Test
+    public void test9TwoProjectsImportedViaStarOperator() throws InterruptedException, CoreException {
+       // Create projects and set references
+       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc", "data\\template\\refactoringMoveTest\\moveFieldTest\\test9\\projectSrc");
+       
+       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest", "data\\template\\refactoringMoveTest\\moveFieldTest\\test9\\projectDest");
+       
+       TestUtilsRefactoring.setProjectReferences("projectSrc", new String[]{"projectDest"}, bot);
+       
+       // Execute Move and Check
+       TestUtilsRefactoring.selectElementInOutlineAndMove(projectDest.getFolder(JDTUtil.getSourceFolderName()), "Other", "destPackage", "Dest", "destPackage", "balance : int", bot);
+       
+       TestUtilsUtil.openEditor(projectSrc.getFolder(JDTUtil.getSourceFolderName()).getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+
+       assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
+
+       projectSrc.delete(true, null);
+       projectDest.delete(true, null);
     }
 }

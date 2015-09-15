@@ -14,6 +14,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.Position;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
@@ -226,7 +227,7 @@ public class TestUtilsRefactoring {
      * @param elementDescription how the element to be moved appears in the outline.
      * @param bot workbench bot.
      */
-    public static void selectAndMoveElementInOutline(IFolder srcFolder, String fromclass, String fromPackage, String destclass, String destpackage, String elementDescription, SWTWorkbenchBot bot){
+    public static void selectElementInOutlineAndMove(IFolder srcFolder, String fromclass, String fromPackage, String destclass, String destpackage, String elementDescription, SWTWorkbenchBot bot){
 
         TestUtilsUtil.openEditor(srcFolder.getFolder(fromPackage).getFile(fromclass + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
@@ -243,24 +244,25 @@ public class TestUtilsRefactoring {
     /**
      * Selects a class in the package explorer and moves it to another package.
      * 
-     * @param projectName name of the project the class to be moved is in.
+     * @param projectNameSrc name of the project the class to be moved is in.
      * @param className name of the class to be moved.
      * @param packageFrom package the class to be moved is in.
+     * @param projectTo destination project.
      * @param packageTo destination package.
      * @param bot swtworkbench bot.
      */
-    public static void selectClassAndMove(String projectName, String className, String packageFrom, String packageTo, SWTWorkbenchBot bot){
+    public static void selectClassAndMove(String projectNameSrc, String className, String packageFrom, String projectTo, String packageTo, SWTWorkbenchBot bot){
 
         SWTBotTree tree = TestUtilsUtil.getProjectExplorer(bot).bot().tree(); 
-        SWTBotTreeItem fieldToMove = TestUtilsUtil.selectInTree(tree, projectName,"src",packageFrom,className+".java");
+        SWTBotTreeItem classToMove = TestUtilsUtil.selectInTree(tree, projectNameSrc,"src",packageFrom,className+".java");
 
-        fieldToMove.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'V');
+        classToMove.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'V');
 
         // Change variable name in rename dialog
         SWTBotShell moveDialog = bot.shell("Move");      
         SWTBot moveDialogBot = moveDialog.bot();
         SWTBotTree moveTree = moveDialogBot.tree();
-        TestUtilsUtil.selectInTree(moveTree, projectName,"src",packageTo);
+        TestUtilsUtil.selectInTree(moveTree, projectTo,"src",packageTo);
 
         // start renaming and wait till finished
         moveDialogBot.button(IDialogConstants.OK_LABEL).click();
@@ -425,7 +427,7 @@ public class TestUtilsRefactoring {
         copyFiles(path + "\\src", srcFolder);
         copyFiles(path + "\\oracle", oracleFolder);
         
-        selectAndMoveElementInOutline(srcFolder, classNameMoveFrom, packageName, classNameMoveTo, packageTo, elementDescription, bot);
+        selectElementInOutlineAndMove(srcFolder, classNameMoveFrom, packageName, classNameMoveTo, packageTo, elementDescription, bot);
         
         TestUtilsUtil.openEditor(srcFolder.getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
         
@@ -452,7 +454,9 @@ public class TestUtilsRefactoring {
         copyFiles(path + "\\src", srcFolder);
         copyFiles(path + "\\oracle", oracleFolder);
         
-        selectClassAndMove(javaProject.getElementName(), classNameMoveFrom, packageFrom, packageTo, bot);
+        String projectName = javaProject.getElementName();
+        
+        selectClassAndMove(projectName, classNameMoveFrom, packageFrom, projectName, packageTo, bot);
         
         compareFileToOracle(srcFolder, oracleFolder, "mainpack", "Main", bot);
     }
@@ -491,7 +495,16 @@ public class TestUtilsRefactoring {
      */
     public static void setProjectReferences(String projectToAddTo, String[] referencedProjects, SWTWorkbenchBot bot) {
         // select the referencingProject in the package explorer
-        SWTBotTreeItem projectToAddReferences = TestUtilsUtil.selectInProjectExplorer(bot, "referencingProject");
+        
+//        SWTBotView viewBot = TestUtilsUtil.getProjectExplorer(bot);
+//        SWTBotTree tree = viewBot.bot().tree();
+//        for (SWTBotTreeItem item : tree.getAllItems()){
+//            System.out.println(item.getText());
+//        }
+//        
+//        System.out.println("searching for "+projectToAddTo);
+        
+        SWTBotTreeItem projectToAddReferences = TestUtilsUtil.selectInProjectExplorer(bot, projectToAddTo);
         projectToAddReferences.select().pressShortcut(SWT.ALT, SWT.CR);
         
         // select the build path "Java Build Path" and "Projects" tab

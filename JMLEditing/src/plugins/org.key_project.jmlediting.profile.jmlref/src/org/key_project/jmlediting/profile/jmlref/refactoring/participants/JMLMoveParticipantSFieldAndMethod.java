@@ -99,8 +99,6 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
         // Only non empty change objects will be added
         ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
         
-        FieldAndMethodMoveRefactoringComputer changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName);
-
         // Find out the projects which need to be checked: active project plus all dependencies
         ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
         projectsToCheck.add(fProject);
@@ -112,6 +110,8 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
 
+                        FieldAndMethodMoveRefactoringComputer changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
+                        
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
 
                         // Get scheduled changes to the java code from the rename processor

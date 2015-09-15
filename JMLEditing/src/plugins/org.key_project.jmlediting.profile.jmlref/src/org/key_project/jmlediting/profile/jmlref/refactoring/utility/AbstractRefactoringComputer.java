@@ -38,7 +38,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
  */
 public abstract class AbstractRefactoringComputer implements
         IRefactoringComputer {
-    
+
     /**
      * Computes the text changes which need to be done to JML code by finding
      * all JML comments in the file, filtering those and computing the changes.

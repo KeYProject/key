@@ -1,5 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.test.refactoring;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -76,5 +78,41 @@ public class MoveClassRefactoringTest{
         
         TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test4p2.complex", "test4p1", javaProject);
         
+    }
+    
+    @Test
+    public void test5MoveIntoPackWithReferences() throws InterruptedException, CoreException {
+
+        TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test1p1", "mainpack", javaProject);
+        
+    }
+    
+    @Test
+    public void test6NoChangeBecauseImported() throws InterruptedException, CoreException {
+
+        TestUtilsRefactoring.runMoveClassTest(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
+        
+    }
+    
+    @Test
+    public void test7MoveIntoAnotherProject() throws InterruptedException, CoreException {
+       // Create projects and set references
+       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc", "data\\template\\refactoringMoveTest\\moveClassTest\\test7\\projectSrc");
+       
+       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest", "data\\template\\refactoringMoveTest\\moveClassTest\\test7\\projectDest");
+       
+       //bot.sleep(20000);
+       
+       TestUtilsRefactoring.setProjectReferences("projectSrc", new String[]{"projectDest"}, bot);
+       
+       // Execute Move and Check
+       TestUtilsRefactoring.selectClassAndMove("projectSrc", "Other", "mainpack", "projectDest", "destPackage", bot);
+       
+       TestUtilsUtil.openEditor(projectSrc.getFolder(JDTUtil.getSourceFolderName()).getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+
+       assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
+
+       projectSrc.delete(true, null);
+       projectDest.delete(true, null);
     }
 }

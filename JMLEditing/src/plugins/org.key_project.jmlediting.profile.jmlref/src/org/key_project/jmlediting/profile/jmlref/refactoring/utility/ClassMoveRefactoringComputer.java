@@ -3,6 +3,8 @@ package org.key_project.jmlediting.profile.jmlref.refactoring.utility;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 
@@ -15,9 +17,11 @@ import org.key_project.jmlediting.core.dom.IStringNode;
  *
  */
 public class ClassMoveRefactoringComputer extends
-        AbstractMoveRefactoringComputer {
+        AbstractRefactoringComputer {
 
     private String fOldFullQualName;
+    private String fOldPackName;
+    private String fNewPackName;
     
     /**
      * Constructor, saves the source and the destination the class to be moved is in and the fully
@@ -28,7 +32,8 @@ public class ClassMoveRefactoringComputer extends
      * @param fOldFullQualName fully qualified name / path of the class to be moved.
      */
     public ClassMoveRefactoringComputer(String fOldPackName, String fNewPackName, String fOldFullQualName) {
-        super(fOldPackName, fNewPackName);
+        this.fOldPackName = fOldPackName;
+        this.fNewPackName = fNewPackName;
         this.fOldFullQualName = fOldFullQualName;
     }
     
@@ -60,5 +65,21 @@ public class ClassMoveRefactoringComputer extends
             }
         }
         return filteredList;
+    }
+
+    /**
+     * Creates the text change and adds it to changesToMake.
+     * 
+     * @param changesToMake list to add the {@link ReplaceEdit}s to.
+     * @param node {@link IASTNode} to compute the change for.
+     */
+    protected final void computeReplaceEdit(ICompilationUnit unit, ArrayList<ReplaceEdit> changesToMake,
+            IASTNode node) {
+
+        final int startOffset = node.getStartOffset();
+        
+        int length = fOldPackName.length();
+        
+        changesToMake.add(new ReplaceEdit(startOffset, length, fNewPackName));      
     }
 }

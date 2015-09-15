@@ -15,6 +15,7 @@ import org.key_project.jmlediting.core.dom.IStringNode;
  * @author Maksim Melnik
  *
  */
+@Deprecated
 public abstract class AbstractMoveRefactoringComputer extends AbstractRefactoringComputer {
 
     private String oldClassFullQualName;
@@ -29,32 +30,6 @@ public abstract class AbstractMoveRefactoringComputer extends AbstractRefactorin
     AbstractMoveRefactoringComputer(String oldClassFullQualName, String newClassFullQualName){
         this.oldClassFullQualName = oldClassFullQualName;
         this.newClassFullQualName = newClassFullQualName;
-    }
-    
-    /**
-     * Creates the text change and adds it to changesToMake.
-     * 
-     * @param changesToMake list to add the {@link ReplaceEdit}s to.
-     * @param node {@link IASTNode} to compute the change for.
-     */
-    protected final void computeReplaceEdit(ICompilationUnit unit, ArrayList<ReplaceEdit> changesToMake,
-            IASTNode node) {
-
-        final int startOffset = node.getStartOffset();
-        
-        // check if it is fully qualified
-        String newClassName = newClassFullQualName.substring(newClassFullQualName.lastIndexOf('.')+1);
-        String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
-
-        IASTNode innerNode = node.getChildren().get(0).getChildren().get(0);
-        if (innerNode instanceof IStringNode && 
-                ((IStringNode) innerNode).getString().equals(oldClassName)) {
-            changesToMake.add(new ReplaceEdit(startOffset, oldClassName.length(), newClassName));
-        }
-        else {
-            final int length = oldClassFullQualName.length();
-            changesToMake.add(new ReplaceEdit(startOffset, length, newClassFullQualName));
-        }
     }
     
     /**
