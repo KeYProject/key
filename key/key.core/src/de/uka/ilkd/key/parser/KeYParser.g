@@ -685,7 +685,7 @@ options {
         Term result = problem();
         // The parser may be ok if a totally unexpected token has turned up
         // We better check that either the file has ended or a "\proof" follows.
-        if(input.LA(1) != EOF && input.LA(1) != PROOF) {
+        if(input.LA(1) != EOF && input.LA(1) != PROOF && input.LA(1) != PROOFSCRIPT) {
             throw new NoViableAltException("after problem", -1, -1, input);
         }
         return result;
@@ -4617,7 +4617,19 @@ preferences returns [String _preferences = null]
 		(s = string_literal)?
 		RBRACE )?
 	;
-	
+
+proofScript returns [ Triple<String, Integer, Integer> locatedString = null ]
+:
+    PROOFSCRIPT ps = STRING_LITERAL
+      { int line = ps.getLine();
+        // +1 for antlr starting at 0
+        // +1 for removing the leading "
+        int col = ps.getCharPositionInLine() + 2;
+        String content = ps.getText().substring(1, ps.getText().length()-1);
+        locatedString = new Triple<String, Integer, Integer>(content, line, col);
+      }
+    ;
+
 proof [IProofFileParser prl] :
         ( PROOF proofBody[prl] )?
     ;

@@ -326,6 +326,7 @@ lexer grammar KeYLexer;
         CHOOSECONTRACT : '\\chooseContract';
         PROOFOBLIGATION : '\\proofObligation';
         PROOF : '\\proof';
+        PROOFSCRIPT : '\\proofScript';
         CONTRACTS : '\\contracts';
         INVARIANTS : '\\invariants';
 
