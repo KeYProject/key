@@ -4639,6 +4639,7 @@ preferences returns [String _preferences = null]
 		RBRACE )?
 	;
 
+// delivers: <Script, start line no, start column no>
 proofScript returns [ Triple<String, Integer, Integer> locatedString = null ]
 :
     PROOFSCRIPT ps = STRING_LITERAL
