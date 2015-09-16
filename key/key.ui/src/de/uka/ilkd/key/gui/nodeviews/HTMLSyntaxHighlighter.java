@@ -175,40 +175,48 @@ public class HTMLSyntaxHighlighter {
             return toHTML(plainTextString);
         }
         
-        // NOTE: Highlighting program variables is the most expensive operation.
-        // There are at least to options to do this:
-        // 1. Get all program variables that are registered for a node.
-        //    Pro: Getting them is fast.
-        //    Con: There may be a lot of them that are not actually contained
-        //         in the node's sequent.
-        // 2. Find all really existing program variables using a visitor.
-        //    Pro: No overhead for nonexisting variables.
-        //    Con: May take quite long to get these variables for big sequents.
-        // None of these option works sufficiently well for large sequents.
-        // We therefore turn location variable highlighting off in case that
-        // there are a lot of registered globals AND the number of formulae
-        // in the sequent is big.
-        
-        Iterable<? extends ProgramVariable> programVariables;
-        
-        if (displayedNode.getGlobalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
-            programVariables = displayedNode.getGlobalProgVars();
+        try {
+            // NOTE: Highlighting program variables is the most expensive operation.
+            // There are at least to options to do this:
+            // 1. Get all program variables that are registered for a node.
+            //    Pro: Getting them is fast.
+            //    Con: There may be a lot of them that are not actually contained
+            //         in the node's sequent.
+            // 2. Find all really existing program variables using a visitor.
+            //    Pro: No overhead for nonexisting variables.
+            //    Con: May take quite long to get these variables for big sequents.
+            // None of these option works sufficiently well for large sequents.
+            // We therefore turn location variable highlighting off in case that
+            // there are a lot of registered globals AND the number of formulae
+            // in the sequent is big.
+            
+            Iterable<? extends ProgramVariable> programVariables;
+            
+            if (displayedNode.getGlobalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
+                programVariables = displayedNode.getGlobalProgVars();
+            }
+            else if (displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
+                programVariables = JoinRuleUtils
+                        .getLocationVariablesHashSet(displayedNode.sequent(),
+                                displayedNode.proof().getServices());
+            }
+            else {
+                programVariables = new HashSet<ProgramVariable>();
+            }
+    
+            // We use div-s instead of br-s because this preserves the line
+            // breaks in JEditorPane's plain text.
+            return concat("<div>",
+                    addSyntaxHighlighting(toHTML(plainTextString),
+                            programVariables).replaceAll("<br>", "</div><div>"),
+                    "</div>");
+        } catch (Throwable t) {
+            // Syntax highlighting should never break the system;
+            // so we catch all throwables. However, a bug should
+            // be filed with the stack trace printed here.
+            t.printStackTrace();
+            return toHTML(plainTextString);
         }
-        else if (displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
-            programVariables = JoinRuleUtils
-                    .getLocationVariablesHashSet(displayedNode.sequent(),
-                            displayedNode.proof().getServices());
-        }
-        else {
-            programVariables = new HashSet<ProgramVariable>();
-        }
-
-        // We use div-s instead of br-s because this preserves the line
-        // breaks in JEditorPane's plain text.
-        return concat("<div>",
-                addSyntaxHighlighting(toHTML(plainTextString),
-                        programVariables).replaceAll("<br>", "</div><div>"),
-                "</div>");
 
     }
 

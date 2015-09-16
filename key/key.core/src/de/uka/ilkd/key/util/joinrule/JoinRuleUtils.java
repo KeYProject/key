@@ -1333,7 +1333,9 @@ public class JoinRuleUtils {
             Term programCounterTerm, Services services) {
         final JavaProgramElement program = programCounterTerm.javaBlock().program();
         if (program instanceof StatementBlock &&
-                ((StatementBlock) program).getInnerMostMethodFrame().getBody().isEmpty()) {
+                (((StatementBlock) program).isEmpty() ||
+                (((StatementBlock) program).getInnerMostMethodFrame() != null &&
+                 ((StatementBlock) program).getInnerMostMethodFrame().getBody().isEmpty()))) {
             return new HashSet<>();
         }
         
