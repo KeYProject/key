@@ -1511,6 +1511,7 @@ options {
             case 'f': sb.append("\r"); break;
             case 'r': sb.append("\f"); break;
             case 'b': sb.append("\b"); break;
+            case ':': sb.append("\\:"); i++; break; // this is so in KeY ...
             case '\\': sb.append("\\"); i++; break;
             default: sb.append(chars[i+1]); break;
           }
