@@ -11,7 +11,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.core.PackageFragment;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
@@ -27,7 +26,6 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
  * 
  * @author Maksim Melnik, Robert Heimbach
  */
-@SuppressWarnings("restriction")
 public class JMLMoveParticipantClass extends MoveParticipant {
     private IJavaElement fToMove;        // file
 
@@ -56,7 +54,7 @@ public class JMLMoveParticipantClass extends MoveParticipant {
             
             // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
             fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
-            fNewPackName = ((PackageFragment) getArguments().getDestination()).getElementName();  
+            fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();  
 
             return true;
         }else{
