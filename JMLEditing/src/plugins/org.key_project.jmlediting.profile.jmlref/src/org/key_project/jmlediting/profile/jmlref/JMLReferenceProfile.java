@@ -10,6 +10,7 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
+import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
@@ -55,6 +56,7 @@ import org.key_project.jmlediting.profile.jmlref.quantifier.ProductQuantifierKey
 import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierPrimary;
 import org.key_project.jmlediting.profile.jmlref.quantifier.SumQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AxiomKeyword;
@@ -104,6 +106,11 @@ IJMLExpressionProfile {
     */
    private final Set<IJMLPrimary> supportedPrimaries = new HashSet<IJMLPrimary>();
 
+   /**
+    * The resolver of this profile.
+    */
+   private final Resolver resolver = new Resolver();
+   
    /**
     * Creates a new profile instance with the given supported keyword.
     *
@@ -213,4 +220,13 @@ IJMLExpressionProfile {
    public Set<ParseFunction> getPrimarySuffixExtensions() {
       return Collections.emptySet();
    }
+    
+   
+   
+   
+   // TODO: added a private final resolver variable for the class, can be wrong
+    @Override
+    public IResolver getResolver() {
+        return this.resolver;
+    }
 }

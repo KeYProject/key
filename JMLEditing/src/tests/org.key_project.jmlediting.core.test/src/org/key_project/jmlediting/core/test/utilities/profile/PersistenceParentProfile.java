@@ -14,6 +14,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.EmptyKeywordContent;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.resolver.IResolver;
 
 public class PersistenceParentProfile extends AbstractJMLProfile {
 
@@ -54,7 +55,17 @@ public class PersistenceParentProfile extends AbstractJMLProfile {
    @Override
    public IEditableDerivedProfile derive(final String id, final String name) {
       return new DerivedProfile<IJMLProfile>(id, name, this) {
+
+        @Override
+        public IResolver getResolver() {
+            return null;
+        }
       };
    }
+
+@Override
+public IResolver getResolver() {
+    return null;
+}
 
 }

@@ -17,6 +17,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
+import org.key_project.jmlediting.core.resolver.IResolver;
 
 public class BasicDerivedProfileTest {
 
@@ -74,8 +75,20 @@ public class BasicDerivedProfileTest {
       @Override
       public IEditableDerivedProfile derive(final String id, final String name) {
          return new DerivedProfile<IJMLProfile>(id, name, this) {
+
+            @Override
+            public IResolver getResolver() {
+                // TODO Auto-generated method stub
+                return null;
+            }
          };
       }
+
+    @Override
+    public IResolver getResolver() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
    }
 
@@ -229,6 +242,12 @@ public class BasicDerivedProfileTest {
    @Test(expected = IllegalArgumentException.class)
    public void testInitializeWithoutParent() {
       new DerivedProfile<IJMLProfile>("a", "b", null) {
+
+        @Override
+        public IResolver getResolver() {
+            // TODO Auto-generated method stub
+            return null;
+        }
       };
       ;
    }

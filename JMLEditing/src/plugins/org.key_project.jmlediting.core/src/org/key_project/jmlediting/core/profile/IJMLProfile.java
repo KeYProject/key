@@ -6,6 +6,7 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.resolver.IResolver;
 
 /**
  * Defines a profile for a JML dialect. A profile consists of a unique id, a
@@ -78,4 +79,13 @@ public interface IJMLProfile {
     */
    Set<IKeywordSort> getAvailableKeywordSorts();
 
+   
+   
+   
+   /**
+    * Returns the resolver for this profile
+    * 
+    * @return IResolver
+    */
+   IResolver getResolver();
 }
