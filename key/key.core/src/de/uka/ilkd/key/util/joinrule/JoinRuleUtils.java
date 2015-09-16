@@ -29,6 +29,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -1313,8 +1314,14 @@ public class JoinRuleUtils {
      */
     private static HashSet<LocationVariable> getProgramLocationsHashSet(
             Term programCounterTerm, Services services) {
+        final JavaProgramElement program = programCounterTerm.javaBlock().program();
+        if (program instanceof StatementBlock &&
+                ((StatementBlock) program).getInnerMostMethodFrame().getBody().isEmpty()) {
+            return new HashSet<>();
+        }
+        
         CollectLocationVariablesVisitorHashSet visitor = new CollectLocationVariablesVisitorHashSet(
-                programCounterTerm.javaBlock().program(), true, services);
+                program, true, services);
 
         // Collect program variables in Java block
         visitor.start();
