@@ -63,18 +63,11 @@ public class JMLProfileManagementTest {
       @Override
       public IEditableDerivedProfile derive(final String id, final String name) {
          return new DerivedProfile<IJMLProfile>(id, name, this) {
-
-            @Override
-            public IResolver getResolver() {
-                // TODO Auto-generated method stub
-                return null;
-            }
          };
       }
 
     @Override
     public IResolver getResolver() {
-        // TODO Auto-generated method stub
         return null;
     }
 

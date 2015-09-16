@@ -3,13 +3,8 @@ package org.key_project.jmlediting.core.dom.internal;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.resolver.ResolveResult;
-import org.key_project.jmlediting.core.resolver.ResolverException;
 
 /**
  * An ASTNode implements a default AST node.
@@ -27,11 +22,6 @@ public class ASTNode extends AbstractASTNode {
     * The list of all children.
     */
    private final List<IASTNode> children;
-
-   /**
-    * The profile of the node
-    */
-   private final IJMLProfile profile;
    
    /**
     * Creates a new {@link ASTNode}. The start offset needs to be less than or
@@ -47,13 +37,12 @@ public class ASTNode extends AbstractASTNode {
     *           the list of children of the node, may be null
     */
    public ASTNode(final int startOffset, final int endOffset, final int type,
-         final List<IASTNode> children, IJMLProfile profile) {
+         final List<IASTNode> children) {
       super(startOffset, endOffset);
       if (NodeTypes.getTypeName(type) == null) {
          throw new IllegalArgumentException(
                "Creates node with unregistered type " + type);
       }
-      this.profile=profile;
       this.type = type;
       this.children = children;
       // Validate children
@@ -87,24 +76,4 @@ public class ASTNode extends AbstractASTNode {
          return Collections.unmodifiableList(children);
       }
    }
-
-    @Override
-    public IJMLProfile getProfile() {
-        // TODO DECLARED PROFILE FOR THE CLASS AND ADDED ENTRY TO CONSTRUCTOR
-        return this.profile;
-    }
-    
-    @Override
-    public ResolveResult resolve(ICompilationUnit cu) {
-        // TODO CALL RESOLVE FROM THE PROFILE, HOW DO I GET COMPILATION UNIT??? GAVE IT AS A PARAMETER, CHECK PLX
-        try {
-            return getProfile().getResolver().resolve(cu, this);
-        }
-        catch (ResolverException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 }

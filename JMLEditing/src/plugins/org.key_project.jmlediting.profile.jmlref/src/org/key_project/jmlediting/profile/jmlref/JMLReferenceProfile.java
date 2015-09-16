@@ -109,7 +109,7 @@ IJMLExpressionProfile {
    /**
     * The resolver of this profile.
     */
-   private final Resolver resolver = new Resolver();
+   private IResolver resolver = new Resolver();
    
    /**
     * Creates a new profile instance with the given supported keyword.
@@ -220,13 +220,9 @@ IJMLExpressionProfile {
    public Set<ParseFunction> getPrimarySuffixExtensions() {
       return Collections.emptySet();
    }
-    
    
-   
-   
-   // TODO: added a private final resolver variable for the class, can be wrong
-    @Override
-    public IResolver getResolver() {
-        return this.resolver;
-    }
+   @Override
+   public IResolver getResolver() {
+       return this.resolver;
+   }
 }

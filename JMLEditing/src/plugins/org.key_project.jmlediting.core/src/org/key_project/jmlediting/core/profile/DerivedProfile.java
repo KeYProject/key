@@ -9,6 +9,7 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.resolver.IResolver;
 
 /**
  * An implementation of {@link IEditableDerivedProfile}.
@@ -51,6 +52,11 @@ public abstract class DerivedProfile<P extends IJMLProfile> implements
     * all if the set is not requested in the meantime.
     */
    private boolean keywordSetIsDirty;
+   
+   /**
+    * Resolver used by the profile. Can be set using {@link #setResolver(IResolver)}.
+    */
+   private IResolver resolver;
 
    /**
     * Creates a new derived profile with the given name and identifier. The
@@ -216,5 +222,14 @@ public abstract class DerivedProfile<P extends IJMLProfile> implements
    public Set<IKeywordSort> getAvailableKeywordSorts() {
       return this.parentProfile.getAvailableKeywordSorts();
    }
-
+   
+   @Override
+   public IResolver getResolver() {
+       return this.resolver;
+   }
+   
+   @Override
+   public void setResolver(IResolver newResolver){
+       this.resolver = newResolver;
+   }
 }

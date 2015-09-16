@@ -110,22 +110,13 @@ public interface IASTNode {
     * @return the AST in a pretty String representation.
     */
    String prettyPrintAST();
-   
-   
-   
-   
-   
-   /**
-    * The JML Profile for the specific node
-    * 
-    * @return The profile of the node.
-    */
-   IJMLProfile getProfile();
 
    /**
     * The method for the node to resolve itself.
+    * @param the {@link IJMLProfile} defining the JML syntax.
+    * @param the {@link ICompilationUnit} of the given node is expected to provide necessary context.
     * 
-    * @return Resolve Result for this specific node
+    * @return the {@link ResolveResult}.
     */
-   ResolveResult resolve(ICompilationUnit cu);
+   ResolveResult resolve(IJMLProfile profile, ICompilationUnit cu);
 }

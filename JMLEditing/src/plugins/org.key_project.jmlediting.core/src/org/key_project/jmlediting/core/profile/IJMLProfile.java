@@ -78,14 +78,12 @@ public interface IJMLProfile {
     * @return an immutable non null set
     */
    Set<IKeywordSort> getAvailableKeywordSorts();
-
-   
-   
    
    /**
-    * Returns the resolver for this profile
+    * Returns the resolver for this profile.
     * 
-    * @return IResolver
+    * @return a resolver implementing {@link IResolver} to resolve nodes or
+    *       null if no resolver was set by the profile.
     */
    IResolver getResolver();
 }

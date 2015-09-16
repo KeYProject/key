@@ -21,7 +21,6 @@ import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.resolver.IResolver;
 
 public class ParserBuilderTest {
 
@@ -480,20 +479,8 @@ public class ParserBuilderTest {
          public IEditableDerivedProfile derive(final String id,
                final String name) {
             return new DerivedProfile<IJMLProfile>(id, name, this) {
-
-                @Override
-                public IResolver getResolver() {
-                    // TODO Auto-generated method stub
-                    return null;
-                }
             };
          }
-
-        @Override
-        public IResolver getResolver() {
-            // TODO Auto-generated method stub
-            return null;
-        }
       });
    }
 

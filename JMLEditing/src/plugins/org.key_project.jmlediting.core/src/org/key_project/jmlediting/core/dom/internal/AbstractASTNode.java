@@ -2,10 +2,14 @@ package org.key_project.jmlediting.core.dom.internal;
 
 import java.util.Iterator;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
 import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.resolver.ResolveResult;
+import org.key_project.jmlediting.core.resolver.ResolverException;
 
 /**
  * Abstract implementation of the {@link IASTNode} which implements common
@@ -123,5 +127,17 @@ public abstract class AbstractASTNode implements IASTNode {
       str += ")";
       return str;
    }
+   
+
+   @Override
+   public ResolveResult resolve(IJMLProfile profile, ICompilationUnit cu) {
+       try {
+           return profile.getResolver().resolve(cu, this);
+       }
+       catch (ResolverException e) {
+           return null;
+       }
+   }
+
 
 }
