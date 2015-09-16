@@ -67,8 +67,10 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                 TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_SUCCEDENT.equals(tacletHint.getTacletOperation())) {
-               newLabelIdRequired = true;
-               originalLabelIds.add(mostImportantLabel.getId());
+               if (originalLabel == null) { // Do not give a new ID if the term has already one (see rule: impRight)
+                  newLabelIdRequired = true;
+                  originalLabelIds.add(mostImportantLabel.getId());
+               }
             }
             if (tacletHint.getSequentFormula() != null) {
                if (!TruthValueEvaluationUtil.isPredicate(tacletHint.getSequentFormula())) {

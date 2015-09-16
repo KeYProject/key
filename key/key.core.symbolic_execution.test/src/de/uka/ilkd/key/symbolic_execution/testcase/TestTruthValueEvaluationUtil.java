@@ -29,6 +29,34 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    
    /**
+    * Tests example: /set/truthValueAnd
+    */
+   public void testAnd3_replaceKnown() throws Exception {
+      // Create expected results
+      ExpectedBranchResult goal13 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("8.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("10.0", TruthValue.TRUE));
+      ExpectedBranchResult goal15 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
+                                                             new ExpectedTruthValueResult("2.0", TruthValue.FALSE),
+                                                             new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("8.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("10.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result1 = new ExpectedTruthValueEvaluationResult(goal13, goal15);
+      // Perform test
+      doTruthValueEvaluationTest("/set/truthValueAnd/test/And3_replaceKnown.proof", 
+                                 "/set/truthValueAnd/oracle/And3_replaceKnown.xml",
+                                 false,
+                                 false,
+                                 result1);
+   }
+   
+   /**
     * Tests example: /set/truthValueUnderstandingProofsMyInteger
     */
    public void testUnderstandingProofs_MyInteger() throws Exception {
@@ -73,8 +101,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                                              new ExpectedTruthValueResult("4.0", TruthValue.TRUE),
                                                              new ExpectedTruthValueResult("5.0", TruthValue.FALSE),
                                                              new ExpectedTruthValueResult("6.0", TruthValue.TRUE),
-                                                             new ExpectedTruthValueResult("7.0", TruthValue.TRUE),
-                                                             new ExpectedTruthValueResult("8.0", TruthValue.TRUE),
+                                                             new ExpectedTruthValueResult("7.0", TruthValue.FALSE),
+                                                             new ExpectedTruthValueResult("8.0", TruthValue.FALSE),
                                                              new ExpectedTruthValueResult("10.0", TruthValue.TRUE),
                                                              new ExpectedTruthValueResult("11.0", TruthValue.TRUE),
                                                              new ExpectedTruthValueResult("12.0", TruthValue.TRUE),
