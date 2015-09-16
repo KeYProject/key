@@ -1506,14 +1506,14 @@ options {
       StringBuilder sb = new StringBuilder();
       for(int i = 0; i < chars.length; i++) {
          if(chars[i] == '\\' && i < chars.length - 1) {
-          switch(chars[i+1]) {
+          switch(chars[++i]) {
             case 'n': sb.append("\n"); break;
-            case 'f': sb.append("\r"); break;
-            case 'r': sb.append("\f"); break;
+            case 'f': sb.append("\f"); break;
+            case 'r': sb.append("\r"); break;
+            case 't': sb.append("\t"); break;
             case 'b': sb.append("\b"); break;
-            case ':': sb.append("\\:"); i++; break; // this is so in KeY ...
-            case '\\': sb.append("\\"); i++; break;
-            default: sb.append(chars[i+1]); break;
+            case ':': sb.append("\\:"); break; // this is so in KeY ...
+            default: sb.append(chars[i]); break; // this more relaxed than before, \a becomes a ...
           }
         } else {
           sb.append(chars[i]);
