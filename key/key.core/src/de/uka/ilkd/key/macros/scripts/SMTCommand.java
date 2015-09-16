@@ -45,7 +45,7 @@ public class SMTCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException, InterruptedException {
+            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
 
         String value = args.get(SOLVER_KEY);
@@ -55,7 +55,7 @@ public class SMTCommand extends AbstractCommand {
 
         SolverTypeCollection su = computeSolvers(value);
 
-        Goal goal = getFirstOpenGoal(proof);
+        Goal goal = getFirstOpenGoal(proof, state);
 
         SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());

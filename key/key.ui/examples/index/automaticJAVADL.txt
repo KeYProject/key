@@ -63,10 +63,17 @@ forkTimeout = 1000
 # forkMemory = 1000m
 
 /*
- * Originally runAllProofs does not print a lot of information.
+ * By default runAllProofs does not print a lot of information.
  * Set this to true to get more output.
  */
 # verboseOutput = true
+
+/*
+ * By default, runAllProofs runs all groups in this file.
+ * By naming a comma separated list of groups here, the
+ * test can be restricted to these groups (for debugging).
+ */
+# runOnlyOn = group1,group2
 
 keySettings = "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009
@@ -280,6 +287,17 @@ group removeDups {
 }
 
 provable ./heap/saddleback_search/Saddleback_search.key
+
+group quicksort {
+   localSettings="
+     [Choice]DefaultChoices=moreSeqRules-moreSeqRules:on
+   "
+   directory = ./heap/quicksort
+
+   provable toplevel.key
+   provable sort.key
+   provable split.key
+}
 
 /*
  * These are simpler regression tests that show a certain feature works

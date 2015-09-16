@@ -15,8 +15,8 @@ public class LeaveCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException, InterruptedException {
-        Goal goal = getFirstOpenGoal(proof);
+            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
+        Goal goal = getFirstOpenGoal(proof, state);
         System.err.println("Deactivating " + goal.node().serialNr());
         goal.setEnabled(false);
     }

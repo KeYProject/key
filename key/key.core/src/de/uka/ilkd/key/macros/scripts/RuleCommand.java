@@ -53,15 +53,15 @@ public class RuleCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException, InterruptedException {
+            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
         Parameters p = parseArgs(proof, args);
-        TacletApp theApp = findTacletApp(proof, p);
+        TacletApp theApp = findTacletApp(proof, p, state);
         assert theApp != null;
 
 
         ImmutableList<TacletApp> assumesCandidates =
-                theApp.findIfFormulaInstantiations(getFirstOpenGoal(proof).sequent(), proof.getServices());
+                theApp.findIfFormulaInstantiations(getFirstOpenGoal(proof, state).sequent(), proof.getServices());
 
         if(assumesCandidates.size() != 1) {
             throw new ScriptException("Not a unique \\assumes instantiation");
@@ -76,44 +76,46 @@ public class RuleCommand extends AbstractCommand {
             throw new ScriptException("Cannot instantiate this rule");
         }
 
-        Goal g = getFirstOpenGoal(proof);
+        Goal g = getFirstOpenGoal(proof, state);
         g.apply(theApp);
     }
 
-    private TacletApp findTacletApp(Proof proof, Parameters p)
+    private TacletApp findTacletApp(Proof proof, Parameters p, Map<String, Object> state)
             throws ScriptException {
 
-        ImmutableList<TacletApp> allApps = findAllTacletApps(proof, p);
+        ImmutableList<TacletApp> allApps = findAllTacletApps(proof, p, state);
         List<TacletApp> matchingApps = filterList(p, allApps);
 
         if(matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
         }
 
-        if(p.occ == -1) {
+        if(p.occ < 0) {
             if(matchingApps.size() > 1)  {
                 throw new ScriptException("More than one applicable occurrence");
             }
             return matchingApps.get(0);
         } else {
-            if(p.occ < 0 || p.occ >= matchingApps.size()) {
-                throw new ScriptException("message TODO");
+            if(p.occ >= matchingApps.size()) {
+                throw new ScriptException("Occurence " + p.occ
+                        + " has been specified, but there only "
+                        + matchingApps.size() + " hits.");
             }
             return matchingApps.get(p.occ);
         }
     }
 
-    private ImmutableList<TacletApp> findAllTacletApps(Proof proof, Parameters p)
+    private ImmutableList<TacletApp> findAllTacletApps(Proof proof, Parameters p, Map<String, Object> state)
             throws ScriptException {
         Services services = proof.getServices();
         TacletFilter filter = new TacletNameFilter(p.rulename);
-        Goal g = getFirstOpenGoal(proof);
+        Goal g = getFirstOpenGoal(proof, state);
         RuleAppIndex index = g.ruleAppIndex ();
         index.autoModeStopped ();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if(p.formula != null && !sf.formula().equals(p.formula)) {
+            if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(
@@ -123,7 +125,7 @@ public class RuleCommand extends AbstractCommand {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if(p.formula != null && !sf.formula().equals(p.formula)) {
+            if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(

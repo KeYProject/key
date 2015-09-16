@@ -49,7 +49,7 @@ public class InstantiateCommand extends AbstractCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args) throws ScriptException, InterruptedException {
+            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
         Parameters params = parseParameters(proof, args);
 
@@ -57,7 +57,7 @@ public class InstantiateCommand extends AbstractCommand {
             throw new ScriptException("One of 'var' or 'formula' must be specified");
         }
 
-        Goal goal = getFirstOpenGoal(proof);
+        Goal goal = getFirstOpenGoal(proof, state);
 
         if(params.var != null) {
             computeFormula(params, goal);
@@ -65,7 +65,7 @@ public class InstantiateCommand extends AbstractCommand {
 
         assert params.formula != null;
 
-        TacletApp theApp = findTacletApp(proof, params);
+        TacletApp theApp = findTacletApp(proof, params, state);
         if(theApp == null) {
             throw new ScriptException("No taclet applicatin found");
         }
@@ -76,14 +76,14 @@ public class InstantiateCommand extends AbstractCommand {
 
         theApp = theApp.tryToInstantiate(proof.getServices());
 
-        Goal g = getFirstOpenGoal(proof);
+        Goal g = getFirstOpenGoal(proof, state);
         g.apply(theApp);
     }
 
-    private TacletApp findTacletApp(Proof proof, Parameters p)
+    private TacletApp findTacletApp(Proof proof, Parameters p, Map<String, Object> state)
             throws ScriptException {
 
-        ImmutableList<TacletApp> allApps = findAllTacletApps(proof, p);
+        ImmutableList<TacletApp> allApps = findAllTacletApps(proof, p, state);
         TacletApp matchingApp = filterList(p, allApps);
 
         if(matchingApp == null) {
@@ -93,7 +93,7 @@ public class InstantiateCommand extends AbstractCommand {
         return matchingApp;
     }
 
-    private ImmutableList<TacletApp> findAllTacletApps(Proof proof, Parameters p)
+    private ImmutableList<TacletApp> findAllTacletApps(Proof proof, Parameters p, Map<String, Object> state)
             throws ScriptException {
 
         String rulename;
@@ -105,7 +105,7 @@ public class InstantiateCommand extends AbstractCommand {
 
         Services services = proof.getServices();
         TacletFilter filter = new TacletNameFilter(rulename);
-        Goal g = getFirstOpenGoal(proof);
+        Goal g = getFirstOpenGoal(proof, state);
         RuleAppIndex index = g.ruleAppIndex ();
         index.autoModeStopped ();
 

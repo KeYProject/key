@@ -154,8 +154,6 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
            info.getSource() instanceof ProofMacro) {
            if (!isAtLeastOneMacroRunning()) {
                printResults(openGoals, info, result2);
-           } else if (!macroChosen()) {
-               finish(proof);
            }
        } else if (info.getSource() instanceof ProblemLoader) {
            if (verbosity > Verbosity.SILENT) System.out.println("[ DONE ... loading ]");

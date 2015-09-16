@@ -35,7 +35,9 @@ import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.util.Triple;
 
 
 /** 
@@ -203,6 +205,27 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
     
     
+    public boolean hasProofScript() throws ProofInputException {
+        if(lastParser == null) {
+            readProblem();
+        }
+        return lastParser.isAtProofScript();
+    }
+
+    public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
+        if (lastParser == null) {
+            readProblem();
+        }
+        assert hasProofScript() : "Call this only if there is a proofScript!";
+        try {
+            return lastParser.proofScript();
+        } catch (RecognitionException ex) {
+            // problemParser cannot be null
+            String message = lastParser.getErrorMessage(ex);
+            throw new ProofInputException(message, ex);
+        }
+    }
+
     /** 
      * Reads a saved proof of a .key file.
      */

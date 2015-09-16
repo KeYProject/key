@@ -38,6 +38,7 @@ heap/vstte10_05_Queue/README.txt
 
 heap/fm12_01_LRS/README.txt
 heap/permutedSum/README.txt
+heap/quicksort/README.txt
 
 heap/verifyThis15_1_RelaxedPrefix/README.txt
 heap/verifyThis15_2_ParallelGcd/README.txt

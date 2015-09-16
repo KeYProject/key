@@ -24,6 +24,8 @@ import static org.junit.Assert.*;
  */
 public class TestFile implements Serializable {
 
+   private static final long serialVersionUID = 7779439078807127045L;
+
    private final TestProperty testProperty;
    private final String path;
    private final ProofCollectionSettings settings;
@@ -87,7 +89,7 @@ public class TestFile implements Serializable {
     *            not exist.
     */
    public File getKeYFile() throws IOException {
-      File baseDirectory = settings.getBaseDirectory();
+      File baseDirectory = settings.getGroupDirectory();
       File keyFile = getAbsoluteFile(baseDirectory, path);
 
       if (keyFile.isDirectory()) {
@@ -137,6 +139,8 @@ public class TestFile implements Serializable {
       // Initialize KeY settings.
       String gks = settings.getGlobalKeYSettings();
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
+      String lks = settings.getLocalKeYSettings();
+      ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
 
       // Name resolution for the available KeY file.
       File keyFile = getKeYFile();
@@ -195,9 +199,7 @@ public class TestFile implements Serializable {
          if(verbose) {
             t.printStackTrace(System.err);
          }
-         throw new Exception(
-               "Exception while attempting to prove file (see cause for details): "
-                     + keyFile, t);
+         throw t;
       }
       finally {
          if (loadedProof != null) {
