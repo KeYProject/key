@@ -43,10 +43,15 @@ public final class ProofCollection {
    public List<RunAllProofsTestUnit> createRunAllProofsTestUnits()
          throws IOException {
 
-      List<RunAllProofsTestUnit> ret = new LinkedList<>();
+      List<String> activeGroups = settings.getRunOnlyOn();
 
+      List<RunAllProofsTestUnit> ret = new LinkedList<>();
       Set<String> testCaseNames = new LinkedHashSet<>();
       for (ProofCollectionUnit proofCollectionUnit : units) {
+
+         if(activeGroups != null && !activeGroups.contains(proofCollectionUnit.getName())) {
+            continue;
+         }
 
          final String proposedTestCaseName = proofCollectionUnit.getName();
          String testCaseName = proposedTestCaseName;
