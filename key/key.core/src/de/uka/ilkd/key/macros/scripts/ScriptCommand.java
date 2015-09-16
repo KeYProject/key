@@ -14,9 +14,19 @@ public class ScriptCommand extends AbstractCommand {
             throws ScriptException, InterruptedException {
 
         String filename = args.get("#2");
+        File file;
+        Object baseFileObject = stateMap.get(ProofScriptEngine.BASE_FILE_NAME_KEY);
+        if(baseFileObject != null) {
+            File baseFile = new File(baseFileObject.toString());
+            file = new File(baseFile.getParent(), filename);
+        } else {
+            file = new File(filename);
+        }
+
+        System.err.println("Included script " + file);
 
         try {
-            ProofScriptEngine pse = new ProofScriptEngine(new File(filename));
+            ProofScriptEngine pse = new ProofScriptEngine(file);
             pse.execute(uiControl, proof);
         } catch (Exception e) {
             throw new ScriptException("Error while running script'" + filename

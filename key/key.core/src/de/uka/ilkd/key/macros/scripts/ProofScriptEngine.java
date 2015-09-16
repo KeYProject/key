@@ -15,6 +15,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class ProofScriptEngine {
 
+    public static final String BASE_FILE_NAME_KEY = "baseFileName";
+
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
     private final Location initialLocation;
@@ -50,6 +52,13 @@ public class ProofScriptEngine {
         mlp.setLocation(initialLocation.getLine(), initialLocation.getColumn());
 
         Map<String, Object> stateMap = new HashMap<String, Object>();
+
+        // add the filename (if available) to the statemap.
+        String filename = initialLocation.getFilename();
+        if(filename != null && filename.length() > 0) {
+            stateMap.put(BASE_FILE_NAME_KEY, filename);
+        }
+
         while(true) {
 
             if(Thread.interrupted()) {

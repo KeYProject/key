@@ -1,0 +1,227 @@
+
+Making interactive persistent using proof scripts
+=================================================
+  Mattias Ulbrich <ulbrich@kit.edu>, 2015
+
+
+Experimental feature: Proof scripts are currently only visible in the
+GUI if KeY is launched with the --experimental option. Concrete syntax
+is subject to change.
+
+Every KeY user knows the pain of manually redoing an interactive proof
+over and over again even though only a tiny bit of the program or
+specification have changed. NOW you can use proof scripts which will
+alleviate your worries with repeating proofs.
+
+Proof scripts are textual representations of rule applications,
+settings changes and macro invocations. They are notated in linear
+order. The target of a script command is usually the first open goal
+in the proof tree, i.e., the first reached when traversing the proof
+tree (not necessarily the first in the "Goal" pane in the GUI).
+
+
+Syntax of proof scripts
+-----------------------
+
+Proof commands start with an identifier followed by optional
+arguments:
+
+   command argName="argument" "argument without name" ;
+
+Every command is terminated with a semicolon. There are named
+arguments in the form argName="argument" and unnamed argument without
+name. Single '...'and double quotes "..." can both be used. If
+"argument" is an identifier itself, the quotes can optionally be
+dropped, like in
+
+   rule andRight ;
+
+The character # begins a comment which extends to the end of the
+line. Currently, there are no multi-line comments in proof scripts.
+Proof scripts are case sensitive.
+
+
+How can scripts be loaded
+-------------------------
+
+1. In the GUI:
+
+Open a proof obligation. Currently proof scripts work only reliably if
+applied to the root of a fresh proof obligation (no rule applications,
+prune steps). The open the context menu (sequent or proof tree),
+choose "Strategy macros" and then "Run proof script ...". In the file
+dialog that appears, choose the script file to load. The script is
+automatically applied. You can follow the process in a logging window.
+
+2. From within key input files:
+
+At the very end of key files *INSTEAD* of a \proof object, you can now
+attach a proof script directly in double quotes following the keyword
+\proofScript. An very simple example reads:
+
+----------8<----------
+\predicates {a; b;}
+\problem { a & b -> a }
+
+\proofScript "
+   rule 'impRight';          
+   rule 'andLeft';
+   rule 'close';"
+----------8<----------
+
+Since the script is no enclosed in "...", only single quotes '...' can
+be used in the script. You can also load a script from an external
+file by writing
+
+   \proofScript "script 'some_filename.script';"
+
+
+Commands in scripts
+-------------------
+
+This list of available script commands is subject to change and to
+extension. If you write your own script commands (s. below), please
+add an explanation to this list here. The list is sorted alphabetically.
+
+-- auto ------------------
+
+Apply the automatic KeY strategy on the current goal. Optinally you
+can specify the number of steps to run.
+
+Examples:
+   auto steps=30000;
+       # run at most 30000 steps automatically.
+
+-- cut -------------------
+
+Performs a cut and thus splits the sequent into two goals. The unnamed
+argument is the formula to cut with
+
+Examples:
+   cut "value1 = value2";
+
+-- exit ------------------
+
+Terminate the script prematurely at that point. Used mainly for debug
+purposes.
+
+Examples:
+   exit;
+
+-- instantiate -----------
+
+Quantifier instantiation is a task that often occurs. Instead of
+specifying the entire formula, it suffices here to name the variable
+that is to be instantiated. If that is not unique, the number of the
+occurrence of that quantified variable can be specified as well.
+
+Examples:
+   instantiate var="x" occ="3" with="42"
+       # Instantiate the third instantiateable formula whose bound
+       # variable is called "x" with the value 42
+
+   instantiate formula="\forall int x; f(x) = 42" with="23"
+       # The quantified formula can also be specified if wanted.
+       # This here for the antecedent.
+
+   instantiate formula="\exists int x; f(x) = 42" with="23"
+       # Existentially quantified variables can be instantiated if they
+       # occur on the succedent side.
+
+   instantiate hide var=x value="x_0"
+       # instantiate x and hide the quantified formula
+
+-- leave -----------------
+
+Mark the currently active goal as non-interactive (the orange hand
+symbol in the GUI). It is then excluded from further analysis by
+scripts. This is good for debugging unfinished proof scripts.
+
+-- macro -----------------
+
+Invoke a macro on the current goal. The names of available macros
+include:
+
+  autopilot      full autopilot
+  autopilot-prep preparation only autopilot
+  split-prop     propositional expansion w/ splits
+  upd-simpl      update simplification
+  heap-simpl     heap simplification
+
+Examples:
+  macro autopilot-prep;
+
+(Future version may drop the macro keyword and allow macro invocations
+directly.)
+
+-- rule ------------------
+
+Apply a single rule onto the current sequent. As unnamed argument add
+the name of the taclet to be applied. If the taclet matches only once
+on the entire sequent, the rule is applied. If it matches more than
+once you need to specify more. In that case you can specify the
+sequence formula and the number of the occurrence in the formula.
+
+Examples:
+   rule andRight;
+       # if there is only one matching spot on the sequent
+
+   rule eqSymm formula="a=b";
+       # changes sequent "a=b ==> c=d" to "b=a ==> c=d"
+       # "rule eqSymm;" alone would have been ambiguous.
+
+   rule eqSymm formula="a=b->c=d" occ=2
+       # changes sequent "a=b->c=d ==>" to "a=b->d=c ==>".
+       # occurrence number needed since there are 
+       # two possible applications on the formula
+
+-- script ----------------
+
+Invoke another script which resides in an external file.
+
+Example:
+   script '/path/to/other/file.script';
+
+-- select ----------------
+
+Unlike most other commands, this command does not change the proof but
+chooses the goal on which the next step operates. Currently you can
+specify a formula. The goal is chosen such that the formula appears
+(toplevel) on the sequent (antecedent or succedent). You can limit the
+search to antecedent or succedent.
+
+Examples:
+   select formula="{ x:=1 }y < x";
+       # search for the formula anywhere
+   select succedent formula="wellFormed(someHeap)";
+       # search only the succedent for the formula
+
+-- smt -------------------
+
+Invoke an external SMT solver. That solver must be adequately
+configured outside the script mechanism. By default, Z3 is invoked,
+but that can be chosen.
+
+Examples:
+   smt;
+       # invoke Z3
+   smt solver="Z3,yices";
+       # a comma separated list of solvers can be specified.
+
+-- tryclose --------------
+
+Unlike other commands this command operates on ALL open goals and
+effectively applies the "try provable goals below" macro to all of
+them. A number of steps can optionally be given.
+
+Examples:
+   tryclose;
+   tryclose steps=2000;
+       # spend 2000 steps on each open goal
+
+
+Write your on proof commands
+----------------------------
+
+to be done.
+Contact Mattias, if you are interested.
