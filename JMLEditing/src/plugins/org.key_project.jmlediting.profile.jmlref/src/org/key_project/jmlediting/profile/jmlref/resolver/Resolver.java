@@ -185,15 +185,14 @@ public class Resolver implements IResolver {
             }
         });
         
-        // Check if there are any JML comments not yet mapped. Those are (should be) invariants
-        // Put the ... of the compilation unit into commentToAST.
+        // Check if there are any JML comments not yet mapped. 
+        // Those should be class invariants not directly written above a field or such.
+        // Put the CompilationUnit/ASTNode into commentToAST.
         // Method invariants should have been mapped before.
-        // TODO: Is that the right thing?
-        ASTNode nodeForInvariant = (CompilationUnit) compilationUnit;
         
         for (Comment comment : jmlcomments){
             if (!commentToAST.containsKey(comment)){
-                commentToAST.put(comment, nodeForInvariant);
+                commentToAST.put(comment, jdtAST);
             }
         }
         
@@ -269,7 +268,8 @@ public class Resolver implements IResolver {
 
     private TypeDeclaration getDeclaringClass(final ASTNode context) {
         ASTNode clazz = context;
-        while(!(clazz instanceof TypeDeclaration)) {
+        while((clazz != null) && !(clazz instanceof TypeDeclaration) &&
+                clazz.getParent() != null) {
             clazz = clazz.getParent();
         }
         return (TypeDeclaration)clazz;
@@ -301,7 +301,9 @@ public class Resolver implements IResolver {
             jdtNode = findParameters(context, currentTask.resolveString);
         }
         
-        if(jdtNode == null && currentTask.lastResult == null) {
+        // we need to get more information, in particular which class declared the method/field.
+        // not needed if we already have the CompilationUnit set as context (e.g. in case of an invariant)
+        if(jdtNode == null && currentTask.lastResult == null && !(context instanceof CompilationUnit)) {
             context = getDeclaringClass(context);
         }
         
