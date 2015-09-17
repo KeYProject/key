@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
+import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
@@ -409,7 +410,9 @@ public class Resolver implements IResolver {
             catch (final TypeComputerException e) {
                 throw new ResolverException("TypeComputer threw an exception when trying to resolve a method parameter.", e);
             }
-            result[i] = Signature.createTypeSignature(b.getQualifiedName(), true);
+            if(b != null) {
+                result[i] = Signature.createTypeSignature(b.getQualifiedName(), true);
+            }
         }
         
         return result;
@@ -488,50 +491,44 @@ public class Resolver implements IResolver {
         if(typeBinding.isPrimitive()) {
             throw new ResolverException("Can not resolve an access to a primitive type.");
         } else if(typeBinding.isArray()) {
-            // TODO: We found an array .. what to do? What is the context we set to?
-        } else {
-            IType type = null;
-            ITypeBinding[] parameterTypes = null;
-            try {
-                if(typeBinding.isParameterizedType()) {
-                    // TODO: Not working yet.
-                    final ITypeBinding newTypeBinding = typeBinding.getErasure();
-                    
-                    parameterTypes = typeBinding.getTypeArguments();
-                    // Save Parameters here.. 
-                    
-                    //System.out.println(typeBinding.getQualifiedName());
-                    //System.out.println(newTypeBinding.getQualifiedName());
-                    type = compilationUnit.getJavaProject().findType(newTypeBinding.getQualifiedName());
-                
-                    
-                /*} else if(typeBinding.isWildcardType()) {
-                    // TODO Wrong order .. should be above parameterized type
-                    final ITypeBinding newTypeBinding = typeBinding.getGenericTypeOfWildcardType();
-                    //System.out.println(newTypeBinding.getQualifiedName());
-                    type = compilationUnit.getJavaProject().findType(newTypeBinding.getQualifiedName());
-                */
-                } else {
-                    //System.out.println(typeBinding.getQualifiedName());
-                    type = compilationUnit.getJavaProject().findType(typeBinding.getQualifiedName());
-                }
-            }
-            catch (final JavaModelException e) {
-                LogUtil.getLogger().logError(e);
-            }
+            // TODO: We found an array .. what to do? What is the context we set to.          
+            // Set context to Object for everything that isnt ".length" or ".clone()" 
+            //      context.getAST().resolveWellKnownType("java.lang.Object");
             
-            if(type == null) {
-                return null;
-            }
-            ASTNode node = null;
-            if(type.getClassFile() != null) {
-                node = JDTUtil.parse(type.getClassFile());
-            } else if(type.getCompilationUnit() != null) {
-                 node = JDTUtil.parse(type.getCompilationUnit());
-            }
-            return getTypeInCompilationUnit(type.getElementName(), node);
+        } else if(typeBinding.isParameterizedType()) {
+            ITypeBinding[] parameterTypes = null;
+            final ITypeBinding newTypeBinding = typeBinding.getErasure();
+                
+            // TODO: Save Parameters here.. 
+            parameterTypes = typeBinding.getTypeArguments();
+            
+            //System.out.println(typeBinding.getQualifiedName());
+            //System.out.println(newTypeBinding.getQualifiedName());
+            return findASTNodeFromType(newTypeBinding);
+        } else {
+            //System.out.println(typeBinding.getQualifiedName());
+            return findASTNodeFromType(typeBinding);
         }
         return null;
+    }
+    
+    private ASTNode findASTNodeFromType(final ITypeBinding binding) {
+        final IType type;
+        try {
+            type = compilationUnit.getJavaProject().findType(binding.getQualifiedName());
+        }
+        catch (final JavaModelException e) {
+            LogUtil.getLogger().logError(e);
+            return null;
+        }
+        ASTNode node = null;
+        if(type.getClassFile() != null) {
+            node = JDTUtil.parse(type.getClassFile());
+        } else if(type.getCompilationUnit() != null) {
+             node = JDTUtil.parse(type.getCompilationUnit());
+        }
+        
+        return getTypeInCompilationUnit(type.getElementName(), node);
     }
     
     private ASTNode findFromImports(final String resolveString) throws ResolverException {
