@@ -9,7 +9,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 
 /**
  * Interface of a Refactoring Computer. Such a class computes all the changes which
- * need to be done to the JML annotations of a given java source files.
+ * need to be done to the JML annotations of a given java source file.
  * 
  * @author Robert Heimbach
  *

@@ -15,7 +15,7 @@ import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.ReplaceEdit;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRenameRefactoringComputer;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefactoringComputer;
 
 /**
  * Participant to take part in the renaming of method parameters.
@@ -25,7 +25,7 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.DefaultRena
  * particular method. Thus this participant, unlike the others, only needs to check
  * the active class for changes to make. </p>
  * <p>
- * See {@link JMLRenameParticipantFields} for additional information.
+ * The class uses the {@link RenameRefactoringComputer} to compute the needed changes.</p>
  * 
  * @author Robert Heimbach
  *
@@ -39,10 +39,12 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     private IJavaProject fProject;
     
     /**
+     * Initializes the refactoring participant with the needed information.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    protected boolean initialize(Object element) {
+    protected final boolean initialize(Object element) {
         fmethodParameter = (ILocalVariable) element;
         
         // check if it is a method parameter
@@ -62,20 +64,22 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName() {
-        return "JML Parameters Refactoring Rename Participant";
-    }
-
-    /**
-     * No condition checking. Changes are done direcly (or not at all).
+     * Name of this participant.
      * <p>
      * {@inheritDoc}
      */
     @Override
-    public RefactoringStatus checkConditions(IProgressMonitor pm,
+    public final String getName() {
+        return "JML Parameters Refactoring Rename Participant";
+    }
+
+    /**
+     * No condition checking. Changes are done directly (or not at all).
+     * <p>
+     * {@inheritDoc}
+     */
+    @Override
+    public final RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
         
         return new RefactoringStatus();
@@ -87,15 +91,13 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
      * that those certainly exist, because the method using the parameter is in the active class.
      * 
      * @return Returns null, since changes to JML are directly added to the already
-     * scheduled java changes.
-     * 
-     *  {@inheritDoc}
+     *          scheduled java changes.
      */
     @Override
-    public Change createChange(final IProgressMonitor pm) throws CoreException,
+    public final Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
-        DefaultRenameRefactoringComputer changesComputer = new DefaultRenameRefactoringComputer(fmethodParameter, fOldName, fNewName);
+        RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(fmethodParameter, fOldName, fNewName);
 
         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
                 fCompUnit, fProject);

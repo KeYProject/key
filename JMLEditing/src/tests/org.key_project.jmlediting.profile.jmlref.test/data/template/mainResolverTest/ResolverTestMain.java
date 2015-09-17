@@ -2,6 +2,7 @@ package resolver.test;
 
 import java.io.*;
 import java.util.HashMap;
+import java.math.BigInteger;
 
 public class ResolverTestMain {
    
@@ -13,6 +14,9 @@ public class ResolverTestMain {
     private /*@ spec_public @*/ ResolverTestClass1 field3 = null;
     private /*@ spec_public @*/ long fieldMultiple1, fieldMultiple2;
     private /*@ spec_public @*/ HashMap<Integer, String> field4 = new HashMap<Integer, String>();
+    private /*@ spec_public @*/ BigInteger integer = new BigInteger(0);
+    private /*@ spec_public @*/ java.math.BigDecimal decimal = new java.math.BigDecimal(0);
+    private FileReader fr = null;
     private int[] arrayfield;
     
     public ResolverTestMain(int field1, String field2, ResolverTestClass1 field3) {
@@ -197,10 +201,31 @@ public class ResolverTestMain {
     
     /*@ normal_behavior
       @ assignable field4;
-      @ ensures field4.containsKey(1);
+      @ ensures field4.containsKey(1) && 
+                field4.put(1, "one") != null;
       @*/
     public HashMap<Integer,String> doSomething13() {
         field4.containsKey(1);
+        field4.put(1, "one");
         return new HashMap<Integer, String>();
-    }    
+    }
+    
+    /*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures integer.add(integer) == integer
+      @  && java.math.BigDecimal.valueOf(100) == decimal;
+      @*/
+    public void doSomething13() {
+        decimal = java.math.BigDecimal.valueOf(100);
+        integer = integer.add(integer);
+    }
+    
+    /*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures fr.read() == \result;
+      @*/
+    public int doSeomthing14() {
+        return fr.read();
+    }
+    
 }

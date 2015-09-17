@@ -9,7 +9,7 @@ import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 public class DerivedExpressionProfile extends
       DerivedProfile<IJMLExpressionProfile> implements IJMLExpressionProfile {
 
-   public DerivedExpressionProfile(final String name, final String identifier,
+    public DerivedExpressionProfile(final String name, final String identifier,
          final IJMLExpressionProfile parentProfile) {
       super(name, identifier, parentProfile);
    }
@@ -23,5 +23,4 @@ public class DerivedExpressionProfile extends
    public Set<ParseFunction> getPrimarySuffixExtensions() {
       return this.getParentProfile().getPrimarySuffixExtensions();
    }
-
 }

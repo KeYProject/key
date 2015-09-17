@@ -387,17 +387,19 @@ public final class JavaEditorManager {
                   
                   @Override
                   public void elementChanged(ElementChangedEvent event) {
-                     //only update if it is extendable in props
+                     //only update if it is extendable in properties
                      if(PreferenceUtil.isExtensionsEnabled()){
-                        if (event.getDelta().getElement() instanceof ICompilationUnit){//update only if change is in ICompilationUnit and all of the changes happend to a comment
+                        if (event.getDelta().getElement() instanceof ICompilationUnit){
+                            //update only if change is in ICompilationUnit and all of the changes happened to a comment
+                            // check for length == 0 makes sure that no outline update is triggered by JDT.
                            if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0){
                                if (Display.getDefault() != null && !Display.getDefault().isDisposed()){
                                  Display.getDefault().asyncExec(new Runnable() {
                                     
                                     @Override
                                     public void run() {
+                                      //refresh outline with Content
                                        if (outlineViewer != null && joutline.getControl() != null){
-                                          //refresh outline with Content
                                           outlineViewer.refresh(true);
                                        }
                                     }

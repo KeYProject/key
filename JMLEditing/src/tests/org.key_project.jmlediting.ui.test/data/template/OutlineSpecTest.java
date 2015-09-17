@@ -9,12 +9,16 @@ public class OutlineSpecTest {
    
    public int/*@ pure @*/ amount() {
       /*@ behavior
-       *@   random comment in method
-       *@
+       @   random comment in method
+       @
        */
       return i;
    }
-   
+
+   /*@ behavior
+    @ 
+    @
+    */
    public int /*@ pure nullable @*/ testMulti (){
       return 1;
    }

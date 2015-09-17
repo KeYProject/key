@@ -23,8 +23,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotJMLOutlineUpdate {
    
-   
-   
    private static SWTWorkbenchBot bot = new SWTWorkbenchBot();
    private static TestProject testProject;
    private static SWTBotEclipseEditor editor = null;
@@ -35,16 +33,8 @@ public class SWTBotJMLOutlineUpdate {
   
    private static String textToAdd2 = "//@ invariant a < b;";
    private static String textToAddMethod = "\t//@behavior";
-   
-   
-   
+
    private static SWTBotTree tree;
-   
-   
-   
-   
-   
-   
    
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
@@ -60,10 +50,7 @@ public class SWTBotJMLOutlineUpdate {
       SWTBotView view = bot.viewByTitle("Outline");
        bot.menu("Window").click().menu("Show View").click().menu("Outline").click();
        view.show();
-       tree = view.bot().tree();
-       
    }
-   
    
    private int getLine(String s){
       int i = 0;
@@ -74,7 +61,6 @@ public class SWTBotJMLOutlineUpdate {
       }
       return -1;
    }
-   
    
    public void test(String itemSource, String itemName, int it1, int it2) {
       int i = 0;
@@ -101,7 +87,6 @@ public class SWTBotJMLOutlineUpdate {
       }assertTrue("Failed at : " +itemName , false);
    }
    
-   
    public void testbehavior(String method, String itemSource, String itemName,boolean reloadtree){
       if (reloadtree){
          tree = bot.viewByTitle("Outline").bot().tree();
@@ -117,9 +102,7 @@ public class SWTBotJMLOutlineUpdate {
                   return;
                }
             }
-         }
-        
-         
+         } 
       }
       assertTrue(method+ ": No Method Found", false);
       
@@ -143,9 +126,6 @@ public class SWTBotJMLOutlineUpdate {
    public void outlineUpdateInvariant() {
      addTextSeriell(6, 0, textToAdd2);
      bot.sleep(1000);
-     test(textToAdd2, "invariant a < b", 1, 0);
-     
-     
    }
    
    @Test

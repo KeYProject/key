@@ -3,6 +3,7 @@ package org.key_project.jmlediting.core.profile;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.resolver.IResolver;
 
 /**
  * The {@link IDerivedProfile} is a jml profile which has been derived from
@@ -42,5 +43,10 @@ public interface IDerivedProfile extends IJMLProfile {
     * @return all keywords supported additionally to the keywords of the parent
     */
    Set<IKeyword> getAdditionalKeywords();
+   
+   /**
+    * Changes the resolver used.
+    */
+   void setResolver(IResolver newResolver);
 
 }

@@ -41,31 +41,29 @@ import org.key_project.jmlediting.core.dom.NodePrinter;
  * @author Timm Lippert
  *
  */
-
 public class JMLASTCommentLocator {
 
    /**
     * Lists to return for outline with necessary comments and underlying AST
-    * nodes
+    * nodes.
     */
-   ArrayList<JMLComments> jmlForMethodList = new ArrayList<JMLComments>();
-   ArrayList<JMLComments> jmlClassList = new ArrayList<JMLComments>();
-   final Map<Integer, Integer> sourceOffsetToCommentOffset;
-   final Map<Integer, JMLComments> fieldDeclarationMap;
-   final Map<Integer, JMLComments> methoddDeclarationMap;
+   private ArrayList<JMLComments> jmlForMethodList = new ArrayList<JMLComments>();
+   private ArrayList<JMLComments> jmlClassList = new ArrayList<JMLComments>();
+   private final Map<Integer, Integer> sourceOffsetToCommentOffset;
+   private final Map<Integer, JMLComments> fieldDeclarationMap;
+   private final Map<Integer, JMLComments> methoddDeclarationMap;
    
-   int Sourcelength = 0;
-   final List<int[]> methodStartEndoffsets = new ArrayList<int[]>();
-   final List<int[]> fieldStartToEnd = new ArrayList<int[]>();
+   private final List<int[]> methodStartEndoffsets = new ArrayList<int[]>();
+   private final List<int[]> fieldStartToEnd = new ArrayList<int[]>();
    
    
-   List<Comment> comments;
-   String[] methodKeyWords = { "normal_behavior", "normal_behaviour","behavior","behaviour","exceptional_behaviour","exceptional_behavior" };
+   private List<Comment> comments;
+   private String[] methodKeyWords = { "normal_behavior", "normal_behaviour","behavior","behaviour","exceptional_behaviour","exceptional_behavior" };
   
 
    /**
-    * Constructor for /{@link JMLASTCommentLocator} </br> gets all
-    * {@link Comment} of the {@link ICompilationUnit} and saves all JML Comments
+    * Constructor for {@link JMLASTCommentLocator}. It gets all
+    * {@link Comment} of the {@link ICompilationUnit} and saves all JML Comments.
     * 
     * @param icu
     *           {@link ICompilationUnit} Unit of the Project
@@ -88,11 +86,12 @@ public class JMLASTCommentLocator {
       final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(icu);
       CompilationUnit cu = (CompilationUnit) jdtAST;
       comments = cu.getCommentList();
-      // return indext in list
+      
+      // we only have start information of comments but not the content.
       sourceOffsetToCommentOffset = new HashMap<Integer, Integer>();
       fieldDeclarationMap = new HashMap<Integer, JMLComments>();
       methoddDeclarationMap = new HashMap<Integer, JMLComments>();
-      //iterate over Field and method declarations to get all start and legth offsets
+      //iterate over Field and method declarations to get all start and length information
       jdtAST.accept(new ASTVisitor() {
          
          @Override
@@ -106,7 +105,7 @@ public class JMLASTCommentLocator {
 
          @Override
          public boolean visit(MethodDeclaration node) {
-            // Cast missing to IMethod node.resolveBinding().getJavaElement();
+             // get needed offsets.
             try {
                int offset = 0;
                if(node.resolveBinding() != null) {
@@ -132,54 +131,44 @@ public class JMLASTCommentLocator {
       // Get keywords for JML to check for
       // iterate over comments and make different lists for comments
       String text, keyword = null;
-      Comment currentcomment;
-      
-      
       
       if (source != null) {
-         Sourcelength = source.length();
-         for (Object obj : comments) {
-            if (obj instanceof Comment) {
-               currentcomment = (Comment) obj;
-               if (!currentcomment.isDocComment()) {
-                  text = source.substring(
-                        currentcomment.getStartPosition(),
-                        currentcomment.getLength() + currentcomment.getStartPosition());
-                  if (isJMLComm(text)) {
-                     // if JML comm then make readable Text and get Keyword of
-
-
-                     text = removeJMLComm(text,
-                           ((Comment) obj).isBlockComment());
-                     try {
-                        node = parser.parse(text, 0, text.length());
-                        
-                        listofIAST = node.getChildren();
-                           keyword = getFirstKeyword(listofIAST.get(0));
-                           if (keyword == null) keyword = getFirstKeyword(listofIAST.get(1));
-                        
-                        text = NodePrinter.print(node).trim();
-                        
-                        if (formethod(keyword)) {
-                           jmlForMethodList.add(new JMLComments(text, currentcomment, "method"));
-                        }
-                        else if (commentInMethod(currentcomment.getStartPosition(),currentcomment,text)){
-                        }
-                        else if (commentInField(currentcomment.getStartPosition(),currentcomment,text)) {                           
-                        }
-                        else if (notInMethod(currentcomment.getStartPosition())) {
-                           jmlClassList.add(new JMLComments(text, currentcomment, "Class"));
-                        }
-                     }
-                     catch (ParserException e) {
-                     //not necessary to catch exception of parser
-                     
-                     }
-                     
-                  }
-               }
-            }
-         }
+         for (Comment currentComment : comments) {
+           if (!currentComment.isDocComment()) {
+              text = source.substring(
+                    currentComment.getStartPosition(),
+                    currentComment.getLength() + currentComment.getStartPosition());
+              if (isJMLComm(text)) {
+                 // if JML comm then make readable Text and get Keyword of
+                 text = removeJMLComm(text,
+                       ((Comment) currentComment).isBlockComment());
+                 try {
+                    node = parser.parse(text, 0, text.length());
+                    
+                    listofIAST = node.getChildren();
+                       keyword = getFirstKeyword(listofIAST.get(0));
+                       if (keyword == null) keyword = getFirstKeyword(listofIAST.get(1));
+                    
+                    text = NodePrinter.print(node).trim();
+                    
+                    // check to what the comment belongs to and add to respective list.
+                    if (formethod(keyword)) {
+                       jmlForMethodList.add(new JMLComments(text, currentComment));
+                    }
+                    else if (commentInMethod(currentComment.getStartPosition(),currentComment,text)){
+                    }
+                    else if (commentInField(currentComment.getStartPosition(),currentComment,text)) {                           
+                    }
+                    else if (notInMethod(currentComment.getStartPosition())) {
+                       jmlClassList.add(new JMLComments(text, currentComment));
+                    }
+                 }
+                 catch (ParserException e) {
+                 }
+                 
+              }
+           }
+        }
       }
    }
 
@@ -187,7 +176,7 @@ public class JMLASTCommentLocator {
    private boolean commentInMethod(int startPosition, Comment com, String text) {
       for (int[] i : methodStartEndoffsets){
          if (startPosition >= i[0] && startPosition <= (i[2])){
-            methoddDeclarationMap.put(i[2], new JMLComments(text, com, "method"));
+            methoddDeclarationMap.put(i[2], new JMLComments(text, com));
             return true;
          }
       }
@@ -198,7 +187,7 @@ public class JMLASTCommentLocator {
    private boolean commentInField(int startPosition, Comment com, String text) {
       for (int[] i : fieldStartToEnd){
          if (startPosition >= i[0] && startPosition <= (i[1]+i[0])){
-            fieldDeclarationMap.put(i[0]+i[1], new JMLComments(text, com, "Field"));
+            fieldDeclarationMap.put(i[0]+i[1], new JMLComments(text, com));
             return true;
          }
       }
@@ -238,23 +227,11 @@ public class JMLASTCommentLocator {
    }
 
 
-   /**
-    * 
-    * @param text
-    *           the text that should get checked if it is a JML comment
-    * @return true if it is a comment by knowing it contains "/*@" or "//@" for
-    *         initializing a JML comment
-    */
    private boolean isJMLComm(String text) {
       // only take JML Comments declared with /*@
       return (text.contains("/*@") || text.contains("//@"));
    }
 
-   /**
-    * Checks if given Keyword is for a method like all kinds of behaviors or behaviours
-    * @param keyword
-    * @return
-    */
    private boolean formethod(String keyword) {
       for (String s : methodKeyWords) {
          if (keyword.equals(s))
@@ -282,11 +259,11 @@ public class JMLASTCommentLocator {
    }
 
    /**
-    * Gets all JML Comments which are underneath the Class and not in a function or a Field declaration
+    * Gets all JML Comments which are underneath the Class and not in a function or a Field declaration.
     * 
-    * @return List of JML Comments with Text
+    * @return List of JML Comments with Text.
     */
-   public List<JMLComments> getClassInvariants() {
+   public final List<JMLComments> getClassInvariants() {
 
       return jmlClassList;
    }
@@ -298,24 +275,24 @@ public class JMLASTCommentLocator {
     * 
     * @param offset
     *           offset of {@link IMethod} which the comment should be found for
-    * @return All Comments for the given Method offset if it has a JML comment as first leading comment else null
+    * @return All Comments for the given Method offset if it has a JML comment as first leading comment else null.
     */
-   public List<JMLComments> getMethodJMLComm(int offset) {
+   public final List<JMLComments> getMethodJMLComm(int offset) {
       List<JMLComments> retlist = new ArrayList<JMLComments>();
       int commlocationinList = -1;
       // look if method is in hashmap
       if (sourceOffsetToCommentOffset.containsKey(offset)) {
          commlocationinList = sourceOffsetToCommentOffset.get(offset);
          if (commlocationinList != -1) {
-            for (JMLComments com : jmlForMethodList) {
-               if (com.getStartOffset() <= offset && com.getStartOffset() >= comments.get(commlocationinList).getStartPosition()) {
-                  retlist.add(com);
+            for (JMLComments comment : jmlForMethodList) {
+               if (comment.getStartOffset() <= offset && comment.getStartOffset() >= comments.get(commlocationinList).getStartPosition()) {
+                  retlist.add(comment);
                   break;
                }
             }
          }
          if (methoddDeclarationMap.containsKey(offset)){
-         retlist.add(methoddDeclarationMap.get(offset));
+             retlist.add(methoddDeclarationMap.get(offset));
          }
       }
       return retlist;
@@ -324,12 +301,10 @@ public class JMLASTCommentLocator {
    /**
     * Gets the matching Comments for a given @ {@link IFile}'s {@link ISourceRange}'s offset + length.
     * 
-    * @param offset Should be {@link IFile}'s {@link ISourceRange} offset + legth. 
-    * @return  Thr {@link JMLComments} for the given offset.
+    * @param offset Should be {@link IFile}'s {@link ISourceRange} offset + length. 
+    * @return  The {@link JMLComments} for the given offset.
     */
-   public JMLComments getFieldJMLComm(int offset) {
+   public final JMLComments getFieldJMLComm(int offset) {
          return fieldDeclarationMap.get(offset);
    }
-   
 }
-

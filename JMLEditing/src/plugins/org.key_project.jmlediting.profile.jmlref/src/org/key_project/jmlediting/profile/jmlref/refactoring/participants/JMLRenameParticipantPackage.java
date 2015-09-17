@@ -2,7 +2,6 @@ package org.key_project.jmlediting.profile.jmlref.refactoring.participants;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -12,16 +11,14 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
-import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.ClassMoveRefactoringComputer;
-import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtilities;
+import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtil;
 
 /**
  * Class to participate in the refactoring renaming of packages.
@@ -34,8 +31,6 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
  * <p>
  * Note that JDT takes care of the "Rename subpackages" option by calling this participant
  * on each subpackage which needs to be renamed. </p>
- * <p>
- * Some additional information can be found in {@link JMLRenameParticipantFields}.
  * 
  * @author Robert Heimbach
  *
@@ -57,9 +52,16 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
         return "JML Package Refactoring Rename Participant";
     }
     
+    
+    /**
+     * {@inheritDoc} <p>
+     * Extract and save all the information we need to carry out the package renaming.
+     * In particular, a list of the fully qualified names of all classes which are located
+     * in the package to be renamed is created because occurrences of those Strings need
+     * to be replaced in the JML annotations.
+     */
     @Override
-    protected boolean initialize(Object element) { 
-        
+    protected final boolean initialize(Object element) { 
         fJavaElementToRename = (IJavaElement) element;
         fOldName = fJavaElementToRename.getElementName();
         fProject = fJavaElementToRename.getJavaProject();
@@ -69,7 +71,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
         // Search through the package for java classes and save all the qualified class names.
         // Occurrences in JML like this need to be changed.
         try {
-            fAllQualifiedNamesToSearchFor = RefactoringUtilities.getAllQualifiedNamesOfClasses(fPackageToRename);
+            fAllQualifiedNamesToSearchFor = RefactoringUtil.getAllQualifiedNamesOfClasses(fPackageToRename);
             
             return (fAllQualifiedNamesToSearchFor.size() > 0);
         } 
@@ -86,7 +88,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
      * {@inheritDoc}
      */
     @Override
-    public RefactoringStatus checkConditions(IProgressMonitor pm,
+    public final RefactoringStatus checkConditions(IProgressMonitor pm,
             CheckConditionsContext context) throws OperationCanceledException {
         return new RefactoringStatus();
     }
@@ -103,7 +105,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
      * {@inheritDoc}
      */
     @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
+    public final Change createChange(IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         // To accumulate all changes to files without java (text) changes.
@@ -115,12 +117,9 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
         ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
         projectsToCheck.add(fProject);
 
-        try {
-            RefactoringUtilities.getAllProjectsToCheck(projectsToCheck, fProject);
-            
-            // Look through all source files in each package and project
-            for (final IJavaProject project : projectsToCheck) {
-                for (final IPackageFragment pac : RefactoringUtilities.getAllPackageFragmentsContainingSources(project)) {
+        try {// Look through all source files in each package and project
+            for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck, fProject)) {
+                for (final IPackageFragment pac : RefactoringUtil.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac.getCompilationUnits()) {
                         
                         // Several classes could potentially be referenced but RefcatoringComputer can only search for one at a time.
@@ -152,18 +151,8 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
                             // In case changes to the JML code needs to be done (but not to the java code)
                             if (!allChangesToJMLinUnit.isEmpty()){
                                 
-                                // Gather all the edits to the text (JML annotations) in a MultiTextEdit
-                                // and add those to a change object for the given file
-                                TextFileChange tfChange = new TextFileChange("", (IFile) unit.getCorrespondingResource());                         
-                                MultiTextEdit allEdits = new MultiTextEdit();
-                                
-                                for (final ReplaceEdit edit: allChangesToJMLinUnit) {
-                                   allEdits.addChild(edit);
-                                }
-
-                                tfChange.setEdit(allEdits);
-                                
-                                changesToFilesWithoutJavaChanges.add(tfChange);
+                                changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
+                                        unit, allChangesToJMLinUnit));
                             }
                         }
                     }
@@ -174,19 +163,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
             return null;
         }
         
-        // Return null if only shared changes, otherwise gather changes to JML for classes with no java changes.
-        if (changesToFilesWithoutJavaChanges.isEmpty())
-            return null;
-        else if (changesToFilesWithoutJavaChanges.size() == 1){
-            return changesToFilesWithoutJavaChanges.get(0);
-        }
-        // Create a composite change to gather all the changes (effect in preview: a tree item above without preview)
-        else {
-            CompositeChange allChangesToFilesWithoutJavaChanges = new CompositeChange("Changes to JML");
-            for (TextFileChange change : changesToFilesWithoutJavaChanges){
-                allChangesToFilesWithoutJavaChanges.add(change);
-            }
-            return allChangesToFilesWithoutJavaChanges;
-        }
+        // After iterating through all needed projects and source files, determine what needs to be returned.    
+        return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
     }
 }

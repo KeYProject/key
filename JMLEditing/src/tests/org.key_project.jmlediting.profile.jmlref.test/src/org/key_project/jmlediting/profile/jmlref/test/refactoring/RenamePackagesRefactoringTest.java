@@ -38,54 +38,54 @@ public class RenamePackagesRefactoringTest {
     }
     
     @After public void deleteTestPackage() throws CoreException {
-        RefactoringTestUtil.deleteAllPackagesFromFolder(srcFolder);
+        TestUtilsRefactoring.deleteAllPackagesFromFolder(srcFolder);
     }
     
     @Test
     public void test1OneClassInOnePackage() throws CoreException {   
-        RefactoringTestUtil.runPackageRenameTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test1", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
     
     @Test
     public void test2TwoClassesInSamePackage() throws CoreException {   
-        RefactoringTestUtil.runPackageRenameTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test2", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
     
     @Test
     public void test3TwoClassesInSamePackageMoreReferences() throws CoreException {   
-        RefactoringTestUtil.runPackageRenameTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test3", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
     
     @Test
     public void test4TwoPackagesTwoClassesInRenamedPackage() throws CoreException {   
-        RefactoringTestUtil.runPackageRenameTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
     
     @Test
     public void test5RenamingOfSubpackage() throws CoreException {   
-        RefactoringTestUtil.runPackageRenameTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
                  "test.subpackage", "test.newPackageName", javaProject, false);
     }
     
     @Test
     public void test6RenamingOfSubpackageAndReferenceToClassInParentPackage() throws CoreException {   
-        RefactoringTestUtil.runPackageRenameTest(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
                  "test.subpackage", "test.newPackageName", javaProject, false);
     }
     
     @Test
     public void test7RenameParentPackageWithRenameSubpackagesOptionActivated() throws CoreException {   
-        RefactoringTestUtil.runPackageRenameTest(TESTPATH+"\\test7", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test7", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, true);
     }
     
     @Test
     public void test8RenameParentPackageOnly() throws CoreException {   
-        RefactoringTestUtil.runPackageRenameTest(TESTPATH+"\\test8", srcFolder, oracleFolder, bot, 
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test8", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
     }
 }

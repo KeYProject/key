@@ -9,6 +9,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.EmptyKeywordContent;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.resolver.IResolver;
 
 /**
  * This class implements some methods of the {@link IJMLProfile} in a generic
@@ -30,6 +31,11 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    private final Set<IUserDefinedKeywordContentDescription> supportedContentDescriptions;
 
    private final Set<IKeywordSort> availableSorts;
+   
+   /**
+    * A resolver which knows how to work with the given profile to resolve {@link IASTNode}.
+    */
+   private IResolver resolver;
 
    /**
     * Creates a new empty {@link AbstractJMLProfile}.
@@ -79,6 +85,11 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
 
    protected Set<IKeywordSort> getAvailableKeywordSortsInternal() {
       return this.availableSorts;
+   }
+   
+   @Override
+   public IResolver getResolver() {
+       return this.resolver;
    }
 
 }
