@@ -1,0 +1,18 @@
+package org.key_project.jmlediting.ui.test.Outline;
+
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+@RunWith(Suite.class)
+@SuiteClasses({
+   // parser
+   SWTBotJMLOutlineView.class,
+   SWTBotJMLoutlineSpecPure.class,
+   SWTBotJMLOutlineUpdate.class
+})
+
+public class JMLOutlineAllTestSuit {
+
+}

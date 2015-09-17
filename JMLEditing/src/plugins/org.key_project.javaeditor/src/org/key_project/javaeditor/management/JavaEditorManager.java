@@ -19,14 +19,14 @@ import java.util.Arrays;
 import javax.naming.OperationNotSupportedException;
 
 import org.eclipse.jdt.core.ElementChangedEvent;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IElementChangedListener;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.eclipse.jdt.internal.ui.javaeditor.SemanticHighlightingManager;
-import org.eclipse.jdt.internal.ui.viewsupport.JavaUILabelProvider;
+import org.eclipse.jdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
+import org.eclipse.jdt.internal.ui.viewsupport.DecoratingJavaLabelProvider;
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -37,6 +37,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
@@ -73,8 +74,7 @@ public final class JavaEditorManager {
     * The only instance of this class.
     */
    public static final JavaEditorManager instance = new JavaEditorManager();
-
-   private static boolean count = false;
+     
    /**
     * Listens for changes on {@link PreferenceUtil#getStore()}.
     */
@@ -126,7 +126,8 @@ public final class JavaEditorManager {
       public void pageActivated(IWorkbenchPage page) {
       }
    };
-
+   
+  
    /**
     * Listens for changes of {@link IPartListener}s.
     */
@@ -336,25 +337,7 @@ public final class JavaEditorManager {
     * @param javaEditor The {@link JavaEditor} to update its outline.
     */
    private static void updateOutline(final JavaEditor javaEditor) {
-      // add update listener for the Outline
-//         JavaCore.addElementChangedListener(new IElementChangedListener() {
-//            
-//            @Override
-//            public void elementChanged(ElementChangedEvent event) {
-//               if (event.getDelta().getElement().getElementType() == IJavaElement.COMPILATION_UNIT) {
-//                  try {
-//                     IContentOutlinePage outline = (IContentOutlinePage)javaEditor.getAdapter(IContentOutlinePage.class);
-//                     updateOutline(outline);
-//                  }
-//                  catch (Exception e) {
-//                     LogUtil.getLogger().logError(e);
-//                  }
-//               
-//               
-//               }
-//            }
-//         });
-//      
+
       javaEditor.getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
          @Override
          public void run() {
@@ -368,8 +351,7 @@ public final class JavaEditorManager {
          }
       });
    }
-   
-   
+
    
    /**
     * Updates the given {@link IPage} of the outline view according to 
@@ -383,10 +365,15 @@ public final class JavaEditorManager {
    private static void updateOutline(IPage outlinePage) throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
       if (outlinePage instanceof JavaOutlinePage) {
          
-         JavaOutlinePage joutline = (JavaOutlinePage) outlinePage; 
+         final JavaOutlinePage joutline = (JavaOutlinePage) outlinePage; 
+    
          final TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
-         ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
-         outlineViewer.setLabelProvider(new OutlineLableWrapper(new JavaUILabelProvider())); //Set new LableProvider to an extended one with overwritten getImage method
+         final ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
+         
+         //Set new LableProvider to an extended one with overwritten getImage method and the old AppearanceAwareLableProvier
+         OutlineLableWrapper wrapper =  new OutlineLableWrapper((AppearanceAwareLabelProvider)((DecoratingJavaLabelProvider)outlineViewer.getLabelProvider()).getStyledStringProvider());
+         outlineViewer.setLabelProvider(wrapper);
+         
          if (contentProvider instanceof OutlineContentProviderWrapper) {
             if (!PreferenceUtil.isExtensionsEnabled()) { // Restore input if required
                outlineViewer.setContentProvider(((OutlineContentProviderWrapper) contentProvider).getOriginalProvider());
@@ -395,6 +382,34 @@ public final class JavaEditorManager {
          else {
             if (PreferenceUtil.isExtensionsEnabled()) { // Change input if required
                outlineViewer.setContentProvider(new OutlineContentProviderWrapper(contentProvider));
+               //add Listener That gets called to ElementChanges in ICompilationunits
+               JavaCore.addElementChangedListener(new IElementChangedListener() {
+                  
+                  @Override
+                  public void elementChanged(ElementChangedEvent event) {
+                     //only update if it is extendable in properties
+                     if(PreferenceUtil.isExtensionsEnabled()){
+                        if (event.getDelta().getElement() instanceof ICompilationUnit){
+                            //update only if change is in ICompilationUnit and all of the changes happened to a comment
+                            // check for length == 0 makes sure that no outline update is triggered by JDT.
+                           if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0){
+                               if (Display.getDefault() != null && !Display.getDefault().isDisposed()){
+                                 Display.getDefault().asyncExec(new Runnable() {
+                                    
+                                    @Override
+                                    public void run() {
+                                      //refresh outline with Content
+                                       if (outlineViewer != null && joutline.getControl() != null){
+                                          outlineViewer.refresh(true);
+                                       }
+                                    }
+                                 });
+                               }
+                           }
+                        }
+                     }
+                  }
+               });
             }
          }
       }

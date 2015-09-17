@@ -19,8 +19,10 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.javaeditor.extension,
+ org.key_project.javaeditor.management,
  org.key_project.javaeditor.outline,
  org.key_project.javaeditor.preference.page,
  org.key_project.javaeditor.util
 Import-Package: org.eclipse.emf.common,
- org.eclipse.emf.edit
+ org.eclipse.emf.edit,
+ org.eclipse.jdt.core.manipulation

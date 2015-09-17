@@ -76,7 +76,6 @@ public class BasicDerivedProfileTest {
          return new DerivedProfile<IJMLProfile>(id, name, this) {
          };
       }
-
    }
 
    private final BaseProfile parentProfile = new BaseProfile();

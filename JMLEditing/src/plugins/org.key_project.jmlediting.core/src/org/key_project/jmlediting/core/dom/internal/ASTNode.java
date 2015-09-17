@@ -22,7 +22,7 @@ public class ASTNode extends AbstractASTNode {
     * The list of all children.
     */
    private final List<IASTNode> children;
-
+   
    /**
     * Creates a new {@link ASTNode}. The start offset needs to be less than or
     * equal to the end offset.
@@ -76,5 +76,4 @@ public class ASTNode extends AbstractASTNode {
          return Collections.unmodifiableList(children);
       }
    }
-
 }

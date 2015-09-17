@@ -21,8 +21,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotJMLOutlineUpdate {
    
-   
-   
    private static SWTWorkbenchBot bot = new SWTWorkbenchBot();
    private static TestProject testProject;
    private static SWTBotEclipseEditor editor = null;
@@ -31,12 +29,10 @@ public class SWTBotJMLOutlineUpdate {
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineUpdateTest";
   
-   private static String textToAdd = "//@ invariant test;";
-   
-//   private static String textToAdd2 = "/*@ behavior\r\n     @ requires 1+1;\r\n     @*/\r\n   /**\r\n    * javadoc\r\n    */\r\n";
-   
+   private static String textToAdd2 = "//@ invariant a < b;";
+   private static String textToAddMethod = "\t//@behavior";
+
    private static SWTBotTree tree;
-   
    
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
@@ -52,8 +48,17 @@ public class SWTBotJMLOutlineUpdate {
       SWTBotView view = bot.viewByTitle("Outline");
        bot.menu("Window").click().menu("Show View").click().menu("Outline").click();
        view.show();
-       tree = view.bot().tree();
-       
+       tree = view.bot().tree();   
+   }
+   
+   private int getLine(String s){
+      int i = 0;
+      for(String linestr : editor.getLines()){
+         if (linestr.contains(s)) {
+            return i;
+         } else i++;
+      }
+      return -1;
    }
    
    public void test(String itemSource, String itemName, int it1, int it2) {
@@ -68,7 +73,7 @@ public class SWTBotJMLOutlineUpdate {
                   item2.click();
                   item2.select().click();
                   if (item2.getText().equals(itemName)) {
-                     assertEquals(itemSource, editor.getSelection());
+                     assertEquals(itemSource.trim(), editor.getSelection().trim());
                      assertEquals(itemName, item2.getText());
                   } else {
                      assertTrue(false);
@@ -81,32 +86,67 @@ public class SWTBotJMLOutlineUpdate {
       }assertTrue("Failed at : " +itemName , false);
    }
    
+   public void testbehavior(String method, String itemSource, String itemName,boolean reloadtree){
+      if (reloadtree){
+         tree = bot.viewByTitle("Outline").bot().tree();
+      }
+      for (SWTBotTreeItem item : tree.getAllItems()) {
+         if(item.getItems() != null){
+            for (SWTBotTreeItem item2 : item.getItems() ){
+               if(item2.getText().equals(method)) {
+                  item2.expand();
+                  item2.getItems()[0].select().click();;
+                  assertEquals(itemName.trim(), item2.getItems()[0].getText().trim());
+                  assertEquals(itemSource.trim(), editor.getSelection().trim());
+                  return;
+               }
+            }
+         } 
+      }
+      assertTrue(method+ ": No Method Found", false);
+      
+      
+   }
+   
    
    @AfterClass
    public static void closeEditor() {
       editor.close();
    }
-
-   
-   public void saveUpdate() {
-      bot.saveAllEditors();
-   }
    
    public void addTextSeriell(int startLine, int startCol, String text) {
       for (int i = 0; i < text.length(); i++ ){
-//         bot.activeEditor().toTextEditor().insertText(startLine, i+startCol, text.charAt(i));
+         bot.activeEditor().toTextEditor().insertText(startLine, i+startCol, String.valueOf(text.charAt(i)));
       }
    }
    
+   
    @Test
-   public void outlineUpdateTestOnInitialChange(){
-      bot.activeEditor().toTextEditor().insertText(5, 0, textToAdd);
-      //TODO: noch saven bzw sollte angezeigt werden da init change !! weitere test kein bock auf den rotz
-      test(textToAdd, "invariant test", 1, 0);
+   public void outlineUpdateInvariant() {
+     addTextSeriell(6, 0, textToAdd2);
+     bot.sleep(1000);
+     test(textToAdd2, "invariant a < b", 1, 0);  
    }
    
-   public void outlineUpdateTestOnSave() {
- //     bot.activeEditor().toTextEditor().insertText(line, column, text);
+   @Test
+   public void outlineUpdateMethod() {
+      addTextSeriell(getLine("public void ab")-1, 0, textToAddMethod);
+      bot.sleep(1000);
+      testbehavior("ab() : void", "//@behavior", "behavior", true);
+   }
+   
+   @Test
+   public void outlinePureType() {
+      addTextSeriell(getLine("public void a"), 9, " /*@pure@*/");
+      bot.sleep(1000);
+      testbehavior("a() : void", "/*@pure@*/", "pure", true);
+   }
+   
+   @Test
+   public void outlineSpecType() {
+      addTextSeriell(getLine("private int i"), 10, "/*@spec_public@*/ ");
+      bot.sleep(10000);
+      testbehavior("i : int", "/*@spec_public@*/", "spec_public", true);
    }
    
    

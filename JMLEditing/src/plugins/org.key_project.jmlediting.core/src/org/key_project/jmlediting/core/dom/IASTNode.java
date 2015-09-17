@@ -2,6 +2,10 @@ package org.key_project.jmlediting.core.dom;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.resolver.ResolveResult;
+
 /**
  * This class specifies a general AST node for JML.
  *
@@ -107,4 +111,12 @@ public interface IASTNode {
     */
    String prettyPrintAST();
 
+   /**
+    * The method for the node to resolve itself.
+    * @param the {@link IJMLProfile} defining the JML syntax.
+    * @param the {@link ICompilationUnit} of the given node is expected to provide necessary context.
+    * 
+    * @return the {@link ResolveResult}.
+    */
+   ResolveResult resolve(IJMLProfile profile, ICompilationUnit cu);
 }

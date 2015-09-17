@@ -30,12 +30,13 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
    public OutlineContentProviderWrapper(ITreeContentProvider originalProvider) {
       this.originalProvider = originalProvider;
    }
+   
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void dispose() {
+   public final void dispose() {
       originalProvider.dispose();
    }
 
@@ -43,7 +44,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
     * {@inheritDoc}
     */
    @Override
-   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+   public final void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       originalProvider.inputChanged(viewer, oldInput, newInput);
    }
 
@@ -51,7 +52,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
     * {@inheritDoc}
     */
    @Override
-   public Object[] getElements(Object inputElement) {
+   public final Object[] getElements(Object inputElement) {
       Object[] elements = originalProvider.getElements(inputElement);
       for (IOutlineModifier modifyer : outlineModifier) {
          elements = modifyer.modify(inputElement, elements);
@@ -63,7 +64,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
     * {@inheritDoc}
     */
    @Override
-   public Object[] getChildren(Object parentElement) {
+   public final Object[] getChildren(Object parentElement) {
       Object[] elements = originalProvider.getChildren(parentElement);
       for (IOutlineModifier modifyer : outlineModifier) {
          elements = modifyer.modify(parentElement, elements);
@@ -75,7 +76,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
     * {@inheritDoc}
     */
    @Override
-   public Object getParent(Object element) {
+   public final Object getParent(Object element) {
       return originalProvider.getParent(element);
    }
 
@@ -83,7 +84,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
     * {@inheritDoc}
     */
    @Override
-   public boolean hasChildren(Object element) {
+   public final boolean hasChildren(Object element) {
       return !ArrayUtil.isEmpty(getChildren(element));
    }
 
@@ -91,7 +92,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
     * Returns the original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
     * @return The original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
     */
-   public ITreeContentProvider getOriginalProvider() {
+   public final ITreeContentProvider getOriginalProvider() {
       return originalProvider;
    }
 }

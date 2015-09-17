@@ -56,5 +56,4 @@ public class PersistenceParentProfile extends AbstractJMLProfile {
       return new DerivedProfile<IJMLProfile>(id, name, this) {
       };
    }
-
 }
