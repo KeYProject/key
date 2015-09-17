@@ -1,22 +1,14 @@
 package org.key_project.jmlediting.ui.test.Outline;
 
-import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.locks.Condition;
 
-import javax.swing.SwingUtilities;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
-import org.eclipse.swtbot.swt.finder.waits.ICondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPageLayout;
@@ -27,8 +19,6 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject.SaveGuarantee;
-import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.SwingUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotJMLOutlineUpdate {
@@ -43,7 +33,6 @@ public class SWTBotJMLOutlineUpdate {
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineUpdateTest";
   
-   private static String textToAdd = "//@ invariant test;";
    private static String textToAdd2 = "//@ invariant a < b;";
    private static String textToAddMethod = "\t//@behavior";
    
@@ -51,9 +40,6 @@ public class SWTBotJMLOutlineUpdate {
    
    private static SWTBotTree tree;
    
-   private int offset = 0;
-   private int firstMeth = 5;//test where actual methods are
-   private int secMethod = 7;
    
    
    
