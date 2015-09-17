@@ -119,8 +119,17 @@ public class Resolver implements IResolver {
         imports.addAll(jdtAST.imports());
         pack = jdtAST.getPackage();
         
-        // Get all the JDT comments so we can find the correct one.
-        final List<Comment> jdtCommentList = jdtAST.getCommentList();
+        // Get all JDT comments for the JML comments so we can find the correct one
+        List<Comment> jdtcomments = jdtAST.getCommentList();
+        ArrayList<Comment> listWithoutJavaDoc = new ArrayList<Comment>();
+        for (Comment comment : jdtcomments){
+            
+            if (!comment.isDocComment()){
+                listWithoutJavaDoc.add(comment);
+            }
+        }
+        
+        final List<Comment> jdtCommentList = listWithoutJavaDoc;
         
         // Locate the comments
         String source = null;
@@ -160,19 +169,28 @@ public class Resolver implements IResolver {
             
             @Override
             public boolean preVisit2(final ASTNode node) {
+                // Check if the node has a comment at all
                 final int start = jdtAST.firstLeadingCommentIndex(node);
                 if (start != -1) {
-                    int pos = start;
-                    while (pos < jdtCommentList.size()
-                            && jdtCommentList.get(pos).getStartPosition() < node.getStartPosition()) {
-                        final Comment comment = jdtCommentList.get(pos);
-                        assert !commentToAST.containsKey(comment);
-                        if(node.getNodeType() == ASTNode.PRIMITIVE_TYPE || node.getNodeType() == ASTNode.SIMPLE_TYPE) {
-                            commentToAST.put(comment, node.getParent());
-                        } else {
-                            commentToAST.put(comment, node);
+                    // extended start = start if JML in between Javadoc and Node (e.g. method)
+                    // extended start < start if JML above Javadoc.
+                    // Note that it will not be extended if an empty line is between JML and Javadoc.
+                    int extStartNode = jdtAST.getExtendedStartPosition(node);
+                    int extEndNode = extStartNode + jdtAST.getExtendedLength(node);
+                    
+                    // JML belongs to the node if it is in between the extended area covered by the node
+                    for (Comment comment : jdtCommentList){
+                        int commentStart = comment.getStartPosition();
+                        int commentEnd = commentStart + comment.getLength();
+                        
+                        if (commentStart >= extStartNode && commentEnd < extEndNode){
+                          assert !commentToAST.containsKey(comment);
+                          if(node.getNodeType() == ASTNode.PRIMITIVE_TYPE || node.getNodeType() == ASTNode.SIMPLE_TYPE) {
+                              commentToAST.put(comment, node.getParent());
+                          } else {
+                              commentToAST.put(comment, node);
+                          }
                         }
-                        pos++;
                     }
                 }
                 return super.preVisit2(node);
