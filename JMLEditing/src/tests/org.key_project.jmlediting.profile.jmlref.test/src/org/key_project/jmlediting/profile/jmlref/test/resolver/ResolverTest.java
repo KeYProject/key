@@ -132,6 +132,19 @@ public class ResolverTest {
         assertEquals(type, result.getResolveType());
         assertTrue(result.getBinding().isEqualTo(resolveBinding(jdt)));
     }
+    private void importTest(final String jmlString, final String jdtString, final int jmlSkip, final ResolveResultType type) throws ResolverException {
+        final IResolver resolver = new Resolver(); // JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject())
+        ResolveResult result = null;
+        
+        result = resolver.resolve(cu, getIASTNode(jmlString, jmlSkip));
+        while(resolver.hasNext()) {
+            result = resolver.next();
+        }        
+        assertNotEquals(result, null);
+        
+        assertEquals(jdtString, result.getName());
+        assertEquals(type, result.getResolveType());
+    }
     
     @Test
     public void resolveFieldTest1() throws ResolverException {
@@ -205,6 +218,7 @@ public class ResolverTest {
     public void resolveMethodSameName1ParameterTest2() throws ResolverException {
         test("methodSameName1Parameter1", 0, 0, 1, ResolveResultType.METHOD);
     }
+    /* TypeComputer Tests
     @Test
     public void resolveMethodComplexParameterTest1() throws ResolverException {
         test("methodComplexParameter1", 0, 0, 0, ResolveResultType.METHOD);
@@ -212,7 +226,7 @@ public class ResolverTest {
     @Test
     public void resolveMethodComplexParameterTest2() throws ResolverException {
         test("methodComplexParameter1", 0, 0, 1, ResolveResultType.METHOD);
-    }
+    }*/
     @Test
     public void resolveMemberAccessTest1() throws ResolverException {
         test("field3", "methodNoParameter1" , 1, 0, 3, ResolveResultType.METHOD);
@@ -251,9 +265,21 @@ public class ResolverTest {
     }
     @Test
     public void resolvePackageImportType1() throws ResolverException {
-        test("field4", "containsKey", 0, 0, 1, ResolveResultType.METHOD);
+        importTest("integer", "add", 1, ResolveResultType.METHOD);
+        // TODO: new Test needed, because I can not compare JDT trees.
     }
-
+    @Test
+    public void resolvePackageImportParameterizedType1() throws ResolverException {
+        importTest("field4", "containsKey", 1, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolvePackageImportParameterizedType2() throws ResolverException {
+        importTest("field4", "put", 2, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolvePackageImportOnDemand1() throws ResolverException {
+        importTest("fr", "read", 0, ResolveResultType.METHOD);
+    }
     //TODO: write tests, that are meant to fail.
 
     /**

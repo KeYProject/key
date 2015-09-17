@@ -28,8 +28,6 @@ public class TypeComputer implements ITypeComputer {
     @Override
     public ITypeBinding computeType(final IASTNode node) throws TypeComputerException {
         
-        System.out.println("DefaultTypeComputer.computeStep");
-        
         if(node == null) {
             return null;
         }
@@ -46,6 +44,7 @@ public class TypeComputer implements ITypeComputer {
         } else if(node.getType() == NodeTypes.NODE) {
             
         } else if(node.getType() == NodeTypes.LIST) {
+            
             
         } else if(node.getType() == NodeTypes.SEQ) {
             
