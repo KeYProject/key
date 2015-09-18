@@ -1,16 +1,18 @@
 package test;
 
 public class TestClass {
-    //@ invariant aNewName == 5;
-    public int aNewName = 5;
+
+    public int balance = 5;
+    
+    //@ invariant balance == 5;
     
     /*@ normal_behavior
-      @ assignable aNewName;
+      @ assignable balance;
       @*/ 
     public void setBalance(int newBalance) {
         if (newBalance == 5)
-            aNewName = newBalance;
+            balance = newBalance;
         else
-            aNewName = 5;
+            balance = 5;
     }
 }

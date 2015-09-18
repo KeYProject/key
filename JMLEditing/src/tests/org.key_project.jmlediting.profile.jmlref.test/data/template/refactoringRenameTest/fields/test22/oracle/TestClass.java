@@ -1,8 +1,10 @@
 package test;
 
 public class TestClass {
-    //@ invariant aNewName == 5;
+
     public int aNewName = 5;
+    
+    //@ invariant aNewName == 5;
     
     /*@ normal_behavior
       @ assignable aNewName;
