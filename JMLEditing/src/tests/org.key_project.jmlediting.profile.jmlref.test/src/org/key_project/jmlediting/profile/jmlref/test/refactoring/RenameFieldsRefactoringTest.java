@@ -164,4 +164,10 @@ public class RenameFieldsRefactoringTest {
          TestUtilsRefactoring.runFieldRenameTest(TESTPATH+"\\test22", srcFolder, oracleFolder, bot, 
                  "TestClass", "test", "balance : int", "aNewName", javaProject);
      }
+     
+     @Test
+     public void test23StaticSamePackage() throws CoreException {
+         TestUtilsRefactoring.runFieldRenameTest(TESTPATH+"\\test23", srcFolder, oracleFolder, bot, 
+                 "TestClassOther", "test", "balance : int", "aNewName", javaProject);
+     }
 }

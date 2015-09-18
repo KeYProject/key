@@ -133,7 +133,7 @@ public class RenameMethodRefactoringTest {
     }
     
     // TODO: Resolver returns null but no Exception.
-    //@Test
+    @Test
     public void test16TwoClassesDifferentPackageStatic() throws CoreException {   
         TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test16", srcFolder, oracleFolder, bot, 
                 "TestClassOther", "otherPackage", "getBalance() : int", "newMethodName", javaProject);
