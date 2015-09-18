@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.Attributes.Name;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -100,13 +102,7 @@ public class Resolver implements IResolver {
         }
         
         // reset everything .. so we can resolve more than once, with one instance or a resolver
-        context = null;
-        this.compilationUnit = compilationUnit;
-        commentToAST.clear();
-        imports.clear();
-        tasks.clear();
-        currentTask = null;
-        pack = null;
+        reset(compilationUnit);
         
         // First, we get all the information about, what we have to resolve by checking the given IASTNode.
         // this builds up the task list.
@@ -115,14 +111,15 @@ public class Resolver implements IResolver {
         // Parse JML and map nodes to JDT
         // Parse JDT first
         final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(compilationUnit);
-        
+                
         imports.addAll(jdtAST.imports());
+        
         pack = jdtAST.getPackage();
         
         // Get all JDT comments for the JML comments so we can find the correct one
-        List<Comment> jdtcomments = jdtAST.getCommentList();
-        ArrayList<Comment> listWithoutJavaDoc = new ArrayList<Comment>();
-        for (Comment comment : jdtcomments){
+        final List<Comment> jdtcomments = jdtAST.getCommentList();
+        final ArrayList<Comment> listWithoutJavaDoc = new ArrayList<Comment>();
+        for (final Comment comment : jdtcomments){
             
             if (!comment.isDocComment()){
                 listWithoutJavaDoc.add(comment);
@@ -175,13 +172,13 @@ public class Resolver implements IResolver {
                     // extended start = start if JML in between Javadoc and Node (e.g. method)
                     // extended start < start if JML above Javadoc.
                     // Note that it will not be extended if an empty line is between JML and Javadoc.
-                    int extStartNode = jdtAST.getExtendedStartPosition(node);
-                    int extEndNode = extStartNode + jdtAST.getExtendedLength(node);
+                    final int extStartNode = jdtAST.getExtendedStartPosition(node);
+                    final int extEndNode = extStartNode + jdtAST.getExtendedLength(node);
                     
                     // JML belongs to the node if it is in between the extended area covered by the node
-                    for (Comment comment : jdtCommentList){
-                        int commentStart = comment.getStartPosition();
-                        int commentEnd = commentStart + comment.getLength();
+                    for (final Comment comment : jdtCommentList){
+                        final int commentStart = comment.getStartPosition();
+                        final int commentEnd = commentStart + comment.getLength();
                         
                         if (commentStart >= extStartNode && commentEnd < extEndNode){
                           assert !commentToAST.containsKey(comment);
@@ -201,6 +198,19 @@ public class Resolver implements IResolver {
         context = commentToAST.get(jdtComment);
         
         return next();
+    }
+
+    /** Reset everything to their default values.
+     * @param compilationUnit the {@link ICompilationUnit} to reset to.
+     */
+    private void reset(final ICompilationUnit compilationUnit) {
+        context = null;
+        this.compilationUnit = compilationUnit;
+        commentToAST.clear();
+        imports.clear();
+        tasks.clear();
+        currentTask = null;
+        pack = null;
     }
     
     /**
@@ -309,12 +319,23 @@ public class Resolver implements IResolver {
             if(currentTask.isMethod) {
                 // TODO: WHY?
                 context = getDeclaringClass(context);
-                
+
                 final IType type = (IType) ((TypeDeclaration)context).resolveBinding().getJavaElement();
+                
+                /*for(IMethodBinding methodBinding : ((TypeDeclaration)context).resolveBinding().getDeclaredMethods()) {
+                    methodBinding.
+                }*/
+                
                 
                 //System.out.println(type.getFullyQualifiedName());
                 final IMethod method = type.getMethod(currentTask.resolveString, createParameterSignatures(currentTask.parameters));
-                
+                try {
+                    final IMethod[] allMethods = type.getMethods();
+                    
+                }
+                catch (final JavaModelException e) {
+                    LogUtil.getLogger().logError(e);
+                }
                 //TODO .. problem still exists with parameterized types
                 //type.findMethods(method);
                 
@@ -382,6 +403,10 @@ public class Resolver implements IResolver {
             // method was not defined in this class.
             final Type newContext = getDeclaringClass(context).getSuperclassType();
             try {
+                if(newContext == null) {
+                    // TODO:
+                }
+                
                 final IType type = compilationUnit.getJavaProject().findType(newContext.resolveBinding().getQualifiedName());
                 if(type == null) {
                     return null;
@@ -436,8 +461,7 @@ public class Resolver implements IResolver {
         return result;
     }
 
-    /**
-     * Uses the {@link SearchEngine} to get the class specified by resolveString
+    /** Uses the {@link SearchEngine} to get the class specified by resolveString.
      * @param resolveString the class name you are searching for
      * @param binding the {@link IPackageBinding} of the package that is used as a context to search in
      * @return the {@link ASTNode} of the {@link TypeDeclaration} of the class we are searching for
@@ -509,6 +533,7 @@ public class Resolver implements IResolver {
         if(typeBinding.isPrimitive()) {
             throw new ResolverException("Can not resolve an access to a primitive type.");
         } else if(typeBinding.isArray()) {
+            
             // TODO: We found an array .. what to do? What is the context we set to.          
             // Set context to Object for everything that isnt ".length" or ".clone()" 
             //      context.getAST().resolveWellKnownType("java.lang.Object");
@@ -553,8 +578,15 @@ public class Resolver implements IResolver {
         
         for(final ImportDeclaration imp : imports) {
             
-            final IBinding binding = imp.resolveBinding();       
+            final org.eclipse.jdt.core.dom.Name n = imp.getName();
+            /*        // Create an additional Import for java.lang.*
+            final ImportDeclaration javaLang = jdtAST.getAST().newImportDeclaration();
+            javaLang.setName(jdtAST.getAST().newQualifiedName(jdtAST.getAST().newSimpleName("java"), jdtAST.getAST().newSimpleName("lang")));
+            javaLang.setOnDemand(true);
+            javaLang.*/
             
+            final IBinding binding = imp.resolveBinding();       
+            // TODO: java.lang. package import
             if(binding instanceof IPackageBinding) {
                 final ASTNode result = findInPackage(resolveString, (IPackageBinding) binding);
                 if(result == null) {
@@ -758,7 +790,7 @@ public class Resolver implements IResolver {
      * @param jmlNode - the {@link IASTNode} that is supposed to be resolved.
      * @throws ResolverException is thrown, if the jmlNode isn't built correctly.
      */
-    protected void buildResolverTask(final IASTNode jmlNode) throws ResolverException {
+    protected final void buildResolverTask(final IASTNode jmlNode) throws ResolverException {
         
         tasks.add(new ResolverTask());
         
@@ -785,7 +817,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isPrimaryExpr(final IASTNode node) {
+    protected final boolean isPrimaryExpr(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
             // PRIMARY
@@ -809,7 +841,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isJavaKeyword(final IASTNode node) {
+    protected final boolean isJavaKeyword(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.JAVA_KEYWORD) {
             tasks.getLast().isKeyword  = true;
@@ -824,7 +856,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isJmlPrimary(final IASTNode node) {
+    protected final boolean isJmlPrimary(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.JML_PRIMARY) {                    
             // PRIMARY -> JML_PRIMARY
@@ -839,7 +871,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isKeyword(final IASTNode node) {
+    protected final boolean isKeyword(final IASTNode node) {
         boolean result = false;
         if(node.getType() == NodeTypes.KEYWORD && ((IKeywordNode)node).getKeywordInstance().equals("\\result")) {
             // PRIMARY -> JML_PRIMARY -> []
@@ -857,7 +889,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isIdentifier(final IASTNode node) {
+    protected final boolean isIdentifier(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.IDENTIFIER) {                    
             // PRIMARY -> IDENTIFIER
@@ -872,7 +904,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isString(final IASTNode node) {
+    protected final boolean isString(final IASTNode node) {
         boolean result = false;
         if(node.getType() == NodeTypes.STRING) {
             // PRIMARY -> IDENTIFIER -> STRING
@@ -889,7 +921,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isList(final IASTNode node) {
+    protected final boolean isList(final IASTNode node) {
         boolean result = false;
         if(node.getType() == NodeTypes.LIST) {
             // PRIMARY -> IDENTIFIER -> STRING
@@ -907,7 +939,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isArrayAccess(final IASTNode node) {
+    protected final boolean isArrayAccess(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.ARRAY_ACCESS) {
             // PRIMARY -> []
@@ -926,7 +958,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isMethodCall(final IASTNode node) {
+    protected final boolean isMethodCall(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.METHOD_CALL_PARAMETERS) {
             // PRIMARY -> IDENTIFIER -> STRING
@@ -944,7 +976,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isEmptyList(final IASTNode node) {
+    protected final boolean isEmptyList(final IASTNode node) {
         // PRIMARY -> IDENTIFIER -> STRING
         //         -> LIST       -> METHOD_CALL -> NONE           
         return node.getType() == NodeTypes.NONE;
@@ -956,7 +988,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isExpressionList(final IASTNode node) {
+    protected final boolean isExpressionList(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.EXPRESSION_LIST) {
             // PRIMARY -> IDENTIFIER -> STRING
@@ -975,7 +1007,7 @@ public class Resolver implements IResolver {
      * @param node - the {@link IASTNode} to get information from
      * @return true, if the node and every child node is correct.
      */
-    protected boolean isMemberAccess(final IASTNode node) {
+    protected final boolean isMemberAccess(final IASTNode node) {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.MEMBER_ACCESS) {
             // PRIMARY -> IDENTIFIER -> STRING
@@ -993,7 +1025,7 @@ public class Resolver implements IResolver {
      * {@inheritDoc}
      */
     @Override
-    public boolean hasNext() {
+    public final boolean hasNext() {
         if(tasks.size() > 0) {
             return true;
         }

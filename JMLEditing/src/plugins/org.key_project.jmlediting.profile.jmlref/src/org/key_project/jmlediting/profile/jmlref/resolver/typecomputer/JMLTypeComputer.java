@@ -60,7 +60,7 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
             
             // TODO: call on child? .. give everything to resolver?
             // compare afterwards?
-            return callResolver(node, new Resolver());
+            return callResolver(node.getChildren().get(0), new Resolver());
             
         } else if(type == ExpressionNodeTypes.CONDITIONAL_OP) {
             
