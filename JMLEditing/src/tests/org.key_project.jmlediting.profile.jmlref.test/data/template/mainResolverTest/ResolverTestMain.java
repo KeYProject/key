@@ -6,8 +6,6 @@ import java.math.BigInteger;
 
 public class ResolverTestMain {
    
-   //@invariant a+b*c;
-   
     private static int staticField1 = 0;
     private /*@ spec_public @*/ int field1 = 0;
     private /*@ spec_public @*/ String field2 = "field2content";

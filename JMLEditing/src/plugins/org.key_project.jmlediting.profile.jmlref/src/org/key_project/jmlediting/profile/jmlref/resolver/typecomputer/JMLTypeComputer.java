@@ -112,10 +112,10 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
                 if(child.getType() != NodeTypes.STRING) {
                     operand = computeType(child);
                     if (arithmeticalBinding(operand)) {
-                       if(operand.equals(FLOAT) || operand.equals(P_FLOAT)) {
+                       if(operand.isEqualTo(FLOAT) || operand.isEqualTo(P_FLOAT)) {
                           savedType = FLOAT;
-                       } else if(operand.equals(INTEGER) || operand.equals(P_INTEGER)) {
-                          if(!operand.equals(FLOAT)) {
+                       } else if(operand.isEqualTo(INTEGER) || operand.isEqualTo(P_INTEGER)) {
+                          if(!operand.isEqualTo(FLOAT)) {
                              savedType = INTEGER;
                           }
                        }
@@ -166,7 +166,8 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
            return createWellKnownType(((IStringNode) node.getChildren().get(0)).getString());
             
         } else if(type == ExpressionNodeTypes.REFERENCE_TYPE) {
-           return callResolver(node.getChildren().get(0), new Resolver());
+//           return callResolver(node.getChildren().get(0).get(0) , new Resolver());
+           return callResolver(node.getChildren().get(0).getChildren().get(0), new Resolver());
             
         } else if(type == ExpressionNodeTypes.RELATIONAL_OP) {
             
@@ -185,8 +186,8 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
     }
     
     private boolean arithmeticalBinding (ITypeBinding b1) {
-       return ( b1.equals(FLOAT) || b1.equals(INTEGER) || b1.equals(CHAR) 
-              || b1.equals(P_FLOAT) || b1.equals(P_INTEGER) || b1.equals(P_CHAR) );
+       return ( b1.isEqualTo(FLOAT) || b1.isEqualTo(INTEGER) || b1.isEqualTo(CHAR) 
+              || b1.isEqualTo(P_FLOAT) || b1.isEqualTo(P_INTEGER) || b1.isEqualTo(P_CHAR) );
        
     }
   
