@@ -218,7 +218,6 @@ public class ResolverTest {
     public void resolveMethodSameName1ParameterTest2() throws ResolverException {
         test("methodSameName1Parameter1", 0, 0, 1, ResolveResultType.METHOD);
     }
-    /* TypeComputer Tests
     @Test
     public void resolveMethodComplexParameterTest1() throws ResolverException {
         test("methodComplexParameter1", 0, 0, 0, ResolveResultType.METHOD);
@@ -226,7 +225,7 @@ public class ResolverTest {
     @Test
     public void resolveMethodComplexParameterTest2() throws ResolverException {
         test("methodComplexParameter1", 0, 0, 1, ResolveResultType.METHOD);
-    }*/
+    }
     @Test
     public void resolveMemberAccessTest1() throws ResolverException {
         test("field3", "methodNoParameter1" , 1, 0, 3, ResolveResultType.METHOD);

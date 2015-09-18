@@ -25,7 +25,7 @@ Test7: more complex usage of balance. More than one member access.
 Test8: Changes to the JML code in the other class but no changes to the java code. Other class accesses the balance field
       from the main class by using getBalance() but refers to the field in the JML code.
 Test9: Like 8 but with 2 files without java changes.
-(Resolver problem) Test10: change within an invariant.
+Test10: change within an invariant.
 Test11: combination of this qualifier and method with same name as the field.
 Test12: test11 plus a nested field call: TestClass balance; this.balance.balance()
 Test13: test12 with changed order: this.balance().balance
@@ -43,6 +43,8 @@ Test20: Additional to test19, the referencingProject has an own field called bal
 
 Tests with only one project:
 Test21: Accessing a field using a fully qualified class name.
+Test22: Class invariant but not written above the field it refers to.
+Test23: Static field access. Other class is in same package. Thus no package reference before class name needed.
 
 ****** Testing Parameter Renaming *****
 Test1: One method, one parameter.

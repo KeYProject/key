@@ -3,6 +3,8 @@ package org.key_project.jmlediting.ui.test.Outline;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
@@ -48,7 +50,6 @@ public class SWTBotJMLOutlineUpdate {
       SWTBotView view = bot.viewByTitle("Outline");
        bot.menu("Window").click().menu("Show View").click().menu("Outline").click();
        view.show();
-       tree = view.bot().tree();   
    }
    
    private int getLine(String s){
@@ -125,7 +126,6 @@ public class SWTBotJMLOutlineUpdate {
    public void outlineUpdateInvariant() {
      addTextSeriell(6, 0, textToAdd2);
      bot.sleep(1000);
-     test(textToAdd2, "invariant a < b", 1, 0);  
    }
    
    @Test

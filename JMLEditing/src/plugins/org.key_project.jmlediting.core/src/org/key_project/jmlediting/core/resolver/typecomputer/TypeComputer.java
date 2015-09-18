@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.core.resolver.typecomputer;
 
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -17,9 +18,19 @@ import org.key_project.util.jdt.JDTUtil;
 public class TypeComputer implements ITypeComputer {
 
     protected ICompilationUnit compilationUnit;
+   
+    final protected ITypeBinding P_FLOAT, P_INTEGER, P_CHAR,
+                                  FLOAT, INTEGER, CHAR;
 
     public TypeComputer(final ICompilationUnit compilationUnit) {
         this.compilationUnit = compilationUnit;
+        
+        P_FLOAT = createWellKnownType("float");
+        P_INTEGER = createWellKnownType("int");
+        P_CHAR = createWellKnownType("char");
+        FLOAT = createWellKnownType("java.lang.Float");
+        INTEGER = createWellKnownType("java.lang.Integer");
+        CHAR = createWellKnownType("java.lang.Character");
     }
 
     /**
@@ -124,7 +135,8 @@ public class TypeComputer implements ITypeComputer {
             return createWellKnownType("java.lang.String");
         } else if(type == JavaBasicsNodeTypes.NAME) {
             // TODO .. what is name?
-            //return createWellKnownType("");
+           System.out.println("No IType of NodeType");
+           return createWellKnownType("NAME"); // should never happen
         }
         return null;
     }

@@ -7,10 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes.Name;
 
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -37,7 +38,6 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
-import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
@@ -48,8 +48,6 @@ import org.key_project.jmlediting.core.resolver.ResolveResultType;
 import org.key_project.jmlediting.core.resolver.ResolverException;
 import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputer;
 import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputerException;
-import org.key_project.jmlediting.core.utilities.CommentLocator;
-import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.typecomputer.JMLTypeComputer;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
@@ -111,22 +109,8 @@ public class Resolver implements IResolver {
         // Parse JML and map nodes to JDT
         // Parse JDT first
         final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(compilationUnit);
-                
-        imports.addAll(jdtAST.imports());
         
         pack = jdtAST.getPackage();
-        
-        // Get all JDT comments for the JML comments so we can find the correct one
-        final List<Comment> jdtcomments = jdtAST.getCommentList();
-        final ArrayList<Comment> listWithoutJavaDoc = new ArrayList<Comment>();
-        for (final Comment comment : jdtcomments){
-            
-            if (!comment.isDocComment()){
-                listWithoutJavaDoc.add(comment);
-            }
-        }
-        
-        final List<Comment> jdtCommentList = listWithoutJavaDoc;
         
         // Locate the comments
         String source = null;
@@ -137,29 +121,32 @@ public class Resolver implements IResolver {
             return null;
         }
         
-        Comment jdtComment = null;
+        // Finding the whole JML comment which contains our IASTNode by
+        // getting all JDT comments (everything with // or /*)
+        // and filtering those for comments which start with either //@ or /*@
+        List<Comment> jdtcomments = jdtAST.getCommentList();
         
-        // TODO: REWRITE! COMPLEATLY! DONT USE COMMENT LOCATOR .. JUST USE JDT COMMENTS
-        final CommentLocator locator = new CommentLocator(source);
+        final ArrayList<Comment> jmlcomments = new ArrayList<Comment>();
         
-        for (final CommentRange jmlCommentRange : locator.findJMLCommentRanges()) {
+        Comment jmlComment = null;
+        
+        // Filtering the JDT comments
+        for (Comment comment : jdtcomments){
             
-            // Search for the correct CommentRange containing our IASTNode that is supposed to be resolved.
-            if(jmlCommentRange.getBeginOffset() <= jmlNode.getStartOffset() && jmlCommentRange.getEndOffset() >= jmlNode.getEndOffset()) {
-                // Map the JML comment to the corresponding JDT comment.
-                for (final Comment comment : jdtCommentList) {
-                    // check if we got the correct JDT comment
-                    if (jmlCommentRange.getBeginOffset() == comment.getStartPosition()) {
-                        jdtComment = comment;
-                        break;
-                    }
-                }
-                // Go out of the for loop, because we found the correct jdt comment.
-                break;
+            int commentStart = comment.getStartPosition();
+            String stringToCompare = source.substring(commentStart, commentStart+3);
+            
+            if (stringToCompare.equals("//@") || stringToCompare.equals("/*@"))
+            {
+                jmlcomments.add(comment);
+                
+                // check if the JML comment contains our IASTNode that is supposed to be resolved
+                if (commentStart <= jmlNode.getStartOffset() &&
+                        commentStart + comment.getLength() >= jmlNode.getEndOffset())
+                    jmlComment = comment;
             }
         }
-        
-        // TODO: REWRITE Mapping for context
+
         
         // this maps every jdt comment to the jdt ASTNode it belongs to.
         jdtAST.accept(new ASTVisitor() {
@@ -176,9 +163,6 @@ public class Resolver implements IResolver {
                     final int extEndNode = extStartNode + jdtAST.getExtendedLength(node);
                     
                     // JML belongs to the node if it is in between the extended area covered by the node
-                    for (final Comment comment : jdtCommentList){
-                        final int commentStart = comment.getStartPosition();
-                        final int commentEnd = commentStart + comment.getLength();
                         
                         if (commentStart >= extStartNode && commentEnd < extEndNode){
                           assert !commentToAST.containsKey(comment);
@@ -194,8 +178,19 @@ public class Resolver implements IResolver {
             }
         });
         
+        // Check if there are any JML comments not yet mapped. 
+        // Those should be class invariants not directly written above a field or such.
+        // Put the TypeDecleration of the CompilationUnit/ASTNode into commentToAST.
+        // Method invariants should have been mapped before.
+        
+        for (Comment comment : jmlcomments){
+            if (!commentToAST.containsKey(comment)){
+                ASTNode compUnitType = getTypeInCompilationUnit(compilationUnit.getElementName().substring(0, compilationUnit.getElementName().lastIndexOf('.')), jdtAST);
+                commentToAST.put(comment, compUnitType);
+            }
+        }
+        
         // now we have all the information we need
-        context = commentToAST.get(jdtComment);
         
         return next();
     }
@@ -279,7 +274,8 @@ public class Resolver implements IResolver {
 
     private TypeDeclaration getDeclaringClass(final ASTNode context) {
         ASTNode clazz = context;
-        while(!(clazz instanceof TypeDeclaration)) {
+        while((clazz != null) && !(clazz instanceof TypeDeclaration) &&
+                clazz.getParent() != null) {
             clazz = clazz.getParent();
         }
         return (TypeDeclaration)clazz;
@@ -311,6 +307,7 @@ public class Resolver implements IResolver {
             jdtNode = findParameters(context, currentTask.resolveString);
         }
         
+        // we need to get more information, in particular which class declared the method/field.
         if(jdtNode == null && currentTask.lastResult == null) {
             context = getDeclaringClass(context);
         }
@@ -360,8 +357,72 @@ public class Resolver implements IResolver {
             jdtNode = findFromImports(currentTask.resolveString);
         }
         
+       if (jdtNode == null) {
+            jdtNode = findNextReferencesClass(currentTask.resolveString);
+        }
+        
         // return what we found... either null or the jdtNode
         return jdtNode;
+    }
+
+
+    private ASTNode findNextReferencesClass(final String resolveString) {
+        
+        IJavaProject javaProject = compilationUnit.getJavaProject();
+        
+        LinkedList<ResolverTask> tasksToWorkWith = new LinkedList<ResolverTask>();
+        tasksToWorkWith.addAll(tasks);
+        
+        final LinkedList<IType> result = new LinkedList<IType>();
+        final SearchEngine se = new SearchEngine();
+        
+        String packToSearch = resolveString;
+        String classToSearch = "";
+        int tasksToRemove = 0;
+        
+        while (tasksToWorkWith.size() > 0 && result.size() == 0){
+            
+            classToSearch = tasksToWorkWith.removeFirst().resolveString;
+            
+            try {
+                se.searchAllTypeNames(packToSearch.toCharArray(), SearchPattern.R_EXACT_MATCH, 
+                        classToSearch.toCharArray(), SearchPattern.R_EXACT_MATCH,
+                        IJavaSearchConstants.CLASS,
+                        SearchEngine.createJavaSearchScope(new IJavaElement[] {javaProject}), 
+                        new TypeNameMatchRequestor() {
+                            @Override
+                            public void acceptTypeNameMatch(final TypeNameMatch match) {
+                                result.add(match.getType());
+                            }
+                        },
+                        IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, new NullProgressMonitor());
+            }
+            catch (JavaModelException e) {
+                return null;
+            }
+            
+            packToSearch = packToSearch + "." + classToSearch;
+            tasksToRemove++;
+        }
+        
+        if (result.size() > 0){
+            IJavaElement foundClass = result.get(0).getParent();
+            if (foundClass instanceof ICompilationUnit) {
+                ICompilationUnit compUnitFound = (ICompilationUnit) foundClass;
+                
+                for (int i = tasksToRemove; i > 0; i--){
+                    if (i == 1){
+                        ResolverTask taskFoundClass = tasks.removeFirst();
+                        currentTask = taskFoundClass;
+                    } else {
+                        tasks.removeFirst();
+                    }
+                }
+                return (CompilationUnit) JDTUtil.parse(compUnitFound);
+            }
+        }
+        
+        return null;
     }
 
     private ASTNode findIMethod(final ASTNode context, final IMethod method) {

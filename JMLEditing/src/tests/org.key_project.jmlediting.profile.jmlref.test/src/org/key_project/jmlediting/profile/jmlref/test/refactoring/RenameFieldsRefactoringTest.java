@@ -94,8 +94,7 @@ public class RenameFieldsRefactoringTest {
                 "TestClass", "test", "balance : int", "aNewName", javaProject);
     }
     
-    //TODO: does not work yet
-    //@Test
+    @Test
     public void test10Invariant() throws CoreException {
         TestUtilsRefactoring.runFieldRenameTest(TESTPATH+"\\test10", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "balance : int", "aNewName", javaProject);
@@ -158,5 +157,17 @@ public class RenameFieldsRefactoringTest {
      public void test21FullyQualifiedAccessOfField() throws CoreException {
          TestUtilsRefactoring.runFieldRenameTest(TESTPATH+"\\test21", srcFolder, oracleFolder, bot, 
                  "TestClass", "test", "balance : int", "newName", javaProject);   
+     }
+     
+     @Test
+     public void test22InvariantNotAboveField() throws CoreException {
+         TestUtilsRefactoring.runFieldRenameTest(TESTPATH+"\\test22", srcFolder, oracleFolder, bot, 
+                 "TestClass", "test", "balance : int", "aNewName", javaProject);
+     }
+     
+     @Test
+     public void test23StaticSamePackage() throws CoreException {
+         TestUtilsRefactoring.runFieldRenameTest(TESTPATH+"\\test23", srcFolder, oracleFolder, bot, 
+                 "TestClassOther", "test", "balance : int", "aNewName", javaProject);
      }
 }
