@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.Attributes.Name;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
@@ -110,6 +109,7 @@ public class Resolver implements IResolver {
         // Parse JDT first
         final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(compilationUnit);
         
+        imports.addAll(jdtAST.imports());
         pack = jdtAST.getPackage();
         
         // Locate the comments
@@ -124,26 +124,27 @@ public class Resolver implements IResolver {
         // Finding the whole JML comment which contains our IASTNode by
         // getting all JDT comments (everything with // or /*)
         // and filtering those for comments which start with either //@ or /*@
-        List<Comment> jdtcomments = jdtAST.getCommentList();
+        final List<Comment> jdtComments = jdtAST.getCommentList();
         
-        final ArrayList<Comment> jmlcomments = new ArrayList<Comment>();
+        final ArrayList<Comment> jmlComments = new ArrayList<Comment>();
         
         Comment jmlComment = null;
         
         // Filtering the JDT comments
-        for (Comment comment : jdtcomments){
+        for (final Comment comment : jdtComments){
             
-            int commentStart = comment.getStartPosition();
-            String stringToCompare = source.substring(commentStart, commentStart+3);
+            final int commentStart = comment.getStartPosition();
+            final String stringToCompare = source.substring(commentStart, commentStart+3);
             
             if (stringToCompare.equals("//@") || stringToCompare.equals("/*@"))
             {
-                jmlcomments.add(comment);
+                jmlComments.add(comment);
                 
                 // check if the JML comment contains our IASTNode that is supposed to be resolved
                 if (commentStart <= jmlNode.getStartOffset() &&
-                        commentStart + comment.getLength() >= jmlNode.getEndOffset())
+                        commentStart + comment.getLength() >= jmlNode.getEndOffset()) {
                     jmlComment = comment;
+                }
             }
         }
 
@@ -156,21 +157,22 @@ public class Resolver implements IResolver {
                 // Check if the node has a comment at all
                 final int start = jdtAST.firstLeadingCommentIndex(node);
                 if (start != -1) {
-                    // extended start = start if JML in between Javadoc and Node (e.g. method)
-                    // extended start < start if JML above Javadoc.
-                    // Note that it will not be extended if an empty line is between JML and Javadoc.
-                    final int extStartNode = jdtAST.getExtendedStartPosition(node);
-                    final int extEndNode = extStartNode + jdtAST.getExtendedLength(node);
-                    
-                    // JML belongs to the node if it is in between the extended area covered by the node
-                        
-                        if (commentStart >= extStartNode && commentEnd < extEndNode){
-                          assert !commentToAST.containsKey(comment);
-                          if(node.getNodeType() == ASTNode.PRIMITIVE_TYPE || node.getNodeType() == ASTNode.SIMPLE_TYPE) {
+                 // extended start = start if JML in between Javadoc and Node (e.g. method)
+                 // extended start < start if JML above Javadoc.
+                 // Note that it will not be extended if an empty line is between JML and Javadoc.
+                 final int extStartNode = jdtAST.getExtendedStartPosition(node);
+                 final int extEndNode = extStartNode + jdtAST.getExtendedLength(node);
+                 // JML belongs to the node if it is in between the extended area covered by the node
+                 for (final Comment comment : jmlComments){
+                     final int commentStart = comment.getStartPosition();
+                     final int commentEnd = commentStart + comment.getLength();
+                     if (commentStart >= extStartNode && commentEnd < extEndNode){
+                         assert !commentToAST.containsKey(comment);
+                         if(node.getNodeType() == ASTNode.PRIMITIVE_TYPE || node.getNodeType() == ASTNode.SIMPLE_TYPE) {
                               commentToAST.put(comment, node.getParent());
-                          } else {
-                              commentToAST.put(comment, node);
-                          }
+                         } else {
+                             commentToAST.put(comment, node);
+                         }
                         }
                     }
                 }
@@ -183,14 +185,15 @@ public class Resolver implements IResolver {
         // Put the TypeDecleration of the CompilationUnit/ASTNode into commentToAST.
         // Method invariants should have been mapped before.
         
-        for (Comment comment : jmlcomments){
+        for (final Comment comment : jmlComments){
             if (!commentToAST.containsKey(comment)){
-                ASTNode compUnitType = getTypeInCompilationUnit(compilationUnit.getElementName().substring(0, compilationUnit.getElementName().lastIndexOf('.')), jdtAST);
+                final ASTNode compUnitType = getTypeInCompilationUnit(compilationUnit.getElementName().substring(0, compilationUnit.getElementName().lastIndexOf('.')), jdtAST);
                 commentToAST.put(comment, compUnitType);
             }
         }
         
         // now we have all the information we need
+        context = commentToAST.get(jmlComment);
         
         return next();
     }
@@ -212,7 +215,7 @@ public class Resolver implements IResolver {
      * {@inheritDoc}
      */
     @Override
-    public ResolveResult next() throws ResolverException {
+    public final ResolveResult next() throws ResolverException {
         currentTask = tasks.poll();
         // no more task?
         if(currentTask == null) {
@@ -274,7 +277,7 @@ public class Resolver implements IResolver {
 
     private TypeDeclaration getDeclaringClass(final ASTNode context) {
         ASTNode clazz = context;
-        while((clazz != null) && !(clazz instanceof TypeDeclaration) &&
+        while(clazz != null && !(clazz instanceof TypeDeclaration) &&
                 clazz.getParent() != null) {
             clazz = clazz.getParent();
         }
@@ -368,9 +371,9 @@ public class Resolver implements IResolver {
 
     private ASTNode findNextReferencesClass(final String resolveString) {
         
-        IJavaProject javaProject = compilationUnit.getJavaProject();
+        final IJavaProject javaProject = compilationUnit.getJavaProject();
         
-        LinkedList<ResolverTask> tasksToWorkWith = new LinkedList<ResolverTask>();
+        final LinkedList<ResolverTask> tasksToWorkWith = new LinkedList<ResolverTask>();
         tasksToWorkWith.addAll(tasks);
         
         final LinkedList<IType> result = new LinkedList<IType>();
@@ -397,7 +400,7 @@ public class Resolver implements IResolver {
                         },
                         IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, new NullProgressMonitor());
             }
-            catch (JavaModelException e) {
+            catch (final JavaModelException e) {
                 return null;
             }
             
@@ -406,19 +409,19 @@ public class Resolver implements IResolver {
         }
         
         if (result.size() > 0){
-            IJavaElement foundClass = result.get(0).getParent();
+            final IJavaElement foundClass = result.get(0).getParent();
             if (foundClass instanceof ICompilationUnit) {
-                ICompilationUnit compUnitFound = (ICompilationUnit) foundClass;
+                final ICompilationUnit compUnitFound = (ICompilationUnit) foundClass;
                 
                 for (int i = tasksToRemove; i > 0; i--){
                     if (i == 1){
-                        ResolverTask taskFoundClass = tasks.removeFirst();
+                        final ResolverTask taskFoundClass = tasks.removeFirst();
                         currentTask = taskFoundClass;
                     } else {
                         tasks.removeFirst();
                     }
                 }
-                return (CompilationUnit) JDTUtil.parse(compUnitFound);
+                return JDTUtil.parse(compUnitFound);
             }
         }
         
