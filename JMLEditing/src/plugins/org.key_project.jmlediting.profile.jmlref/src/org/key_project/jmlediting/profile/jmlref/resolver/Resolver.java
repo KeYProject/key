@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -32,9 +31,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
@@ -79,7 +76,6 @@ public class Resolver implements IResolver {
         public IStringNode node = null;
         public final List<IASTNode> parameters = new LinkedList<IASTNode>();
         public ResolveResult lastResult = null;
-        public int position = 1;
     }
 
     private ASTNode context = null;
@@ -257,7 +253,7 @@ public class Resolver implements IResolver {
             
         }
             
-        final ResolveResult finalResult = new ResolveResult(jdtNode, resultType, binding);
+        final ResolveResult finalResult = new ResolveResult(jdtNode, resultType, binding, currentTask.node);
         
         if(tasks.peek() != null) {
             tasks.peek().lastResult = finalResult;
@@ -1104,7 +1100,6 @@ public class Resolver implements IResolver {
             //         -> LIST       -> ARRAY_ACCESS
             tasks.add(new ResolverTask());
             tasks.getLast().isArrayAcess = true;
-            
             result = true;
         }
         return result;
@@ -1170,15 +1165,9 @@ public class Resolver implements IResolver {
         if(node.getType() == ExpressionNodeTypes.MEMBER_ACCESS) {
             // PRIMARY -> IDENTIFIER -> STRING
             //         -> LIST       -> MEMBER_ACCESS
-            int positionLastTask = 1;
-            if (!tasks.isEmpty()){
-                positionLastTask = tasks.getLast().position; 
-            }
-            
             tasks.add(new ResolverTask());
             tasks.getLast().node = (IStringNode) node.getChildren().get(1);
             tasks.getLast().resolveString = tasks.getLast().node.getString();
-            tasks.getLast().position = positionLastTask + 2;
             result = true;
         }
         
