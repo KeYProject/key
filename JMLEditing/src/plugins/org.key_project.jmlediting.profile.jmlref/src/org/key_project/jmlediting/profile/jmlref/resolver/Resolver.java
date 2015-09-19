@@ -726,11 +726,16 @@ public class Resolver implements IResolver {
                     if(type == null || !type.getElementName().equals(resolveString)) {
                         continue;
                     }
+                    
+                    ASTNode node = null;
+                    
                     if(type.getClassFile() != null) {
-                        return JDTUtil.parse(type.getClassFile());
+                        node = JDTUtil.parse(type.getClassFile());
                     } else if(type.getCompilationUnit() != null) {
-                        return JDTUtil.parse(type.getCompilationUnit());
+                        node = JDTUtil.parse(type.getCompilationUnit());
                     }
+                    
+                    return getTypeInCompilationUnit(resolveString, node);
                 }
                 catch (final JavaModelException e) {
                     LogUtil.getLogger().logError(e);
@@ -760,11 +765,13 @@ public class Resolver implements IResolver {
                     
                     if(type.getClassFile() != null) {
                         JDTUtil.parse(type.getClassFile()).accept(methodFinder);
-                        return result.poll();
                     } else if(type.getCompilationUnit() != null) {
                         JDTUtil.parse(type.getCompilationUnit()).accept(methodFinder);
-                        return result.poll();
                     }
+                    if(!result.isEmpty()) {
+                        return result.poll();   
+                    }
+                    
                 }
                 catch (final JavaModelException e) {
                     LogUtil.getLogger().logError(e);
