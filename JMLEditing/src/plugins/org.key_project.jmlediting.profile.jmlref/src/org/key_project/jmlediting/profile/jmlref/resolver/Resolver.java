@@ -31,7 +31,10 @@ import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
@@ -773,7 +776,39 @@ public class Resolver implements IResolver {
                 
                 
             } else if(binding instanceof IVariableBinding) {
-                // TODO not implemented
+                // TODO: Check maksims implementation
+                IType type = null;
+                try{
+                    type = compilationUnit.getJavaProject().findType(((IVariableBinding) binding).getDeclaringClass().getQualifiedName());
+                    final IVariableBinding vb = (IVariableBinding) binding;
+                    final LinkedList<VariableDeclaration> result = new LinkedList<VariableDeclaration>();
+                    
+                    final ASTVisitor variableFinder = new ASTVisitor() {      
+                        
+                        // VariableDeclarationFragment extends VariableDeclaration, is the if statement down useful ?
+                        @Override
+                        public boolean visit(VariableDeclarationFragment node) {
+                            if(vb.getJavaElement().equals(node.resolveBinding().getJavaElement())) {
+                                result.add(node);
+                                return false;
+                            }
+                            return super.visit(node);
+                        }
+                        
+                    };
+                    
+                    if(type.getClassFile() != null) {
+                        JDTUtil.parse(type.getClassFile()).accept(variableFinder);
+                        return result.poll();
+                    } else if(type.getCompilationUnit() != null) {
+                        JDTUtil.parse(type.getCompilationUnit()).accept(variableFinder);
+                        return result.poll();
+                    }
+                    
+                }catch (final JavaModelException e) {
+                    LogUtil.getLogger().logError(e);
+                    return null;
+                }
                 
             } else {
                 throw new ResolverException("ImportDeclaration returned an unrecognised IBinding.");
