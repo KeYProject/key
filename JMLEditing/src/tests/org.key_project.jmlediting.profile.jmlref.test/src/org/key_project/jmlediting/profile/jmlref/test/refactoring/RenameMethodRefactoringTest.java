@@ -106,15 +106,13 @@ public class RenameMethodRefactoringTest {
                 "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
     }
     
-    // TODO: NullPointerException. getSuperclassType();
-    //@Test
+    @Test
     public void test12ThreeSuccessiveMethodCalls() throws CoreException {   
         TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test12", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "getBalance() : String", "newMethodName", javaProject);
     }
     
-    // TODO: Resolver NullPointerException
-    //@Test
+    @Test
     public void test13SuccessiveMethodCallsWithExtraParenthesis() throws CoreException {   
         TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test13", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "getBalance() : int", "newMethodName", javaProject);
@@ -132,7 +130,6 @@ public class RenameMethodRefactoringTest {
                 "TestClassOther", "test", "getBalance() : int", "newMethodName", javaProject);
     }
     
-    // TODO: Resolver returns null but no Exception.
     @Test
     public void test16TwoClassesDifferentPackageStatic() throws CoreException {   
         TestUtilsRefactoring.runMethodRenameTest(TESTPATH+"\\test16", srcFolder, oracleFolder, bot, 

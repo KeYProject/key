@@ -30,8 +30,8 @@ Test11: combination of this qualifier and method with same name as the field.
 Test12: test11 plus a nested field call: TestClass balance; this.balance.balance()
 Test13: test12 with changed order: this.balance().balance
 Test14: test11/12 with more nesting: this.balance.balance == test.balance.balance().balance
-(Resolver problem) Test15: field reference after a MethodCall: get("someClass").balance
-(Resolver problem) Test16: test15 with another call afterwards: (classes.get(0)).balance.equals("5")
+(Resolver problem) Test15: method call and Cast
+(Resolver problem) Test16: ArrayList access and equals: (classes.get(0)).balance.equals("5")
 (Resolver problem) Test17: test16 without the parentheses
 Test18: many MemberAccesses and MethodCalls plus distinguishing between String and field: 
          project.getClass().getDeclaredField("balance").equals(balance)
@@ -57,7 +57,7 @@ Test1: One class, one method which uses the class in java code and JML.
 Test2: One class, one method which only references the class in JML (twice!), i.e. no java text changes recorded for that class
 Test3: Two classes, same package. OtherClass initializes TestClass.
 Test4: like Test3 but without any reference to TestClass in OtherClass, thus no java changes in that class.
-(Resolver problem) Test5: Two classes, different package.
+Test5: Two classes, different package.
 Test6: Accessing a class using the fully qualified class name.
 
 ****** Testing Package Renaming *****
@@ -84,7 +84,7 @@ Test9: Nested method calls. getBalance() is argument to another method, valueOf(
 Test10: Successive method calls: method().getBalance()
 Test11: Successive method calls: like 11 but within another method call, i.e. as an argument to another method call.
 Test12: Successive method calls: three method calls and getBalance() in the middle.
-(Resolver problem) test13: Successive method calls: like test 10 but the first method call is (unnecessarily) in a parenthesis.
-test14: Successive method calls: the first method call has two arguments.
-test15: Two classes, same package and getBalance() static.
-(Resolver problem) test16: Two classes, different packages and getBalance() static.
+Test13: Successive method calls: like test 10 but the first method call is (unnecessarily) in a parenthesis.
+Test14: Successive method calls: the first method call has two arguments.
+Test15: Two classes, same package and getBalance() static.
+Test16: Two classes, different packages and getBalance() static.

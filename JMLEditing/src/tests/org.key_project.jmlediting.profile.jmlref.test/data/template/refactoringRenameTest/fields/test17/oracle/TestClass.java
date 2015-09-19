@@ -15,7 +15,7 @@ public class TestClass {
       @ assignable \nothing;
       @*/
     public boolean accessBalanceFromOtherClass() {
-        return (classes.get(0).newName.equals("5"));
+        return classes.get(0).newName.equals("5");
         
     }
     
