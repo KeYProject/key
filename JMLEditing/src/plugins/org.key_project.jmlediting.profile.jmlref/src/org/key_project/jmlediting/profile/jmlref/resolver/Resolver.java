@@ -776,7 +776,6 @@ public class Resolver implements IResolver {
                 
                 
             } else if(binding instanceof IVariableBinding) {
-                // TODO: Check maksims implementation
                 IType type = null;
                 try{
                     type = compilationUnit.getJavaProject().findType(((IVariableBinding) binding).getDeclaringClass().getQualifiedName());
