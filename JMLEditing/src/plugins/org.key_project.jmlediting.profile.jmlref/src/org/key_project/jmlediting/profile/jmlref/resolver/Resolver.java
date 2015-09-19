@@ -345,7 +345,6 @@ public class Resolver implements IResolver {
                 //final List<ASTNode> resultList = new LinkedList<ASTNode>();
                 //findMethod(context, currentTask.resolveString, resultList);
                 //if(resultList.size() > 0) {
-                    // pick the best one... change list to a hashmap maybe?
                 //    jdtNode = resultList.get(0);
                 //}
             } else {
@@ -359,8 +358,7 @@ public class Resolver implements IResolver {
         if(jdtNode == null) {
             jdtNode = findFromImports(currentTask.resolveString);
         }
-        
-       if (jdtNode == null) {
+        if (jdtNode == null) {
             jdtNode = findNextReferencesClass(currentTask.resolveString);
         }
         
@@ -369,6 +367,10 @@ public class Resolver implements IResolver {
     }
 
 
+    /** Checks if the chain of strings we have to resolve is actually a Package rather than Fields/ MemberAccess.
+     * @param resolveString the current String we want to resolve.
+     * @return an {@link ASTNode} of the class we found or null if none could be found.
+     */
     private ASTNode findNextReferencesClass(final String resolveString) {
         
         final IJavaProject javaProject = compilationUnit.getJavaProject();
@@ -409,20 +411,26 @@ public class Resolver implements IResolver {
         }
         
         if (result.size() > 0){
-            final IJavaElement foundClass = result.get(0).getParent();
-            if (foundClass instanceof ICompilationUnit) {
-                final ICompilationUnit compUnitFound = (ICompilationUnit) foundClass;
-                
-                for (int i = tasksToRemove; i > 0; i--){
-                    if (i == 1){
-                        final ResolverTask taskFoundClass = tasks.removeFirst();
-                        currentTask = taskFoundClass;
-                    } else {
-                        tasks.removeFirst();
-                    }
+            final IType type = result.getFirst();
+            
+            for (int i = tasksToRemove; i > 0; i--){
+                if (i == 1){
+                    final ResolverTask taskFoundClass = tasks.removeFirst();
+                    currentTask = taskFoundClass;
+                } else {
+                    tasks.removeFirst();
                 }
-                return JDTUtil.parse(compUnitFound);
             }
+            
+            ASTNode node = null;
+                            
+            if(type.getClassFile() != null) {
+                node = JDTUtil.parse(type.getClassFile());
+            } else if(type.getCompilationUnit() != null) {
+                node = JDTUtil.parse(type.getCompilationUnit());
+            }
+            
+            return getTypeInCompilationUnit(resolveString, node);
         }
         
         return null;
