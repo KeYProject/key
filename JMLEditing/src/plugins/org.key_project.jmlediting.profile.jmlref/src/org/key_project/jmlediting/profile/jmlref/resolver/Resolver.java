@@ -76,6 +76,7 @@ public class Resolver implements IResolver {
         public IStringNode node = null;
         public final List<IASTNode> parameters = new LinkedList<IASTNode>();
         public ResolveResult lastResult = null;
+        public int position = 1;
     }
 
     private ASTNode context = null;
@@ -1134,9 +1135,15 @@ public class Resolver implements IResolver {
         if(node.getType() == ExpressionNodeTypes.MEMBER_ACCESS) {
             // PRIMARY -> IDENTIFIER -> STRING
             //         -> LIST       -> MEMBER_ACCESS
+            int positionLastTask = 1;
+            if (!tasks.isEmpty()){
+                positionLastTask = tasks.getLast().position; 
+            }
+            
             tasks.add(new ResolverTask());
             tasks.getLast().node = (IStringNode) node.getChildren().get(1);
             tasks.getLast().resolveString = tasks.getLast().node.getString();
+            tasks.getLast().position = positionLastTask + 2;
             result = true;
         }
         
