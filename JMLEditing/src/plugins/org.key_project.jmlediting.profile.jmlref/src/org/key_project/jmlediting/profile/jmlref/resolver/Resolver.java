@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -31,6 +30,7 @@ import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -253,7 +253,7 @@ public class Resolver implements IResolver {
             
         }
             
-        final ResolveResult finalResult = new ResolveResult(jdtNode, resultType, binding);
+        final ResolveResult finalResult = new ResolveResult(jdtNode, resultType, binding, currentTask.node);
         
         if(tasks.peek() != null) {
             tasks.peek().lastResult = finalResult;
@@ -780,7 +780,38 @@ public class Resolver implements IResolver {
                 
                 
             } else if(binding instanceof IVariableBinding) {
-                // TODO not implemented
+                IType type = null;
+                try{
+                    type = compilationUnit.getJavaProject().findType(((IVariableBinding) binding).getDeclaringClass().getQualifiedName());
+                    final IVariableBinding vb = (IVariableBinding) binding;
+                    final LinkedList<VariableDeclaration> result = new LinkedList<VariableDeclaration>();
+                    
+                    final ASTVisitor variableFinder = new ASTVisitor() {      
+                        
+                        // VariableDeclarationFragment extends VariableDeclaration, is the if statement down useful ?
+                        @Override
+                        public boolean visit(VariableDeclarationFragment node) {
+                            if(vb.getJavaElement().equals(node.resolveBinding().getJavaElement())) {
+                                result.add(node);
+                                return false;
+                            }
+                            return super.visit(node);
+                        }
+                        
+                    };
+                    
+                    if(type.getClassFile() != null) {
+                        JDTUtil.parse(type.getClassFile()).accept(variableFinder);
+                        return result.poll();
+                    } else if(type.getCompilationUnit() != null) {
+                        JDTUtil.parse(type.getCompilationUnit()).accept(variableFinder);
+                        return result.poll();
+                    }
+                    
+                }catch (final JavaModelException e) {
+                    LogUtil.getLogger().logError(e);
+                    return null;
+                }
                 
             } else {
                 throw new ResolverException("ImportDeclaration returned an unrecognised IBinding.");
@@ -1075,7 +1106,6 @@ public class Resolver implements IResolver {
             //         -> LIST       -> ARRAY_ACCESS
             tasks.add(new ResolverTask());
             tasks.getLast().isArrayAcess = true;
-            
             result = true;
         }
         return result;
