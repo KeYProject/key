@@ -322,8 +322,8 @@ public class Resolver implements IResolver {
 
                 final IType type = (IType) ((TypeDeclaration)context).resolveBinding().getJavaElement();
                 
-                /*for(IMethodBinding methodBinding : ((TypeDeclaration)context).resolveBinding().getDeclaredMethods()) {
-                    methodBinding.
+                /*for(final IMethodBinding methodBinding : ((TypeDeclaration)context).resolveBinding().getDeclaredMethods()) {
+                    final MethodBinding mb = (MethodBinding) methodBinding;
                 }*/
                 
                 
@@ -357,6 +357,9 @@ public class Resolver implements IResolver {
         }
         if(jdtNode == null) {
             jdtNode = findFromImports(currentTask.resolveString);
+        }
+        if(jdtNode == null) {
+            jdtNode = findInPackage(currentTask.resolveString, "java.lang");
         }
         if (jdtNode == null) {
             jdtNode = findNextReferencesClass(currentTask.resolveString);
@@ -430,7 +433,7 @@ public class Resolver implements IResolver {
                 node = JDTUtil.parse(type.getCompilationUnit());
             }
             
-            return getTypeInCompilationUnit(resolveString, node);
+            return getTypeInCompilationUnit(classToSearch, node);
         }
         
         return null;
@@ -473,15 +476,24 @@ public class Resolver implements IResolver {
         
         if(result.isEmpty()) {
             // method was not defined in this class.
-            final Type newContext = getDeclaringClass(context).getSuperclassType();
+            final TypeDeclaration declaringClass = getDeclaringClass(context);
+            final Type newContext = declaringClass.getSuperclassType();
             try {
-                if(newContext == null) {
-                    // TODO:
-                }
+                IType type = null;
                 
-                final IType type = compilationUnit.getJavaProject().findType(newContext.resolveBinding().getQualifiedName());
-                if(type == null) {
-                    return null;
+                if(newContext == null) {
+                    // if we were already Searching in Object.. then return null
+                    final TypeComputer tc = new TypeComputer(compilationUnit);
+                    final ITypeBinding objectBinding = tc.createWellKnownType("java.lang.Object");
+                    if(declaringClass.resolveBinding().isEqualTo(objectBinding)) {
+                        return null;
+                    }
+                    type = compilationUnit.getJavaProject().findType(objectBinding.getQualifiedName());
+                } else {
+                    type = compilationUnit.getJavaProject().findType(newContext.resolveBinding().getQualifiedName());
+                    if(type == null) {
+                        return null;
+                    }
                 }
                 
                 ASTNode node = null;
@@ -491,7 +503,7 @@ public class Resolver implements IResolver {
                      node = JDTUtil.parse(type.getCompilationUnit());
                 }
                 
-                return findIMethod(node, method);
+                return findIMethod(getTypeInCompilationUnit(type.getElementName(), node), method);
                 
             }
             catch (final JavaModelException e) {
@@ -535,17 +547,61 @@ public class Resolver implements IResolver {
 
     /** Uses the {@link SearchEngine} to get the class specified by resolveString.
      * @param resolveString the class name you are searching for
-     * @param binding the {@link IPackageBinding} of the package that is used as a context to search in
+     * @param packageName the name of the package that is used as a context to search in
      * @return the {@link ASTNode} of the {@link TypeDeclaration} of the class we are searching for
      */
-    private ASTNode findInPackage(final String resolveString, final IPackageBinding binding) {
-        // there might be a more efficient way of doing this.
-        // on demand packages will be searched like this.
+    private ASTNode findInPackage(final String resolveString, final String packageName) {
         final SearchEngine se = new SearchEngine();
         final LinkedList<IType> result = new LinkedList<IType>();
         
         try {
-            se.searchAllTypeNames(pack.getName().getFullyQualifiedName().toCharArray(), 
+            se.searchAllTypeNames(packageName.toCharArray(), 
+                    SearchPattern.R_EXACT_MATCH, 
+                    resolveString.toCharArray(), 
+                    SearchPattern.R_EXACT_MATCH, 
+                    IJavaSearchConstants.TYPE, 
+                    SearchEngine.createJavaSearchScope(new IJavaElement[] {compilationUnit.getJavaProject()}), 
+                    new TypeNameMatchRequestor() {
+                        @Override
+                        public void acceptTypeNameMatch(final TypeNameMatch match) {
+                            result.add(match.getType());
+                        }
+                    },
+                    IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
+                    new NullProgressMonitor());
+        }
+        catch (final JavaModelException e) {
+            LogUtil.getLogger().logError(e);
+        }
+        
+        ASTNode node = null;
+        
+        if(result.size() > 0) {
+            final IType type = result.getFirst();
+            
+            if(type.getClassFile() != null) {
+                node = JDTUtil.parse(type.getClassFile());
+            } else if(type.getCompilationUnit() != null) {
+                node = JDTUtil.parse(type.getCompilationUnit());
+            }
+        } else {
+            return null;
+        }
+        
+        return getTypeInCompilationUnit(resolveString, node);
+    }
+    
+    /** Uses the {@link SearchEngine} to get the class specified by resolveString.
+     * @param resolveString the class name you are searching for
+     * @param binding the {@link IPackageBinding} of the package that is used as a context to search in
+     * @return the {@link ASTNode} of the {@link TypeDeclaration} of the class we are searching for
+     */
+    private ASTNode findInPackage(final String resolveString, final IPackageBinding binding) {
+        final SearchEngine se = new SearchEngine();
+        final LinkedList<IType> result = new LinkedList<IType>();
+        
+        try {
+            se.searchAllTypeNames(binding.getName().toCharArray(), 
                     SearchPattern.R_EXACT_MATCH, 
                     resolveString.toCharArray(), 
                     SearchPattern.R_EXACT_MATCH, 
@@ -558,7 +614,7 @@ public class Resolver implements IResolver {
                         }
                     },
                     IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
-                    null);
+                    new NullProgressMonitor());
         }
         catch (final JavaModelException e) {
             LogUtil.getLogger().logError(e);
@@ -650,15 +706,9 @@ public class Resolver implements IResolver {
         
         for(final ImportDeclaration imp : imports) {
             
-            final org.eclipse.jdt.core.dom.Name n = imp.getName();
-            /*        // Create an additional Import for java.lang.*
-            final ImportDeclaration javaLang = jdtAST.getAST().newImportDeclaration();
-            javaLang.setName(jdtAST.getAST().newQualifiedName(jdtAST.getAST().newSimpleName("java"), jdtAST.getAST().newSimpleName("lang")));
-            javaLang.setOnDemand(true);
-            javaLang.*/
+            final IBinding binding = imp.resolveBinding(); 
             
-            final IBinding binding = imp.resolveBinding();       
-            // TODO: java.lang. package import
+            // ***** PackageBinding - OnDemand Packages
             if(binding instanceof IPackageBinding) {
                 final ASTNode result = findInPackage(resolveString, (IPackageBinding) binding);
                 if(result == null) {
