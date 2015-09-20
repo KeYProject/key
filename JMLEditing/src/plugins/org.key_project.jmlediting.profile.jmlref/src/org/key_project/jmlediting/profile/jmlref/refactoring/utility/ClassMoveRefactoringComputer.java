@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring.utility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -71,15 +72,18 @@ public class ClassMoveRefactoringComputer extends
      * Creates the text change and adds it to changesToMake.
      * 
      * @param changesToMake list to add the {@link ReplaceEdit}s to.
-     * @param node {@link IASTNode} to compute the change for.
+     * @param primaryStringMap {@link IASTNode} to compute the change for.
      */
     protected final void computeReplaceEdit(ICompilationUnit unit, ArrayList<ReplaceEdit> changesToMake,
-            IASTNode node) {
+            HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
 
-        final int startOffset = node.getStartOffset();
+        for (IASTNode node : primaryStringMap.keySet()) {
         
-        int length = fOldPackName.length();
-        
-        changesToMake.add(new ReplaceEdit(startOffset, length, fNewPackName));      
+            final int startOffset = node.getStartOffset();
+            
+            int length = fOldPackName.length();
+            
+            changesToMake.add(new ReplaceEdit(startOffset, length, fNewPackName));
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring.utility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -9,13 +10,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
-import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
-import org.key_project.jmlediting.core.resolver.ResolveResultType;
 import org.key_project.jmlediting.core.resolver.ResolverException;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 
 /**
  * The refactoring computer to compute changes to the JML annotations when a 
@@ -85,69 +83,106 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
      *            The compilation unit the IASTNode is in.
      * @param changesToMake
      *            Arraylist of {@link ReplaceEdit}s to accumulate the needed changes.
-     * @param node
+     * @param primaryStringMap
      *            IASTNode of the primary expression type to resolve.
      */
     @Override
-    protected final void computeReplaceEdit(final ICompilationUnit unit, final ArrayList<ReplaceEdit> changesToMake, final IASTNode node) {
+    protected final void computeReplaceEdit(final ICompilationUnit unit, final ArrayList<ReplaceEdit> changesToMake, final HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
         
-        final IASTNode nodeToChange = node;
-    
-        final IResolver resolver = new Resolver();
-        ResolveResult result = null;
+        Resolver resolver = new Resolver();
+
         try {
-            
-            result = resolver.resolve(unit, node);
-            
-            if (isReferencedElement(result)){
-                createEditAndAddToList(changesToMake, nodeToChange);
-            }
-            
-            // Complex expressions (e.g. method calls or member accesses) need to call 
-            // the .next() method of the Resolver to move through the node to the inner node 
-            // which is less complex
-            
-            // To move to the right place in the expression; usually saved as a list.
-            int i = 0;
-                      
-            while(resolver.hasNext()) { 
-                 result = resolver.next();
-                 
-                 if (isReferencedElement(result)) {
-                     // Access inner node which resolver checked by .next() method.
-                    if (nodeToChange.getChildren().size() >= 1) {
-                         
-                        final List<IASTNode> nodesToSelectFrom = nodeToChange.getChildren().get(1).getChildren();                      
-                         
-                        if (nodesToSelectFrom.size() > i) {
-                             IASTNode selection = nodesToSelectFrom.get(i);
-                             
-                             // If it is a method call, get the next list item.
-                             if (selection.getType() == ExpressionNodeTypes.METHOD_CALL_PARAMETERS){
-                                 if (nodesToSelectFrom.size() > i+1)
-                                     selection = nodesToSelectFrom.get(i+1);
-                                 else {
-                                     continue; // correct selection not possible
-                                 }
-                             }
-                             createEditAndAddToList(changesToMake, selection);
+        
+            for (IASTNode primary : primaryStringMap.keySet()){
+                
+                List<IStringNode> stringNodes = primaryStringMap.get(primary);
+                
+                boolean changeNeeded = false;
+                
+                // only one stringNode --> Resolve the whole primary 
+                // change the position given by the IStringNode
+                if (stringNodes.size() == 1) {
+                    
+                    changeNeeded = isReferencedElement(resolver.resolve(unit, primary));
+                    
+                    // complex primaries need more calls to the resolver
+                    while (changeNeeded == false && resolver.hasNext()) {
+                        changeNeeded = isReferencedElement(resolver.next());
+                    }
+                    
+                    if (changeNeeded){
+                        createEditAndAddToList(changesToMake, stringNodes.get(0));
+                    }
+                }
+                else { // Shared primaries.
+                    
+                    ResolveResult result = null;
+                    
+                    result = resolver.resolve(unit, primary);
+                    
+                    if (isReferencedElement(result)){
+                        createEditAndAddToList(changesToMake, result.getStringNode());
+                    }
+                    
+                    while (resolver.hasNext()){
+                        
+                        result = resolver.next();
+                        
+                        if (isReferencedElement(result)) {
+                            createEditAndAddToList(changesToMake, result.getStringNode());
                         }
-                    }    
-                 }
-                 // Change i to have the correct starting place for the next call of resolver.next()
-                 if (result != null && result.getResolveType().equals(ResolveResultType.METHOD)){
-                     // In case of a Method Call like in test().test, the whole method call has two list entries
-                     // in the node. One for the name of the method and one for the arguments.
-                     // Thus we need to skip two instead of one.
-                     i = i + 2;
-                 }
-                 else {
-                     i = i + 1;
-                 }
+                    }
+                }
             }
+            
+            
+          
+                
+    //            // Complex expressions (e.g. method calls or member accesses) need to call 
+    //            // the .next() method of the Resolver to move through the node to the inner node 
+    //            // which is less complex
+    //            
+    //            // To move to the right place in the expression; usually saved as a list.
+    //            int i = 0;
+    //                      
+    //            while(resolver.hasNext()) { 
+    //                 result = resolver.next();
+    //                 
+    //                 if (isReferencedElement(result)) {
+    //                     // Access inner node which resolver checked by .next() method.
+    //                    if (nodeToChange.getChildren().size() >= 1) {
+    //                         
+    //                        final List<IASTNode> nodesToSelectFrom = nodeToChange.getChildren().get(1).getChildren();                      
+    //                         
+    //                        if (nodesToSelectFrom.size() > i) {
+    //                             IASTNode selection = nodesToSelectFrom.get(i);
+    //                             
+    //                             // If it is a method call, get the next list item.
+    //                             if (selection.getType() == ExpressionNodeTypes.METHOD_CALL_PARAMETERS){
+    //                                 if (nodesToSelectFrom.size() > i+1)
+    //                                     selection = nodesToSelectFrom.get(i+1);
+    //                                 else {
+    //                                     continue; // correct selection not possible
+    //                                 }
+    //                             }
+    //                             createEditAndAddToList(changesToMake, selection);
+    //                        }
+    //                    }    
+    //                 }
+    //                 // Change i to have the correct starting place for the next call of resolver.next()
+    //                 if (result != null && result.getResolveType().equals(ResolveResultType.METHOD)){
+    //                     // In case of a Method Call like in test().test, the whole method call has two list entries
+    //                     // in the node. One for the name of the method and one for the arguments.
+    //                     // Thus we need to skip two instead of one.
+    //                     i = i + 2;
+    //                 }
+    //                 else {
+    //                     i = i + 1;
+    //                 }
+    //            }
         }
-        catch (final ResolverException e) {
-            LogUtil.getLogger().logError(e);
+        catch (ResolverException e){
+            LogUtil.getLogger().logError(e);;
         }
     }
     
@@ -173,24 +208,12 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
      * @param node the {@link IASTNode} which should be edited.
      */
     private void createEditAndAddToList(final ArrayList<ReplaceEdit> changesToMake,
-            final IASTNode node) {
-
-        IASTNode changeThisNode = node;
-        
-        // Get the place to be edited in the JML comment / the node.
-        if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
-            changeThisNode = node.getChildren().get(0).getChildren().get(0);
-        }
-        
-        // Keep the . when it is a member access like "this.field" instead of replacing it.
-        if (node.getType() == ExpressionNodeTypes.MEMBER_ACCESS){
-            changeThisNode = node.getChildren().get(1);
-        }
+            final IStringNode node) {
         
         // compute the text location which needs to change.
-        final int startOffset = changeThisNode.getStartOffset();
-        final int length = changeThisNode.getEndOffset()
-                - changeThisNode.getStartOffset();
+        final int startOffset = node.getStartOffset();
+        final int length = node.getEndOffset()
+                - node.getStartOffset();
 
         final ReplaceEdit edit = new ReplaceEdit(startOffset,
                 length, fNewName);

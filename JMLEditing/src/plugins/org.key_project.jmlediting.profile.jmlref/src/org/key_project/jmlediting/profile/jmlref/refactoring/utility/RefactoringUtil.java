@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring.utility;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -36,16 +37,14 @@ public class RefactoringUtil {
         
         ArrayList<IPackageFragment> allFragments = new ArrayList<IPackageFragment>();
         
-        IPackageFragmentRoot[] roots = project.getPackageFragmentRoots();
+         List<IPackageFragmentRoot> roots = JDTUtil.getSourcePackageFragmentRoots(project);
         
         // Checks each roots if it contains source/class files (i.e. it is no archive) 
         for (IPackageFragmentRoot root: roots){
-            if (!root.isArchive()) {
-                IJavaElement[] children = root.getChildren();            
-                for (IJavaElement child: children){
-                    if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT)
-                        allFragments.add((IPackageFragment)child);
-                }
+            IJavaElement[] children = root.getChildren();            
+            for (IJavaElement child: children){
+                if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT)
+                    allFragments.add((IPackageFragment)child);
             }
         }     
         return allFragments;

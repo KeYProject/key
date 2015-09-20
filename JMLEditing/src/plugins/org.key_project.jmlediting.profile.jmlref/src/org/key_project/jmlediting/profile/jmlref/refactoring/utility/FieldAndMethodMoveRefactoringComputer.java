@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring.utility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -193,27 +194,30 @@ public class FieldAndMethodMoveRefactoringComputer extends
      * Creates the text change and adds it to changesToMake.
      * 
      * @param changesToMake list to add the {@link ReplaceEdit}s to.
-     * @param node {@link IASTNode} to compute the change for.
+     * @param primaryStringMap {@link IASTNode} to compute the change for.
      */
     protected final void computeReplaceEdit(ICompilationUnit unit, ArrayList<ReplaceEdit> changesToMake,
-            IASTNode node) {
+            HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
 
-        final int startOffset = node.getStartOffset();
+        for (IASTNode node : primaryStringMap.keySet()) {
         
-        // check which type of access it is. The type determines the length of the replace edit and the new content
-        
-        String newClassName = newClassFullQualName.substring(newClassFullQualName.lastIndexOf('.')+1);
-        String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
-        
-        // Check how the access string starts. Non fully qualified if it starts with class name instead of package name.
-        IASTNode innerNode = node.getChildren().get(0).getChildren().get(0);
-        if (innerNode instanceof IStringNode && 
-                ((IStringNode) innerNode).getString().equals(oldClassName)) {
-            changesToMake.add(new ReplaceEdit(startOffset, oldClassName.length(), newClassName));
-        }
-        else {
-            final int length = oldClassFullQualName.length();
-            changesToMake.add(new ReplaceEdit(startOffset, length, newClassFullQualName));
+            final int startOffset = node.getStartOffset();
+            
+            // check which type of access it is. The type determines the length of the replace edit and the new content
+            
+            String newClassName = newClassFullQualName.substring(newClassFullQualName.lastIndexOf('.')+1);
+            String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
+            
+            // Check how the access string starts. Non fully qualified if it starts with class name instead of package name.
+            IASTNode innerNode = node.getChildren().get(0).getChildren().get(0);
+            if (innerNode instanceof IStringNode && 
+                    ((IStringNode) innerNode).getString().equals(oldClassName)) {
+                changesToMake.add(new ReplaceEdit(startOffset, oldClassName.length(), newClassName));
+            }
+            else {
+                final int length = oldClassFullQualName.length();
+                changesToMake.add(new ReplaceEdit(startOffset, length, newClassFullQualName));
+            }
         }
     }
 }

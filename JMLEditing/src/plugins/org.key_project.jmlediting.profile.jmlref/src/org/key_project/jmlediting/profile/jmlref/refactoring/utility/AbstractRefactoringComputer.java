@@ -1,6 +1,8 @@
 package org.key_project.jmlediting.profile.jmlref.refactoring.utility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -28,7 +30,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
  * calling the {@link #computeNeededChangesToJML(ICompilationUnit, IJavaProject)} method, 
  * which uses a {@link CommentLocator} to find all JML comments, filters those using the abstract
  * {@link #filterStringNodes(List)} and creates the list of {@link ReplaceEdit}s by 
- * calling the abstract method {@link #computeReplaceEdit(ICompilationUnit, ArrayList, IASTNode)}. </p>
+ * calling the abstract method {@link #computeReplaceEdit(ICompilationUnit, ArrayList, HashMap)}. </p>
  * <p>
  * By implementing both abstract methods, one can define the exact behavior of the refactoring computer.
  * For example, one can define if the {@link Resolver} is called or not. </p>
@@ -65,13 +67,11 @@ public abstract class AbstractRefactoringComputer implements
         for (final CommentRange range : loc.findJMLCommentRanges()) {
 
             // Filter the comments
-            final List<IASTNode> foundReferences = getReferencesInJMLcomments(project,
+            final HashMap<IASTNode, List<IStringNode>> foundReferences = getReferencesInJMLcomments(project,
                     source, range);
 
-            for (final IASTNode node : foundReferences) {
-                // this method is abstract to allow different ways to compute the edits.
-                computeReplaceEdit(unit, changesToMake, node);
-            }
+            // this method is abstract to allow different ways to compute the edits.
+            computeReplaceEdit(unit, changesToMake, foundReferences);
         }
         return changesToMake;
     }
@@ -80,10 +80,10 @@ public abstract class AbstractRefactoringComputer implements
      * Creates the text change for a given JML comment and adds the change to changesToMake.
      * 
      * @param changesToMake list to add the {@link ReplaceEdit}s to.
-     * @param node {@link IASTNode} to compute the change for.
+     * @param primaryStringMap {@link IASTNode} to compute the change for.
      */
     abstract protected void computeReplaceEdit(ICompilationUnit unit, ArrayList<ReplaceEdit> changesToMake,
-            IASTNode node);
+            HashMap<IASTNode, List<IStringNode>> primaryStringMap);
 
     /**
      * Searches through a given {@link CommentRange} in a source file and returns 
@@ -99,7 +99,7 @@ public abstract class AbstractRefactoringComputer implements
      * @return List of found JML comments, represented as {@link IASTNode}s. 
      *          Potentially empty if a ParserException was thrown or no comment could be found.
      */
-    private final List<IASTNode> getReferencesInJMLcomments(IJavaProject project,
+    private final HashMap<IASTNode, List<IStringNode>> getReferencesInJMLcomments(IJavaProject project,
             String source, CommentRange range) {
         
         List<IASTNode> stringNodes = new ArrayList<IASTNode>();
@@ -115,16 +115,16 @@ public abstract class AbstractRefactoringComputer implements
             stringNodes = Nodes.getAllNodesOfType(parseResult, NodeTypes.STRING);
         }
         catch (final ParserException e) {
-            return new ArrayList<IASTNode>();
+            return new HashMap<IASTNode, List<IStringNode>>();
         }
         
         // Filter the nodes by finding all strings which match the old name of the element to be renamed.
         final List<IStringNode> filteredStringNodes =  filterStringNodes(stringNodes);
         
         // For those occurrences left, find the primary nodes which provide the needed context for resolving.
-        final List<IASTNode> primaries = getPrimaryNodes(filteredStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
+        final HashMap<IASTNode, List<IStringNode>> primaryStringMap = getPrimaryNodes(filteredStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
         
-        return primaries;
+        return primaryStringMap;
     }
 
     /**
@@ -136,18 +136,25 @@ public abstract class AbstractRefactoringComputer implements
      * @param notKeYProfile boolean: true if the KeY-JML Profile is no used.
      * @return list of {@link IASTNode}s of primary node type.
      */
-    private List<IASTNode>getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult, final boolean notKeYProfile){
-        final List<IASTNode> primaries = new ArrayList<IASTNode>();
+    private HashMap<IASTNode, List<IStringNode>> getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult, final boolean notKeYProfile){
+        final HashMap<IASTNode, List<IStringNode>> primaryStringMap = new HashMap<IASTNode, List<IStringNode>>();
         
         for (final IStringNode stringNode: stringNodes) {       
           final IASTNode primary = getPrimaryNode(parseResult, stringNode, notKeYProfile);
           // nested expressions would add the same primary twice, e.g. if code looks like this:
           // TestClass test;
           // /*@ ensures this.test.test ... @*/
-          if (!primaries.contains(primary))
-              primaries.add(primary);  
+          if (!primaryStringMap.containsKey(primary)) {
+              // put in a new primary-list of stringnodes pair.
+              LinkedList<IStringNode> stringNodesForPrimary = new LinkedList<IStringNode>();
+              stringNodesForPrimary.add(stringNode);
+              primaryStringMap.put(primary, stringNodesForPrimary);  
+          }
+          else { // shared primary. more than one string node has the same primary.
+              primaryStringMap.get(primary).add(stringNode);
+          }
         }
-        return primaries;
+        return primaryStringMap;
     }
 
     /**
