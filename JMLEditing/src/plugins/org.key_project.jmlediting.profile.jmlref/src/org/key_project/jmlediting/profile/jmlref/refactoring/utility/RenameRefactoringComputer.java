@@ -10,6 +10,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
 import org.key_project.jmlediting.core.resolver.ResolverException;
 import org.key_project.jmlediting.core.utilities.LogUtil;
@@ -89,7 +91,8 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
     @Override
     protected final void computeReplaceEdit(final ICompilationUnit unit, final ArrayList<ReplaceEdit> changesToMake, final HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
         
-        Resolver resolver = new Resolver();
+        IResolver resolver = JMLPreferencesHelper
+                .getProjectActiveJMLProfile(unit.getJavaProject().getProject()).getResolver();
 
         try {
         
@@ -134,10 +137,6 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                     }
                 }
             }
-            
-            
-          
-                
     //            // Complex expressions (e.g. method calls or member accesses) need to call 
     //            // the .next() method of the Resolver to move through the node to the inner node 
     //            // which is less complex
