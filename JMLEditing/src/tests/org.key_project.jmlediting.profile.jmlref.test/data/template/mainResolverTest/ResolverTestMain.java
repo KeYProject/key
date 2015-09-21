@@ -89,15 +89,6 @@ public class ResolverTestMain {
     }
     
     /*@ normal_behavior
-      @ assignable field3;
-      @ ensures \result == ((ResolverTestClass1) field3.getThis()).field1;
-      @*/
-    public int castMethodAndThis() {
-        field3 = new ResolverTestClass1();
-        return ((ResolverTestClass1) field3.getThis(null)).field1;
-    }
-    
-    /*@ normal_behavior
       @ assignable \nothing;
       @ ensures \result == method2Parameters1(parameter1, field1);
       @*/
@@ -242,5 +233,14 @@ public class ResolverTestMain {
       @*/
     public int testImportField() {
         return staticField;
+    }
+    
+    /*@ normal_behavior
+      @ assignable field3;
+      @ ensures \result == ((ResolverTestClass1) field3.getThis()).field1;
+      @*/
+    public int castMethodAndThis() {
+        field3 = new ResolverTestClass1();
+        return ((ResolverTestClass1) field3.getThis(null)).field1;
     }
 }

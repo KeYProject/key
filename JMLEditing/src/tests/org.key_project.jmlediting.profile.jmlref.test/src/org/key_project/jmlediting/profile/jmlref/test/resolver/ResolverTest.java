@@ -104,6 +104,18 @@ public class ResolverTest {
     private void test(final String string, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type) throws ResolverException {
         test(string, string, file, jdtSkip, jmlSkip, type, null);
     }
+    
+    /**
+     * 
+     * @param jmlString
+     * @param jdtString
+     * @param file
+     * @param jdtSkip
+     * @param jmlSkip
+     * @param type
+     * @param nodeToResolve
+     * @throws ResolverException
+     */
     private void test(final String jmlString, final String jdtString, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type, IASTNode nodeToResolve) throws ResolverException {
         final IResolver resolver = new Resolver(); // JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject())
         ResolveResult result = null;

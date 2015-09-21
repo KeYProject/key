@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
    // parser
    SWTBotJMLOutlineView.class,
-   SWTBotJMLoutlineSpecPure.class,
+   SWTBotJMLOutlineSpecPure.class,
    SWTBotJMLOutlineUpdate.class
 })
 
