@@ -58,6 +58,9 @@ public class ResolverTest {
     private static List<IASTNode> iASTList = new ArrayList<IASTNode>();
     private static ASTNode mainJDT;
     private static ASTNode class1JDT;
+    private static ASTNode class2JDT;
+    private static ICompilationUnit cu3;
+    private final static String PATHFILE3 = "src/resolver/test/otherPackage/ResolverTestClass2";
     private final static String PATH = "src/resolver/test/";
     private final static String FILE1 = "ResolverTestMain";
     private final static String FILE2 = "ResolverTestClass1";
@@ -71,6 +74,8 @@ public class ResolverTest {
        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data\\template\\mainResolverTest", testFolder);
        TestUtilsUtil.waitForBuild();
        JMLPreferencesHelper.setProjectJMLProfile(javaProject.getProject(), JMLPreferencesHelper.getDefaultJMLProfile());
+       
+       System.out.println(testFolder.getFolder("otherPackage").getFile("ResolverTestClass2.java").getName());
        
        // Parse JDT
        cu = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATH+FILE1+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -90,6 +95,9 @@ public class ResolverTest {
        
        cu2 = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATH+FILE2+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
        class1JDT = JDTUtil.parse(cu2);
+       
+       cu3 = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATHFILE3+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+       class2JDT = JDTUtil.parse(cu3);
     }
     
 
@@ -111,18 +119,34 @@ public class ResolverTest {
         }
         
         ASTNode jdt = null;
+        
+        ASTNode resultFile = null;
+        switch(file){
+        case 0:
+            resultFile = mainJDT;
+            break;
+        case 1:
+            resultFile = class1JDT;
+            break;
+        case 2:
+            resultFile = class2JDT;
+            break;
+        default:
+            break;
+        }
+        
         switch(type) {
         case FIELD:
-            jdt = getFieldDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getFieldDecleration(jdtString, resultFile, jdtSkip);
             break;
         case METHOD:
-            jdt = getMethodDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getMethodDecleration(jdtString, resultFile, jdtSkip);
             break;
         case PARAMETER:
-            jdt = getParameterDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getParameterDecleration(jdtString, resultFile, jdtSkip);
             break;
         case CLASS:
-            jdt = getTypeDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getTypeDecleration(jdtString, resultFile, jdtSkip);
             break;
         case UNSPECIFIED:
             break;
@@ -287,6 +311,10 @@ public class ResolverTest {
     @Test
     public void resolvePackageImportOnDemand1() throws ResolverException {
         importTest("fr", "read", 0, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveStaticImportField() throws ResolverException {
+        test("staticField", 2, 0, 0, ResolveResultType.FIELD);
     }
     //TODO: write tests, that are meant to fail.
 

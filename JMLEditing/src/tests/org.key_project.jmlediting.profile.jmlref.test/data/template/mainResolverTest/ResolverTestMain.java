@@ -3,6 +3,7 @@ package resolver.test;
 import java.io.*;
 import java.util.HashMap;
 import java.math.BigInteger;
+import static resolver.test.otherPackage.ResolverTestClass2.staticField;
 
 public class ResolverTestMain {
    
@@ -233,5 +234,13 @@ public class ResolverTestMain {
       @*/
     public int doSeomthing14() {
         return fr.read();
+    }
+    
+    /*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures staticField == \result; 
+      @*/
+    public int testImportField() {
+        return staticField;
     }
 }
