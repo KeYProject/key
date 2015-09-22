@@ -36,7 +36,7 @@ public class FieldAndMethodMoveRefactoringComputer extends
     private ICompilationUnit compUnit;
     
     /**
-     * Constructor. Saves the fully qualified name of the classes the field/method should be moved from and moved
+     * Constructor, which saves the fully qualified name of the classes the field/method should be moved from and moved
      * to as well as the name of the field/method to be moved and the compilation unit for
      * which the JML changes should be computed for.
      *  
@@ -194,7 +194,8 @@ public class FieldAndMethodMoveRefactoringComputer extends
      * Creates the text change and adds it to changesToMake.
      * 
      * @param changesToMake list to add the {@link ReplaceEdit}s to.
-     * @param primaryStringMap {@link IASTNode} to compute the change for.
+     * @param primaryStringMap {@link IASTNode} to compute the change for and the {@link IStringNodes}
+     *          which they contain.
      */
     protected final void computeReplaceEdit(ICompilationUnit unit, ArrayList<ReplaceEdit> changesToMake,
             HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
@@ -204,7 +205,6 @@ public class FieldAndMethodMoveRefactoringComputer extends
             final int startOffset = node.getStartOffset();
             
             // check which type of access it is. The type determines the length of the replace edit and the new content
-            
             String newClassName = newClassFullQualName.substring(newClassFullQualName.lastIndexOf('.')+1);
             String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
             

@@ -84,8 +84,8 @@ public class JMLMoveParticipantClass extends MoveParticipant {
      * add those to the changes to the java code which are already scheduled.
      * 
      * @return Returns null if only shared text changes are made. Otherwise
-     *      returns a TextChange Object which gathered all the changes to JML annotations 
-     *      in class which does not have any Java changes scheduled.
+     *      returns a {@link TextChange} which gathered all the changes to JML annotations 
+     *      in classes which do not have any Java changes scheduled.
      *
      */
     public final Change createChange(final IProgressMonitor pm) throws CoreException,
