@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.math.BigInteger;
 import static resolver.test.otherPackage.ResolverTestClass2.staticField;
+import static resolver.test.otherPackage.ResolverTestClass2.staticMethod;
 
 public class ResolverTestMain {
    
@@ -237,7 +238,7 @@ public class ResolverTestMain {
     
     /*@ normal_behavior
       @ assignable field3;
-      @ ensures \result == ((ResolverTestClass1) field3.getThis()).field1;
+      @ ensures \result == ((ResolverTestClass1) field3.getThisAsObjectType()).field1;
       @*/
     public int castMethodAndThis() {
         field3 = new ResolverTestClass1();
