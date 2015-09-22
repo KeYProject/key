@@ -40,8 +40,8 @@ fi
 
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
-JAVA_OPTIONS=""
-
+JAVA_OPTIONS="-XX:+UseG1GC"
+#
 #
 # Now $KEY_HOME
 #
