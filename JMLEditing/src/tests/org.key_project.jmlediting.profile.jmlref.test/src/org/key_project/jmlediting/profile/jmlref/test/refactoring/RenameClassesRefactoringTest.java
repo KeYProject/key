@@ -63,8 +63,7 @@ public class RenameClassesRefactoringTest {
                 "TestClass", "test", "NewClassName", javaProject);
     }
     
-    // TODO: import Statements a problem with current Resolver status.
-    //@Test
+    @Test
     public void test5TwoClassesDifferentPackage() throws CoreException {
         TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "NewClassName", javaProject);

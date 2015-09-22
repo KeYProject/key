@@ -27,7 +27,7 @@ public class SWTBotJMLOutlineUpdate {
    private static TestProject testProject;
    private static SWTBotEclipseEditor editor = null;
 
-   private static final String PROJECT_NAME = "OutlineTest";
+   private static final String PROJECT_NAME = "OutlineTestUpdate";
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineUpdateTest";
   

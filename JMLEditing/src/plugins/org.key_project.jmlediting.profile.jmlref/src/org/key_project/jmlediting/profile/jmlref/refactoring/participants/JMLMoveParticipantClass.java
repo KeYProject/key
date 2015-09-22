@@ -44,22 +44,18 @@ public class JMLMoveParticipantClass extends MoveParticipant {
      */
     @Override
     protected final boolean initialize(Object element) {
-        if(element instanceof IJavaElement){
-            fToMove=(IJavaElement) element;
+        fToMove=(IJavaElement) element;
 
-            fDocName = fToMove.getElementName();
-            fOldFullQualName=((IType) element).getFullyQualifiedName();
+        fDocName = fToMove.getElementName();
+        fOldFullQualName=((IType) element).getFullyQualifiedName();
 
-            fProject = fToMove.getJavaProject();
-            
-            // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
-            fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
-            fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();  
+        fProject = fToMove.getJavaProject();
+        
+        // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
+        fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
+        fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();  
 
-            return true;
-        }else{
-            return false;
-        }
+        return true;
     }
 
     /**

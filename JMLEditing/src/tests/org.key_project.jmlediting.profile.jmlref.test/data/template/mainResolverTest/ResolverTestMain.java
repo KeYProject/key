@@ -3,6 +3,7 @@ package resolver.test;
 import java.io.*;
 import java.util.HashMap;
 import java.math.BigInteger;
+import static resolver.test.otherPackage.ResolverTestClass2.staticField;
 
 public class ResolverTestMain {
    
@@ -226,4 +227,20 @@ public class ResolverTestMain {
         return fr.read();
     }
     
+    /*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures staticField == \result; 
+      @*/
+    public int testImportField() {
+        return staticField;
+    }
+    
+    /*@ normal_behavior
+      @ assignable field3;
+      @ ensures \result == ((ResolverTestClass1) field3.getThis()).field1;
+      @*/
+    public int castMethodAndThis() {
+        field3 = new ResolverTestClass1();
+        return ((ResolverTestClass1) field3.getThis(null)).field1;
+    }
 }

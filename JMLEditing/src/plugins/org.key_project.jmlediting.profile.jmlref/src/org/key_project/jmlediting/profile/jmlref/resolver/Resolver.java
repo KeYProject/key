@@ -986,11 +986,13 @@ public class Resolver implements IResolver {
         boolean result = false;
         if(node.getType() == ExpressionNodeTypes.PRIMARY_EXPR) {
             // PRIMARY
+            IASTNode firstChildren = node.getChildren().get(0);
             if(!isPrimaryExpr(node.getChildren().get(0))) {
                 // Primaries may be cascaded.
-                result = isIdentifier(node.getChildren().get(0)) 
-                      || isJmlPrimary(node.getChildren().get(0))
-                      || isJavaKeyword(node.getChildren().get(0));
+                result = isIdentifier(firstChildren) 
+                      || isJmlPrimary(firstChildren)
+                      || isJavaKeyword(firstChildren)
+                      || isCast(firstChildren);
             }
             // Process the Children of the Node
             if(node.getChildren().size() > 1) {
@@ -1182,6 +1184,25 @@ public class Resolver implements IResolver {
             result = true;
         }
         
+        return result;
+    }
+    
+    /**
+     * This method is part of the ResolverTask building process. It should be called on an {@link IASTNode} 
+     * that has the type {@link ExpressionNodeTypes}.{@code CAST}
+     * @param node - the {@link IASTNode} to get information from.
+     * @return true, if the node and every child node is correct.
+     */
+    protected final boolean isCast(final IASTNode node) {
+        boolean result = false;
+        if (node.getType() == ExpressionNodeTypes.CAST) {
+            // Cast expressions like e.g.: (CastTo) object.method() ... 
+            // saves the CastTo information in the first children
+            // and the rest in the second children.
+            if (node.getChildren().size() >= 2) {
+                result = isPrimaryExpr(node.getChildren().get(1));
+            }
+        }
         return result;
     }
 

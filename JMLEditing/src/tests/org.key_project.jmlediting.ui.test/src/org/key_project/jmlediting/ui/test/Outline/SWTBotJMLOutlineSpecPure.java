@@ -22,13 +22,13 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 
 
-public class SWTBotJMLoutlineSpecPure {
+public class SWTBotJMLOutlineSpecPure {
    
    private static SWTWorkbenchBot bot = new SWTWorkbenchBot();
    private static TestProject testProject;
    private static SWTBotEclipseEditor editor = null;
 
-   private static final String PROJECT_NAME = "OutlineTest";
+   private static final String PROJECT_NAME = "OutlineTestSpecPure";
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineSpecTest";
    

@@ -127,17 +127,4 @@ public abstract class AbstractASTNode implements IASTNode {
       str += ")";
       return str;
    }
-   
-
-   @Override
-   public ResolveResult resolve(IJMLProfile profile, ICompilationUnit cu) {
-       try {
-           return profile.getResolver().resolve(cu, this);
-       }
-       catch (ResolverException e) {
-           return null;
-       }
-   }
-
-
 }

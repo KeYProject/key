@@ -43,17 +43,13 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
      */
     @Override
     protected final boolean initialize(Object element) {
-        if(element instanceof IJavaElement){
-            elementToMove = (IJavaElement) element;           
-            fProject = elementToMove.getJavaProject();
-            elementName = elementToMove.getElementName();
-            oldClassFullQualName = ((IType) elementToMove.getParent()).getFullyQualifiedName();
-            IType destination = (IType) getArguments().getDestination();
-            newClassFullQualName = destination.getFullyQualifiedName();
-            return true;
-        }else{
-            return false;
-        }
+        elementToMove = (IJavaElement) element;           
+        fProject = elementToMove.getJavaProject();
+        elementName = elementToMove.getElementName();
+        oldClassFullQualName = ((IType) elementToMove.getParent()).getFullyQualifiedName();
+        IType destination = (IType) getArguments().getDestination();
+        newClassFullQualName = destination.getFullyQualifiedName();
+        return true;
     }
 
     

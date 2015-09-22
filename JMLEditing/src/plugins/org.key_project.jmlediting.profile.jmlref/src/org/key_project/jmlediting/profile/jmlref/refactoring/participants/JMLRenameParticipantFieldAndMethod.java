@@ -58,16 +58,10 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
     @Override
     protected final boolean initialize(final Object element) {
         fNewName = getArguments().getNewName();
-
-        if (element instanceof IJavaElement) {
-            fJavaElementToRename = (IJavaElement) element;
-            fProject = fJavaElementToRename.getJavaProject();
-            fOldName = fJavaElementToRename.getElementName();
-            return true;
-        }
-        else {
-            return false;
-        }
+        fJavaElementToRename = (IJavaElement) element;
+        fProject = fJavaElementToRename.getJavaProject();
+        fOldName = fJavaElementToRename.getElementName();
+        return true;
     }
 
     /**

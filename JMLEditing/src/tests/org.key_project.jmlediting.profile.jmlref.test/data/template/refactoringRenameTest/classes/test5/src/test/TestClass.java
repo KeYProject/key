@@ -6,7 +6,7 @@ public class TestClass {
     /*@ normal_behavior
       @ ensures TestClass.balance = newBalance;
       @*/
-    void setBalance(int newBalance){
+    public void setBalance(int newBalance){
         TestClass.balance = newBalance;
     }
 }

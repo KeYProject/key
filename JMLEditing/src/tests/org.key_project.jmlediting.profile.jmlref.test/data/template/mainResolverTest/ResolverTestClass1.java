@@ -23,5 +23,7 @@ public class ResolverTestClass1 {
 	public ResolverTestClass1 getThis(ResolverTestClass1 parameter1) {
 	    return this;
 	}
-	
+	public Object getThisAsObjectType() {
+	    return this;
+	}
 }

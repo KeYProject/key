@@ -4,15 +4,12 @@ public class TestClass {
     public int newName;
     
     /*@ normal_behavior
-      @ ensures get("TestClass").newName ==> \result == 0;
+      @ ensures \result == ((TestClass) get("TestClass")).newName;
       @ assignable \nothing;
       @*/
     public int accessBalanceFromOtherClass() {
         
-        if (Integer.toString(newName).equals("5"))
-            return 0;
-        else
-            return 1;
+        return ((TestClass) get("TestClass")).newName;
     }
     
     private Object get(String clazz){
