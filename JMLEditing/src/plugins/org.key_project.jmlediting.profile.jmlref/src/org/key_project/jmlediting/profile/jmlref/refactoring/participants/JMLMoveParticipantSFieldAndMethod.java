@@ -39,7 +39,8 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
     private IJavaProject fProject;
     
     /**
-     * {@inheritDoc} Initializes the source and destination paths, aswell as the field to move itself.
+     * {@inheritDoc} Saves the element which is moved, the name of the element,
+     * its source and destination class, as well as the project starting the refactoring.
      */
     @Override
     protected final boolean initialize(Object element) {
@@ -84,8 +85,8 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
      * code changes needs to be done carefully.
      * 
      * @return Returns null if only shared text changes are made. Otherwise
-     *      returns a TextChange Object which gathered all the changes to JML annotations 
-     *      in class which does not have any Java changes scheduled.
+     *      returns a {@link TextChange} which gathered all the changes to JML annotations 
+     *      in classes which do not have any Java changes scheduled.
      *
      */
     @Override

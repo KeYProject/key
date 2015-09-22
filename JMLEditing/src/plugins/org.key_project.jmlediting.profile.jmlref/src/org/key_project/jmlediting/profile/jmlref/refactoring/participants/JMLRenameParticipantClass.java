@@ -99,8 +99,8 @@ public class JMLRenameParticipantClass extends RenameParticipant {
      * Computes the changes which need to be done to the JML code.
      * <p>
      * @return Returns null if only shared text changes are made. Otherwise
-     *          returns a TextChange Object which gathered all the changes to JML annotations 
-     *          in class which does not have any Java changes scheduled. </p>
+     *          returns a {@link TextChange} which gathered all the changes to JML annotations 
+     *          in classes which do not have any Java changes scheduled. </p>
      */
     @Override
     public final Change createPreChange(final IProgressMonitor pm) throws CoreException,

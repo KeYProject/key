@@ -27,10 +27,11 @@ import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
  * <p>
  * The {@link ReplaceEdit}s are created by calling the {@link Resolver} and finding out if 
  * the JML expression / the {@link IASTNode} refers to the element to be refactored. Complex
- * expressions need to call the {@link Resolver.#next()} method and mimick the way the Resolver
- * traverses the expression. </p>
+ * expressions need to call the {@link Resolver#next()} method which traverses the tree structure. </p>
  * 
  * @author Robert Heimbach
+ * 
+ * @see {@link AbstractRefactoringComputer}
  */
 public class RenameRefactoringComputer extends AbstractRefactoringComputer {
 
@@ -84,13 +85,15 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
      * @param unit
      *            The compilation unit the IASTNode is in.
      * @param changesToMake
-     *            Arraylist of {@link ReplaceEdit}s to accumulate the needed changes.
+     *            {@link ArrayList} of {@link ReplaceEdit}s to accumulate the needed changes.
      * @param primaryStringMap
-     *            IASTNode of the primary expression type to resolve.
+     *            {@link HashMap} which provides for all primary node which needs to be resolved a list
+     *            of {@link IStringNode}s which all had this node as their primary.
      */
     @Override
     protected final void computeReplaceEdit(final ICompilationUnit unit, final ArrayList<ReplaceEdit> changesToMake, final HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
         
+        // Get the resolver which is defined for the active profile.
         IResolver resolver = JMLPreferencesHelper
                 .getProjectActiveJMLProfile(unit.getJavaProject().getProject()).getResolver();
 
@@ -117,7 +120,8 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                         createEditAndAddToList(changesToMake, stringNodes.get(0));
                     }
                 }
-                else { // Shared primaries.
+                else {// Shared primaries. Several string nodes had this node as their primary.
+                      // the resolver provides the information which part of the node needs to be changed.
                     
                     ResolveResult result = null;
                     
@@ -137,48 +141,6 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                     }
                 }
             }
-    //            // Complex expressions (e.g. method calls or member accesses) need to call 
-    //            // the .next() method of the Resolver to move through the node to the inner node 
-    //            // which is less complex
-    //            
-    //            // To move to the right place in the expression; usually saved as a list.
-    //            int i = 0;
-    //                      
-    //            while(resolver.hasNext()) { 
-    //                 result = resolver.next();
-    //                 
-    //                 if (isReferencedElement(result)) {
-    //                     // Access inner node which resolver checked by .next() method.
-    //                    if (nodeToChange.getChildren().size() >= 1) {
-    //                         
-    //                        final List<IASTNode> nodesToSelectFrom = nodeToChange.getChildren().get(1).getChildren();                      
-    //                         
-    //                        if (nodesToSelectFrom.size() > i) {
-    //                             IASTNode selection = nodesToSelectFrom.get(i);
-    //                             
-    //                             // If it is a method call, get the next list item.
-    //                             if (selection.getType() == ExpressionNodeTypes.METHOD_CALL_PARAMETERS){
-    //                                 if (nodesToSelectFrom.size() > i+1)
-    //                                     selection = nodesToSelectFrom.get(i+1);
-    //                                 else {
-    //                                     continue; // correct selection not possible
-    //                                 }
-    //                             }
-    //                             createEditAndAddToList(changesToMake, selection);
-    //                        }
-    //                    }    
-    //                 }
-    //                 // Change i to have the correct starting place for the next call of resolver.next()
-    //                 if (result != null && result.getResolveType().equals(ResolveResultType.METHOD)){
-    //                     // In case of a Method Call like in test().test, the whole method call has two list entries
-    //                     // in the node. One for the name of the method and one for the arguments.
-    //                     // Thus we need to skip two instead of one.
-    //                     i = i + 2;
-    //                 }
-    //                 else {
-    //                     i = i + 1;
-    //                 }
-    //            }
         }
         catch (ResolverException e){
             LogUtil.getLogger().logError(e);;

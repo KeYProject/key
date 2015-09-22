@@ -25,8 +25,8 @@ public class ClassMoveRefactoringComputer extends
     private String fNewPackName;
     
     /**
-     * Constructor, saves the source and the destination the class to be moved is in and the fully
-     * qualified name of the class.
+     * Constructor, which saves the fully qualified name of the class which is moved and the source package
+     * the class is in and the destination package it should be moved to.
      * 
      * @param fOldPackName name of the package the class is in.
      * @param fNewPackName name of the package the class should be moved to.
@@ -72,7 +72,8 @@ public class ClassMoveRefactoringComputer extends
      * Creates the text change and adds it to changesToMake.
      * 
      * @param changesToMake list to add the {@link ReplaceEdit}s to.
-     * @param primaryStringMap {@link IASTNode} to compute the change for.
+     * @param primaryStringMap {@link IASTNode} to compute the change for and the {@link IStringNodes}
+     *          which they contain.
      */
     protected final void computeReplaceEdit(ICompilationUnit unit, ArrayList<ReplaceEdit> changesToMake,
             HashMap<IASTNode, List<IStringNode>> primaryStringMap) {

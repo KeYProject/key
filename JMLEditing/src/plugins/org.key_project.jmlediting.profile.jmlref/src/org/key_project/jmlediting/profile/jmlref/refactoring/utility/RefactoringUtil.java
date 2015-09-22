@@ -37,22 +37,21 @@ public class RefactoringUtil {
         
         ArrayList<IPackageFragment> allFragments = new ArrayList<IPackageFragment>();
         
-         List<IPackageFragmentRoot> roots = JDTUtil.getSourcePackageFragmentRoots(project);
+        List<IPackageFragmentRoot> roots = JDTUtil.getSourcePackageFragmentRoots(project);
         
-        // Checks each roots if it contains source/class files (i.e. it is no archive) 
-        for (IPackageFragmentRoot root: roots){
-            IJavaElement[] children = root.getChildren();            
-            for (IJavaElement child: children){
+        // Iterate through the fragment roots to get all package fragments. 
+        for (IPackageFragmentRoot root: roots){         
+            for (IJavaElement child: root.getChildren()){
                 if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT)
                     allFragments.add((IPackageFragment)child);
             }
-        }     
+        }
         return allFragments;
     }
     
-    /**
-     * Fills a given ArrayList with {@link IJavaProject}s which need to be checked in the refactoring
-     * because they all require the given project and thus can reference any class of that given project.
+    /** 
+     * Fills a given {@link ArrayList} with {@link IJavaProject}s which all require the given 
+     * refactoringStartingProject.
      * 
      * @param projectsToCheck ArrayList of IJavaProjects to fill.
      * @param refactoringStartingProject Given project for which we search in the required project list of the other projects.
@@ -161,7 +160,7 @@ public class RefactoringUtil {
     /**
      * Combines a list of {@link TextEdit}s into a {@link MultiTextEdit}.
      * @param editsToCombine The list of edits to combine.
-     * @return The multitextedit which combined all the edits in the given list.
+     * @return The {@link MultiTextEdit} which combined all the edits in the given list.
      */
     public static MultiTextEdit combineEditsToMultiEdit(final ArrayList<ReplaceEdit> editsToCombine){
         // Gather all the edits to the text (JML annotations) in a MultiTextEdit
@@ -175,14 +174,16 @@ public class RefactoringUtil {
     }
     
     /**
-     * Checks if a given region is covering another given region.
+     * Checks if a given {@link IRegion} is covering another given region.
+     * A region covers another if it starts earlier and ends later.
      * 
      * @param region The first of the given regions.
      * @param other The other region.
-     * @return True if region is covering the other.
+     * @return True if region is covering the other. Else false.
      */
     public static Boolean isCovering (final IRegion region, final IRegion other){
         
+        // get the start and end of both regions.
         int start = region.getOffset();
         int end = start + region.getLength();
         
@@ -196,14 +197,19 @@ public class RefactoringUtil {
     }
     
     /**
-     * Checks if a given region is overlapping another given region. 
+     * Checks if a given {@link IRegion} is overlapping another given region. 
+     * A region overlaps another region if it neither covers the other, is covered
+     * by the other one or is a completely different region.
+     * That is, if the region starts within the other region but ends later or 
+     * if the region starts earlier than the other but ends within it.
      * 
      * @param region First of the given regions.
      * @param other The other one.
-     * @return True if the regions are overlapping.
+     * @return True if the regions are overlapping. Else false.
      */
     public static Boolean isOverlapping (final IRegion region, final IRegion other){
         
+        // Get the start and end information of both regions.
         int start = region.getOffset();
         int end = start + region.getLength();
         
