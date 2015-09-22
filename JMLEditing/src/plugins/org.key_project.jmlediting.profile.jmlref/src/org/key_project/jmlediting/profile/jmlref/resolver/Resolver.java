@@ -783,6 +783,9 @@ public class Resolver implements IResolver {
                 IType type = null;
                 try{
                     type = compilationUnit.getJavaProject().findType(((IVariableBinding) binding).getDeclaringClass().getQualifiedName());
+                    if(type == null) {
+                        continue;
+                    }
                     final IVariableBinding vb = (IVariableBinding) binding;
                     final LinkedList<VariableDeclaration> result = new LinkedList<VariableDeclaration>();
                     
@@ -790,7 +793,7 @@ public class Resolver implements IResolver {
                         
                         // VariableDeclarationFragment extends VariableDeclaration, is the if statement down useful ?
                         @Override
-                        public boolean visit(VariableDeclarationFragment node) {
+                        public boolean visit(final VariableDeclarationFragment node) {
                             if(vb.getJavaElement().equals(node.resolveBinding().getJavaElement())) {
                                 result.add(node);
                                 return false;
@@ -802,9 +805,11 @@ public class Resolver implements IResolver {
                     
                     if(type.getClassFile() != null) {
                         JDTUtil.parse(type.getClassFile()).accept(variableFinder);
-                        return result.poll();
                     } else if(type.getCompilationUnit() != null) {
                         JDTUtil.parse(type.getCompilationUnit()).accept(variableFinder);
+                    }
+                    
+                    if(!result.isEmpty()) {
                         return result.poll();
                     }
                     
