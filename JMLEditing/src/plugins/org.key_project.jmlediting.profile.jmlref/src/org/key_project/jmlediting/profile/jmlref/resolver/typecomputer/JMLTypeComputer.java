@@ -162,8 +162,7 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
            return createWellKnownType(((IStringNode) node.getChildren().get(0)).getString());
             
         } else if(type == ExpressionNodeTypes.REFERENCE_TYPE) {
-//           return callResolver(node.getChildren().get(0).get(0) , new Resolver());
-           return callResolver(node.getChildren().get(0).getChildren().get(0), new Resolver());
+           return callResolver(node, new Resolver());
             
         } else if(type == ExpressionNodeTypes.RELATIONAL_OP) {
             
