@@ -73,6 +73,11 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
+    * Indicates if updates are included or not.
+    */
+   public static final boolean INCLUDE_UPDATES = true;
+   
+   /**
     * The {@link TabbedPropertySheetWidgetFactory} to use.
     */
    private final TabbedPropertySheetWidgetFactory factory;
@@ -217,9 +222,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Compute result
             ITreeSettings settings = node.getExecutionNode().getSettings();
             final TruthValueEvaluationResult result = TruthValueEvaluationUtil.evaluate(keyNode, 
-                                                                                      FormulaTermLabel.NAME,
-                                                                                      settings.isUseUnicode(),
-                                                                                      settings.isUsePrettyPrinting());
+                                                                                        FormulaTermLabel.NAME,
+                                                                                        settings.isUseUnicode(),
+                                                                                        settings.isUsePrettyPrinting());
             if (!root.isDisposed()) {
                root.getDisplay().syncExec(new Runnable() {
                   @Override

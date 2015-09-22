@@ -94,7 +94,9 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
          }
          Term predicate = findUninterpretedPredicateTerm(term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()));
          term = removeUninterpretedPredicate(keyNode, term);
-         term = TermBuilder.goBelowUpdates(term);
+         if (!INCLUDE_UPDATES) {
+            term = TermBuilder.goBelowUpdates(term);
+         }
          return new Pair<Term, Term>(term, predicate);
       }
       else if (node instanceof KeYLoopInvariant) {
@@ -108,7 +110,9 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
             int index = executionNode.getProofNode().sequent().succedent().indexOf(pio.constrainedFormula());
             term = keyNode.sequent().succedent().get(index).formula();
          }
-         term = TermBuilder.goBelowUpdates(term);
+         if (!INCLUDE_UPDATES) {
+            term = TermBuilder.goBelowUpdates(term);
+         }
          return new Pair<Term, Term>(term, null);
       }
       else {

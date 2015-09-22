@@ -77,7 +77,9 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
             int index = executionNode.getProofNode().sequent().succedent().indexOf(pio.constrainedFormula());
             term = keyNode.sequent().succedent().get(index).formula();
          }
-         term = TermBuilder.goBelowUpdates(term);
+         if (!INCLUDE_UPDATES) {
+            term = TermBuilder.goBelowUpdates(term);
+         }
          return new Pair<Term, Term>(term, null);
       }
       else {

@@ -17,11 +17,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.util.Pair;
 
@@ -53,13 +56,17 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
          term = term.sub(0);
       }
       Term uninterpretedPredicate = AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof());
+      Term sfTerm = keyNode.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      ImmutableList<Term> updates = TermBuilder.goBelowUpdates2(sfTerm).first;
       if (uninterpretedPredicate != null) {
          Term predicate = findUninterpretedPredicateTerm(term, uninterpretedPredicate);
          term = removeUninterpretedPredicate(keyNode, term);
-         return new Pair<Term, Term>(term, predicate);
+         return new Pair<Term, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, term) : term, 
+                                     predicate);
       }
       else {
-         return new Pair<Term, Term>(term, null);
+         return new Pair<Term, Term>(INCLUDE_UPDATES ? keyNode.proof().getServices().getTermBuilder().applySequential(updates, term) : term, 
+                                     null);
       }
    }
 }
