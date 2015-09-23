@@ -337,8 +337,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              null, 
                                                              createNotUndefinedValueValidator(methodProblemsTitle), 
                                                              true,
-                                                             new Choice("Search may not stop after an index was accepted", "SearchDoesNotStop"), 
-                                                             new Choice("Search may not check all array elements even if no index was accepted", "NotAllConsidered"), 
+                                                             new Choice("Search may not stop after an index was accepted by method accept", "SearchDoesNotStop"), 
+                                                             new Choice("Search may not check all array elements even if no index was accepted by method accept", "NotAllConsidered"), 
                                                              new Choice("Not the first accepted index might be returned", "NotFirstFoundReturned"), 
                                                              new Choice("-1 might be returned instead of the accepted index", "MinusOneReturned"), 
                                                              new Choice("Accepted index might be returned instead of -1", "AcceptedIndexReturned"), 
@@ -377,13 +377,13 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                           new NotUndefinedValueValidator("Question '" + returnValueTitle + "' not answered."), 
                                                           true,
                                                           new Choice("An integer < -1 might be returned", "LessMinusOne"),
-                                                          new Choice("-1 is returned if no index was accepted", "MinusOneNotFound", true),
-                                                          new Choice("-1 might be returned even if an index was accepted", "MinusOneFound"),
+                                                          new Choice("-1 is returned if no index was accepted by method accept", "MinusOneNotFound", true),
+                                                          new Choice("-1 might be returned even if an index was accepted by method accept", "MinusOneFound"),
                                                           new Choice("0 might be returned", "NullReturned", true),
                                                           new Choice("array.length - 1 might be returned", "LengthMinusOneReturned", true),
                                                           new Choice("array.length might be returned", "LengthReturned"),
-                                                          new Choice("An integer within array bounds might be returned if no index was accepted", "IndexNotFoundReturned"),
-                                                          new Choice("An integer within array bounds is returned if an index was accepted", "IndexFoundReturned", true));
+                                                          new Choice("An integer within array bounds might be returned if no index was accepted by method accept", "IndexNotFoundReturned"),
+                                                          new Choice("An integer within array bounds is returned if an index was accepted by method accept", "IndexFoundReturned", true));
       return new QuestionPage(pageName, 
                               title, 
                               createQuestionPageMessage(), 
@@ -921,7 +921,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
 //                                                       new Choice("arrayListeners might contain an Object as element", "ArrayarrayListenersContainsObject"), 
                                                        createElseWrongChoice(description));
       String title = constructor ?
-                     "Is the class invariant established by " + method + "?" :
+                     "Is the class invariant established by " + method + " in case of normal termination?" :
                      "Is the class invariant preserved by " + method + "?";
       return new RadioButtonsQuestion("classInvariant", 
                                       title, 

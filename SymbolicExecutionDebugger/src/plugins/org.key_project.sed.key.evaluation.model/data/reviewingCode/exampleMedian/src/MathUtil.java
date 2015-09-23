@@ -12,7 +12,7 @@ public class MathUtil {
     * the median is the value of the array element in the middle of start and end.
     * <p>
     * In case that the number of array elements between start and end is even,
-    * the median is the average of the two middle elements.
+    * the median is the average (integer division) of the two middle elements.
     * @param array The sorted array for which to compute the median.
     * @param start A valid index in the array.
     * @param end A valid index in the array.
