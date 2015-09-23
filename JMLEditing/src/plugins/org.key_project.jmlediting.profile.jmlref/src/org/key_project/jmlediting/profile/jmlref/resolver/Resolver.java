@@ -1,6 +1,8 @@
 package org.key_project.jmlediting.profile.jmlref.resolver;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,7 +95,7 @@ public class Resolver implements IResolver {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public ResolveResult resolve(final ICompilationUnit compilationUnit, final IASTNode jmlNode) throws ResolverException {
+    public final ResolveResult resolve(final ICompilationUnit compilationUnit, final IASTNode jmlNode) throws ResolverException {
                 
         // check if the given IASTNode is correct and get possible information
         if(jmlNode == null || compilationUnit == null) {
@@ -119,6 +121,7 @@ public class Resolver implements IResolver {
         try {
             source = compilationUnit.getSource();
         } catch(final JavaModelException e) {
+            // CompilationUnit has no source attached to it? 
             LogUtil.getLogger().logError(e);
             return null;
         }
@@ -237,9 +240,12 @@ public class Resolver implements IResolver {
             }
             
             if(jdtNode == null) {
+                // set context to null so we don't give out wrong information on a following next() call.
+                context = null;
                 return null;
             }
             
+            // get more information to pass on.
             binding = resolveBinding(jdtNode);
             resultType = getResolveType(jdtNode);
             
@@ -271,7 +277,7 @@ public class Resolver implements IResolver {
             } else if(currentTask.resolveString.equals("super")) {
                 return getDeclaringClass(context).getSuperclassType();
             } else if(currentTask.resolveString.equals("\\result")) {
-                return findMethodReturnValue();
+                return findMethodReturnValue(context);
             }
         }
         return null;
@@ -286,11 +292,11 @@ public class Resolver implements IResolver {
         return (TypeDeclaration)clazz;
     }
 
-    private ASTNode findMethodReturnValue() throws ResolverException {
+    private ASTNode findMethodReturnValue(final ASTNode context) {
         if(context instanceof MethodDeclaration) {
             return ((MethodDeclaration) context).getReturnType2();
         } else {
-            throw new ResolverException("Context is not set to a MethodDeclaration.");
+            return null;
         }
     }
 
@@ -300,77 +306,72 @@ public class Resolver implements IResolver {
      * @throws ResolverException is thrown if the setNewContext method throws a ResolverException
      */
     private ASTNode findIdentifier() throws ResolverException {
+        // Initialize jdtNode with null. If this ever changes to something else, we found our node!
         ASTNode jdtNode = null;
         
-        if(currentTask.lastResult != null) {
-            // set new context
-            context = setNewContext();
-            
-        } else if(!currentTask.isMethod) {
-            // If we get in here, this is the first call of this function, means our context is set to
-            // the method/code the comment is bound to.
+        // Set the context.
+        context = setNewContext();
+        
+        // start with searching for parameters if we are not searching for a method or a class
+        // if lastResult is null, this must be the first call of next() and is the only case we could find parameters in
+        if(currentTask.lastResult == null && !currentTask.isMethod) {
+            //TODO: Check if context is set to a MethodDeclaration but if not findParameters will return null anyways.
             jdtNode = findParameters(context, currentTask.resolveString);
         }
         
         // we need to get more information, in particular which class declared the method/field.
-        if(jdtNode == null && currentTask.lastResult == null) {
-            context = getDeclaringClass(context);
-        }
+        context = getDeclaringClass(context);
         
-        if(jdtNode == null) {
-            if(currentTask.isMethod) {
+        // are we searching for a method?
+        if(jdtNode == null && currentTask.isMethod) {
+            ASTNode searchContext = context;
+            
+            jdtNode = findMethod(searchContext, currentTask.resolveString, currentTask.parameters);
+            
+            while(jdtNode == null) {
+                //  Set new context to super class and call it again until we reach Object
+                final Type superClass = ((TypeDeclaration)searchContext).getSuperclassType();
+                IType type = null;
                 
-                context = getDeclaringClass(context);
-                
-                jdtNode = findMethod(context, currentTask.resolveString, currentTask.parameters);
-                
-                if(jdtNode == null) {
+                if(superClass == null) {
+                    // Create a TypeBinding of object to compare
+                    final JMLTypeComputer tc = new JMLTypeComputer(compilationUnit);
+                    final ITypeBinding objectTypeBinding = tc.createWellKnownType("java.lang.Object");
                     
-                    //  Set new context to super class and call it again until we reach Object
-                    final Type superClass = ((TypeDeclaration)context).getSuperclassType();
-                    IType type = null;
-                    
-                    if(superClass == null) {
-                        // Create a TypeBinding of object to compare
-                        final JMLTypeComputer tc = new JMLTypeComputer(compilationUnit);
-                        final ITypeBinding objectTypeBinding = tc.createWellKnownType("java.lang.Object");
-                        
-                        if(((TypeDeclaration)context).resolveBinding().isEqualTo(objectTypeBinding)) {
-                            return null;
-                        }
-                        try {
-                            type = compilationUnit.getJavaProject().findType(objectTypeBinding.getQualifiedName());
-                        }
-                        catch (final JavaModelException e) {
-                            LogUtil.getLogger().logError(e);
-                        }
-                    } else {
-                        type = (IType) superClass.resolveBinding().getJavaElement();
+                    if(((TypeDeclaration)searchContext).resolveBinding().isEqualTo(objectTypeBinding)) {
+                        break;
                     }
-                    if(type == null) {
-                        return null;
+                    try {
+                        type = compilationUnit.getJavaProject().findType(objectTypeBinding.getQualifiedName());
                     }
-                    
-                    ASTNode node = null;
-                    if(type.getClassFile() != null) {
-                        node = JDTUtil.parse(type.getClassFile());
-                    } else if(type.getCompilationUnit() != null) {
-                         node = JDTUtil.parse(type.getCompilationUnit());
+                    catch (final JavaModelException e) {
+                        LogUtil.getLogger().logError(e);
                     }
-                    
-                    jdtNode = findMethod(getTypeInCompilationUnit(type.getElementName(), node), currentTask.resolveString, currentTask.parameters);
+                } else {
+                    type = (IType) superClass.resolveBinding().getJavaElement();
+                }
+                if(type == null) {
+                    break;
                 }
                 
-            } else {
-                jdtNode = findField(context, currentTask.resolveString);
+                ASTNode node = null;
+                if(type.getClassFile() != null) {
+                    node = JDTUtil.parse(type.getClassFile());
+                } else if(type.getCompilationUnit() != null) {
+                     node = JDTUtil.parse(type.getCompilationUnit());
+                }
+                searchContext = getTypeInCompilationUnit(type.getElementName(), node);
+                jdtNode = findMethod(searchContext, currentTask.resolveString, currentTask.parameters);      
             }
         }
-        
+        if(jdtNode == null) {
+            jdtNode = findField(context, currentTask.resolveString);
+        }
         if(jdtNode == null) {
             jdtNode = findInPackage(currentTask.resolveString, pack.resolveBinding());
         }
         if(jdtNode == null) {
-            jdtNode = findFromImports(currentTask.resolveString);
+            jdtNode = findInImports(currentTask.resolveString);
         }
         if(jdtNode == null) {
             jdtNode = findInPackage(currentTask.resolveString, "java.lang");
@@ -419,15 +420,39 @@ public class Resolver implements IResolver {
         // did we find something?
         if(candidateList.size() > 0) {
             if(candidateList.size() == 1) {
-                 method = (IMethod) candidateList.get(0).getJavaElement();
+                method = (IMethod) candidateList.get(0).getJavaElement();
             } else {
-                // TODO: select correct method here. 
+                // ----------
+                final int[] dist = new int[candidateList.size()];
+                for(int i = 0; i < candidateList.size(); i++) {
+                    dist[i] = calculateDistanceToActualParameters(candidateList.get(i).getParameterTypes(), iASTTypeBindings);
+                }
+                Arrays.sort(dist);
+                
+                // TODO: select correct method here. Lösungsansatz? :( 
                 // WARNING: Detect ambitious method declarations.
             }
         }
         
         // get the JDTNode for it.
         return findIMethod(context, method);
+    }
+
+    /** Helper method to calculate what method is the correct one to call.
+     * @param parameterTypes
+     * @param iASTTypeBindings
+     * @return
+     */
+    private int calculateDistanceToActualParameters(final ITypeBinding[] parameterTypes, final ITypeBinding[] iASTTypeBindings) {
+        if(parameterTypes.length != iASTTypeBindings.length) {
+            return Integer.MAX_VALUE;
+        }
+        if(parameterTypes.length == 0) {
+            return 0;
+        }
+        // TODO !! :( Lösungsansatz ?
+        
+        return 0;
     }
 
     /** Gets the {@link ITypeBinding}s of the given {@link IASTNode}s from the {@link JMLTypeComputer}.
@@ -528,30 +553,25 @@ public class Resolver implements IResolver {
         return null;
     }
 
-    private ASTNode findIMethod(final ASTNode context, final IMethod method) {
-        // TODO: Has to be rewritten because the logic to find the function has moved to another class.
-        // this can now be much simpler!
-        
-        
+    /** Finds the {@link MethodDeclaration} corresponding to the given {@link IMethod}.
+     * @param context the context to find the {@link MethodDeclaration} in.
+     * @param method the {@link IMethod} to search for.
+     * @return the {@link MethodDeclaration} or {@code null} if nothing has been found.
+     */
+    private MethodDeclaration findIMethod(final ASTNode context, final IMethod method) {
         if(method == null || context == null)  {
             return null;
         }
+        
         final LinkedList<MethodDeclaration> result = new LinkedList<MethodDeclaration>();
         
-        //final String key = method.getKey();
-        
         final String[] expectedParameterKeys = Signature.getParameterTypes(method.getKey());
-        //final String subkey2 = key.substring(key.indexOf("(")+1, key.indexOf(")"));
-        
                 
         context.accept(new ASTVisitor() {
-            
             @Override
             public boolean visit(final MethodDeclaration node) {
                 if(node.getName().getIdentifier().equals(method.getElementName())) {
                     final String[] actualParameterKeys = Signature.getParameterTypes(node.resolveBinding().getKey());
-                    //final String key = node.resolveBinding().getKey();
-                    //final String subkey = key.substring(key.indexOf("(")+1, key.indexOf(")"));
                     if(actualParameterKeys.length == expectedParameterKeys.length) {
 
                         for(int i = 0; i < actualParameterKeys.length; i++) {
@@ -571,74 +591,10 @@ public class Resolver implements IResolver {
         });
         
         if(result.isEmpty()) {
-            // method was not defined in this class.
-            final TypeDeclaration declaringClass = getDeclaringClass(context);
-            final Type newContext = declaringClass.getSuperclassType();
-            try {
-                IType type = null;
-                
-                if(newContext == null) {
-                    // if we were already Searching in Object.. then return null
-                    final TypeComputer tc = new TypeComputer(compilationUnit);
-                    final ITypeBinding objectBinding = tc.createWellKnownType("java.lang.Object");
-                    if(declaringClass.resolveBinding().isEqualTo(objectBinding)) {
-                        return null;
-                    }
-                    type = compilationUnit.getJavaProject().findType(objectBinding.getQualifiedName());
-                } else {
-                    type = compilationUnit.getJavaProject().findType(newContext.resolveBinding().getQualifiedName());
-                    if(type == null) {
-                        return null;
-                    }
-                }
-                
-                ASTNode node = null;
-                if(type.getClassFile() != null) {
-                    node = JDTUtil.parse(type.getClassFile());
-                } else if(type.getCompilationUnit() != null) {
-                     node = JDTUtil.parse(type.getCompilationUnit());
-                }
-                
-                return findIMethod(getTypeInCompilationUnit(type.getElementName(), node), method);
-                
-            }
-            catch (final JavaModelException e) {
-                LogUtil.getLogger().logError(e);
-            }
+            return null;
         }
-        
-        return result.poll();
-    }
-
-    /** Uses the TypeComputer to find out what the ITypeBinding of the parameters are then creates the Signature of those Bindings.
-     * 
-     * @param parameters the List of the parameters
-     * @return a String array containing the signatures of the parameter types in the same order.
-     * @throws ResolverException if the TypeComputer can not compute the parameter type.
-     */
-    private String[] createParameterSignatures(final List<IASTNode> parameters) throws ResolverException {
-        if(parameters.size() == 0) {
-            return new String[0];
-        }
-        
-       final String[] result = new String[currentTask.parameters.size()];
-        
-        for(int i = 0; i < currentTask.parameters.size(); i++) {
-            final JMLTypeComputer tc = new JMLTypeComputer(compilationUnit);
             
-            ITypeBinding b = null;
-            try {
-                b = tc.computeType(currentTask.parameters.get(i));
-            }
-            catch (final TypeComputerException e) {
-                throw new ResolverException("TypeComputer threw an exception when trying to resolve a method parameter.", e);
-            }
-            if(b != null) {
-                result[i] = Signature.createTypeSignature(b.getQualifiedName(), true);
-            }
-        }
-        
-        return result;
+        return result.poll();
     }
 
     /** Uses the {@link SearchEngine} to get the class specified by resolveString.
@@ -733,14 +689,20 @@ public class Resolver implements IResolver {
         return getTypeInCompilationUnit(resolveString, node);
     }
 
-    private ASTNode getTypeInCompilationUnit(final String resolveString, final ASTNode node) {
-        final LinkedList<ASTNode> endResult = new LinkedList<ASTNode>();
+    /** Gets the {@link TypeDeclaration} with the given name.
+     * @param name the name of the type we are searching for.
+     * @param node the context we are searching in.
+     * @return the {@link TypeDeclaration} or {@code null} if nothing has been found.
+     */
+    private TypeDeclaration getTypeInCompilationUnit(final String name, final ASTNode node) {
+        final LinkedList<TypeDeclaration> endResult = new LinkedList<TypeDeclaration>();
         
-        if(node != null && resolveString != null) {
+        if(node != null && name != null) {
             node.accept(new ASTVisitor() {
                 @Override
                 public boolean visit(final TypeDeclaration node) {
-                    if(node.getName().getIdentifier() != null && node.getName().getIdentifier().equals(resolveString)) {
+                    if(node.getName().getIdentifier() != null && node.getName().getIdentifier().equals(name)) {
+                        // We found it. Stop searching.
                         endResult.add(node);
                         return false;
                     }
@@ -751,7 +713,17 @@ public class Resolver implements IResolver {
         return endResult.poll();
     }
 
+    /** Method to calculate the new context. It checks the last resolved result and sets its type to the new context to search in.
+     * @return the {@link TypeDeclaration} that corresponds to the type that is the new context or the context that was set before the call if there was no last result.
+     * @throws ResolverException if the last result points to a primitive type that can not have members.
+     */
     private ASTNode setNewContext() throws ResolverException {
+        // If there is no last result, we don't change the context.
+        if(currentTask.lastResult == null) {
+            return context;
+        }
+        
+        // get the last result and get its type.
         final ITypeBinding typeBinding = TypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding());
         // START testing what the new context might be
         if(typeBinding.isPrimitive()) {
@@ -779,7 +751,7 @@ public class Resolver implements IResolver {
         return null;
     }
     
-    private ASTNode findASTNodeFromType(final ITypeBinding binding) {
+    private TypeDeclaration findASTNodeFromType(final ITypeBinding binding) {
         final IType type;
         try {
             type = compilationUnit.getJavaProject().findType(binding.getQualifiedName());
@@ -798,7 +770,7 @@ public class Resolver implements IResolver {
         return getTypeInCompilationUnit(type.getElementName(), node);
     }
     
-    private ASTNode findFromImports(final String resolveString) throws ResolverException {
+    private ASTNode findInImports(final String resolveString) throws ResolverException {
         
         for(final ImportDeclaration imp : imports) {
             
@@ -813,7 +785,7 @@ public class Resolver implements IResolver {
                     return result;
                 }
                 
-            // ***** TypeBinding 
+            // ***** TypeBinding - class imports
             } else if(binding instanceof ITypeBinding) {
                 
                 IType type = null;
@@ -1307,9 +1279,38 @@ public class Resolver implements IResolver {
      */
     @Override
     public final boolean hasNext() {
-        if(tasks.size() > 0) {
-            return true;
-        }
-        return false;
+        return tasks.size() > 0 ? true : false;
     }
+    
+    /** Uses the TypeComputer to find out what the ITypeBinding of the parameters are then creates the Signature of those Bindings.
+     * 
+     * @param parameters the List of the parameters
+     * @return a String array containing the signatures of the parameter types in the same order.
+     * @throws ResolverException if the TypeComputer can not compute the parameter type.
+     */
+    /*private String[] createParameterSignatures(final List<IASTNode> parameters) throws ResolverException {
+        if(parameters.size() == 0) {
+            return new String[0];
+        }
+        
+       final String[] result = new String[currentTask.parameters.size()];
+        
+        for(int i = 0; i < currentTask.parameters.size(); i++) {
+            final JMLTypeComputer tc = new JMLTypeComputer(compilationUnit);
+            
+            ITypeBinding b = null;
+            try {
+                b = tc.computeType(currentTask.parameters.get(i));
+            }
+            catch (final TypeComputerException e) {
+                throw new ResolverException("TypeComputer threw an exception when trying to resolve a method parameter.", e);
+            }
+            if(b != null) {
+                result[i] = Signature.createTypeSignature(b.getQualifiedName(), true);
+            }
+        }
+        
+        return result;
+    }*/
+    
 }
