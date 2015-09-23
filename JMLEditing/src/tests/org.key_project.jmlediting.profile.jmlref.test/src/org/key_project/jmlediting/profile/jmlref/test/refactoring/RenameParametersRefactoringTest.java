@@ -4,7 +4,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -13,6 +12,13 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * The tests for the renaming of parameters. See the data\template\refactoringRenameTest\TestExplanation.txt 
+ * for more information.
+ * 
+ * @author Robert Heimbach
+ *
+ */
 public class RenameParametersRefactoringTest {
     private static final String PROJECT_NAME = "JMLRefactoringRenameTestParameters";
 
@@ -64,7 +70,7 @@ public class RenameParametersRefactoringTest {
     }
     
     @Test
-    public void test5RenameLocalVariable() throws CoreException {
+    public void test5RenameLocalVariableNoParameter() throws CoreException {
         TestUtilsRefactoring.runParameterRenameTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "setBalance(boolean) : void", "aNewName", 26);
     }

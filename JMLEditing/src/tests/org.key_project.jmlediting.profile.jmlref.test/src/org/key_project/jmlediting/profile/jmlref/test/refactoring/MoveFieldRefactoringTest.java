@@ -167,4 +167,9 @@ public class MoveFieldRefactoringTest {
        projectSrc.delete(true, null);
        projectDest.delete(true, null);
     }
+    
+    @Test
+    public void test10MoveFieldIntoEmptyClass() throws CoreException {
+        TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH, srcFolder, oracleFolder, bot, "TestClass", "test", "balance: int", "Other", "test", javaProject);
+    }
 }

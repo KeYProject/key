@@ -16,6 +16,7 @@ import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 import org.key_project.util.jdt.JDTUtil;
 
 /**
@@ -197,10 +198,9 @@ public class RefactoringUtil {
     }
     
     /**
-     * Checks if a given {@link IRegion} is overlapping another given region. 
-     * A region overlaps another region if it neither covers the other, is covered
-     * by the other one or is a completely different region.
-     * That is, if the region starts within the other region but ends later or 
+     * Checks if a given {@link IRegion} is overlapping another given region.
+     * A region overlaps the other region if the region covers it,
+     * if the region starts within the other region but ends later or 
      * if the region starts earlier than the other but ends within it.
      * 
      * @param region First of the given regions.
@@ -216,10 +216,38 @@ public class RefactoringUtil {
         int startOther = other.getOffset();
         int endOther = startOther + other.getLength();
         
-        if (((start <= startOther) && (end >= startOther) && (end < endOther)) || // region ends too early. other is longer.
+        if  (isCovering(region, other) || 
+            ((start <= startOther) && (end >= startOther) && (end < endOther)) || // region ends too early. other is longer.
             ((start > startOther) && (start < endOther) && (end >= endOther)))   // region starts too late.
             return true;
         else 
             return false;
+    }
+    
+    /**
+     * 
+     * @param textEdit
+     * @param other
+     * @return
+     */
+    public static Boolean isOverlapping(final TextEdit textEdit, final IRegion other) {
+       
+        boolean overlap = false;
+        
+        if (textEdit.hasChildren()) {
+            for (TextEdit edit: textEdit.getChildren()){
+                if (isOverlapping(edit.getRegion(), other)){
+                    overlap = true;
+                    break;
+                }
+            }
+        }
+        else {
+            if (isOverlapping(textEdit.getRegion(), other)){
+                overlap = true;
+            }
+        }
+        
+        return overlap;
     }
 }

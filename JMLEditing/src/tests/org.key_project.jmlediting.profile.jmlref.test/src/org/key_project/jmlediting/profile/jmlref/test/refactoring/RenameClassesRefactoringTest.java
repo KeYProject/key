@@ -12,6 +12,13 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * The tests for the renaming of classes. See the data\template\refactoringRenameTest\TestExplanation.txt 
+ * for more information.
+ * 
+ * @author Robert Heimbach
+ *
+ */
 public class RenameClassesRefactoringTest {
     private static final String PROJECT_NAME = "JMLRefactoringRenameTestClasses";
 

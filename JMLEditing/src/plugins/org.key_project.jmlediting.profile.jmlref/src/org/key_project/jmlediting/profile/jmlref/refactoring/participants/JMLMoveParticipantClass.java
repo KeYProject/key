@@ -120,7 +120,9 @@ public class JMLMoveParticipantClass extends MoveParticipant {
                             }
                         }
                         else {
-                            // In case changes to the JML code needs to be done (but not to the java code)
+                            // In the extremely unlikely case that changes to the JML code needs to be done (but not to the java code)
+                            // Note that, when a class is imported -> changes to import declaration.
+                            // Class itself -> changes to the package declaration.
                             if (!changesToJML.isEmpty()){
 
                                 changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
