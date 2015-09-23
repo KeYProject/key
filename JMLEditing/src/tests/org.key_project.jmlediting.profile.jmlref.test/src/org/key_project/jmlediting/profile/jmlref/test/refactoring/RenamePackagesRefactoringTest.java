@@ -1,5 +1,8 @@
 package org.key_project.jmlediting.profile.jmlref.test.refactoring;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -12,6 +15,13 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * The tests for the renaming of packages. See the data\template\refactoringRenameTest\TestExplanation.txt 
+ * for more information.
+ * 
+ * @author Robert Heimbach
+ *
+ */
 public class RenamePackagesRefactoringTest {
     
     private static final String PROJECT_NAME = "JMLRefactoringRenameTestPackages";
@@ -87,5 +97,24 @@ public class RenamePackagesRefactoringTest {
     public void test8RenameParentPackageOnly() throws CoreException {   
         TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test8", srcFolder, oracleFolder, bot, 
                  "test", "newPackageName", javaProject, false);
+    }
+    
+    @Test
+    public void test9RenameEmptyPackageInitializeFalse() throws CoreException {
+        
+        IFolder emptyFolder = TestUtilsUtil.createFolder(srcFolder, "emptyPackage");
+        
+        // rename empty package and check if file in other package is unchanged (field name is emptyPackage)
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test9", srcFolder, oracleFolder, bot, "emptyPackage", "newPackageName", javaProject, false);
+        
+        // check if "emptyPackage" does not exist any more but a package with "newPackageName" exists instead
+        IFolder folderAfterRename = srcFolder.getFolder("newPackageName");
+        assertFalse(emptyFolder.exists());
+        assertTrue(folderAfterRename.exists());
+    }
+    
+    @Test
+    public void test10HaveClassWithJMLButWithoutJavaChanges() throws CoreException {
+        TestUtilsRefactoring.runPackageRenameTest(TESTPATH+"\\test10", srcFolder, oracleFolder, bot, "test", "newPackageName", javaProject, false);
     }
 }

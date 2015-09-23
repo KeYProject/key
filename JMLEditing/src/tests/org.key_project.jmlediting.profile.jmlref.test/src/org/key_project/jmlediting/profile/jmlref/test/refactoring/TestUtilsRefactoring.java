@@ -160,6 +160,15 @@ public class TestUtilsRefactoring {
     }
 
 
+    /**
+     * 
+     * @param projectName
+     * @param packageName
+     * @param srcFolder
+     * @param newPackageName
+     * @param bot
+     * @param activateSubpackageOption
+     */
     public static void selectPackageAndExecuteRenaming(String projectName,
             String packageName, IFolder srcFolder, String newPackageName,
             SWTWorkbenchBot bot, Boolean activateSubpackageOption) {
@@ -400,7 +409,7 @@ public class TestUtilsRefactoring {
         
         copyFiles(path + "\\src", srcFolder);
         copyFiles(path + "\\oracle", oracleFolder);
-        
+
         selectPackageAndExecuteRenaming(project.getElementName(), packageName, srcFolder, newPackageName, bot, renameSubpackages);
         
         compareAllFilesInProjectToOracle(project, oracleFolder, bot);

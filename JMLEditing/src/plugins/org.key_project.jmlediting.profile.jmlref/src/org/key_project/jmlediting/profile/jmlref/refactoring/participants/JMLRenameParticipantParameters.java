@@ -6,7 +6,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -49,8 +48,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
         
         // check if it is a method parameter
         // and check if it has a declaring method and a non-null compilation unit (should be true)
-        if (fmethodParameter.isParameter() && fmethodParameter.getDeclaringMember().getElementType() == IJavaElement.METHOD
-                && !(fmethodParameter.getDeclaringMember().getCompilationUnit() == null)) {
+        if (fmethodParameter.isParameter() && !(fmethodParameter.getDeclaringMember().getCompilationUnit() == null)) {
             fOldName = fmethodParameter.getElementName();
             fNewName = getArguments().getNewName();
             fProject = fmethodParameter.getJavaProject();
@@ -107,11 +105,8 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
 
         // add our edits to the java changes
         // JDT will compute the shifts and the preview
-        // Too make sure no exception is thrown but should never be null.
-        if (changesToJavaCode != null) {
-            for (final ReplaceEdit edit : changesToJML) {
-                changesToJavaCode.addEdit(edit);
-            }
+        for (final ReplaceEdit edit : changesToJML) {
+            changesToJavaCode.addEdit(edit);
         }
         
         return null;

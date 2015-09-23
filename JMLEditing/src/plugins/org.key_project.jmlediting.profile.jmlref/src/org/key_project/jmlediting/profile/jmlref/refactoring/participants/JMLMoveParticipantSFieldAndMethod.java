@@ -89,7 +89,7 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
      *      in classes which do not have any Java changes scheduled.
      *
      */
-    @Override
+    //@Override
     public final Change createChange(IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
@@ -111,46 +111,46 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
                         
                         final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
 
-                        // Get scheduled changes to the java code from the rename processor
-                        final TextChange changesToJavaCode = getTextChange(unit);
-
-                        // add our edits to the java changes
-                        // JDT will compute the shifts and the preview
-                        if (changesToJavaCode != null) {
+                        if (!changesToJML.isEmpty()) {
                             
-                            MultiTextEdit jmlEditsCombined = RefactoringUtil.combineEditsToMultiEdit(changesToJML);
-   
-                            // Choose the right place in the tree to add the JML edits.
-                            // changesToJavaCode is a MultiTextEdit (as a root) consisting of a MultiTextEdit consisting of Edits
-                            IRegion regionJML = jmlEditsCombined.getRegion();
-                            
-                            TextEdit presetRootEdit = changesToJavaCode.getEdit();
-                            
-                            TextEdit[] children = presetRootEdit.getChildren();
-                            
-                            // check if some child completely covers the JML region. Add it then.
-                            // Otherwise add it as a separate child
-                            boolean overlap = false;
-                            boolean jmlAdded = false;
-                            for (TextEdit child : children) {
-                                if (RefactoringUtil.isCovering(child.getRegion(), regionJML)) {
-                                    child.addChild(jmlEditsCombined);
-                                    jmlAdded = true;
-                                    break;
+                            // Get scheduled changes to the java code from the rename processor
+                            final TextChange changesToJavaCode = getTextChange(unit);
+    
+                            // add our edits to the java changes
+                            // JDT will compute the shifts and the preview
+                            if (changesToJavaCode != null) {
+                                
+                                MultiTextEdit jmlEditsCombined = RefactoringUtil.combineEditsToMultiEdit(changesToJML);
+       
+                                // Choose the right place in the tree to add the JML edits.
+                                // changesToJavaCode is a MultiTextEdit (as a root) consisting of a MultiTextEdit consisting of Edits
+                                IRegion regionJML = jmlEditsCombined.getRegion();
+                                
+                                TextEdit presetRootEdit = changesToJavaCode.getEdit();
+                                
+                                TextEdit givenMultiEdit = presetRootEdit.getChildren()[0];
+                                
+                                // Check if we can add it next to the given multi edit to the root
+                                if (!RefactoringUtil.isOverlapping(presetRootEdit, regionJML)) {
+                                    presetRootEdit.addChild(jmlEditsCombined);
                                 }
-                                if (RefactoringUtil.isOverlapping(child.getRegion(), regionJML)){
-                                    overlap = true;
+                                // else check if we can add it into the given multi edit as a child
+                                else if (!RefactoringUtil.isOverlapping(givenMultiEdit, regionJML)){
+                                    givenMultiEdit.addChild(jmlEditsCombined);
+                                }
+                                // we could not add them all together (better preview tree) -> so try to add them individually
+                                else {
+                                    for (ReplaceEdit edit : changesToJML){
+                                        if (!RefactoringUtil.isOverlapping(givenMultiEdit, edit.getRegion())){
+                                            // create a copy of the edit we want to put in because we need one without an already set parent
+                                            ReplaceEdit newEdit = new ReplaceEdit(edit.getOffset(), edit.getLength(), edit.getText());
+                                            givenMultiEdit.addChild(newEdit);
+                                        }
+                                    }
                                 }
                             }
-                            
-                            if(!jmlAdded && !overlap){
-                                presetRootEdit.addChild(jmlEditsCombined);
-                            }
-                        }
-                        else {
-                            // In case changes to the JML code needs to be done (but not to the java code)
-                            if (!changesToJML.isEmpty()){
-
+                            else {
+                                // In case changes to the JML code needs to be done (but not to the java code)
                                 changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
                                         unit, changesToJML));
                             }

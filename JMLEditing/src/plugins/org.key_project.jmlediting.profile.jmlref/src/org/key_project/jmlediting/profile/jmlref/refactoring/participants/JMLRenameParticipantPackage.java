@@ -23,11 +23,11 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
 /**
  * Class to participate in the refactoring renaming of packages.
  * <p>
- * Conceptually, renaming a package is equivalent to moving all classes in the renamed 
- * package to the newly created package. Thus, this participant uses the {@link ClassMoveRefactoringComputer}
- * to search through all classes in each (necessary) project for references to classes which were located
- * in the renamed package and using the fully qualified name, i.e. naming the path with all 
- * the packages. </p>
+ * Conceptually, renaming a package is equivalent to creating a new package, moving all classes from the renamed 
+ * package to the newly created package and deleting the old package. Thus, this participant uses the 
+ * {@link ClassMoveRefactoringComputer} to search through all classes in each (necessary) project for references 
+ * to classes which were located in the renamed package and using the fully qualified name, i.e. naming the path
+ * with all the packages. </p>
  * <p>
  * Note that JDT takes care of the "Rename subpackages" option by calling this participant
  * on each subpackage which needs to be renamed. </p>

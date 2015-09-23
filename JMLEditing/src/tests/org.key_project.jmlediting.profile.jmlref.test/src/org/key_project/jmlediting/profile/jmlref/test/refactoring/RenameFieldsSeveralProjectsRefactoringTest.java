@@ -10,6 +10,13 @@ import org.junit.Test;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * The tests for the renaming of fields when more than one project is involved.
+ * See the data\template\refactoringRenameTest\TestExplanation.txt for more information.
+ * 
+ * @author Robert Heimbach
+ *
+ */
 public class RenameFieldsSeveralProjectsRefactoringTest {
 
     private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
