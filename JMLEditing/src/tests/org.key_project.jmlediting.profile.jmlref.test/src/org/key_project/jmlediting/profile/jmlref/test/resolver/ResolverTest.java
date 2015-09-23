@@ -116,7 +116,7 @@ public class ResolverTest {
      * @param nodeToResolve
      * @throws ResolverException
      */
-    private void test(final String jmlString, final String jdtString, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type, IASTNode nodeToResolve) throws ResolverException {
+    private void test(final String jmlString, final String jdtString, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type, final IASTNode nodeToResolve) throws ResolverException {
         final IResolver resolver = new Resolver(); // JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject())
         ResolveResult result = null;
         
@@ -327,6 +327,10 @@ public class ResolverTest {
     @Test
     public void resolveStaticImportField() throws ResolverException {
         test("staticField", 2, 0, 0, ResolveResultType.FIELD);
+    }
+    @Test
+    public void resolveMultipleApplicableMethods() throws ResolverException {
+        test("sameNameApplicable", 0, 0, 0, ResolveResultType.METHOD);
     }
     //TODO: write tests, that are meant to fail.
 

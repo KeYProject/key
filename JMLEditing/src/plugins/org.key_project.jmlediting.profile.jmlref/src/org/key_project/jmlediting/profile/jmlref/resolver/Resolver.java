@@ -429,6 +429,7 @@ public class Resolver implements IResolver {
                 Arrays.sort(dist);
                 
                 // TODO: select correct method here. Lösungsansatz? :( 
+                // http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.12.2
                 // WARNING: Detect ambitious method declarations.
             }
         }
@@ -1263,8 +1264,9 @@ public class Resolver implements IResolver {
     protected final boolean isCast(final IASTNode node) {
         boolean result = false;
         if (node.getType() == ExpressionNodeTypes.CAST) {
-            if (node.getChildren().size() > 0)
+            if (node.getChildren().size() > 0) {
                 result = isReferenceType(node.getChildren().get(0));
+            }
         }
         return result;
     }
@@ -1283,7 +1285,7 @@ public class Resolver implements IResolver {
             // Such a node type is build like this
             // ReferenceType(Name(String, String, String,...))
             // More than one String is used when the cast goal is fully qualified like (java.lang.String)
-           List<IASTNode> children = node.getChildren().get(0).getChildren();
+           final List<IASTNode> children = node.getChildren().get(0).getChildren();
            for (int i = 0; i < children.size(); i++) {
                tasks.getLast().isClass = true;
                isString(children.get(i));

@@ -244,4 +244,16 @@ public class ResolverTestMain {
         field3 = new ResolverTestClass1();
         return ((ResolverTestClass1) field3.getThis(null)).field1;
     }
+    
+    public int sameNameApplicable(String p1) {
+        return 0;
+    }
+    public int sameNameApplicable(Serializable p1) {
+        return 0;
+    }
+    public int sameNameApplicable(Object p1) {
+        return 0;
+    }
+    //@ invariant sameNameApplicable(field2) == 0;
+    
 }
