@@ -140,12 +140,16 @@ public abstract class AbstractRefactoringComputer implements
         final HashMap<IASTNode, List<IStringNode>> primaryStringMap = new HashMap<IASTNode, List<IStringNode>>();
         
         for (final IStringNode stringNode: stringNodes) {       
-          final IASTNode primary = getPrimaryNode(parseResult, stringNode, notKeYProfile);
+          IASTNode primary = getPrimaryNode(parseResult, stringNode, notKeYProfile);
+          // Some string nodes are not contained in a primary node, e.g. if it is a cast expression.
+          if (primary == null) {
+              primary = stringNode;
+          }
           // nested expressions would add the same primary twice, e.g. if code looks like this:
           // TestClass test;
           // /*@ ensures this.test.test ... @*/
           if (!primaryStringMap.containsKey(primary)) {
-              // put in a new primary-list of stringnodes pair.
+              // put in a new primary - list of string nodes pair.
               LinkedList<IStringNode> stringNodesForPrimary = new LinkedList<IStringNode>();
               stringNodesForPrimary.add(stringNode);
               primaryStringMap.put(primary, stringNodesForPrimary);  

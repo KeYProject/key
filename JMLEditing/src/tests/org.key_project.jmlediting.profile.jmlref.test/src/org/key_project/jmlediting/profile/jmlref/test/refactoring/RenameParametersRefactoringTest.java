@@ -4,6 +4,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -60,5 +61,11 @@ public class RenameParametersRefactoringTest {
     public void test4FieldAndOtherMethodUsingSameName() throws CoreException {   
         TestUtilsRefactoring.runParameterRenameTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
+    }
+    
+    @Test
+    public void test5RenameLocalVariable() throws CoreException {
+        TestUtilsRefactoring.runParameterRenameTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "setBalance(boolean) : void", "aNewName", 26);
     }
 }

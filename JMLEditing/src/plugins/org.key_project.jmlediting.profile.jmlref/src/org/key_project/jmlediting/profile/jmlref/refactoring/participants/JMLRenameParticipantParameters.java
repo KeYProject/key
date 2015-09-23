@@ -48,7 +48,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
         fmethodParameter = (ILocalVariable) element;
         
         // check if it is a method parameter
-        // That is, it has a declaring method and a non-null compilation unit
+        // and check if it has a declaring method and a non-null compilation unit (should be true)
         if (fmethodParameter.isParameter() && fmethodParameter.getDeclaringMember().getElementType() == IJavaElement.METHOD
                 && !(fmethodParameter.getDeclaringMember().getCompilationUnit() == null)) {
             fOldName = fmethodParameter.getElementName();
@@ -107,6 +107,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
 
         // add our edits to the java changes
         // JDT will compute the shifts and the preview
+        // Too make sure no exception is thrown but should never be null.
         if (changesToJavaCode != null) {
             for (final ReplaceEdit edit : changesToJML) {
                 changesToJavaCode.addEdit(edit);

@@ -51,6 +51,7 @@ Test1: One method, one parameter.
 Test2: One method, two parameters, renamed parameter is first.
 Test3: One method, two parameters, renamed parameter is second.
 Test4: Field with same name. Other method (constructor) using parameter with same name.
+Test5: Starting to rename a local variable, not a parameter of a method.
 
 ****** Testing Class Renaming (oracle file has the name of the original class name) *****
 Test1: One class, one method which uses the class in java code and JML.

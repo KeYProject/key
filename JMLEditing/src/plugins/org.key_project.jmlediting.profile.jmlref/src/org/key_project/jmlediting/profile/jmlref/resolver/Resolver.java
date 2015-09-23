@@ -39,8 +39,6 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
-import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
-import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
@@ -76,6 +74,7 @@ public class Resolver implements IResolver {
         public boolean isMethod = false;
         public boolean isArrayAcess = false;
         public boolean isKeyword = false;
+        public boolean isClass = false;
         public String resolveString = null;
         public IStringNode node = null;
         public final List<IASTNode> parameters = new LinkedList<IASTNode>();
@@ -1032,7 +1031,7 @@ public class Resolver implements IResolver {
             // it's either a String (as in some assignable clauses or when the typeComputer
             // calls the resolver to resolve a type name) or it is a primary expression,
             // when called from a normal source that tries to resolve fields or methods. 
-            final boolean result = isString(jmlNode) || isPrimaryExpr(jmlNode);
+            final boolean result = isReferenceType(jmlNode) || isString(jmlNode) || isPrimaryExpr(jmlNode);
             if(result == false) {
                 throw new ResolverException("Given IASTNode is not resolvable.");
             }
@@ -1264,13 +1263,36 @@ public class Resolver implements IResolver {
     protected final boolean isCast(final IASTNode node) {
         boolean result = false;
         if (node.getType() == ExpressionNodeTypes.CAST) {
-            // Cast expressions like e.g.: (CastTo) object.method() ... 
-            // saves the CastTo information in the first children
-            // and the rest in the second children.
-            if (node.getChildren().size() >= 2) {
-                result = isPrimaryExpr(node.getChildren().get(1));
-            }
+            if (node.getChildren().size() > 0)
+                result = isReferenceType(node.getChildren().get(0));
         }
+        return result;
+    }
+    
+    /**
+     * This method is part of the ResolverTask building process. It is needed when a 
+     * cast expression is needed to be resolved, i.e. to find out to which class some object 
+     * is casted to.
+     * @param node - the {@link IASTNode} to get information from.
+     * @return true, if the node and every child node is correct.
+     */
+    protected final boolean isReferenceType(final IASTNode node) {
+        boolean result = false;
+        if (node.getType() == ExpressionNodeTypes.REFERENCE_TYPE) {
+            result = true;
+            // Such a node type is build like this
+            // ReferenceType(Name(String, String, String,...))
+            // More than one String is used when the cast goal is fully qualified like (java.lang.String)
+           List<IASTNode> children = node.getChildren().get(0).getChildren();
+           for (int i = 0; i < children.size(); i++) {
+               tasks.getLast().isClass = true;
+               isString(children.get(i));
+               // add a new task for the next String if there is still one more String
+               if ( i+1 < children.size()) {
+                   tasks.add(new ResolverTask());
+               }
+           }
+       }
         return result;
     }
 
