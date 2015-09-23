@@ -216,7 +216,7 @@ public class RefactoringUtil {
         int startOther = other.getOffset();
         int endOther = startOther + other.getLength();
         
-        if  (isCovering(region, other) || 
+        if  (isCovering(region, other) || isCovering(other, region) ||
             ((start <= startOther) && (end >= startOther) && (end < endOther)) || // region ends too early. other is longer.
             ((start > startOther) && (start < endOther) && (end >= endOther)))   // region starts too late.
             return true;
@@ -249,5 +249,24 @@ public class RefactoringUtil {
         }
         
         return overlap;
+    }
+    
+    /**
+     * 
+     * @param editsToAdd
+     * @param addTo
+     * @return
+     */
+    public static Boolean hasNoOverlapping(final ArrayList<ReplaceEdit> editsToAdd, final MultiTextEdit addTo) {
+        boolean canBeAdded = true;
+        
+        for (ReplaceEdit editToAdd : editsToAdd) {
+            if (isOverlapping(addTo, editToAdd.getRegion())){
+                canBeAdded = false;
+                break;
+            }
+        }
+        
+        return canBeAdded;
     }
 }

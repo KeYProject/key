@@ -11,7 +11,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
@@ -89,7 +88,7 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
      *      in classes which do not have any Java changes scheduled.
      *
      */
-    //@Override
+    @Override
     public final Change createChange(IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
@@ -107,50 +106,80 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
 
+                        //TODO: absolutely horrible. Better try to do all changes to java code and run JML then.
+                        // TODO: but refactoring computer / resolving of Class.field needs to be rewritten.
+                        // Get scheduled changes to the java code from the rename processor
+                        final TextChange changesToJavaCode = getTextChange(unit);
+                        
                         FieldAndMethodMoveRefactoringComputer changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
                         
-                        final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
+                        ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
 
-                        if (!changesToJML.isEmpty()) {
-                            
-                            // Get scheduled changes to the java code from the rename processor
-                            final TextChange changesToJavaCode = getTextChange(unit);
-    
+                        if (!changesToJML.isEmpty() && changesToJavaCode != null) { 
                             // add our edits to the java changes
                             // JDT will compute the shifts and the preview
-                            if (changesToJavaCode != null) {
                                 
-                                MultiTextEdit jmlEditsCombined = RefactoringUtil.combineEditsToMultiEdit(changesToJML);
-       
-                                // Choose the right place in the tree to add the JML edits.
-                                // changesToJavaCode is a MultiTextEdit (as a root) consisting of a MultiTextEdit consisting of Edits
-                                IRegion regionJML = jmlEditsCombined.getRegion();
-                                
-                                TextEdit presetRootEdit = changesToJavaCode.getEdit();
-                                
-                                TextEdit givenMultiEdit = presetRootEdit.getChildren()[0];
-                                
-                                // Check if we can add it next to the given multi edit to the root
-                                if (!RefactoringUtil.isOverlapping(presetRootEdit, regionJML)) {
-                                    presetRootEdit.addChild(jmlEditsCombined);
+                            // Choose the right place in the tree to add the JML edits.
+                            // changesToJavaCode is a MultiTextEdit (as a root) consisting of a MultiTextEdit consisting of Edits 
+                            MultiTextEdit presetRootEdit = (MultiTextEdit) changesToJavaCode.getEdit();                              
+                            MultiTextEdit givenMultiEdit = (MultiTextEdit) presetRootEdit.getChildren()[0];
+                            
+                            if (RefactoringUtil.hasNoOverlapping(changesToJML, presetRootEdit)){
+                                for(ReplaceEdit editToJML : changesToJML){
+                                    presetRootEdit.addChild(editToJML);
                                 }
-                                // else check if we can add it into the given multi edit as a child
-                                else if (!RefactoringUtil.isOverlapping(givenMultiEdit, regionJML)){
-                                    givenMultiEdit.addChild(jmlEditsCombined);
-                                }
-                                // we could not add them all together (better preview tree) -> so try to add them individually
-                                else {
-                                    for (ReplaceEdit edit : changesToJML){
-                                        if (!RefactoringUtil.isOverlapping(givenMultiEdit, edit.getRegion())){
-                                            // create a copy of the edit we want to put in because we need one without an already set parent
-                                            ReplaceEdit newEdit = new ReplaceEdit(edit.getOffset(), edit.getLength(), edit.getText());
-                                            givenMultiEdit.addChild(newEdit);
-                                        }
-                                    }
+                                changesToJavaCode.perform(pm);
+                                changesToJavaCode.dispose();
+                                
+                                changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
+                                changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
+                                
+                                if (!changesToJML.isEmpty()){
+                                    changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
+                                            unit, changesToJML));
                                 }
                             }
-                            else {
-                                // In case changes to the JML code needs to be done (but not to the java code)
+                            else if (RefactoringUtil.hasNoOverlapping(changesToJML, givenMultiEdit)){
+                                for(ReplaceEdit editToJML : changesToJML){
+                                    givenMultiEdit.addChild(editToJML);
+                                }
+                                changesToJavaCode.perform(pm);
+                                changesToJavaCode.dispose();
+                                
+                                changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
+                                changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
+                                
+                                if (!changesToJML.isEmpty()){
+                                    changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
+                                            unit, changesToJML));
+                                }
+                            }
+                            else { // perform the changes to the java code and recompute the JML changes
+                                changesToJavaCode.perform(pm);
+                                changesToJavaCode.dispose();
+                                
+                                changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
+                                changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
+                                
+                                if (!changesToJML.isEmpty()){
+                                    changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
+                                            unit, changesToJML));
+                                }
+                            }
+                        }
+                        else if (!changesToJML.isEmpty() && changesToJavaCode == null) {
+                            // In case changes to the JML code needs to be done (but not to the java code)
+                            changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
+                                    unit, changesToJML));
+                        }
+                        else if (changesToJavaCode != null && changesToJML.isEmpty()) {
+                            changesToJavaCode.perform(pm);
+                            changesToJavaCode.dispose();
+                            
+                            changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
+                            changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
+                            
+                            if (!changesToJML.isEmpty()){
                                 changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
                                         unit, changesToJML));
                             }
@@ -165,5 +194,5 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
 
         // After iterating through all needed projects and source files, determine what needs to be returned.    
         return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
-    }
+    }   
 }

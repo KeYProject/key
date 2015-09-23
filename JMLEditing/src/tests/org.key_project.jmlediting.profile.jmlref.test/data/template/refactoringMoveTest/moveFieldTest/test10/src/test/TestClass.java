@@ -2,6 +2,7 @@ package test;
 
 public class TestClass {
     
+    //@ invariant TestClass.balance > 0;
     public static int balance;
 
     /*@
