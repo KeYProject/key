@@ -688,7 +688,7 @@ public class Node  {
 
         private Node nextSibling(Node m) {
             Node p = m.parent;
-            while (p != null && m != root && p != root) {
+            while (p != null && m != root) {
                 final int c = p.childrenCount();
                 final int x = p.getChildNr(m);
                 if (x + 1 < c) {
