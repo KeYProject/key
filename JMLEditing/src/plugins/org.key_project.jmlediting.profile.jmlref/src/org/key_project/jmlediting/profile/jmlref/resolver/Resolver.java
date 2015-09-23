@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.resolver;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -313,7 +314,7 @@ public class Resolver implements IResolver {
         
         // start with searching for parameters if we are not searching for a method or a class
         // if lastResult is null, this must be the first call of next() and is the only case we could find parameters in
-        if(currentTask.lastResult == null && !currentTask.isMethod) {
+        if(currentTask.lastResult == null && !currentTask.isMethod && !currentTask.isClass) {
             //TODO: Check if context is set to a MethodDeclaration but if not findParameters will return null anyways.
             jdtNode = findParameters(context, currentTask.resolveString);
         }
@@ -323,6 +324,10 @@ public class Resolver implements IResolver {
         
         // are we searching for a method?
         if(jdtNode == null && currentTask.isMethod) {
+            
+            // TODO: Generic Methods are not supported yet.
+            // TODO: Variable Arity Methods are not supported yet.
+            
             ASTNode searchContext = context;
             
             jdtNode = findMethod(searchContext, currentTask.resolveString, currentTask.parameters);
@@ -363,7 +368,7 @@ public class Resolver implements IResolver {
                 jdtNode = findMethod(searchContext, currentTask.resolveString, currentTask.parameters);      
             }
         }
-        if(jdtNode == null) {
+        if(jdtNode == null  && !currentTask.isClass) {
             jdtNode = findField(context, currentTask.resolveString);
         }
         if(jdtNode == null) {
@@ -421,38 +426,57 @@ public class Resolver implements IResolver {
             if(candidateList.size() == 1) {
                 method = (IMethod) candidateList.get(0).getJavaElement();
             } else {
-                // ----------
-                final int[] dist = new int[candidateList.size()];
-                for(int i = 0; i < candidateList.size(); i++) {
-                    dist[i] = calculateDistanceToActualParameters(candidateList.get(i).getParameterTypes(), iASTTypeBindings);
-                }
-                Arrays.sort(dist);
+                // Choose most specific method
+                // Implemented following this logic:
+                // http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.12.2.5
+                final ArrayList<IMethodBinding> maxSpecific = new ArrayList<IMethodBinding>();
+                maxSpecific.addAll(candidateList);
                 
-                // TODO: select correct method here. Lösungsansatz? :( 
-                // http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.12.2
-                // WARNING: Detect ambitious method declarations.
+                for(final IMethodBinding m1 : candidateList) {
+                    for(final IMethodBinding m2 : candidateList) {
+                        if(m1.equals(m2)) {
+                            continue;
+                        }
+                        // are both m1 and m2 considered max specific?
+                        // is m1 strictly more specific than m2?
+                        // TODO we can precompute this and get the results from a matrix
+                        if(maxSpecific.contains(m1) && maxSpecific.contains(m2) 
+                        && isMoreSpecific(m1,m2) 
+                        && !isMoreSpecific(m2, m1)) {
+                            maxSpecific.remove(m2);
+                        }
+                    }
+                }
+                
+                // do we have methods left?
+                if(maxSpecific.size() > 0) {
+                    // do we have more than 1? :(
+                    if(maxSpecific.size() > 1) {
+                        throw new ResolverException("The method invocation is ambiguous.");
+                    }
+                    method = (IMethod) maxSpecific.get(0).getJavaElement();
+                } else {
+                    return null;
+                }
             }
         }
-        
         // get the JDTNode for it.
         return findIMethod(context, method);
     }
 
-    /** Helper method to calculate what method is the correct one to call.
-     * @param parameterTypes
-     * @param iASTTypeBindings
-     * @return
-     */
-    private int calculateDistanceToActualParameters(final ITypeBinding[] parameterTypes, final ITypeBinding[] iASTTypeBindings) {
-        if(parameterTypes.length != iASTTypeBindings.length) {
-            return Integer.MAX_VALUE;
+    private boolean isMoreSpecific(final IMethodBinding m1, final IMethodBinding m2) {
+        final ITypeBinding[] types1 = m1.getParameterTypes();
+        final ITypeBinding[] types2 = m2.getParameterTypes();
+        if(types1.length != types2.length || types1.length == 0) {
+            return false;
         }
-        if(parameterTypes.length == 0) {
-            return 0;
+        for(int i = 0; i < types1.length; i++) {
+            if(!types1[i].isEqualTo(types2[i])
+            && !types1[i].isSubTypeCompatible(types2[i])) {
+               return false; 
+            }
         }
-        // TODO !! :( Lösungsansatz ?
-        
-        return 0;
+        return true;
     }
 
     /** Gets the {@link ITypeBinding}s of the given {@link IASTNode}s from the {@link JMLTypeComputer}.
