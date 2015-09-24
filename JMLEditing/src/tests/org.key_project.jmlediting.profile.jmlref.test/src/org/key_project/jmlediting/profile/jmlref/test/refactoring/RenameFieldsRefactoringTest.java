@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfileAE;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -177,4 +178,13 @@ public class RenameFieldsRefactoringTest {
          TestUtilsRefactoring.runFieldRenameTest(TESTPATH+"\\test23", srcFolder, oracleFolder, bot, 
                  "TestClassOther", "test", "balance : int", "aNewName", javaProject);
      }
+     
+     @Test
+     public void test24JMLProfile() throws CoreException {
+         JMLPreferencesHelper.setProjectJMLProfile(javaProject.getProject(), new JMLReferenceProfileAE());
+
+         TestUtilsRefactoring.runFieldRenameTest(TESTPATH+"\\test24", srcFolder, oracleFolder, bot, 
+                 "TestClass", "test", "balance : int", "aNewName", javaProject);
+     }
+
 }

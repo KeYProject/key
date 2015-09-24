@@ -196,10 +196,10 @@ public class TestUtilsRefactoring {
      * Selects the class named className in the outline view of the SWTWorkbenchBot bot and
      * activates renaming to newClassName.
      * 
-     * @param className the class the field is in (without .java file ending).
+     * @param className the class to be renamed (without .java file ending).
      * @param packageName name of the package the class is in.
      * @param srcFolder sourceFolder of the class className.
-     * @param newClassName the new name of the class
+     * @param newClassName the new name of the class.
      * @param bot SWTWorkbenchBot to select the outline view from.
      */
     public static void selectClassAndExecuteRenaming(String className,
@@ -210,9 +210,9 @@ public class TestUtilsRefactoring {
         
         // select the fieldToChange in the outline view of the bot
         SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree(); 
-        SWTBotTreeItem fieldToRename = TestUtilsUtil.selectInTree(tree, className);
+        SWTBotTreeItem classToRename = TestUtilsUtil.selectInTree(tree, className);
         
-        fieldToRename.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
+        classToRename.select().pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
                 
         // Change variable name in rename dialog
         SWTBotShell renameDialog = bot.shell("Rename Type");      
@@ -588,7 +588,7 @@ public class TestUtilsRefactoring {
     public static void deleteAllPackagesFromFolder(IFolder folder) throws CoreException {
         for (IResource member : folder.members()) {
             if (member instanceof IFolder) {
-                folder.getFolder(member.getName()).delete(true, null);
+                folder.getFolder(member.getName()).delete(false, null);
             }
         }
     }

@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -81,7 +79,7 @@ public class FieldAndMethodMoveRefactoringComputer extends
             }
         }
         
-        // Check for non fully qualified access. Only classname.element is needed.
+        // Check for non fully qualified access, that is OldClassName.elementName
         // Only needed in certain cases.
         if (checkForNonFullyQualified()) {
             
@@ -95,20 +93,14 @@ public class FieldAndMethodMoveRefactoringComputer extends
                 if((oldClassName+"."+elementName).contains(stringNode.getString()))
                     nodeString=nodeString+stringNode.getString();
                 // reset
-                else nodeString="";
+                else 
+                    nodeString="";
                 
                 if (nodeString.equals(oldClassName+"."+elementName)) {
                     
                     // Add the node with the non fully qualified access only if 
                     // it was not already added before as part of a fully qualified access.
-                    int startNodeToAdd = stringNode.getStartOffset();
-                    
-                    boolean isContained = false;
-                    for (IStringNode nodeAlreadyInList : filteredList){
-                        if (nodeAlreadyInList.containsOffset(startNodeToAdd))
-                            isContained = true;
-                    }
-                    if (!isContained)
+                    if (!filteredList.contains(stringNode))
                         filteredList.add(stringNode);
                 }
             }
@@ -119,73 +111,80 @@ public class FieldAndMethodMoveRefactoringComputer extends
     
     /**
      * Check if it is needed to check for non fully qualified access to static methods or fields.
-     * Possible if the class with the element to be moved is imported by or in the same package
+     * Possible if :
+     * 1) We are in the class we moved the field to (e.g. if an invariant was moved with it)
+     * 2) The destination class of the element to be moved is imported by or in the same package
      * as the class for which the JML changes are computed.
+     * 
      * @return true if non fully qualified access, i.e. ClassName.field, is possible.
      */
     private boolean checkForNonFullyQualified() {
         
-        int lastPoint = oldClassFullQualName.lastIndexOf('.');
-        String packageOldClass = oldClassFullQualName.substring(0, lastPoint);
-        String oldClassName = oldClassFullQualName.substring(lastPoint+1);
+        int lastPoint = newClassFullQualName.lastIndexOf('.');
+        String packageNewClass = newClassFullQualName.substring(0, lastPoint);
+        String newClassName = newClassFullQualName.substring(lastPoint+1);
         
-        // Non fully qualified references are possible of if the (old) class with the field being moved is imported
-        IImportDeclaration oldClassImported = compUnit.getImport(oldClassFullQualName);
-        IImportDeclaration packageOldClassFullyImported = compUnit.getImport(packageOldClass+".*");
-        if (oldClassImported.exists())
+        // Check if we want to compute JML changes for the destination class
+        String nameOfCurrentClass = compUnit.getElementName().substring(0, compUnit.getElementName().lastIndexOf('.'));
+        if (nameOfCurrentClass.equals(newClassName)) {
+            return true;
+        }
+
+        // Non fully qualified references are possible if the destination class with the field being moved is imported
+        if (compUnit.getImport(newClassFullQualName).exists())
             return true;
         
-        // if the wildcard import * is used, we need additionally check if the a class with same
-        // name is in the same package. Then this is used first.
-        if (packageOldClassFullyImported.exists()){
+        // check if the package of the destination class is imported using a wildcard/on demand import
+        // Note that a class in the package of the current compilation unit with the same name as the destination class
+        // has a higher priority than the wildcard import and would be used instead.
+        if (compUnit.getImport(packageNewClass+".*").exists()){
             try {
-                IPackageFragment pack = (IPackageFragment) compUnit.getParent();
-                IJavaElement[] elementsInPackage = pack.getChildren();
-                for (IJavaElement ele : elementsInPackage){
+                IJavaElement[] elementsInCUPackage = ((IPackageFragment) compUnit.getParent()).getChildren();
+                for (IJavaElement ele : elementsInCUPackage){
                     if (ele.getElementType() == IJavaElement.COMPILATION_UNIT){
                         String elementName = ele.getElementName();
                         // remove the .java from Classname.java
                         String className = elementName.substring(0, elementName.lastIndexOf('.'));
-                        if (className.equals(oldClassName))
+                        if (className.equals(newClassName))
                             return false;
                     }
                 }
-                // we have not found any class with the same name of the class to be moved in the package
+                // we have not found any class with the same name as the destination class
                 return true;
             }
             catch (JavaModelException e) {
                 return false;
             }   
         }
-        
-        // Non fully qualified references might be possible if 
-        // the (old) class is in the same package as the class for which changes are computed 
-        String packageUnit;
-        try {
-            IPackageDeclaration[] packages = compUnit.getPackageDeclarations();
-            if (packages.length > 0){
-                packageUnit = packages[0].getElementName();
-                
-                // Is in same class -> Check if some other Class with the same name as the old class is imported
-                if (packageOldClass.equals(packageUnit)){
-                    
-                   IImportDeclaration[] allImports = compUnit.getImports();
-                   for (IImportDeclaration declaration : allImports){
-                       String importStatement = declaration.getElementName();
-                       String importedClass = importStatement.substring(importStatement.lastIndexOf('.')+1);
-                       if (importedClass.equals(oldClassName)){
-                           return false;
-                       }
-                   }
-                   // In same package (no import needed) and no other class with same name imported
-                   return true;
-
-                }
-            }      
-        }
-        catch (JavaModelException e) {
-            return false;
-        }
+//        
+//        // Non fully qualified references might be possible if 
+//        // the (old) class is in the same package as the class for which changes are computed 
+//        String packageUnit;
+//        try {
+//            IPackageDeclaration[] packages = compUnit.getPackageDeclarations();
+//            if (packages.length > 0){
+//                packageUnit = packages[0].getElementName();
+//                
+//                // Is in same class -> Check if some other Class with the same name as the old class is imported
+//                if (packageNewClass.equals(packageUnit)){
+//                    
+//                   IImportDeclaration[] allImports = compUnit.getImports();
+//                   for (IImportDeclaration declaration : allImports){
+//                       String importStatement = declaration.getElementName();
+//                       String importedClass = importStatement.substring(importStatement.lastIndexOf('.')+1);
+//                       if (importedClass.equals(newClassName)){
+//                           return false;
+//                       }
+//                   }
+//                   // In same package (no import needed) and no other class with same name imported
+//                   return true;
+//
+//                }
+//            }      
+//        }
+//        catch (JavaModelException e) {
+//            return false;
+//        }
         
         return false;
     }
@@ -204,11 +203,11 @@ public class FieldAndMethodMoveRefactoringComputer extends
         
             final int startOffset = node.getStartOffset();
             
-            // check which type of access it is. The type determines the length of the replace edit and the new content
             String newClassName = newClassFullQualName.substring(newClassFullQualName.lastIndexOf('.')+1);
             String oldClassName = oldClassFullQualName.substring(oldClassFullQualName.lastIndexOf('.')+1);
             
-            // Check how the access string starts. Non fully qualified if it starts with class name instead of package name.
+            // check which type of access it is. The type determines the length of the replace edit and the new content.
+            // Non fully qualified access starts with the class name instead of the package name.
             IASTNode innerNode = node.getChildren().get(0).getChildren().get(0);
             if (innerNode instanceof IStringNode && 
                     ((IStringNode) innerNode).getString().equals(oldClassName)) {

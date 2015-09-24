@@ -122,7 +122,7 @@ public abstract class AbstractRefactoringComputer implements
         final List<IStringNode> filteredStringNodes =  filterStringNodes(stringNodes);
         
         // For those occurrences left, find the primary nodes which provide the needed context for resolving.
-        final HashMap<IASTNode, List<IStringNode>> primaryStringMap = getPrimaryNodes(filteredStringNodes, parseResult, !(activeProfile.getIdentifier().equals("org.key_project.jmlediting.profile.key")));
+        final HashMap<IASTNode, List<IStringNode>> primaryStringMap = getPrimaryNodes(filteredStringNodes, parseResult);
         
         return primaryStringMap;
     }
@@ -133,15 +133,17 @@ public abstract class AbstractRefactoringComputer implements
      * 
      * @param stringNodes list of {@link IStringNode}s for which the corresponding primary nodes should be returned.
      * @param parseResult An {@link IASTNode} containing the parse result, i.e. the JML comments in the compilation unit. 
-     * @param notKeYProfile boolean: true if the KeY-JML Profile is no used.
      * @return list of {@link IASTNode}s of primary node type.
      */
-    private HashMap<IASTNode, List<IStringNode>> getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult, final boolean notKeYProfile){
+    private HashMap<IASTNode, List<IStringNode>> getPrimaryNodes(final List<IStringNode> stringNodes, final IASTNode parseResult){
         final HashMap<IASTNode, List<IStringNode>> primaryStringMap = new HashMap<IASTNode, List<IStringNode>>();
         
-        for (final IStringNode stringNode: stringNodes) {       
-          IASTNode primary = getPrimaryNode(parseResult, stringNode, notKeYProfile);
-          // Some string nodes are not contained in a primary node, e.g. if it is a cast expression.
+        for (final IStringNode stringNode: stringNodes) {     
+            
+          IASTNode primary = getPrimaryNode(parseResult, stringNode);
+          
+          // Some string nodes are not contained in a primary node, e.g. if it is a cast expression and the class destination is renamed
+          // or assignable statement in the JML profile (non-KeY profile).
           if (primary == null) {
               primary = stringNode;
           }
@@ -149,12 +151,14 @@ public abstract class AbstractRefactoringComputer implements
           // TestClass test;
           // /*@ ensures this.test.test ... @*/
           if (!primaryStringMap.containsKey(primary)) {
+              
               // put in a new primary - list of string nodes pair.
               LinkedList<IStringNode> stringNodesForPrimary = new LinkedList<IStringNode>();
               stringNodesForPrimary.add(stringNode);
               primaryStringMap.put(primary, stringNodesForPrimary);  
           }
-          else { // shared primary. more than one string node has the same primary.
+          else { 
+              // shared primary. more than one string node has the same primary.
               primaryStringMap.get(primary).add(stringNode);
           }
         }
@@ -167,10 +171,9 @@ public abstract class AbstractRefactoringComputer implements
      * 
      * @param context JML comment which provides the necessary context.
      * @param toTest string node to find the primary node for.
-     * @param notKeYProfile boolean: true if the KeY profile is not used.
      * @return the primary node of the given string node.
      */
-    private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest, final boolean notKeYProfile) {
+    private IASTNode getPrimaryNode(final IASTNode context, final IStringNode toTest) {
         return context.traverse(new INodeTraverser<IASTNode>() {
 
             @Override
@@ -186,13 +189,7 @@ public abstract class AbstractRefactoringComputer implements
                         }
                     }
                 }
-                // If the KeY Profile is not used, the primary node from the assignable node
-                // cannot be found. In that case the primary node is the string node itself.
-                if (notKeYProfile && existing == null){
-                    return toTest;
-                }     
-                else
-                    return existing;
+                return existing;
             }        
         }, null);
     }

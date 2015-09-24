@@ -47,8 +47,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
         fmethodParameter = (ILocalVariable) element;
         
         // check if it is a method parameter
-        // and check if it has a declaring method and a non-null compilation unit (should be true)
-        if (fmethodParameter.isParameter() && !(fmethodParameter.getDeclaringMember().getCompilationUnit() == null)) {
+        if (fmethodParameter.isParameter()) {
             fOldName = fmethodParameter.getElementName();
             fNewName = getArguments().getNewName();
             fProject = fmethodParameter.getJavaProject();
