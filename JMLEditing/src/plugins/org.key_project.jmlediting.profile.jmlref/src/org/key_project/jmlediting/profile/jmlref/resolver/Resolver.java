@@ -346,8 +346,7 @@ public class Resolver implements IResolver {
                 
                 if(superClass == null) {
                     // Create a TypeBinding of object to compare
-                    final JMLTypeComputer tc = new JMLTypeComputer(compilationUnit);
-                    final ITypeBinding objectTypeBinding = tc.createWellKnownType("java.lang.Object");
+                    final ITypeBinding objectTypeBinding = context.getAST().resolveWellKnownType("java.lang.Object");
                     
                     if(((TypeDeclaration)searchContext).resolveBinding().isEqualTo(objectTypeBinding)) {
                         break;
@@ -505,26 +504,25 @@ public class Resolver implements IResolver {
      * @return true, if the types match after unboxing. False otherwise.
      */
     private boolean isUnboxingConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
-        final TypeComputer tc = new TypeComputer(compilationUnit);
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Boolean"))) {
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Boolean"))) {
             return that.getQualifiedName().equals("boolean");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Byte"))) {
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Byte"))) {
             return that.getQualifiedName().equals("byte");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Short"))) {
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Short"))) {
             return that.getQualifiedName().equals("short");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Character"))) {
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Character"))) {
             return that.getQualifiedName().equals("char");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Integer"))) {
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Integer"))) {
             return that.getQualifiedName().equals("int");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Long"))) {
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Long"))) {
             return that.getQualifiedName().equals("long");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Double"))) {
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Double"))) {
             return that.getQualifiedName().equals("double");
         }
         return false;
@@ -537,30 +535,29 @@ public class Resolver implements IResolver {
      * @return true, if the types match after boxing. False otherwise.
      */
     private boolean isBoxingConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
-        final TypeComputer tc = new TypeComputer(compilationUnit);
         if(other.getQualifiedName().equals("boolean")) {
-            return that.isEqualTo(tc.createWellKnownType("java.lang.Boolean"));
+            return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Boolean"));
         }
         if(other.getQualifiedName().equals("byte")) {
-            return that.isEqualTo(tc.createWellKnownType("java.lang.Byte"));
+            return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Byte"));
         }
         if(other.getQualifiedName().equals("short")) {
-            return that.isEqualTo(tc.createWellKnownType("java.lang.Short"));
+            return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Short"));
         }
         if(other.getQualifiedName().equals("char")) {
-            return that.isEqualTo(tc.createWellKnownType("java.lang.Character"));
+            return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Character"));
         }
         if(other.getQualifiedName().equals("int")) {
-            return that.isEqualTo(tc.createWellKnownType("java.lang.Integer"));
+            return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Integer"));
         }
         if(other.getQualifiedName().equals("long")) {
-            return that.isEqualTo(tc.createWellKnownType("java.lang.Long"));
+            return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Long"));
         }
         if(other.getQualifiedName().equals("float")) {
-            return that.isEqualTo(tc.createWellKnownType("java.lang.Float"));
+            return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Float"));
         }
         if(other.getQualifiedName().equals("double")) {
-            return that.isEqualTo(tc.createWellKnownType("java.lang.Double"));
+            return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Double"));
         }
         if(other.isNullType()) {
             if(!that.isPrimitive()) {
@@ -577,9 +574,6 @@ public class Resolver implements IResolver {
      * @return true, if {@code other} is a sub type of {@code that}. False otherwise.
      */
     private boolean isWideningReferenceConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
-//        if(that.isEqualTo(new TypeComputer(compilationUnit).createWellKnownType("java.lang.Object"))) {
-//            return true;
-//        }
         ITypeBinding cother = other;
         if(that.isPrimitive()) {
             return false;
@@ -709,27 +703,26 @@ public class Resolver implements IResolver {
      * @return the {@link ITypeBinding} of the unboxed type or null if the type can not be unboxed.
      */
     private ITypeBinding unboxPrimitiveType(final ITypeBinding other) {
-        final TypeComputer tc = new TypeComputer(compilationUnit);
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Boolean"))) {
-            return tc.createWellKnownType("boolean");
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Boolean"))) {
+            return context.getAST().resolveWellKnownType("boolean");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Byte"))) {
-            return tc.createWellKnownType("byte");
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Byte"))) {
+            return context.getAST().resolveWellKnownType("byte");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Short"))) {
-            return tc.createWellKnownType("short");
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Short"))) {
+            return context.getAST().resolveWellKnownType("short");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Character"))) {
-            return tc.createWellKnownType("char");
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Character"))) {
+            return context.getAST().resolveWellKnownType("char");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Integer"))) {
-            return tc.createWellKnownType("int");
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Integer"))) {
+            return context.getAST().resolveWellKnownType("int");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Long"))) {
-            return tc.createWellKnownType("long");
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Long"))) {
+            return context.getAST().resolveWellKnownType("long");
         }
-        if(other.isEqualTo(tc.createWellKnownType("java.lang.Double"))) {
-            return tc.createWellKnownType("double");
+        if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Double"))) {
+            return context.getAST().resolveWellKnownType("double");
         }
         return null;
     }
@@ -739,30 +732,29 @@ public class Resolver implements IResolver {
      * @return the {@link ITypeBinding} of the boxed type or null if the type can not be boxed.
      */
     private ITypeBinding boxPrimitiveType(final ITypeBinding other) {
-        final TypeComputer tc = new TypeComputer(compilationUnit);
         if(other.getQualifiedName().equals("boolean")) {
-            return tc.createWellKnownType("java.lang.Boolean");
+            return context.getAST().resolveWellKnownType("java.lang.Boolean");
         }
         if(other.getQualifiedName().equals("byte")) {
-            return tc.createWellKnownType("java.lang.Byte");
+            return context.getAST().resolveWellKnownType("java.lang.Byte");
         }
         if(other.getQualifiedName().equals("short")) {
-            return tc.createWellKnownType("java.lang.Short");
+            return context.getAST().resolveWellKnownType("java.lang.Short");
         }
         if(other.getQualifiedName().equals("char")) {
-            return tc.createWellKnownType("java.lang.Character");
+            return context.getAST().resolveWellKnownType("java.lang.Character");
         }
         if(other.getQualifiedName().equals("int")) {
-            return tc.createWellKnownType("java.lang.Integer");
+            return context.getAST().resolveWellKnownType("java.lang.Integer");
         }
         if(other.getQualifiedName().equals("long")) {
-            return tc.createWellKnownType("java.lang.Long");
+            return context.getAST().resolveWellKnownType("java.lang.Long");
         }
         if(other.getQualifiedName().equals("float")) {
-            return tc.createWellKnownType("java.lang.Float");
+            return context.getAST().resolveWellKnownType("java.lang.Float");
         }
         if(other.getQualifiedName().equals("double")) {
-            return tc.createWellKnownType("java.lang.Double");
+            return context.getAST().resolveWellKnownType("java.lang.Double");
         }
         return null;
     }
