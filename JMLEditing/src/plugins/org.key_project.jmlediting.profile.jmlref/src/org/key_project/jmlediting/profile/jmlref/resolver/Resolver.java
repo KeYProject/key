@@ -1,9 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.resolver;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -86,6 +83,7 @@ public class Resolver implements IResolver {
     private ICompilationUnit compilationUnit = null;
     private final Map<Comment, ASTNode> commentToAST = new HashMap<Comment, ASTNode>();
     private final List<ImportDeclaration> imports = new ArrayList<ImportDeclaration>();
+    private final List<ImportDeclaration> onDemandImports = new ArrayList<ImportDeclaration>();
     private final LinkedList<ResolverTask> tasks = new LinkedList<ResolverTask>();
     private ResolverTask currentTask = null;
     private PackageDeclaration pack = null;
@@ -113,7 +111,15 @@ public class Resolver implements IResolver {
         // Parse JDT first
         final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(compilationUnit);
         
-        imports.addAll(jdtAST.imports());
+        final List<ImportDeclaration> importList = jdtAST.imports();
+        for(final ImportDeclaration i : importList) {
+            if(i.isOnDemand()) {
+                onDemandImports.add(i);
+            } else {
+                imports.add(i);
+            }
+        }
+        
         pack = jdtAST.getPackage();
         
         // Locate the comments
@@ -231,6 +237,7 @@ public class Resolver implements IResolver {
         IBinding binding = null; 
         ResolveResultType resultType;    
         
+        // TODO: what to do with an array access... 
         if(!currentTask.isArrayAcess) {
             
             if(currentTask.isKeyword) {
@@ -372,10 +379,13 @@ public class Resolver implements IResolver {
             jdtNode = findField(context, currentTask.resolveString);
         }
         if(jdtNode == null) {
+            jdtNode = findInImports(currentTask.resolveString, imports);
+        }
+        if(jdtNode == null) {
             jdtNode = findInPackage(currentTask.resolveString, pack.resolveBinding());
         }
         if(jdtNode == null) {
-            jdtNode = findInImports(currentTask.resolveString);
+            jdtNode = findInImports(currentTask.resolveString, onDemandImports);
         }
         if(jdtNode == null) {
             jdtNode = findInPackage(currentTask.resolveString, "java.lang");
@@ -388,8 +398,10 @@ public class Resolver implements IResolver {
         return jdtNode;
     }
 
-
     private ASTNode findMethod(final ASTNode context, final String resolveString, final List<IASTNode> parameters) throws ResolverException {
+
+        // roughly implemented following this logic: 
+        // https://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.12.2
         
         // compute the TypeBindings of the parameters from the IASTNodes
         final ITypeBinding[] iASTTypeBindings = getTypeBindings(parameters);
@@ -401,16 +413,21 @@ public class Resolver implements IResolver {
             
             final ITypeBinding[] methodTypeBindings = methodBinding.getParameterTypes();
             
+            // argument count and name equal?
             if(methodBinding.getName().equals(resolveString) 
             && methodTypeBindings.length == iASTTypeBindings.length) {
+                // no arguments?
                 if(methodTypeBindings.length == 0) {
+                    // OK, add it to our possible candidates
                     candidateList.add(methodBinding);
                 } else {
                     for(int i = 0; i < methodTypeBindings.length; i++) {
-                        if(!methodTypeBindings[i].isEqualTo(iASTTypeBindings[i]) && 
-                           !methodTypeBindings[i].isCastCompatible(iASTTypeBindings[i])) {
+                        // call method invocation conversion on every parameter
+                        if(!isMethodInvocationConversionCompatible(methodTypeBindings[i], iASTTypeBindings[i])) {
                             break;
                         }
+                        // if we got here and didn't break out of the loop yet
+                        // and it was the last parameter => add it to the list of possible candidates
                         if(i == methodTypeBindings.length - 1) {
                             candidateList.add(methodBinding);
                         }
@@ -423,6 +440,7 @@ public class Resolver implements IResolver {
         
         // did we find something?
         if(candidateList.size() > 0) {
+            // if there is only one... Nothing to decide on.
             if(candidateList.size() == 1) {
                 method = (IMethod) candidateList.get(0).getJavaElement();
             } else {
@@ -437,9 +455,9 @@ public class Resolver implements IResolver {
                         if(m1.equals(m2)) {
                             continue;
                         }
+                        
                         // are both m1 and m2 considered max specific?
                         // is m1 strictly more specific than m2?
-                        // TODO we can precompute this and get the results from a matrix
                         if(maxSpecific.contains(m1) && maxSpecific.contains(m2) 
                         && isMoreSpecific(m1,m2) 
                         && !isMoreSpecific(m2, m1)) {
@@ -462,6 +480,291 @@ public class Resolver implements IResolver {
         }
         // get the JDTNode for it.
         return findIMethod(context, method);
+    }
+
+    /** This is a helper method to help with method resolving. 
+     * It checks whether the given types correlate to each other by Method Invocation Conversion rules.
+     * <br>See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.3
+     * as a reference.
+     * @param that the type the method definition has
+     * @param other the type the method is called with
+     * @return true, if the types correlate after Method Invocation Conversion rules. False otherwise.
+     */
+    private boolean isMethodInvocationConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
+        return that.isEqualTo(other) 
+            || isWideningPrimitiveConversionCompatible(that, other)
+            || isWideningReferenceConversionCompatible(that, other)
+            || isBoxingConversionCompatible(that, other)
+            || isUnboxingConversionCompatible(that, other);
+    }
+    
+    /** Helper Method. Checks if the {@code other} type can be unboxed to the {@code that} type.
+     * See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.8
+     * @param that the type the method definition has
+     * @param other the type the method is called with
+     * @return true, if the types match after unboxing. False otherwise.
+     */
+    private boolean isUnboxingConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
+        final TypeComputer tc = new TypeComputer(compilationUnit);
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Boolean"))) {
+            return that.getQualifiedName().equals("boolean");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Byte"))) {
+            return that.getQualifiedName().equals("byte");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Short"))) {
+            return that.getQualifiedName().equals("short");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Character"))) {
+            return that.getQualifiedName().equals("char");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Integer"))) {
+            return that.getQualifiedName().equals("int");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Long"))) {
+            return that.getQualifiedName().equals("long");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Double"))) {
+            return that.getQualifiedName().equals("double");
+        }
+        return false;
+    }
+
+    /** Helper Method. Checks if the {@code other} type can be boxed to the {@code that} type.
+     * See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.7
+     * @param that the type the method definition has
+     * @param other the type the method is called with
+     * @return true, if the types match after boxing. False otherwise.
+     */
+    private boolean isBoxingConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
+        final TypeComputer tc = new TypeComputer(compilationUnit);
+        if(other.getQualifiedName().equals("boolean")) {
+            return that.isEqualTo(tc.createWellKnownType("java.lang.Boolean"));
+        }
+        if(other.getQualifiedName().equals("byte")) {
+            return that.isEqualTo(tc.createWellKnownType("java.lang.Byte"));
+        }
+        if(other.getQualifiedName().equals("short")) {
+            return that.isEqualTo(tc.createWellKnownType("java.lang.Short"));
+        }
+        if(other.getQualifiedName().equals("char")) {
+            return that.isEqualTo(tc.createWellKnownType("java.lang.Character"));
+        }
+        if(other.getQualifiedName().equals("int")) {
+            return that.isEqualTo(tc.createWellKnownType("java.lang.Integer"));
+        }
+        if(other.getQualifiedName().equals("long")) {
+            return that.isEqualTo(tc.createWellKnownType("java.lang.Long"));
+        }
+        if(other.getQualifiedName().equals("float")) {
+            return that.isEqualTo(tc.createWellKnownType("java.lang.Float"));
+        }
+        if(other.getQualifiedName().equals("double")) {
+            return that.isEqualTo(tc.createWellKnownType("java.lang.Double"));
+        }
+        if(other.isNullType()) {
+            if(!that.isPrimitive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Helper Method. Checks if the {@code other} type is a sub type of the {@code that} type.
+     * See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.5
+     * @param that the type the method definition has
+     * @param other the type the method is called with
+     * @return true, if {@code other} is a sub type of {@code that}. False otherwise.
+     */
+    private boolean isWideningReferenceConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
+//        if(that.isEqualTo(new TypeComputer(compilationUnit).createWellKnownType("java.lang.Object"))) {
+//            return true;
+//        }
+        ITypeBinding cother = other;
+        if(that.isPrimitive()) {
+            return false;
+        }
+        if(other.isPrimitive()) {
+            cother = boxPrimitiveType(other);
+        }
+        if(cother == null) {
+            return false;
+        }
+        
+        // get lists, so we don't check interfaces multiple times
+        final ArrayList<ITypeBinding> checked = new ArrayList<>();
+        final ArrayList<ITypeBinding> leftToCheck = new ArrayList<>();
+
+        // Check Super classes and gather interfaces on the way
+        for(ITypeBinding current = cother; current != null ; current = current.getSuperclass()) {
+            
+            if(current.isEqualTo(that)) {
+                return true;
+            }
+            
+            for(final ITypeBinding i : current.getInterfaces()) {
+                if(!leftToCheck.contains(i)) {
+                    leftToCheck.add(i);
+                }
+            }            
+        }
+        
+        // check gathered interfaces
+        while(leftToCheck.size() > 0) {
+            final ITypeBinding i = leftToCheck.get(0);
+            
+            if(i.isEqualTo(that)) {
+                return true;
+            }
+            
+            checked.add(i);
+            leftToCheck.remove(i);
+            
+            for(final ITypeBinding j : i.getInterfaces()) {
+                if(!leftToCheck.contains(j) && !checked.contains(j)) {
+                    leftToCheck.add(j);
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    /** Helper Method. Checks if the {@code other} type can be extended to the {@code that} type.
+     * See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.2
+     * @param that the type the method definition has
+     * @param other the type the method is called with
+     * @return true, if {@code other} can be extended to {@code that}. False otherwise.
+     */
+    private boolean isWideningPrimitiveConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
+        ITypeBinding cother = other;
+        if(!that.isPrimitive()) {
+            return false;
+        }
+        if(!other.isPrimitive()) {
+            cother = unboxPrimitiveType(other);
+        }
+        if(cother == null) {
+            return false;
+        }
+        // comparing strings is actually easier than creating the types and comparing them.
+        final String thatName = that.getQualifiedName();
+        final String otherName = cother.getQualifiedName();
+        final String bYTE = "byte";
+        final String sHORT = "short";
+        final String iNT = "int";
+        final String lONG = "long";
+        final String fLOAT = "float";
+        final String dOUBLE = "double";
+        final String cHAR = "char";
+        
+        if(otherName.equals(bYTE) && 
+              (thatName.equals(sHORT)
+            || thatName.equals(iNT)
+            || thatName.equals(lONG)
+            || thatName.equals(fLOAT)
+            || thatName.equals(dOUBLE))) {
+            return true;
+        }
+        
+        if(otherName.equals(sHORT) && 
+                (thatName.equals(iNT)
+              || thatName.equals(lONG)
+              || thatName.equals(fLOAT)
+              || thatName.equals(dOUBLE))) {
+              return true;
+        }
+        
+        if(otherName.equals(cHAR) && 
+                (thatName.equals(iNT)
+              || thatName.equals(lONG)
+              || thatName.equals(fLOAT)
+              || thatName.equals(dOUBLE))) {
+              return true;
+        }
+        
+        if(otherName.equals(iNT) && 
+                (thatName.equals(lONG)
+              || thatName.equals(fLOAT)
+              || thatName.equals(dOUBLE))) {
+              return true;
+        }
+        
+        if(otherName.equals(lONG) && 
+                (thatName.equals(fLOAT)
+              || thatName.equals(dOUBLE))) {
+              return true;
+        }
+        
+        if(otherName.equals(fLOAT) && 
+                thatName.equals(dOUBLE)) {
+              return true;
+        }
+        
+        return false;
+    }
+
+    /** Performs unboxing of primitive types.
+     * @param other the {@link ITypeBinding} to be unboxed.
+     * @return the {@link ITypeBinding} of the unboxed type or null if the type can not be unboxed.
+     */
+    private ITypeBinding unboxPrimitiveType(final ITypeBinding other) {
+        final TypeComputer tc = new TypeComputer(compilationUnit);
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Boolean"))) {
+            return tc.createWellKnownType("boolean");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Byte"))) {
+            return tc.createWellKnownType("byte");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Short"))) {
+            return tc.createWellKnownType("short");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Character"))) {
+            return tc.createWellKnownType("char");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Integer"))) {
+            return tc.createWellKnownType("int");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Long"))) {
+            return tc.createWellKnownType("long");
+        }
+        if(other.isEqualTo(tc.createWellKnownType("java.lang.Double"))) {
+            return tc.createWellKnownType("double");
+        }
+        return null;
+    }
+
+    /** Performs boxing of primitive types.
+     * @param other the {@link ITypeBinding} to be boxed.
+     * @return the {@link ITypeBinding} of the boxed type or null if the type can not be boxed.
+     */
+    private ITypeBinding boxPrimitiveType(final ITypeBinding other) {
+        final TypeComputer tc = new TypeComputer(compilationUnit);
+        if(other.getQualifiedName().equals("boolean")) {
+            return tc.createWellKnownType("java.lang.Boolean");
+        }
+        if(other.getQualifiedName().equals("byte")) {
+            return tc.createWellKnownType("java.lang.Byte");
+        }
+        if(other.getQualifiedName().equals("short")) {
+            return tc.createWellKnownType("java.lang.Short");
+        }
+        if(other.getQualifiedName().equals("char")) {
+            return tc.createWellKnownType("java.lang.Character");
+        }
+        if(other.getQualifiedName().equals("int")) {
+            return tc.createWellKnownType("java.lang.Integer");
+        }
+        if(other.getQualifiedName().equals("long")) {
+            return tc.createWellKnownType("java.lang.Long");
+        }
+        if(other.getQualifiedName().equals("float")) {
+            return tc.createWellKnownType("java.lang.Float");
+        }
+        if(other.getQualifiedName().equals("double")) {
+            return tc.createWellKnownType("java.lang.Double");
+        }
+        return null;
     }
 
     private boolean isMoreSpecific(final IMethodBinding m1, final IMethodBinding m2) {
@@ -794,7 +1097,7 @@ public class Resolver implements IResolver {
         return getTypeInCompilationUnit(type.getElementName(), node);
     }
     
-    private ASTNode findInImports(final String resolveString) throws ResolverException {
+    private ASTNode findInImports(final String resolveString, final List<ImportDeclaration> imports) throws ResolverException {
         
         for(final ImportDeclaration imp : imports) {
             
@@ -802,6 +1105,9 @@ public class Resolver implements IResolver {
             
             // ***** PackageBinding - OnDemand Packages
             if(binding instanceof IPackageBinding) {
+                if(currentTask.isMethod) {
+                    continue;
+                }
                 final ASTNode result = findInPackage(resolveString, (IPackageBinding) binding);
                 if(result == null) {
                     continue;
@@ -811,7 +1117,9 @@ public class Resolver implements IResolver {
                 
             // ***** TypeBinding - class imports
             } else if(binding instanceof ITypeBinding) {
-                
+                if(currentTask.isMethod) {
+                    continue;
+                }
                 IType type = null;
                 try {
                     type = compilationUnit.getJavaProject().findType(((ITypeBinding) binding).getQualifiedName());
@@ -836,13 +1144,17 @@ public class Resolver implements IResolver {
                 
             // Static Method Import
             } else if(binding instanceof IMethodBinding) {
+                if(!currentTask.isMethod || currentTask.isClass) {
+                    continue;
+                }
                 IType type = null;
                 try {
                     type = compilationUnit.getJavaProject().findType(((IMethodBinding) binding).getDeclaringClass().getQualifiedName());
-                    if(type == null) {
+                    
+                    final IMethodBinding mb = (IMethodBinding) binding;
+                    if(type == null || !mb.getName().equals(resolveString)) {
                         continue;
                     }
-                    final IMethodBinding mb = (IMethodBinding) binding;
                     final LinkedList<MethodDeclaration> result = new LinkedList<MethodDeclaration>();
                     final ASTVisitor methodFinder = new ASTVisitor() {
                         
@@ -873,13 +1185,17 @@ public class Resolver implements IResolver {
                 
             // Static Variable Imports
             } else if(binding instanceof IVariableBinding) {
+                if(currentTask.isClass || currentTask.isMethod) {
+                    continue;
+                }
                 IType type = null;
                 try{
                     type = compilationUnit.getJavaProject().findType(((IVariableBinding) binding).getDeclaringClass().getQualifiedName());
-                    if(type == null) {
+                    
+                    final IVariableBinding vb = (IVariableBinding) binding;
+                    if(type == null  || !vb.getName().equals(resolveString)) {
                         continue;
                     }
-                    final IVariableBinding vb = (IVariableBinding) binding;
                     final LinkedList<VariableDeclaration> result = new LinkedList<VariableDeclaration>();
                     
                     final ASTVisitor variableFinder = new ASTVisitor() {      

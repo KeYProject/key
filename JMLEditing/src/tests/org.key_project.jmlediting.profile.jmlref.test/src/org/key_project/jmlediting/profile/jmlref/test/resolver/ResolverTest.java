@@ -186,6 +186,20 @@ public class ResolverTest {
         assertEquals(jdtString, result.getName());
         assertEquals(type, result.getResolveType());
     }
+
+    /** This method just calls the {@link Resolver} with the given string. This method is supposed to be called from tests, that want to test for an exception, since this method will not compare results.
+     * @param jmlString the name of the method, field or class you want to resolve. It will be searched in the test file.
+     * @param jmlSkip the amount of times the found string will be skipped until it is considered to be resolved. 
+     * @throws ResolverException is thrown if the resolver throws one
+     */
+    private void exceptionTest(final String jmlString, final int jmlSkip) throws ResolverException {
+        final IResolver resolver = new Resolver();
+        
+        resolver.resolve(cu, getIASTNode(jmlString, jmlSkip));
+        while(resolver.hasNext()) {
+            resolver.next();
+        }        
+    }
     
     @Test
     public void resolveFieldTest1() throws ResolverException {
@@ -332,7 +346,10 @@ public class ResolverTest {
     public void resolveMultipleApplicableMethods() throws ResolverException {
         test("sameNameApplicable", 0, 0, 0, ResolveResultType.METHOD);
     }
-    //TODO: write tests, that are meant to fail.
+    @Test(expected=ResolverException.class)
+    public void resolveAmbiguousMethod() throws ResolverException {
+        exceptionTest("ambiguousMethod", 0);
+    }
 
     /**
      * Helper function for the tests.

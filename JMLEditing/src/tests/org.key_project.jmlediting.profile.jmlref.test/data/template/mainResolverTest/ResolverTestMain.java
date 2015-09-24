@@ -256,4 +256,14 @@ public class ResolverTestMain {
     }
     //@ invariant sameNameApplicable(field2) == 0;
     
+    class S {};
+    class A extends S{};
+    A someA;
+    /*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures ambiguousMethod(someA,someA);
+     */
+    public boolean ambiguousMethod(S s, A a) {return false;}
+    public boolean ambiguousMethod(A a, S s) {return false;}
+    
 }
