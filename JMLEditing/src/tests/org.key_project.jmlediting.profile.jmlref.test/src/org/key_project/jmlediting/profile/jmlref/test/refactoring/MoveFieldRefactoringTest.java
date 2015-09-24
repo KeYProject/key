@@ -104,8 +104,8 @@ public class MoveFieldRefactoringTest {
 
        assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
 
-       projectSrc.delete(true, null);
-       projectDest.delete(true, null);
+       projectSrc.delete(false, null);
+       projectDest.delete(false, null);
     }
     
     @Test
@@ -124,8 +124,8 @@ public class MoveFieldRefactoringTest {
 
        assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
 
-       projectSrc.delete(true, null);
-       projectDest.delete(true, null);
+       projectSrc.delete(false, null);
+       projectDest.delete(false, null);
     }
     
     @Test
@@ -136,7 +136,7 @@ public class MoveFieldRefactoringTest {
        final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest", "data\\template\\refactoringMoveTest\\moveFieldTest\\test8\\projectDest");
        
        TestUtilsRefactoring.setProjectReferences("projectSrc", new String[]{"projectDest"}, bot);
-       
+
        // Execute Move and Check
        TestUtilsRefactoring.selectElementInOutlineAndMove(projectDest.getFolder(JDTUtil.getSourceFolderName()), "Other", "destPackage", "Dest", "destPackage", "balance : int", bot);
        
@@ -144,8 +144,8 @@ public class MoveFieldRefactoringTest {
 
        assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
 
-       projectSrc.delete(true, null);
-       projectDest.delete(true, null);
+       projectSrc.delete(false, null);
+       projectDest.delete(false, null);
     }
     
     @Test
@@ -164,7 +164,40 @@ public class MoveFieldRefactoringTest {
 
        assertEquals(TestUtilsRefactoring.getOracle(projectSrc.getFolder("oracle"), "Main"),TestUtilsRefactoring.getContentAfterRefactoring(bot));
 
-       projectSrc.delete(true, null);
-       projectDest.delete(true, null);
+       projectSrc.delete(false, null);
+       projectDest.delete(false, null);
+    }
+    
+    @Test
+    public void test10MoveFieldWithInvariantIntoEmptyClass() throws CoreException {
+        
+        TestUtilsRefactoring.copyFiles(TESTPATH+"\\test10" + "\\src", srcFolder);
+        TestUtilsRefactoring.copyFiles(TESTPATH+"\\test10" + "\\oracle", oracleFolder);
+        
+        TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "TestClass", "test", "Other", "test", "balance : int", bot);
+
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile("TestClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "TestClass"), 
+                TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t","    "));
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile("Other" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "Other"), 
+                TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t","    "));
+    }
+    
+    @Test
+    public void test11MoveFieldWithInvariantIntoOtherClass() throws CoreException {
+        
+        TestUtilsRefactoring.copyFiles(TESTPATH+"\\test11" + "\\src", srcFolder);
+        TestUtilsRefactoring.copyFiles(TESTPATH+"\\test11" + "\\oracle", oracleFolder);
+        
+        TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "Other", "test", "TestClass", "test", "balance : int", bot);
+        
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile("TestClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "TestClass"), 
+                TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t","    "));
+        TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile("Other" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+        assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "Other"), 
+                TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t","    "));
+        
     }
 }

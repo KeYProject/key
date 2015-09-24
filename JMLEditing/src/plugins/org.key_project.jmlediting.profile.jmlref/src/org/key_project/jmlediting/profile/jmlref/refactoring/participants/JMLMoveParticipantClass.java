@@ -44,22 +44,18 @@ public class JMLMoveParticipantClass extends MoveParticipant {
      */
     @Override
     protected final boolean initialize(Object element) {
-        if(element instanceof IJavaElement){
-            fToMove=(IJavaElement) element;
+        fToMove=(IJavaElement) element;
 
-            fDocName = fToMove.getElementName();
-            fOldFullQualName=((IType) element).getFullyQualifiedName();
+        fDocName = fToMove.getElementName();
+        fOldFullQualName=((IType) element).getFullyQualifiedName();
 
-            fProject = fToMove.getJavaProject();
-            
-            // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
-            fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
-            fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();  
+        fProject = fToMove.getJavaProject();
+        
+        // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
+        fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
+        fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();  
 
-            return true;
-        }else{
-            return false;
-        }
+        return true;
     }
 
     /**
@@ -88,8 +84,8 @@ public class JMLMoveParticipantClass extends MoveParticipant {
      * add those to the changes to the java code which are already scheduled.
      * 
      * @return Returns null if only shared text changes are made. Otherwise
-     *      returns a TextChange Object which gathered all the changes to JML annotations 
-     *      in class which does not have any Java changes scheduled.
+     *      returns a {@link TextChange} which gathered all the changes to JML annotations 
+     *      in classes which do not have any Java changes scheduled.
      *
      */
     public final Change createChange(final IProgressMonitor pm) throws CoreException,
@@ -124,7 +120,9 @@ public class JMLMoveParticipantClass extends MoveParticipant {
                             }
                         }
                         else {
-                            // In case changes to the JML code needs to be done (but not to the java code)
+                            // In the extremely unlikely case that changes to the JML code needs to be done (but not to the java code)
+                            // Note that, when a class is imported -> changes to import declaration.
+                            // Class itself -> changes to the package declaration.
                             if (!changesToJML.isEmpty()){
 
                                 changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(

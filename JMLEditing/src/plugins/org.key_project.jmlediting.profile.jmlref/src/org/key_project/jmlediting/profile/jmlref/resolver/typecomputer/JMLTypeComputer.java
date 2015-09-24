@@ -50,15 +50,9 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
                || type == ExpressionNodeTypes.BINARY_OR
                || type == ExpressionNodeTypes.BINARY_EXCLUSIVE_OR) {
         } else if(type == ExpressionNodeTypes.CAST) {
-
-            // TODO: call on child? .. give everything to resolver?
-            // compare afterwards?
            
            // If type is primitive Type .. TypeComputer has to handle it.
-           // TODO: How is the Cast tree built? Return 1st Child?
            return computeType(node.getChildren().get(0));
-           
-           //return callResolver(toResolve, new Resolver());
             
         } else if(type == ExpressionNodeTypes.CONDITIONAL_OP) {
            // condition ? exp1 : exp2;
@@ -71,7 +65,7 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
         
         } else if(type == ExpressionNodeTypes.EXPRESSION_LIST) {
         
-        //}else if(type == ExpressionNodeTypes.IDENTIFIER) {
+        } else if(type == ExpressionNodeTypes.IDENTIFIER) {
             
         } else if(type == ExpressionNodeTypes.IMPLIES) {
            // ==>
@@ -90,7 +84,9 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
             if(node.getChildren().size() < 3) {
                 //TODO: Error erstellen throw new TypeComputerException("Can not have a logical operator without two operands.", node);
             }
-            else return createWellKnownType("boolean");
+            else {
+                return createWellKnownType("boolean");
+            }
             
         } else if(type == ExpressionNodeTypes.MINUS
                || type == ExpressionNodeTypes.PLUS
@@ -159,8 +155,7 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
            return createWellKnownType(((IStringNode) node.getChildren().get(0)).getString());
             
         } else if(type == ExpressionNodeTypes.REFERENCE_TYPE) {
-//           return callResolver(node.getChildren().get(0).get(0) , new Resolver());
-           return callResolver(node.getChildren().get(0).getChildren().get(0), new Resolver());
+           return callResolver(node, new Resolver());
             
         } else if(type == ExpressionNodeTypes.RELATIONAL_OP) {
             
@@ -178,9 +173,9 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
         throw new TypeComputerException("Can not identify node type.", node);
     }
     
-    private boolean arithmeticalBinding (ITypeBinding b1) {
-       return ( b1.isEqualTo(FLOAT) || b1.isEqualTo(INTEGER) || b1.isEqualTo(CHAR) 
-              || b1.isEqualTo(P_FLOAT) || b1.isEqualTo(P_INTEGER) || b1.isEqualTo(P_CHAR) );
+    private boolean arithmeticalBinding (final ITypeBinding b1) {
+       return b1.isEqualTo(FLOAT) || b1.isEqualTo(INTEGER) || b1.isEqualTo(CHAR) 
+              || b1.isEqualTo(P_FLOAT) || b1.isEqualTo(P_INTEGER) || b1.isEqualTo(P_CHAR);
        
     }
   

@@ -12,6 +12,13 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * The tests for the renaming of parameters. See the data\template\refactoringRenameTest\TestExplanation.txt 
+ * for more information.
+ * 
+ * @author Robert Heimbach
+ *
+ */
 public class RenameParametersRefactoringTest {
     private static final String PROJECT_NAME = "JMLRefactoringRenameTestParameters";
 
@@ -60,5 +67,11 @@ public class RenameParametersRefactoringTest {
     public void test4FieldAndOtherMethodUsingSameName() throws CoreException {   
         TestUtilsRefactoring.runParameterRenameTest(TESTPATH+"\\test4", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
+    }
+    
+    @Test
+    public void test5RenameLocalVariableNoParameter() throws CoreException {
+        TestUtilsRefactoring.runParameterRenameTest(TESTPATH+"\\test5", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "setBalance(boolean) : void", "aNewName", 26);
     }
 }

@@ -12,6 +12,13 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * The tests for the renaming of classes. See the data\template\refactoringRenameTest\TestExplanation.txt 
+ * for more information.
+ * 
+ * @author Robert Heimbach
+ *
+ */
 public class RenameClassesRefactoringTest {
     private static final String PROJECT_NAME = "JMLRefactoringRenameTestClasses";
 
@@ -72,6 +79,18 @@ public class RenameClassesRefactoringTest {
     @Test
     public void test6FullyQualifiedClassAccess() throws CoreException {
         TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "NewClassName", javaProject);
+    }
+    
+    @Test
+    public void test7NoChangesOtherStringClassUsed() throws CoreException {
+        TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH+"\\test7", srcFolder, oracleFolder, bot, 
+                "Integer", "test", "NewClassName", javaProject);
+    }
+    
+    @Test
+    public void test8ReferencedInCastExpression() throws CoreException {
+        TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH+"\\test8", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "NewClassName", javaProject);
     }
 }

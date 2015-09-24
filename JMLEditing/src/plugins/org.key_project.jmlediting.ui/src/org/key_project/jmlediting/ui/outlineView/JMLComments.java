@@ -2,13 +2,10 @@ package org.key_project.jmlediting.ui.outlineView;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.Comment;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.resolver.ResolveResult;
 
 /**
  * Contains {@link IASTNode} with a readable string that should be shown in the Outline.
@@ -83,9 +80,4 @@ public class JMLComments implements IASTNode {
    public final String prettyPrintAST() {
       return text;
    }
-
-    @Override
-    public final ResolveResult resolve(IJMLProfile profile, ICompilationUnit cu) {
-        return null;
-    }
 }

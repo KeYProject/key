@@ -3,6 +3,8 @@ package resolver.test;
 import java.io.*;
 import java.util.HashMap;
 import java.math.BigInteger;
+import static resolver.test.otherPackage.ResolverTestClass2.staticField;
+import static resolver.test.otherPackage.ResolverTestClass2.staticMethod;
 
 public class ResolverTestMain {
    
@@ -225,5 +227,43 @@ public class ResolverTestMain {
     public int doSeomthing14() {
         return fr.read();
     }
+    
+    /*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures staticField == \result; 
+      @*/
+    public int testImportField() {
+        return staticField;
+    }
+    
+    /*@ normal_behavior
+      @ assignable field3;
+      @ ensures \result == ((ResolverTestClass1) field3.getThisAsObjectType()).field1;
+      @*/
+    public int castMethodAndThis() {
+        field3 = new ResolverTestClass1();
+        return ((ResolverTestClass1) field3.getThis(null)).field1;
+    }
+    
+    public int sameNameApplicable(String p1) {
+        return 0;
+    }
+    public int sameNameApplicable(Serializable p1) {
+        return 0;
+    }
+    public int sameNameApplicable(Object p1) {
+        return 0;
+    }
+    //@ invariant sameNameApplicable(field2) == 0;
+    
+    class S {};
+    class A extends S{};
+    A someA;
+    /*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures ambiguousMethod(someA,someA);
+     */
+    public boolean ambiguousMethod(S s, A a) {return false;}
+    public boolean ambiguousMethod(A a, S s) {return false;}
     
 }

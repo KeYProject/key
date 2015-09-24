@@ -52,22 +52,16 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
     /**
      * {@inheritDoc} 
      * <p> Saves the new name to change to. Saves the old name and the
-     * field/method to be changed as a IJavaElement to search for references to it. Saves
+     * field/method to be changed as a {@link IJavaElement} to search for references to it. Saves
      * the active Project, i.e. the project which contains the class which field/method changes.</p>
      */
     @Override
     protected final boolean initialize(final Object element) {
         fNewName = getArguments().getNewName();
-
-        if (element instanceof IJavaElement) {
-            fJavaElementToRename = (IJavaElement) element;
-            fProject = fJavaElementToRename.getJavaProject();
-            fOldName = fJavaElementToRename.getElementName();
-            return true;
-        }
-        else {
-            return false;
-        }
+        fJavaElementToRename = (IJavaElement) element;
+        fProject = fJavaElementToRename.getJavaProject();
+        fOldName = fJavaElementToRename.getElementName();
+        return true;
     }
 
     /**
@@ -88,8 +82,8 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
      * add those to the changes to the java code which are already scheduled.
      * 
      * @return Returns null if only shared text changes are made. Otherwise
-     *      returns a TextChange Object which gathered all the changes to JML annotations 
-     *      in class which does not have any Java changes scheduled.
+     *      returns a {@link TextChange} which gathered all the changes to JML annotations 
+     *      in classes which do not have any Java changes scheduled.
      *
      */
     @Override

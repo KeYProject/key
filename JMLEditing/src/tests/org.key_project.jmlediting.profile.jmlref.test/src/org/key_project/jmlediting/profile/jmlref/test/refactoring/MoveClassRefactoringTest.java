@@ -15,6 +15,13 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+/**
+ * Note that the RenamePackagesRefactoringTest is testing the correct moving of classes indirecly as well
+ * because the ClassMoveRefactoringComputer is used internally. A renaming of a package is seen
+ * as a creation of a new package, the movement of all classes from the old in the new and the deletion of the old package.
+ * 
+ * @author Maksim Melnik, Robert Heimbach
+ */
 public class MoveClassRefactoringTest{
 
     private static final String PROJECT_NAME = "MoveClassRefactoringTest";

@@ -11,14 +11,12 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
-import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.FieldAndMethodMoveRefactoringComputer;
@@ -39,21 +37,18 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
     private IJavaProject fProject;
     
     /**
-     * {@inheritDoc} Initializes the source and destination paths, aswell as the field to move itself.
+     * {@inheritDoc} Saves the element which is moved, the name of the element,
+     * its source and destination class, as well as the project starting the refactoring.
      */
     @Override
     protected final boolean initialize(Object element) {
-        if(element instanceof IJavaElement){
-            elementToMove = (IJavaElement) element;           
-            fProject = elementToMove.getJavaProject();
-            elementName = elementToMove.getElementName();
-            oldClassFullQualName = ((IType) elementToMove.getParent()).getFullyQualifiedName();
-            IType destination = (IType) getArguments().getDestination();
-            newClassFullQualName = destination.getFullyQualifiedName();
-            return true;
-        }else{
-            return false;
-        }
+        elementToMove = (IJavaElement) element;           
+        fProject = elementToMove.getJavaProject();
+        elementName = elementToMove.getElementName();
+        oldClassFullQualName = ((IType) elementToMove.getParent()).getFullyQualifiedName();
+        IType destination = (IType) getArguments().getDestination();
+        newClassFullQualName = destination.getFullyQualifiedName();
+        return true;
     }
 
     
@@ -88,8 +83,8 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
      * code changes needs to be done carefully.
      * 
      * @return Returns null if only shared text changes are made. Otherwise
-     *      returns a TextChange Object which gathered all the changes to JML annotations 
-     *      in class which does not have any Java changes scheduled.
+     *      returns a {@link TextChange} which gathered all the changes to JML annotations 
+     *      in classes which do not have any Java changes scheduled.
      *
      */
     @Override
@@ -104,59 +99,35 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
         projectsToCheck.add(fProject);
         
         try {
-            // Look through all source files in each package and project
+            // Look through all source files in each package and project and perform the scheduled java changes, if available.
             for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck, fProject)) {
                 for (final IPackageFragment pac : RefactoringUtil.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
-
+                        
+                        final TextChange changesToJavaCode = getTextChange(unit);
+                        
+                        if (changesToJavaCode != null){
+                            changesToJavaCode.perform(pm);
+                            changesToJavaCode.dispose();
+                        }
+                    }
+                }
+            }
+            
+            // Now check the updated files for needed JML changes. We could not have done it before, because import declarations needed to be updated.
+            for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck, fProject)) {
+                for (final IPackageFragment pac : RefactoringUtil.getAllPackageFragmentsContainingSources(project)) {
+                    for (final ICompilationUnit unit : pac
+                            .getCompilationUnits()) {
+                        
                         FieldAndMethodMoveRefactoringComputer changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
                         
-                        final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
-
-                        // Get scheduled changes to the java code from the rename processor
-                        final TextChange changesToJavaCode = getTextChange(unit);
-
-                        // add our edits to the java changes
-                        // JDT will compute the shifts and the preview
-                        if (changesToJavaCode != null) {
-                            
-                            MultiTextEdit jmlEditsCombined = RefactoringUtil.combineEditsToMultiEdit(changesToJML);
-   
-                            // Choose the right place in the tree to add the JML edits.
-                            // changesToJavaCode is a MultiTextEdit (as a root) consisting of a MultiTextEdit consisting of Edits
-                            IRegion regionJML = jmlEditsCombined.getRegion();
-                            
-                            TextEdit presetRootEdit = changesToJavaCode.getEdit();
-                            
-                            TextEdit[] children = presetRootEdit.getChildren();
-                            
-                            // check if some child completely covers the JML region. Add it then.
-                            // Otherwise add it as a separate child
-                            boolean overlap = false;
-                            boolean jmlAdded = false;
-                            for (TextEdit child : children) {
-                                if (RefactoringUtil.isCovering(child.getRegion(), regionJML)) {
-                                    child.addChild(jmlEditsCombined);
-                                    jmlAdded = true;
-                                    break;
-                                }
-                                if (RefactoringUtil.isOverlapping(child.getRegion(), regionJML)){
-                                    overlap = true;
-                                }
-                            }
-                            
-                            if(!jmlAdded && !overlap){
-                                presetRootEdit.addChild(jmlEditsCombined);
-                            }
-                        }
-                        else {
-                            // In case changes to the JML code needs to be done (but not to the java code)
-                            if (!changesToJML.isEmpty()){
-
-                                changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                                        unit, changesToJML));
-                            }
+                        ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
+                        
+                        if (!changesToJML.isEmpty()){
+                            changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
+                                    unit, changesToJML));
                         }
                     }
                 }
@@ -168,5 +139,5 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
 
         // After iterating through all needed projects and source files, determine what needs to be returned.    
         return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
-    }
+    }   
 }

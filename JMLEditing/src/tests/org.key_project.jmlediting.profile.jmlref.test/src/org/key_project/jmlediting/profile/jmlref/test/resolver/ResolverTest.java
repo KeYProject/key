@@ -58,6 +58,9 @@ public class ResolverTest {
     private static List<IASTNode> iASTList = new ArrayList<IASTNode>();
     private static ASTNode mainJDT;
     private static ASTNode class1JDT;
+    private static ASTNode class2JDT;
+    private static ICompilationUnit cu3;
+    private final static String PATHFILE3 = "src/resolver/test/otherPackage/ResolverTestClass2";
     private final static String PATH = "src/resolver/test/";
     private final static String FILE1 = "ResolverTestMain";
     private final static String FILE2 = "ResolverTestClass1";
@@ -71,6 +74,8 @@ public class ResolverTest {
        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data\\template\\mainResolverTest", testFolder);
        TestUtilsUtil.waitForBuild();
        JMLPreferencesHelper.setProjectJMLProfile(javaProject.getProject(), JMLPreferencesHelper.getDefaultJMLProfile());
+       
+       System.out.println(testFolder.getFolder("otherPackage").getFile("ResolverTestClass2.java").getName());
        
        // Parse JDT
        cu = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATH+FILE1+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -90,34 +95,70 @@ public class ResolverTest {
        
        cu2 = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATH+FILE2+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
        class1JDT = JDTUtil.parse(cu2);
+       
+       cu3 = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATHFILE3+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+       class2JDT = JDTUtil.parse(cu3);
     }
     
 
     private void test(final String string, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type) throws ResolverException {
-        test(string, string, file, jdtSkip, jmlSkip, type);
+        test(string, string, file, jdtSkip, jmlSkip, type, null);
     }
-    private void test(final String jmlString, final String jdtString, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type) throws ResolverException {
+    
+    /**
+     * 
+     * @param jmlString
+     * @param jdtString
+     * @param file
+     * @param jdtSkip
+     * @param jmlSkip
+     * @param type
+     * @param nodeToResolve
+     * @throws ResolverException
+     */
+    private void test(final String jmlString, final String jdtString, final int file, final int jdtSkip, final int jmlSkip, final ResolveResultType type, final IASTNode nodeToResolve) throws ResolverException {
         final IResolver resolver = new Resolver(); // JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject())
         ResolveResult result = null;
         
-        result = resolver.resolve(cu, getIASTNode(jmlString, jmlSkip));
+        if (nodeToResolve == null) {
+            result = resolver.resolve(cu, getIASTNode(jmlString, jmlSkip));
+        }
+        else {
+            result = resolver.resolve(cu, nodeToResolve);
+        }
         while(resolver.hasNext()) {
             result = resolver.next();
         }
         
         ASTNode jdt = null;
+        
+        ASTNode resultFile = null;
+        switch(file){
+        case 0:
+            resultFile = mainJDT;
+            break;
+        case 1:
+            resultFile = class1JDT;
+            break;
+        case 2:
+            resultFile = class2JDT;
+            break;
+        default:
+            break;
+        }
+        
         switch(type) {
         case FIELD:
-            jdt = getFieldDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getFieldDecleration(jdtString, resultFile, jdtSkip);
             break;
         case METHOD:
-            jdt = getMethodDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getMethodDecleration(jdtString, resultFile, jdtSkip);
             break;
         case PARAMETER:
-            jdt = getParameterDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getParameterDecleration(jdtString, resultFile, jdtSkip);
             break;
         case CLASS:
-            jdt = getTypeDecleration(jdtString, file == 0 ? mainJDT : class1JDT, jdtSkip);
+            jdt = getTypeDecleration(jdtString, resultFile, jdtSkip);
             break;
         case UNSPECIFIED:
             break;
@@ -144,6 +185,20 @@ public class ResolverTest {
         
         assertEquals(jdtString, result.getName());
         assertEquals(type, result.getResolveType());
+    }
+
+    /** This method just calls the {@link Resolver} with the given string. This method is supposed to be called from tests, that want to test for an exception, since this method will not compare results.
+     * @param jmlString the name of the method, field or class you want to resolve. It will be searched in the test file.
+     * @param jmlSkip the amount of times the found string will be skipped until it is considered to be resolved. 
+     * @throws ResolverException is thrown if the resolver throws one
+     */
+    private void exceptionTest(final String jmlString, final int jmlSkip) throws ResolverException {
+        final IResolver resolver = new Resolver();
+        
+        resolver.resolve(cu, getIASTNode(jmlString, jmlSkip));
+        while(resolver.hasNext()) {
+            resolver.next();
+        }        
     }
     
     @Test
@@ -208,7 +263,7 @@ public class ResolverTest {
     }
     @Test
     public void resolveArrayFieldTest1() throws ResolverException {
-        test("arrayfield", "length" , 0, 0, 0, ResolveResultType.FIELD);
+        test("arrayfield", "length" , 0, 0, 0, ResolveResultType.FIELD, null);
     }
     @Test
     public void resolveMethodSameName1ParameterTest1() throws ResolverException {
@@ -228,39 +283,43 @@ public class ResolverTest {
     }
     @Test
     public void resolveMemberAccessTest1() throws ResolverException {
-        test("field3", "methodNoParameter1" , 1, 0, 3, ResolveResultType.METHOD);
+        test("field3", "methodNoParameter1" , 1, 0, 3, ResolveResultType.METHOD, null);
     }
     @Test
     public void resolveMemberAccessTest2() throws ResolverException {
-        test("field3", "method1Parameter4", 1, 0, 4, ResolveResultType.METHOD);
+        test("field3", "method1Parameter4", 1, 0, 4, ResolveResultType.METHOD, null);
     }
     @Test
     public void resolveMemberAccessTest3() throws ResolverException {
-        test("ResolverTestClass1", "staticMethodNoParameter10", 1, 0, 0, ResolveResultType.METHOD);
+        test("ResolverTestClass1", "staticMethodNoParameter10", 1, 0, 0, ResolveResultType.METHOD, null);
     }
     @Test
     public void resolveMemberAccessTest4() throws ResolverException {
-        test("field3", "field11", 1, 0, 7, ResolveResultType.FIELD);
+        test("field3", "field11", 1, 0, 7, ResolveResultType.FIELD, null);
     }
     @Test
     public void resolveMemberAccessTest5() throws ResolverException {
-        test("ResolverTestClass1", "staticField10", 1, 0, 2, ResolveResultType.FIELD);
+        test("ResolverTestClass1", "staticField10", 1, 0, 2, ResolveResultType.FIELD, null);
     }
     @Test
     public void resolveMemberAccessTest6() throws ResolverException {
-        test("ResolverTestClass1", "staticMethod1Parameter10", 1, 0, 1, ResolveResultType.METHOD);
+        test("ResolverTestClass1", "staticMethod1Parameter10", 1, 0, 1, ResolveResultType.METHOD, null);
     }
     @Test
     public void resolveMemberAccessTest7() throws ResolverException {
-        test("field3", "field1", 1, 0, 5, ResolveResultType.FIELD);
+        test("field3", "field1", 1, 0, 5, ResolveResultType.FIELD, null);
     }
     @Test
     public void resolveMemberAccessTest8() throws ResolverException {
-        test("field3", "field10", 1, 0, 6, ResolveResultType.FIELD);
+        test("field3", "field10", 1, 0, 6, ResolveResultType.FIELD, null);
     }
     @Test
     public void resolveMemberAccessTest9() throws ResolverException {
-        test("field3", "getThis", 1, 0, 11, ResolveResultType.METHOD);
+        test("field3", "getThis", 1, 0, 11, ResolveResultType.METHOD, null);
+    }
+    @Test
+    public void resolverCastExpression() throws ResolverException {
+        test("castMethodAndThis", "field1", 1, 0, 0, ResolveResultType.FIELD, getIASTNodeCast());
     }
     @Test
     public void resolvePackageImportType1() throws ResolverException {
@@ -279,7 +338,18 @@ public class ResolverTest {
     public void resolvePackageImportOnDemand1() throws ResolverException {
         importTest("fr", "read", 0, ResolveResultType.METHOD);
     }
-    //TODO: write tests, that are meant to fail.
+    @Test
+    public void resolveStaticImportField() throws ResolverException {
+        test("staticField", 2, 0, 0, ResolveResultType.FIELD);
+    }
+    @Test
+    public void resolveMultipleApplicableMethods() throws ResolverException {
+        test("sameNameApplicable", 0, 0, 0, ResolveResultType.METHOD);
+    }
+    @Test(expected=ResolverException.class)
+    public void resolveAmbiguousMethod() throws ResolverException {
+        exceptionTest("ambiguousMethod", 0);
+    }
 
     /**
      * Helper function for the tests.
@@ -413,6 +483,22 @@ public class ResolverTest {
                         return node;
                     }
                 }
+            }
+        }
+        return null;
+    }
+    
+    private IASTNode getIASTNodeCast() {
+        final List<IASTNode> list = new ArrayList<IASTNode>();
+        
+        for(final IASTNode jml : iASTList) {
+             list.addAll(Nodes.getAllNodesOfType(jml, ExpressionNodeTypes.PRIMARY_EXPR));
+        }
+        
+        
+        for(final IASTNode node : list) {
+            if(node.getChildren().get(0).getType() == ExpressionNodeTypes.CAST) {
+                return node;
             }
         }
         return null;

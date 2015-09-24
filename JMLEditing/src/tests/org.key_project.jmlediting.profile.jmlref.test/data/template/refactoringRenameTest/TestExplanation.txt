@@ -4,8 +4,11 @@ Run a renaming and compare the editor content to a given oracle, i.e. the result
 
 1) Each test in its own folder. Separated in src and oracle.
 2) First, files are copied and oracle string is generated.
-3) Renaming is done (usually of the field named balance).
+3) Renaming is done (by selection a field/method from the outline or a package from the package explorer).
 4) Comparison of editor after renaming to oracle.
+
+
+@see TestUtilsRefactoring for the methods used in testing.
 
 
 What is tested:
@@ -45,12 +48,14 @@ Tests with only one project:
 Test21: Accessing a field using a fully qualified class name.
 Test22: Class invariant but not written above the field it refers to.
 Test23: Static field access. Other class is in same package. Thus no package reference before class name needed.
+Test24: Using the JML Reference Profile AE.
 
 ****** Testing Parameter Renaming *****
 Test1: One method, one parameter.
 Test2: One method, two parameters, renamed parameter is first.
 Test3: One method, two parameters, renamed parameter is second.
 Test4: Field with same name. Other method (constructor) using parameter with same name.
+Test5: Starting to rename a local variable, not a parameter of a method.
 
 ****** Testing Class Renaming (oracle file has the name of the original class name) *****
 Test1: One class, one method which uses the class in java code and JML.
@@ -59,6 +64,8 @@ Test3: Two classes, same package. OtherClass initializes TestClass.
 Test4: like Test3 but without any reference to TestClass in OtherClass, thus no java changes in that class.
 Test5: Two classes, different package.
 Test6: Accessing a class using the fully qualified class name.
+Test7: No changes at all. Class with name String is renamed but java.lang.String used in the other class.
+Test8: Class to be renamed is referenced in a cast expression.
 
 ****** Testing Package Renaming *****
 Test1: One class, one package reference in JML.
@@ -70,6 +77,8 @@ Test5: Like test4 but package to be renamed is a sub folder.
 Test6: One references class is in parent package and one referenced class is in sub package, which is to be renamed. 
 Test7: Like test6 but parent package is renamed. The "rename subpackages" option activated.
 Test8: Like test7 but option is deactivated - only the parent package is renamed.
+Test9: Renaming of an empty Package. TestClass has a field with the same name as the empty and to be renamed package. Checking if the folder was renamed correctly.
+Test10: One of the involved classes has no java changes but only changes to the JML annotations.
 
 ****** Testing Method Renaming (usually renaming of getBalance() *****
 Test1: One class, one method calling another method in that class. No other method with same name in that class.
