@@ -37,12 +37,14 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
         //if(type == ExpressionNodeTypes.ARRAY_ACCESS) {}else 
             
         if(type == ExpressionNodeTypes.ARRAY_CLASS) {
+           // type_of(String[])
            
         } else if(type == ExpressionNodeTypes.ARRAY_DIM_DECL) {
          
         } else if(type == ExpressionNodeTypes.ARRAY_INITIALIZER) {
         
         } else if(type == ExpressionNodeTypes.ASSIGNMENT) {
+           // set myGostVar := jmlExpression;
 
         } else if(type == ExpressionNodeTypes.BINARY_AND 
                || type == ExpressionNodeTypes.BINARY_OR
@@ -59,17 +61,20 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
            //return callResolver(toResolve, new Resolver());
             
         } else if(type == ExpressionNodeTypes.CONDITIONAL_OP) {
+           // condition ? exp1 : exp2;
         
         } else if(type == ExpressionNodeTypes.EQUALITY) {
             // the 2 sides must be of the same type
         
         } else if(type == ExpressionNodeTypes.EQUIVALENCE_OP) {
+           // <=>
         
         } else if(type == ExpressionNodeTypes.EXPRESSION_LIST) {
         
         //}else if(type == ExpressionNodeTypes.IDENTIFIER) {
             
         } else if(type == ExpressionNodeTypes.IMPLIES) {
+           // ==>
         
         } else if(type == ExpressionNodeTypes.JAVA_KEYWORD) {
             // super / this / ?
