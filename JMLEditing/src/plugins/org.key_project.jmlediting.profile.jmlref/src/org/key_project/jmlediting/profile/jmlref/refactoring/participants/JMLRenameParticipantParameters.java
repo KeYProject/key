@@ -19,95 +19,97 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefac
 /**
  * Participant to take part in the renaming of method parameters.
  * <p>
- * As the scope of method parameters is just the method itself, any 
- * JML annotation using the renamed method parameter only makes sense above that
- * particular method. Thus this participant, unlike the others, only needs to check
- * the active class for changes to make. </p>
+ * As the scope of method parameters is just the method itself, any JML annotation using the renamed
+ * method parameter only makes sense above that particular method. Thus this participant, unlike the
+ * others, only needs to check the active class for changes to make.
+ * </p>
  * <p>
- * The class uses the {@link RenameRefactoringComputer} to compute the needed changes.</p>
+ * The class uses the {@link RenameRefactoringComputer} to compute the needed changes.
+ * </p>
  * 
  * @author Robert Heimbach
  *
  */
 public class JMLRenameParticipantParameters extends RenameParticipant {
 
-    private String fNewName;
-    private String fOldName;
-    private ICompilationUnit fCompUnit;
-    private ILocalVariable fmethodParameter;
-    private IJavaProject fProject;
-    
-    /**
-     * Initializes the refactoring participant with the needed information.
-     * <p>
-     * {@inheritDoc}
-     */
-    @Override
-    protected final boolean initialize(Object element) {
-        fmethodParameter = (ILocalVariable) element;
-        
-        // check if it is a method parameter
-        if (fmethodParameter.isParameter()) {
-            fOldName = fmethodParameter.getElementName();
-            fNewName = getArguments().getNewName();
-            fProject = fmethodParameter.getJavaProject();
-            fCompUnit = fmethodParameter.getDeclaringMember().getCompilationUnit();
+   private String fNewName;
+   private String fOldName;
+   private ICompilationUnit fCompUnit;
+   private ILocalVariable fmethodParameter;
+   private IJavaProject fProject;
 
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+   /**
+    * Initializes the refactoring participant with the needed information.
+    * <p>
+    * {@inheritDoc}
+    */
+   @Override
+   protected final boolean initialize(Object element) {
+      fmethodParameter = (ILocalVariable) element;
 
-    /**
-     * Name of this participant.
-     * <p>
-     * {@inheritDoc}
-     */
-    @Override
-    public final String getName() {
-        return "JML Parameters Refactoring Rename Participant";
-    }
+      // check if it is a method parameter
+      if (fmethodParameter.isParameter()) {
+         fOldName = fmethodParameter.getElementName();
+         fNewName = getArguments().getNewName();
+         fProject = fmethodParameter.getJavaProject();
+         fCompUnit = fmethodParameter.getDeclaringMember().getCompilationUnit();
 
-    /**
-     * No condition checking. Changes are done directly (or not at all).
-     * <p>
-     * {@inheritDoc}
-     */
-    @Override
-    public final RefactoringStatus checkConditions(IProgressMonitor pm,
-            CheckConditionsContext context) throws OperationCanceledException {
-        
-        return new RefactoringStatus();
-    }
-    
-    /**
-     * Computes the changes which need to be done to the JML code of the active class and
-     * add those to the changes to the java code which are already scheduled. Note
-     * that those certainly exist, because the method using the parameter is in the active class.
-     * 
-     * @return Returns null, since changes to JML are directly added to the already
-     *          scheduled java changes.
-     */
-    @Override
-    public final Change createChange(final IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+         return true;
+      }
+      else {
+         return false;
+      }
+   }
 
-        RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(fmethodParameter, fOldName, fNewName);
+   /**
+    * Name of this participant.
+    * <p>
+    * {@inheritDoc}
+    */
+   @Override
+   public final String getName() {
+      return "JML Parameters Refactoring Rename Participant";
+   }
 
-        final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
-                fCompUnit, fProject);
-        
-        // Get scheduled changes to the java code from the rename processor
-        final TextChange changesToJavaCode = getTextChange(fCompUnit);
+   /**
+    * No condition checking. Changes are done directly (or not at all).
+    * <p>
+    * {@inheritDoc}
+    */
+   @Override
+   public final RefactoringStatus checkConditions(IProgressMonitor pm,
+         CheckConditionsContext context) throws OperationCanceledException {
 
-        // add our edits to the java changes
-        // JDT will compute the shifts and the preview
-        for (final ReplaceEdit edit : changesToJML) {
-            changesToJavaCode.addEdit(edit);
-        }
-        
-        return null;
-    }
+      return new RefactoringStatus();
+   }
+
+   /**
+    * Computes the changes which need to be done to the JML code of the active class and add those
+    * to the changes to the java code which are already scheduled. Note that those certainly exist,
+    * because the method using the parameter is in the active class.
+    * 
+    * @return Returns null, since changes to JML are directly added to the already scheduled java
+    *         changes.
+    */
+   @Override
+   public final Change createChange(final IProgressMonitor pm) throws CoreException,
+         OperationCanceledException {
+
+      RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(fmethodParameter,
+            fOldName, fNewName);
+
+      final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
+            fCompUnit, fProject);
+
+      // Get scheduled changes to the java code from the rename processor
+      final TextChange changesToJavaCode = getTextChange(fCompUnit);
+
+      // add our edits to the java changes
+      // JDT will compute the shifts and the preview
+      for (final ReplaceEdit edit : changesToJML) {
+         changesToJavaCode.addEdit(edit);
+      }
+
+      return null;
+   }
 }

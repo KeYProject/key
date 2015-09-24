@@ -88,7 +88,7 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
      *
      */
     @Override
-    public final Change createChange(IProgressMonitor pm) throws CoreException,
+   public final Change createChange(IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
         // Only non empty change objects will be added
