@@ -48,6 +48,7 @@ Tests with only one project:
 Test21: Accessing a field using a fully qualified class name.
 Test22: Class invariant but not written above the field it refers to.
 Test23: Static field access. Other class is in same package. Thus no package reference before class name needed.
+Test24: Using the JML Reference Profile AE.
 
 ****** Testing Parameter Renaming *****
 Test1: One method, one parameter.
@@ -64,6 +65,7 @@ Test4: like Test3 but without any reference to TestClass in OtherClass, thus no 
 Test5: Two classes, different package.
 Test6: Accessing a class using the fully qualified class name.
 Test7: No changes at all. Class with name String is renamed but java.lang.String used in the other class.
+Test8: Class to be renamed is referenced in a cast expression.
 
 ****** Testing Package Renaming *****
 Test1: One class, one package reference in JML.

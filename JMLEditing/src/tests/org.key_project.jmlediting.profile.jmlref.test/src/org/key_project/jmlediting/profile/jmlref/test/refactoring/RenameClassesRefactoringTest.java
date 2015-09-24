@@ -81,4 +81,16 @@ public class RenameClassesRefactoringTest {
         TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH+"\\test6", srcFolder, oracleFolder, bot, 
                 "TestClass", "test", "NewClassName", javaProject);
     }
+    
+    @Test
+    public void test7NoChangesOtherStringClassUsed() throws CoreException {
+        TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH+"\\test7", srcFolder, oracleFolder, bot, 
+                "Integer", "test", "NewClassName", javaProject);
+    }
+    
+    @Test
+    public void test8ReferencedInCastExpression() throws CoreException {
+        TestUtilsRefactoring.runClassRenameTestBasic(TESTPATH+"\\test8", srcFolder, oracleFolder, bot, 
+                "TestClass", "test", "NewClassName", javaProject);
+    }
 }

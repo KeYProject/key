@@ -10,7 +10,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -43,8 +42,7 @@ public class RefactoringUtil {
         // Iterate through the fragment roots to get all package fragments. 
         for (IPackageFragmentRoot root: roots){         
             for (IJavaElement child: root.getChildren()){
-                if (child.getElementType() == IJavaElement.PACKAGE_FRAGMENT)
-                    allFragments.add((IPackageFragment)child);
+                allFragments.add((IPackageFragment)child);
             }
         }
         return allFragments;
@@ -76,7 +74,9 @@ public class RefactoringUtil {
                 for (String requiredProject: requiredProjectNames){
                     
                     if (requiredProject.equals(refactoringStartingProject.getElementName())) {
-                        projectsToCheck.add(project);
+                        if (!projectsToCheck.contains(project)) {
+                            projectsToCheck.add(project);
+                        }
                     }
                 } 
             }
@@ -172,101 +172,5 @@ public class RefactoringUtil {
         }
     
         return allEdits;
-    }
-    
-    /**
-     * Checks if a given {@link IRegion} is covering another given region.
-     * A region covers another if it starts earlier and ends later.
-     * 
-     * @param region The first of the given regions.
-     * @param other The other region.
-     * @return True if region is covering the other. Else false.
-     */
-    public static Boolean isCovering (final IRegion region, final IRegion other){
-        
-        // get the start and end of both regions.
-        int start = region.getOffset();
-        int end = start + region.getLength();
-        
-        int startOther = other.getOffset();
-        int endOther = startOther + other.getLength();
-        
-        if ((start <= startOther) && (end >= endOther))
-            return true;
-        else 
-            return false;
-    }
-    
-    /**
-     * Checks if a given {@link IRegion} is overlapping another given region.
-     * A region overlaps the other region if the region covers it,
-     * if the region starts within the other region but ends later or 
-     * if the region starts earlier than the other but ends within it.
-     * 
-     * @param region First of the given regions.
-     * @param other The other one.
-     * @return True if the regions are overlapping. Else false.
-     */
-    public static Boolean isOverlapping (final IRegion region, final IRegion other){
-        
-        // Get the start and end information of both regions.
-        int start = region.getOffset();
-        int end = start + region.getLength();
-        
-        int startOther = other.getOffset();
-        int endOther = startOther + other.getLength();
-        
-        if  (isCovering(region, other) || isCovering(other, region) ||
-            ((start <= startOther) && (end >= startOther) && (end < endOther)) || // region ends too early. other is longer.
-            ((start > startOther) && (start < endOther) && (end >= endOther)))   // region starts too late.
-            return true;
-        else 
-            return false;
-    }
-    
-    /**
-     * 
-     * @param textEdit
-     * @param other
-     * @return
-     */
-    public static Boolean isOverlapping(final TextEdit textEdit, final IRegion other) {
-       
-        boolean overlap = false;
-        
-        if (textEdit.hasChildren()) {
-            for (TextEdit edit: textEdit.getChildren()){
-                if (isOverlapping(edit.getRegion(), other)){
-                    overlap = true;
-                    break;
-                }
-            }
-        }
-        else {
-            if (isOverlapping(textEdit.getRegion(), other)){
-                overlap = true;
-            }
-        }
-        
-        return overlap;
-    }
-    
-    /**
-     * 
-     * @param editsToAdd
-     * @param addTo
-     * @return
-     */
-    public static Boolean hasNoOverlapping(final ArrayList<ReplaceEdit> editsToAdd, final MultiTextEdit addTo) {
-        boolean canBeAdded = true;
-        
-        for (ReplaceEdit editToAdd : editsToAdd) {
-            if (isOverlapping(addTo, editToAdd.getRegion())){
-                canBeAdded = false;
-                break;
-            }
-        }
-        
-        return canBeAdded;
     }
 }

@@ -17,7 +17,6 @@ import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
-import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.FieldAndMethodMoveRefactoringComputer;
@@ -100,89 +99,35 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
         projectsToCheck.add(fProject);
         
         try {
-            // Look through all source files in each package and project
+            // Look through all source files in each package and project and perform the scheduled java changes, if available.
             for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck, fProject)) {
                 for (final IPackageFragment pac : RefactoringUtil.getAllPackageFragmentsContainingSources(project)) {
                     for (final ICompilationUnit unit : pac
                             .getCompilationUnits()) {
-
-                        //TODO: absolutely horrible. Better try to do all changes to java code and run JML then.
-                        // TODO: but refactoring computer / resolving of Class.field needs to be rewritten.
-                        // Get scheduled changes to the java code from the rename processor
+                        
                         final TextChange changesToJavaCode = getTextChange(unit);
+                        
+                        if (changesToJavaCode != null){
+                            changesToJavaCode.perform(pm);
+                            changesToJavaCode.dispose();
+                        }
+                    }
+                }
+            }
+            
+            // Now check the updated files for needed JML changes. We could not have done it before, because import declarations needed to be updated.
+            for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck, fProject)) {
+                for (final IPackageFragment pac : RefactoringUtil.getAllPackageFragmentsContainingSources(project)) {
+                    for (final ICompilationUnit unit : pac
+                            .getCompilationUnits()) {
                         
                         FieldAndMethodMoveRefactoringComputer changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
                         
                         ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
-
-                        if (!changesToJML.isEmpty() && changesToJavaCode != null) { 
-                            // add our edits to the java changes
-                            // JDT will compute the shifts and the preview
-                                
-                            // Choose the right place in the tree to add the JML edits.
-                            // changesToJavaCode is a MultiTextEdit (as a root) consisting of a MultiTextEdit consisting of Edits 
-                            MultiTextEdit presetRootEdit = (MultiTextEdit) changesToJavaCode.getEdit();                              
-                            MultiTextEdit givenMultiEdit = (MultiTextEdit) presetRootEdit.getChildren()[0];
-                            
-                            if (RefactoringUtil.hasNoOverlapping(changesToJML, presetRootEdit)){
-                                for(ReplaceEdit editToJML : changesToJML){
-                                    presetRootEdit.addChild(editToJML);
-                                }
-                                changesToJavaCode.perform(pm);
-                                changesToJavaCode.dispose();
-                                
-                                changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
-                                changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
-                                
-                                if (!changesToJML.isEmpty()){
-                                    changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                                            unit, changesToJML));
-                                }
-                            }
-                            else if (RefactoringUtil.hasNoOverlapping(changesToJML, givenMultiEdit)){
-                                for(ReplaceEdit editToJML : changesToJML){
-                                    givenMultiEdit.addChild(editToJML);
-                                }
-                                changesToJavaCode.perform(pm);
-                                changesToJavaCode.dispose();
-                                
-                                changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
-                                changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
-                                
-                                if (!changesToJML.isEmpty()){
-                                    changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                                            unit, changesToJML));
-                                }
-                            }
-                            else { // perform the changes to the java code and recompute the JML changes
-                                changesToJavaCode.perform(pm);
-                                changesToJavaCode.dispose();
-                                
-                                changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
-                                changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
-                                
-                                if (!changesToJML.isEmpty()){
-                                    changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                                            unit, changesToJML));
-                                }
-                            }
-                        }
-                        else if (!changesToJML.isEmpty() && changesToJavaCode == null) {
-                            // In case changes to the JML code needs to be done (but not to the java code)
+                        
+                        if (!changesToJML.isEmpty()){
                             changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
                                     unit, changesToJML));
-                        }
-                        else if (changesToJavaCode != null && changesToJML.isEmpty()) {
-                            changesToJavaCode.perform(pm);
-                            changesToJavaCode.dispose();
-                            
-                            changesComputer = new FieldAndMethodMoveRefactoringComputer(oldClassFullQualName, newClassFullQualName, elementName, unit);
-                            changesToJML = changesComputer.computeNeededChangesToJML(unit, project);
-                            
-                            if (!changesToJML.isEmpty()){
-                                changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                                        unit, changesToJML));
-                            }
                         }
                     }
                 }

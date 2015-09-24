@@ -1,14 +1,14 @@
 package test;
 
-import java.lang.String;
+import java.lang.Integer;
 
 public class TestClass {
     static int balance;
     
     /*@ normal_behavior
-      @ ensures \result == String.valueOf(balance);
+      @ ensures \result == Integer.valueOf(balance);
       @*/
-    String returnString (){
-        return String.valueOf(balance);
+    Integer returnString (){
+        return Integer.valueOf(balance);
     }
 }
