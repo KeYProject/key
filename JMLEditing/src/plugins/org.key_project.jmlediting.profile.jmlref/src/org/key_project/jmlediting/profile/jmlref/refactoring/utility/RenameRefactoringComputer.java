@@ -18,16 +18,18 @@ import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 
 /**
- * The refactoring computer to compute changes to the JML annotations when a renaming was done by
- * calling the method {@link #computeNeededChangesToJML(ICompilationUnit, IJavaProject)}.
+ * The refactoring computer to compute changes to the JML annotations when a renaming was done
+ * by calling the method {@link #computeNeededChangesToJML(ICompilationUnit, IJavaProject)}.
  * <p>
- * The list of {@link IStringNode}s is filtered by comparing the Strings to the name of the element
- * which is refactored. Filtering is important to reduce the number of times the Resolver is called.
+ * The list of {@link IStringNode}s is filtered by comparing the Strings to the name of the
+ * element which is refactored. Filtering is important to reduce the number of times the
+ * Resolver is called.
  * </p>
  * <p>
- * The {@link ReplaceEdit}s are created by calling the {@link Resolver} and finding out if the JML
- * expression / the {@link IASTNode} refers to the element to be refactored. Complex expressions
- * need to call the {@link Resolver#next()} method which traverses the tree structure.
+ * The {@link ReplaceEdit}s are created by calling the {@link Resolver} and finding out if the
+ * JML expression / the {@link IASTNode} refers to the element to be refactored. Complex
+ * expressions need to call the {@link Resolver#next()} method which traverses the tree
+ * structure.
  * </p>
  * 
  * @author Robert Heimbach
@@ -41,16 +43,13 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
    private String fNewName;
 
    /**
-    * Constructor of the rename refactoring computer. Additionally to the old and new name of the
-    * element to be renamed it saves a reference to the element itself to check later which elements
-    * in the JML annotations really refer to this element.
+    * Constructor of the rename refactoring computer. Additionally to the old and new name of
+    * the element to be renamed it saves a reference to the element itself to check later
+    * which elements in the JML annotations really refer to this element.
     * 
-    * @param fJavaElementToRename
-    *           Element which is renamed.
-    * @param fOldName
-    *           Old name of the element which is renamed.
-    * @param fNewName
-    *           New name of the element which is renamed.
+    * @param fJavaElementToRename Element which is renamed.
+    * @param fOldName Old name of the element which is renamed.
+    * @param fNewName New name of the element which is renamed.
     */
    public RenameRefactoringComputer(IJavaElement fJavaElementToRename, String fOldName,
          String fNewName) {
@@ -60,12 +59,11 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
    }
 
    /**
-    * Filters a list of {@link IASTNode} for those which potentially reference the element to be
-    * renamed by comparing the string node to the old name of the element to be renamed.
+    * Filters a list of {@link IASTNode} for those which potentially reference the element to
+    * be renamed by comparing the string node to the old name of the element to be renamed.
     * 
-    * @param nodesList
-    *           List to filter. Should be a list of {@link IStringNode}s.
-    * @return filtered list of string nodes. Potentially empty.
+    * @param nodesList List to filter. Should be a list of {@link IStringNode}s.
+    * @return filtered list of string nodes. Potentially empty. Guaranteed not null.
     */
    protected final ArrayList<IStringNode> filterStringNodes(final List<IASTNode> nodesList) {
 
@@ -82,17 +80,18 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
    }
 
    /**
-    * Checks if a given {@link IASTNode} in a given {@link ICompilationUnit} references the element
-    * to be renamed. Then the needed {@Link ReplaceEdit} is created and added to
-    * changesToMake.
+    * Checks if a given {@link IASTNode} in a given {@link ICompilationUnit} references the
+    * element to be renamed with the help of an {@link IResolver} provided by the active JML
+    * profile. Then the needed {@Link ReplaceEdit} is created and added to the given
+    * {@code changesToMake}.
     *
-    * @param unit
-    *           The compilation unit the IASTNode is in.
-    * @param changesToMake
-    *           {@link ArrayList} of {@link ReplaceEdit}s to accumulate the needed changes.
-    * @param primaryStringMap
-    *           {@link HashMap} which provides for all primary node which needs to be resolved a
-    *           list of {@link IStringNode}s which all had this node as their primary.
+    * @param unit The compilation unit the IASTNode is in.
+    * @param changesToMake {@link ArrayList} of {@link ReplaceEdit}s to accumulate the needed
+    *           changes.
+    * @param primaryStringMap {@link HashMap} which provides a list of {@link IStringNode}s
+    *           for every primary node which needs to be resolved. The list of string nodes
+    *           are all the locations in the primary node which could potentially be
+    *           referenced to the renamed element.
     */
    @Override
    protected final void computeReplaceEdit(final ICompilationUnit unit,
@@ -104,7 +103,8 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
             unit.getJavaProject().getProject()).getResolver();
 
       try {
-
+         // iterate through the primaries and check if we have more than one potential
+         // reference within a primary
          for (IASTNode primary : primaryStringMap.keySet()) {
 
             List<IStringNode> stringNodes = primaryStringMap.get(primary);
@@ -117,7 +117,7 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
 
                changeNeeded = isReferencedElement(resolver.resolve(unit, primary));
 
-               // complex primaries need more calls to the resolver
+               // complex primaries may need more calls to the resolver
                while (changeNeeded == false && resolver.hasNext()) {
                   changeNeeded = isReferencedElement(resolver.next());
                }
@@ -126,7 +126,7 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                   createEditAndAddToList(changesToMake, stringNodes.get(0));
                }
             }
-            else {// Shared primaries. Several string nodes had this node as their primary.
+            else {// Shared primaries. Several string nodes have this node as their primary.
                   // the resolver provides the information which part of the node needs to be
                   // changed.
 
@@ -137,7 +137,7 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
                if (isReferencedElement(result)) {
                   createEditAndAddToList(changesToMake, result.getStringNode());
                }
-
+               // resolve the full primary expression.
                while (resolver.hasNext()) {
 
                   result = resolver.next();
@@ -158,9 +158,8 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
    /**
     * Checks if the resolved result equals the element to be renamed.
     * 
-    * @param result
-    *           The {@link ResolveResult}.
-    * @return true if the resolve result equals the element to be renamed. Falls otherwise.
+    * @param result The {@link ResolveResult}.
+    * @return true if the resolve result equals the element to be renamed. False otherwise.
     */
    private Boolean isReferencedElement(final ResolveResult result) {
       if (result == null || result.getBinding() == null) {
@@ -171,12 +170,10 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
    }
 
    /**
-    * Creates the text change and adds it to changesToMake.
+    * Creates the text change and adds it to {@code changesToMake}.
     * 
-    * @param changesToMake
-    *           list of {@link ReplaceEdit}s to fill.
-    * @param node
-    *           the {@link IASTNode} which should be edited.
+    * @param changesToMake list of {@link ReplaceEdit}s to fill.
+    * @param node the {@link IStringNode} which should be edited.
     */
    private void createEditAndAddToList(final ArrayList<ReplaceEdit> changesToMake,
          final IStringNode node) {

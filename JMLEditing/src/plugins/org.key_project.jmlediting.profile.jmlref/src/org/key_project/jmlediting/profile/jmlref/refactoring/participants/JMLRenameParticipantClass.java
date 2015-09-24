@@ -24,11 +24,13 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefac
  * Class to participate in the renaming of classes.
  * <p>
  * Note that this participant uses {{@link #createPreChange(IProgressMonitor)} to avoid
- * synchronization problems. Any returned changes (that is, changes not added to the scheduled java
- * changes) are done before the java changes. This is needed, whenever the renamed class does not
- * have any scheduled changes to the java source code (Renaming of the compilation unit is not a
- * text change). In such a case, the JML changes raised an exception, because the file they were
- * defined on was not in sync with the file system anymore (renamed before).
+ * synchronization problems. Any changes returned by this participant (that is, changes not
+ * added to the scheduled java changes) are done before the java changes. This makes sure that
+ * the compilation unit was not already renamed. Otherwise, an exception would be thrown
+ * because the file system is not in sync anymore.
+ * </p>
+ * <p>
+ * Note that the renaming of a class is not considered a text change.
  * </p>
  * 
  * @author Robert Heimbach
@@ -94,8 +96,8 @@ public class JMLRenameParticipantClass extends RenameParticipant {
     * <p>
     * 
     * @return Returns null if only shared text changes are made. Otherwise returns a
-    *         {@link TextChange} which gathered all the changes to JML annotations in classes which
-    *         do not have any Java changes scheduled.
+    *         {@link TextChange} which gathered all the changes to JML annotations in classes
+    *         which do not have any Java changes scheduled.
     *         </p>
     */
    @Override
@@ -113,8 +115,8 @@ public class JMLRenameParticipantClass extends RenameParticipant {
       projectsToCheck.add(fProject);
 
       try {// Look through all source files in each package and project
-         for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck,
-               fProject)) {
+         for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(
+               projectsToCheck, fProject)) {
             for (final IPackageFragment pac : RefactoringUtil
                   .getAllPackageFragmentsContainingSources(project)) {
                for (final ICompilationUnit unit : pac.getCompilationUnits()) {
@@ -133,11 +135,12 @@ public class JMLRenameParticipantClass extends RenameParticipant {
                      }
                   }
                   else {
-                     // In case changes to the JML code needs to be done (but not to the java code)
+                     // In case changes to the JML code needs to be done (but not to the java
+                     // code)
                      if (!changesToJML.isEmpty()) {
 
-                        changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                              unit, changesToJML));
+                        changesToFilesWithoutJavaChanges.add(RefactoringUtil
+                              .combineEditsToChange(unit, changesToJML));
                      }
                   }
                }
@@ -148,7 +151,8 @@ public class JMLRenameParticipantClass extends RenameParticipant {
          return null;
       }
 
-      // After iterating through all needed projects and source files, determine what needs to be
+      // After iterating through all needed projects and source files, determine what needs to
+      // be
       // returned.
       return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
    }

@@ -23,13 +23,14 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefac
 /**
  * Class to participate in the rename refactoring of java fields and methods.
  * <p>
- * It uses the {@link RenameRefactoringComputer} to compute the changes which need to be done. The
- * changes are then added to the scheduled java changes as the JDT takes care of moving offsets in
- * the editor and preview when several changes are made to the same file.
+ * It uses the {@link RenameRefactoringComputer} to compute the changes which need to be done.
+ * The changes are then added to the scheduled java changes as the JDT takes care of moving
+ * offsets in the editor and preview when several changes are made to the same file.
  * </p>
  * <p>
- * The class usually returns NULL because changes are added in-place to the Java changes except if
- * changes to JML annotations to a class need to be made for which no Java changes are needed.
+ * The class usually returns NULL because changes are added in-place to the Java changes
+ * except if changes to JML annotations to a class need to be made for which no Java changes
+ * are needed.
  * </p>
  * 
  * @author Robert Heimbach
@@ -54,9 +55,9 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
    /**
     * {@inheritDoc}
     * <p>
-    * Saves the new name to change to. Saves the old name and the field/method to be changed as a
-    * {@link IJavaElement} to search for references to it. Saves the active Project, i.e. the
-    * project which contains the class which field/method changes.
+    * Saves the new name to change to. Saves the old name and the field/method to be changed
+    * as a {@link IJavaElement} to search for references to it. Saves the active Project, i.e.
+    * the project which contains the class which field/method changes.
     * </p>
     */
    @Override
@@ -81,12 +82,12 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
    }
 
    /**
-    * Computes the changes which need to be done to the JML code and add those to the changes to the
-    * java code which are already scheduled.
+    * Computes the changes which need to be done to the JML code and add those to the changes
+    * to the java code which are already scheduled.
     * 
     * @return Returns null if only shared text changes are made. Otherwise returns a
-    *         {@link TextChange} which gathered all the changes to JML annotations in classes which
-    *         do not have any Java changes scheduled.
+    *         {@link TextChange} which gathered all the changes to JML annotations in classes
+    *         which do not have any Java changes scheduled.
     *
     */
    @Override
@@ -104,8 +105,8 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
       projectsToCheck.add(fProject);
 
       try {// Look through all source files in each package and project
-         for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck,
-               fProject)) {
+         for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(
+               projectsToCheck, fProject)) {
             for (final IPackageFragment pac : RefactoringUtil
                   .getAllPackageFragmentsContainingSources(project)) {
                for (final ICompilationUnit unit : pac.getCompilationUnits()) {
@@ -124,11 +125,12 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
                      }
                   }
                   else {
-                     // In case changes to the JML code needs to be done (but not to the java code)
+                     // In case changes to the JML code needs to be done (but not to the java
+                     // code)
                      if (!changesToJML.isEmpty()) {
 
-                        changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                              unit, changesToJML));
+                        changesToFilesWithoutJavaChanges.add(RefactoringUtil
+                              .combineEditsToChange(unit, changesToJML));
                      }
                   }
                }
@@ -139,7 +141,8 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
          return null;
       }
 
-      // After iterating through all needed projects and source files, determine what needs to be
+      // After iterating through all needed projects and source files, determine what needs to
+      // be
       // returned.
       return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
    }

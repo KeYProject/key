@@ -10,9 +10,9 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 
 /**
- * Class to compute the changes which needs to be done to the JML annotations if a class is moved.
- * In particular, it specifies how the list of nodes is filtered, i.e. how the JML expression to be
- * replaced is found.
+ * Class to compute the changes which needs to be done to the JML annotations if a class is
+ * moved. In particular, it specifies how the list of nodes is filtered, i.e. how the JML
+ * expression to be replaced is found.
  * 
  * @author Maksim Melnik, Robert Heimbach
  *
@@ -24,15 +24,12 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
    private String fNewPackName;
 
    /**
-    * Constructor, which saves the fully qualified name of the class which is moved and the source
-    * package the class is in and the destination package it should be moved to.
+    * Constructor, which saves the fully qualified name of the class which is moved and the
+    * source package the class is in and the destination package it should be moved to.
     * 
-    * @param fOldPackName
-    *           name of the package the class is in.
-    * @param fNewPackName
-    *           name of the package the class should be moved to.
-    * @param fOldFullQualName
-    *           fully qualified name / path of the class to be moved.
+    * @param fOldPackName name of the package the class is in.
+    * @param fNewPackName name of the package the class should be moved to.
+    * @param fOldFullQualName fully qualified name / path of the class to be moved.
     */
    public ClassMoveRefactoringComputer(String fOldPackName, String fNewPackName,
          String fOldFullQualName) {
@@ -45,8 +42,7 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
     * Filters a list of {@link IASTNode} to exclude JML expression which does not need to be
     * changed.
     * 
-    * @param nodesList
-    *           a list to be filtered. {@link IStringNode}s are expected.
+    * @param nodesList a list to be filtered. {@link IStringNode}s are expected.
     * @return list of filtered {@link IStringNode}s.
     */
    protected final List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
@@ -60,7 +56,8 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
       for (final IASTNode node : nodesList) {
          final IStringNode stringNode = (IStringNode) node;
 
-         // combine the expression because the current String is contained in the string to replace.
+         // combine the expression because the current String is contained in the string to
+         // replace.
          if (fOldFullQualName.contains(stringNode.getString()))
             nodeString = nodeString + stringNode.getString();
          // reset the expression
@@ -75,16 +72,16 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
    }
 
    /**
-    * Creates the text change and adds it to changesToMake.
+    * Creates the text change and adds it to {@code changesToMake}.
     * 
-    * @param changesToMake
-    *           list to add the {@link ReplaceEdit}s to.
-    * @param primaryStringMap
-    *           {@link IASTNode} to compute the change for and the {@link IStringNodes} which they
-    *           contain.
+    * @param unit not needed here.
+    * @param changesToMake list to add the {@link ReplaceEdit}s to.
+    * @param primaryStringMap {@link IASTNode} to compute the change for and the
+    *           {@link IStringNode}s which they contain.
     */
    protected final void computeReplaceEdit(ICompilationUnit unit,
-         ArrayList<ReplaceEdit> changesToMake, HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
+         ArrayList<ReplaceEdit> changesToMake,
+         HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
 
       for (IASTNode node : primaryStringMap.keySet()) {
 

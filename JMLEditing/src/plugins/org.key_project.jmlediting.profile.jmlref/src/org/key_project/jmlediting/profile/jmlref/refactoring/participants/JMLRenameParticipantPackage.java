@@ -23,15 +23,16 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
 /**
  * Class to participate in the refactoring renaming of packages.
  * <p>
- * Conceptually, renaming a package is equivalent to creating a new package, moving all classes from
- * the renamed package to the newly created package and deleting the old package. Thus, this
- * participant uses the {@link ClassMoveRefactoringComputer} to search through all classes in each
- * (necessary) project for references to classes which were located in the renamed package and using
- * the fully qualified name, i.e. naming the path with all the packages.
+ * Conceptually, renaming a package is equivalent to creating a new package, moving all
+ * classes from the renamed package to the newly created package and deleting the old package.
+ * Thus, this participant uses the {@link ClassMoveRefactoringComputer} to search through all
+ * classes in each (necessary) project for references to classes which were located in the
+ * renamed package and using the fully qualified name, i.e. naming the path with all the
+ * packages.
  * </p>
  * <p>
- * Note that JDT takes care of the "Rename subpackages" option by calling this participant on each
- * subpackage which needs to be renamed.
+ * Note that JDT takes care of the "Rename subpackages" option by calling this participant on
+ * each subpackage which needs to be renamed.
  * </p>
  * 
  * @author Robert Heimbach
@@ -59,10 +60,10 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
    /**
     * {@inheritDoc}
     * <p>
-    * Extract and save all the information we need to carry out the package renaming. In particular,
-    * a list of the fully qualified names of all classes which are located in the package to be
-    * renamed is created because occurrences of those Strings need to be replaced in the JML
-    * annotations.
+    * Extract and save all the information we need to carry out the package renaming. In
+    * particular, a list of the fully qualified names of all classes which are located in the
+    * package to be renamed is created because occurrences of those Strings need to be
+    * replaced in the JML annotations.
     */
    @Override
    protected final boolean initialize(Object element) {
@@ -103,9 +104,9 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
     * Creating the changes which need to be done to the JML annotations.
     * </p>
     * <p>
-    * The process is the following: Determining which projects need to be checked, iterating through
-    * all the packages and classes in those projects and search for any fully qualified references
-    * to classes which are located in the renamed package.
+    * The process is the following: Determining which projects need to be checked, iterating
+    * through all the packages and classes in those projects and search for any fully
+    * qualified references to classes which are located in the renamed package.
     * </p>
     * {@inheritDoc}
     */
@@ -123,14 +124,14 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
       projectsToCheck.add(fProject);
 
       try {// Look through all source files in each package and project
-         for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(projectsToCheck,
-               fProject)) {
+         for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(
+               projectsToCheck, fProject)) {
             for (final IPackageFragment pac : RefactoringUtil
                   .getAllPackageFragmentsContainingSources(project)) {
                for (final ICompilationUnit unit : pac.getCompilationUnits()) {
 
-                  // Several classes could potentially be referenced but RefcatoringComputer can
-                  // only search for one at a time.
+                  // Several classes could potentially be referenced but RefcatoringComputer
+                  // can only search for one at a time.
                   // Thus iterate through all the potential references.
                   ArrayList<ReplaceEdit> allChangesToJMLinUnit = new ArrayList<ReplaceEdit>();
 
@@ -157,11 +158,12 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
                      }
                   }
                   else {
-                     // In case changes to the JML code needs to be done (but not to the java code)
+                     // In case changes to the JML code needs to be done (but not to the java
+                     // code)
                      if (!allChangesToJMLinUnit.isEmpty()) {
 
-                        changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                              unit, allChangesToJMLinUnit));
+                        changesToFilesWithoutJavaChanges.add(RefactoringUtil
+                              .combineEditsToChange(unit, allChangesToJMLinUnit));
                      }
                   }
                }
@@ -172,7 +174,8 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
          return null;
       }
 
-      // After iterating through all needed projects and source files, determine what needs to be
+      // After iterating through all needed projects and source files, determine what needs to
+      // be
       // returned.
       return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
    }

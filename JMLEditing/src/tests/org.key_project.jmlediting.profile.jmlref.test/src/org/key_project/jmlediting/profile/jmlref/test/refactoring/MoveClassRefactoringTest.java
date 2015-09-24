@@ -16,10 +16,10 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
- * Note that the RenamePackagesRefactoringTest is testing the correct moving of classes indirecly as
- * well because the ClassMoveRefactoringComputer is used internally. A renaming of a package is seen
- * as a creation of a new package, the movement of all classes from the old in the new and the
- * deletion of the old package.
+ * Note that the RenamePackagesRefactoringTest is testing the correct moving of classes
+ * indirecly as well because the ClassMoveRefactoringComputer is used internally. A renaming
+ * of a package is seen as a creation of a new package, the movement of all classes from the
+ * old in the new and the deletion of the old package.
  * 
  * @author Maksim Melnik, Robert Heimbach
  */
@@ -64,48 +64,48 @@ public class MoveClassRefactoringTest {
    @Test
    public void test1SimpleMove() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test1", srcFolder, oracleFolder, bot,
-            CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
+      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test1", srcFolder, oracleFolder,
+            bot, CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
 
    }
 
    @Test
    public void test2MoveComplexPackage() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test2", srcFolder, oracleFolder, bot,
-            CLASS_NAME_MOVE, "test2p1", "test2p2.complex", javaProject);
+      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test2", srcFolder, oracleFolder,
+            bot, CLASS_NAME_MOVE, "test2p1", "test2p2.complex", javaProject);
 
    }
 
    @Test
    public void test3MoveUseOps() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test3", srcFolder, oracleFolder, bot,
-            CLASS_NAME_MOVE, "test3p1", "test3p2", javaProject);
+      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test3", srcFolder, oracleFolder,
+            bot, CLASS_NAME_MOVE, "test3p1", "test3p2", javaProject);
 
    }
 
    @Test
    public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test4", srcFolder, oracleFolder, bot,
-            CLASS_NAME_MOVE, "test4p2.complex", "test4p1", javaProject);
+      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test4", srcFolder, oracleFolder,
+            bot, CLASS_NAME_MOVE, "test4p2.complex", "test4p1", javaProject);
 
    }
 
    @Test
    public void test5MoveIntoPackWithReferences() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test5", srcFolder, oracleFolder, bot,
-            CLASS_NAME_MOVE, "test1p1", "mainpack", javaProject);
+      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test5", srcFolder, oracleFolder,
+            bot, CLASS_NAME_MOVE, "test1p1", "mainpack", javaProject);
 
    }
 
    @Test
    public void test6NoChangeBecauseImported() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test6", srcFolder, oracleFolder, bot,
-            CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
+      TestUtilsRefactoring.runMoveClassTest(TESTPATH + "\\test6", srcFolder, oracleFolder,
+            bot, CLASS_NAME_MOVE, "test1p1", "test1p2", javaProject);
 
    }
 
@@ -120,11 +120,12 @@ public class MoveClassRefactoringTest {
 
       // bot.sleep(20000);
 
-      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" }, bot);
+      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" },
+            bot);
 
       // Execute Move and Check
-      TestUtilsRefactoring.selectClassAndMove("projectSrc", "Other", "mainpack", "projectDest",
-            "destPackage", bot);
+      TestUtilsRefactoring.selectClassAndMove("projectSrc", "Other", "mainpack",
+            "projectDest", "destPackage", bot);
 
       TestUtilsUtil.openEditor(projectSrc.getFolder(JDTUtil.getSourceFolderName())
             .getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));

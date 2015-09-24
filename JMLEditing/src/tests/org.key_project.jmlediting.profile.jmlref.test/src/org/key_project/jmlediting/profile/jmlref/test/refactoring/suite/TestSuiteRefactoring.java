@@ -6,8 +6,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    TestSuiteMoveRefactoring.class,
-    TestSuiteRenameRefactoring.class
+   TestSuiteMoveRefactoring.class,
+   TestSuiteRenameRefactoring.class
 })
 
 

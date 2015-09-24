@@ -19,9 +19,9 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefac
 /**
  * Participant to take part in the renaming of method parameters.
  * <p>
- * As the scope of method parameters is just the method itself, any JML annotation using the renamed
- * method parameter only makes sense above that particular method. Thus this participant, unlike the
- * others, only needs to check the active class for changes to make.
+ * As the scope of method parameters is just the method itself, any JML annotation using the
+ * renamed method parameter only makes sense above that particular method. Thus this
+ * participant, unlike the others, only needs to check the active class for changes to make.
  * </p>
  * <p>
  * The class uses the {@link RenameRefactoringComputer} to compute the needed changes.
@@ -84,19 +84,19 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
    }
 
    /**
-    * Computes the changes which need to be done to the JML code of the active class and add those
-    * to the changes to the java code which are already scheduled. Note that those certainly exist,
-    * because the method using the parameter is in the active class.
+    * Computes the changes which need to be done to the JML code of the active class and add
+    * those to the changes to the java code which are already scheduled. Note that those
+    * certainly exist, because the method using the parameter is in the active class.
     * 
-    * @return Returns null, since changes to JML are directly added to the already scheduled java
-    *         changes.
+    * @return Returns null, since changes to JML are directly added to the already scheduled
+    *         java changes.
     */
    @Override
    public final Change createChange(final IProgressMonitor pm) throws CoreException,
          OperationCanceledException {
 
-      RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(fmethodParameter,
-            fOldName, fNewName);
+      RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(
+            fmethodParameter, fOldName, fNewName);
 
       final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
             fCompUnit, fProject);

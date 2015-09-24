@@ -13,17 +13,17 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 
 /**
- * Class to compute the changes which needs to be done to the JML annotations if a static field or
- * method is moved. In particular, it specifies how the list of nodes is filtered, i.e. how the JML
- * expression to be replaced is found.
+ * Class to compute the changes which needs to be done to the JML annotations if a static
+ * field or method is moved. In particular, it specifies how the list of nodes is filtered,
+ * i.e. how the JML expression to be replaced is found.
  * <p>
- * Note that {@link #filterStringNodes(List)} in this class is considerably more complex than in
- * {@link ClassMoveRefactoringComputer} because static fields and methods can be accessed in a non
- * fully qualified way, i.e. Classname.field, additionally to the fully qualified way of
- * package.subpackage.Classname.field.
+ * Note that {@link #filterStringNodes(List)} in this class is considerably more complex than
+ * in {@link ClassMoveRefactoringComputer} because static fields and methods can be accessed
+ * in a non fully qualified way, i.e. Classname.elementToMove, additionally to the fully qualified way
+ * of package.subpackage.Classname.elementToMove.
  * </p>
  * 
- * @author Maksim Melnik, Robert Heimbach
+ * @author Robert Heimbach, Maksim Melnik
  *
  */
 public class FieldAndMethodMoveRefactoringComputer extends AbstractRefactoringComputer {
@@ -34,18 +34,15 @@ public class FieldAndMethodMoveRefactoringComputer extends AbstractRefactoringCo
    private ICompilationUnit compUnit;
 
    /**
-    * Constructor, which saves the fully qualified name of the classes the field/method should be
-    * moved from and moved to as well as the name of the field/method to be moved and the
+    * Constructor, which saves the fully qualified name of the classes the field/method should
+    * be moved from and moved to as well as the name of the field/method to be moved and the
     * compilation unit for which the JML changes should be computed for.
     * 
-    * @param oldClassFullQualName
-    *           Fully qualified name of the class the field/method is in.
-    * @param newClassFullQualName
-    *           Fully qualified name of the class the field/method should be moved to.
-    * @param elementName
-    *           Name of the field/method to be moved.
-    * @param unit
-    *           {@link ICompilationUnit} for which the changes are computed for.
+    * @param oldClassFullQualName Fully qualified name of the class the field/method is in.
+    * @param newClassFullQualName Fully qualified name of the class the field/method should be
+    *           moved to.
+    * @param elementName Name of the field/method to be moved.
+    * @param unit {@link ICompilationUnit} for which the changes are computed for.
     */
    public FieldAndMethodMoveRefactoringComputer(String oldClassFullQualName,
          String newClassFullQualName, String elementName, ICompilationUnit unit) {
@@ -57,11 +54,10 @@ public class FieldAndMethodMoveRefactoringComputer extends AbstractRefactoringCo
 
    /**
     * Filters a list of {@link IASTNode} to exclude JML expressions which does not need to be
-    * changed. First, all fully qualified references are searched and then the non fully qualified
-    * ones.
+    * changed. First, all fully qualified references are searched and then the non fully
+    * qualified ones.
     * 
-    * @param nodesList
-    *           a list to be filtered. {@link IStringNode}s are expected.
+    * @param nodesList a list to be filtered. {@link IStringNode}s are expected.
     * @return list of filtered {@link IStringNode}s.
     */
    protected final List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
@@ -89,8 +85,8 @@ public class FieldAndMethodMoveRefactoringComputer extends AbstractRefactoringCo
       // Only needed in certain cases.
       if (checkForNonFullyQualified()) {
 
-         String oldClassName = oldClassFullQualName
-               .substring(oldClassFullQualName.lastIndexOf('.') + 1);
+         String oldClassName = oldClassFullQualName.substring(oldClassFullQualName
+               .lastIndexOf('.') + 1);
          nodeString = "";
 
          for (final IASTNode node : nodesList) {
@@ -116,10 +112,10 @@ public class FieldAndMethodMoveRefactoringComputer extends AbstractRefactoringCo
    }
 
    /**
-    * Check if it is needed to check for non fully qualified access to static methods or fields.
-    * Possible if : 1) We are in the class we moved the field to (e.g. if an invariant was moved
-    * with it) 2) The destination class of the element to be moved is imported by or in the same
-    * package as the class for which the JML changes are computed.
+    * Check if it is needed to check for non fully qualified access to static methods or
+    * fields. Possible if : 1) We are in the class we moved the field to (e.g. if an invariant
+    * was moved with it) 2) The destination class of the element to be moved is imported by or
+    * in the same package as the class for which the JML changes are computed.
     * 
     * @return true if non fully qualified access, i.e. ClassName.field, is possible.
     */
@@ -136,13 +132,16 @@ public class FieldAndMethodMoveRefactoringComputer extends AbstractRefactoringCo
          return true;
       }
 
-      // Non fully qualified references are possible if the destination class with the field being
+      // Non fully qualified references are possible if the destination class with the field
+      // being
       // moved is imported
       if (compUnit.getImport(newClassFullQualName).exists())
          return true;
 
-      // check if the package of the destination class is imported using a wildcard/on demand import
-      // Note that a class in the package of the current compilation unit with the same name as the
+      // check if the package of the destination class is imported using a wildcard/on demand
+      // import
+      // Note that a class in the package of the current compilation unit with the same name
+      // as the
       // destination class
       // has a higher priority than the wildcard import and would be used instead.
       if (compUnit.getImport(packageNewClass + ".*").exists()) {
@@ -170,33 +169,35 @@ public class FieldAndMethodMoveRefactoringComputer extends AbstractRefactoringCo
    }
 
    /**
-    * Creates the text change and adds it to changesToMake.
+    * Creates the text change and adds it to {@code changesToMake}. It is important to 
+    * distinguish whether a fully qualified reference is done or not.
     * 
-    * @param changesToMake
-    *           list to add the {@link ReplaceEdit}s to.
-    * @param primaryStringMap
-    *           {@link IASTNode} to compute the change for and the {@link IStringNodes} which they
-    *           contain.
+    * @param unit not needed here.
+    * @param changesToMake list to add the {@link ReplaceEdit}s to.
+    * @param primaryStringMap {@link IASTNode} to compute the change for and the
+    *           {@link IStringNode}s which they contain.
     */
    protected final void computeReplaceEdit(ICompilationUnit unit,
-         ArrayList<ReplaceEdit> changesToMake, HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
+         ArrayList<ReplaceEdit> changesToMake,
+         HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
 
       for (IASTNode node : primaryStringMap.keySet()) {
 
          final int startOffset = node.getStartOffset();
 
-         String newClassName = newClassFullQualName
-               .substring(newClassFullQualName.lastIndexOf('.') + 1);
-         String oldClassName = oldClassFullQualName
-               .substring(oldClassFullQualName.lastIndexOf('.') + 1);
+         String newClassName = newClassFullQualName.substring(newClassFullQualName
+               .lastIndexOf('.') + 1);
+         String oldClassName = oldClassFullQualName.substring(oldClassFullQualName
+               .lastIndexOf('.') + 1);
 
-         // check which type of access it is. The type determines the length of the replace edit and
-         // the new content.
+         // check which type of access it is. The type determines the length of the replace
+         // edit and the new content.
          // Non fully qualified access starts with the class name instead of the package name.
          IASTNode innerNode = node.getChildren().get(0).getChildren().get(0);
          if (innerNode instanceof IStringNode
                && ((IStringNode) innerNode).getString().equals(oldClassName)) {
-            changesToMake.add(new ReplaceEdit(startOffset, oldClassName.length(), newClassName));
+            changesToMake.add(new ReplaceEdit(startOffset, oldClassName.length(),
+                  newClassName));
          }
          else {
             final int length = oldClassFullQualName.length();

@@ -49,31 +49,35 @@ public class RenameParametersRefactoringTest {
 
    @Test
    public void test1OneParameter() throws CoreException {
-      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test1", srcFolder, oracleFolder,
-            bot, "TestClass", "test", "setBalance(int) : void", "aNewName", 6);
+      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test1", srcFolder,
+            oracleFolder, bot, "TestClass", "test", "setBalance(int) : void", "aNewName", 6);
    }
 
    @Test
    public void test2TwoParametersFirst() throws CoreException {
-      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test2", srcFolder, oracleFolder,
-            bot, "TestClass", "test", "setBalance(int, boolean) : void", "aNewName", 7);
+      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test2", srcFolder,
+            oracleFolder, bot, "TestClass", "test", "setBalance(int, boolean) : void",
+            "aNewName", 7);
    }
 
    @Test
    public void test3TwoParametersSecond() throws CoreException {
-      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test3", srcFolder, oracleFolder,
-            bot, "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
+      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test3", srcFolder,
+            oracleFolder, bot, "TestClass", "test", "setBalance(boolean, int) : void",
+            "aNewName", 26);
    }
 
    @Test
    public void test4FieldAndOtherMethodUsingSameName() throws CoreException {
-      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test4", srcFolder, oracleFolder,
-            bot, "TestClass", "test", "setBalance(boolean, int) : void", "aNewName", 26);
+      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test4", srcFolder,
+            oracleFolder, bot, "TestClass", "test", "setBalance(boolean, int) : void",
+            "aNewName", 26);
    }
 
    @Test
    public void test5RenameLocalVariableNoParameter() throws CoreException {
-      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test5", srcFolder, oracleFolder,
-            bot, "TestClass", "test", "setBalance(boolean) : void", "aNewName", 26);
+      TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test5", srcFolder,
+            oracleFolder, bot, "TestClass", "test", "setBalance(boolean) : void", "aNewName",
+            26);
    }
 }

@@ -58,45 +58,46 @@ public class MoveFieldRefactoringTest {
    @Test
    public void test1SimpleMove() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test1", srcFolder, oracleFolder,
-            bot, CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, CLASS_NAME_MOVE_TO, "test1p2",
-            javaProject);
+      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test1", srcFolder,
+            oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE,
+            CLASS_NAME_MOVE_TO, "test1p2", javaProject);
    }
 
    @Test
    public void test2MoveComplexPackage() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test2", srcFolder, oracleFolder,
-            bot, CLASS_NAME_MOVE_FROM, "test2p1", FIELD_TO_MOVE, CLASS_NAME_MOVE_TO,
-            "test2p2.complex", javaProject);
+      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test2", srcFolder,
+            oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test2p1", FIELD_TO_MOVE,
+            CLASS_NAME_MOVE_TO, "test2p2.complex", javaProject);
    }
 
    @Test
    public void test3MoveUseOps() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test3", srcFolder, oracleFolder,
-            bot, CLASS_NAME_MOVE_FROM, "test3p1", FIELD_TO_MOVE, CLASS_NAME_MOVE_TO, "test3p2",
-            javaProject);
+      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test3", srcFolder,
+            oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test3p1", FIELD_TO_MOVE,
+            CLASS_NAME_MOVE_TO, "test3p2", javaProject);
    }
 
    @Test
    public void test4MoveComplexUseOpsBackwards() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test4", srcFolder, oracleFolder,
-            bot, CLASS_NAME_MOVE_TO, "test4p2\\complex", FIELD_TO_MOVE, CLASS_NAME_MOVE_FROM,
-            "test4p1", javaProject);
+      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test4", srcFolder,
+            oracleFolder, bot, CLASS_NAME_MOVE_TO, "test4p2\\complex", FIELD_TO_MOVE,
+            CLASS_NAME_MOVE_FROM, "test4p1", javaProject);
    }
 
    @Test
    public void test5MoveIntoClassWithReferences() throws InterruptedException, CoreException {
 
-      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test5", srcFolder, oracleFolder,
-            bot, CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, "Main", "mainpack", javaProject);
+      TestUtilsRefactoring.runMoveOutlineElementTest(TESTPATH + "\\test5", srcFolder,
+            oracleFolder, bot, CLASS_NAME_MOVE_FROM, "test1p1", FIELD_TO_MOVE, "Main",
+            "mainpack", javaProject);
    }
 
    @Test
-   public void test6MoveIntoAnotherProjectFromSamePackageNoImport() throws InterruptedException,
-         CoreException {
+   public void test6MoveIntoAnotherProjectFromSamePackageNoImport()
+         throws InterruptedException, CoreException {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test6\\projectSrc");
@@ -104,7 +105,8 @@ public class MoveFieldRefactoringTest {
       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test6\\projectDest");
 
-      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" }, bot);
+      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" },
+            bot);
 
       // Execute Move and Check
       TestUtilsRefactoring.selectElementInOutlineAndMove(
@@ -122,7 +124,8 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test7TwoProjectsMoveFieldNotReferences() throws InterruptedException, CoreException {
+   public void test7TwoProjectsMoveFieldNotReferences() throws InterruptedException,
+         CoreException {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test7\\projectSrc");
@@ -130,7 +133,8 @@ public class MoveFieldRefactoringTest {
       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test7\\projectDest");
 
-      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" }, bot);
+      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" },
+            bot);
 
       // Execute Move and Check
       TestUtilsRefactoring.selectElementInOutlineAndMove(
@@ -148,8 +152,8 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test8TwoProjectsClassImportedMovedIntoOtherFolder() throws InterruptedException,
-         CoreException {
+   public void test8TwoProjectsClassImportedMovedIntoOtherFolder()
+         throws InterruptedException, CoreException {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test8\\projectSrc");
@@ -157,12 +161,13 @@ public class MoveFieldRefactoringTest {
       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test8\\projectDest");
 
-      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" }, bot);
+      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" },
+            bot);
 
       // Execute Move and Check
       TestUtilsRefactoring.selectElementInOutlineAndMove(
-            projectDest.getFolder(JDTUtil.getSourceFolderName()), "Other", "destPackage", "Dest",
-            "destPackage", "balance : int", bot);
+            projectDest.getFolder(JDTUtil.getSourceFolderName()), "Other", "destPackage",
+            "Dest", "destPackage", "balance : int", bot);
 
       TestUtilsUtil.openEditor(projectSrc.getFolder(JDTUtil.getSourceFolderName())
             .getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -175,7 +180,8 @@ public class MoveFieldRefactoringTest {
    }
 
    @Test
-   public void test9TwoProjectsImportedViaStarOperator() throws InterruptedException, CoreException {
+   public void test9TwoProjectsImportedViaStarOperator() throws InterruptedException,
+         CoreException {
       // Create projects and set references
       final IProject projectSrc = TestUtilsRefactoring.createProjectWithFiles("projectSrc",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test9\\projectSrc");
@@ -183,12 +189,13 @@ public class MoveFieldRefactoringTest {
       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest",
             "data\\template\\refactoringMoveTest\\moveFieldTest\\test9\\projectDest");
 
-      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" }, bot);
+      TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" },
+            bot);
 
       // Execute Move and Check
       TestUtilsRefactoring.selectElementInOutlineAndMove(
-            projectDest.getFolder(JDTUtil.getSourceFolderName()), "Other", "destPackage", "Dest",
-            "destPackage", "balance : int", bot);
+            projectDest.getFolder(JDTUtil.getSourceFolderName()), "Other", "destPackage",
+            "Dest", "destPackage", "balance : int", bot);
 
       TestUtilsUtil.openEditor(projectSrc.getFolder(JDTUtil.getSourceFolderName())
             .getFolder("mainpack").getFile("Main" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
@@ -206,17 +213,17 @@ public class MoveFieldRefactoringTest {
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test10" + "\\src", srcFolder);
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test10" + "\\oracle", oracleFolder);
 
-      TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "TestClass", "test", "Other",
-            "test", "balance : int", bot);
+      TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "TestClass", "test",
+            "Other", "test", "balance : int", bot);
 
       TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(
             "TestClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "TestClass"), TestUtilsRefactoring
-            .getContentAfterRefactoring(bot).replace("\t", "    "));
+      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "TestClass"),
+            TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t", "    "));
       TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(
             "Other" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "Other"), TestUtilsRefactoring
-            .getContentAfterRefactoring(bot).replace("\t", "    "));
+      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "Other"),
+            TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t", "    "));
    }
 
    @Test
@@ -225,17 +232,17 @@ public class MoveFieldRefactoringTest {
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test11" + "\\src", srcFolder);
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test11" + "\\oracle", oracleFolder);
 
-      TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "Other", "test", "TestClass",
-            "test", "balance : int", bot);
+      TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "Other", "test",
+            "TestClass", "test", "balance : int", bot);
 
       TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(
             "TestClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "TestClass"), TestUtilsRefactoring
-            .getContentAfterRefactoring(bot).replace("\t", "    "));
+      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "TestClass"),
+            TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t", "    "));
       TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(
             "Other" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "Other"), TestUtilsRefactoring
-            .getContentAfterRefactoring(bot).replace("\t", "    "));
+      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "Other"),
+            TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t", "    "));
 
    }
 }

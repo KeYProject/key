@@ -40,13 +40,15 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
 
       // Execute Renaming and Check
       TestUtilsRefactoring.selectElementInOutlineAndExecuteRenaming("balance : int",
-            "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()),
-            "aNewName", bot, "Rename Field");
+            "ReferencedClass", "test",
+            referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot,
+            "Rename Field");
       assertEquals(TestUtilsRefactoring.getOracle(referencedProject.getFolder("oracle"),
             "ReferencedClass"), TestUtilsRefactoring.getContentAfterRefactoring(bot));
 
       TestUtilsUtil.openEditor(referencingProject.getFolder(JDTUtil.getSourceFolderName())
-            .getFolder("test").getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+            .getFolder("test")
+            .getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
       assertEquals(TestUtilsRefactoring.getOracle(referencingProject.getFolder("oracle"),
             "ReferencingClass"), TestUtilsRefactoring.getContentAfterRefactoring(bot));
 
@@ -69,13 +71,15 @@ public class RenameFieldsSeveralProjectsRefactoringTest {
 
       // Execute Renaming and Check
       TestUtilsRefactoring.selectElementInOutlineAndExecuteRenaming("balance : int",
-            "ReferencedClass", "test", referencedProject.getFolder(JDTUtil.getSourceFolderName()),
-            "aNewName", bot, "Rename Field");
+            "ReferencedClass", "test",
+            referencedProject.getFolder(JDTUtil.getSourceFolderName()), "aNewName", bot,
+            "Rename Field");
       assertEquals(TestUtilsRefactoring.getOracle(referencedProject.getFolder("oracle"),
             "ReferencedClass"), TestUtilsRefactoring.getContentAfterRefactoring(bot));
 
       TestUtilsUtil.openEditor(referencingProject.getFolder(JDTUtil.getSourceFolderName())
-            .getFolder("test").getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+            .getFolder("test")
+            .getFile("ReferencingClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
       assertEquals(TestUtilsRefactoring.getOracle(referencingProject.getFolder("oracle"),
             "ReferencingClass"), TestUtilsRefactoring.getContentAfterRefactoring(bot));
 
