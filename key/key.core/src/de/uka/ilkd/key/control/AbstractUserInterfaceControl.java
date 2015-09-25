@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -176,7 +177,8 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
 
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            if (TaskStartedInfo.TaskKind.Macro == info.getKind()) {
+            if (TaskStartedInfo.TaskKind.Macro == info.getKind()
+                    && !info.getMessage().contains(ApplyStrategy.PROCESSING_STRATEGY)) {
                 macroStarted(info);
             }
         }
