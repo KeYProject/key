@@ -77,6 +77,9 @@ public class Resolver implements IResolver {
         public IStringNode node = null;
         public final List<IASTNode> parameters = new LinkedList<IASTNode>();
         public ResolveResult lastResult = null;
+        public boolean isArray = false;
+        public ITypeBinding[] typeArguments;
+        public ITypeBinding originalTypeBinding;
     }
 
     private ASTNode context = null;
@@ -237,7 +240,6 @@ public class Resolver implements IResolver {
         IBinding binding = null; 
         ResolveResultType resultType;    
         
-        // TODO: what to do with an array access... 
         if(!currentTask.isArrayAcess) {
             
             if(currentTask.isKeyword) {
@@ -254,10 +256,10 @@ public class Resolver implements IResolver {
             
             // get more information to pass on.
             binding = resolveBinding(jdtNode);
-            resultType = getResolveType(jdtNode);
+            resultType = getResolveType(jdtNode); 
             
         } else {
-            
+            // Array Access
             jdtNode = currentTask.lastResult.getJDTNode();
             binding = TypeComputer.getTypeFromBinding(currentTask.lastResult.getBinding()).getComponentType();
             resultType = ResolveResultType.ARRAY_ACCESS;
@@ -265,16 +267,14 @@ public class Resolver implements IResolver {
             if(binding == null) {
                 throw new ResolverException("Tried to perform an array access on a non array.");
             }
-            
         }
-            
+        
         final ResolveResult finalResult = new ResolveResult(jdtNode, resultType, binding, currentTask.node);
         
         if(tasks.peek() != null) {
             tasks.peek().lastResult = finalResult;
         }
         return finalResult;
-        
     }
     
     private ASTNode processKeyword() throws ResolverException {            
@@ -317,7 +317,17 @@ public class Resolver implements IResolver {
         ASTNode jdtNode = null;
         
         // Set the context.
+        // Very important method call!
         context = setNewContext();
+        
+        if(currentTask.isArray) {
+            // TODO
+            if(currentTask.resolveString.equals("length")) {
+                // return type = int
+                // jdtnode will be null.
+                // no binding.
+            }
+        }
         
         // start with searching for parameters if we are not searching for a method or a class
         // if lastResult is null, this must be the first call of next() and is the only case we could find parameters in
@@ -1047,18 +1057,22 @@ public class Resolver implements IResolver {
         // START testing what the new context might be
         if(typeBinding.isPrimitive()) {
             throw new ResolverException("Can not resolve an access to a primitive type.");
+        
         } else if(typeBinding.isArray()) {
             
-            // TODO: We found an array .. what to do? What is the context we set to.          
-            // Set context to Object for everything that isnt ".length" or ".clone()" 
-            //      context.getAST().resolveWellKnownType("java.lang.Object");
+            // if we find an array as the context to call something we set a special flag
+            // so we can look out for the length field and set the context to object as most
+            // of it's method are from there.
+            currentTask.isArray = true;
+            currentTask.originalTypeBinding = typeBinding;
+            
+            return findASTNodeFromType(context.getAST().resolveWellKnownType("java.lang.Object"));
             
         } else if(typeBinding.isParameterizedType()) {
-            ITypeBinding[] parameterTypes = null;
             final ITypeBinding newTypeBinding = typeBinding.getErasure();
                 
             // TODO: Save Parameters here.. 
-            parameterTypes = typeBinding.getTypeArguments();
+            currentTask.typeArguments = typeBinding.getTypeArguments();
             
             //System.out.println(typeBinding.getQualifiedName());
             //System.out.println(newTypeBinding.getQualifiedName());
@@ -1067,7 +1081,7 @@ public class Resolver implements IResolver {
             //System.out.println(typeBinding.getQualifiedName());
             return findASTNodeFromType(typeBinding);
         }
-        return null;
+        
     }
     
     private TypeDeclaration findASTNodeFromType(final ITypeBinding binding) {

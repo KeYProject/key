@@ -8,6 +8,12 @@ import static resolver.test.otherPackage.ResolverTestClass2.staticMethod;
 
 public class ResolverTestMain {
    
+    // this is a normal comment to filter out
+    
+    /* This is a block comment to filter out 
+     * 
+     */
+    
     private static int staticField1 = 0;
     private /*@ spec_public @*/ int field1 = 0;
     private /*@ spec_public @*/ String field2 = "field2content";
@@ -19,6 +25,11 @@ public class ResolverTestMain {
     private FileReader fr = null;
     private int[] arrayfield;
     
+    /** This is a JavaDoc Comment to filter out.
+     * @param field1
+     * @param field2
+     * @param field3
+     */
     public ResolverTestMain(int field1, String field2, ResolverTestClass1 field3) {
         this.field1 = field1;
         this.field2 = field2;
@@ -265,5 +276,6 @@ public class ResolverTestMain {
      */
     public boolean ambiguousMethod(S s, A a) {return false;}
     public boolean ambiguousMethod(A a, S s) {return false;}
+    
     
 }
