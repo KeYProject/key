@@ -245,4 +245,19 @@ public class MoveFieldRefactoringTest {
             TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t", "    "));
 
    }
+   
+   @Test
+   public void test12WildcardImportAndClassWithSameNameAsDestinationInSamePackage() throws CoreException {
+
+      TestUtilsRefactoring.copyFiles(TESTPATH + "\\test12" + "\\src", srcFolder);
+      TestUtilsRefactoring.copyFiles(TESTPATH + "\\test12" + "\\oracle", oracleFolder);
+
+      TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "SourceClass", "destPackage",
+            "Dest", "destPackage", "fieldToMove : int", bot);
+
+      TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(
+            "TestClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+      assertEquals(TestUtilsRefactoring.getOracle(oracleFolder, "TestClass"),
+            TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t", "    "));
+   }
 }

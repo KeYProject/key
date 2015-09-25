@@ -134,22 +134,21 @@ public class RenameFieldsRefactoringTest {
             bot, "TestClass", "test", "balance : TestClass", "newName", javaProject);
    }
 
-   // TODO: Problem with accessing the right location in the list.
-   // @Test
+   @Test
    public void test15MethodCallAndCast() throws CoreException {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test15", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "newName", javaProject);
    }
 
    // TODO: Problem with Resolver currently
-   // @Test
+   //@Test
    public void test16ArrayAccessAndEquals() throws CoreException {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test16", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : String", "newName", javaProject);
    }
 
    // TODO: Problem with Resolver currently
-   // @Test
+   //@Test
    public void test17LikeTest16WithoutParentheses() throws CoreException {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test17", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : String", "newName", javaProject);
