@@ -17,6 +17,8 @@ import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -24,6 +26,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.INodeTraverser;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
@@ -262,10 +265,6 @@ public class ResolverTest {
         test("fieldMultiple2", 0, 0, 0, ResolveResultType.FIELD);
     }
     @Test
-    public void resolveArrayFieldTest1() throws ResolverException {
-        test("arrayfield", "length" , 0, 0, 0, ResolveResultType.FIELD, null);
-    }
-    @Test
     public void resolveMethodSameName1ParameterTest1() throws ResolverException {
         test("methodSameName1Parameter1",  0, 1, 0, ResolveResultType.METHOD);
     }
@@ -318,13 +317,12 @@ public class ResolverTest {
         test("field3", "getThis", 1, 0, 11, ResolveResultType.METHOD, null);
     }
     @Test
-    public void resolverCastExpression() throws ResolverException {
+    public void resolveCastExpression() throws ResolverException {
         test("castMethodAndThis", "field1", 1, 0, 0, ResolveResultType.FIELD, getIASTNodeCast());
     }
     @Test
     public void resolvePackageImportType1() throws ResolverException {
         importTest("integer", "add", 1, ResolveResultType.METHOD);
-        // TODO: new Test needed, because I can not compare JDT trees.
     }
     @Test
     public void resolvePackageImportParameterizedType1() throws ResolverException {
@@ -349,6 +347,96 @@ public class ResolverTest {
     @Test(expected=ResolverException.class)
     public void resolveAmbiguousMethod() throws ResolverException {
         exceptionTest("ambiguousMethod", 0);
+    }
+    @Test
+    public void resolveWrongParameterTest() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       ResolveResult result = null;
+       
+       result = resolver.resolve(cu, null);
+       assertEquals(null, result);
+       
+       result = resolver.resolve(null, getIASTNode("field1", 0));
+       assertEquals(null, result);
+//       
+//       while(resolver.hasNext()) {
+//           resolver.next();
+//       }    
+    }
+    @Test
+    public void resolveTooManyNextCalls() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       ResolveResult result = null;
+       
+       result = resolver.resolve(cu, getIASTNode("field1", 0));
+       
+       while(resolver.hasNext()) {
+           result = resolver.next();
+       }
+       // call it once more.
+       result = resolver.next();
+       assertEquals(null, result);
+    }
+    @Test(expected=ResolverException.class)
+    public void resolveWrongIASTNode() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       
+       final IASTNode mark = getIASTNode("parameter1", 0);
+       final IASTNode newNode = iASTList.get(10).traverse(new INodeTraverser<IASTNode>() {
+
+         @Override
+         public IASTNode traverse(final IASTNode node, final IASTNode existing) {
+            if(node.containsOffset(mark.getStartOffset()) && node.getType() == ExpressionNodeTypes.EQUALITY) {
+               return node;
+            }
+            return existing;
+         }
+          
+       }, mark);
+       
+       resolver.resolve(cu, newNode);
+    }
+    @Test
+    public void resolveArrayAccess() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       ResolveResult result = null;
+       
+       result = resolver.resolve(cu, getIASTNode("arrayField2", 0));
+       
+       while(resolver.hasNext()) {
+           result = resolver.next();
+       }
+       
+       assertNotEquals(null, result);
+       
+       final ASTNode jdt = getFieldDecleration("arrayField2", mainJDT, 0);
+       
+       assertTrue(result.getJDTNode().subtreeMatch(new ASTMatcher(), jdt));
+       assertEquals("arrayField2", result.getName());
+       assertEquals(ResolveResultType.ARRAY_ACCESS, result.getResolveType());
+       assertTrue(result.getBinding().isEqualTo(((IVariableBinding)resolveBinding(jdt)).getType().getComponentType()));
+    }
+    @Test(expected=ResolverException.class)
+    public void resolveAccessToPrimitiveType() throws ResolverException {
+       exceptionTest("primitiveField", 0);
+    }
+    @Test
+    public void resolveArrayLength() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       ResolveResult result = null;
+       
+       result = resolver.resolve(cu, getIASTNode("arrayfield", 0));
+       
+       while(resolver.hasNext()) {
+           result = resolver.next();
+       }
+       
+       assertNotEquals(null, result);
+       
+       assertEquals(null, result.getJDTNode());
+       assertEquals("length", result.getName());
+       assertEquals(ResolveResultType.ARRAY_LENGTH, result.getResolveType());
+       assertTrue(result.getBinding().isEqualTo(mainJDT.getAST().resolveWellKnownType("int")));
     }
 
     /**

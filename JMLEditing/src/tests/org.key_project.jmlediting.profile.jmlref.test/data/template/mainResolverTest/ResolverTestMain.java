@@ -24,6 +24,9 @@ public class ResolverTestMain {
     private /*@ spec_public @*/ java.math.BigDecimal decimal = new java.math.BigDecimal(0);
     private FileReader fr = null;
     private int[] arrayfield;
+    private long[] arrayField2;
+    private float[][] arrayField3;
+    private int primitiveField;
     
     /** This is a JavaDoc Comment to filter out.
      * @param field1
@@ -276,6 +279,10 @@ public class ResolverTestMain {
      */
     public boolean ambiguousMethod(S s, A a) {return false;}
     public boolean ambiguousMethod(A a, S s) {return false;}
+
+    //@ invariant arrayField2[1] == 1;
     
+    //@ invariant arrayField3[1][1] == 1;
     
+    //@ invariant primitiveField.someAccessThatDoesNotExist;
 }

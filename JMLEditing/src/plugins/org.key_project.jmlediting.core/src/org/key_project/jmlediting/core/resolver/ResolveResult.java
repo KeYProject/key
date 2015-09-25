@@ -13,7 +13,7 @@ public class ResolveResult {
     private final IBinding binding;
     private final IStringNode stringNode;
     
-    public ResolveResult(final ASTNode jdtNode, final ResolveResultType type, final IBinding binding, IStringNode stringNode) {
+    public ResolveResult(final ASTNode jdtNode, final ResolveResultType type, final IBinding binding, final IStringNode stringNode) {
         this.jdtNode = jdtNode;
         this.type = type;
         this.binding = binding;
@@ -37,7 +37,7 @@ public class ResolveResult {
     }
 
     public final String getName() {
-        return binding.getName();
+        return stringNode.getString();
     }
 
     public final ResolveResultType getResolveType() {
