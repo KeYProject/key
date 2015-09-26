@@ -74,17 +74,17 @@ public class Resolver implements IResolver {
     * @author Christopher Beckmann
     */
    private final class ResolverTask {
-      public boolean isMethod = false;
-      public boolean isArrayAcess = false;
-      public boolean isKeyword = false;
-      public boolean isClass = false;
-      public String resolveString = null;
-      public IStringNode node = null;
-      public final List<IASTNode> parameters = new LinkedList<IASTNode>();
-      public ResolveResult lastResult = null;
-      public boolean isArray = false;
-      public Map<String, ITypeBinding> typeArguments = new HashMap<String, ITypeBinding>();
-      public ITypeBinding originalTypeBinding;
+      private boolean isMethod = false;
+      private boolean isArrayAcess = false;
+      private boolean isKeyword = false;
+      private boolean isClass = false;
+      private String resolveString = null;
+      private IStringNode node = null;
+      private final List<IASTNode> parameters = new LinkedList<IASTNode>();
+      private ResolveResult lastResult = null;
+      private boolean isArray = false;
+      private Map<String, ITypeBinding> typeArguments = new HashMap<String, ITypeBinding>();
+      private ITypeBinding originalTypeBinding;
    }
 
    private ASTNode context = null;
