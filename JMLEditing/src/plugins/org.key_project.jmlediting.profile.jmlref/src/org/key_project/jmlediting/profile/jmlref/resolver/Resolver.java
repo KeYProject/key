@@ -283,9 +283,6 @@ public class Resolver implements IResolver {
             // no binding.
             final ResolveResult finalResult = new ResolveResult(null, ResolveResultType.ARRAY_LENGTH, context.getAST().resolveWellKnownType("int"), currentTask.node);
 
-            if(tasks.peek() != null) {
-               tasks.peek().lastResult = finalResult;
-            }
             return finalResult;
          }
       }
@@ -522,87 +519,10 @@ public class Resolver implements IResolver {
     *         rules. False otherwise.
     */
    private boolean isMethodInvocationConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
+      
       return that.isEqualTo(other) 
             || isWideningPrimitiveConversionCompatible(that, other) 
-            || isWideningReferenceConversionCompatible(that, other)
-            || isBoxingConversionCompatible(that, other) 
-            || isUnboxingConversionCompatible(that, other);
-   }
-
-   /**
-    * Helper Method. Checks if the {@code other} type can be unboxed to the
-    * {@code that} type. See:
-    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.8
-    * 
-    * @param that the type the method definition has
-    * @param other the type the method is called with
-    * @return true, if the types match after unboxing. False otherwise.
-    */
-   private boolean isUnboxingConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
-      if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Boolean"))) {
-         return that.getQualifiedName().equals("boolean");
-      }
-      if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Byte"))) {
-         return that.getQualifiedName().equals("byte");
-      }
-      if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Short"))) {
-         return that.getQualifiedName().equals("short");
-      }
-      if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Character"))) {
-         return that.getQualifiedName().equals("char");
-      }
-      if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Integer"))) {
-         return that.getQualifiedName().equals("int");
-      }
-      if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Long"))) {
-         return that.getQualifiedName().equals("long");
-      }
-      if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Double"))) {
-         return that.getQualifiedName().equals("double");
-      }
-      return false;
-   }
-
-   /**
-    * Helper Method. Checks if the {@code other} type can be boxed to the
-    * {@code that} type. See:
-    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.7
-    * 
-    * @param that the type the method definition has
-    * @param other the type the method is called with
-    * @return true, if the types match after boxing. False otherwise.
-    */
-   private boolean isBoxingConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
-      if(other.getQualifiedName().equals("boolean")) {
-         return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Boolean"));
-      }
-      if(other.getQualifiedName().equals("byte")) {
-         return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Byte"));
-      }
-      if(other.getQualifiedName().equals("short")) {
-         return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Short"));
-      }
-      if(other.getQualifiedName().equals("char")) {
-         return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Character"));
-      }
-      if(other.getQualifiedName().equals("int")) {
-         return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Integer"));
-      }
-      if(other.getQualifiedName().equals("long")) {
-         return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Long"));
-      }
-      if(other.getQualifiedName().equals("float")) {
-         return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Float"));
-      }
-      if(other.getQualifiedName().equals("double")) {
-         return that.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Double"));
-      }
-      if(other.isNullType()) {
-         if(!that.isPrimitive()) {
-            return true;
-         }
-      }
-      return false;
+            || isWideningReferenceConversionCompatible(that, other);
    }
 
    /**
@@ -617,8 +537,16 @@ public class Resolver implements IResolver {
     */
    private boolean isWideningReferenceConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
       ITypeBinding cother = other;
-      if(that.isPrimitive()) {
+      
+      if(that == null || that.isPrimitive()) {        
          return false;
+      }
+      if(other == null) {
+         return false;
+      }
+      // if the calling type is the null type it fits anyways.
+      if(other.isNullType()) {
+         return true;
       }
       if(other.isPrimitive()) {
          cother = boxPrimitiveType(other);
@@ -678,18 +606,28 @@ public class Resolver implements IResolver {
     */
    private boolean isWideningPrimitiveConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
       ITypeBinding cother = other;
-      if(!that.isPrimitive()) {
+      ITypeBinding cthat = that;
+      
+      if(that == null) {        
          return false;
       }
+      if(other == null) {
+         return false;
+      }
+      
       if(!other.isPrimitive()) {
          cother = unboxPrimitiveType(other);
       }
-      if(cother == null) {
+      if(!that.isPrimitive()) {
+         cthat = unboxPrimitiveType(that);
+      }
+      
+      if(cother == null || cthat == null) {
          return false;
       }
       // comparing strings is actually easier than creating the types and
       // comparing them.
-      final String thatName = that.getQualifiedName();
+      final String thatName = cthat.getQualifiedName();
       final String otherName = cother.getQualifiedName();
       final String bYTE = "byte";
       final String sHORT = "short";
@@ -698,7 +636,11 @@ public class Resolver implements IResolver {
       final String fLOAT = "float";
       final String dOUBLE = "double";
       final String cHAR = "char";
-
+      
+      if(thatName.equals(otherName)) {
+         return true;
+      }
+      
       if(otherName.equals(bYTE)
             && (thatName.equals(sHORT) 
                   || thatName.equals(iNT) 
@@ -746,6 +688,7 @@ public class Resolver implements IResolver {
 
    /**
     * Performs unboxing of primitive types.
+    * See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.8
     * 
     * @param other the {@link ITypeBinding} to be unboxed.
     * @return the {@link ITypeBinding} of the unboxed type or null if the type
@@ -770,6 +713,9 @@ public class Resolver implements IResolver {
       if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Long"))) {
          return context.getAST().resolveWellKnownType("long");
       }
+      if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Float"))) {
+         return context.getAST().resolveWellKnownType("float");
+      }
       if(other.isEqualTo(context.getAST().resolveWellKnownType("java.lang.Double"))) {
          return context.getAST().resolveWellKnownType("double");
       }
@@ -778,6 +724,7 @@ public class Resolver implements IResolver {
 
    /**
     * Performs boxing of primitive types.
+    * See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.7
     * 
     * @param other the {@link ITypeBinding} to be boxed.
     * @return the {@link ITypeBinding} of the boxed type or null if the type can
@@ -1304,7 +1251,7 @@ public class Resolver implements IResolver {
     * 
     * @param context
     *           is the context this method is searching in. Should be a
-    *           {@link CompilationUnit}, {@link TypeDeclaration},
+    *           {@link TypeDeclaration},
     *           {@link FieldDeclaration} or {@link VariableDeclarationFragment}
     * @param name
     *           is the name of the identifier we are searching for
@@ -1316,15 +1263,8 @@ public class Resolver implements IResolver {
          return null;
       }
 
-      if(context instanceof CompilationUnit) {
-         for(final Object types : ((CompilationUnit) context).types()) {
-            final ASTNode result = findField((ASTNode) types, name);
-            if(result != null) {
-               return result;
-            }
-         }
          // TYPE DECLERATION
-      } else if(context instanceof TypeDeclaration) {
+      if(context instanceof TypeDeclaration) {
          if(((TypeDeclaration) context).getName().getIdentifier().equals(name)) {
             return context;
          }

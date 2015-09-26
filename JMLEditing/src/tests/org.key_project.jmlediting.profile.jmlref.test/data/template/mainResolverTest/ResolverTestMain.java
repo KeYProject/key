@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import static resolver.test.otherPackage.ResolverTestClass2.staticField;
 import static resolver.test.otherPackage.ResolverTestClass2.staticMethod;
 
-public class ResolverTestMain {
+public class ResolverTestMain extends ResolverTestSuper {
    
     // this is a normal comment to filter out
     
@@ -285,4 +285,103 @@ public class ResolverTestMain {
     //@ invariant arrayField3[1][1] == 1;
     
     //@ invariant primitiveField.someAccessThatDoesNotExist;
+    
+    //@ invariant primitiveField[1];
+    
+    //@ invariant staticMethod() == 0;
+    
+    //@ invariant ((BigInteger)integer).add(integer) == integer;
+    
+    //@ invariant super.superField == 0;
+    
+    //@ invariant superMethod((Integer)1) == 1;
+    
+    //@ invariant ((java.math.BigDecimal)decimal).add(decimal) == decimal;
+    
+    //@ invariant ((FileReader)fr).read() == 1;
+   
+    
+    // These are the tests for the boxing and unboxing conversion.
+    Boolean _booleanField;
+    boolean booleanField;
+    Byte _byteField;
+    byte byteField;
+    Short _shortField;
+    short shortField;
+    Character _charField;
+    char charField;
+    Long _longField;
+    long longField;
+    Float _floatField;
+    float floatField;
+    Double _doubleField;
+    double doubleField;
+    Integer _intField;
+    int intField;
+   
+   //@ invariant booleanMethod(booleanField, _booleanField);
+   //@ invariant byteMethod(byteField, _byteField);
+   //@ invariant shortMethod(shortField, _shortField);
+   //@ invariant charMethod(charField, _charField);
+   //@ invariant longMethod(longField, _longField);
+   //@ invariant floatMethod(floatField, _floatField);
+   //@ invariant doubleMethod(doubleField, _doubleField);
+   //@ invariant intMethod(intField, _intField);
+    
+    public boolean intMethod(Integer i1, int i2) {return true; }
+    public boolean booleanMethod(Boolean b1, boolean b2) { return true; }
+    public boolean byteMethod(Byte b1, byte b2) { return true; }
+    public boolean shortMethod(Short b1, short b2) { return true; }
+    public boolean charMethod(Character c1, char c2) { return true; }
+    public boolean longMethod(Long l1, long l2) { return true; }
+    public boolean floatMethod(Float f1, float f2) { return true; }
+    public boolean doubleMethod(Double d1, double d2) { return true; }
+    public boolean nullMethod(ResolverTestMain m1) { return true; }
+    
+    // now tests for the widening primitive conversion
+    
+    //      byte -> short | int | long | float | double
+   //@ invariant shortMethod(byteField, _byteField);
+   //@ invariant intMethod(byteField, _byteField);
+   //@ invariant longMethod(byteField, _byteField);
+   //@ invariant floatMethod(byteField, _byteField);
+   //@ invariant doubleMethod(byteField, _byteField);
+    
+    //      short -> int | long | float | double 
+    //@ invariant intMethod(shortField, _shortField);
+    //@ invariant longMethod(shortField, _shortField);
+    //@ invariant floatMethod(shortField, _shortField);
+    //@ invariant doubleMethod(shortField, _shortField);
+    
+    //      char -> int | long | float | double
+    //@ invariant intMethod(charField, _charField);
+    //@ invariant longMethod(charField, _charField);
+    //@ invariant floatMethod(charField, _charField);
+    //@ invariant doubleMethod(charField, _charField);
+    
+    //      int -> long | float | double
+    //@ invariant longMethod(intField, _intField);
+    //@ invariant floatMethod(intField, _intField);
+    //@ invariant doubleMethod(intField, _intField);
+    
+    //      long -> float | double
+    //@ invariant floatMethod(longField, _longField);
+    //@ invariant doubleMethod(longField, _longField);
+    
+    //      float -> double
+    //@ invariant doubleMethod(floatField, _floatField);
+    
+    public boolean serializableMethod(java.io.Serializable p1) { return true; }
+    //@ invariant serializableMethod(booleanField);
+    //@ invariant serializableMethod(byteField);
+    //@ invariant serializableMethod(shortField);
+    //@ invariant serializableMethod(charField);
+    //@ invariant serializableMethod(intField);
+    //@ invariant serializableMethod(longField);
+    //@ invariant serializableMethod(floatField);
+    //@ invariant serializableMethod(doubleField);
+    
+    
+    
+   
 }

@@ -60,13 +60,16 @@ public class ResolverTest {
     private static ICompilationUnit cu2;
     private static List<IASTNode> iASTList = new ArrayList<IASTNode>();
     private static ASTNode mainJDT;
+    private static ASTNode superJDT;
     private static ASTNode class1JDT;
     private static ASTNode class2JDT;
     private static ICompilationUnit cu3;
-    private final static String PATHFILE3 = "src/resolver/test/otherPackage/ResolverTestClass2";
+    private static ICompilationUnit cuSuper;
     private final static String PATH = "src/resolver/test/";
     private final static String FILE1 = "ResolverTestMain";
     private final static String FILE2 = "ResolverTestClass1";
+    private final static String PATHFILE3 = "src/resolver/test/otherPackage/ResolverTestClass2";
+    private final static String FILE4 = "ResolverTestSuper";
     
     @BeforeClass
     public static void initProject() throws CoreException, InterruptedException {
@@ -101,6 +104,9 @@ public class ResolverTest {
        
        cu3 = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATHFILE3+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
        class2JDT = JDTUtil.parse(cu3);
+       
+       cuSuper = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATH+FILE4+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+       superJDT = JDTUtil.parse(cuSuper);
     }
     
 
@@ -146,6 +152,8 @@ public class ResolverTest {
         case 2:
             resultFile = class2JDT;
             break;
+        case 3:
+           resultFile = superJDT;
         default:
             break;
         }
@@ -318,7 +326,7 @@ public class ResolverTest {
     }
     @Test
     public void resolveCastExpression() throws ResolverException {
-        test("castMethodAndThis", "field1", 1, 0, 0, ResolveResultType.FIELD, getIASTNodeCast());
+        test("castMethodAndThis", "field1", 1, 0, 0, ResolveResultType.FIELD, getIASTNodeCast("ResolverTestClass1"));
     }
     @Test
     public void resolvePackageImportType1() throws ResolverException {
@@ -341,6 +349,10 @@ public class ResolverTest {
         test("staticField", 2, 0, 0, ResolveResultType.FIELD);
     }
     @Test
+    public void resolveStaticImportMethod() throws ResolverException {
+        test("staticMethod", 2, 0, 0, ResolveResultType.METHOD);
+    }
+    @Test
     public void resolveMultipleApplicableMethods() throws ResolverException {
         test("sameNameApplicable", 0, 0, 0, ResolveResultType.METHOD);
     }
@@ -358,10 +370,6 @@ public class ResolverTest {
        
        result = resolver.resolve(null, getIASTNode("field1", 0));
        assertEquals(null, result);
-//       
-//       while(resolver.hasNext()) {
-//           resolver.next();
-//       }    
     }
     @Test
     public void resolveTooManyNextCalls() throws ResolverException {
@@ -420,6 +428,10 @@ public class ResolverTest {
     public void resolveAccessToPrimitiveType() throws ResolverException {
        exceptionTest("primitiveField", 0);
     }
+    @Test(expected=ResolverException.class)
+    public void resolveArrayAccessToNonArrayType() throws ResolverException {
+       exceptionTest("primitiveField", 1);
+    }
     @Test
     public void resolveArrayLength() throws ResolverException {
        final IResolver resolver = new Resolver();
@@ -438,6 +450,256 @@ public class ResolverTest {
        assertEquals(ResolveResultType.ARRAY_LENGTH, result.getResolveType());
        assertTrue(result.getBinding().isEqualTo(mainJDT.getAST().resolveWellKnownType("int")));
     }
+    @Test
+    public void resolveClassImportBinaryAndCast() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       ResolveResult result = null;
+       
+       result = resolver.resolve(cu, getIASTNodeCast("BigInteger"));
+       
+       while(resolver.hasNext()) {
+           result = resolver.next();
+       }
+       
+       assertNotEquals(null, result);
+       
+       assertNotEquals(null, result.getJDTNode());
+       assertEquals("add", result.getName());
+       assertEquals(ResolveResultType.METHOD, result.getResolveType());
+    }
+    @Test
+    public void resolveThisKeyword() throws ResolverException {
+       test("this", "field2", 0, 0, 0, ResolveResultType.FIELD, null);
+    }
+    @Test
+    public void resolveSuperKeyword() throws ResolverException {
+       test("super", "superField", 3, 0, 0, ResolveResultType.FIELD, null);
+    }
+    @Test
+    public void resolveMethodInSuperClass() throws ResolverException {
+       test("superMethod", 3, 0, 0, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveFullyReferencedClassCast() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       ResolveResult result = null;
+       
+       result = resolver.resolve(cu, getIASTNodeCast("java"));
+       
+       while(resolver.hasNext()) {
+           result = resolver.next();
+       }
+       
+       assertNotEquals(null, result);
+       
+       assertNotEquals(null, result.getJDTNode());
+       assertEquals("add", result.getName());
+       assertEquals(ResolveResultType.METHOD, result.getResolveType());
+    }
+    @Test
+    public void resolveOnDemandImport() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       ResolveResult result = null;
+
+       result = resolver.resolve(cu, getIASTNodeCast("FileReader"));
+       
+       while(resolver.hasNext()) {
+           result = resolver.next();
+       }
+       
+       assertNotEquals(null, result);
+       
+       assertNotEquals(null, result.getJDTNode());
+       assertEquals("read", result.getName());
+       assertEquals(ResolveResultType.METHOD, result.getResolveType());
+    }
+    @Test
+    public void resolveMethodBoxingUnboxingBoolean() throws ResolverException {
+       test("booleanMethod", 0, 0, 0, ResolveResultType.METHOD);
+       //@ invariant booleanMethod(booleanField, _booleanField);
+    }
+    @Test
+    public void resolveMethodBoxingUnboxingByte() throws ResolverException {
+       test("byteMethod", 0, 0, 0, ResolveResultType.METHOD);
+       //@ invariant byteMethod(byteField, _byteField);
+       //@ invariant shortMethod(shortField, _shortField);
+       //@ invariant charMethod(charField, _charField);
+       //@ invariant longMethod(longField, _longField);
+       //@ invariant floatMethod(floatField, _floatField);
+       //@ invariant doubleMethod(doubleField, _doubleField);
+    }
+    @Test
+    public void resolveMethodBoxingUnboxingShort() throws ResolverException {
+       test("shortMethod", 0, 0, 0, ResolveResultType.METHOD);
+       //@ invariant shortMethod(shortField, _shortField);
+    }
+    @Test
+    public void resolveMethodBoxingUnboxingChar() throws ResolverException {
+       test("charMethod", 0, 0, 0, ResolveResultType.METHOD);
+       //@ invariant charMethod(charField, _charField);
+    }
+    @Test
+    public void resolveMethodBoxingUnboxingLong() throws ResolverException {
+       test("longMethod", 0, 0, 0, ResolveResultType.METHOD);
+       //@ invariant longMethod(longField, _longField);
+    }
+    @Test
+    public void resolveMethodBoxingUnboxingFloat() throws ResolverException {
+       test("floatMethod", 0, 0, 0, ResolveResultType.METHOD);
+       //@ invariant floatMethod(floatField, _floatField);
+    }
+    @Test
+    public void resolveMethodBoxingUnboxingDouble() throws ResolverException {
+       test("doubleMethod", 0, 0, 0, ResolveResultType.METHOD);
+       //@ invariant doubleMethod(doubleField, _doubleField);
+    }
+    @Test
+    public void resolveMethodBoxingUnboxingInt() throws ResolverException {
+       test("intMethod", 0, 0, 0, ResolveResultType.METHOD);
+       //@ invariant intMethod(intField, _intField);
+    }
+    //  byte -> short | int | long | float | double
+    //@ invariant shortMethod(byteField, _byteField);
+    //@ invariant intMethod(byteField, _byteField);
+    //@ invariant longMethod(byteField, _byteField);
+    //@ invariant floatMethod(byteField, _byteField);
+    //@ invariant doubleMethod(byteField, _byteField);
+    @Test
+    public void resolveMethodWideningPrimitiveConversionByte1() throws ResolverException {
+       test("shortMethod", 0, 0, 1, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionByte2() throws ResolverException {
+       test("intMethod", 0, 0, 1, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionByte3() throws ResolverException {
+       test("longMethod", 0, 0, 1, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionByte4() throws ResolverException {
+       test("floatMethod", 0, 0, 1, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionByte5() throws ResolverException {
+       test("doubleMethod", 0, 0, 1, ResolveResultType.METHOD);
+    }
+      //      short -> int | long | float | double 
+      //@ invariant intMethod(shortField, _shortField);
+      //@ invariant longMethod(shortField, _shortField);
+      //@ invariant floatMethod(shortField, _shortField);
+      //@ invariant doubleMethod(shortField, _shortField);
+    @Test
+    public void resolveMethodWideningPrimitiveConversionShort1() throws ResolverException {
+       test("intMethod", 0, 0, 2, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionShort2() throws ResolverException {
+       test("longMethod", 0, 0, 2, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionShort3() throws ResolverException {
+       test("floatMethod", 0, 0, 2, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionShort4() throws ResolverException {
+       test("doubleMethod", 0, 0, 2, ResolveResultType.METHOD);
+    }
+      //      char -> int | long | float | double
+      //@ invariant intMethod(charField, _charField);
+      //@ invariant longMethod(charField, _charField);
+      //@ invariant floatMethod(charField, _charField);
+      //@ invariant doubleMethod(charField, _charField);
+    @Test
+    public void resolveMethodWideningPrimitiveConversionChar1() throws ResolverException {
+       test("intMethod", 0, 0, 3, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionChar2() throws ResolverException {
+       test("longMethod", 0, 0, 3, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionChar3() throws ResolverException {
+       test("floatMethod", 0, 0, 3, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionChar4() throws ResolverException {
+       test("doubleMethod", 0, 0, 3, ResolveResultType.METHOD);
+    }
+      //      int -> long | float | double
+      //@ invariant longMethod(intField, _intField);
+      //@ invariant floatMethod(intField, _intField);
+      //@ invariant doubleMethod(intField, _intField);
+    @Test
+    public void resolveMethodWideningPrimitiveConversionInt1() throws ResolverException {
+       test("longMethod", 0, 0, 4, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionInt2() throws ResolverException {
+       test("floatMethod", 0, 0, 4, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionInt3() throws ResolverException {
+       test("doubleMethod", 0, 0, 4, ResolveResultType.METHOD);
+    }
+      //      long -> float | double
+      //@ invariant floatMethod(longField, _longField);
+      //@ invariant doubleMethod(longField, _longField);
+    @Test
+    public void resolveMethodWideningPrimitiveConversionLong1() throws ResolverException {
+       test("floatMethod", 0, 0, 5, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveMethodWideningPrimitiveConversionLong2() throws ResolverException {
+       test("doubleMethod", 0, 0, 5, ResolveResultType.METHOD);
+    }
+      //      float -> double
+      //@ invariant doubleMethod(floatField, _floatField);
+    @Test
+    public void resolveMethodWideningPrimitiveConversionFloat1() throws ResolverException {
+       test("doubleMethod", 0, 0, 6, ResolveResultType.METHOD);
+    }
+    //@ invariant serializableMethod(booleanField);
+    @Test
+    public void resolveMethodWideningReferenceConversion1() throws ResolverException {
+       test("serializableMethod", 0, 0, 0, ResolveResultType.METHOD);
+    }
+    //@ invariant serializableMethod(byteField);
+    @Test
+    public void resolveMethodWideningReferenceConversion2() throws ResolverException {
+       test("serializableMethod", 0, 0, 1, ResolveResultType.METHOD);
+    }
+    //@ invariant serializableMethod(shortField);
+    @Test
+    public void resolveMethodWideningReferenceConversion3() throws ResolverException {
+       test("serializableMethod", 0, 0, 2, ResolveResultType.METHOD);
+    }
+    //@ invariant serializableMethod(charField);
+    @Test
+    public void resolveMethodWideningReferenceConversion4() throws ResolverException {
+       test("serializableMethod", 0, 0, 3, ResolveResultType.METHOD);
+    }
+    //@ invariant serializableMethod(intField);
+    @Test
+    public void resolveMethodWideningReferenceConversion5() throws ResolverException {
+       test("serializableMethod", 0, 0, 4, ResolveResultType.METHOD);
+    }
+    //@ invariant serializableMethod(longField);
+    @Test
+    public void resolveMethodWideningReferenceConversion6() throws ResolverException {
+       test("serializableMethod", 0, 0, 5, ResolveResultType.METHOD);
+    }
+    //@ invariant serializableMethod(floatField);
+    @Test
+    public void resolveMethodWideningReferenceConversion7() throws ResolverException {
+       test("serializableMethod", 0, 0, 6, ResolveResultType.METHOD);
+    }
+    //@ invariant serializableMethod(doubleField);
+    @Test
+    public void resolveMethodWideningReferenceConversion8() throws ResolverException {
+       test("serializableMethod", 0, 0, 7, ResolveResultType.METHOD);
+    }
+    //********************************************************************************************
 
     /**
      * Helper function for the tests.
@@ -576,7 +838,7 @@ public class ResolverTest {
         return null;
     }
     
-    private IASTNode getIASTNodeCast() {
+    private IASTNode getIASTNodeCast(final String name) {
         final List<IASTNode> list = new ArrayList<IASTNode>();
         
         for(final IASTNode jml : iASTList) {
@@ -586,7 +848,10 @@ public class ResolverTest {
         
         for(final IASTNode node : list) {
             if(node.getChildren().get(0).getType() == ExpressionNodeTypes.CAST) {
-                return node;
+                if(node.getChildren().get(0).getChildren().get(0).getChildren().get(0).getChildren().size() > 0 &&
+                      ((IStringNode)node.getChildren().get(0).getChildren().get(0).getChildren().get(0).getChildren().get(0)).getString().equals(name)) {
+                   return node;
+                }
             }
         }
         return null;
