@@ -75,6 +75,14 @@ public class TestClass {
       //public
       
    }
+   //test hat nix damit zu tun
+   public void def() {
+      
+   }
+   
+   public void defe() {
+      
+   }
    
    //@ set a = "a";
    

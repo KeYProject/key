@@ -35,7 +35,7 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
          root =  javaParent;
       }else if (comments == null) return currentChildren;
       
-      if (comments != null) {
+      
    
          // add invariants to class
          if (javaParent.getElementType() == IJavaElement.TYPE && javaParent.getParent().equals(root)){
@@ -114,7 +114,7 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
             
             return childrenToShowInOutline;
          }
-      }
+      
       return currentChildren;
   }
 }
