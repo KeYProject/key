@@ -106,7 +106,7 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
    private final HashMap<IASTNode, List<IStringNode>> getReferencesInJMLcomments(
          IJavaProject project, String source, CommentRange range) {
 
-      List<IASTNode> stringNodes = new ArrayList<IASTNode>();
+      List<IASTNode> stringNodes;
 
       // Get the project specific active JML profile and create a JML parser for
       // it.

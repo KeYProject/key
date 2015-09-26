@@ -28,7 +28,7 @@ public class RenameClassesRefactoringTest {
    private static IProject project;
    private static IFolder oracleFolder;
    private static IJavaProject javaProject;
-   final String TESTPATH = "data\\template\\refactoringRenameTest\\classes";
+   final static String TESTPATH = "data\\template\\refactoringRenameTest\\classes";
 
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {

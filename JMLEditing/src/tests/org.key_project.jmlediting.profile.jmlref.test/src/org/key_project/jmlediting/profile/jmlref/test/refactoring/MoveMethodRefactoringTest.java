@@ -24,11 +24,10 @@ public class MoveMethodRefactoringTest {
    private static IFolder oracleFolder;
 
    private static IJavaProject javaProject;
-   final String TESTPATH = "data\\template\\refactoringMoveTest\\moveMethodTest";
-   final String REF_CLASS_NAME = "Main";
-   final String CLASS_NAME_MOVE_FROM = "Settings";
-   final String CLASS_NAME_MOVE_TO = "Params";
-   final String METH_TO_MOVE = "go";
+   static final String TESTPATH = "data\\template\\refactoringMoveTest\\moveMethodTest";
+   static final String CLASS_NAME_MOVE_FROM = "Settings";
+   static final String CLASS_NAME_MOVE_TO = "Params";
+   static final String METH_TO_MOVE = "go";
 
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {

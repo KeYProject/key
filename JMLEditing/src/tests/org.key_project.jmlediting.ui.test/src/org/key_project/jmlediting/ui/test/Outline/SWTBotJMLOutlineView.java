@@ -62,7 +62,7 @@ public class SWTBotJMLOutlineView {
       editor.close();
    }
    
-   public void testbehavior(String method, String itemSource, String itemName,boolean reloadtree){
+   public static void testbehavior(String method, String itemSource, String itemName,boolean reloadtree){
       if (reloadtree){
          tree = bot.viewByTitle("Outline").bot().tree();
       }
@@ -89,7 +89,7 @@ public class SWTBotJMLOutlineView {
    
    
    
-   public void test(String itemSource, String itemName, int it1, int it2) {
+   public static void test(String itemSource, String itemName, int it1, int it2) {
       int i = 0;
       for (SWTBotTreeItem item : tree.getAllItems()) {
          //check the invariants

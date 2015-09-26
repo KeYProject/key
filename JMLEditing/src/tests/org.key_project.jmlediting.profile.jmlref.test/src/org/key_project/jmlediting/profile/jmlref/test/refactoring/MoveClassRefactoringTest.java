@@ -34,9 +34,8 @@ public class MoveClassRefactoringTest {
    private static IFolder oracleFolder;
 
    private static IJavaProject javaProject;
-   final String REF_CLASS_NAME = "Main";
-   final String CLASS_NAME_MOVE = "Settings";
-   final String TESTPATH = "data\\template\\refactoringMoveTest\\moveClassTest";
+   final static String CLASS_NAME_MOVE = "Settings";
+   final static String TESTPATH = "data\\template\\refactoringMoveTest\\moveClassTest";
 
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
@@ -117,8 +116,6 @@ public class MoveClassRefactoringTest {
 
       final IProject projectDest = TestUtilsRefactoring.createProjectWithFiles("projectDest",
             "data\\template\\refactoringMoveTest\\moveClassTest\\test7\\projectDest");
-
-      // bot.sleep(20000);
 
       TestUtilsRefactoring.setProjectReferences("projectSrc", new String[] { "projectDest" },
             bot);

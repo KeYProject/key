@@ -59,7 +59,7 @@ public class SWTBotJMLOutlineSpecPure {
    }
    
    
-   public void testChild(String varName, String itemSource, String itemName,boolean reloadtree){
+   public static void testChild(String varName, String itemSource, String itemName,boolean reloadtree){
       if (reloadtree){
          tree = bot.viewByTitle("Outline").bot().tree();
       }

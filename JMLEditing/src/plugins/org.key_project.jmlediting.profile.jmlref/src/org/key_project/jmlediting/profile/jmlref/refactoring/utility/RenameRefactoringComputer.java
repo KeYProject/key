@@ -3,6 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.refactoring.utility;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -105,9 +106,9 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
       try {
          // iterate through the primaries and check if we have more than one potential
          // reference within a primary
-         for (IASTNode primary : primaryStringMap.keySet()) {
-
-            List<IStringNode> stringNodes = primaryStringMap.get(primary);
+         for (Entry<IASTNode, List<IStringNode>> entry : primaryStringMap.entrySet()) {
+            
+            List<IStringNode> stringNodes = entry.getValue();
 
             boolean changeNeeded = false;
 
@@ -115,7 +116,7 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
             // change the position given by the IStringNode
             if (stringNodes.size() == 1) {
 
-               changeNeeded = isReferencedElement(resolver.resolve(unit, primary));
+               changeNeeded = isReferencedElement(resolver.resolve(unit, entry.getKey()));
 
                // complex primaries may need more calls to the resolver
                while (changeNeeded == false && resolver.hasNext()) {
@@ -132,7 +133,7 @@ public class RenameRefactoringComputer extends AbstractRefactoringComputer {
 
                ResolveResult result = null;
 
-               result = resolver.resolve(unit, primary);
+               result = resolver.resolve(unit, entry.getKey());
 
                if (isReferencedElement(result)) {
                   createEditAndAddToList(changesToMake, result.getStringNode());

@@ -27,7 +27,7 @@ public class RenameParametersRefactoringTest {
    private static IFolder srcFolder;
    private static IProject project;
    private static IFolder oracleFolder;
-   final String TESTPATH = "data\\template\\refactoringRenameTest\\parameters";
+   static final String TESTPATH = "data\\template\\refactoringRenameTest\\parameters";
 
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {

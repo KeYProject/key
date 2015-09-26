@@ -26,11 +26,10 @@ public class MoveFieldRefactoringTest {
    private static IFolder oracleFolder;
 
    private static IJavaProject javaProject;
-   final String REF_CLASS_NAME = "Main";
-   final String CLASS_NAME_MOVE_FROM = "Settings";
-   final String CLASS_NAME_MOVE_TO = "Params";
-   final String FIELD_TO_MOVE = "x : int";
-   final String TESTPATH = "data\\template\\refactoringMoveTest\\moveFieldTest";
+   static final String CLASS_NAME_MOVE_FROM = "Settings";
+   static final String CLASS_NAME_MOVE_TO = "Params";
+   static final String FIELD_TO_MOVE = "x : int";
+   static final String TESTPATH = "data\\template\\refactoringMoveTest\\moveFieldTest";
 
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
@@ -245,15 +244,16 @@ public class MoveFieldRefactoringTest {
             TestUtilsRefactoring.getContentAfterRefactoring(bot).replace("\t", "    "));
 
    }
-   
+
    @Test
-   public void test12WildcardImportAndClassWithSameNameAsDestinationInSamePackage() throws CoreException {
+   public void test12WildcardImportAndClassWithSameNameAsDestinationInSamePackage()
+         throws CoreException {
 
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test12" + "\\src", srcFolder);
       TestUtilsRefactoring.copyFiles(TESTPATH + "\\test12" + "\\oracle", oracleFolder);
 
-      TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "SourceClass", "destPackage",
-            "Dest", "destPackage", "fieldToMove : int", bot);
+      TestUtilsRefactoring.selectElementInOutlineAndMove(srcFolder, "SourceClass",
+            "destPackage", "Dest", "destPackage", "fieldToMove : int", bot);
 
       TestUtilsUtil.openEditor(srcFolder.getFolder("test").getFile(
             "TestClass" + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));

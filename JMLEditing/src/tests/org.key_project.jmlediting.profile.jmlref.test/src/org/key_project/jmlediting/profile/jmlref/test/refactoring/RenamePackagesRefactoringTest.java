@@ -33,7 +33,7 @@ public class RenamePackagesRefactoringTest {
    private static IFolder oracleFolder;
 
    private static IJavaProject javaProject;
-   final String TESTPATH = "data\\template\\refactoringRenameTest\\packages";
+   static final String TESTPATH = "data\\template\\refactoringRenameTest\\packages";
 
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
