@@ -158,4 +158,18 @@ public class RenameMethodRefactoringTest {
             oracleFolder, bot, "TestClassOther", "otherPackage", "getBalance() : int",
             "newMethodName", javaProject);
    }
+   
+   @Test
+   public void test17MethodOverride() throws CoreException {
+      TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test17", srcFolder,
+            oracleFolder, bot, "TestParent", "test", "returnAnInteger() : int",
+            "aNewMethodName", javaProject);
+   }
+   
+   @Test
+   public void test18Cast() throws CoreException {
+      TestUtilsRefactoring.runMethodRenameTest(TESTPATH + "\\test18", srcFolder,
+            oracleFolder, bot, "TestParent", "test", "returnAnInteger() : int",
+            "newMethodName", javaProject);
+   }
 }
