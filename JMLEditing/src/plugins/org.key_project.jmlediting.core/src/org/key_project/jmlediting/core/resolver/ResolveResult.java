@@ -12,12 +12,14 @@ public class ResolveResult {
     private final ResolveResultType type;
     private final IBinding binding;
     private final IStringNode stringNode;
+    private final ITypeBinding returnValue;
     
-    public ResolveResult(final ASTNode jdtNode, final ResolveResultType type, final IBinding binding, final IStringNode stringNode) {
+    public ResolveResult(final ASTNode jdtNode, final ResolveResultType type, final IBinding binding, final ITypeBinding returnValue, final IStringNode stringNode) {
         this.jdtNode = jdtNode;
         this.type = type;
         this.binding = binding;
         this.stringNode = stringNode;
+        this.returnValue = returnValue;
     }
 
     /**
@@ -48,13 +50,13 @@ public class ResolveResult {
         return stringNode;
     }
     
-    /** Get the return type.
-     * @return the return type of the Method. If the stored resolve information is not from a method, it returns null;
+    /** Gets the return type if this ResolveResult stores a method.
+     *  Or if the type of whatever is stored in here is parameterized, 
+     *  it will return the type it should actually be.
+     * 
+     * @return an {@link ITypeBinding}.
      */
-    public final ITypeBinding getMethodReturnType() {
-        if(type == ResolveResultType.METHOD) {
-            return ((IMethodBinding) binding).getReturnType();
-        }
-        return null;
+    public final ITypeBinding getReturnType() {
+        return returnValue;
     }
 }

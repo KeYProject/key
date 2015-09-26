@@ -2,6 +2,7 @@ package resolver.test;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.math.BigInteger;
 import static resolver.test.otherPackage.ResolverTestClass2.staticField;
 import static resolver.test.otherPackage.ResolverTestClass2.staticMethod;
@@ -22,6 +23,7 @@ public class ResolverTestMain extends ResolverTestSuper {
     private /*@ spec_public @*/ HashMap<Integer, String> field4 = new HashMap<Integer, String>();
     private /*@ spec_public @*/ BigInteger integer = new BigInteger(0);
     private /*@ spec_public @*/ java.math.BigDecimal decimal = new java.math.BigDecimal(0);
+    private ArrayList<Integer> arraylist;
     private FileReader fr = null;
     private int[] arrayfield;
     private long[] arrayField2;
@@ -299,6 +301,8 @@ public class ResolverTestMain extends ResolverTestSuper {
     //@ invariant ((java.math.BigDecimal)decimal).add(decimal) == decimal;
     
     //@ invariant ((FileReader)fr).read() == 1;
+    
+    //@ invariant arraylist.get(0).equals(4);
    
     
     // These are the tests for the boxing and unboxing conversion.
@@ -371,7 +375,7 @@ public class ResolverTestMain extends ResolverTestSuper {
     //      float -> double
     //@ invariant doubleMethod(floatField, _floatField);
     
-    public boolean serializableMethod(java.io.Serializable p1) { return true; }
+    public boolean serializableMethod(Serializable p1) { return true; }
     //@ invariant serializableMethod(booleanField);
     //@ invariant serializableMethod(byteField);
     //@ invariant serializableMethod(shortField);

@@ -18,12 +18,14 @@ import org.key_project.util.jdt.JDTUtil;
 public class TypeComputer implements ITypeComputer {
 
     protected ICompilationUnit compilationUnit;
-   
+    protected IResolver resolver;
+    
     final protected ITypeBinding P_FLOAT, P_INTEGER, P_CHAR,
                                   FLOAT, INTEGER, CHAR;
 
-    public TypeComputer(final ICompilationUnit compilationUnit) {
+    public TypeComputer(final ICompilationUnit compilationUnit, final IResolver resolver) {
         this.compilationUnit = compilationUnit;
+        this.resolver = resolver;
         
         P_FLOAT = createWellKnownType("float");
         P_INTEGER = createWellKnownType("int");
@@ -146,13 +148,23 @@ public class TypeComputer implements ITypeComputer {
     }
     
     /**
+     * Calls the {@link IResolver} that was provided when creating the TypeComputer and resolves the given {@link IASTNode} with it.
+     * @param node the {@link IASTNode} that will be resolved
+     * @return the resulting {@link ITypeBinding}
+     * @throws TypeComputerException if the {@link IResolver} can not resolve the {@link IASTNode} 
+     */
+    public ITypeBinding callResolver(final IASTNode node) throws TypeComputerException {
+       return callResolver(node, resolver);
+    }
+    
+    /**
      * Calls the specified {@link IResolver} and resolves the given {@link IASTNode} with it.
      * @param node the {@link IASTNode} that will be resolved
      * @param resolver the {@link IResolver} to be used when resolving.
      * @return the resulting {@link ITypeBinding}
      * @throws TypeComputerException if the {@link IResolver} can not resolve the {@link IASTNode} 
      */
-    public ITypeBinding callResolver(final IASTNode node, final IResolver resolver) throws TypeComputerException {
+    public final ITypeBinding callResolver(final IASTNode node, final IResolver resolver) throws TypeComputerException {
         ResolveResult result = null;
         
         try {

@@ -80,9 +80,7 @@ public class ResolverTest {
        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data\\template\\mainResolverTest", testFolder);
        TestUtilsUtil.waitForBuild();
        JMLPreferencesHelper.setProjectJMLProfile(javaProject.getProject(), JMLPreferencesHelper.getDefaultJMLProfile());
-       
-       System.out.println(testFolder.getFolder("otherPackage").getFile("ResolverTestClass2.java").getName());
-       
+        
        // Parse JDT
        cu = (ICompilationUnit) JavaCore.create(javaProject.getProject().getFile(PATH+FILE1+JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
        mainJDT = JDTUtil.parse(cu);
@@ -339,6 +337,10 @@ public class ResolverTest {
     @Test
     public void resolvePackageImportParameterizedType2() throws ResolverException {
         importTest("field4", "put", 2, ResolveResultType.METHOD);
+    }
+    @Test
+    public void resolveParameterizedType3() throws ResolverException {
+       importTest("arraylist", "equals", 0,ResolveResultType.METHOD);
     }
     @Test
     public void resolvePackageImportOnDemand1() throws ResolverException {
