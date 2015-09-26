@@ -284,18 +284,7 @@ public class Resolver implements IResolver {
             throw new ResolverException("Tried to perform an array access on a non array.", originalNode, null);
          }
       }
-      
-      if(currentTask.isArray) {
-         if(currentTask.resolveString.equals("length")) {
-            // return type = int
-            // jdtnode will be null.
-            // no binding.
-            returnValue = context.getAST().resolveWellKnownType("int");
-            final ResolveResult finalResult = new ResolveResult(null, ResolveResultType.ARRAY_LENGTH, returnValue, returnValue, currentTask.node);
-            return finalResult;
-         }
-      }
-      
+           
       // If we have parameterized types in our result. 
       // We have to add the real result as an additional parameter.
       if(currentTask.typeArguments.size() > 0) {
@@ -303,6 +292,21 @@ public class Resolver implements IResolver {
          if(value != null) {
             returnValue = value;
          }
+      }
+      
+      // TODO Left to implement:
+      // Check if the current saved TypeBinding is equal to the type parameters of this class
+      // If this is true => Get the bounds and set them as the returnValue, so we can
+      // know what methods we can use on the following next() call.
+      
+      if(currentTask.isArray && currentTask.resolveString.equals("length")) {
+         returnValue = context.getAST().resolveWellKnownType("int");
+         final ResolveResult finalResult = new ResolveResult(null, ResolveResultType.ARRAY_LENGTH, returnValue, returnValue, currentTask.node);
+         return finalResult;
+      }
+      
+      if(currentTask.isArray && currentTask.resolveString.equals("clone")) {
+         returnValue = currentTask.originalTypeBinding;
       }
       
       final ResolveResult finalResult = new ResolveResult(jdtNode, resolveResultType, binding, returnValue, currentTask.node);
@@ -364,8 +368,6 @@ public class Resolver implements IResolver {
       // if lastResult is null, this must be the first call of next() and is
       // the only case we could find parameters in
       if(currentTask.lastResult == null && !currentTask.isMethod && !currentTask.isClass && !currentTask.isArray) {
-         // TODO: Check if context is set to a MethodDeclaration but if not
-         // findParameters will return null anyways.
          jdtNode = findParameters(context, currentTask.resolveString);
       }
 
@@ -376,8 +378,8 @@ public class Resolver implements IResolver {
       // are we searching for a method?
       if(jdtNode == null && currentTask.isMethod) {
 
-         // TODO: Generic Methods are not supported yet.
          // TODO: Variable Arity Methods are not supported yet.
+         // TODO: Wildcards not supported yet.
 
          ASTNode searchContext = context;
 
@@ -392,7 +394,7 @@ public class Resolver implements IResolver {
          ASTNode searchContext = context;
 
          do {
-            jdtNode = findField(context, currentTask.resolveString);
+            jdtNode = findField(searchContext, currentTask.resolveString);
             searchContext = getSuperClass(searchContext);
             
          } while(jdtNode == null && searchContext != null);
@@ -421,8 +423,19 @@ public class Resolver implements IResolver {
    }
 
    private ASTNode findTypeParameter(final String resolveString) {
-      // TODO Auto-generated method stub
-      return null;
+      final List<TypeParameter> result = new LinkedList<TypeParameter>();
+      context.accept(new ASTVisitor() {
+         
+         @Override
+         public boolean visit(final TypeParameter node) {
+            if(node.getName().getIdentifier().equals(resolveString)) {
+               result.add(node);
+               return false;
+            }
+            return true;
+         }
+      });
+      return result.size() > 0 ? result.get(0) : null;
    }
 
    private TypeDeclaration getSuperClass(final ASTNode searchContext) {
@@ -461,7 +474,7 @@ public class Resolver implements IResolver {
    
    private ASTNode findMethod(final ASTNode context, final String resolveString, final List<IASTNode> parameters) throws ResolverException {
 
-      // roughly implemented following this logic:
+      // implemented following this logic roughly:
       // https://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.12.2
 
       // compute the TypeBindings of the parameters from the IASTNodes
@@ -1098,8 +1111,10 @@ public class Resolver implements IResolver {
    private ASTNode setNewContext() throws ResolverException {
       // If there is no last result, we don't change the context.
       if(currentTask.lastResult == null) {
-         // are we in a parameterized class right now? Then save the type arguments!
-         // TODO saveTypeArguments(getDeclaringClass(context).resolveBinding());
+         
+         // TODO Collect Information about Type Parameter Bounds here.
+         // To make assumptions when searching for methods.
+         
          return context;
       }
 
@@ -1116,9 +1131,9 @@ public class Resolver implements IResolver {
          // of it's method are from there.
          currentTask.isArray = true;
          
-         // TODO: clone() Method has this return value: 
-         // How do we handle this? Is this a special case like "length"?
-         // Needs to be implemented.
+         // clone() Method has this return value: 
+         // This a special case like "length". It can be found through Object though.
+         // So we test for it at the end like we do for "length"
          currentTask.originalTypeBinding = typeBinding;
 
          return findASTNodeFromType(context.getAST().resolveWellKnownType("java.lang.Object"));

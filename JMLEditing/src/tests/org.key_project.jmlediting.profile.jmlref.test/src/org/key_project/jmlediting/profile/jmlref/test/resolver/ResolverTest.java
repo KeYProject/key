@@ -482,6 +482,10 @@ public class ResolverTest {
        test("superMethod", 3, 0, 0, ResolveResultType.METHOD);
     }
     @Test
+    public void resolveFieldInSuperClass() throws ResolverException {
+       test("superField", 3, 0, 0, ResolveResultType.FIELD);
+    }
+    @Test
     public void resolveFullyReferencedClassCast() throws ResolverException {
        final IResolver resolver = new Resolver();
        ResolveResult result = null;

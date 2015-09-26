@@ -303,6 +303,8 @@ public class ResolverTestMain extends ResolverTestSuper {
     //@ invariant ((FileReader)fr).read() == 1;
     
     //@ invariant arraylist.get(0).equals(4);
+
+    //@ invariant superField == 12;
    
     
     // These are the tests for the boxing and unboxing conversion.
@@ -384,6 +386,7 @@ public class ResolverTestMain extends ResolverTestSuper {
     //@ invariant serializableMethod(longField);
     //@ invariant serializableMethod(floatField);
     //@ invariant serializableMethod(doubleField);
+    
     
     
     
