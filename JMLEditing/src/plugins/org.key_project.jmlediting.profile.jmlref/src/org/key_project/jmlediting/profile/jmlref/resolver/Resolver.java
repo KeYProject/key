@@ -78,13 +78,15 @@ public class Resolver implements IResolver {
       private boolean isArrayAcess = false;
       private boolean isKeyword = false;
       private boolean isClass = false;
+      private boolean isArray = false;
+      private boolean isTypeVariable = false;
+      private int skipIdentifier = 0;
       private String resolveString = null;
       private IStringNode node = null;
-      private final List<IASTNode> parameters = new LinkedList<IASTNode>();
       private ResolveResult lastResult = null;
-      private boolean isArray = false;
-      private Map<String, ITypeBinding> typeArguments = new HashMap<String, ITypeBinding>();
       private ITypeBinding originalTypeBinding;
+      private final Map<String, ITypeBinding> typeArguments = new HashMap<String, ITypeBinding>();
+      private final List<IASTNode> parameters = new LinkedList<IASTNode>();
    }
 
    private ASTNode context = null;
@@ -96,6 +98,7 @@ public class Resolver implements IResolver {
    private ResolverTask currentTask = null;
    private PackageDeclaration pack = null;
    private IASTNode originalNode = null;
+   private int skipIdentifier = 0;
 
    /**
     * {@inheritDoc}
@@ -230,9 +233,11 @@ public class Resolver implements IResolver {
       originalNode = null;
       commentToAST.clear();
       imports.clear();
+      onDemandImports.clear();
       tasks.clear();
       currentTask = null;
       pack = null;
+      skipIdentifier = 0;
    }
 
    /**
@@ -259,10 +264,77 @@ public class Resolver implements IResolver {
             jdtNode = findIdentifier();
          }
 
+         
+         // if we have multiple of the same task in here
+         // because we are trying to find something from a TypeParameter 
+         // we keep on going with the next task instead of returning null
+         if(skipIdentifier != 0 && !currentTask.isTypeVariable) {
+            if(tasks.peek() != null && skipIdentifier == tasks.peek().skipIdentifier) {
+               if(jdtNode == null) {
+                  return next();
+               } else {
+                  // If we found something we remove the rest of the tasks with our skip identifier
+                  // so we can work normally after that
+                  final List<ResolverTask> toRemove = new LinkedList<ResolverTask>();
+                  for(final ResolverTask t : tasks) {
+                     if(t.skipIdentifier == skipIdentifier) {
+                        toRemove.add(t);
+                     }
+                  }
+                  // I have to do this like this, because removing an element from the list above,
+                  // will terminate it earlier than I actually want it to.
+                  for(final ResolverTask t : toRemove) {
+                     tasks.remove(t);
+                  }
+               }
+            }
+            // reset skip identifier to either the next task or if its not part 0
+            if(tasks.peek() != null) {
+               skipIdentifier = tasks.peek().skipIdentifier;
+            }
+         }
+         
+         // Are we trying to access functions of a TypeParameter?
+         if(jdtNode == null && currentTask.isTypeVariable || jdtNode instanceof TypeParameter) {
+            
+            // We don't know the final types yet. So we get all the type bounds.
+            final ITypeBinding[] bounds = jdtNode == null ? currentTask.lastResult.getReturnType().getTypeBounds() : ((TypeParameter)jdtNode).resolveBinding().getTypeBounds();
+            // Do we have bounds? If not .. we can not access anything on this type. Because we don't know what type it will be.
+            if(bounds.length > 0) {
+               // remove the next task and replace it with our versions
+               final ResolverTask nextTask = jdtNode == null ? currentTask : tasks.poll();
+               ResolveResult result = null;
+               final int identifier = nextTask.hashCode();
+               skipIdentifier = identifier;
+               for(final ITypeBinding t : bounds) {
+                  tasks.addFirst(new ResolverTask());
+                  tasks.getFirst().isArrayAcess = nextTask.isArrayAcess;
+                  tasks.getFirst().isClass = nextTask.isClass;
+                  tasks.getFirst().isKeyword = nextTask.isKeyword;
+                  tasks.getFirst().isMethod = nextTask.isMethod;
+                  tasks.getFirst().node = nextTask.node;
+                  tasks.getFirst().parameters.addAll(nextTask.parameters);
+                  tasks.getFirst().resolveString = nextTask.resolveString;
+                  tasks.getFirst().skipIdentifier = identifier;
+                  result = new ResolveResult(jdtNode, resolveResultType, binding, t, currentTask.node);
+                  tasks.getFirst().lastResult = result;
+               }
+            } else {
+               // If there is no bound.. set the next context to Object. Those functions are everywhere.
+               returnValue = context.getAST().resolveWellKnownType("java.lang.Object");
+               currentTask.isTypeVariable = false;
+               currentTask.lastResult = new ResolveResult(currentTask.lastResult.getJDTNode(), currentTask.lastResult.getResolveType(), currentTask.lastResult.getBinding(), returnValue, currentTask.lastResult.getStringNode());
+               tasks.add(currentTask);
+            }
+            if(jdtNode == null) {
+               return next();
+            }
+         }
+         
          if(!currentTask.isArray) {
             if(jdtNode == null) {
                // set context to null so we don't give out wrong information on
-               // a following next() call.
+               // a following next() call.              
                context = null;
                return null;
             }
@@ -293,20 +365,21 @@ public class Resolver implements IResolver {
             returnValue = value;
          }
       }
-      
-      // TODO Left to implement:
-      // Check if the current saved TypeBinding is equal to the type parameters of this class
-      // If this is true => Get the bounds and set them as the returnValue, so we can
-      // know what methods we can use on the following next() call.
-      
-      if(currentTask.isArray && currentTask.resolveString.equals("length")) {
-         returnValue = context.getAST().resolveWellKnownType("int");
-         final ResolveResult finalResult = new ResolveResult(null, ResolveResultType.ARRAY_LENGTH, returnValue, returnValue, currentTask.node);
-         return finalResult;
-      }
-      
-      if(currentTask.isArray && currentTask.resolveString.equals("clone")) {
-         returnValue = currentTask.originalTypeBinding;
+
+      if(currentTask.isArray) {
+         if(currentTask.resolveString.equals("length")) {
+            returnValue = context.getAST().resolveWellKnownType("int");
+            final ResolveResult finalResult = new ResolveResult(null, ResolveResultType.ARRAY_LENGTH, returnValue, returnValue, currentTask.node);
+            return finalResult;
+         } else if(currentTask.resolveString.equals("clone")) {
+            returnValue = currentTask.originalTypeBinding;
+            binding = resolveBinding(jdtNode);
+         } else {
+            // this is a method we can pass on
+            binding = resolveBinding(jdtNode);
+            returnValue = TypeComputer.getTypeFromBinding(binding);
+            resolveResultType = getResolveType(jdtNode);
+         }
       }
       
       final ResolveResult finalResult = new ResolveResult(jdtNode, resolveResultType, binding, returnValue, currentTask.node);
@@ -363,6 +436,12 @@ public class Resolver implements IResolver {
       // Very important method call!
       context = setNewContext();
 
+      // is this a type variable? 
+      // then get to the end part so we can start building ResolveResults
+      if(currentTask.isTypeVariable) {
+         return null;
+      }
+         
       // start with searching for parameters if we are not searching for a
       // method or a class
       // if lastResult is null, this must be the first call of next() and is
@@ -439,6 +518,9 @@ public class Resolver implements IResolver {
    }
 
    private TypeDeclaration getSuperClass(final ASTNode searchContext) {
+      if(searchContext == null) {
+         return null;
+      }
       // Set new context to super class and call it again until we
       // reach Object
       final Type superClass = getDeclaringClass(searchContext).getSuperclassType();
@@ -1111,17 +1193,20 @@ public class Resolver implements IResolver {
    private ASTNode setNewContext() throws ResolverException {
       // If there is no last result, we don't change the context.
       if(currentTask.lastResult == null) {
-         
-         // TODO Collect Information about Type Parameter Bounds here.
-         // To make assumptions when searching for methods.
-         
          return context;
       }
 
       // get the last result and get its type.
       final ITypeBinding typeBinding = currentTask.lastResult.getReturnType();
+
       // START testing what the new context might be
-      if(typeBinding.isPrimitive()) {
+      if(typeBinding.isTypeVariable()) {
+         // set a boolean to true so we know that we have to search inside
+         // the type bounds next time
+         currentTask.isTypeVariable = true;
+         return context;
+         
+      } else if(typeBinding.isPrimitive()) {
          throw new ResolverException("Can not resolve an access to a primitive type.", originalNode, null);
 
       } else if(typeBinding.isArray()) {
