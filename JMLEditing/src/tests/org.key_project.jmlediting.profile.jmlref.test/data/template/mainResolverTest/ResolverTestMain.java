@@ -284,8 +284,6 @@ public class ResolverTestMain extends ResolverTestSuper {
 
     //@ invariant arrayField2[1] == 1;
     
-    //@ invariant arrayField3[1][1] == 1;
-    
     //@ invariant primitiveField.someAccessThatDoesNotExist;
     
     //@ invariant primitiveField[1];
@@ -305,7 +303,9 @@ public class ResolverTestMain extends ResolverTestSuper {
     //@ invariant arraylist.get(0).equals(4);
 
     //@ invariant superField == 12;
-   
+    
+    //@ invariant arrayField3.clone().equals(o);
+    Object o;
     
     // These are the tests for the boxing and unboxing conversion.
     Boolean _booleanField;
