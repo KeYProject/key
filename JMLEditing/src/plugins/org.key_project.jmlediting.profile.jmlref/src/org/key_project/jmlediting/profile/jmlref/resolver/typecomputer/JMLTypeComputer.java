@@ -5,6 +5,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputer;
 import org.key_project.jmlediting.core.resolver.typecomputer.ITypeComputer;
 import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputerException;
@@ -19,7 +20,11 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
 public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
 
     public JMLTypeComputer(final ICompilationUnit compilationUnit) {
-        super(compilationUnit);
+        super(compilationUnit, new Resolver());
+    }
+    
+    public JMLTypeComputer(final ICompilationUnit compilationUnit, final IResolver resolver) {
+       super(compilationUnit, resolver);
     }
     
     /**
@@ -149,13 +154,13 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
                 }
             }
             
-            return callResolver(node, new Resolver());
+            return callResolver(node);
             
         } else if(type == ExpressionNodeTypes.PRIMITIVE_TYPE) {
            return createWellKnownType(((IStringNode) node.getChildren().get(0)).getString());
             
         } else if(type == ExpressionNodeTypes.REFERENCE_TYPE) {
-           return callResolver(node, new Resolver());
+           return callResolver(node);
             
         } else if(type == ExpressionNodeTypes.RELATIONAL_OP) {
             

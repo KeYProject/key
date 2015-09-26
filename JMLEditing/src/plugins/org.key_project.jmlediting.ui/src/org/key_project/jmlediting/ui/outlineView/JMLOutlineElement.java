@@ -22,7 +22,7 @@ import org.key_project.jmlediting.core.dom.IASTNode;
  */
 public class JMLOutlineElement implements IJavaElement, ISourceReference {
    private IJavaElement parent;
-   private final int type = 100;
+   private static final int type = 100;
    private IASTNode jmlNode;
    
    /**

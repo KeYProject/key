@@ -27,117 +27,116 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
  * @author Maksim Melnik, Robert Heimbach
  */
 public class JMLMoveParticipantClass extends MoveParticipant {
-    private IJavaElement fToMove;        // file
 
-    private String fDocName;                // file name
+   private String fOldFullQualName; // old fully qualified
+   private String fOldPackName; // old package name
+   private String fNewPackName; // new package name
 
-    private String fOldFullQualName;        // old fully qualified
-    private String fOldPackName;            // old package name
-    private String fNewPackName;            // new package name
+   private IJavaProject fProject;
 
-    private IJavaProject fProject;
+   /**
+    * Initializes the source and destination paths, as well as the file to move itself.
+    * <p>
+    * {@inheritDoc}
+    */
+   @Override
+   protected final boolean initialize(Object element) {
+      IJavaElement fToMove = (IJavaElement) element;
 
-    /**
-     * Initializes the source and destination paths, as well as the file to move itself.
-     * <p>
-     * {@inheritDoc} 
-     */
-    @Override
-    protected final boolean initialize(Object element) {
-        fToMove=(IJavaElement) element;
+      String fDocName = fToMove.getElementName();
+      fOldFullQualName = ((IType) element).getFullyQualifiedName();
 
-        fDocName = fToMove.getElementName();
-        fOldFullQualName=((IType) element).getFullyQualifiedName();
+      fProject = fToMove.getJavaProject();
 
-        fProject = fToMove.getJavaProject();
-        
-        // get the old and new package name , because we only want to replace package names, otherwise nested classes problem        
-        fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName)-1);
-        fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();  
+      fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName) - 1);
+      fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();
 
-        return true;
-    }
+      return true;
+   }
 
-    /**
-     * Name of this class. 
-     * <p>
-     * {@inheritDoc}
-     */
-    @Override
-    public final String getName() {
-        return "JML Field Move Participant";
-    }
+   /**
+    * Name of this class.
+    * <p>
+    * {@inheritDoc}
+    */
+   @Override
+   public final String getName() {
+      return "JML Field Move Participant";
+   }
 
-    /**
-     * Do nothing.
-     * <p>
-     * {@inheritDoc}
-     */
-    @Override
-    public final RefactoringStatus checkConditions(IProgressMonitor pm,
-            CheckConditionsContext context) throws OperationCanceledException {
-        return new RefactoringStatus();
-    }
+   /**
+    * Do nothing.
+    * <p>
+    * {@inheritDoc}
+    */
+   @Override
+   public final RefactoringStatus checkConditions(IProgressMonitor pm,
+         CheckConditionsContext context) throws OperationCanceledException {
+      return new RefactoringStatus();
+   }
 
-    /**
-     * Computes the changes which need to be done to the JML code and
-     * add those to the changes to the java code which are already scheduled.
-     * 
-     * @return Returns null if only shared text changes are made. Otherwise
-     *      returns a {@link TextChange} which gathered all the changes to JML annotations 
-     *      in classes which do not have any Java changes scheduled.
-     *
-     */
-    public final Change createChange(final IProgressMonitor pm) throws CoreException,
-    OperationCanceledException {
+   /**
+    * Computes the changes which need to be done to the JML code and add those to the changes
+    * to the java code which are already scheduled.
+    * 
+    * @return Returns null if only shared text changes are made. Otherwise returns a
+    *         {@link TextChange} which gathered all the changes to JML annotations in classes
+    *         which do not have any Java changes scheduled.
+    *
+    */
+   public final Change createChange(final IProgressMonitor pm) throws CoreException,
+         OperationCanceledException {
 
-        // Only non empty change objects will be added
-        ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
-        
-        ClassMoveRefactoringComputer changesComputer = new ClassMoveRefactoringComputer(fOldPackName, fNewPackName, fOldFullQualName);
+      // Only non empty change objects will be added
+      ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
 
-        // Find out the projects which need to be checked: active project plus all dependencies
-        ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
-        projectsToCheck.add(fProject);
+      ClassMoveRefactoringComputer changesComputer = new ClassMoveRefactoringComputer(
+            fOldPackName, fNewPackName, fOldFullQualName);
 
-        try {// Look through all source files in each package and project
-            for (final IJavaProject project :  RefactoringUtil.getAllProjectsToCheck(projectsToCheck, fProject)) {
-                for (final IPackageFragment pac : RefactoringUtil.getAllPackageFragmentsContainingSources(project)) {
-                    for (final ICompilationUnit unit : pac
-                            .getCompilationUnits()) {
+      // Find out the projects which need to be checked: active project plus all dependencies
+      ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
+      projectsToCheck.add(fProject);
 
-                        final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(
-                                unit, project);
+      try {// Look through all source files in each package and project
+         for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(
+               projectsToCheck, fProject)) {
+            for (final IPackageFragment pac : RefactoringUtil
+                  .getAllPackageFragmentsContainingSources(project)) {
+               for (final ICompilationUnit unit : pac.getCompilationUnits()) {
 
-                        // Get scheduled changes to the java code from the rename processor
-                        final TextChange changesToJavaCode = getTextChange(unit);
+                  final ArrayList<ReplaceEdit> changesToJML = changesComputer
+                        .computeNeededChangesToJML(unit, project);
 
-                        // add our edits to the java changes
-                        // JDT will compute the shifts and the preview
-                        if (changesToJavaCode != null) {
-                            for (final ReplaceEdit edit : changesToJML) {
-                                changesToJavaCode.addEdit(edit);
-                            }
-                        }
-                        else {
-                            // In the extremely unlikely case that changes to the JML code needs to be done (but not to the java code)
-                            // Note that, when a class is imported -> changes to import declaration.
-                            // Class itself -> changes to the package declaration.
-                            if (!changesToJML.isEmpty()){
+                  // Get scheduled changes to the java code from the rename processor
+                  final TextChange changesToJavaCode = getTextChange(unit);
 
-                                changesToFilesWithoutJavaChanges.add(RefactoringUtil.combineEditsToChange(
-                                        unit, changesToJML));
-                            }
-                        }
-                    }
-                }
+                  // add our edits to the java changes
+                  // JDT will compute the shifts and the preview
+                  if (changesToJavaCode != null) {
+                     for (final ReplaceEdit edit : changesToJML) {
+                        changesToJavaCode.addEdit(edit);
+                     }
+                  }
+                  else {
+                     // In the extremely unlikely case that changes to the JML code needs to
+                     // be done (but not to the java code).
+                     // Note that, when a class is imported -> changes to import declaration.
+                     // Class itself -> changes to the package declaration.
+                     if (!changesToJML.isEmpty()) {
+                        changesToFilesWithoutJavaChanges.add(RefactoringUtil
+                              .combineEditsToChange(unit, changesToJML));
+                     }
+                  }
+               }
             }
-        }
-        catch (final JavaModelException e) {
-            return null;
-        }
+         }
+      }
+      catch (final JavaModelException e) {
+         return null;
+      }
 
-        // After iterating through all needed projects and source files, determine what needs to be returned.    
-        return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
-    }
+      // After iterating through all needed projects and source files, determine what needs to
+      // be returned.
+      return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
+   }
 }

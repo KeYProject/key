@@ -8,13 +8,10 @@ import org.key_project.jmlediting.profile.jmlref.test.refactoring.MoveFieldRefac
 import org.key_project.jmlediting.profile.jmlref.test.refactoring.MoveMethodRefactoringTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-    MoveClassRefactoringTest.class,
-    MoveFieldRefactoringTest.class,
-    MoveMethodRefactoringTest.class
-})
+@SuiteClasses({ 
+      MoveClassRefactoringTest.class, 
+      MoveFieldRefactoringTest.class,
+      MoveMethodRefactoringTest.class })
+public class TestSuiteMoveRefactoring {
 
-
-public class TestSuiteMoveRefactoring {  
-    
 }

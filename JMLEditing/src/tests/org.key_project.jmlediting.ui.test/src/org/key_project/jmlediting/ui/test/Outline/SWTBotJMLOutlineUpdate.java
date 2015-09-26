@@ -87,7 +87,7 @@ public class SWTBotJMLOutlineUpdate {
       }assertTrue("Failed at : " +itemName , false);
    }
    
-   public void testbehavior(String method, String itemSource, String itemName,boolean reloadtree){
+   public static void testbehavior(String method, String itemSource, String itemName,boolean reloadtree){
       if (reloadtree){
          tree = bot.viewByTitle("Outline").bot().tree();
       }

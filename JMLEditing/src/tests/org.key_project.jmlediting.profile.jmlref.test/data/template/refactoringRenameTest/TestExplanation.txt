@@ -33,7 +33,6 @@ Test11: combination of this qualifier and method with same name as the field.
 Test12: test11 plus a nested field call: TestClass balance; this.balance.balance()
 Test13: test12 with changed order: this.balance().balance
 Test14: test11/12 with more nesting: this.balance.balance == test.balance.balance().balance
-(Resolver problem) Test15: method call and Cast
 (Resolver problem) Test16: ArrayList access and equals: (classes.get(0)).balance.equals("5")
 (Resolver problem) Test17: test16 without the parentheses
 Test18: many MemberAccesses and MethodCalls plus distinguishing between String and field: 

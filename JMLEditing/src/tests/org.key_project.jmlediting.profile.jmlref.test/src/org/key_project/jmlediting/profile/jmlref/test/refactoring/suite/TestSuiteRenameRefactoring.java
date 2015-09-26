@@ -12,12 +12,12 @@ import org.key_project.jmlediting.profile.jmlref.test.refactoring.RenameParamete
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    RenameFieldsRefactoringTest.class,
-    RenameFieldsSeveralProjectsRefactoringTest.class,
-    RenameParametersRefactoringTest.class,
-    RenameClassesRefactoringTest.class,
-    RenamePackagesRefactoringTest.class,
-    RenameMethodRefactoringTest.class
+   RenameFieldsRefactoringTest.class,
+   RenameFieldsSeveralProjectsRefactoringTest.class,
+   RenameParametersRefactoringTest.class,
+   RenameClassesRefactoringTest.class,
+   RenamePackagesRefactoringTest.class,
+   RenameMethodRefactoringTest.class
 })
 
 public class TestSuiteRenameRefactoring {

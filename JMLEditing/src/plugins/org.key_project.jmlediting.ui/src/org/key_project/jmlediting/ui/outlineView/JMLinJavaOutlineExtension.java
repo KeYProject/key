@@ -70,22 +70,19 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
             
             comlist  = comments.getMethodJMLComm(offset);
             
-            // method has JML comments, add to array with content to show.
-            if (comlist != null)  {
-               
-               arroffset = comlist.size();
-               childrenToShowInOutline = new Object[currentChildren.length+arroffset];
-               int i=0;
-               // add new elements
-               for (JMLComments com : comlist){
-                  childrenToShowInOutline[i++] = new JMLOutlineElement((IJavaElement) parent, com);
-               }
-               // add old elements
-               for (i = offset; i < childrenToShowInOutline.length; i++){
-                  childrenToShowInOutline[i] = currentChildren[i-1];
-               }
-            } else childrenToShowInOutline = currentChildren;
-            
+            // method has JML comments, add to array with content to show. 
+            arroffset = comlist.size();
+            childrenToShowInOutline = new Object[currentChildren.length+arroffset];
+            int i=0;
+            // add new elements
+            for (JMLComments com : comlist){
+               childrenToShowInOutline[i++] = new JMLOutlineElement((IJavaElement) parent, com);
+            }
+            // add old elements
+            for (i = offset; i < childrenToShowInOutline.length; i++){
+               childrenToShowInOutline[i] = currentChildren[i-1];
+            }
+
             return childrenToShowInOutline;
                
             
