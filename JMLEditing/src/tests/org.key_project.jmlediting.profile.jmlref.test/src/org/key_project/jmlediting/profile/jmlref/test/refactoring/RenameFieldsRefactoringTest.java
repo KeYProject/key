@@ -186,5 +186,11 @@ public class RenameFieldsRefactoringTest {
       TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test24", srcFolder, oracleFolder,
             bot, "TestClass", "test", "balance : int", "aNewName", javaProject);
    }
+   
+   @Test
+   public void test25AccessFieldParentClass() throws CoreException {
+      TestUtilsRefactoring.runFieldRenameTest(TESTPATH + "\\test25", srcFolder, oracleFolder,
+            bot, "TestParent", "test", "fieldToRename : int", "aNewName", javaProject);
+   }
 
 }
