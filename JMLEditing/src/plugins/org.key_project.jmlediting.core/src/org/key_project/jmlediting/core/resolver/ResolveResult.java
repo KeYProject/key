@@ -5,6 +5,12 @@ import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.key_project.jmlediting.core.dom.IStringNode;
 
+/**
+ * A container for information about the resolve result.
+ * 
+ * @author Christopher Beckmann
+ *
+ */
 public class ResolveResult {
     
     private final ASTNode jdtNode;
