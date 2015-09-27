@@ -19,7 +19,8 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
  */
 public class TaskBuilder {
 
-   private final LinkedList<ResolverTask> tasks; // the task list which should be build and returned
+   private final LinkedList<ResolverTask> tasks; // the task list which should be build and
+                                                 // returned
 
    /**
     * Constructs a TaskBuilder and initializes the task list.
@@ -36,7 +37,8 @@ public class TaskBuilder {
     * @param jmlNode - the {@link IASTNode} that is supposed to be resolved.
     * @throws ResolverException is thrown, if the jmlNode isn't built correctly.
     */
-   protected final LinkedList<ResolverTask> buildResolverTask(final IASTNode jmlNode) throws ResolverException {
+   protected final LinkedList<ResolverTask> buildResolverTask(final IASTNode jmlNode)
+            throws ResolverException {
 
       tasks.add(new ResolverTask());
 
@@ -45,15 +47,18 @@ public class TaskBuilder {
          // it's either a String (as in some assignable clauses or when the typeComputer
          // calls the resolver to resolve a type name) or it is a primary expression,
          // when called from a normal source that tries to resolve fields or methods.
-         final boolean result = isReferenceType(jmlNode) || isString(jmlNode) || isPrimaryExpr(jmlNode);
+         final boolean result = isReferenceType(jmlNode) || isString(jmlNode)
+                  || isPrimaryExpr(jmlNode);
          if (result == false) {
-            throw new ResolverException("Given IASTNode is not resolvable/ not supported.", jmlNode, null);
+            throw new ResolverException("Given IASTNode is not resolvable/ not supported.",
+                     jmlNode, null);
          }
 
       }
       catch (final NullPointerException e) {
          throw new ResolverException("Given IASTNode is not resolvable. "
-               + "A NullPointerException occured while trying to access children.", jmlNode, e);
+                  + "A NullPointerException occured while trying to access children.",
+                  jmlNode, e);
       }
 
       return tasks;
@@ -75,7 +80,7 @@ public class TaskBuilder {
          if (!isPrimaryExpr(node.getChildren().get(0))) {
             // Primaries may be cascaded.
             result = isIdentifier(firstChildren) || isJmlPrimary(firstChildren)
-                  || isJavaKeyword(firstChildren) || isCast(firstChildren);
+                     || isJavaKeyword(firstChildren) || isCast(firstChildren);
          }
          // Process the Children of the Node
          if (node.getChildren().size() > 1) {
@@ -127,7 +132,7 @@ public class TaskBuilder {
    private final boolean isKeyword(final IASTNode node) {
       boolean result = false;
       if (node.getType() == NodeTypes.KEYWORD
-            && ((IKeywordNode) node).getKeywordInstance().equals("\\result")) {
+               && ((IKeywordNode) node).getKeywordInstance().equals("\\result")) {
          // PRIMARY -> JML_PRIMARY -> []
          tasks.getLast().setKeyword(true);
          tasks.getLast().setResolveString(((IKeywordNode) node).getKeywordInstance());
@@ -228,7 +233,7 @@ public class TaskBuilder {
          tasks.getLast().setMethod(true);
 
          result = isExpressionList(node.getChildren().get(0))
-               || isEmptyList(node.getChildren().get(0));
+                  || isEmptyList(node.getChildren().get(0));
       }
       return result;
    }

@@ -1,15 +1,13 @@
 package org.key_project.jmlediting.profile.jmlref.resolver.typecomputer;
 
-import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
-
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.resolver.IResolver;
-import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputer;
 import org.key_project.jmlediting.core.resolver.typecomputer.ITypeComputer;
+import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputer;
 import org.key_project.jmlediting.core.resolver.typecomputer.TypeComputerException;
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;

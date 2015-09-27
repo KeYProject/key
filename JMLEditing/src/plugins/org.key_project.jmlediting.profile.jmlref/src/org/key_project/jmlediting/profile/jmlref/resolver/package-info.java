@@ -1,4 +1,6 @@
-/**Default Resolver functionality for default JML.
+/**
+ * Default Resolver functionality for default JML.
+ * 
  * @author Christopher Beckmann
  *
  */
