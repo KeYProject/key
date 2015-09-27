@@ -47,17 +47,15 @@ import org.key_project.util.jdt.JDTUtil;
 
 /**
  * The Resolver class, that only has three public methods. <br>
- * "{@code resolve}({@link ICompilationUnit}, {@link IASTNode}) ->
- * 
- * {@link ResolveResult}" will resolve the given {@link IASTNode} and find the corresponding
- * JavaElement or JML declaration <br>
+ * "{@code resolve}({@link ICompilationUnit}, {@link IASTNode}) -> {@link ResolveResult}" will
+ * resolve the given {@link IASTNode} and find the corresponding JavaElement or JML
+ * declaration <br>
  * "{@code next()} -> {@link ResolveResult}" will resolve any member access that is appended
  * to the original identifier. <br>
  * "{@code hasNext()} -> boolean" that will return true, if the taskList is not empty and
  * there is still something to resolve with the next() method.
  * 
  * @author Christopher Beckmann
- * 
  * @see {@link TaskBuilder}
  * @see {@link ResolverTask}
  */
@@ -80,7 +78,7 @@ public class Resolver implements IResolver {
    @SuppressWarnings("unchecked")
    @Override
    public final ResolveResult resolve(final ICompilationUnit compilationUnit,
-         final IASTNode jmlNode) throws ResolverException {
+            final IASTNode jmlNode) throws ResolverException {
 
       if (jmlNode == null || compilationUnit == null) {
          return null;
@@ -115,7 +113,7 @@ public class Resolver implements IResolver {
       // Get the context information. That is the ASTNode to which the JML node refers to /
       // belongs to.
       context = (new JMLCommentToASTMapper(compilationUnit, jdtAST))
-            .getASTOfJMLComment(jmlNode);
+               .getASTOfJMLComment(jmlNode);
 
       return next();
    }
@@ -143,6 +141,7 @@ public class Resolver implements IResolver {
     */
    @Override
    public final ResolveResult next() throws ResolverException {
+
       // Get the task to do - if there is any left.
       currentTask = tasks.poll();
       if (currentTask == null) {
@@ -173,9 +172,8 @@ public class Resolver implements IResolver {
                   return next();
                }
                else {
-                  // If we found something we remove the rest of the tasks with our skip
-                  // identifier
-                  // so we can work normally after that
+                  // If we found something, we remove the rest of the tasks with our skip
+                  // identifier so we can work normally after that
                   final List<ResolverTask> toRemove = new LinkedList<ResolverTask>();
                   for (final ResolverTask t : tasks) {
                      if (t.getSkipIdentifier() == skipIdentifier) {
@@ -198,12 +196,12 @@ public class Resolver implements IResolver {
 
          // Are we trying to access functions of a TypeParameter?
          if (jdtNode == null && currentTask.isTypeVariable()
-               || jdtNode instanceof TypeParameter) {
+                  || jdtNode instanceof TypeParameter) {
 
             // We don't know the final types yet. So we get all the type bounds.
             final ITypeBinding[] bounds = jdtNode == null ? currentTask.getLastResult()
-                  .getReturnType().getTypeBounds() : ((TypeParameter) jdtNode)
-                  .resolveBinding().getTypeBounds();
+                     .getReturnType().getTypeBounds() : ((TypeParameter) jdtNode)
+                     .resolveBinding().getTypeBounds();
             // Do we have bounds? If not .. we can not access anything on this type. Because
             // we don't know what type it will be.
             if (bounds.length > 0) {
@@ -223,7 +221,7 @@ public class Resolver implements IResolver {
                   tasks.getFirst().setResolveString(nextTask.getResolveString());
                   tasks.getFirst().setSkipIdentifier(identifier);
                   result = new ResolveResult(jdtNode, resolveResultType, binding, t,
-                        currentTask.getNode());
+                           currentTask.getNode());
                   tasks.getFirst().setLastResult(result);
                }
             }
@@ -233,9 +231,9 @@ public class Resolver implements IResolver {
                returnValue = context.getAST().resolveWellKnownType("java.lang.Object");
                currentTask.setTypeVariable(false);
                currentTask.setLastResult(new ResolveResult(currentTask.getLastResult()
-                     .getJDTNode(), currentTask.getLastResult().getResolveType(), currentTask
-                     .getLastResult().getBinding(), returnValue, currentTask.getLastResult()
-                     .getStringNode()));
+                        .getJDTNode(), currentTask.getLastResult().getResolveType(),
+                        currentTask.getLastResult().getBinding(), returnValue, currentTask
+                                 .getLastResult().getStringNode()));
                tasks.add(currentTask);
             }
             if (jdtNode == null) {
@@ -261,13 +259,13 @@ public class Resolver implements IResolver {
          // Array Access
          jdtNode = currentTask.getLastResult().getJDTNode();
          binding = TypeComputer.getTypeFromBinding(currentTask.getLastResult().getBinding())
-               .getComponentType();
+                  .getComponentType();
          returnValue = TypeComputer.getTypeFromBinding(binding);
          resolveResultType = ResolveResultType.ARRAY_ACCESS;
 
          if (binding == null) {
             throw new ResolverException("Tried to perform an array access on a non array.",
-                  originalNode, null);
+                     originalNode, null);
          }
       }
 
@@ -284,8 +282,8 @@ public class Resolver implements IResolver {
          if (currentTask.getResolveString().equals("length")) {
             returnValue = context.getAST().resolveWellKnownType("int");
             final ResolveResult finalResult = new ResolveResult(null,
-                  ResolveResultType.ARRAY_LENGTH, returnValue, returnValue,
-                  currentTask.getNode());
+                     ResolveResultType.ARRAY_LENGTH, returnValue, returnValue,
+                     currentTask.getNode());
             return finalResult;
          }
          else if (currentTask.getResolveString().equals("clone")) {
@@ -301,7 +299,7 @@ public class Resolver implements IResolver {
       }
 
       final ResolveResult finalResult = new ResolveResult(jdtNode, resolveResultType,
-            binding, returnValue, currentTask.getNode());
+               binding, returnValue, currentTask.getNode());
 
       if (tasks.peek() != null) {
          tasks.peek().setLastResult(finalResult);
@@ -309,6 +307,7 @@ public class Resolver implements IResolver {
       return finalResult;
    }
 
+   // Depending on the keyword, we need to search in different directions / different content.
    private ASTNode processKeyword() throws ResolverException {
       if (currentTask.isKeyword()) {
          if (currentTask.getResolveString().equals("this")) {
@@ -324,15 +323,18 @@ public class Resolver implements IResolver {
       return null;
    }
 
+   // we traverse the ASTNode to the top, i.e. from child to parent, until we found
+   // a type declaration
    private TypeDeclaration getDeclaringClass(final ASTNode context) {
       ASTNode clazz = context;
       while (clazz != null && !(clazz instanceof TypeDeclaration)
-            && clazz.getParent() != null) {
+               && clazz.getParent() != null) {
          clazz = clazz.getParent();
       }
       return (TypeDeclaration) clazz;
    }
 
+   // returns the returnType of a method or null if it is no method
    private ASTNode findMethodReturnValue(final ASTNode context) {
       if (context instanceof MethodDeclaration) {
          return ((MethodDeclaration) context).getReturnType2();
@@ -369,7 +371,7 @@ public class Resolver implements IResolver {
       // if lastResult is null, this must be the first call of next() and is
       // the only case we could find parameters in
       if (currentTask.getLastResult() == null && !currentTask.isMethod()
-            && !currentTask.isClass() && !currentTask.isArray()) {
+               && !currentTask.isClass() && !currentTask.isArray()) {
          jdtNode = findParameters(context, currentTask.getResolveString());
       }
 
@@ -387,7 +389,7 @@ public class Resolver implements IResolver {
 
          do {
             jdtNode = (new MethodFinder(searchContext, currentTask, compilationUnit,
-                  originalNode)).findMethod();
+                     originalNode)).findMethod();
             searchContext = getSuperClass(searchContext);
 
          }
@@ -427,12 +429,15 @@ public class Resolver implements IResolver {
       return jdtNode;
    }
 
+   // we search the context for the node with the given name.
    private ASTNode findTypeParameter(final String resolveString) {
       final List<TypeParameter> result = new LinkedList<TypeParameter>();
       context.accept(new ASTVisitor() {
 
          @Override
          public boolean visit(final TypeParameter node) {
+            if (result.size() > 0)
+               return false;
             if (node.getName().getIdentifier().equals(resolveString)) {
                result.add(node);
                return false;
@@ -455,14 +460,14 @@ public class Resolver implements IResolver {
       if (superClass == null) {
          // Create a TypeBinding of object to compare
          final ITypeBinding objectTypeBinding = context.getAST().resolveWellKnownType(
-               "java.lang.Object");
+                  "java.lang.Object");
 
          if (((TypeDeclaration) searchContext).resolveBinding().isEqualTo(objectTypeBinding)) {
             return null;
          }
          try {
             type = compilationUnit.getJavaProject().findType(
-                  objectTypeBinding.getQualifiedName());
+                     objectTypeBinding.getQualifiedName());
          }
          catch (final JavaModelException e) {
             LogUtil.getLogger().logError(e);
@@ -486,8 +491,8 @@ public class Resolver implements IResolver {
    }
 
    /**
-    * Checks if the chain of strings we have to resolve is actually a Package rather than
-    * Fields/ MemberAccess.
+    * Checks if the chain of strings we have to resolve is actually a package rather than
+    * fields/memberAccess.
     * 
     * @param resolveString the current String we want to resolve.
     * @return an {@link ASTNode} of the class we found or null if none could be found.
@@ -496,9 +501,13 @@ public class Resolver implements IResolver {
 
       final IJavaProject javaProject = compilationUnit.getJavaProject();
 
+      // Get a working copy of the task list because we want to remove the ones we have seen
       final LinkedList<ResolverTask> tasksToWorkWith = new LinkedList<ResolverTask>();
       tasksToWorkWith.addAll(tasks);
 
+      // We use a search engine to find a class with a given name in a given package
+      // The strings which needs to be resolved and are stored in the tasks, are combined
+      // that the last one is tested as the class name and all before as the package path
       final LinkedList<IType> result = new LinkedList<IType>();
       final SearchEngine se = new SearchEngine();
 
@@ -511,30 +520,34 @@ public class Resolver implements IResolver {
          classToSearch = tasksToWorkWith.removeFirst().getResolveString();
 
          try {
-            se.searchAllTypeNames(packToSearch.toString().toCharArray(), SearchPattern.R_EXACT_MATCH,
-                  classToSearch.toCharArray(), SearchPattern.R_EXACT_MATCH,
-                  IJavaSearchConstants.CLASS,
-                  SearchEngine.createJavaSearchScope(new IJavaElement[] { javaProject }),
-                  new TypeNameMatchRequestor() {
-                     @Override
-                     public void acceptTypeNameMatch(final TypeNameMatch match) {
-                        result.add(match.getType());
-                     }
-                  }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
-                  new NullProgressMonitor());
+            se.searchAllTypeNames(packToSearch.toString().toCharArray(),
+                     SearchPattern.R_EXACT_MATCH, classToSearch.toCharArray(),
+                     SearchPattern.R_EXACT_MATCH, IJavaSearchConstants.CLASS,
+                     SearchEngine.createJavaSearchScope(new IJavaElement[] { javaProject }),
+                     new TypeNameMatchRequestor() {
+                        @Override
+                        public void acceptTypeNameMatch(final TypeNameMatch match) {
+                           result.add(match.getType());
+                        }
+                     }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
+                     new NullProgressMonitor());
          }
          catch (final JavaModelException e) {
             return null;
          }
 
+         // the string which we assumed was a class, will next be tested as the last
+         // part of the package path
          packToSearch.append(".");
          packToSearch.append(classToSearch);
          tasksToRemove++;
       }
 
+      // Check if we have found some class. It could have ended because no tasks were left
       if (result.size() > 0) {
          final IType type = result.getFirst();
 
+         // We remove all the tasks which were in fact just the path to a class
          for (int i = tasksToRemove; i > 0; i--) {
             if (i == 1) {
                final ResolverTask taskFoundClass = tasks.removeFirst();
@@ -545,6 +558,7 @@ public class Resolver implements IResolver {
             }
          }
 
+         // We get the class file of the found class and return its type declaration.
          ASTNode node = null;
 
          if (type.getClassFile() != null) {
@@ -574,15 +588,16 @@ public class Resolver implements IResolver {
 
       try {
          se.searchAllTypeNames(packageName.toCharArray(), SearchPattern.R_EXACT_MATCH,
-               resolveString.toCharArray(), SearchPattern.R_EXACT_MATCH,
-               IJavaSearchConstants.TYPE, SearchEngine
-                     .createJavaSearchScope(new IJavaElement[] { compilationUnit
-                           .getJavaProject() }), new TypeNameMatchRequestor() {
-                  @Override
-                  public void acceptTypeNameMatch(final TypeNameMatch match) {
-                     result.add(match.getType());
-                  }
-               }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, new NullProgressMonitor());
+                  resolveString.toCharArray(), SearchPattern.R_EXACT_MATCH,
+                  IJavaSearchConstants.TYPE, SearchEngine
+                           .createJavaSearchScope(new IJavaElement[] { compilationUnit
+                                    .getJavaProject() }), new TypeNameMatchRequestor() {
+                     @Override
+                     public void acceptTypeNameMatch(final TypeNameMatch match) {
+                        result.add(match.getType());
+                     }
+                  }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
+                  new NullProgressMonitor());
       }
       catch (final JavaModelException e) {
          LogUtil.getLogger().logError(e);
@@ -622,15 +637,16 @@ public class Resolver implements IResolver {
 
       try {
          se.searchAllTypeNames(binding.getName().toCharArray(), SearchPattern.R_EXACT_MATCH,
-               resolveString.toCharArray(), SearchPattern.R_EXACT_MATCH,
-               IJavaSearchConstants.TYPE, SearchEngine
-                     .createJavaSearchScope(new IJavaElement[] { binding.getJavaElement() }),
-               new TypeNameMatchRequestor() {
-                  @Override
-                  public void acceptTypeNameMatch(final TypeNameMatch match) {
-                     result.add(match.getType());
-                  }
-               }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, new NullProgressMonitor());
+                  resolveString.toCharArray(), SearchPattern.R_EXACT_MATCH,
+                  IJavaSearchConstants.TYPE, SearchEngine
+                           .createJavaSearchScope(new IJavaElement[] { binding
+                                    .getJavaElement() }), new TypeNameMatchRequestor() {
+                     @Override
+                     public void acceptTypeNameMatch(final TypeNameMatch match) {
+                        result.add(match.getType());
+                     }
+                  }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
+                  new NullProgressMonitor());
       }
       catch (final JavaModelException e) {
          LogUtil.getLogger().logError(e);
@@ -670,7 +686,7 @@ public class Resolver implements IResolver {
             @Override
             public boolean visit(final TypeDeclaration node) {
                if (node.getName().getIdentifier() != null
-                     && node.getName().getIdentifier().equals(name)) {
+                        && node.getName().getIdentifier().equals(name)) {
                   // We found it. Stop searching.
                   endResult.add(node);
                   return false;
@@ -710,7 +726,7 @@ public class Resolver implements IResolver {
       }
       else if (typeBinding.isPrimitive()) {
          throw new ResolverException("Can not resolve an access to a primitive type.",
-               originalNode, null);
+                  originalNode, null);
 
       }
       else if (typeBinding.isArray()) {
@@ -794,8 +810,12 @@ public class Resolver implements IResolver {
       return getTypeInCompilationUnit(type.getElementName(), node);
    }
 
+   // The given resolveString could be a class which is explicitly imported
+   // or it could be a class which is imported on demand (using the * import).
+   // But it could also be the name of a field/method was imported directly with a static
+   // import.
    private ASTNode findInImports(final String resolveString,
-         final List<ImportDeclaration> imports) throws ResolverException {
+            final List<ImportDeclaration> imports) throws ResolverException {
 
       for (final ImportDeclaration imp : imports) {
 
@@ -823,7 +843,7 @@ public class Resolver implements IResolver {
             IType type = null;
             try {
                type = compilationUnit.getJavaProject().findType(
-                     ((ITypeBinding) binding).getQualifiedName());
+                        ((ITypeBinding) binding).getQualifiedName());
                if (type == null || !type.getElementName().equals(resolveString)) {
                   continue;
                }
@@ -853,7 +873,7 @@ public class Resolver implements IResolver {
             IType type = null;
             try {
                type = compilationUnit.getJavaProject().findType(
-                     ((IMethodBinding) binding).getDeclaringClass().getQualifiedName());
+                        ((IMethodBinding) binding).getDeclaringClass().getQualifiedName());
 
                final IMethodBinding mb = (IMethodBinding) binding;
                if (type == null || !mb.getName().equals(resolveString)) {
@@ -897,7 +917,7 @@ public class Resolver implements IResolver {
             IType type = null;
             try {
                type = compilationUnit.getJavaProject().findType(
-                     ((IVariableBinding) binding).getDeclaringClass().getQualifiedName());
+                        ((IVariableBinding) binding).getDeclaringClass().getQualifiedName());
 
                final IVariableBinding vb = (IVariableBinding) binding;
                if (type == null || !vb.getName().equals(resolveString)) {
@@ -937,7 +957,8 @@ public class Resolver implements IResolver {
          }
          else {
             throw new ResolverException(
-                  "ImportDeclaration returned an unrecognised IBinding.", originalNode, null);
+                     "ImportDeclaration returned an unrecognised IBinding.", originalNode,
+                     null);
          }
       }
 

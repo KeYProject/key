@@ -24,7 +24,7 @@ public class TaskBuilder {
    /**
     * Constructs a TaskBuilder and initializes the task list.
     */
-   TaskBuilder() {
+   public TaskBuilder() {
       tasks = new LinkedList<ResolverTask>();
    }
 
