@@ -46,23 +46,32 @@ public class TypeComputer implements ITypeComputer {
         }
         
         if(node.getType() == NodeTypes.STRING) {
-            // end
+           // TODO: possible we have to do something here... 
+           return null;
+           
         } else if(node.getType() == NodeTypes.KEYWORD) {
-            // TODO: check childs
+           return null;
             
         } else if(node.getType() == NodeTypes.KEYWORD_APPL) {
+           return null;
             
         } else if(node.getType() == NodeTypes.KEYWORD_CONTENT) {
+           return null;
             
         } else if(node.getType() == NodeTypes.NODE) {
+           return null;
             
         } else if(node.getType() == NodeTypes.LIST) {
+           return null;
             
         } else if(node.getType() == NodeTypes.SEQ) {
+           return null;
             
         } else if(node.getType() == NodeTypes.SOME) {
+           return null;
             
         } else if(node.getType() == NodeTypes.NONE) {
+           return null;
             
         }
         throw new TypeComputerException("Can not identify the node type.", node);

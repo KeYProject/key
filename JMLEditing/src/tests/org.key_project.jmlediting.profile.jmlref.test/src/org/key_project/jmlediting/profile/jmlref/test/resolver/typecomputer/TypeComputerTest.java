@@ -518,9 +518,9 @@ public class TypeComputerTest {
    }
    
    @Test
-   public void ExpressionNodeTypesJML_PRIMARY() throws TypeComputerException {
+   public void ExpressionNodeTypesPRIMARY_EXPR2() throws TypeComputerException {
       
-      final ITypeBinding result = test(0, ExpressionNodeTypes.JML_PRIMARY, 32);
+      final ITypeBinding result = test(0, ExpressionNodeTypes.PRIMARY_EXPR, 32);
       
       assertNotEquals(null, result);
       assertEquals("boolean" , result.getQualifiedName());
