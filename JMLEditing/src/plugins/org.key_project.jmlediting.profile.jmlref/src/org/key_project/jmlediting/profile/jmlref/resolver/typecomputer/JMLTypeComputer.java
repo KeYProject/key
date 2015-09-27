@@ -4,6 +4,7 @@ import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
@@ -52,10 +53,14 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
         
         } else if(type == ExpressionNodeTypes.ASSIGNMENT) {
            // set myGostVar := jmlExpression;
+           //return Type of wanted element
+           return computeType(node.getChildren().get(0));
 
         } else if(type == ExpressionNodeTypes.BINARY_AND 
                || type == ExpressionNodeTypes.BINARY_OR
                || type == ExpressionNodeTypes.BINARY_EXCLUSIVE_OR) {
+            return createWellKnownType("boolean"); 
+           
         } else if(type == ExpressionNodeTypes.CAST) {
            
            // If type is primitive Type .. TypeComputer has to handle it.
@@ -66,42 +71,11 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
         
         } else if(type == ExpressionNodeTypes.EQUALITY) {
             // the 2 sides must be of the same type
-           ITypeBinding returnBinding = null;
-           ITypeBinding oldBinding = null;
-           if (node.getChildren().size() <= 2){
-              return null; // TODO: Exception log or something to know equlaity is not correct
-           }
-           for (IASTNode child : node.getChildren()){
-              if(child.getType() != NodeTypes.STRING){
-                 returnBinding = computeType(child);
-                    if(oldBinding != null){
-                       if (!returnBinding.isEqualTo(oldBinding)){
-                          // Type missmatch (int a) == (String b)
-                          // TODO: log Error
-                          return null;
-                       }
-                    } else oldBinding = returnBinding;
-              }
-           }
-           return returnBinding;
+           return createWellKnownType("boolean");
         
         } else if(type == ExpressionNodeTypes.EQUIVALENCE_OP) {
            // <=>
-           
-           ITypeBinding returnBinding = null;
-           if (node.getChildren().size() <= 2){
-              return null; // TODO: Exception log or something to know equlaity is not correct
-           }
-           for (IASTNode child : node.getChildren()){
-              if(child.getType() != NodeTypes.STRING){
-                 returnBinding = computeType(child);
-                 if(!(returnBinding.isEqualTo(createWellKnownType("boolean")) || returnBinding.isEqualTo(createWellKnownType("java.lang.Boolean")))){
-                    //TODO: LOG error type missmatch
-                    return null;
-                 }
-              }
-           }
-           return returnBinding;
+           return createWellKnownType("boolean");
         
         } else if(type == ExpressionNodeTypes.EXPRESSION_LIST) {
         
@@ -109,24 +83,13 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
             
         } else if(type == ExpressionNodeTypes.IMPLIES) {
            // ==> child should be primary
-           ITypeBinding returnBinding = null;
-           for (IASTNode child : node.getChildren()){
-              if(child.getType() != NodeTypes.STRING){
-                 returnBinding = computeType(child);
-                 if(!(returnBinding.isEqualTo(createWellKnownType("boolean")) || returnBinding.isEqualTo(createWellKnownType("java.lang.Boolean")))){
-                    //TODO: LOG error type missmatch
-                    return null;
-                 }
-              }
-           }
-           return returnBinding;
+           return createWellKnownType("boolean");
               
         } else if(type == ExpressionNodeTypes.JAVA_KEYWORD) {
             // super / this / ?
         
         } else if(type == ExpressionNodeTypes.JML_PRIMARY) {
             // \result \old(...) ?
-        
         
         } else if(type == ExpressionNodeTypes.LOGICAL_AND
                || type == ExpressionNodeTypes.LOGICAL_OR) {
@@ -139,9 +102,7 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
                 return createWellKnownType("boolean");
             }
             
-        } else if(type == ExpressionNodeTypes.MINUS
-               || type == ExpressionNodeTypes.PLUS
-               || type == ExpressionNodeTypes.MULT
+        } else if(type == ExpressionNodeTypes.MULT
                || type == ExpressionNodeTypes.ADDITIVE) {
             if(node.getChildren().size() % 2 != 1 || node.getChildren().size() == 1) {
                return null;
@@ -168,23 +129,24 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
             return savedType;
             
             
-            
+        } else if (type == ExpressionNodeTypes.MINUS
+               || type == ExpressionNodeTypes.PLUS) {
+           //+int
+           ITypeBinding operator = computeType(node.getChildren().get(1));
+           if (operator.isEqualTo(FLOAT) || operator.isEqualTo(P_FLOAT)){
+              return P_FLOAT;
+           }
+           return P_INTEGER;
+        
         } else if(type == ExpressionNodeTypes.NEW_EXPRESSION) {
+           //new bla | first child is string node second is Reference Type
+            return computeType(node.getChildren().get(1));
+            
             
         } else if(type == ExpressionNodeTypes.NOT) {
             // !boolean
+           return (createWellKnownType("boolean"));
            
-            //first cild is String ! scond is Primary
-            final ITypeBinding expected = createWellKnownType("boolean");
-            final ITypeBinding actual = computeType(node.getChildren().get(1));
-            
-            if(actual.isEqualTo(expected) || actual.isEqualTo(createWellKnownType("java.lang.Boolean"))) {
-                return expected;
-            } else {
-                return null; // Log Error for Showng missmatch
-            }
-            
-            
         } else if(type == ExpressionNodeTypes.POST_FIX_EXPR) {
            //i++ increase ||| first element primary that gets increased second is string ++/--
            return computeType(node.getChildren().get(0));
@@ -211,23 +173,15 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
            return callResolver(node);
             
         } else if(type == ExpressionNodeTypes.RELATIONAL_OP) {
-           if (node.getChildren().size() != 3) {
-              return null; //TODO: LOG Error Missing operant
-           }
-           for (IASTNode child : node.getChildren()){
-              if(child.getType() != NodeTypes.STRING) {
-                 if (!arithmeticalBinding(computeType(child))){
-                    return null; // TODO: LOG ERROR not comparable
-                 }
-              }
-           }
            return createWellKnownType("boolean");
             
         } else if(type == ExpressionNodeTypes.SHIFT) {
-            
+           return computeType(node.getChildren().get(0)); 
+           
         } else if(type == ExpressionNodeTypes.SUPER_CALL) {
             
         } else if(type == ExpressionNodeTypes.TILDE) {
+           return createWellKnownType("int");
             
         } else if(type == ExpressionNodeTypes.TYPE_ARGUMENT) {
            
