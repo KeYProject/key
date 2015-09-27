@@ -133,6 +133,9 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
                || type == ExpressionNodeTypes.PLUS) {
            //+int
            ITypeBinding operator = computeType(node.getChildren().get(1));
+           if (operator.isEqualTo(createWellKnownType("double")) || operator.isEqualTo(createWellKnownType("java.lang.Double"))){
+              return operator;
+           }
            if (operator.isEqualTo(FLOAT) || operator.isEqualTo(P_FLOAT)){
               return P_FLOAT;
            }
