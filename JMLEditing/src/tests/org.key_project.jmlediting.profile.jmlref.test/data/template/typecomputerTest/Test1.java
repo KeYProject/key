@@ -31,17 +31,18 @@ public class Test1 {
    //@ invariant 2.5 >> 1;
    //@ invariant --floatField;
    //@ invariant ~intField;
-   //@ invariant +intField;
+   //@ invariant +floatField;
    //@ invariant booleanField == new Boolean();
    //@ invariant o = stringField = "someString";
    
    //@ invariant stringField = "someString";
-   //@ invariant -intField;
+   //@ invariant -doubleField;
    
    boolean booleanField;
    Boolean booleanField2;
    int intField;
    float floatField;
+   double doubleField;
    String stringField;
    int[] intArrayField;
    Object o;
