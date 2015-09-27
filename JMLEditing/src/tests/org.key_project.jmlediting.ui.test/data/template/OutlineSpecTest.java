@@ -1,6 +1,15 @@
 package test;
 
 public class OutlineSpecTest {
+   
+   public class clazz {
+      //randome comment
+      
+      
+      public void clazz1(){
+         
+      }
+   }
 
    public int /*@ spec_public@*/ balance = 0;
    
@@ -14,6 +23,10 @@ public class OutlineSpecTest {
        */
       return i;
    }
+   
+   public void a(){
+      
+   }
 
    /*@ behavior
     @ 
@@ -25,6 +38,33 @@ public class OutlineSpecTest {
 
 
    public int /*@ spec_protected nullable@*/ balance2 = 0;
-
+   
+   /*@ behavior
+   @ 
+   @
+   */
+   public void a(){
+      new clazz(){
+         
+      }
+      
+   }
+   //ohne comment
+   public void acsda(){
+      new clazz(){
+         
+      }
+      
+   }
+   
+   
+   public clazz /*@nullable@*/ z = new clazz(){
+      
+   };
+ 
+   public clazz  zz = new clazz(){
+      
+   };
+   
    
 }

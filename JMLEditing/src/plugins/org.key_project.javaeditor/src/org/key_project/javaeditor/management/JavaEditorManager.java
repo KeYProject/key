@@ -394,7 +394,7 @@ public final class JavaEditorManager {
                             // check for length == 0 makes sure that no outline update is triggered by JDT.
                            if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0){
                                if (Display.getDefault() != null && !Display.getDefault().isDisposed()){
-                                 Display.getDefault().asyncExec(new Runnable() {
+                                 Display.getDefault().syncExec(new Runnable() {
                                     
                                     @Override
                                     public void run() {

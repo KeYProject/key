@@ -35,7 +35,7 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
          root =  javaParent;
       }else if (comments == null) return currentChildren;
       
-      if (comments != null) {
+      
    
          // add invariants to class
          if (javaParent.getElementType() == IJavaElement.TYPE && javaParent.getParent().equals(root)){
@@ -72,6 +72,7 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
             
             // method has JML comments, add to array with content to show. 
             arroffset = comlist.size();
+            
             childrenToShowInOutline = new Object[currentChildren.length+arroffset];
             int i=0;
             // add new elements
@@ -79,8 +80,8 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
                childrenToShowInOutline[i++] = new JMLOutlineElement((IJavaElement) parent, com);
             }
             // add old elements
-            for (i = offset; i < childrenToShowInOutline.length; i++){
-               childrenToShowInOutline[i] = currentChildren[i-1];
+            for (i = arroffset; i < currentChildren.length+comlist.size(); i++){
+               childrenToShowInOutline[i] = currentChildren[i-comlist.size()];
             }
 
             return childrenToShowInOutline;
@@ -111,7 +112,7 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
             
             return childrenToShowInOutline;
          }
-      }
+      
       return currentChildren;
   }
 }

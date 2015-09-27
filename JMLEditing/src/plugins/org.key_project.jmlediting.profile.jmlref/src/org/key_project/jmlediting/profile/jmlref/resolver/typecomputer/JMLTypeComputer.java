@@ -1,5 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.resolver.typecomputer;
 
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
+
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -64,17 +66,54 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
         
         } else if(type == ExpressionNodeTypes.EQUALITY) {
             // the 2 sides must be of the same type
+           ITypeBinding returnBinding = null;
+           ITypeBinding oldBinding = null;
+           for (IASTNode child : node.getChildren()){
+              if(child.getType() != NodeTypes.STRING){
+                 returnBinding = computeType(child);
+                    if(oldBinding != null){
+                       if (!returnBinding.isEqualTo(oldBinding)){
+                          // Type missmatch (int a) == (String b)
+                          // TODO: log Error
+                          return null;
+                       }
+                    } else oldBinding = returnBinding;
+              }
+           }
+           return returnBinding;
         
         } else if(type == ExpressionNodeTypes.EQUIVALENCE_OP) {
            // <=>
+           ITypeBinding returnBinding = null;
+           for (IASTNode child : node.getChildren()){
+              if(child.getType() != NodeTypes.STRING){
+                 returnBinding = computeType(child);
+                 if(!(returnBinding.isEqualTo(createWellKnownType("boolean")) || returnBinding.isEqualTo(createWellKnownType("java.lang.Boolean")))){
+                    //TODO: LOG error type missmatch
+                    return null;
+                 }
+              }
+           }
+           return returnBinding;
         
         } else if(type == ExpressionNodeTypes.EXPRESSION_LIST) {
         
         } else if(type == ExpressionNodeTypes.IDENTIFIER) {
             
         } else if(type == ExpressionNodeTypes.IMPLIES) {
-           // ==>
-        
+           // ==> child should be primary
+           ITypeBinding returnBinding = null;
+           for (IASTNode child : node.getChildren()){
+              if(child.getType() != NodeTypes.STRING){
+                 returnBinding = computeType(child);
+                 if(!(returnBinding.isEqualTo(createWellKnownType("boolean")) || returnBinding.isEqualTo(createWellKnownType("java.lang.Boolean")))){
+                    //TODO: LOG error type missmatch
+                    return null;
+                 }
+              }
+           }
+           return returnBinding;
+              
         } else if(type == ExpressionNodeTypes.JAVA_KEYWORD) {
             // super / this / ?
         
