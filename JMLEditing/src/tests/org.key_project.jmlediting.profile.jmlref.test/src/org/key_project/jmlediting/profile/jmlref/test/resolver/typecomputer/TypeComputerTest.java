@@ -120,17 +120,20 @@ public class TypeComputerTest {
       
       final IASTNode node = iASTList.get(commentNr);
       
-      return node.traverse(new INodeTraverser<IASTNode>() {
-
-         @Override
-         public IASTNode traverse(final IASTNode node, final IASTNode existing) {
-            if(node.getType() == type && existing == null) {
-               return node;
-            }
-            return existing;
+      return findNode(node, type);
+   }
+   
+   private IASTNode findNode(final IASTNode node, final int type) {
+      if(node.getType() == type) {
+         return node;
+      }
+      for(final IASTNode child : node.getChildren()) {
+         final IASTNode result = findNode(child, type);
+         if(result != null) {
+            return result;
          }
-         
-      }, null);
+      }
+      return null;
    }
    
    // ***************************************************************************

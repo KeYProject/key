@@ -156,12 +156,10 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
             
             ITypeBinding result = null;
 
-            result = computeType(node);
-
+            result = computeType(node.getChildren().get(0));
             if(result != null) {
                return result;
             }
-            
          }
          return callResolver(node);
 
