@@ -172,7 +172,7 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
             final ITypeBinding expected = createWellKnownType("boolean");
             final ITypeBinding actual = computeType(node.getChildren().get(0));
             
-            if(typeMatch(actual, expected)) {
+            if(actual.isEqualTo(expected)) {
                 return expected;
             } else {
                 throw new TypeComputerException("Type mismatch: The result should be boolean.", node);
@@ -210,7 +210,7 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
         } else if(type == ExpressionNodeTypes.TILDE) {
             
         } else if(type == ExpressionNodeTypes.TYPE_ARGUMENT) {
-            
+           
         } else {
             return super.computeType(node);
         }

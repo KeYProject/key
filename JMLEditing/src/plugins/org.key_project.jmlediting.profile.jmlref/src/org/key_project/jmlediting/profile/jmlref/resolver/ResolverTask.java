@@ -56,7 +56,7 @@ public final class ResolverTask {
       return isMethod;
    }
 
-   public final void setMethod(boolean isMethod) {
+   public final void setMethod(final boolean isMethod) {
       this.isMethod = isMethod;
    }
 
@@ -64,7 +64,7 @@ public final class ResolverTask {
       return isArrayAcess;
    }
 
-   public final void setArrayAcess(boolean isArrayAcess) {
+   public final void setArrayAcess(final boolean isArrayAcess) {
       this.isArrayAcess = isArrayAcess;
    }
 
@@ -72,7 +72,7 @@ public final class ResolverTask {
       return isKeyword;
    }
 
-   public final void setKeyword(boolean isKeyword) {
+   public final void setKeyword(final boolean isKeyword) {
       this.isKeyword = isKeyword;
    }
 
@@ -80,7 +80,7 @@ public final class ResolverTask {
       return isClass;
    }
 
-   public final void setClass(boolean isClass) {
+   public final void setClass(final boolean isClass) {
       this.isClass = isClass;
    }
 
@@ -88,7 +88,7 @@ public final class ResolverTask {
       return isArray;
    }
 
-   public final void setArray(boolean isArray) {
+   public final void setArray(final boolean isArray) {
       this.isArray = isArray;
    }
 
@@ -96,7 +96,7 @@ public final class ResolverTask {
       return isTypeVariable;
    }
 
-   public final void setTypeVariable(boolean isTypeVariable) {
+   public final void setTypeVariable(final boolean isTypeVariable) {
       this.isTypeVariable = isTypeVariable;
    }
 
@@ -104,7 +104,7 @@ public final class ResolverTask {
       return skipIdentifier;
    }
 
-   public final void setSkipIdentifier(int skipIdentifier) {
+   public final void setSkipIdentifier(final int skipIdentifier) {
       this.skipIdentifier = skipIdentifier;
    }
 
@@ -112,7 +112,7 @@ public final class ResolverTask {
       return resolveString;
    }
 
-   public final void setResolveString(String resolveString) {
+   public final void setResolveString(final String resolveString) {
       this.resolveString = resolveString;
    }
 
@@ -120,7 +120,7 @@ public final class ResolverTask {
       return node;
    }
 
-   public final void setNode(IStringNode node) {
+   public final void setNode(final IStringNode node) {
       this.node = node;
    }
 
@@ -128,7 +128,7 @@ public final class ResolverTask {
       return lastResult;
    }
 
-   public final void setLastResult(ResolveResult lastResult) {
+   public final void setLastResult(final ResolveResult lastResult) {
       this.lastResult = lastResult;
    }
 
@@ -136,7 +136,7 @@ public final class ResolverTask {
       return originalTypeBinding;
    }
 
-   public final void setOriginalTypeBinding(ITypeBinding originalTypeBinding) {
+   public final void setOriginalTypeBinding(final ITypeBinding originalTypeBinding) {
       this.originalTypeBinding = originalTypeBinding;
    }
 
@@ -144,7 +144,7 @@ public final class ResolverTask {
       return parameters;
    }
 
-   public final void setParameters(LinkedList<IASTNode> parameters) {
+   public final void setParameters(final LinkedList<IASTNode> parameters) {
       this.parameters = parameters;
    }
 
@@ -152,7 +152,30 @@ public final class ResolverTask {
       return typeArguments;
    }
 
-   public void setTypeArguments(HashMap<String, ITypeBinding> typeArguments) {
+   public void setTypeArguments(final HashMap<String, ITypeBinding> typeArguments) {
       this.typeArguments = typeArguments;
    }
+   
+   @Override
+   public String toString() {
+      final StringBuilder sb = new StringBuilder();
+      if(resolveString != null) {
+         sb.append(resolveString);
+      }
+      if(isMethod) {
+         sb.append("(");
+         for(int i = 0; i < parameters.size(); i++) {
+            sb.append("?");
+            if(i < parameters.size() - 1) {
+               sb.append(" ,");
+            }
+         }
+         sb.append(")");
+      }
+      if(isArrayAcess) {
+         sb.append("[]");
+      }
+      return sb.toString();
+   }
+   
 }

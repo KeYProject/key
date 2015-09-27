@@ -19,7 +19,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
  */
 public class TaskBuilder {
 
-   private LinkedList<ResolverTask> tasks; // the task list which should be build and returned
+   private final LinkedList<ResolverTask> tasks; // the task list which should be build and returned
 
    /**
     * Constructs a TaskBuilder and initializes the task list.
@@ -36,8 +36,7 @@ public class TaskBuilder {
     * @param jmlNode - the {@link IASTNode} that is supposed to be resolved.
     * @throws ResolverException is thrown, if the jmlNode isn't built correctly.
     */
-   protected final LinkedList<ResolverTask> buildResolverTask(final IASTNode jmlNode)
-         throws ResolverException {
+   protected final LinkedList<ResolverTask> buildResolverTask(final IASTNode jmlNode) throws ResolverException {
 
       tasks.add(new ResolverTask());
 
@@ -46,18 +45,15 @@ public class TaskBuilder {
          // it's either a String (as in some assignable clauses or when the typeComputer
          // calls the resolver to resolve a type name) or it is a primary expression,
          // when called from a normal source that tries to resolve fields or methods.
-         final boolean result = isReferenceType(jmlNode) || isString(jmlNode)
-               || isPrimaryExpr(jmlNode);
+         final boolean result = isReferenceType(jmlNode) || isString(jmlNode) || isPrimaryExpr(jmlNode);
          if (result == false) {
-            throw new ResolverException("Given IASTNode is not resolvable/ not supported.",
-                  jmlNode, null);
+            throw new ResolverException("Given IASTNode is not resolvable/ not supported.", jmlNode, null);
          }
 
       }
       catch (final NullPointerException e) {
          throw new ResolverException("Given IASTNode is not resolvable. "
-               + "A NullPointerException occured while trying to access children.", jmlNode,
-               e);
+               + "A NullPointerException occured while trying to access children.", jmlNode, e);
       }
 
       return tasks;

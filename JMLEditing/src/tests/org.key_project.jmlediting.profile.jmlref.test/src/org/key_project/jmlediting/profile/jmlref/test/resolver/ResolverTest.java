@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
@@ -780,7 +781,6 @@ public class ResolverTest {
     public void resolveMethodWideningReferenceConversion8() throws ResolverException {
        test("serializableMethod", 0, 0, 7, ResolveResultType.METHOD);
     }
-    
     @Test 
     public void resolveParameterizedTypeTest1() throws ResolverException {
        test(1, "field", "methodFromBound1", 5, 0, 0, ResolveResultType.METHOD, null);
@@ -792,6 +792,14 @@ public class ResolverTest {
     @Test 
     public void resolveParameterizedTypeTest3() throws ResolverException {
        test(1, "field", "methodFromIBound3", 7, 0, 2, ResolveResultType.METHOD, null);
+    }
+    @Test 
+    public void resolveParameterizedTypeTest5() throws ResolverException {
+       test(1, "field", "field", 8, 0, 3, ResolveResultType.FIELD, null);
+    }
+    @Test 
+    public void resolveParameterizedTypeTest6() throws ResolverException {
+       test(1, "T", "methodFromIBound3", 7, 0, 0, ResolveResultType.METHOD, null);
     }
     @Test 
     public void resolveParameterizedTypeTest4() throws ResolverException {
@@ -809,6 +817,12 @@ public class ResolverTest {
     @Test
     public void resolveArrayCloneMethod() throws ResolverException {
        test(0, "arrayField3", "equals", 0, 0, 0, ResolveResultType.METHOD, null, true);
+    }
+    @Test(expected=ResolverException.class)
+    public void resolveMethodResultInInvariant() throws ResolverException {
+       final IResolver resolver = new Resolver();
+       
+       resolver.resolve(cuParam2, getIASTNode("\\result", 0, 2));
     }
     //********************************************************************************************
 
@@ -953,6 +967,22 @@ public class ResolverTest {
                         return node;
                     }
                 }
+            }
+            if(node.getChildren().get(0).getChildren().get(0).getType() == NodeTypes.KEYWORD) {
+               if(((IKeywordNode)node.getChildren().get(0).getChildren().get(0)).getKeywordInstance().equals(identifier)) {
+                  if(skip-- == 0) {
+                      return node;
+                  }
+              }
+            }
+            if(node.getChildren().get(0).getType() == ExpressionNodeTypes.CAST 
+            && node.getChildren().get(0).getChildren().get(0).getType() == ExpressionNodeTypes.REFERENCE_TYPE 
+            && node.getChildren().get(0).getChildren().get(0).getChildren().get(0).getChildren().get(0).getType() == NodeTypes.STRING) {
+               if(((IStringNode)node.getChildren().get(0).getChildren().get(0).getChildren().get(0).getChildren().get(0)).getString().equals(identifier)) {
+                  if(skip-- == 0) {
+                      return node;
+                  }
+              }
             }
         }
         return null;
