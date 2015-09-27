@@ -17,13 +17,13 @@ import org.key_project.jmlediting.core.utilities.LogUtil;
  * This class is used by the {@link Resolver} at the beginning stage when gathering information.
  * <br><br>
  * The using class will need to call the only available method,
- * {@link #getASTOfJMLComment(IASTNode)}, and will return the {@link ASTNode} for a given
+ * {@link #getSearchContext(IASTNode)}, and will return the {@link ASTNode} for a given
  * {@link IASTNode}. That is, the context information to which a JML comment refers to.
  * 
  * @author Christopher Beckmann
  *
  */
-public class JMLCommentToASTMapper {
+public class SearchContextMapper {
 
    private final CompilationUnit jdtAST;
    private final ICompilationUnit compilationUnit;
@@ -34,7 +34,7 @@ public class JMLCommentToASTMapper {
     * @param compilationUnit a given {@link ICompilationUnit} which we should search through.
     * @param jdtAST the AST of the parsed {@code compilationUnit}
     */
-   JMLCommentToASTMapper(final ICompilationUnit compilationUnit, final CompilationUnit jdtAST) {
+   SearchContextMapper(final ICompilationUnit compilationUnit, final CompilationUnit jdtAST) {
       this.compilationUnit = compilationUnit;
       this.jdtAST = jdtAST;
    }
@@ -44,12 +44,10 @@ public class JMLCommentToASTMapper {
     * or method declaration but it can also be a class itself in case of a class invariant.
     * 
     * @param jmlNode the {@link IASTNode} for which the {@link ASTNode} should be found.
-    * @return the ASTNode which belongs to the given IASTNode. Can be null if nothing was
+    * @return the {@link ASTNode} which belongs to the given {@link IASTNode}. Can be {@code null} if nothing was
     *         found.
     */
-   
-   // getCommentList() is called on the compilation unit
-   public final ASTNode getASTOfJMLComment(final IASTNode jmlNode) {
+   public final ASTNode getSearchContext(final IASTNode jmlNode) {
 
       final HashMap<Comment, ASTNode> commentToAST = new HashMap<Comment, ASTNode>();
 

@@ -108,8 +108,8 @@ public class Resolver implements IResolver {
       }
 
       // Get the context information. That is the ASTNode to which the JML node refers to / belongs to.
-      context = new JMLCommentToASTMapper(compilationUnit, jdtAST)
-               .getASTOfJMLComment(jmlNode);
+      context = new SearchContextMapper(compilationUnit, jdtAST)
+               .getSearchContext(jmlNode);
 
       return next();
    }
