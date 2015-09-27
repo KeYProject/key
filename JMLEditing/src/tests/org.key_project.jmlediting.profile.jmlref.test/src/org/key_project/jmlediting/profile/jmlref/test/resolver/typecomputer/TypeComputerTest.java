@@ -405,8 +405,8 @@ public class TypeComputerTest {
       final ITypeBinding result = test(0, ExpressionNodeTypes.TILDE, 26);
       
       assertNotEquals(null, result);
-      assertEquals("float" , result.getQualifiedName());
-      assertTrue(cu.getAST().resolveWellKnownType("float").isEqualTo(result));
+      assertEquals("int" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("int").isEqualTo(result));
    }
    
    @Test

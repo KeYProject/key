@@ -30,7 +30,7 @@ public class Test1 {
    //@ invariant 12 << 1;
    //@ invariant 2.5 >> 1;
    //@ invariant --floatField;
-   //@ invariant ~floatField;
+   //@ invariant ~intField;
    //@ invariant +intField;
    //@ invariant booleanField == new Boolean();
    //@ invariant o = stringField = "someString";
