@@ -7,12 +7,11 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-   // parser
    SWTBotJMLOutlineView.class,
    SWTBotJMLOutlineSpecPure.class,
    SWTBotJMLOutlineUpdate.class
 })
 
-public class JMLOutlineAllTestSuit {
+public class JMLOutlineAllTestSuite {
 
 }

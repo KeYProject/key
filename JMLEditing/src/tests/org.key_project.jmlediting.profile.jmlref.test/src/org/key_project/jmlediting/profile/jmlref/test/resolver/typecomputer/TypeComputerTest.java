@@ -459,8 +459,8 @@ public class TypeComputerTest {
       final ITypeBinding result = test(0, ExpressionNodeTypes.MINUS, 31);
       
       assertNotEquals(null, result);
-      assertEquals("int" , result.getQualifiedName());
-      assertTrue(cu.getAST().resolveWellKnownType("int").isEqualTo(result));
+      assertEquals("double" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("double").isEqualTo(result));
    }
    
    @Test(expected = TypeComputerException.class)
