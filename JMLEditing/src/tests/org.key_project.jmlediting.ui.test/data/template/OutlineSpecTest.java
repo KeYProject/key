@@ -44,11 +44,27 @@ public class OutlineSpecTest {
    @
    */
    public void a(){
+      new clazz(){
+         
+      }
       
    }
+   //ohne comment
+   public void acsda(){
+      new clazz(){
+         
+      }
+      
+   }
+   
    
    public clazz /*@nullable@*/ z = new clazz(){
       
    };
+ 
+   public clazz  zz = new clazz(){
+      
+   };
+   
    
 }
