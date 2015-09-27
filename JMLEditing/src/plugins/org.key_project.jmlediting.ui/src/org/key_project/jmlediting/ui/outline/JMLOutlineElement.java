@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.outlineView;
+package org.key_project.jmlediting.ui.outline;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;

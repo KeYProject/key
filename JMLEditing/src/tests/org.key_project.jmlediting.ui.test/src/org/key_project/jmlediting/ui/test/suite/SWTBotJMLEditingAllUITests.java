@@ -3,7 +3,6 @@ package org.key_project.jmlediting.ui.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.key_project.jmlediting.ui.test.Outline.JMLOutlineAllTestSuit;
 import org.key_project.jmlediting.ui.test.completion.SWTBotJMLCompletionProposalComputerTest;
 import org.key_project.jmlediting.ui.test.completion.SWTBotStoreRefKeywordProposalsTest;
 import org.key_project.jmlediting.ui.test.formatter.SWTBotFormatterTest;
@@ -15,6 +14,10 @@ import org.key_project.jmlediting.ui.test.hover.SWTBotJMLHoverTest;
 import org.key_project.jmlediting.ui.test.marker.SWTBotParseErrorMarkerTest;
 import org.key_project.jmlediting.ui.test.marker.SWTBotValidationErrorMarkerTest;
 import org.key_project.jmlediting.ui.test.miscellaneous.SWTBotEnableDisableTest;
+import org.key_project.jmlediting.ui.test.outline.JMLOutlineAllTestSuit;
+import org.key_project.jmlediting.ui.test.outline.SWTBotJMLOutlineSpecPure;
+import org.key_project.jmlediting.ui.test.outline.SWTBotJMLOutlineUpdate;
+import org.key_project.jmlediting.ui.test.outline.SWTBotJMLOutlineView;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLColorPreferencePageTest;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLKeywordWizardTest;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLProfileWizardTest;
@@ -47,8 +50,9 @@ import org.key_project.jmlediting.ui.test.preferencepages.SWTBotProfilePropertie
    SWTBotProfilePropertiesTest.class,
    SWTBotProfilePropertiesTest2.class,
    // outline
-   JMLOutlineAllTestSuit.class
-  
+   SWTBotJMLOutlineView.class,
+   SWTBotJMLOutlineSpecPure.class,
+   SWTBotJMLOutlineUpdate.class
 })
 public class SWTBotJMLEditingAllUITests {
 

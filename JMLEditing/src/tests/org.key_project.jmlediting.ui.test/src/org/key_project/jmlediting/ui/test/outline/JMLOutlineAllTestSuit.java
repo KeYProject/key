@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.test.Outline;
+package org.key_project.jmlediting.ui.test.outline;
 
 
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.test.Outline;
+package org.key_project.jmlediting.ui.test.outline;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

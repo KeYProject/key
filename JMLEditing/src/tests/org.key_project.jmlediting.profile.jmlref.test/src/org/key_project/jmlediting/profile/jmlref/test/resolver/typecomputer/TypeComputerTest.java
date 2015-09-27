@@ -468,7 +468,7 @@ public class TypeComputerTest {
       
       final TypeComputer tc = new JMLTypeComputer(icu);
       
-      final ITypeBinding result = tc.computeType(new IASTNode() {
+      tc.computeType(new IASTNode() {
          
          @Override
          public <T> T traverse(final INodeTraverser<T> traverser, final T init) {
