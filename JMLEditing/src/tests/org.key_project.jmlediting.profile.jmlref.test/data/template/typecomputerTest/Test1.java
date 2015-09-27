@@ -11,9 +11,24 @@ public class Test1 {
    //@ invariant 4.5;
    //@ invariant 5 * 4.3 * 10;
    //@ invariant 5 * intField;
+   //@ invariant booleanField <==> true;
+   
+   //@ invariant true ==> booleanField;
+   //@ invariant !booleanField2;
+   //@ invariant (Object)stringField;
+   //@ invariant intField < 10;
+   //@ invariant ++intField;
+   //@ invariant intField++;
+   //@ invariant (15 + 16 + 17 + 18);
+   //@ invariant 19 - (17 + 5.6 * 1 * 0.1);
+   //@ invariant booleanField && booleanField2;
+   //@ invariant booleanField || booleanField2;
    
    boolean booleanField;
+   Boolean booleanField2;
    int intField;
+   String stringField;
+   int[] intArrayField;
    
    
 }

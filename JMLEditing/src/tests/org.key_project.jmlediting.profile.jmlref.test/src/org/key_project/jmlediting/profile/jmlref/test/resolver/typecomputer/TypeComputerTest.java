@@ -94,8 +94,8 @@ public class TypeComputerTest {
       
       final TypeComputer tc = new JMLTypeComputer(compUnit);
       
-      //JavaBasicsNodeTypes.BOOLEAN_LITERAL
       final IASTNode node = getIASTNode(type, commentNr);
+      assertNotEquals(null, node);
       
       final ITypeBinding result = tc.computeType(node);
       return result;
@@ -211,8 +211,8 @@ public class TypeComputerTest {
       final ITypeBinding result = test(0, ExpressionNodeTypes.MULT, 7);
       
       assertNotEquals(null, result);
-      assertEquals("double" , result.getQualifiedName());
-      assertTrue(cu.getAST().resolveWellKnownType("double").isEqualTo(result));
+      assertEquals("float" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("float").isEqualTo(result));
    }
    
    @Test
@@ -224,6 +224,121 @@ public class TypeComputerTest {
       assertEquals("int" , result.getQualifiedName());
       assertTrue(cu.getAST().resolveWellKnownType("int").isEqualTo(result));
    }
+   
+   @Test
+   public void ExpressionNodeTypesEQUIVALENCE_OP() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.EQUIVALENCE_OP, 9);
+      
+      assertNotEquals(null, result);
+      assertEquals("int" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("int").isEqualTo(result));
+   }
+   
+   // ************************************************************************
+   
+   @Test
+   public void ExpressionNodeTypesIMPLIES() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.IMPLIES, 10);
+      
+      assertNotEquals(null, result);
+      assertEquals("int" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("int").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesNOT() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.NOT, 11);
+      
+      assertNotEquals(null, result);
+      assertEquals("boolean" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("boolean").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesCAST() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.CAST, 12);
+      
+      assertNotEquals(null, result);
+      assertEquals("java.lang.Object" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("java.lang.Object").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesRELATIONAL_OP() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.RELATIONAL_OP, 13);
+      
+      assertNotEquals(null, result);
+      assertEquals("boolean" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("boolean").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesPREFIX_INCREMENT() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.PREFIX_INCREMENT, 14);
+      
+      assertNotEquals(null, result);
+      assertEquals("int" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("int").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesPOST_FIX_EXPR() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.POST_FIX_EXPR, 15);
+      
+      assertNotEquals(null, result);
+      assertEquals("int" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("int").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesADDITIVE1() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.ADDITIVE, 16);
+      
+      assertNotEquals(null, result);
+      assertEquals("int" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("int").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesADDITIVE2() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.ADDITIVE, 17);
+      
+      assertNotEquals(null, result);
+      assertEquals("float" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("float").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesLOGICAL_AND() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.LOGICAL_AND, 18);
+      
+      assertNotEquals(null, result);
+      assertEquals("boolean" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("boolean").isEqualTo(result));
+   }
+   
+   @Test
+   public void ExpressionNodeTypesLOGICAL_OR() throws TypeComputerException {
+      
+      final ITypeBinding result = test(0, ExpressionNodeTypes.LOGICAL_OR, 19);
+      
+      assertNotEquals(null, result);
+      assertEquals("boolean" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("boolean").isEqualTo(result));
+   }
+   
+   // ***************************************************************************
+   
    
    
 }
