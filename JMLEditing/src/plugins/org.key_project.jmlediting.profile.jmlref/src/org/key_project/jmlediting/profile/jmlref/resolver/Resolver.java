@@ -75,31 +75,28 @@ public class Resolver implements IResolver {
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("unchecked")
    @Override
-   public final ResolveResult resolve(final ICompilationUnit compilationUnit,
-            final IASTNode jmlNode) throws ResolverException {
+   public final ResolveResult resolve(final ICompilationUnit compilationUnit, final IASTNode jmlNode) throws ResolverException {
 
       if (jmlNode == null || compilationUnit == null) {
          return null;
       }
 
       // reset everything .. so we can resolve more than once, with one instance of a resolver
-      reset(compilationUnit);
+      reset(compilationUnit, jmlNode);
 
-      // First, we get all the information about what we have to resolve by checking the given
-      // IASTNode.
+      // First, we get all the information about what we have to resolve by checking the given IASTNode.
       // this builds up the task list.
-      originalNode = jmlNode;
-      tasks = (new TaskBuilder()).buildResolverTask(jmlNode);
+      tasks = new TaskBuilder().buildResolverTask(jmlNode);
 
-      // Gather information about the current compilation unit
+      // Gather information about the current CompilationUnit
       // Parse JDT first
       final CompilationUnit jdtAST = (CompilationUnit) JDTUtil.parse(compilationUnit);
 
       // Save the package information and the import declarations
       pack = jdtAST.getPackage();
 
+      @SuppressWarnings("unchecked")
       final List<ImportDeclaration> importList = jdtAST.imports();
       for (final ImportDeclaration i : importList) {
          if (i.isOnDemand()) {
@@ -110,9 +107,8 @@ public class Resolver implements IResolver {
          }
       }
 
-      // Get the context information. That is the ASTNode to which the JML node refers to /
-      // belongs to.
-      context = (new JMLCommentToASTMapper(compilationUnit, jdtAST))
+      // Get the context information. That is the ASTNode to which the JML node refers to / belongs to.
+      context = new JMLCommentToASTMapper(compilationUnit, jdtAST)
                .getASTOfJMLComment(jmlNode);
 
       return next();
@@ -122,8 +118,9 @@ public class Resolver implements IResolver {
     * Reset the ResolverTask to its default values.
     * 
     * @param compilationUnit the {@link ICompilationUnit} to reset to.
+    * @param jmlNode the {@link IASTNode} the resolver was called with
     */
-   private void reset(final ICompilationUnit compilationUnit) {
+   private void reset(final ICompilationUnit compilationUnit, final IASTNode jmlNode) {
       context = null;
       this.compilationUnit = compilationUnit;
       originalNode = null;
@@ -134,6 +131,7 @@ public class Resolver implements IResolver {
       currentTask = null;
       pack = null;
       skipIdentifier = 0;
+      originalNode = jmlNode;
    }
 
    /**
@@ -166,8 +164,8 @@ public class Resolver implements IResolver {
          // if we have multiple of the same task in here
          // because we are trying to find something from a TypeParameter
          // we keep on going with the next task instead of returning null
-         if (skipIdentifier != 0 && !currentTask.isTypeVariable()) {
-            if (tasks.peek() != null && skipIdentifier == tasks.peek().getSkipIdentifier()) {
+         if (skipIdentifier != 0) {
+            if (tasks.peek() != null) {
                if (jdtNode == null) {
                   return next();
                }
@@ -195,13 +193,12 @@ public class Resolver implements IResolver {
          }
 
          // Are we trying to access functions of a TypeParameter?
-         if (jdtNode == null && currentTask.isTypeVariable()
-                  || jdtNode instanceof TypeParameter) {
+         if (jdtNode == null && currentTask.isTypeVariable() || jdtNode instanceof TypeParameter) {
 
             // We don't know the final types yet. So we get all the type bounds.
             final ITypeBinding[] bounds = jdtNode == null ? currentTask.getLastResult()
-                     .getReturnType().getTypeBounds() : ((TypeParameter) jdtNode)
-                     .resolveBinding().getTypeBounds();
+                     .getReturnType().getTypeBounds() : 
+                     ((TypeParameter) jdtNode).resolveBinding().getTypeBounds();
             // Do we have bounds? If not .. we can not access anything on this type. Because
             // we don't know what type it will be.
             if (bounds.length > 0) {
@@ -220,8 +217,7 @@ public class Resolver implements IResolver {
                   tasks.getFirst().getParameters().addAll(nextTask.getParameters());
                   tasks.getFirst().setResolveString(nextTask.getResolveString());
                   tasks.getFirst().setSkipIdentifier(identifier);
-                  result = new ResolveResult(jdtNode, resolveResultType, binding, t,
-                           currentTask.getNode());
+                  result = new ResolveResult(jdtNode, resolveResultType, binding, t, currentTask.getNode());
                   tasks.getFirst().setLastResult(result);
                }
             }
@@ -230,10 +226,7 @@ public class Resolver implements IResolver {
                // everywhere.
                returnValue = context.getAST().resolveWellKnownType("java.lang.Object");
                currentTask.setTypeVariable(false);
-               currentTask.setLastResult(new ResolveResult(currentTask.getLastResult()
-                        .getJDTNode(), currentTask.getLastResult().getResolveType(),
-                        currentTask.getLastResult().getBinding(), returnValue, currentTask
-                                 .getLastResult().getStringNode()));
+               currentTask.setLastResult(new ResolveResult(currentTask.getLastResult().getJDTNode(), currentTask.getLastResult().getResolveType(), currentTask.getLastResult().getBinding(), returnValue, currentTask.getLastResult().getStringNode()));
                tasks.add(currentTask);
             }
             if (jdtNode == null) {
@@ -264,8 +257,7 @@ public class Resolver implements IResolver {
          resolveResultType = ResolveResultType.ARRAY_ACCESS;
 
          if (binding == null) {
-            throw new ResolverException("Tried to perform an array access on a non array.",
-                     originalNode, null);
+            throw new ResolverException("Tried to perform an array access on a non array.", originalNode, null);
          }
       }
 
@@ -281,9 +273,7 @@ public class Resolver implements IResolver {
       if (currentTask.isArray()) {
          if (currentTask.getResolveString().equals("length")) {
             returnValue = context.getAST().resolveWellKnownType("int");
-            final ResolveResult finalResult = new ResolveResult(null,
-                     ResolveResultType.ARRAY_LENGTH, returnValue, returnValue,
-                     currentTask.getNode());
+            final ResolveResult finalResult = new ResolveResult(null, ResolveResultType.ARRAY_LENGTH, returnValue, returnValue, currentTask.getNode());
             return finalResult;
          }
          else if (currentTask.getResolveString().equals("clone")) {
@@ -298,10 +288,9 @@ public class Resolver implements IResolver {
          }
       }
 
-      final ResolveResult finalResult = new ResolveResult(jdtNode, resolveResultType,
-               binding, returnValue, currentTask.getNode());
+      final ResolveResult finalResult = new ResolveResult(jdtNode, resolveResultType, binding, returnValue, currentTask.getNode());
 
-      if (tasks.peek() != null) {
+      if (tasks.peek() != null && !(jdtNode instanceof TypeParameter)) {
          tasks.peek().setLastResult(finalResult);
       }
       return finalResult;
@@ -335,12 +324,12 @@ public class Resolver implements IResolver {
    }
 
    // returns the returnType of a method or null if it is no method
-   private ASTNode findMethodReturnValue(final ASTNode context) {
+   private ASTNode findMethodReturnValue(final ASTNode context) throws ResolverException {
       if (context instanceof MethodDeclaration) {
          return ((MethodDeclaration) context).getReturnType2();
       }
       else {
-         return null;
+         throw new ResolverException("'\\result' can not be resolved, if the JML comment is not bound to a method", originalNode, null);
       }
    }
 
@@ -370,8 +359,7 @@ public class Resolver implements IResolver {
       // method or a class
       // if lastResult is null, this must be the first call of next() and is
       // the only case we could find parameters in
-      if (currentTask.getLastResult() == null && !currentTask.isMethod()
-               && !currentTask.isClass() && !currentTask.isArray()) {
+      if (context instanceof MethodDeclaration && !currentTask.isMethod() && !currentTask.isClass() && !currentTask.isArray()) {
          jdtNode = findParameters(context, currentTask.getResolveString());
       }
 
@@ -388,8 +376,7 @@ public class Resolver implements IResolver {
          ASTNode searchContext = context;
 
          do {
-            jdtNode = (new MethodFinder(searchContext, currentTask, compilationUnit,
-                     originalNode)).findMethod();
+            jdtNode = new MethodFinder(searchContext, currentTask, compilationUnit, originalNode).findMethod();
             searchContext = getSuperClass(searchContext);
 
          }
@@ -436,8 +423,9 @@ public class Resolver implements IResolver {
 
          @Override
          public boolean visit(final TypeParameter node) {
-            if (result.size() > 0)
+            if (result.size() > 0) {
                return false;
+            }
             if (node.getName().getIdentifier().equals(resolveString)) {
                result.add(node);
                return false;
@@ -448,6 +436,11 @@ public class Resolver implements IResolver {
       return result.size() > 0 ? result.get(0) : null;
    }
 
+   /** Returns the super class of the class the given {@link ASTNode} is in.
+    * 
+    * @param searchContext the {@link ASTNode} to get the super class from
+    * @return the {@link TypeDeclaration} of the super class
+    */
    private TypeDeclaration getSuperClass(final ASTNode searchContext) {
       if (searchContext == null) {
          return null;
@@ -459,15 +452,13 @@ public class Resolver implements IResolver {
 
       if (superClass == null) {
          // Create a TypeBinding of object to compare
-         final ITypeBinding objectTypeBinding = context.getAST().resolveWellKnownType(
-                  "java.lang.Object");
+         final ITypeBinding objectTypeBinding = context.getAST().resolveWellKnownType("java.lang.Object");
 
          if (((TypeDeclaration) searchContext).resolveBinding().isEqualTo(objectTypeBinding)) {
             return null;
          }
          try {
-            type = compilationUnit.getJavaProject().findType(
-                     objectTypeBinding.getQualifiedName());
+            type = compilationUnit.getJavaProject().findType(objectTypeBinding.getQualifiedName());
          }
          catch (final JavaModelException e) {
             LogUtil.getLogger().logError(e);
@@ -511,7 +502,7 @@ public class Resolver implements IResolver {
       final LinkedList<IType> result = new LinkedList<IType>();
       final SearchEngine se = new SearchEngine();
 
-      StringBuilder packToSearch = new StringBuilder(resolveString);
+      final StringBuilder packToSearch = new StringBuilder(resolveString);
       String classToSearch = "";
       int tasksToRemove = 0;
 
@@ -672,7 +663,7 @@ public class Resolver implements IResolver {
    }
 
    /**
-    * Gets the {@link TypeDeclaration} with the given name.
+    * Gets the {@link TypeDeclaration} with the given name inside the given context given as {@code node}.
     * 
     * @param name the name of the type we are searching for.
     * @param node the context we are searching in.
@@ -685,8 +676,10 @@ public class Resolver implements IResolver {
          node.accept(new ASTVisitor() {
             @Override
             public boolean visit(final TypeDeclaration node) {
-               if (node.getName().getIdentifier() != null
-                        && node.getName().getIdentifier().equals(name)) {
+               if(endResult.size() > 0) {
+                  return false;
+               }
+               if (node.getName().getIdentifier() != null && node.getName().getIdentifier().equals(name)) {
                   // We found it. Stop searching.
                   endResult.add(node);
                   return false;
@@ -704,8 +697,7 @@ public class Resolver implements IResolver {
     * 
     * @return the {@link TypeDeclaration} that corresponds to the type that is the new context
     *         or the context that was set before the call if there was no last result.
-    * @throws ResolverException if the last result points to a primitive type that can not
-    *            have members.
+    * @throws ResolverException if the last result points to a primitive type that can not have members.
     */
    private ASTNode setNewContext() throws ResolverException {
       // If there is no last result, we don't change the context.
@@ -719,14 +711,13 @@ public class Resolver implements IResolver {
       // START testing what the new context might be
       if (typeBinding.isTypeVariable()) {
          // set a boolean to true so we know that we have to search inside
-         // the type bounds next time
+         // the type parameter bounds next time
          currentTask.setTypeVariable(true);
          return context;
 
       }
       else if (typeBinding.isPrimitive()) {
-         throw new ResolverException("Can not resolve an access to a primitive type.",
-                  originalNode, null);
+         throw new ResolverException("Can not resolve an access to a primitive type.", originalNode, null);
 
       }
       else if (typeBinding.isArray()) {
@@ -810,13 +801,14 @@ public class Resolver implements IResolver {
       return getTypeInCompilationUnit(type.getElementName(), node);
    }
 
-   // The given resolveString could be a class which is explicitly imported
-   // or it could be a class which is imported on demand (using the * import).
-   // But it could also be the name of a field/method was imported directly with a static
-   // import.
-   private ASTNode findInImports(final String resolveString,
-            final List<ImportDeclaration> imports) throws ResolverException {
+   
+   private ASTNode findInImports(final String resolveString, final List<ImportDeclaration> imports) throws ResolverException {
 
+      /* The given resolveString could be a class which is explicitly imported
+       * or it could be a class which is imported on demand (using the * import).
+       * But it could also be the name of a field/ method that was imported directly 
+       * with a static import.
+       */
       for (final ImportDeclaration imp : imports) {
 
          final IBinding binding = imp.resolveBinding();
@@ -872,8 +864,7 @@ public class Resolver implements IResolver {
             }
             IType type = null;
             try {
-               type = compilationUnit.getJavaProject().findType(
-                        ((IMethodBinding) binding).getDeclaringClass().getQualifiedName());
+               type = compilationUnit.getJavaProject().findType(((IMethodBinding) binding).getDeclaringClass().getQualifiedName());
 
                final IMethodBinding mb = (IMethodBinding) binding;
                if (type == null || !mb.getName().equals(resolveString)) {
@@ -956,9 +947,7 @@ public class Resolver implements IResolver {
 
          }
          else {
-            throw new ResolverException(
-                     "ImportDeclaration returned an unrecognised IBinding.", originalNode,
-                     null);
+            throw new ResolverException("ImportDeclaration returned an unrecognised IBinding.", originalNode, null);
          }
       }
 
@@ -1071,6 +1060,9 @@ public class Resolver implements IResolver {
       else if (jdtNode instanceof Type) {
          binding = ((Type) jdtNode).resolveBinding();
       }
+      else if(jdtNode instanceof TypeParameter) {
+         binding = ((TypeParameter)jdtNode).resolveBinding();
+      }
       return binding;
    }
 
@@ -1084,7 +1076,7 @@ public class Resolver implements IResolver {
    private ResolveResultType getResolveType(final ASTNode jdtNode) {
       ResolveResultType resultType = ResolveResultType.UNSPECIFIED;
 
-      if (jdtNode instanceof TypeDeclaration) {
+      if (jdtNode instanceof TypeDeclaration || jdtNode instanceof TypeParameter) {
          resultType = ResolveResultType.CLASS;
       }
       else if (jdtNode instanceof MethodDeclaration) {

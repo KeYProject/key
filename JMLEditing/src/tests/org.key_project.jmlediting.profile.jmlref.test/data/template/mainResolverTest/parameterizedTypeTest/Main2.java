@@ -8,4 +8,6 @@ public class Main2<T> {
    //@ invariant field.equals(o);
    
    //@ invariant somethingThatDoesNotExist;
+   
+   //@ invariant \result;
 }

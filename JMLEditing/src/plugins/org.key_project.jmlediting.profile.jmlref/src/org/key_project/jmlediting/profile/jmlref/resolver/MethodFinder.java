@@ -27,12 +27,12 @@ import org.key_project.jmlediting.profile.jmlref.resolver.typecomputer.JMLTypeCo
  */
 public class MethodFinder {
 
-   private ASTNode context;
-   private ResolverTask currentTask;
-   private ICompilationUnit compilationUnit;
-   private IASTNode originalNode;
-   private String resolveString;
-   private List<IASTNode> parameters;
+   private final ASTNode context;
+   private final ResolverTask currentTask;
+   private final ICompilationUnit compilationUnit;
+   private final IASTNode originalNode;
+   private final String resolveString;
+   private final List<IASTNode> parameters;
 
    /**
     * Constructor of the method finder. It needs the following information given as
@@ -45,14 +45,13 @@ public class MethodFinder {
     *           be called.
     * @param originalNode the original {@link IASTNode} which should be resolved.
     */
-   MethodFinder(ASTNode context, ResolverTask currentTask, ICompilationUnit compilationUnit,
-         IASTNode originalNode) {
+   MethodFinder(final ASTNode context, final ResolverTask currentTask, final ICompilationUnit compilationUnit, final IASTNode originalNode) {
       this.context = context;
       this.currentTask = currentTask;
       this.compilationUnit = compilationUnit;
       this.originalNode = originalNode;
-      this.resolveString = currentTask.getResolveString();
-      this.parameters = currentTask.getParameters();
+      resolveString = currentTask.getResolveString();
+      parameters = currentTask.getParameters();
    }
 
    /**
@@ -151,8 +150,7 @@ public class MethodFinder {
             if (maxSpecific.size() > 0) {
                // do we have more than 1? :(
                if (maxSpecific.size() > 1) {
-                  throw new ResolverException("The method invocation is ambiguous.",
-                        originalNode, null);
+                  throw new ResolverException("The method invocation is ambiguous.", originalNode, null);
                }
                method = (IMethod) maxSpecific.get(0).getJavaElement();
             }
@@ -168,7 +166,8 @@ public class MethodFinder {
    /**
     * This is a helper method to help with method resolving. It checks whether the given types
     * correlate to each other by Method Invocation Conversion rules. <br>
-    * See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.3 as a
+    * See: <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.3">
+    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.3</a> as a
     * reference.
     * 
     * @param that the type the method definition has
@@ -176,23 +175,23 @@ public class MethodFinder {
     * @return true, if the types correlate after Method Invocation Conversion rules. False
     *         otherwise.
     */
-   private boolean isMethodInvocationConversionCompatible(final ITypeBinding that,
-         final ITypeBinding other) {
+   private boolean isMethodInvocationConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
 
-      return that.isEqualTo(other) || isWideningPrimitiveConversionCompatible(that, other)
+      return that.isEqualTo(other) 
+            || isWideningPrimitiveConversionCompatible(that, other)
             || isWideningReferenceConversionCompatible(that, other);
    }
 
    /**
     * Helper Method. Checks if the {@code other} type is a sub type of the {@code that} type.
-    * See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.5
+    * See: <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.5">
+    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.5</a>
     * 
     * @param that the type the method definition has
     * @param other the type the method is called with
     * @return true, if {@code other} is a sub type of {@code that}. False otherwise.
     */
-   private boolean isWideningReferenceConversionCompatible(final ITypeBinding that,
-         final ITypeBinding other) {
+   private boolean isWideningReferenceConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
       ITypeBinding cother = other;
 
       if (that == null || that.isPrimitive()) {
@@ -253,14 +252,14 @@ public class MethodFinder {
 
    /**
     * Helper Method. Checks if the {@code other} type can be extended to the {@code that}
-    * type. See: https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.2
+    * type. See: <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.2">
+    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.2</a>
     * 
     * @param that the type the method definition has
     * @param other the type the method is called with
     * @return true, if {@code other} can be extended to {@code that}. False otherwise.
     */
-   private boolean isWideningPrimitiveConversionCompatible(final ITypeBinding that,
-         final ITypeBinding other) {
+   private boolean isWideningPrimitiveConversionCompatible(final ITypeBinding that, final ITypeBinding other) {
       ITypeBinding cother = other;
       ITypeBinding cthat = that;
 
@@ -298,29 +297,39 @@ public class MethodFinder {
       }
 
       if (otherName.equals(bYTE)
-            && (thatName.equals(sHORT) || thatName.equals(iNT) || thatName.equals(lONG)
-                  || thatName.equals(fLOAT) || thatName.equals(dOUBLE))) {
+            && (thatName.equals(sHORT) 
+                  || thatName.equals(iNT) 
+                  || thatName.equals(lONG)
+                  || thatName.equals(fLOAT) 
+                  || thatName.equals(dOUBLE))) {
          return true;
       }
 
       if (otherName.equals(sHORT)
-            && (thatName.equals(iNT) || thatName.equals(lONG) || thatName.equals(fLOAT) || thatName
-                  .equals(dOUBLE))) {
+            && (thatName.equals(iNT) 
+                  || thatName.equals(lONG) 
+                  || thatName.equals(fLOAT) 
+                  || thatName.equals(dOUBLE))) {
          return true;
       }
 
       if (otherName.equals(cHAR)
-            && (thatName.equals(iNT) || thatName.equals(lONG) || thatName.equals(fLOAT) || thatName
-                  .equals(dOUBLE))) {
+            && (thatName.equals(iNT) 
+                  || thatName.equals(lONG) 
+                  || thatName.equals(fLOAT)
+                  || thatName.equals(dOUBLE))) {
          return true;
       }
 
       if (otherName.equals(iNT)
-            && (thatName.equals(lONG) || thatName.equals(fLOAT) || thatName.equals(dOUBLE))) {
+            && (thatName.equals(lONG) 
+                  || thatName.equals(fLOAT) 
+                  || thatName.equals(dOUBLE))) {
          return true;
       }
 
-      if (otherName.equals(lONG) && (thatName.equals(fLOAT) || thatName.equals(dOUBLE))) {
+      if (otherName.equals(lONG) 
+            && (thatName.equals(fLOAT) || thatName.equals(dOUBLE))) {
          return true;
       }
 
@@ -351,8 +360,7 @@ public class MethodFinder {
          @Override
          public boolean visit(final MethodDeclaration node) {
             if (node.getName().getIdentifier().equals(method.getElementName())) {
-               final String[] actualParameterKeys = Signature.getParameterTypes(node
-                     .resolveBinding().getKey());
+               final String[] actualParameterKeys = Signature.getParameterTypes(node.resolveBinding().getKey());
                if (actualParameterKeys.length == expectedParameterKeys.length) {
 
                   for (int i = 0; i < actualParameterKeys.length; i++) {
@@ -380,8 +388,9 @@ public class MethodFinder {
    }
 
    /**
-    * Performs unboxing of primitive types. See:
-    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.8
+    * Performs unboxing of primitive types. <br>
+    * See: <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.8">
+    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.8</a>
     * 
     * @param other the {@link ITypeBinding} to be unboxed.
     * @return the {@link ITypeBinding} of the unboxed type or null if the type can not be
@@ -416,8 +425,9 @@ public class MethodFinder {
    }
 
    /**
-    * Performs boxing of primitive types. See:
-    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.7
+    * Performs boxing of primitive types. <br>
+    * See: <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.7">
+    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.7</a>
     * 
     * @param other the {@link ITypeBinding} to be boxed.
     * @return the {@link ITypeBinding} of the boxed type or null if the type can not be boxed.
@@ -450,6 +460,16 @@ public class MethodFinder {
       return null;
    }
 
+   /**
+    * When more than one method is both applicable and accessible to a method invocation.
+    * We then have to choose the most specific one. This method tells you whether a method {@code m1}
+    * is more specific than a method {@code m2}. <br>
+    * See <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.12.2.5">
+    * https://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.12.2.5</a>
+    * @param m1 the first method
+    * @param m2 the second method
+    * @return {@code true}, if the first method is more specific than the second, {@code false} otherwise.
+    */
    private boolean isMoreSpecific(final IMethodBinding m1, final IMethodBinding m2) {
       final ITypeBinding[] types1 = m1.getParameterTypes();
       final ITypeBinding[] types2 = m2.getParameterTypes();
@@ -473,8 +493,7 @@ public class MethodFinder {
     * @throws ResolverException if the {@link JMLTypeComputer} throws a
     *            {@link TypeComputerException}.
     */
-   private ITypeBinding[] getTypeBindings(final List<IASTNode> parameters)
-         throws ResolverException {
+   private ITypeBinding[] getTypeBindings(final List<IASTNode> parameters) throws ResolverException {
       // if the parameter list is empty, return an empty array
       if (parameters.size() == 0) {
          return new ITypeBinding[0];
@@ -492,9 +511,7 @@ public class MethodFinder {
             result[i] = tc.computeType(parameters.get(i));
          }
          catch (final TypeComputerException e) {
-            throw new ResolverException(
-                  "TypeComputer threw an exception when trying to compute the type of a method parameter.",
-                  originalNode, e);
+            throw new ResolverException("TypeComputer threw an exception when trying to compute the type of a method parameter.", originalNode, e);
          }
       }
       return result;

@@ -58,7 +58,6 @@ public class TypeComputer implements ITypeComputer {
             
         } else if(node.getType() == NodeTypes.LIST) {
             
-            
         } else if(node.getType() == NodeTypes.SEQ) {
             
         } else if(node.getType() == NodeTypes.SOME) {
@@ -87,23 +86,13 @@ public class TypeComputer implements ITypeComputer {
         }
         return null;
     }
-
-    
-    public static boolean typeMatch(final ITypeBinding b1, final ITypeBinding b2) {
-        // TODO: check if the first owns the second or something..
-        //
-        // ITypeBinding - isCastCompatible(type); ! :D
-        //b1.isCastCompatible(b2);
-        
-        return b1.isEqualTo(b2);
-    }
     
     /** 
      * Tests if the given {@link IASTNode} is one of the types specified in {@link JavaBasicsNodeTypes}.
      * @param node the {@link IASTNode} to test
      * @return true, if the type of the {@link IASTNode} is specified in the {@link JavaBasicsNodeTypes} class.
      */
-    public boolean isPrimitive(final IASTNode node) {
+    protected final boolean isPrimitive(final IASTNode node) {
         final int type = node.getType();
         return type == JavaBasicsNodeTypes.BOOLEAN_LITERAL ||
             type == JavaBasicsNodeTypes.CHARACTER_LITERAL ||
@@ -119,7 +108,7 @@ public class TypeComputer implements ITypeComputer {
      * @param node the {@link IASTNode} to check
      * @return the corresponding {@link ITypeBinding} or null
      */
-    public ITypeBinding getType(final IASTNode node) {
+    protected final ITypeBinding getType(final IASTNode node) {
         
         final int type = node.getType();
         if(type == JavaBasicsNodeTypes.BOOLEAN_LITERAL) {
@@ -143,7 +132,7 @@ public class TypeComputer implements ITypeComputer {
         return null;
     }
     
-    public ITypeBinding createWellKnownType(final String type) {
+    protected final ITypeBinding createWellKnownType(final String type) {
         return JDTUtil.parse(compilationUnit).getAST().resolveWellKnownType(type);
     }
     
@@ -153,7 +142,7 @@ public class TypeComputer implements ITypeComputer {
      * @return the resulting {@link ITypeBinding}
      * @throws TypeComputerException if the {@link IResolver} can not resolve the {@link IASTNode} 
      */
-    public ITypeBinding callResolver(final IASTNode node) throws TypeComputerException {
+    protected final ITypeBinding callResolver(final IASTNode node) throws TypeComputerException {
        return callResolver(node, resolver);
     }
     
@@ -164,7 +153,7 @@ public class TypeComputer implements ITypeComputer {
      * @return the resulting {@link ITypeBinding}
      * @throws TypeComputerException if the {@link IResolver} can not resolve the {@link IASTNode} 
      */
-    public final ITypeBinding callResolver(final IASTNode node, final IResolver resolver) throws TypeComputerException {
+    protected final ITypeBinding callResolver(final IASTNode node, final IResolver resolver) throws TypeComputerException {
         ResolveResult result = null;
         
         try {

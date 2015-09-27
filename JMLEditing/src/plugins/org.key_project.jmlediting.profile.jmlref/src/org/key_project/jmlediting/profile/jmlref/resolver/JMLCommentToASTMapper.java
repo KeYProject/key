@@ -14,9 +14,8 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 
 /**
- * This class is used by the {@link Resolver} at the beginning stage when gathering
- * information.
- * <p>
+ * This class is used by the {@link Resolver} at the beginning stage when gathering information.
+ * <br><br>
  * The using class will need to call the only available method,
  * {@link #getASTOfJMLComment(IASTNode)}, and will return the {@link ASTNode} for a given
  * {@link IASTNode}. That is, the context information to which a JML comment refers to.
@@ -26,8 +25,8 @@ import org.key_project.jmlediting.core.utilities.LogUtil;
  */
 public class JMLCommentToASTMapper {
 
-   private CompilationUnit jdtAST;
-   private ICompilationUnit compilationUnit;
+   private final CompilationUnit jdtAST;
+   private final ICompilationUnit compilationUnit;
 
    /**
     * The constructor saves the {@link ICompilationUnit} and the {@link CompilationUnit}.
@@ -35,7 +34,7 @@ public class JMLCommentToASTMapper {
     * @param compilationUnit a given {@link ICompilationUnit} which we should search through.
     * @param jdtAST the AST of the parsed {@code compilationUnit}
     */
-   JMLCommentToASTMapper(ICompilationUnit compilationUnit, CompilationUnit jdtAST) {
+   JMLCommentToASTMapper(final ICompilationUnit compilationUnit, final CompilationUnit jdtAST) {
       this.compilationUnit = compilationUnit;
       this.jdtAST = jdtAST;
    }
@@ -48,9 +47,9 @@ public class JMLCommentToASTMapper {
     * @return the ASTNode which belongs to the given IASTNode. Can be null if nothing was
     *         found.
     */
-   @SuppressWarnings("unchecked")
+   
    // getCommentList() is called on the compilation unit
-   public final ASTNode getASTOfJMLComment(IASTNode jmlNode) {
+   public final ASTNode getASTOfJMLComment(final IASTNode jmlNode) {
 
       final HashMap<Comment, ASTNode> commentToAST = new HashMap<Comment, ASTNode>();
 
@@ -68,6 +67,7 @@ public class JMLCommentToASTMapper {
       // Finding the full JML comment which contains our IASTNode we need to resolve by
       // getting all JDT comments (everything with // or /*)
       // and filtering those for comments which start with either //@ or /*@
+      @SuppressWarnings("unchecked")
       final List<Comment> jdtComments = jdtAST.getCommentList();
 
       final ArrayList<Comment> jmlComments = new ArrayList<Comment>();
