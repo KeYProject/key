@@ -515,7 +515,16 @@ public class TypeComputerTest {
             return false;
          }
       });
+   }
+   
+   @Test
+   public void ExpressionNodeTypesJML_PRIMARY() throws TypeComputerException {
       
+      final ITypeBinding result = test(0, ExpressionNodeTypes.JML_PRIMARY, 32);
+      
+      assertNotEquals(null, result);
+      assertEquals("boolean" , result.getQualifiedName());
+      assertTrue(cu.getAST().resolveWellKnownType("boolean").isEqualTo(result));
    }
    
    

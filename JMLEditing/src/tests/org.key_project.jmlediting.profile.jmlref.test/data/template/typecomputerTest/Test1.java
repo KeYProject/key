@@ -37,6 +37,7 @@ public class Test1 {
    
    //@ invariant stringField = "someString";
    //@ invariant -doubleField;
+   //@ invariant (((!booleanField)));
    
    boolean booleanField;
    Boolean booleanField2;
