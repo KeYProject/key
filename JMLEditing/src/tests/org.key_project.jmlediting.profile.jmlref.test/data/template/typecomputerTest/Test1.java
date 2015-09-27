@@ -24,11 +24,27 @@ public class Test1 {
    //@ invariant booleanField && booleanField2;
    //@ invariant booleanField || booleanField2;
    
+   //@ invariant booleanField & booleanField2;
+   //@ invariant booleanField ^ booleanField2;
+   //@ invariant booleanField | booleanField2;
+   //@ invariant 12 << 1;
+   //@ invariant 2.5 >> 1;
+   //@ invariant --floatField;
+   //@ invariant ~intField;
+   //@ invariant +intField;
+   //@ invariant booleanField == new Boolean();
+   //@ invariant o = stringField = "someString";
+   
+   //@ invariant stringField = "someString";
+   //@ invariant -intField;
+   
    boolean booleanField;
    Boolean booleanField2;
    int intField;
+   float floatField;
    String stringField;
    int[] intArrayField;
+   Object o;
    
    
 }

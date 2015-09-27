@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.outlineView;
+package org.key_project.jmlediting.ui.outline;
 
 import java.util.ArrayList;
 import java.util.HashMap;
