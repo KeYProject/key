@@ -68,6 +68,9 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
             // the 2 sides must be of the same type
            ITypeBinding returnBinding = null;
            ITypeBinding oldBinding = null;
+           if (node.getChildren().size() <= 2){
+              return null; // TODO: Exception log or something to know equlaity is not correct
+           }
            for (IASTNode child : node.getChildren()){
               if(child.getType() != NodeTypes.STRING){
                  returnBinding = computeType(child);
@@ -84,7 +87,11 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
         
         } else if(type == ExpressionNodeTypes.EQUIVALENCE_OP) {
            // <=>
+           
            ITypeBinding returnBinding = null;
+           if (node.getChildren().size() <= 2){
+              return null; // TODO: Exception log or something to know equlaity is not correct
+           }
            for (IASTNode child : node.getChildren()){
               if(child.getType() != NodeTypes.STRING){
                  returnBinding = computeType(child);
@@ -148,7 +155,7 @@ public class JMLTypeComputer extends TypeComputer implements ITypeComputer {
                        if(operand.isEqualTo(FLOAT) || operand.isEqualTo(P_FLOAT)) {
                           savedType = FLOAT;
                        } else if(operand.isEqualTo(INTEGER) || operand.isEqualTo(P_INTEGER)) {
-                          if(!operand.isEqualTo(FLOAT)) {
+                          if(!savedType.isEqualTo(FLOAT)) {
                              savedType = INTEGER;
                           }
                        }
