@@ -6,8 +6,11 @@ import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 
 public class MacroCommand extends AbstractCommand {
 
@@ -32,10 +35,16 @@ public class MacroCommand extends AbstractCommand {
         }
 
         Goal g = getFirstOpenGoal(proof, state);
+        ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
         try {
-            macro.applyTo(uiControl, g.node(), null, uiControl);
+            uiControl.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
+            synchronized (macro) {
+                info = macro.applyTo(uiControl, g.node(), null, uiControl);
+            }
         } catch (Exception e) {
             throw new ScriptException("Macro '" + macroName + "' raised an exception: " + e.getMessage(), e);
+        } finally {
+            uiControl.taskFinished(info);
         }
 
     }
