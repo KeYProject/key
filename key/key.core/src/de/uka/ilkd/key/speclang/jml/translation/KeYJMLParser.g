@@ -1501,7 +1501,9 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 	    result = new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType());
 	}
 	|
-	  EXCEPTION { result = new SLExpression(tb.var(excVar), excVar.getKeYJavaType()); }
+	  EXCEPTION 
+	  { if (excVar==null) raiseError("\\exception may only appear in determines clauses");
+	    else result = new SLExpression(tb.var(excVar), excVar.getKeYJavaType()); }
     |
 	(LPAREN quantifier) => result=specquantifiedexpression
     |
