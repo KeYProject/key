@@ -20,7 +20,7 @@ import org.key_project.jmlediting.core.utilities.LogUtil;
  * {@link #getSearchContext(IASTNode)}, and will return the {@link ASTNode} for a given
  * {@link IASTNode}. That is, the context information to which a JML comment refers to.
  * 
- * @author Christopher Beckmann
+ * @author Christopher Beckmann, Robert Heimbach
  *
  */
 public class SearchContextMapper {

@@ -26,9 +26,10 @@ import org.key_project.jmlediting.profile.jmlref.refactoring.utility.Refactoring
  * Conceptually, renaming a package is equivalent to creating a new package, moving all
  * classes from the renamed package to the newly created package and deleting the old package.
  * Thus, this participant uses the {@link ClassMoveRefactoringComputer} to search through all
- * classes in each (necessary) project for references to classes which were located in the
- * renamed package and using the fully qualified name, i.e. naming the path with all the
- * packages.
+ * classes in each (necessary) project for fully qualified references to classes which were
+ * located in the renamed package. Those fully qualified references to classes, i.e.
+ * references using the full path to the class, like package.subpackage.Class, are the only
+ * possible usage of package names in JML annotations.
  * </p>
  * <p>
  * Note that JDT takes care of the "Rename subpackages" option by calling this participant on
@@ -77,7 +78,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
       // Occurrences in JML like this need to be changed.
       try {
          fAllQualifiedNamesToSearchFor = RefactoringUtil
-               .getAllQualifiedNamesOfClasses(fPackageToRename);
+                  .getAllQualifiedNamesOfClasses(fPackageToRename);
 
          return (fAllQualifiedNamesToSearchFor.size() > 0);
       }
@@ -95,7 +96,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
     */
    @Override
    public final RefactoringStatus checkConditions(IProgressMonitor pm,
-         CheckConditionsContext context) throws OperationCanceledException {
+            CheckConditionsContext context) throws OperationCanceledException {
       return new RefactoringStatus();
    }
 
@@ -112,7 +113,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
     */
    @Override
    public final Change createChange(IProgressMonitor pm) throws CoreException,
-         OperationCanceledException {
+            OperationCanceledException {
 
       // To accumulate all changes to files without java (text) changes.
       // Only non empty change objects will be added to this
@@ -125,9 +126,9 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
 
       try {// Look through all source files in each package and project
          for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(
-               projectsToCheck, fProject)) {
+                  projectsToCheck, fProject)) {
             for (final IPackageFragment pac : RefactoringUtil
-                  .getAllPackageFragmentsContainingSources(project)) {
+                     .getAllPackageFragmentsContainingSources(project)) {
                for (final ICompilationUnit unit : pac.getCompilationUnits()) {
 
                   // Several classes could potentially be referenced but RefcatoringComputer
@@ -138,9 +139,9 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
                   for (String potentialReference : fAllQualifiedNamesToSearchFor) {
 
                      ClassMoveRefactoringComputer changesComputer = new ClassMoveRefactoringComputer(
-                           fOldName, fNewName, potentialReference);
+                              fOldName, fNewName, potentialReference);
                      final ArrayList<ReplaceEdit> changesToJML = changesComputer
-                           .computeNeededChangesToJML(unit, project);
+                              .computeNeededChangesToJML(unit, project);
 
                      if (changesToJML.size() > 0) {
                         allChangesToJMLinUnit.addAll(changesToJML);
@@ -163,7 +164,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
                      if (!allChangesToJMLinUnit.isEmpty()) {
 
                         changesToFilesWithoutJavaChanges.add(RefactoringUtil
-                              .combineEditsToChange(unit, allChangesToJMLinUnit));
+                                 .combineEditsToChange(unit, allChangesToJMLinUnit));
                      }
                   }
                }
@@ -175,8 +176,7 @@ public class JMLRenameParticipantPackage extends RenameParticipant {
       }
 
       // After iterating through all needed projects and source files, determine what needs to
-      // be
-      // returned.
+      // be returned.
       return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
    }
 }

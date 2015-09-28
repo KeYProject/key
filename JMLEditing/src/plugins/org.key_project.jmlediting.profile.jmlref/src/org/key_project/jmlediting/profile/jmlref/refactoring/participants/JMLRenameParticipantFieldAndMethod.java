@@ -142,8 +142,7 @@ public class JMLRenameParticipantFieldAndMethod extends RenameParticipant {
       }
 
       // After iterating through all needed projects and source files, determine what needs to
-      // be
-      // returned.
+      // be returned.
       return RefactoringUtil.assembleChangeObject(changesToFilesWithoutJavaChanges);
    }
 }
