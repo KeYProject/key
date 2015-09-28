@@ -2,6 +2,8 @@ example.path = Information Flow
 example.name = Examples
 example.additionalFile.1 = src/mini/AliasingExamples.java
 example.additionalFile.2 = src/mini/MiniExamples.java
+example.additionalFile.3 = src/mini/MiniExamplesLecture.java
+example.additionalFile.4 = src/mini/DifferenceSeqLocset.java
 
 Information flow examples.
 
