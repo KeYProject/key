@@ -7,8 +7,9 @@ import org.key_project.javaeditor.util.ExtendableOutlineUtil;
 import org.key_project.util.java.ArrayUtil;
 
 /**
- * The {@link ITreeContentProvider} which allows to modify
- * the original content provided in the {@link JavaOutlinePage}.
+ * The {@link ITreeContentProvider} which allows to modify the original content provided in
+ * the {@link JavaOutlinePage}.
+ * 
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
@@ -17,20 +18,22 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
     * The original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
     */
    private ITreeContentProvider originalProvider;
-   
+
    /**
     * The available {@link IOutlineModifier}.
     */
-   private final IOutlineModifier[] outlineModifier = ExtendableOutlineUtil.createEnabledJavaExtensions();
-   
+   private final IOutlineModifier[] outlineModifier = ExtendableOutlineUtil
+            .createEnabledJavaExtensions();
+
    /**
     * Constructor.
-    * @param originalProvider The original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
+    * 
+    * @param originalProvider The original {@link ITreeContentProvider} of a
+    *           {@link JavaOutlinePage}.
     */
    public OutlineContentProviderWrapper(ITreeContentProvider originalProvider) {
       this.originalProvider = originalProvider;
    }
-   
 
    /**
     * {@inheritDoc}
@@ -90,6 +93,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
 
    /**
     * Returns the original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
+    * 
     * @return The original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
     */
    public final ITreeContentProvider getOriginalProvider() {
