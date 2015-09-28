@@ -550,6 +550,7 @@ group javadl {
    provable ./standard_key/java_dl/postConditionTaclets1.key
    provable ./standard_key/java_dl/postConditionTaclets2.key
    provable ./standard_key/java_dl/quantifiedQuery.key
+   provable ./standard_key/java_dl/recursion/triangular.key
    provable ./standard_key/java_dl/reverseArray.key
    provable ./standard_key/java_dl/reverseArray2.key
    provable ./standard_key/java_dl/simpleAssignment.key
