@@ -1,7 +1,5 @@
 package org.key_project.jmlediting.profile.jmlref.resolver.typecomputer;
 
-import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
-
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.key_project.jmlediting.core.dom.IASTNode;
