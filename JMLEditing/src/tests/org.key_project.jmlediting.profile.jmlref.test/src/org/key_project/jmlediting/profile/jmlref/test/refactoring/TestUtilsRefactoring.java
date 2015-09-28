@@ -148,7 +148,7 @@ public class TestUtilsRefactoring {
 
       TestUtilsUtil.openEditor(srcFolder.getFolder(packageName).getFile(
             className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
-
+      
       // select the method which uses the parameter in the outline view of the bot
       SWTBotTree tree = TestUtilsUtil.getOutlineView(bot).bot().tree();
       SWTBotTreeItem methodUsingParameter = TestUtilsUtil.selectInTree(tree, className,
@@ -169,7 +169,9 @@ public class TestUtilsRefactoring {
       editor.navigateTo(pos.line, newPosition);
 
       // press the shortcut twice to enter the dialog instead of live editing
+      bot.sleep(1000);
       editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
+      bot.sleep(1000);
       editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'R');
 
       // Change variable name in rename dialog

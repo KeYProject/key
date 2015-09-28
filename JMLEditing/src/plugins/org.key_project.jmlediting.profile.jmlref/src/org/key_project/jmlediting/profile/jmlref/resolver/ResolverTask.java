@@ -155,27 +155,27 @@ public final class ResolverTask {
    public void setTypeArguments(final HashMap<String, ITypeBinding> typeArguments) {
       this.typeArguments = typeArguments;
    }
-   
+
    @Override
    public String toString() {
       final StringBuilder sb = new StringBuilder();
-      if(resolveString != null) {
+      if (resolveString != null) {
          sb.append(resolveString);
       }
-      if(isMethod) {
+      if (isMethod) {
          sb.append("(");
-         for(int i = 0; i < parameters.size(); i++) {
+         for (int i = 0; i < parameters.size(); i++) {
             sb.append("?");
-            if(i < parameters.size() - 1) {
+            if (i < parameters.size() - 1) {
                sb.append(" ,");
             }
          }
          sb.append(")");
       }
-      if(isArrayAcess) {
+      if (isArrayAcess) {
          sb.append("[]");
       }
       return sb.toString();
    }
-   
+
 }

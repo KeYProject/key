@@ -20,7 +20,6 @@ import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestPr
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject.SaveGuarantee;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-
 public class SWTBotJMLOutlineView {
    
    
@@ -32,11 +31,7 @@ public class SWTBotJMLOutlineView {
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "OutlineTestClass";
    
-   private static SWTBotTree tree;
-   
-   
-   private static String textToAdd = "   /*@ behavior\r\n     @ requires 1+1;\r\n     @*/\r\n   /**\r\n    * javadoc\r\n    */\r\n   public void abcdtest(){}";
-   
+   private static SWTBotTree tree;   
    
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {

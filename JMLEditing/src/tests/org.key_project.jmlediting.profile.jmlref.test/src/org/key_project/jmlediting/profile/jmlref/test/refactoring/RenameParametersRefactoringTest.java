@@ -50,7 +50,7 @@ public class RenameParametersRefactoringTest {
    @Test
    public void test1OneParameter() throws CoreException {
       TestUtilsRefactoring.runParameterRenameTest(TESTPATH + "\\test1", srcFolder,
-            oracleFolder, bot, "TestClass", "test", "setBalance(int) : void", "aNewName", 6);
+            oracleFolder, bot, "TestClass", "test", "setBalance(int) : void", "aNewName", 7);
    }
 
    @Test

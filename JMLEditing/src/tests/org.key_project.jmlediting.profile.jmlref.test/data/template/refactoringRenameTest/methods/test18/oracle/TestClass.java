@@ -7,11 +7,11 @@ public class TestClass extends TestParent {
      @ ensures \result == ((TestParent) returnParentAsObject).newMethodName();
      @*/
    int doSomething() {
-      return ((TestParent) returnParentAsObject).newMethodName();
+      return ((TestParent) returnParentAsObject()).newMethodName();
    }
    
    Object returnParentAsObject() {
-      return super();
+      return new TestParent();
    }
    
 

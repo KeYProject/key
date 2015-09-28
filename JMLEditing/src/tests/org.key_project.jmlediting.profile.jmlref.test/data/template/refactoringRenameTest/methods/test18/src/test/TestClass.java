@@ -7,11 +7,11 @@ public class TestClass extends TestParent {
      @ ensures \result == ((TestParent) returnParentAsObject).returnAnInteger();
      @*/
    int doSomething() {
-      return ((TestParent) returnParentAsObject).returnAnInteger();
+      return ((TestParent) returnParentAsObject()).returnAnInteger();
    }
    
    Object returnParentAsObject() {
-      return super();
+      return new TestParent();
    }
    
 
