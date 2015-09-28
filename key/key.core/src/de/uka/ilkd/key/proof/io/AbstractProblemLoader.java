@@ -33,7 +33,6 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
@@ -272,7 +271,7 @@ public abstract class AbstractProblemLoader {
                 
                 if (proof != null) {
                  OneStepSimplifier.refreshOSS(proof);
-                 result = replayProofOrScript(proof);
+                    result = replayProof(proof);
                 }
                                       
                 // this message is propagated to the top level in console mode
@@ -494,16 +493,15 @@ public abstract class AbstractProblemLoader {
         return proofList;
     }
 
-    private ReplayResult replayProofOrScript(Proof proof) throws ProofInputException, ProblemLoaderException {
+    /**
+     * Run proof script if it is present in the input data.
+     */
+    protected void runExistingProofScript() throws ProofInputException, ProblemLoaderException {
         if (envInput instanceof KeYUserProblemFile) {
             KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
             if(kupf.hasProofScript()) {
-                return replayProofScript(proof);
-            } else {
-                return replayProof(proof);
+                replayProofScript(proof);
             }
-        } else {
-            return new ReplayResult("", Collections.<Throwable>emptyList(), proof.root());
         }
     }
 
