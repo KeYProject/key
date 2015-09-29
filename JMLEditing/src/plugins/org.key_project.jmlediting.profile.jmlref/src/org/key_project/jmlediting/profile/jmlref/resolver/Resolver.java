@@ -12,30 +12,39 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
+import org.eclipse.jdt.internal.compiler.ast.ForeachStatement;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
@@ -108,8 +117,7 @@ public class Resolver implements IResolver {
       }
 
       // Get the context information. That is the ASTNode to which the JML node refers to / belongs to.
-      context = new SearchContextMapper(compilationUnit, jdtAST)
-               .getSearchContext(jmlNode);
+      context = new SearchContextMapper(compilationUnit, jdtAST).getSearchContext(jmlNode);
 
       return next();
    }
@@ -344,7 +352,7 @@ public class Resolver implements IResolver {
       // Initialize jdtNode with null. If this ever changes to something else,
       // we found our node!
       ASTNode jdtNode = null;
-
+      
       // Set the context.
       // Very important method call!
       context = setNewContext();
@@ -365,8 +373,34 @@ public class Resolver implements IResolver {
 
       // we need to get more information, in particular which class declared the method/field.
       // if our context is already set to a TypeDeclaration nothing will change.
-      context = getDeclaringClass(context);
+      // context = getDeclaringClass(context);
 
+      if (jdtNode == null && !currentTask.isMethod() && !currentTask.isClass() && !currentTask.isArray()) {
+
+         ASTNode searchContext = context;
+
+         ASTNode lastChecked;
+         do {
+            // TODO
+            do {
+               lastChecked = searchContext;
+               
+               jdtNode = findField(searchContext, currentTask.getResolveString());
+               
+               searchContext = getParentSearchContext(searchContext);
+               
+               
+            } while (jdtNode == null && !(lastChecked instanceof TypeDeclaration));
+            
+            searchContext = getSuperClass(searchContext);
+            
+         }
+         while (jdtNode == null && searchContext != null);
+      }
+      
+      // after this .. we set the context to the class.
+      context = getDeclaringClass(context);
+      
       // are we searching for a method?
       if (jdtNode == null && currentTask.isMethod()) {
 
@@ -377,17 +411,6 @@ public class Resolver implements IResolver {
 
          do {
             jdtNode = new MethodFinder(searchContext, currentTask, compilationUnit, originalNode).findMethod();
-            searchContext = getSuperClass(searchContext);
-
-         }
-         while (jdtNode == null && searchContext != null);
-      }
-      if (jdtNode == null && !currentTask.isClass() && !currentTask.isArray()) {
-
-         ASTNode searchContext = context;
-
-         do {
-            jdtNode = findField(searchContext, currentTask.getResolveString());
             searchContext = getSuperClass(searchContext);
 
          }
@@ -416,9 +439,25 @@ public class Resolver implements IResolver {
       return jdtNode;
    }
 
+   private ASTNode getParentSearchContext(final ASTNode searchContext) {
+      if(searchContext == null) {
+         return null;
+      }
+      if(searchContext instanceof TypeDeclaration) {
+         return searchContext;
+      }
+      ASTNode result = searchContext;
+      final TypeDeclaration thisType = getDeclaringClass(searchContext);
+      do {
+         result = result.getParent();
+      } while(!(result instanceof Block) && !thisType.subtreeMatch(new ASTMatcher(), result));
+      
+      return result;
+   }
+
    // we search the context for the node with the given name.
    private ASTNode findTypeParameter(final String resolveString) {
-      final List<TypeParameter> result = new LinkedList<TypeParameter>();
+      final LinkedList<TypeParameter> result = new LinkedList<TypeParameter>();
       context.accept(new ASTVisitor() {
 
          @Override
@@ -433,7 +472,7 @@ public class Resolver implements IResolver {
             return true;
          }
       });
-      return result.size() > 0 ? result.get(0) : null;
+      return result.poll();
    }
 
    /** Returns the super class of the class the given {@link ASTNode} is in.
@@ -968,39 +1007,98 @@ public class Resolver implements IResolver {
       if (context == null || name == null) {
          return null;
       }
-
-      // TYPE DECLERATION
-      if (context instanceof TypeDeclaration) {
-         if (((TypeDeclaration) context).getName().getIdentifier().equals(name)) {
-            return context;
-         }
-
-         for (final FieldDeclaration field : ((TypeDeclaration) context).getFields()) {
-            final ASTNode result = findField(field, name);
-            if (result != null) {
-               return result;
+      
+      final LinkedList<VariableDeclarationFragment> result = new LinkedList<VariableDeclarationFragment>();
+      
+      context.accept(new ASTVisitor() {  
+         
+         @Override
+         public boolean visit(final TypeDeclaration node) {
+            if(node.subtreeMatch(new ASTMatcher(), context)) {
+               return true;
             }
+            return false;
          }
-
-         // FIELD DECLERATION
-      }
-      else if (context instanceof FieldDeclaration) {
-         for (final Object fragment : ((FieldDeclaration) context).fragments()) {
-            final ASTNode result = findField((VariableDeclarationFragment) fragment, name);
-            if (result != null) {
-               return result;
+         
+         @Override
+         public boolean visit(final ForStatement node) {
+            if(node.subtreeMatch(new ASTMatcher(), context)) {
+               return true;
             }
+            return false;
          }
+         
+         @Override
+         public boolean visit(final WhileStatement node) {
+            if(node.subtreeMatch(new ASTMatcher(), context)) {
+               return true;
+            }
+            return false;
+         }
+         
+         @Override
+         public boolean visit(final SwitchStatement node) {
+            if(node.subtreeMatch(new ASTMatcher(), context)) {
+               return true;
+            }
+            return false;
+         }
+         
+         @Override
+         public boolean visit(final MethodDeclaration node) {
+            if(node.subtreeMatch(new ASTMatcher(), context)) {
+               return true;
+            }
+            return false;
+         }
+         
+         @Override
+         public boolean visit(final VariableDeclarationFragment node) {
+            if(result.size() > 0) {
+               return false;
+            }
+            if(node.getName().getIdentifier().equals(name)) {
+               result.add(node);
+               return false;
+            }
+            return true;
+         }
+      });
+      
+      return result.poll();
 
-         // VariableDeclarationFragment
-      }
-      else if (context instanceof VariableDeclarationFragment) {
-         if (((VariableDeclarationFragment) context).getName().getIdentifier().equals(name)) {
-            return context;
-         }
-      }
-      // NOTHING FOUND
-      return null;
+//      // TYPE DECLERATION
+//      if (context instanceof TypeDeclaration) {
+//         if (((TypeDeclaration) context).getName().getIdentifier().equals(name)) {
+//            return context;
+//         }
+//
+//         for (final FieldDeclaration field : ((TypeDeclaration) context).getFields()) {
+//            final ASTNode result = findField(field, name);
+//            if (result != null) {
+//               return result;
+//            }
+//         }
+//
+//         // FIELD DECLERATION
+//      }
+//      else if (context instanceof FieldDeclaration) {
+//         for (final Object fragment : ((FieldDeclaration) context).fragments()) {
+//            final ASTNode result = findField((VariableDeclarationFragment) fragment, name);
+//            if (result != null) {
+//               return result;
+//            }
+//         }
+//
+//         // VariableDeclarationFragment
+//      }
+//      else if (context instanceof VariableDeclarationFragment) {
+//         if (((VariableDeclarationFragment) context).getName().getIdentifier().equals(name)) {
+//            return context;
+//         }
+//      }
+//      // NOTHING FOUND
+//      return null;
    }
 
    /**
