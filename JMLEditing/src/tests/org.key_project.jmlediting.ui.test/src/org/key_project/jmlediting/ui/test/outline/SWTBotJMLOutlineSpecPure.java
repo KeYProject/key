@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -36,7 +35,7 @@ public class SWTBotJMLOutlineSpecPure {
    
 
    @BeforeClass
-   public static void initProject() throws CoreException, InterruptedException {
+   public static void initProject() throws Exception {
       TestUtilsUtil.closeWelcomeView();
       TestUtilsUtil.findView(IPageLayout.ID_OUTLINE);
       testProject = JMLEditingUITestUtils.createProjectWithFile(bot, PROJECT_NAME, PACKAGE_NAME, CLASS_NAME, SaveGuarantee.NO_SAVE);
@@ -46,11 +45,9 @@ public class SWTBotJMLOutlineSpecPure {
       testProject.restoreClassAndOpen();
       editor = testProject.getOpenedEditor();
       
+      TestUtilsUtil.openView(IPageLayout.ID_OUTLINE);
       SWTBotView view = bot.viewByTitle("Outline");
-       bot.menu("Window").click().menu("Show View").click().menu("Outline").click();
-       view.show();
-       tree = view.bot().tree();
-       
+      tree = view.bot().tree();
    }
    
    @AfterClass

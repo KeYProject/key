@@ -7,11 +7,11 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-   SWTBotJMLOutlineView.class,
    SWTBotJMLOutlineSpecPure.class,
-   SWTBotJMLOutlineUpdate.class
+   SWTBotJMLOutlineUpdate.class,
+   SWTBotJMLOutlineView.class
 })
 
-public class JMLOutlineAllTestSuite {
+public class SWTBotJMLOutlineAllTestSuite {
 
 }
