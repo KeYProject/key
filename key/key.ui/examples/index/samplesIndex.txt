@@ -56,6 +56,7 @@ InformationFlow/MethodContracts/README.txt
 InformationFlow/ToyVoting/README.txt
 InformationFlow/SimpleEvoting/README.txt
 InformationFlow/ToyBanking/README.txt
+InformationFlow/ToyBanking/README2.txt
 InformationFlow/NewObjects/README.txt
 InformationFlow/LoopInvariants/README.txt
 InformationFlow/BlockContracts/README.txt

@@ -23,6 +23,7 @@ import javax.swing.text.html.HTMLDocument;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
@@ -177,7 +178,7 @@ public class HTMLSyntaxHighlighter {
         
         try {
             // NOTE: Highlighting program variables is the most expensive operation.
-            // There are at least to options to do this:
+            // There are at least two options to do this:
             // 1. Get all program variables that are registered for a node.
             //    Pro: Getting them is fast.
             //    Con: There may be a lot of them that are not actually contained
@@ -191,16 +192,16 @@ public class HTMLSyntaxHighlighter {
             // in the sequent is big.
             
             Iterable<? extends ProgramVariable> programVariables;
+            final InitConfig initConfig = displayedNode.proof().getInitConfig();
             
             if (displayedNode.getGlobalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
                 programVariables = displayedNode.getGlobalProgVars();
-            }
-            else if (displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
+            } else if (initConfig != null
+                    && displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
                 programVariables = JoinRuleUtils
                         .getLocationVariablesHashSet(displayedNode.sequent(),
-                                displayedNode.proof().getServices());
-            }
-            else {
+                                                     initConfig.getServices());
+            } else {
                 programVariables = new HashSet<ProgramVariable>();
             }
     

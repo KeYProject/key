@@ -1,6 +1,7 @@
 example.path = Information Flow
 example.name = Block Contracts
 example.additionalFile.1 = src/contract/IFBlockExamples.java
+example.additionalFile.2 = src/contract/IFEfficiencyExamples.java
 
 
 Information flow examples.
