@@ -143,6 +143,11 @@ public interface ProofMacro {
      * This method may be called from within the GUI thread and be compatible
      * with that fact.
      *
+     * This method must be implemented to have the same effect as calling
+     * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence)} with
+     * <code>node.proof()</code> as proof and all open goals below
+     * <code>node</code>.
+     *
      * @param node
      *            the node (not <code>null</code>)
      * @param posInOcc
