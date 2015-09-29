@@ -170,7 +170,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                            openGoals);
                System.exit(0);
            }
-           if (macroChosen()) {
+           ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+           if(problemLoader.hasProofScript()) {
+               problemLoader.replayProofScript();
+           } else if (macroChosen()) {
                applyMacro();
            } else {
                finish(proof);

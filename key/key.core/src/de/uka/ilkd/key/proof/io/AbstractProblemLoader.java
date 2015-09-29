@@ -495,17 +495,18 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Run proof script if it is present in the input data.
+     *
+     * @return <code>true</code> iff there is a proof script to run
      */
-    protected void runExistingProofScript() throws ProofInputException, ProblemLoaderException {
+    public boolean hasProofScript() {
         if (envInput instanceof KeYUserProblemFile) {
             KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-            if(kupf.hasProofScript()) {
-                replayProofScript(proof);
-            }
+            return kupf.hasProofScript();
         }
+        return false;
     }
 
-    private ReplayResult replayProofScript(Proof proof) {
+    public ReplayResult replayProofScript() {
 
         assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;

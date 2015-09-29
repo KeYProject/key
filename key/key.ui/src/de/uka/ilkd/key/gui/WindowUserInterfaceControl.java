@@ -217,7 +217,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                if (macroChosen()) {
+                ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+                if(problemLoader.hasProofScript()) {
+                    problemLoader.replayProofScript();
+                } else if (macroChosen()) {
                     applyMacro();
                 }
             }

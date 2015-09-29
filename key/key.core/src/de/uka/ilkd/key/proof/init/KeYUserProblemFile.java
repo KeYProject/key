@@ -205,11 +205,15 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
     
     
-    public boolean hasProofScript() throws ProofInputException {
+    public boolean hasProofScript() {
+        try {
         if(lastParser == null) {
             readProblem();
         }
         return lastParser.isAtProofScript();
+        } catch (ProofInputException e) {
+            return false;
+        }
     }
 
     public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
