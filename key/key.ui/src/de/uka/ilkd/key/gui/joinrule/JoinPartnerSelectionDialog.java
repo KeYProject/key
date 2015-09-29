@@ -520,8 +520,10 @@ public class JoinPartnerSelectionDialog extends JDialog {
 
             for (SequentFormula succedentFormula : joinGoalPio.first.sequent()
                     .succedent()) {
-                antecedent = antecedent.insertFirst(new SequentFormula(tb
-                        .not(succedentFormula.formula()))).semisequent();
+                if (!succedentFormula.formula().isContainsJavaBlockRecursive()) {
+                    antecedent = antecedent.insertFirst(new SequentFormula(tb
+                            .not(succedentFormula.formula()))).semisequent();
+                }
             }
 
             if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
@@ -543,8 +545,10 @@ public class JoinPartnerSelectionDialog extends JDialog {
 
             for (SequentFormula succedentFormula : partnerGoal.sequent()
                     .succedent()) {
-                antecedent = antecedent.insertFirst(new SequentFormula(tb
-                        .not(succedentFormula.formula()))).semisequent();
+                if (!succedentFormula.formula().isContainsJavaBlockRecursive()) {
+                    antecedent = antecedent.insertFirst(new SequentFormula(tb
+                            .not(succedentFormula.formula()))).semisequent();
+                }
             }
 
             if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
