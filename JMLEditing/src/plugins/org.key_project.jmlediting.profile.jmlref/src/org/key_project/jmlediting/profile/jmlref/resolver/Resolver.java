@@ -151,7 +151,7 @@ public class Resolver implements IResolver {
       
       // Get the task to do - if there is any left.
       currentTask = tasks.poll();
-      if (currentTask == null || context == null) {
+      if (currentTask == null) {
          return null;
       }
 
@@ -164,7 +164,7 @@ public class Resolver implements IResolver {
       if (!currentTask.isArrayAcess()) {
 
          if (currentTask.isKeyword()) {
-            jdtNode = processKeyword();
+            jdtNode = processKeyword(context);
          }
          else {
             jdtNode = findIdentifier();
@@ -306,7 +306,10 @@ public class Resolver implements IResolver {
    }
 
    // Depending on the keyword, we need to search in different directions / different content.
-   private ASTNode processKeyword() throws ResolverException {
+   private ASTNode processKeyword(final ASTNode context) throws ResolverException {
+      if(context == null) {
+         return null;
+      }
       if (currentTask.isKeyword()) {
          if (currentTask.getResolveString().equals("this")) {
             return getDeclaringClass(context);
@@ -357,6 +360,9 @@ public class Resolver implements IResolver {
       // Set the context.
       // Very important method call!
       context = setNewContext();
+      if(context == null) {
+         return null;
+      }
 
       // is this a type variable?
       // then get to the end part so we can start building ResolveResults
@@ -418,7 +424,7 @@ public class Resolver implements IResolver {
          while (jdtNode == null && searchContext != null);
       }
       if (jdtNode == null && !currentTask.isArray()) {
-         jdtNode = findTypeParameter(currentTask.getResolveString());
+         jdtNode = findTypeParameter(context, currentTask.getResolveString());
       }
       if (jdtNode == null && !currentTask.isArray()) {
          jdtNode = findInImports(currentTask.getResolveString(), imports);
@@ -447,6 +453,8 @@ public class Resolver implements IResolver {
       if(searchContext instanceof TypeDeclaration) {
          return searchContext;
       }
+
+      // get the next scope .. if we come by our own TypeDeclaration we stop.
       ASTNode result = searchContext;
       final TypeDeclaration thisType = getDeclaringClass(searchContext);
       do {
@@ -457,7 +465,10 @@ public class Resolver implements IResolver {
    }
 
    // we search the context for the node with the given name.
-   private ASTNode findTypeParameter(final String resolveString) {
+   private ASTNode findTypeParameter(final ASTNode context, final String resolveString) {
+      if(context == null) {
+         return null;
+      }
       final LinkedList<TypeParameter> result = new LinkedList<TypeParameter>();
       context.accept(new ASTVisitor() {
 

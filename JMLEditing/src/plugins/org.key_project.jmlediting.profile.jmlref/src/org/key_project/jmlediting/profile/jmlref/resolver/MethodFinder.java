@@ -66,8 +66,13 @@ public class MethodFinder {
     *            being called or the method invocation is ambiguous.
     */
    public final ASTNode findMethod() throws ResolverException {
+      
+      if(context == null) {
+         return null;
+      }
+      
       // implemented following this logic roughly:
-      //
+      // 
 
       // compute the TypeBindings of the parameters from the IASTNodes
       final ITypeBinding[] iASTTypeBindings = getTypeBindings(parameters);
