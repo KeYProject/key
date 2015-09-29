@@ -23,18 +23,18 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 
 /**
- * Abstract class with the common behavior of refactoring computers which participant in the
+ * Abstract class defining with common behavior of refactoring computers participating in the
  * move or rename refactoring.
  * <p>
  * Changes to the JML annotations of a given java source file can be computed by calling the
  * {@link #computeNeededChangesToJML(ICompilationUnit, IJavaProject)} method, which uses a
  * {@link CommentLocator} to find all JML comments, filters those using the abstract
- * {@link #filterStringNodes(List)} and creates the list of {@link ReplaceEdit}s by calling
- * the abstract method {@link #computeReplaceEdit(ICompilationUnit, ArrayList, HashMap)}.
+ * {@link #filterStringNodes(List)} and creates a list of {@link ReplaceEdit}s by calling the
+ * abstract method {@link #computeReplaceEdit(ICompilationUnit, ArrayList, HashMap)}.
  * </p>
  * <p>
  * By implementing both abstract methods, one can define the exact behavior of the refactoring
- * computer. For example, one can define if a {@link IResolver} is called or not.
+ * computer. For example, one can define if a resolver is called or not.
  * </p>
  * 
  * @author Robert Heimbach
@@ -53,7 +53,7 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
     *            {@link ICompilationUnit} or he JMLcomments could not be received.
     */
    public final ArrayList<ReplaceEdit> computeNeededChangesToJML(ICompilationUnit unit,
-         IJavaProject project) throws JavaModelException {
+            IJavaProject project) throws JavaModelException {
 
       final ArrayList<ReplaceEdit> changesToMake = new ArrayList<ReplaceEdit>();
 
@@ -67,7 +67,7 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
 
          // Filter the comments
          final HashMap<IASTNode, List<IStringNode>> foundReferences = getReferencesInJMLcomments(
-               project, source, range);
+                  project, source, range);
 
          // this method is abstract to allow different ways to compute the
          // edits.
@@ -85,8 +85,8 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
     *           {@link IStringNode}s which they contain.
     */
    abstract protected void computeReplaceEdit(ICompilationUnit unit,
-         ArrayList<ReplaceEdit> changesToMake,
-         HashMap<IASTNode, List<IStringNode>> primaryStringMap);
+            ArrayList<ReplaceEdit> changesToMake,
+            HashMap<IASTNode, List<IStringNode>> primaryStringMap);
 
    /**
     * Searches through a given {@link CommentRange} in a source file and returns all JML
@@ -101,17 +101,18 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
     * @return Hash map of found JML comments, represented as {@link IASTNode}s paired with all
     *         the locations of potential references to the element to be refactored stored in
     *         a list of {@link IStringNode}s. The hash map is potentially empty if a
-    *         ParserException was thrown or no JML comment was found but guaranteed not null.
+    *         ParserException was thrown or no JML comment was found. Guaranteed to be not
+    *         null.
     */
    private final HashMap<IASTNode, List<IStringNode>> getReferencesInJMLcomments(
-         IJavaProject project, String source, CommentRange range) {
+            IJavaProject project, String source, CommentRange range) {
 
       List<IASTNode> stringNodes;
 
       // Get the project specific active JML profile and create a JML parser for
       // it.
       final IJMLProfile activeProfile = JMLPreferencesHelper
-            .getProjectActiveJMLProfile(project.getProject());
+               .getProjectActiveJMLProfile(project.getProject());
       final IJMLParser parser = activeProfile.createParser();
       IASTNode parseResult;
       try {
@@ -130,14 +131,15 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
       // For those occurrences left, find the primary nodes which provide the
       // needed context for resolving.
       final HashMap<IASTNode, List<IStringNode>> primaryStringMap = getPrimaryNodes(
-            filteredStringNodes, parseResult);
+               filteredStringNodes, parseResult);
 
       return primaryStringMap;
    }
 
    /**
     * Returns the primary nodes for a given list of string nodes using the context information
-    * of the parse result.
+    * of the parse result. That is, we look if the given node is part of a larger JML
+    * expression.
     * 
     * @param stringNodes list of {@link IStringNode}s for which the corresponding primary
     *           nodes should be returned.
@@ -146,7 +148,7 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
     * @return list of {@link IASTNode}s of primary node type.
     */
    private HashMap<IASTNode, List<IStringNode>> getPrimaryNodes(
-         final List<IStringNode> stringNodes, final IASTNode parseResult) {
+            final List<IStringNode> stringNodes, final IASTNode parseResult) {
       final HashMap<IASTNode, List<IStringNode>> primaryStringMap = new HashMap<IASTNode, List<IStringNode>>();
 
       for (final IStringNode stringNode : stringNodes) {
@@ -205,10 +207,10 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
 
    /**
     * Filters a list of {@link IASTNode} for those which potentially reference the element to
-    * be renamed by comparing the name.
+    * be renamed, e.g. by comparing the name.
     * 
-    * @param nodesList list to filter. Should be a list of IStringNodes.
-    * @return filtered list
+    * @param nodesList list to filter. Should be a list of {@link IStringNode}s.
+    * @return filtered list the filtered list of nodes.
     */
    protected abstract List<IStringNode> filterStringNodes(final List<IASTNode> nodesList);
 }
