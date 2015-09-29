@@ -44,21 +44,21 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     * {@inheritDoc}
     */
    @Override
-   protected final boolean initialize(Object element) {
+   protected final boolean initialize(final Object element) {
       fmethodParameter = (ILocalVariable) element;
 
       // check if it is a method parameter
-      if (fmethodParameter.isParameter()) {
+//      if (fmethodParameter.isParameter()) {
          fOldName = fmethodParameter.getElementName();
          fNewName = getArguments().getNewName();
          fProject = fmethodParameter.getJavaProject();
          fCompUnit = fmethodParameter.getDeclaringMember().getCompilationUnit();
 
          return true;
-      }
-      else {
-         return false;
-      }
+//      }
+//      else {
+//         return false;
+//      }
    }
 
    /**
@@ -77,8 +77,8 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     * {@inheritDoc}
     */
    @Override
-   public final RefactoringStatus checkConditions(IProgressMonitor pm,
-         CheckConditionsContext context) throws OperationCanceledException {
+   public final RefactoringStatus checkConditions(final IProgressMonitor pm,
+         final CheckConditionsContext context) throws OperationCanceledException {
 
       return new RefactoringStatus();
    }
@@ -95,7 +95,7 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
    public final Change createChange(final IProgressMonitor pm) throws CoreException,
          OperationCanceledException {
 
-      RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(
+      final RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(
             fmethodParameter, fOldName, fNewName);
 
       final ArrayList<ReplaceEdit> changesToJML = changesComputer.computeNeededChangesToJML(

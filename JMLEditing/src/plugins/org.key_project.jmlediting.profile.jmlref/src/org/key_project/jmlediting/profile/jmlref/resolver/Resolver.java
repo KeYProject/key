@@ -148,9 +148,10 @@ public class Resolver implements IResolver {
    @Override
    public final ResolveResult next() throws ResolverException {
 
+      
       // Get the task to do - if there is any left.
       currentTask = tasks.poll();
-      if (currentTask == null) {
+      if (currentTask == null || context == null) {
          return null;
       }
 
@@ -381,7 +382,7 @@ public class Resolver implements IResolver {
 
          ASTNode lastChecked;
          do {
-            // TODO
+            // Check every scope.
             do {
                lastChecked = searchContext;
                
@@ -1022,33 +1023,21 @@ public class Resolver implements IResolver {
          
          @Override
          public boolean visit(final ForStatement node) {
-            if(node.subtreeMatch(new ASTMatcher(), context)) {
-               return true;
-            }
             return false;
          }
          
          @Override
          public boolean visit(final WhileStatement node) {
-            if(node.subtreeMatch(new ASTMatcher(), context)) {
-               return true;
-            }
             return false;
          }
          
          @Override
          public boolean visit(final SwitchStatement node) {
-            if(node.subtreeMatch(new ASTMatcher(), context)) {
-               return true;
-            }
             return false;
          }
          
          @Override
          public boolean visit(final MethodDeclaration node) {
-            if(node.subtreeMatch(new ASTMatcher(), context)) {
-               return true;
-            }
             return false;
          }
          
@@ -1066,39 +1055,6 @@ public class Resolver implements IResolver {
       });
       
       return result.poll();
-
-//      // TYPE DECLERATION
-//      if (context instanceof TypeDeclaration) {
-//         if (((TypeDeclaration) context).getName().getIdentifier().equals(name)) {
-//            return context;
-//         }
-//
-//         for (final FieldDeclaration field : ((TypeDeclaration) context).getFields()) {
-//            final ASTNode result = findField(field, name);
-//            if (result != null) {
-//               return result;
-//            }
-//         }
-//
-//         // FIELD DECLERATION
-//      }
-//      else if (context instanceof FieldDeclaration) {
-//         for (final Object fragment : ((FieldDeclaration) context).fragments()) {
-//            final ASTNode result = findField((VariableDeclarationFragment) fragment, name);
-//            if (result != null) {
-//               return result;
-//            }
-//         }
-//
-//         // VariableDeclarationFragment
-//      }
-//      else if (context instanceof VariableDeclarationFragment) {
-//         if (((VariableDeclarationFragment) context).getName().getIdentifier().equals(name)) {
-//            return context;
-//         }
-//      }
-//      // NOTHING FOUND
-//      return null;
    }
 
    /**
