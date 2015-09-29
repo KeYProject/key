@@ -547,7 +547,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
 
         if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
                 new Semisequent(new SequentFormula(formulaToProve))),
-                services, 10000)) {
+                services, 1000)) {
             return false;
         }
         
