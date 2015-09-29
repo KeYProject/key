@@ -189,7 +189,7 @@ public class TaskBuilder {
          // PRIMARY -> IDENTIFIER -> STRING
          // -> LIST
          for (final IASTNode child : node.getChildren()) {
-            result = isMethodCall(child) || isMemberAccess(child) || isArrayAccess(child);
+            result = isMethodCall(child) || isMemberAccess(child) || isArrayAccess(child) || isInvKeyword(child) || isSeq(child);
          }
       }
       return result;
@@ -336,6 +336,40 @@ public class TaskBuilder {
             }
          }
       }
+      return result;
+   }
+
+   /**
+    * This method checks if the given {@link IASTNode} is a Seq node.
+    * This node is used for array accesses of the type array[*].
+    * @param node node to check.
+    * @return true if it is a Seq node and thus in fact an array access.
+    */
+   private boolean isSeq(IASTNode node) {
+      boolean result = false;
+      if (node.getType() == NodeTypes.SEQ) {
+         final IStringNode save = tasks.getLast().getNode();
+
+         tasks.add(new ResolverTask());
+         tasks.getLast().setArrayAcess(true);
+         tasks.getLast().setNode(save);
+         result = true;
+      }
+      return result;
+   }
+
+   /**
+    * This method checks if the given {@link IASTNode} is an \inv keyword. 
+    * Instead of being part of the MemberAccess node, it is saved as a Keyword node 
+    * as a child in the list node.
+    * @param node the node to check.
+    * @return true if it is an \inv keyword. False else.
+    */
+   private boolean isInvKeyword(IASTNode node) {
+      boolean result = false;
+      if (node.getType() == NodeTypes.KEYWORD && ((IKeywordNode) node).getKeywordInstance().equals("\\inv")) {
+         result = true;
+      }  
       return result;
    }
 
