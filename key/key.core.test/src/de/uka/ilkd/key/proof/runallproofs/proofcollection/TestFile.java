@@ -189,10 +189,9 @@ public class TestFile implements Serializable {
             // Save the available proof to a temporary file.
             loadedProof.saveToFile(proofFile);
             reloadProof(proofFile);
-         }
-
-         if(verbose) {
-            System.err.println("... success: reloaded.");
+            if(verbose) {
+                System.err.println("... success: reloaded.");
+            }
          }
       }
       catch (Throwable t) {
