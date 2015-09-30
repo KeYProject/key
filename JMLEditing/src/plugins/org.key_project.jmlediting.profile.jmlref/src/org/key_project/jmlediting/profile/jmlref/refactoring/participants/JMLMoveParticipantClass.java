@@ -48,7 +48,13 @@ public class JMLMoveParticipantClass extends MoveParticipant {
 
       fProject = fToMove.getJavaProject();
 
-      fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName) - 1);
+      if (fOldFullQualName.equals(fDocName)) {
+         fOldPackName = "";
+      }
+      else {
+         fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName) - 1);
+      }
+
       fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();
 
       return true;
@@ -71,7 +77,7 @@ public class JMLMoveParticipantClass extends MoveParticipant {
     */
    @Override
    public final RefactoringStatus checkConditions(IProgressMonitor pm,
-         CheckConditionsContext context) throws OperationCanceledException {
+            CheckConditionsContext context) throws OperationCanceledException {
       return new RefactoringStatus();
    }
 
@@ -85,13 +91,13 @@ public class JMLMoveParticipantClass extends MoveParticipant {
     *
     */
    public final Change createChange(final IProgressMonitor pm) throws CoreException,
-         OperationCanceledException {
+            OperationCanceledException {
 
       // Only non empty change objects will be added
       ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
 
       ClassMoveRefactoringComputer changesComputer = new ClassMoveRefactoringComputer(
-            fOldPackName, fNewPackName, fOldFullQualName);
+               fOldPackName, fNewPackName, fOldFullQualName);
 
       // Find out the projects which need to be checked: active project plus all dependencies
       ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
@@ -99,13 +105,13 @@ public class JMLMoveParticipantClass extends MoveParticipant {
 
       try {// Look through all source files in each package and project
          for (final IJavaProject project : RefactoringUtil.getAllProjectsToCheck(
-               projectsToCheck, fProject)) {
+                  projectsToCheck, fProject)) {
             for (final IPackageFragment pac : RefactoringUtil
-                  .getAllPackageFragmentsContainingSources(project)) {
+                     .getAllPackageFragmentsContainingSources(project)) {
                for (final ICompilationUnit unit : pac.getCompilationUnits()) {
 
                   final ArrayList<ReplaceEdit> changesToJML = changesComputer
-                        .computeNeededChangesToJML(unit, project);
+                           .computeNeededChangesToJML(unit, project);
 
                   // Get scheduled changes to the java code from the rename processor
                   final TextChange changesToJavaCode = getTextChange(unit);
@@ -124,7 +130,7 @@ public class JMLMoveParticipantClass extends MoveParticipant {
                      // Class itself -> changes to the package declaration.
                      if (!changesToJML.isEmpty()) {
                         changesToFilesWithoutJavaChanges.add(RefactoringUtil
-                              .combineEditsToChange(unit, changesToJML));
+                                 .combineEditsToChange(unit, changesToJML));
                      }
                   }
                }
