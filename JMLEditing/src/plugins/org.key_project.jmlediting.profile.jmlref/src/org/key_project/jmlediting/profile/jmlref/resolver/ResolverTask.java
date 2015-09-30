@@ -52,6 +52,10 @@ public final class ResolverTask {
       setParameters(new LinkedList<IASTNode>());
    }
 
+   /** Does this task represent a method call?
+    * 
+    * @return true, if this tasks represents a method call. false if not.
+    */
    public final boolean isMethod() {
       return isMethod;
    }

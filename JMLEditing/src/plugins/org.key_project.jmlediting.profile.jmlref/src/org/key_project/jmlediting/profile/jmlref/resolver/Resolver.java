@@ -15,9 +15,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -27,7 +25,6 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
@@ -44,7 +41,6 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
-import org.eclipse.jdt.internal.compiler.ast.ForeachStatement;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.resolver.IResolver;
 import org.key_project.jmlediting.core.resolver.ResolveResult;
@@ -56,13 +52,13 @@ import org.key_project.util.jdt.JDTUtil;
 
 /**
  * The Resolver class, that only has three public methods. <br>
- * "{@code resolve}({@link ICompilationUnit}, {@link IASTNode}) -> {@link ResolveResult}" will
+ * "{@link #resolve(ICompilationUnit, IASTNode) -> {@link ResolveResult}" will
  * resolve the given {@link IASTNode} and find the corresponding JavaElement or JML
  * declaration <br>
- * "{@code next()} -> {@link ResolveResult}" will resolve any member access that is appended
+ * "{@link #next()} -> {@link ResolveResult}" will resolve any member access that is appended
  * to the original identifier. <br>
- * "{@code hasNext()} -> boolean" that will return true, if the taskList is not empty and
- * there is still something to resolve with the next() method.
+ * "{@link #hasNext()} -> boolean" that will return true, if the taskList is not empty and
+ * there is still something to resolve with the {@link #next()} method.
  * 
  * @author Christopher Beckmann
  * @see {@link TaskBuilder}
@@ -87,6 +83,7 @@ public class Resolver implements IResolver {
    @Override
    public final ResolveResult resolve(final ICompilationUnit compilationUnit, final IASTNode jmlNode) throws ResolverException {
 
+      // Valid call ?
       if (jmlNode == null || compilationUnit == null) {
          return null;
       }
@@ -105,6 +102,7 @@ public class Resolver implements IResolver {
       // Save the package information and the import declarations
       pack = jdtAST.getPackage();
 
+      // split the list because we have to check for direct imports first
       @SuppressWarnings("unchecked")
       final List<ImportDeclaration> importList = jdtAST.imports();
       for (final ImportDeclaration i : importList) {
@@ -162,7 +160,7 @@ public class Resolver implements IResolver {
       ResolveResultType resolveResultType = null;
 
       if (!currentTask.isArrayAcess()) {
-
+         // start processing and searching for the identifier
          if (currentTask.isKeyword()) {
             jdtNode = processKeyword(context);
          }

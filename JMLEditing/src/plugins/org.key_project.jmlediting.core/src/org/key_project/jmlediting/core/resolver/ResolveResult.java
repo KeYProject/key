@@ -19,6 +19,14 @@ public class ResolveResult {
     private final IStringNode stringNode;
     private final ITypeBinding returnValue;
     
+    /**
+     * Creates a ResolveResult with the given values.
+     * @param jdtNode the {@link ASTNode} of the result
+     * @param type the {@link ResolveResultType} of the result 
+     * @param binding the {@link IBinding} to the declaration of the result
+     * @param returnValue the {@link ITypeBinding} to the type we would perform a member access search on
+     * @param stringNode the {@link IStringNode} that was used to find the result
+     */
     public ResolveResult(final ASTNode jdtNode, final ResolveResultType type, final IBinding binding, final ITypeBinding returnValue, final IStringNode stringNode) {
         this.jdtNode = jdtNode;
         this.type = type;
@@ -43,14 +51,26 @@ public class ResolveResult {
         return jdtNode;
     }
 
+    /** Gets the name from the {@link IStringNode} that is saved.
+     * 
+     * @return the name of the result
+     */
     public final String getName() {
         return stringNode.getString();
     }
 
+    /** Gets the {@link ResolveResultType} saved in this ResolveResult.
+     * 
+     * @return the {@link ResolveResultType} of the result
+     */
     public final ResolveResultType getResolveType() {
         return type;
     }
     
+    /** Gets the {@link IStringNode} saved.
+     * 
+     * @return the {@link IStringNode} of the result. Can be {@code null} if the ResolveResult was built using another {@link IASTNode} instead.
+     */
     public final IStringNode getStringNode() {
         return stringNode;
     }

@@ -47,8 +47,9 @@ public class TaskBuilder {
          // it's either a String (as in some assignable clauses or when the typeComputer
          // calls the resolver to resolve a type name) or it is a primary expression,
          // when called from a normal source that tries to resolve fields or methods.
-         final boolean result = isReferenceType(jmlNode) || isString(jmlNode)
-                  || isPrimaryExpr(jmlNode);
+         final boolean result = isReferenceType(jmlNode) 
+                             || isString(jmlNode)
+                             || isPrimaryExpr(jmlNode);
          if (result == false) {
             throw new ResolverException("Given IASTNode is not resolvable/ not supported.",
                      jmlNode, null);
@@ -345,7 +346,7 @@ public class TaskBuilder {
     * @param node node to check.
     * @return true if it is a Seq node and thus in fact an array access.
     */
-   private boolean isSeq(IASTNode node) {
+   private boolean isSeq(final IASTNode node) {
       boolean result = false;
       if (node.getType() == NodeTypes.SEQ) {
          final IStringNode save = tasks.getLast().getNode();
@@ -365,7 +366,7 @@ public class TaskBuilder {
     * @param node the node to check.
     * @return true if it is an \inv keyword. False else.
     */
-   private boolean isInvKeyword(IASTNode node) {
+   private boolean isInvKeyword(final IASTNode node) {
       boolean result = false;
       if (node.getType() == NodeTypes.KEYWORD && ((IKeywordNode) node).getKeywordInstance().equals("\\inv")) {
          result = true;

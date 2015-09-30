@@ -14,6 +14,7 @@ import org.key_project.jmlediting.core.resolver.ResolverException;
 import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.util.jdt.JDTUtil;
 
+
 public class TypeComputer implements ITypeComputer {
 
    protected ICompilationUnit compilationUnit;
@@ -155,8 +156,8 @@ public class TypeComputer implements ITypeComputer {
       }
       else if (type == JavaBasicsNodeTypes.NAME) {
          // TODO .. what is name?
-         System.out.println("No IType of NodeType");
-         return createWellKnownType("NAME"); // should never happen
+         //System.out.println("No IType of NodeType");
+         return null; // createWellKnownType("NAME"); // should never happen
       }
       return null;
    }
