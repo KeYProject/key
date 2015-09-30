@@ -88,7 +88,17 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
          final int startOffset = node.getStartOffset();
 
          int length = fOldPackName.length();
-
+         
+         if (length == 0) {
+            // was in default package before. Needs to add a dot.
+            fNewPackName = fNewPackName + ".";
+         }
+         
+         // if the destination is the default package, we need to replace the dot too
+         if (fNewPackName.equals("")){
+            length = length + 1;
+         }
+         
          changesToMake.add(new ReplaceEdit(startOffset, length, fNewPackName));
       }
    }
