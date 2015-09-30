@@ -122,8 +122,20 @@ public class FieldAndMethodMoveRefactoringComputer extends AbstractRefactoringCo
    private boolean checkForNonFullyQualified() {
 
       int lastPoint = newClassFullQualName.lastIndexOf('.');
-      String packageNewClass = newClassFullQualName.substring(0, lastPoint);
-      String newClassName = newClassFullQualName.substring(lastPoint + 1);
+      
+      String packageNewClass;
+      String newClassName;
+      
+      // Check if the destination package is the default package
+      if (lastPoint == -1) {
+         packageNewClass = "";
+         newClassName = newClassFullQualName;
+      }
+      else {
+         packageNewClass = newClassFullQualName.substring(0, lastPoint);
+         newClassName = newClassFullQualName.substring(lastPoint + 1);
+      }
+
 
       // Check if we want to compute JML changes for the destination class
       String nameOfCurrentClass = compUnit.getElementName().substring(0,
