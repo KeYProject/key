@@ -506,35 +506,15 @@ public abstract class AbstractProblemLoader {
         return false;
     }
 
-    public ReplayResult replayProofScript() {
-
+    public Pair<String, Location> readProofScript() throws ProofInputException {
         assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
-        final boolean isOSSActivated =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-        try {
             Triple<String, Integer, Integer> script = kupf.readProofScript();
-            ProofScriptEngine pse = new ProofScriptEngine(script.first,
-                    new Location(kupf.getInitialFile().getAbsolutePath(), script.second, script.third));
+        String path = kupf.getInitialFile().getAbsolutePath();
+        Location location = new Location(path, script.second, script.third);
 
-            // For loading, we generally turn on one step simplification to be
-            // able to load proofs that used it even if the user has currently
-            // turned OSS off.
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-            OneStepSimplifier.refreshOSS(proof);
-
-            // TODO get rid of that ugly cast which is true for all implementations (till now ...)
-            pse.execute((AbstractUserInterfaceControl) control, proof);
-
-            return new ReplayResult("Proof script successfully applied",
-                    Collections.<Throwable>emptyList(), proof.root());
-        } catch(Exception e) {
-            // get better last touched element
-            return new ReplayResult(e.getMessage(), Arrays.<Throwable>asList(e), proof.root());
-        } finally {
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
-        }
+        return new Pair<String, Location>(script.first, location);
     }
 
     private ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
