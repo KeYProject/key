@@ -188,14 +188,18 @@ public class RunAllProofsTest {
     * Uses {@link ProofCollectionParser} to parse the given file and returns a
     * parse result that is received from main parser entry point.
     */
-   public static ProofCollection parseIndexFile() throws IOException,
-         RecognitionException {
+   public static ProofCollection parseIndexFile() throws IOException {
       File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL.txt");
-      CharStream charStream = new ANTLRFileStream(
-            automaticJAVADL.getAbsolutePath());
+      CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
       ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
       TokenStream tokenStream = new CommonTokenStream(lexer);
       ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
-      return parser.parserEntryPoint();
+      try {
+         return parser.parserEntryPoint();
+      } catch (RecognitionException e) {
+         String msg = parser.getErrorMessage(e, parser.getTokenNames());
+         throw new IOException("Cannot parse " + automaticJAVADL +
+                               " at line " + e.line + ": " + msg, e);
+      }
    }
 }
