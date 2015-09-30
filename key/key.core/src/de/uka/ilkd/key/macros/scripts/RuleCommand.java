@@ -18,6 +18,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.rule.NoFindTaclet;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -56,9 +58,8 @@ public class RuleCommand extends AbstractCommand {
             Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
         Parameters p = parseArgs(proof, args);
-        TacletApp theApp = findTacletApp(proof, p, state);
+        TacletApp theApp = makeTacletApp(proof, p, state);
         assert theApp != null;
-
 
         ImmutableList<TacletApp> assumesCandidates =
                 theApp.findIfFormulaInstantiations(getFirstOpenGoal(proof, state).sequent(), proof.getServices());
@@ -78,6 +79,36 @@ public class RuleCommand extends AbstractCommand {
 
         Goal g = getFirstOpenGoal(proof, state);
         g.apply(theApp);
+    }
+
+    private TacletApp makeTacletApp(Proof proof, Parameters p,
+            Map<String, Object> state) throws ScriptException {
+
+        Taclet taclet = proof.getEnv().getInitConfigForEnvironment().
+                lookupActiveTaclet(new Name(p.rulename));
+
+        if(taclet == null) {
+            throw new ScriptException("Taclet '" + p.rulename + "' not known.");
+        }
+
+        if(taclet instanceof NoFindTaclet) {
+            return makeNoFindTacletApp(taclet, proof, p, state);
+        } else {
+            return findTacletApp(proof, p, state);
+        }
+
+    }
+
+    private TacletApp makeNoFindTacletApp(Taclet taclet, Proof proof, Parameters p,
+            Map<String, Object> state) {
+
+        TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclet);
+
+        // TODO allow for sv instantiations at this point
+//        SchemaVariable sv = app.uninstantiatedVars().iterator().next();
+        // app = app.addCheckedInstantiation(sv, formula, proof.getServices(), true);
+
+        return app;
     }
 
     private TacletApp findTacletApp(Proof proof, Parameters p, Map<String, Object> state)
