@@ -65,8 +65,11 @@ public class ProofMacroMenu extends JMenu {
 
     /**
      * The loader used to access the providers for macros.
+     *
+     * This is used as iteration source in other parts of KeY's ui.
      */
-    private static Iterable<ProofMacro> loader = ClassLoaderUtil.loadServices(ProofMacro.class);
+    public static final Iterable<ProofMacro> REGISTERED_MACROS =
+            ClassLoaderUtil.loadServices(ProofMacro.class);
 
     /**
      * The number of defined macros.
@@ -91,8 +94,11 @@ public class ProofMacroMenu extends JMenu {
         
         int count = 0;
         Node node = mediator.getSelectedNode();
-        for (ProofMacro macro : loader) {
+        for (ProofMacro macro : REGISTERED_MACROS) {
                 
+            // This here is for the global strategy menu in "Proof" toplevel menu.
+            // Its entries are needed to anchor keyboard shortcuts for macros
+            // TODO refactor
             boolean applicable;
             if(node == null) {
                 applicable = macro.isApplicableWithoutPosition();

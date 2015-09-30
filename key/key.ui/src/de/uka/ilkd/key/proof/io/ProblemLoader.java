@@ -76,7 +76,6 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
    private Throwable doWork() {
       try {
           load();
-          runExistingProofScript();
           return null;
       } catch (Throwable exception) {
           final String errorMessage = "Failed to load "

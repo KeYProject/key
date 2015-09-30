@@ -100,6 +100,9 @@ public abstract class SequentView extends JEditorPane {
     private final HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight
             = new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
 
+    /** the last observed mouse position for which a highlight was created */
+    private Point lastMousePosition;
+
     SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
         
@@ -240,6 +243,14 @@ public abstract class SequentView extends JEditorPane {
         catch (BadLocationException e) {
             return super.getText(); // shouldn't happen
         }
+    }
+
+    /**
+     * Get the PosInSequent object for the last observed
+     * and highlighted mouse position.
+     */
+    public PosInSequent getLastPosInSequent() {
+        return getPosInSequent(lastMousePosition);
     }
 
     /**
@@ -436,6 +447,7 @@ public abstract class SequentView extends JEditorPane {
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
+        lastMousePosition = p;
     }
 
     @Override

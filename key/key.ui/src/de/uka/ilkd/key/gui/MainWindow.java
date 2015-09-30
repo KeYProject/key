@@ -87,6 +87,7 @@ import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
@@ -289,6 +290,7 @@ public final class MainWindow extends JFrame  {
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         addWindowListener(exitMainAction.windowListener);
+        MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
     }
 
     public static MainWindow getInstance() {
@@ -732,8 +734,6 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        final JMenuItem macros = new ProofMacroMenu(mediator);
-        proof.add(macros);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
