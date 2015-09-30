@@ -40,22 +40,23 @@ public class JMLMoveParticipantClass extends MoveParticipant {
     * {@inheritDoc}
     */
    @Override
-   protected final boolean initialize(Object element) {
-      IJavaElement fToMove = (IJavaElement) element;
+   protected final boolean initialize(final Object element) {
+      final IJavaElement fToMove = (IJavaElement) element;
 
-      String fDocName = fToMove.getElementName();
+      fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();
+      
+      final String fDocName = fToMove.getElementName();
       fOldFullQualName = ((IType) element).getFullyQualifiedName();
 
       fProject = fToMove.getJavaProject();
 
       if (fOldFullQualName.equals(fDocName)) {
          fOldPackName = "";
+         fNewPackName = fNewPackName + '.';
       }
       else {
          fOldPackName = fOldFullQualName.substring(0, fOldFullQualName.indexOf(fDocName) - 1);
       }
-
-      fNewPackName = ((IPackageFragment) getArguments().getDestination()).getElementName();
 
       return true;
    }
@@ -76,8 +77,8 @@ public class JMLMoveParticipantClass extends MoveParticipant {
     * {@inheritDoc}
     */
    @Override
-   public final RefactoringStatus checkConditions(IProgressMonitor pm,
-            CheckConditionsContext context) throws OperationCanceledException {
+   public final RefactoringStatus checkConditions(final IProgressMonitor pm,
+            final CheckConditionsContext context) throws OperationCanceledException {
       return new RefactoringStatus();
    }
 
@@ -90,17 +91,18 @@ public class JMLMoveParticipantClass extends MoveParticipant {
     *         which do not have any Java changes scheduled.
     *
     */
+   @Override
    public final Change createChange(final IProgressMonitor pm) throws CoreException,
             OperationCanceledException {
 
       // Only non empty change objects will be added
-      ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
+      final ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
 
-      ClassMoveRefactoringComputer changesComputer = new ClassMoveRefactoringComputer(
+      final ClassMoveRefactoringComputer changesComputer = new ClassMoveRefactoringComputer(
                fOldPackName, fNewPackName, fOldFullQualName);
 
       // Find out the projects which need to be checked: active project plus all dependencies
-      ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
+      final ArrayList<IJavaProject> projectsToCheck = new ArrayList<IJavaProject>();
       projectsToCheck.add(fProject);
 
       try {// Look through all source files in each package and project

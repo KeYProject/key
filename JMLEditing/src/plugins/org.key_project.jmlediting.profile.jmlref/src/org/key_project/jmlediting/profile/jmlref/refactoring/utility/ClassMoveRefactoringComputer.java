@@ -19,9 +19,9 @@ import org.key_project.jmlediting.core.dom.IStringNode;
  */
 public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
 
-   private String fOldFullQualName;
-   private String fOldPackName;
-   private String fNewPackName;
+   private final String fOldFullQualName;
+   private final String fOldPackName;
+   private final String fNewPackName;
 
    /**
     * Constructor, which saves the fully qualified name of the class which is moved and the
@@ -31,8 +31,8 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
     * @param fNewPackName name of the package the class should be moved to.
     * @param fOldFullQualName fully qualified name / path of the class to be moved.
     */
-   public ClassMoveRefactoringComputer(String fOldPackName, String fNewPackName,
-         String fOldFullQualName) {
+   public ClassMoveRefactoringComputer(final String fOldPackName, final String fNewPackName,
+         final String fOldFullQualName) {
       this.fOldPackName = fOldPackName;
       this.fNewPackName = fNewPackName;
       this.fOldFullQualName = fOldFullQualName;
@@ -45,7 +45,8 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
     * @param nodesList a list to be filtered. {@link IStringNode}s are expected.
     * @return list of filtered {@link IStringNode}s.
     */
-   protected final List<IStringNode> filterStringNodes(List<IASTNode> nodesList) {
+   @Override
+   protected final List<IStringNode> filterStringNodes(final List<IASTNode> nodesList) {
       final ArrayList<IStringNode> filteredList = new ArrayList<IStringNode>();
 
       // Note that an expression like package.subpackage.Class is separated in three nodes.
@@ -58,11 +59,12 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
 
          // combine the expression because the current String is contained in the string to
          // replace.
-         if (fOldFullQualName.contains(stringNode.getString()))
+         if (fOldFullQualName.contains(stringNode.getString())) {
             nodeString = nodeString + stringNode.getString();
          // reset the expression
-         else
+         } else {
             nodeString = "";
+         }
 
          if (nodeString.equals(fOldFullQualName)) {
             filteredList.add(stringNode);
@@ -79,20 +81,22 @@ public class ClassMoveRefactoringComputer extends AbstractRefactoringComputer {
     * @param primaryStringMap {@link IASTNode} to compute the change for and the
     *           {@link IStringNode}s which they contain.
     */
-   protected final void computeReplaceEdit(ICompilationUnit unit,
-         ArrayList<ReplaceEdit> changesToMake,
-         HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
+   @Override
+   protected final void computeReplaceEdit(final ICompilationUnit unit,
+         final ArrayList<ReplaceEdit> changesToMake,
+         final HashMap<IASTNode, List<IStringNode>> primaryStringMap) {
 
-      for (IASTNode node : primaryStringMap.keySet()) {
+      for (final IASTNode node : primaryStringMap.keySet()) {
 
          final int startOffset = node.getStartOffset();
 
          int length = fOldPackName.length();
          
-         if (length == 0) {
-            // was in default package before. Needs to add a dot.
-            fNewPackName = fNewPackName + ".";
-         }
+//         if (length == 0) {
+//            // was in default package before. Needs to add a dot.
+//            fNewPackName = fNewPackName + ".";
+//            //length = length + 1;
+//         }
          
          // if the destination is the default package, we need to replace the dot too
          if (fNewPackName.equals("")){
