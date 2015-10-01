@@ -86,15 +86,18 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private static final long serialVersionUID = -1460097562546341922L;
 
     /** The tooltip hint for the checkbox. */
-    private static final String CB_SELECT_CANDIDATE_HINT = "Select to add shown state as a join partner.";
+    private static final String CB_SELECT_CANDIDATE_HINT =
+            "Select to add shown state as a join partner.";
 
     /** The tooltip for the OK button */
-    private static final String CHOOSE_ALL_BTN_TOOLTIP_TXT = "Select all proposed goals as join partners. "
-            + "Only enabled if the join is applicable for all goals and the chosen join procedure.";
+    private static final String CHOOSE_ALL_BTN_TOOLTIP_TXT =
+            "Select all proposed goals as join partners. "
+                    + "Only enabled if the join is applicable for all goals and the chosen join procedure.";
     /** The tooltip for the choose-all button */
-    private static final String OK_BTN_TOOLTIP_TXT = "Select the chosen goals as join partners. "
-            + "Only enabled if at least one goal is chosen and the join is applicable for the "
-            + "chosen goals and join procedure.";
+    private static final String OK_BTN_TOOLTIP_TXT =
+            "Select the chosen goals as join partners. "
+                    + "Only enabled if at least one goal is chosen and the join is applicable for the "
+                    + "chosen goals and join procedure.";
 
     /** The initial size of this dialog. */
     private static final Dimension INITIAL_SIZE = new Dimension(850, 450);
@@ -105,31 +108,35 @@ public class JoinPartnerSelectionDialog extends JDialog {
      */
     private static final Font TXT_AREA_FONT = new Font(Font.MONOSPACED,
             Font.PLAIN, 14);
-    
-    private final static MainWindow MAIN_WINDOW_INSTANCE = MainWindow.getInstance();
+
+    private final static MainWindow MAIN_WINDOW_INSTANCE = MainWindow
+            .getInstance();
 
     /** Comparator for goals; sorts by serial nr. of the node */
     private static Comparator<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> GOAL_COMPARATOR =
             new Comparator<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>>() {
-        @Override
-        public int compare(
-                Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> o1,
-                Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> o2) {
-            return o1.first.node().serialNr() - o2.first.node().serialNr();
-        }
-    };
+                @Override
+                public int compare(
+                        Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> o1,
+                        Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> o2) {
+                    return o1.first.node().serialNr()
+                            - o2.first.node().serialNr();
+                }
+            };
 
-    private LinkedList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates = null;
+    private LinkedList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates =
+            null;
     private Services services = null;
     private Pair<Goal, PosInOccurrence> joinGoalPio = null;
 
     /** The chosen goals. */
     private SortedSet<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> chosenGoals =
-            new TreeSet<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>>(GOAL_COMPARATOR);
+            new TreeSet<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>>(
+                    GOAL_COMPARATOR);
 
     /** The chosen join method. */
     private JoinProcedure chosenRule = JoinProcedure.getJoinProcedures().head();
-    
+
     /** The chosen distinguishing formula */
     private Term chosenDistForm = null;
 
@@ -147,8 +154,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private JButton chooseAllButton = null;
 
     private JoinPartnerSelectionDialog() {
-        super(MAIN_WINDOW_INSTANCE,
-                "Select partner node for join operation", true);
+        super(MAIN_WINDOW_INSTANCE, "Select partner node for join operation",
+                true);
 
         setLocation(MAIN_WINDOW_INSTANCE.getLocation());
 
@@ -160,8 +167,9 @@ public class JoinPartnerSelectionDialog extends JDialog {
             jep.setContentType("text/html");
 
             // Set font
-            String cssRule = "body { font-family: " + TXT_AREA_FONT.getFamily()
-                    + "; " + "font-size: " + TXT_AREA_FONT.getSize() + "pt; }";
+            String cssRule =
+                    "body { font-family: " + TXT_AREA_FONT.getFamily() + "; "
+                            + "font-size: " + TXT_AREA_FONT.getSize() + "pt; }";
             ((HTMLDocument) jep.getDocument()).getStyleSheet().addRule(cssRule);
         }
 
@@ -174,7 +182,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
         cmbCandidates.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> selectedCandidate = getSelectedCandidate();
+                Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> selectedCandidate =
+                        getSelectedCandidate();
 
                 setHighlightedSequentForArea(selectedCandidate.first,
                         selectedCandidate.second, txtPartner2);
@@ -238,8 +247,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
                 BoxLayout.Y_AXIS));
         joinStateContainer.add(scrpPartner1);
 
-        TitledBorder joinStateContainerTitle = BorderFactory
-                .createTitledBorder("State to join");
+        TitledBorder joinStateContainerTitle =
+                BorderFactory.createTitledBorder("State to join");
         joinStateContainerTitle.setTitleJustification(TitledBorder.LEFT);
         joinStateContainer.setBorder(joinStateContainerTitle);
 
@@ -257,8 +266,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
 
         partnerContainer.add(selectionContainer);
 
-        TitledBorder txtPartner2Title = BorderFactory
-                .createTitledBorder("Potential join partners");
+        TitledBorder txtPartner2Title =
+                BorderFactory.createTitledBorder("Potential join partners");
         txtPartner2Title.setTitleJustification(TitledBorder.LEFT);
         partnerContainer.setBorder(txtPartner2Title);
 
@@ -279,8 +288,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
             joinRulesContainer.add(rb);
         }
 
-        TitledBorder joinRulesContainerTitle = BorderFactory
-                .createTitledBorder("Concrete join rule to apply");
+        TitledBorder joinRulesContainerTitle =
+                BorderFactory.createTitledBorder("Concrete join rule to apply");
         joinRulesContainerTitle.setTitleJustification(TitledBorder.LEFT);
         joinRulesContainerTitle.setBorder(joinStateContainerTitle);
         joinRulesContainer.setBorder(joinRulesContainerTitle);
@@ -292,29 +301,31 @@ public class JoinPartnerSelectionDialog extends JDialog {
             @Override
             public void keyReleased(KeyEvent e) {
                 chosenDistForm =
-                        JoinRuleUtils.translateToFormula(services, txtDistForm.getText());
-                
+                        JoinRuleUtils.translateToFormula(services,
+                                txtDistForm.getText());
+
                 if (chosenDistForm == null || !isSuitableDistFormula()) {
                     txtDistForm.setForeground(Color.RED);
                 }
                 else {
                     txtDistForm.setForeground(Color.BLACK);
                 }
-                
+
                 checkApplicable();
             }
         });
-        
+
         JPanel distFormContainer = new JPanel();
         distFormContainer.setLayout(new BorderLayout());
-        
+
         distFormContainer.add(txtDistForm, BorderLayout.CENTER);
-        
-        TitledBorder distFormContainerTitle = BorderFactory
-                .createTitledBorder("Distinguishing formula (leave empty for automatic generation!)");
+
+        TitledBorder distFormContainerTitle =
+                BorderFactory
+                        .createTitledBorder("Distinguishing formula (leave empty for automatic generation!)");
         distFormContainerTitle.setTitleJustification(TitledBorder.LEFT);
         distFormContainer.setBorder(distFormContainerTitle);
-        
+
         // Control buttons container: OK / Cancel
         okButton = new JButton("OK");
         chooseAllButton = new JButton("Choose All");
@@ -370,9 +381,11 @@ public class JoinPartnerSelectionDialog extends JDialog {
         lowerContainer
                 .setLayout(new BoxLayout(lowerContainer, BoxLayout.Y_AXIS));
         lowerContainer.add(joinRulesContainer);
-        lowerContainer.add(new Box.Filler(verticalFillerDim, verticalFillerDim, verticalFillerDim));
+        lowerContainer.add(new Box.Filler(verticalFillerDim, verticalFillerDim,
+                verticalFillerDim));
         lowerContainer.add(distFormContainer);
-        lowerContainer.add(new Box.Filler(verticalFillerDim, verticalFillerDim, verticalFillerDim));
+        lowerContainer.add(new Box.Filler(verticalFillerDim, verticalFillerDim,
+                verticalFillerDim));
         lowerContainer.add(ctrlBtnsContainer);
 
         // Add components to content pane
@@ -381,9 +394,9 @@ public class JoinPartnerSelectionDialog extends JDialog {
 
         setSize(INITIAL_SIZE);
     }
-    
+
     public static void main(String[] args) {
-        
+
         JoinPartnerSelectionDialog diag = new JoinPartnerSelectionDialog();
         diag.setVisible(true);
     }
@@ -401,19 +414,23 @@ public class JoinPartnerSelectionDialog extends JDialog {
      * @param services
      *            The services object.
      */
-    public JoinPartnerSelectionDialog(Goal joinGoal, PosInOccurrence pio,
+    public JoinPartnerSelectionDialog(
+            Goal joinGoal,
+            PosInOccurrence pio,
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates,
             Services services) {
 
         this();
         this.services = services;
 
-        this.candidates = new LinkedList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>>();
+        this.candidates =
+                new LinkedList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>>();
         this.joinGoalPio = new Pair<Goal, PosInOccurrence>(joinGoal, pio);
 
         for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> candidate : candidates) {
-            int insPos = Collections.binarySearch(this.candidates, candidate,
-                    GOAL_COMPARATOR);
+            int insPos =
+                    Collections.binarySearch(this.candidates, candidate,
+                            GOAL_COMPARATOR);
 
             insPos = (insPos + 1) * -1;
             this.candidates.add(insPos, candidate);
@@ -428,8 +445,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
      * @return All chosen join partners.
      */
     public ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> getChosenCandidates() {
-        ImmutableSLList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> result = ImmutableSLList
-                .nil();
+        ImmutableSLList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> result =
+                ImmutableSLList.nil();
 
         if (chosenGoals != null) {
             return result.append(chosenGoals);
@@ -445,7 +462,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
     public JoinProcedure getChosenJoinRule() {
         return chosenRule;
     }
-    
+
     /**
      * @return The chosen distinguishing formula. If null, an automatic
      *         generation of the distinguishing formula should be performed.
@@ -466,8 +483,9 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private boolean isApplicableForCandidates(
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> theCandidates) {
         if (joinGoalPio != null && candidates != null && chosenRule != null) {
-            JoinRuleBuiltInRuleApp joinRuleApp = (JoinRuleBuiltInRuleApp) JoinRule.INSTANCE
-                    .createApp(joinGoalPio.second, services);
+            JoinRuleBuiltInRuleApp joinRuleApp =
+                    (JoinRuleBuiltInRuleApp) JoinRule.INSTANCE.createApp(
+                            joinGoalPio.second, services);
 
             joinRuleApp.setJoinNode(joinGoalPio.first.node());
             joinRuleApp.setConcreteRule(chosenRule);
@@ -487,17 +505,18 @@ public class JoinPartnerSelectionDialog extends JDialog {
     private void checkApplicable() {
         okButton.setEnabled(chosenGoals.size() > 0
                 && isApplicableForCandidates(immutableListFromIterabe(chosenGoals)));
-        
+
         chooseAllButton
                 .setEnabled(candidates.size() > 0
                         && isApplicableForCandidates(immutableListFromIterabe(candidates)));
-        
-        txtDistForm.setEnabled(candidates.size() == 1 || chosenGoals.size() == 1);
+
+        txtDistForm.setEnabled(candidates.size() == 1
+                || chosenGoals.size() == 1);
         if (!txtDistForm.isEnabled()) {
             chosenDistForm = null;
         }
     }
-    
+
     /**
      * Checks whether the selected distinguishable formula is actually suitable
      * for this purpose.
@@ -509,48 +528,57 @@ public class JoinPartnerSelectionDialog extends JDialog {
         if (chosenDistForm == null) {
             return false;
         }
-        
+
         // The formula should be provable for the first state
         // whilst its complement should be provable for the second state.
-        
+
         final TermBuilder tb = services.getTermBuilder();
-        
-        final Goal partnerGoal = candidates.size() == 1 ? candidates.getFirst().first :
-            (chosenGoals.size() == 1 ? chosenGoals.first().first : null);
-        
+
+        final Goal partnerGoal =
+                candidates.size() == 1 ? candidates.getFirst().first
+                        : (chosenGoals.size() == 1 ? chosenGoals.first().first
+                                : null);
+
         if (partnerGoal == null) {
             return false;
         }
-        
-        return checkProvability(joinGoalPio.first.sequent(), chosenDistForm)
-                && checkProvability(partnerGoal.sequent(), tb.not(chosenDistForm));
+
+        return checkProvability(joinGoalPio.first.sequent(), chosenDistForm,
+                services)
+                && checkProvability(partnerGoal.sequent(),
+                        tb.not(chosenDistForm), services);
     }
-    
+
     /**
-     * TODO: Document.
+     * Checks whether the given formula can be proven within the given sequent.
      *
      * @param seq
+     *            Sequent in which to check the provability of formulaToProve.
      * @param formulaToProve
-     * @return
+     *            Formula to prove.
+     * @return True iff formulaToProve can be proven within the given sequent.
      */
-    private boolean checkProvability(Sequent seq, Term formulaToProve) {
+    private static boolean checkProvability(Sequent seq, Term formulaToProve,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        
+
         Semisequent antecedent = seq.antecedent();
 
         for (SequentFormula succedentFormula : seq.succedent()) {
             if (!succedentFormula.formula().isContainsJavaBlockRecursive()) {
-                antecedent = antecedent.insertFirst(new SequentFormula(tb
-                        .not(succedentFormula.formula()))).semisequent();
+                antecedent =
+                        antecedent.insertFirst(
+                                new SequentFormula(tb.not(succedentFormula
+                                        .formula()))).semisequent();
             }
         }
 
         if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
-                new Semisequent(new SequentFormula(formulaToProve))),
-                services, 1000)) {
+                new Semisequent(new SequentFormula(formulaToProve))), services,
+                1000)) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -581,7 +609,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
      *            Index of the join candidate.
      * @return The n-th candidate in the list.
      */
-    private Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> getNthCandidate(int n) {
+    private Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> getNthCandidate(
+            int n) {
         int i = 0;
         for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> elem : candidates) {
             if (i == n) {
@@ -639,8 +668,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
         }
 
         // Find a match
-        String sequent = LogicPrinter.quickPrintSequent(goal.sequent(),
-                services);
+        String sequent =
+                LogicPrinter.quickPrintSequent(goal.sequent(), services);
         Pattern p = Pattern.compile(subterm);
         Matcher m = p.matcher(sequent);
 
@@ -650,8 +679,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
         if (m.find()) {
             // Assemble new text
             String before = sequent.substring(0, m.start() - 1);
-            String main = "<b>" + sequent.substring(m.start(), m.end())
-                    + "</b>";
+            String main =
+                    "<b>" + sequent.substring(m.start(), m.end()) + "</b>";
             String after = sequent.substring(m.end());
 
             newText = before + main + after;
