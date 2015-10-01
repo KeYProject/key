@@ -63,6 +63,16 @@ forkTimeout = 1000
 # forkMemory = 1000m
 
 /*
+ * To run the forked JVM in debug mode, set the TCP port to listen to here.
+ * You can prefix the port with "wait:" to make the JVM suspend till the
+ * process has connected.
+ *
+ * Examples:  forkDebugPort = "8000"
+ *            forkDebugPort = "wait:1234"
+ */
+forkDebugPort = "wait:1234"
+
+/*
  * By default runAllProofs does not print a lot of information.
  * Set this to true to get more output.
  */

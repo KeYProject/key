@@ -183,8 +183,6 @@ public class TestFile implements Serializable {
          } else {
              // ... script
              ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-             // XXX This seems a hack ...
-             env.getLoadedProof().setEnv(new ProofEnvironment(env.getInitConfig()));
              pse.execute(env.getUi(), env.getLoadedProof());
          }
 
