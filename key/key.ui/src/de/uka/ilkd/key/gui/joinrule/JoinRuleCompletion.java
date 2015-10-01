@@ -17,10 +17,10 @@ import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.util.Triple;
 
 /**
- * This class completes the instantiation for a join rule application.
- * The user is queried for partner goals and concrete join rule to
- * choose. If in forced mode, all potential partners and the if-then-else
- * join method are chosen (no query is shown to the user).
+ * This class completes the instantiation for a join rule application. The user
+ * is queried for partner goals and concrete join rule to choose. If in forced
+ * mode, all potential partners and the if-then-else join method are chosen (no
+ * query is shown to the user).
  * 
  * @author Dominic Scheurer
  */
@@ -28,47 +28,54 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
 
     /** Singleton instance */
     public static final JoinRuleCompletion INSTANCE = new JoinRuleCompletion();
-    
-	private static final JoinProcedure STD_CONCRETE_JOIN_RULE = JoinIfThenElse.instance();
 
-	private JoinRuleCompletion() {}
-	
+    private static final JoinProcedure STD_CONCRETE_JOIN_RULE = JoinIfThenElse
+            .instance();
+
+    private JoinRuleCompletion() {
+    }
+
     @Override
-    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
+    public IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal,
             boolean forced) {
 
-        JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) app;
-        PosInOccurrence pio = joinApp.posInOccurrence();
-        
-        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates =
+        final JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) app;
+        final PosInOccurrence pio = joinApp.posInOccurrence();
+
+        final ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> candidates =
                 JoinRule.findPotentialJoinPartners(goal, pio);
-        
-        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> chosenCandidates = null;
-        JoinProcedure chosenRule = null;
-        Term chosenDistForm = null; // null is admissible standard ==> auto generation
-        
+
+        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> chosenCandidates =
+                null;
+        final JoinProcedure chosenRule;
+        Term chosenDistForm = null; // null is admissible standard ==> auto
+                                    // generation
+
         if (forced) {
             chosenCandidates = candidates;
             chosenRule = STD_CONCRETE_JOIN_RULE;
-        } else {
-            JoinPartnerSelectionDialog dialog =
-                    new JoinPartnerSelectionDialog(goal, pio, candidates, goal.proof().getServices());
+        }
+        else {
+            final JoinPartnerSelectionDialog dialog =
+                    new JoinPartnerSelectionDialog(goal, pio, candidates, goal
+                            .proof().getServices());
             dialog.setVisible(true);
             chosenCandidates = dialog.getChosenCandidates();
             chosenRule = dialog.getChosenJoinRule();
             chosenDistForm = dialog.getChosenDistinguishingFormula();
         }
-        
+
         if (chosenCandidates == null || chosenCandidates.size() < 1) {
-        	return null;
+            return null;
         }
-        
-        JoinRuleBuiltInRuleApp result = new JoinRuleBuiltInRuleApp(app.rule(), pio);
+
+        final JoinRuleBuiltInRuleApp result =
+                new JoinRuleBuiltInRuleApp(app.rule(), pio);
         result.setJoinPartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
         result.setDistinguishingFormula(chosenDistForm);
         result.setJoinNode(goal.node());
-        
+
         return result;
     }
 
@@ -76,7 +83,7 @@ public class JoinRuleCompletion implements InteractiveRuleApplicationCompletion 
     public boolean canComplete(IBuiltInRuleApp app) {
         return checkCanComplete(app);
     }
-    
+
     public static boolean checkCanComplete(IBuiltInRuleApp app) {
         return app instanceof JoinRuleBuiltInRuleApp;
     }
