@@ -515,43 +515,40 @@ public class JoinPartnerSelectionDialog extends JDialog {
         
         final TermBuilder tb = services.getTermBuilder();
         
-        {
-            Semisequent antecedent = joinGoalPio.first.sequent().antecedent();
-
-            for (SequentFormula succedentFormula : joinGoalPio.first.sequent()
-                    .succedent()) {
-                antecedent = antecedent.insertFirst(new SequentFormula(tb
-                        .not(succedentFormula.formula()))).semisequent();
-            }
-
-            if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
-                    new Semisequent(new SequentFormula(chosenDistForm))),
-                    services, 1000)) {
-                return false;
-            }
+        final Goal partnerGoal = candidates.size() == 1 ? candidates.getFirst().first :
+            (chosenGoals.size() == 1 ? chosenGoals.first().first : null);
+        
+        if (partnerGoal == null) {
+            return false;
         }
         
-        {
-            final Goal partnerGoal = candidates.size() == 1 ? candidates.getFirst().first :
-                (chosenGoals.size() == 1 ? chosenGoals.first().first : null);
-            
-            if (partnerGoal == null) {
-                return false;
-            }
-            
-            Semisequent antecedent = partnerGoal.sequent().antecedent();
+        return checkProvability(joinGoalPio.first.sequent(), chosenDistForm)
+                && checkProvability(partnerGoal.sequent(), tb.not(chosenDistForm));
+    }
+    
+    /**
+     * TODO: Document.
+     *
+     * @param seq
+     * @param formulaToProve
+     * @return
+     */
+    private boolean checkProvability(Sequent seq, Term formulaToProve) {
+        final TermBuilder tb = services.getTermBuilder();
+        
+        Semisequent antecedent = seq.antecedent();
 
-            for (SequentFormula succedentFormula : partnerGoal.sequent()
-                    .succedent()) {
+        for (SequentFormula succedentFormula : seq.succedent()) {
+            if (!succedentFormula.formula().isContainsJavaBlockRecursive()) {
                 antecedent = antecedent.insertFirst(new SequentFormula(tb
                         .not(succedentFormula.formula()))).semisequent();
             }
+        }
 
-            if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
-                    new Semisequent(new SequentFormula(tb.not(chosenDistForm)))),
-                    services, 1000)) {
-                return false;
-            }
+        if (!JoinRuleUtils.isProvable(Sequent.createSequent(antecedent,
+                new Semisequent(new SequentFormula(formulaToProve))),
+                services, 1000)) {
+            return false;
         }
         
         return true;
