@@ -6,10 +6,18 @@ import java.io.Serializable;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.util.Pair;
 
 import static org.junit.Assert.*;
 
@@ -155,7 +163,9 @@ public class TestFile implements Serializable {
       boolean success;
       try {
          // Initialize KeY environment and load proof.
-         env = KeYEnvironment.load(keyFile);
+         Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair = load(keyFile);
+         env = pair.first;
+         Pair<String, Location> script = pair.second;
          loadedProof = env.getLoadedProof();
 
          // For a reload test we are done at this point. Loading was successful.
@@ -167,7 +177,17 @@ public class TestFile implements Serializable {
          }
 
          // Run KeY prover.
+         if(script == null) {
+             // auto mode
          env.getProofControl().startAndWaitForAutoMode(loadedProof);
+         } else {
+             // ... script
+             ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+             // XXX This seems a hack ...
+             env.getLoadedProof().setEnv(new ProofEnvironment(env.getInitConfig()));
+             pse.execute(env.getUi(), env.getLoadedProof());
+         }
+
          success = (testProperty == TestProperty.PROVABLE) == loadedProof
                .closed();
          if(verbose) {
@@ -189,10 +209,9 @@ public class TestFile implements Serializable {
             // Save the available proof to a temporary file.
             loadedProof.saveToFile(proofFile);
             reloadProof(proofFile);
-         }
-
-         if(verbose) {
-            System.err.println("... success: reloaded.");
+            if(verbose) {
+                System.err.println("... success: reloaded.");
+            }
          }
       }
       catch (Throwable t) {
@@ -211,6 +230,20 @@ public class TestFile implements Serializable {
       }
 
       return getRunAllProofsTestResult(success, settings);
+   }
+
+   /*
+    * has resemblances with KeYEnvironment.load ...
+    */
+   private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(File keyFile) throws ProblemLoaderException, ProofInputException {
+       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+       AbstractProblemLoader loader = ui.load(null, keyFile, null, null, null, null, false);
+       InitConfig initConfig = loader.getInitConfig();
+       KeYEnvironment<DefaultUserInterfaceControl> env =
+               new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig,
+                       loader.getProof(), loader.getResult());
+       Pair<String, Location> proofScript = loader.hasProofScript() ? loader.readProofScript() : null;
+       return new Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>>(env, proofScript);
    }
 
    /**

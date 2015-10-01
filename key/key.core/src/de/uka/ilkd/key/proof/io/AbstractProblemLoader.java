@@ -33,7 +33,6 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
@@ -272,7 +271,7 @@ public abstract class AbstractProblemLoader {
                 
                 if (proof != null) {
                  OneStepSimplifier.refreshOSS(proof);
-                 result = replayProofOrScript(proof);
+                    result = replayProof(proof);
                 }
                                       
                 // this message is propagated to the top level in console mode
@@ -494,48 +493,28 @@ public abstract class AbstractProblemLoader {
         return proofList;
     }
 
-    private ReplayResult replayProofOrScript(Proof proof) throws ProofInputException, ProblemLoaderException {
+    /**
+     * Run proof script if it is present in the input data.
+     *
+     * @return <code>true</code> iff there is a proof script to run
+     */
+    public boolean hasProofScript() {
         if (envInput instanceof KeYUserProblemFile) {
             KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-            if(kupf.hasProofScript()) {
-                return replayProofScript(proof);
-            } else {
-                return replayProof(proof);
-            }
-        } else {
-            return new ReplayResult("", Collections.<Throwable>emptyList(), proof.root());
+            return kupf.hasProofScript();
         }
+        return false;
     }
 
-    private ReplayResult replayProofScript(Proof proof) {
-
+    public Pair<String, Location> readProofScript() throws ProofInputException {
         assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
-        final boolean isOSSActivated =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-        try {
             Triple<String, Integer, Integer> script = kupf.readProofScript();
-            ProofScriptEngine pse = new ProofScriptEngine(script.first,
-                    new Location(kupf.getInitialFile().getAbsolutePath(), script.second, script.third));
+        String path = kupf.getInitialFile().getAbsolutePath();
+        Location location = new Location(path, script.second, script.third);
 
-            // For loading, we generally turn on one step simplification to be
-            // able to load proofs that used it even if the user has currently
-            // turned OSS off.
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-            OneStepSimplifier.refreshOSS(proof);
-
-            // TODO get rid of that ugly cast which is true for all implementations (till now ...)
-            pse.execute((AbstractUserInterfaceControl) control, proof);
-
-            return new ReplayResult("Proof script successfully applied",
-                    Collections.<Throwable>emptyList(), proof.root());
-        } catch(Exception e) {
-            // get better last touched element
-            return new ReplayResult(e.getMessage(), Arrays.<Throwable>asList(e), proof.root());
-        } finally {
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(isOSSActivated);
-        }
+        return new Pair<String, Location>(script.first, location);
     }
 
     private ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {

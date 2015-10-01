@@ -8,6 +8,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -25,14 +27,17 @@ import javax.swing.text.Document;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.Debug;
 
 public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
 
     private final KeYMediator mediator;
-    private final File file;
+    private final String script;
+    private final Location initialLocation;
     private JDialog monitor;
     private JTextArea logArea;
+
 
     private final Observer observer = new Observer() {
         @Override
@@ -41,15 +46,22 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         }
     };
 
-    public ProofScriptWorker(KeYMediator mediator, File file) {
+    public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
+        this.initialLocation = new Location(file.getAbsolutePath(), 1, 1);
+        this.script = new String(Files.readAllBytes(file.toPath()));
         this.mediator = mediator;
-        this.file = file;
+    }
+
+    public ProofScriptWorker(KeYMediator mediator, String script, Location location) {
+        this.mediator = mediator;
+        this.script = script;
+        this.initialLocation = location;
     }
 
     @Override
     protected Object doInBackground() throws Exception {
         try {
-            ProofScriptEngine engine = new ProofScriptEngine(file);
+            ProofScriptEngine engine = new ProofScriptEngine(script, initialLocation);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch(InterruptedException ex) {
@@ -60,6 +72,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     }
 
     private void makeDialog() {
+        String file = initialLocation.getFilename();
+
         if(monitor != null) {
             logArea.setText("Running script from file '" + file + "':\n");
             return;
@@ -119,7 +133,9 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
      */
     @Override
     public void done() {
+        if(monitor != null) {
         monitor.setVisible(false);
+        }
 
         try {
             get();

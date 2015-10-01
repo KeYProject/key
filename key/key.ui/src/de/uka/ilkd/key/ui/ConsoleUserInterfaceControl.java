@@ -28,7 +28,12 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.SkipMacro;
+import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -44,6 +49,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -170,7 +176,22 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                            openGoals);
                System.exit(0);
            }
-           if (macroChosen()) {
+           ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+           if(problemLoader.hasProofScript()) {
+               try {
+                   Pair<String, Location> script = problemLoader.readProofScript();
+                   ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+                   this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                   pse.execute(this, proof);
+                   // The start and end messages are fake to persuade the system ...
+                   // All this here should refactored anyway ...
+                   this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+               } catch (Exception e) {
+                   // TODO
+                   e.printStackTrace();
+                   System.exit(-1);
+               }
+           } else if (macroChosen()) {
                applyMacro();
            } else {
                finish(proof);
@@ -209,7 +230,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
     
-    void finish(Proof proof) {
+    private void finish(Proof proof) {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)
        mediator.setInteractive(false);
