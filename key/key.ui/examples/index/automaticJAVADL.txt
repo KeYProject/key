@@ -70,7 +70,7 @@ forkTimeout = 1000
  * Examples:  forkDebugPort = "8000"
  *            forkDebugPort = "wait:1234"
  */
-forkDebugPort = "wait:1234"
+# forkDebugPort = "wait:1234"
 
 /*
  * By default runAllProofs does not print a lot of information.
