@@ -1,11 +1,10 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.antlr.runtime.RecognitionException;
-
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 
 /**
  * Used by {@link RunAllProofsTest} command line interface to print out a list
@@ -17,14 +16,14 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
  */
 public class ListRunAllProofsTestCases {
 
-   public static void main(String[] args) throws IOException,
-         RecognitionException {
-      ProofCollection proofCollection = RunAllProofsTest.parseIndexFile();
-      List<RunAllProofsTestUnit> units = proofCollection
-            .createRunAllProofsTestUnits();
-      for (RunAllProofsTestUnit unit : units) {
-         System.out.println(unit.getTestName());
-      }
-   }
+    public static void main(String[] args) throws IOException, RecognitionException {
+        List<RunAllProofsTestUnit> units = new LinkedList<RunAllProofsTestUnit>();
+        for (String s: RunAllProofsTest.PROOF_INDEX) {
+            units.addAll(RunAllProofsTest.parseIndexFile(s).createRunAllProofsTestUnits());
+        }
+        for (RunAllProofsTestUnit unit : units) {
+            System.out.println(unit.getTestName());
+        }
+    }
 
 }
