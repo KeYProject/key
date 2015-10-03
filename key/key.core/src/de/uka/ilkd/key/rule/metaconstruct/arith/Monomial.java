@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 import java.util.Iterator;
 
+import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -45,10 +46,17 @@ public class Monomial {
                                                       BigInteger.ONE );
     
     public static Monomial create(Term monoTerm, Services services) {
-        Monomial res = services.getCaches().getMonomialCache().get ( monoTerm );
+        final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
+        Monomial res;
+        synchronized (monomialCache) {            
+            res = monomialCache.get ( monoTerm );
+        }
+
         if ( res == null ) {
             res = createHelp ( monoTerm, services );
-            services.getCaches().getMonomialCache().put ( monoTerm, res );
+            synchronized (monomialCache) {            
+                monomialCache.put ( monoTerm, res );
+            }
         }
         return res;
     }

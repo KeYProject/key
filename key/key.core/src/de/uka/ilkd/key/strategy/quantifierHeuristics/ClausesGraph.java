@@ -43,10 +43,16 @@ public class ClausesGraph {
     private final ImmutableSet<Term> clauses;
     
     static ClausesGraph create(Term quantifiedFormula, ServiceCaches caches) {
-        ClausesGraph graph = caches.getGraphCache().get ( quantifiedFormula );
+        final Map<Term, ClausesGraph> graphCache = caches.getGraphCache();
+        ClausesGraph graph;
+        synchronized (graphCache) {
+            graph = graphCache.get ( quantifiedFormula );            
+        }
         if ( graph == null ) {
             graph = new ClausesGraph ( quantifiedFormula );
-            caches.getGraphCache().put ( quantifiedFormula, graph );
+            synchronized (graphCache) {
+                graphCache.put ( quantifiedFormula, graph );
+            }
         }
         return graph;
     }

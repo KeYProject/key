@@ -151,10 +151,16 @@ public final class TermFactory {
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (!newTerm.isContainsJavaBlockRecursive()) {
-           Term term = cache.get(newTerm);
+           
+           Term term;  
+           synchronized(cache) { 
+               term = cache.get(newTerm);
+           }
            if(term == null) {
                term = newTerm;
-               cache.put(term, term);
+               synchronized(cache) { 
+                   cache.put(term, term);
+               }
            }
            return term;
         }
