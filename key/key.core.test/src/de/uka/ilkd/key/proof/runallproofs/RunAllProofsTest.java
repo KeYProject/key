@@ -1,15 +1,15 @@
-/*******************************************************************************
- * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
- *                    Technical University Darmstadt, Germany
- *                    Chalmers University of Technology, Sweden
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Technical University Darmstadt - initial API and implementation and/or initial documentation
- *******************************************************************************/
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
 
 package de.uka.ilkd.key.proof.runallproofs;
 
@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,9 +28,6 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 import org.junit.AfterClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
@@ -44,17 +40,17 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
  * This class uses the provided example files from KeY for test purpose on the
  * same way as the bin/runAllProofs.pl does it.
  * </p>
- * 
+ *
  * <p>
  * RunAllProofs documentation can be found at the following location in KeY git
  * repository: key/doc/README.runAllProofs
  * </p>
- * 
+ *
  * <p>
  * The files to test are listed in: <br />
  * $KEY_HOME/key.core.test/resources/testcase/runallproofs/automaticJAVADL.txt
  * </p>
- * 
+ *
  * <p>
  * The test steps for each defined test file are:
  * <ol>
@@ -75,10 +71,14 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
  * {@code "-Dkey.home=D:/Forschung/GIT/KeY" "-Dkey.lib=D:/Forschung/Tools/KeY-External Libs"}
  * .
  * </p>
- * 
+ *
+ * This class itself does not define testcases. The class has subclasses which
+ * define test cases for different run-all-proof scenarios.
+ *
  * @author Martin Hentschel
+ * @see RunAllProofsTestSuite
+ * @see ListRunAllProofsTestCases
  */
-@RunWith(Parameterized.class)
 public class RunAllProofsTest {
    /**
     * The path to the KeY repository. Configurable via system property
@@ -88,16 +88,7 @@ public class RunAllProofsTest {
 
    public static final File EXAMPLE_DIR;
 
-   private static final String JAVADL_INDEX = "index/automaticJAVADL.txt";
-
-   private static final String INFFLOW_INDEX = "index/automaticInfFlow.txt";
-
-   public static final List<String> PROOF_INDEX =
-           Arrays.asList(JAVADL_INDEX, INFFLOW_INDEX);
-
    public static final File KEY_CORE_TEST;
-
-   private static List<StatisticsFile> statisticsFiles = new LinkedList<StatisticsFile>();
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
 
@@ -123,7 +114,7 @@ public class RunAllProofsTest {
 
    /**
     * Constructor.
-    * 
+    *
     * @param unit
     *           {@link RunAllProofsTestUnit} whose test will be executed.
     */
@@ -134,7 +125,7 @@ public class RunAllProofsTest {
    /**
     * Tests each file defined by the instance variables. The tests steps are
     * described in the constructor of this class.
-    * 
+    *
     * @throws Exception
     */
    @Test
@@ -143,64 +134,38 @@ public class RunAllProofsTest {
       assertTrue(report.message, report.success);
    }
 
-   /**
-    * Creates a set of constructor parameters for this class. Uses JUnits
-    * parameterized test case mechanism for to create several test cases from a
-    * set of data. {@link Object.#toString()} of first constructor parameter is
-    * used to determine name of individual test cases, see {@link
-    * RunAllProofsTestUnit.#toString()} for further information.
-    * 
-    * @return The parameters. Each row will be one test case.
-    * @throws IOException
-    *            Occurred Exception.
-    * @throws RecognitionException
-    */
-   @Parameters(name = "{0}")
-   public static Collection<Object[]> data() throws IOException,
-         RecognitionException {
+    /**
+     * Creates a set of constructor parameters for this class. Uses JUnits
+     * parameterized test case mechanism for to create several test cases from a
+     * set of data. {@link Object.#toString()} of first constructor parameter is
+     * used to determine name of individual test cases, see {@link
+     * RunAllProofsTestUnit.#toString()} for further information.
+     *
+     * @param proofIndex
+     *            The file name of the index file which parsed to produce test
+     *            cases
+     * @return The parameters. Each row will be one test case.
+     * @throws IOException
+     *             If an exceptions occurs while reading and parsing the index
+     *             file
+     */
+
+   public static Collection<Object[]> data(ProofCollection proofCollection) throws IOException {
       assertDirectoryExists(KEY_HOME);
       assertDirectoryExists(KEY_CORE_TEST);
       assertDirectoryExists(EXAMPLE_DIR);
-
-      /*
-       * Parse index files containing declarations for KeY files that will be
-       * verified.
-       */
-      List<ProofCollection> proofCollections = new LinkedList<ProofCollection>();
-      for (String s: PROOF_INDEX) {
-          proofCollections.add(parseIndexFile(s));
-      }
-
-      /*
-       * Set up statistics files.
-       */
-      for (ProofCollection proofCollection: proofCollections) {
-          final StatisticsFile statisticsFile =
-                  proofCollection.getSettings().getStatisticsFile();
-          statisticsFile.setUp();
-          statisticsFiles.add(statisticsFile);
-      }
 
       /*
        * Create list of constructor parameters that will be returned by this
        * method. Suitable constructor is automatically determined by JUnit.
        */
       Collection<Object[]> data = new LinkedList<Object[]>();
-      List<RunAllProofsTestUnit> units = new LinkedList<RunAllProofsTestUnit>();
-      for (ProofCollection proofCollection: proofCollections) {
-          units.addAll(proofCollection.createRunAllProofsTestUnits());
-      }
+      List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
       for (RunAllProofsTestUnit unit : units) {
          data.add(new RunAllProofsTestUnit[] { unit });
       }
-      return data;
-   }
 
-   @AfterClass
-   public static void computeSumsAndAverages() throws IOException {
-       for (StatisticsFile statisticsFile: statisticsFiles) {
-           statisticsFile.computeSumsAndAverages();
-       }
+      return data;
    }
 
    /**

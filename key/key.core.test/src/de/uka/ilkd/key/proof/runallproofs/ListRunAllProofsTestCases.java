@@ -13,14 +13,15 @@ import org.antlr.runtime.RecognitionException;
  *
  * @author Kai Wallisch
  *
+ * @see RunAllProofsTestSuite
+ * @see RunAllProofsTest
  */
 public class ListRunAllProofsTestCases {
 
     public static void main(String[] args) throws IOException, RecognitionException {
         List<RunAllProofsTestUnit> units = new LinkedList<RunAllProofsTestUnit>();
-        for (String s: RunAllProofsTest.PROOF_INDEX) {
-            units.addAll(RunAllProofsTest.parseIndexFile(s).createRunAllProofsTestUnits());
-        }
+        units.addAll(RunAllProofsTest.parseIndexFile(RunAllProofsFunctional.INDEX_FILE).createRunAllProofsTestUnits());
+        units.addAll(RunAllProofsTest.parseIndexFile(RunAllProofsInfFlow.INDEX_FILE).createRunAllProofsTestUnits());
         for (RunAllProofsTestUnit unit : units) {
             System.out.println(unit.getTestName());
         }

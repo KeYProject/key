@@ -29,7 +29,7 @@
 			</classpath>
 			<formatter type="xml"/>
 			<test name="de.uka.ilkd.key.suite.TestKey" todir="${test.reports}" />
-			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest" todir="${test.reports}" />
+			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite" todir="${test.reports}" />
 			<test name="de.uka.ilkd.key.proof.proverules.ProveRulesTest" todir="${test.reports}" />
 		</junit>
 		<fail message="Test failure detected, check test results." if="test.failedOrError" />

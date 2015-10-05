@@ -8,9 +8,12 @@ LIST_TESTS_FLAG=--list-tests
 HELP_FLAG=--help
 RELOAD_ENABLED_FLAG=--reload-enabled
 FORK_MODE_FLAG=--fork-mode
+VERBOSE_FLAG=--verbose
 
 list_help() {
-    echo "Usage: runAllProofs [$HELP_FLAG] | [$LIST_TESTS_FLAG] | [ [$RELOAD_ENABLED_FLAG=<true|false>]"
+    echo "Usage: runAllProofs [$HELP_FLAG] | [$LIST_TESTS_FLAG] |"
+    echo "                                     [ [$RELOAD_ENABLED_FLAG=<true|false>]"
+    echo "                                       [$VERBOSE_FLAG]"
     echo "                                       [$FORK_MODE_FLAG=<perFile|perGroup|noFork>]"
     echo "                                       [<groupNames>] ]"
     echo "Examples: runAllProofs $FORK_MODE_FLAG=perFile newBook comprehensions"
@@ -45,31 +48,36 @@ JAVA_ARGS=""
 while [ "$#" -ne 0 ]
     do
     case $1 in
-        --fork-mode=*)
+      --fork-mode=*)
         FORK_MODE=$(echo $1 | cut -d'=' -f 2)
         JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.forkMode=$FORK_MODE"
         shift
         continue
         ;;
-        $RELOAD_ENABLED_FLAG=*)
+      $RELOAD_ENABLED_FLAG=*)
         RELOAD_ENABLED=$(echo $1 | cut -d'=' -f 2)
         JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.reloadEnabled=$RELOAD_ENABLED"
         shift
         continue
         ;;
-        $LIST_TESTS_FLAG)
+      $VERBOSE_FLAG)
+        JAVA_ARGS="$JAVA_ARGS -Dkey.runallproofs.verboseOutput=true"
+        shift
+        continue
+        ;;
+      $LIST_TESTS_FLAG)
         $SCRIPTFOLDER/tools/testRunner.sh de.uka.ilkd.key.proof.runallproofs.ListRunAllProofsTestCases
         exit
         ;;
-        -h|-?|$HELP_FLAG)
+      -h|-?|$HELP_FLAG)
         list_help
         exit
         ;;
-        -*)
+      -*)
         echo Unrecognised option: $1
         exit
         ;;
-        *)
+      *)
         break
         ;;
     esac
@@ -95,5 +103,5 @@ fi
 # Run JUnit
 #
 
-$SCRIPTFOLDER/tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest
+$SCRIPTFOLDER/tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite
 
