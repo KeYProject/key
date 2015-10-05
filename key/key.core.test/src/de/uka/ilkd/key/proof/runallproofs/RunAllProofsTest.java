@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,7 +93,7 @@ public class RunAllProofsTest {
    private static final String INFFLOW_INDEX = "index/automaticInfFlow.txt";
 
    public static final List<String> PROOF_INDEX =
-           asList(new String[] {JAVADL_INDEX, INFFLOW_INDEX});;
+           Arrays.asList(JAVADL_INDEX, INFFLOW_INDEX);
 
    public static final File KEY_CORE_TEST;
 
@@ -101,14 +102,6 @@ public class RunAllProofsTest {
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
 
    public static final String IGNORE_KEY = "ignore";
-
-   private static List<String> asList(final String[] strings) {
-       List<String> list = new LinkedList<String>();
-       for (String s: strings) {
-           list.add(s);
-       }
-       return list;
-   }
 
    /**
     * Computes the constant values.

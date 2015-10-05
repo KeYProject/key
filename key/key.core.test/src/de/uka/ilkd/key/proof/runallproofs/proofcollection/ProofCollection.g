@@ -35,12 +35,13 @@ import static de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection
   }
 }
 
-@lexer::members {
-  @Override
-  public void reportError(RecognitionException e) {
-    throw new RuntimeException(e);
-  }
-}
+//@lexer::members {
+//  @Override
+//  public void recover(RecognitionException e) throws RecognitionException {
+//    super.recover(e);
+//    throw e;
+//  }
+//}
 
 parserEntryPoint returns [ProofCollection proofCollection]
 @init {
