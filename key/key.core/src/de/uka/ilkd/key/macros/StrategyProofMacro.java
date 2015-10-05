@@ -60,11 +60,6 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         return goals != null && !goals.isEmpty();
     }
 
-    @Override
-    public boolean isApplicableWithoutPosition() {
-        return true;
-    }
-
     /**
      * Subclasses can use this method to do some postprocessing on the
      * proof-object after the strategy has finished.

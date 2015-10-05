@@ -56,10 +56,11 @@ public class TryCloseMacro extends AbstractProofMacro {
 
         @Override
         protected String getMessageSuffix() {
-            if(notClosedGoals == 0)
+            if(notClosedGoals == 0) {
             return super.getMessageSuffix();
-            else
+            } else {
                 return super.getMessageSuffix() + ", " + notClosedGoals + " goal(s) remain(s) open.";
+        }
         }
 
         private void incrementNotClosedGoals() {
@@ -136,11 +137,6 @@ public class TryCloseMacro extends AbstractProofMacro {
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
-    }
-
-    @Override
-    public boolean isApplicableWithoutPosition() {
-        return true;
     }
 
     /*

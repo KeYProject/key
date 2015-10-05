@@ -159,14 +159,6 @@ public interface ProofMacro {
                               PosInOccurrence posInOcc);
 
     /**
-     * Can this macro be applied with no {@link PosInOccurrence} given?
-     * This method is necessary because we need to check global applicability
-     * even when no proof is loaded (e.g., in GUI initialization).
-     * Fixes bug #1495
-     */
-    public boolean isApplicableWithoutPosition();
-
-    /**
      * Apply this macro on the given goals.
      *
      * This method can change the proof by applying rules to it.
@@ -242,8 +234,8 @@ public interface ProofMacro {
      * fixes #1356
      */
     class ProgressBarListener extends ProofMacroListener {
-        private int numberGoals;
-        private int numberSteps;
+        private final int numberGoals;
+        private final int numberSteps;
         private int completedGoals;
 
         ProgressBarListener(String name, int numberGoals,

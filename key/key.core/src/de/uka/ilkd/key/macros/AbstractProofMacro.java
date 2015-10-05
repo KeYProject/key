@@ -72,11 +72,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }
 
-    @Override
-    public boolean isApplicableWithoutPosition() {
-        return false;
-    }
-
     /**
      * Gets the maximum number of rule applications allowed for a macro. The
      * implementation is the maximum amount of proof steps for automatic mode.
