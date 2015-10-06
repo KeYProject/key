@@ -70,13 +70,13 @@ public final class RunAllProofsTestUnit implements Serializable {
 
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
         if(verbose) {
-            System.err.println("Running test " + testName);
+            System.out.println("Running test " + testName);
         }
 
         boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
         if(ignoreTest) {
             if(verbose) {
-                System.err.println("... ignoring this test due to 'ignore=true' in file");
+                System.out.println("... ignoring this test due to 'ignore=true' in file");
             }
             return new TestResult("Test case has been ignored", true);
         }
@@ -109,7 +109,7 @@ public final class RunAllProofsTestUnit implements Serializable {
         }
 
         if(verbose) {
-            System.err.println("Returning from test " + testName);
+            System.out.println("Returning from test " + testName);
         }
 
         /*

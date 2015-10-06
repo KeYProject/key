@@ -93,8 +93,8 @@
 				<pathelement path="${basedir}/../key.util.test/bin"/>
 				<pathelement path="${build.dir}"/>
 			</classpath>
-			<formatter type="brief" usefile="false" />
-			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest" />
+			<formatter type="xml"/>
+			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite" />
 		</junit>
 	</target>
 

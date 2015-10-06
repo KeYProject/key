@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.util.IOForwarder;
 
 /**
  * Executes KeY prover for a list of {@link TestFile}s in a separate process.
@@ -122,7 +123,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
       command.add(ForkedTestFileRunner.class.getName());
       command.add(pathToTempDir.toString());
 
-      Process process = pb.inheritIO().start();
+      Process process = pb.start();
+      IOForwarder.forward(process);
       process.waitFor();
       assertEquals("Executed process terminated with non-zero exit value.",
             process.exitValue(), 0);
