@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,9 +88,16 @@ public class RunAllProofsTest {
 
    public static final File EXAMPLE_DIR;
 
+   private static final String JAVADL_INDEX = "index/automaticJAVADL.txt";
+
+   private static final String INFFLOW_INDEX = "index/automaticInfFlow.txt";
+
+   public static final List<String> PROOF_INDEX =
+           Arrays.asList(JAVADL_INDEX, INFFLOW_INDEX);
+
    public static final File KEY_CORE_TEST;
 
-   private static StatisticsFile statisticsFile = null;
+   private static List<StatisticsFile> statisticsFiles = new LinkedList<StatisticsFile>();
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
 
@@ -155,24 +163,33 @@ public class RunAllProofsTest {
       assertDirectoryExists(EXAMPLE_DIR);
 
       /*
-       * Parse index file containing declarations for KeY files that will be
+       * Parse index files containing declarations for KeY files that will be
        * verified.
        */
-      ProofCollection proofCollection = parseIndexFile();
+      List<ProofCollection> proofCollections = new LinkedList<ProofCollection>();
+      for (String s: PROOF_INDEX) {
+          proofCollections.add(parseIndexFile(s));
+      }
 
       /*
-       * Set up statistics file.
+       * Set up statistics files.
        */
-      statisticsFile = proofCollection.getSettings().getStatisticsFile();
-      statisticsFile.setUp();
+      for (ProofCollection proofCollection: proofCollections) {
+          final StatisticsFile statisticsFile =
+                  proofCollection.getSettings().getStatisticsFile();
+          statisticsFile.setUp();
+          statisticsFiles.add(statisticsFile);
+      }
 
       /*
        * Create list of constructor parameters that will be returned by this
        * method. Suitable constructor is automatically determined by JUnit.
        */
       Collection<Object[]> data = new LinkedList<Object[]>();
-      List<RunAllProofsTestUnit> units = proofCollection
-            .createRunAllProofsTestUnits();
+      List<RunAllProofsTestUnit> units = new LinkedList<RunAllProofsTestUnit>();
+      for (ProofCollection proofCollection: proofCollections) {
+          units.addAll(proofCollection.createRunAllProofsTestUnits());
+      }
       for (RunAllProofsTestUnit unit : units) {
          data.add(new RunAllProofsTestUnit[] { unit });
       }
@@ -181,21 +198,27 @@ public class RunAllProofsTest {
 
    @AfterClass
    public static void computeSumsAndAverages() throws IOException {
-      statisticsFile.computeSumsAndAverages();
+       for (StatisticsFile statisticsFile: statisticsFiles) {
+           statisticsFile.computeSumsAndAverages();
+       }
    }
 
    /**
     * Uses {@link ProofCollectionParser} to parse the given file and returns a
     * parse result that is received from main parser entry point.
     */
-   public static ProofCollection parseIndexFile() throws IOException,
-         RecognitionException {
-      File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL.txt");
-      CharStream charStream = new ANTLRFileStream(
-            automaticJAVADL.getAbsolutePath());
+   public static ProofCollection parseIndexFile(final String index) throws IOException {
+      File automaticJAVADL = new File(EXAMPLE_DIR, index);
+      CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
       ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
       TokenStream tokenStream = new CommonTokenStream(lexer);
       ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
-      return parser.parserEntryPoint();
+      try {
+         return parser.parserEntryPoint();
+      } catch (RecognitionException e) {
+         String msg = parser.getErrorMessage(e, parser.getTokenNames());
+         throw new IOException("Cannot parse " + automaticJAVADL +
+                               " at line " + e.line + ": " + msg, e);
+      }
    }
 }

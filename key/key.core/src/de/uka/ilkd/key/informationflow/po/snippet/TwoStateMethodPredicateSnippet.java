@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -46,15 +47,31 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
         final ImmutableList<Term> termList =
                 extractTermListForPredicate(pm, poVars, d.hasMby);
+        final Sort[] argSorts =
+                generateContApplArgumentSorts(termList, pm);
         final Function contApplPred =
-                generateContApplPredicate(nameString, termList, pm, d.tb, d.services);
+                generateContApplPredicate(nameString, argSorts, d.tb, d.services);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
+    }
+
+    protected Sort[] generateContApplArgumentSorts(
+            ImmutableList<Term> termList, IProgramMethod pm) {
+
+        Sort[] argSorts = new Sort[termList.size()];
+        ImmutableArray<Sort> pmSorts = pm.argSorts();
+
+        int i = 0;
+        for (final Term arg : termList) {
+            argSorts[i] = arg.sort();
+            i++;
+        }
+
+        return argSorts;
     }
 
 
     private Function generateContApplPredicate(String nameString,
-                                               ImmutableList<Term> termList,
-                                               IProgramMethod pm,
+                                               Sort[] argSorts,
                                                TermBuilder tb,
                                                Services services) {
         final Name name = new Name(nameString);
@@ -62,22 +79,6 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         Function pred = (Function) functionNS.lookup(name);
 
         if (pred == null) {
-            Sort[] argSorts = new Sort[termList.size()];
-            ImmutableArray<Sort> pmSorts = pm.argSorts(); 
-
-            int i = 0;
-            for (final Term arg : termList) {
-                // bugfix: Take the first argument sorts from the definition of 
-                // the method rather than from the actually provided arguments.
-                // aug 2015 SG + MU
-                if(i < pmSorts.size() - 1) {
-                    argSorts[i] = pmSorts.get(i+1);
-                } else {
-                    argSorts[i] = arg.sort();
-                }
-                i++;
-            }
-
             pred = new Function(name, Sort.FORMULA, argSorts);
             services.getNamespaces().functions().addSafely(pred);
         }

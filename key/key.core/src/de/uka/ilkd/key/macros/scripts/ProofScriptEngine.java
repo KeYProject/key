@@ -15,12 +15,14 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class ProofScriptEngine {
 
+    private static final int MAX_CHARS_PER_COMMAND = 80;
+
     public static final String BASE_FILE_NAME_KEY = "baseFileName";
 
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
     private final Location initialLocation;
-    private String script;
+    private final String script;
 
     private Observer commandMonitor;
 
@@ -72,8 +74,8 @@ public class ProofScriptEngine {
             }
 
             String cmd = "'" + argMap.get(ScriptLineParser.LITERAL_KEY) + "'";
-            if(cmd.length() > 40) {
-                cmd = cmd.substring(0,40) + " ...'";
+            if(cmd.length() > MAX_CHARS_PER_COMMAND) {
+                cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
             if(commandMonitor != null) {

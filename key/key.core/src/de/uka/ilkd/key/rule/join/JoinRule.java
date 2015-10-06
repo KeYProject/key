@@ -158,6 +158,9 @@ public class JoinRule implements BuiltInRule {
             return null;
         }
 
+        // At the moment, the join rule is always applied interactively
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
+
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
 
@@ -259,7 +262,7 @@ public class JoinRule implements BuiltInRule {
                 new SequentFormula(succedentFormula);
         newGoal.addFormula(newSuccedent, new PosInOccurrence(newSuccedent,
                 PosInTerm.getTopLevel(), false));
-
+        
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will
         // be filled after partner node closing. The purpose of this
