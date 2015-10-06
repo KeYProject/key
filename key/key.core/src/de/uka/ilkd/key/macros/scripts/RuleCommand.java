@@ -57,7 +57,7 @@ public class RuleCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
             Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
-        Parameters p = parseArgs(proof, args);
+        Parameters p = parseArgs(proof, args, state);
         TacletApp theApp = makeTacletApp(proof, p, state);
         assert theApp != null;
 
@@ -183,7 +183,7 @@ public class RuleCommand extends AbstractCommand {
         return matchingApps;
     }
 
-    private static Parameters parseArgs(Proof proof, Map<String, String> args)
+    private static Parameters parseArgs(Proof proof, Map<String, String> args, Map<String, Object> state)
             throws ScriptException {
 
         Parameters result = new Parameters();
@@ -198,14 +198,14 @@ public class RuleCommand extends AbstractCommand {
             // on="term to apply to as find"
             String onStr = args.get("on");
             if(onStr != null) {
-                result.on = toTerm(proof, onStr, null);
+                result.on = toTerm(proof, state, onStr, null);
             }
 
             //
             // formula="toplevel formula in which it appears"
             String formStr = args.get("formula");
             if(formStr != null) {
-                result.formula = toTerm(proof, formStr, null);
+                result.formula = toTerm(proof, state, formStr, null);
             }
 
             //

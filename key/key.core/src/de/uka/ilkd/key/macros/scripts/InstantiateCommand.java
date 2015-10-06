@@ -51,7 +51,7 @@ public class InstantiateCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
             Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
 
-        Parameters params = parseParameters(proof, args);
+        Parameters params = parseParameters(proof, args, state);
 
         if((params.var == null) == (params.formula == null)) {
             throw new ScriptException("One of 'var' or 'formula' must be specified");
@@ -201,7 +201,7 @@ public class InstantiateCommand extends AbstractCommand {
                 "' has no occurrence no. '" + params.occ + "'.");
     }
 
-    private Parameters parseParameters(Proof proof, Map<String, String> args)
+    private Parameters parseParameters(Proof proof, Map<String, String> args, Map<String, Object> state)
             throws ScriptException {
         Parameters params = new Parameters();
 
@@ -215,7 +215,7 @@ public class InstantiateCommand extends AbstractCommand {
         String formStr = args.get("formula");
         if(formStr != null) {
             try {
-                params.formula = toTerm(proof, formStr, Sort.FORMULA);
+                params.formula = toTerm(proof, state, formStr, Sort.FORMULA);
             } catch (Exception e) {
                 throw new ScriptException(e);
             }
@@ -237,7 +237,7 @@ public class InstantiateCommand extends AbstractCommand {
         String withStr = args.get("with");
         if(withStr != null) {
             try {
-                params.with = toTerm(proof, withStr, null);
+                params.with = toTerm(proof, state, withStr, null);
             } catch (ParserException e) {
                 throw new ScriptException(e);
             }

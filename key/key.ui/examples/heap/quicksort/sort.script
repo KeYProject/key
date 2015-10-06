@@ -8,29 +8,28 @@ select formula="{heapAtPre:=heap || exc:=null || heap:=heapAfter_sort_0}
 
 macro simp-upd;
 
+let   @seqPre="seqDef{int u;}(0, array.length, array[u])"
+    @seqSplit="seqDef{int u;}(0, array.length, any::select(heapAfter_split, array, arr(u)))"
+     @seqSort="seqDef{int u;}(0, array.length, any::select(heapAfter_sort, array, arr(u)))"
+    @seqSort0="seqDef{int u;}(0, array.length, any::select(heapAfter_sort_0, array, arr(u)))";
+
 rule seqPermSym 
-  formula="seqPerm(seqDef{int u;}(0, array.length, any::select(heapAfter_split, array, arr(u))),
-                   seqDef{int u;}(0, array.length, array[u]))";
+  formula="seqPerm(@seqSplit, @seqPre)";
 
 rule seqPermSym
-  formula="seqPerm(seqDef{int u;}(0, array.length, any::select(heapAfter_sort, array, arr(u))),
-                   seqDef{int u;}(0, array.length, any::select(heapAfter_split, array, arr(u))))";
+  formula="seqPerm(@seqSort, @seqSplit)";
 
 rule seqPermSym
-  formula="seqPerm(seqDef{int u;}(0, array.length, any::select(heapAfter_sort_0, array, arr(u))),
-                   seqDef{int u;}(0, array.length, any::select(heapAfter_sort, array, arr(u))))";
+  formula="seqPerm(@seqSort0, @seqSort)";
 
 rule seqPermTrans
-  formula="seqPerm(seqDef{int u;}(0, array.length, array[u]),
-                   seqDef{int u;}(0, array.length, any::select(heapAfter_split, array, arr(u))))";
+  formula="seqPerm(@seqPre, @seqSplit)";
 
 rule seqPermTrans
-  formula="seqPerm(seqDef{int u;}(0, array.length, array[u]),
-                   seqDef{int u;}(0, array.length, any::select(heapAfter_sort, array, arr(u))))";
+  formula="seqPerm(@seqPre, @seqSort)";
 
 rule seqPermSym
-  formula="seqPerm(seqDef{int u;}(0, array.length, array[u]),
-                   seqDef{int u;}(0, array.length, any::select(heapAfter_sort_0, array, arr(u))))";
+  formula="seqPerm(@seqPre, @seqSort0)";
 
 # Now, the power of autopilot is enough. 
 # Run another 10000 on each open goal.

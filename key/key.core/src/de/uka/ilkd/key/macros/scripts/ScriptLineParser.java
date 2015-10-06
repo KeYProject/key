@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -22,7 +21,7 @@ class ScriptLineParser {
 
     public static final String LITERAL_KEY = "#literal";
 
-    private static final String ADMISSIBLE_CHARS = "-_$";
+    private static final String ADMISSIBLE_CHARS = "-_$@";
 
     /**
      * This is the source of characters
@@ -44,7 +43,7 @@ class ScriptLineParser {
      */
     private int readChars;
 
-    private String file;
+    private final String file;
 
     /**
      * The state of the regular expression parser.

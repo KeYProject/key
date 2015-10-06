@@ -28,7 +28,7 @@ public class SelectCommand extends AbstractCommand {
         }
 
         try {
-            Term t = toTerm(proof, formulaString, Sort.FORMULA);
+            Term t = toTerm(proof, stateMap, formulaString, Sort.FORMULA);
 
             Goal g = findGoalWith(t, proof);
 
@@ -93,8 +93,9 @@ public class SelectCommand extends AbstractCommand {
 
     private boolean contains(Semisequent semiseq, Term formula) {
         for(SequentFormula sf : semiseq.asList()) {
-            if(sf.formula().equalsModRenaming(formula))
+            if(sf.formula().equalsModRenaming(formula)) {
                 return true;
+            }
         }
         return false;
     }

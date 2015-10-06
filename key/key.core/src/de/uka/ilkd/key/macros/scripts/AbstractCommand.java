@@ -21,6 +21,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 public abstract class AbstractCommand implements ProofScriptCommand {
 
     public static final String GOAL_KEY = "goal";
+    public static final String ABBREV_KEY = "abbrMap";
     private static DefaultTermParser PARSER = new DefaultTermParser();
     private static AbbrevMap EMPTY_MAP = new AbbrevMap();
 
@@ -81,14 +82,20 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         return null;
     }
 
-    final protected static Term toTerm(Proof proof, String string, Sort sort) throws ParserException {
+    final protected static Term toTerm(Proof proof, Map<String, Object> state, String string, Sort sort) throws ParserException, ScriptException {
+
+        AbbrevMap abbrMap = (AbbrevMap)state.get(ABBREV_KEY);
+        if(abbrMap == null) {
+            abbrMap = EMPTY_MAP;
+        }
+
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        Term formula = PARSER.parse(reader, sort, services, services.getNamespaces(), EMPTY_MAP);
+        Term formula = PARSER.parse(reader, sort, services, services.getNamespaces(), abbrMap);
         return formula;
     }
 
-    protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
+    final protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
             if(goal.node() == node) {
                 return goal;
@@ -105,7 +112,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         }
     }
 
-    public void setMaxAutomaticSteps(Proof proof, int steps) {
+    final protected void setMaxAutomaticSteps(Proof proof, int steps) {
         if (proof != null) {
             proof.getSettings().getStrategySettings().setMaxSteps(steps);
         }

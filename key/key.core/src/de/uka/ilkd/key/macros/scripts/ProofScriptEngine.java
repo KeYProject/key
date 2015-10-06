@@ -18,6 +18,7 @@ public class ProofScriptEngine {
     private static final int MAX_CHARS_PER_COMMAND = 80;
 
     public static final String BASE_FILE_NAME_KEY = "baseFileName";
+    public static final String OBSERVER_KEY = "commandMonitor";
 
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
@@ -59,6 +60,11 @@ public class ProofScriptEngine {
         String filename = initialLocation.getFilename();
         if(filename != null && filename.length() > 0) {
             stateMap.put(BASE_FILE_NAME_KEY, filename);
+        }
+
+        // add the observer (if installed) to the state map
+        if(commandMonitor != null) {
+            stateMap.put(OBSERVER_KEY, commandMonitor);
         }
 
         while(true) {

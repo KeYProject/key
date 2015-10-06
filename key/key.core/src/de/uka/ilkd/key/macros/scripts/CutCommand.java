@@ -29,7 +29,7 @@ public class CutCommand extends AbstractCommand {
         Term formula;
         try {
             String formString = args.get("#2");
-            formula = toTerm(proof, formString, Sort.FORMULA);
+            formula = toTerm(proof, state, formString, Sort.FORMULA);
         } catch (ParserException e) {
             throw new ScriptException(e);
         }
