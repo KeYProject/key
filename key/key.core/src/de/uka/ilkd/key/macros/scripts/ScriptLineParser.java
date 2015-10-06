@@ -7,6 +7,8 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.parser.Location;
+
 /**
  *
  * @author mattias ulbrich
@@ -39,11 +41,14 @@ class ScriptLineParser {
     private int line = 1;
 
     /**
+     * the filename from which the script is taken.
+     */
+    private String file;
+
+    /**
      * number of characters read so far
      */
     private int readChars;
-
-    private final String file;
 
     /**
      * The state of the regular expression parser.
@@ -225,9 +230,10 @@ class ScriptLineParser {
         return col;
     }
 
-    public void setLocation(int line, int column) {
-        this.line = line;
-        this.col = column;
+    public void setLocation(Location location) {
+        this.line = location.getLine();
+        this.col = location.getColumn();
+        this.file = location.getFilename();
     }
 
 }

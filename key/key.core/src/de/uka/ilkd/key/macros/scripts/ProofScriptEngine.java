@@ -52,7 +52,7 @@ public class ProofScriptEngine {
             throws IOException, InterruptedException, ScriptException {
 
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
-        mlp.setLocation(initialLocation.getLine(), initialLocation.getColumn());
+        mlp.setLocation(initialLocation);
 
         Map<String, Object> stateMap = new HashMap<String, Object>();
 
