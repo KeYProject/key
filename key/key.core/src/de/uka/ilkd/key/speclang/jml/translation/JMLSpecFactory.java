@@ -1462,7 +1462,7 @@ public class JMLSpecFactory {
             paramVars = paramVars.prepend(paramLocVar);
         }
         ProgramVariable resultVar = TB.resultVar(pm, false);
-        ProgramVariable excVar = TB.excVar(pm, false);
+        ProgramVariable excVar = TB.excVar(pm, false); // only for information flow
 
         final ImmutableList<LocationVariable> allHeaps =
                 services.getTypeConverter().getHeapLDT().getAllHeaps();

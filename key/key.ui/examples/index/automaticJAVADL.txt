@@ -76,7 +76,7 @@ forkTimeout = 1000
  * By default runAllProofs does not print a lot of information.
  * Set this to true to get more output.
  */
-# verboseOutput = true
+ verboseOutput = true
 
 /*
  * By default, runAllProofs runs all groups in this file.
