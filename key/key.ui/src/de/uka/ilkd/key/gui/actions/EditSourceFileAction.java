@@ -52,18 +52,21 @@ public class EditSourceFileAction extends AbstractAction {
          i++;
       }
       i += col - 1;
+      if (i  > textArea.getDocument().getLength()) {
+          i = textArea.getDocument().getLength();
+      }
       textArea.setCaretPosition(i);
    }
 
    private final ExceptionDialog parent;
    private final Throwable exception;
-   
+
    public EditSourceFileAction(final ExceptionDialog parent, final Throwable exception) {
       super("Edit Source File");
       this.parent = parent;
       this.exception = exception;
    }
-   
+
    public boolean isValidLocation(final Location location) {
        return !(location == null || location.getFilename() == null
               || location.getFilename().length() == 0);

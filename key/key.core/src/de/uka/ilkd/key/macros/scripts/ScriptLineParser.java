@@ -51,6 +51,12 @@ class ScriptLineParser {
     private int readChars;
 
     /**
+     * While within a string literal, this stores the character with which the
+     * string has started.
+     */
+    private int stringInitChar;
+
+    /**
      * The state of the regular expression parser.
      */
     enum State {
@@ -131,10 +137,21 @@ class ScriptLineParser {
             case '"':
             case '\'':
                 switch(state) {
-                case INIT: state = State.IN_QUOTE; key = "#" + (impCounter++); break;
-                case AFTER_EQ: state = State.IN_QUOTE; break;
-                case IN_QUOTE: state = State.INIT;
-                    result.put(key, sb.toString()); sb.setLength(0); break;
+                case INIT: state = State.IN_QUOTE;
+                    stringInitChar = c;
+                    key = "#" + (impCounter++); break;
+                case AFTER_EQ: state = State.IN_QUOTE;
+                    stringInitChar = c;
+                    break;
+                case IN_QUOTE:
+                    if(stringInitChar == c) {
+                        state = State.INIT;
+                        result.put(key, sb.toString());
+                        sb.setLength(0);
+                    } else {
+                        sb.append((char)c);
+                    }
+                    break;
                 case IN_COMMENT: break;
                 default: exc(c);
                 }

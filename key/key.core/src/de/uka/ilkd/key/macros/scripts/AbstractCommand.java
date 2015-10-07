@@ -25,7 +25,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     private static DefaultTermParser PARSER = new DefaultTermParser();
     private static AbbrevMap EMPTY_MAP = new AbbrevMap();
 
-    final protected Goal getFirstOpenGoal(Proof proof, Map<String, Object> state) throws ScriptException {
+    protected static Goal getFirstOpenGoal(Proof proof, Map<String, Object> state) throws ScriptException {
 
         Object fixedGoal = state.get(GOAL_KEY);
         if(fixedGoal instanceof Node) {
@@ -93,6 +93,13 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         Services services = proof.getServices();
         Term formula = PARSER.parse(reader, sort, services, services.getNamespaces(), abbrMap);
         return formula;
+    }
+
+    final protected static Sort toSort(Proof proof, Map<String, Object> state, String string) throws ParserException, ScriptException {
+        StringReader reader = new StringReader(string);
+        Services services = proof.getServices();
+        Sort sort = (Sort) services.getNamespaces().sorts().lookup(string);
+        return sort;
     }
 
     final protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
