@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -30,10 +31,13 @@ public class LabelManager extends AbstractQuestionInputManager {
                        QuestionInput questionInput,
                        LabelQuestion question) {
       this.questionInput = questionInput;
-      Composite composite = toolkit.createComposite(parent);
-      composite.setLayout(new TableWrapLayout());
-      label = toolkit.createLabel(composite, question.getToolSpecificMessage(getCurrentTool()), SWT.WRAP);
-      label.setLayoutData(new TableWrapData());
+      label = toolkit.createLabel(parent, question.getToolSpecificMessage(getCurrentTool()), SWT.WRAP);
+      if (parent.getLayout() instanceof TableWrapLayout) {
+         label.setLayoutData(new TableWrapData());
+      }
+      else {
+         label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      }
       PropertyChangeListener toolListener = null;
       if (question.hasToolSpecificMessages()) {
          AbstractPageInput<?> pageInput = questionInput.getPageInput();
