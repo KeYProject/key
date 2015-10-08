@@ -16,6 +16,8 @@ import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractFormInput;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
+import org.key_project.sed.key.evaluation.model.input.QuestionInput;
+import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.input.ToolPageInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
@@ -339,6 +341,9 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
                                                     String[] exampleOrder,
                                                     boolean noToolFirst) {
       // Get needed objects
+      AbstractFormInput<?> instructionFormInput = evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(ReviewingCodeEvaluation.INTRODUCTION_FORM_NAME));
+      QuestionPageInput extendPageInput = (QuestionPageInput) instructionFormInput.getPageInput(ReviewingCodeEvaluation.EXTEND_PAGE_NAME);
+      QuestionInput numberOfExamplesInput = extendPageInput.getQuestionInput(ReviewingCodeEvaluation.NUMBER_OF_EXAMPLES_QUESTION);
       RandomForm evaluationForm = ((ReviewingCodeEvaluation) evaluationInput.getEvaluation()).getEvaluationForm();
       RandomFormInput evaluationFormInput = (RandomFormInput) evaluationInput.getFormInput(evaluationForm);
       AbstractPageInput<?> evaluationPage = evaluationFormInput.getPageInput(ReviewingCodeEvaluation.EVALUATION_PAGE_NAME);
@@ -362,18 +367,32 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
       AbstractPageInput<?> feedbackPage = evaluationFormInput.getPageInput(ReviewingCodeEvaluation.FEEDBACK_PAGE);
       AbstractPageInput<?> sendPage = evaluationFormInput.getPageInput(ReviewingCodeEvaluation.SEND_EVALUATION_PAGE_NAME);
       // Set order and tools
-      evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, 
-                                                             jmlPage, 
-                                                             tool1Page, 
-                                                             proof1Page, 
-                                                             proof2Page, 
-                                                             proof3Page, 
-                                                             tool2Page, 
-                                                             proof4Page, 
-                                                             proof5Page, 
-                                                             proof6Page, 
-                                                             feedbackPage, 
-                                                             sendPage));
+      if (ReviewingCodeEvaluation.FOUR_EXAMPLES_CHOICE_VALUE.equals(numberOfExamplesInput.getValue())) {
+         evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, 
+                                                                jmlPage, 
+                                                                tool1Page, 
+                                                                proof2Page, 
+                                                                proof3Page, 
+                                                                tool2Page, 
+                                                                proof4Page, 
+                                                                proof5Page, 
+                                                                feedbackPage, 
+                                                                sendPage));
+      }
+      else {
+         evaluationFormInput.setPageOrder(CollectionUtil.toList(evaluationPage, 
+                                                                jmlPage, 
+                                                                tool1Page, 
+                                                                proof1Page, 
+                                                                proof2Page, 
+                                                                proof3Page, 
+                                                                tool2Page, 
+                                                                proof4Page, 
+                                                                proof5Page, 
+                                                                proof6Page, 
+                                                                feedbackPage, 
+                                                                sendPage));
+      }
       evaluationFormInput.setTool(proof1Page, tool1Page.getPage().getTool());
       evaluationFormInput.setTool(proof2Page, tool1Page.getPage().getTool());
       evaluationFormInput.setTool(proof3Page, tool1Page.getPage().getTool());

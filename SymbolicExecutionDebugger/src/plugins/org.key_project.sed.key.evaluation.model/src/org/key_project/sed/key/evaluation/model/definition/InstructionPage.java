@@ -10,7 +10,7 @@ public class InstructionPage extends AbstractPage {
    private final Image image;
    
    public InstructionPage(String name, String title, String message, URL descriptionURL, Image image) {
-      super(name, title, message, false, false);
+      super(name, title, message, false, false, true);
       this.descriptionURL = descriptionURL;
       this.image = image;
    }

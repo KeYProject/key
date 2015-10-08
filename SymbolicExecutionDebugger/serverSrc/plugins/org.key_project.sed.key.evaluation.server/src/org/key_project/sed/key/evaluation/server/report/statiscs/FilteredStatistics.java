@@ -58,45 +58,47 @@ public class FilteredStatistics {
     * @param tool The optional {@link Tool}.
     */
    protected void update(QuestionInput questionInput, Tool tool) {
-      Boolean correct = questionInput.checkCorrectness();
-      Integer correctnessScore = questionInput.computeCorrectnessScore();
-      Integer trustScore = questionInput.computeTrustScore();
-      long time = questionInput.getValueSetAt();
-      long trustTime = questionInput.getTrustSetAt();
-      if (correct != null || correctnessScore != null || trustScore != null || time > 0 || trustTime > 0) {
-         Map<AbstractQuestion, QuestionStatistics> questionMap;
-         if (tool != null) {
-            questionMap = toolQuestionStatistics.get(tool);
-            if (questionMap == null) {
-               questionMap = new HashMap<AbstractQuestion, QuestionStatistics>();
-               toolQuestionStatistics.put(tool, questionMap);
-            }
-         }
-         else {
-            questionMap = questionStatistics;
-         }
-         QuestionStatistics qs = questionMap.get(questionInput.getQuestion());
-         if (qs == null) {
-            qs = new QuestionStatistics();
-            questionMap.put(questionInput.getQuestion(), qs);
-         }
-         qs.update(correct, correctnessScore, trustScore, time, trustTime);
-      }
-      if (questionInput.getQuestion() instanceof AbstractChoicesQuestion) {
-         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) questionInput.getQuestion();
-         Map<Choice, ChoiceStatistics> statistcsMap = choiceStatistics.get(choiceQuestion);
-         if (statistcsMap == null) {
-            statistcsMap = new HashMap<Choice, ChoiceStatistics>();
-            choiceStatistics.put(choiceQuestion, statistcsMap);
-         }
-         for (Choice choice : choiceQuestion.getChoices()) {
-            if (questionInput.isChoiceSelected(choice)) {
-               ChoiceStatistics cs = statistcsMap.get(choice);
-               if (cs == null) {
-                  cs = new ChoiceStatistics();
-                  statistcsMap.put(choice, cs);
+      if (questionInput.getValue() != null) {
+         Boolean correct = questionInput.checkCorrectness();
+         Integer correctnessScore = questionInput.computeCorrectnessScore();
+         Integer trustScore = questionInput.computeTrustScore();
+         long time = questionInput.getValueSetAt();
+         long trustTime = questionInput.getTrustSetAt();
+         if (correct != null || correctnessScore != null || trustScore != null || time > 0 || trustTime > 0) {
+            Map<AbstractQuestion, QuestionStatistics> questionMap;
+            if (tool != null) {
+               questionMap = toolQuestionStatistics.get(tool);
+               if (questionMap == null) {
+                  questionMap = new HashMap<AbstractQuestion, QuestionStatistics>();
+                  toolQuestionStatistics.put(tool, questionMap);
                }
-               cs.update();
+            }
+            else {
+               questionMap = questionStatistics;
+            }
+            QuestionStatistics qs = questionMap.get(questionInput.getQuestion());
+            if (qs == null) {
+               qs = new QuestionStatistics();
+               questionMap.put(questionInput.getQuestion(), qs);
+            }
+            qs.update(correct, correctnessScore, trustScore, time, trustTime);
+         }
+         if (questionInput.getQuestion() instanceof AbstractChoicesQuestion) {
+            AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) questionInput.getQuestion();
+            Map<Choice, ChoiceStatistics> statistcsMap = choiceStatistics.get(choiceQuestion);
+            if (statistcsMap == null) {
+               statistcsMap = new HashMap<Choice, ChoiceStatistics>();
+               choiceStatistics.put(choiceQuestion, statistcsMap);
+            }
+            for (Choice choice : choiceQuestion.getChoices()) {
+               if (questionInput.isChoiceSelected(choice)) {
+                  ChoiceStatistics cs = statistcsMap.get(choice);
+                  if (cs == null) {
+                     cs = new ChoiceStatistics();
+                     statistcsMap.put(choice, cs);
+                  }
+                  cs.update();
+               }
             }
          }
       }

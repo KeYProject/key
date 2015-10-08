@@ -200,7 +200,7 @@ public class EvaluationInputWriter {
       formAttributes.put(ATTRIBUTE_FORM_NAME, formInput.getForm().getName());
       XMLUtil.appendStartTag(1, TAG_FORM, formAttributes, sb);
       for (AbstractPageInput<?> pageInput : formInput.getPageInputs()) {
-         if (!pageInput.getPage().isReadonly()) {
+         if (!pageInput.getPage().isReadonly() && pageInput.getPage().isEnabled()) {
             appendPageInput(2, pageInput, sb);
          }
       }
@@ -281,7 +281,7 @@ public class EvaluationInputWriter {
       }
       XMLUtil.appendStartTag(0, TAG_FORM, formAttributes, sb);
       for (AbstractPageInput<?> pageInput : formInput.getPageInputs()) {
-         if (!pageInput.getPage().isReadonly()) {
+         if (!pageInput.getPage().isReadonly() && pageInput.getPage().isEnabled()) {
             appendPageInput(1, pageInput, sb);
          }
       }
@@ -415,7 +415,9 @@ public class EvaluationInputWriter {
          throw new IllegalStateException("Unsupported form input: " + formInput);
       }
       for (AbstractPageInput<?> pageInput : formInput.getPageInputs()) {
-         appendPageInput(level + 1, pageInput, sb);
+         if (pageInput.getPage().isEnabled()) {
+            appendPageInput(level + 1, pageInput, sb);
+         }
       }
       XMLUtil.appendEndTag(level, TAG_FORM, sb);
    }

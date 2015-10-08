@@ -10,7 +10,7 @@ public class ToolPage extends AbstractPage implements IPageWithWorkbenchModifier
    private final boolean performWorkbenchModifierAutomatically;
    
    public ToolPage(Tool tool, IWorkbenchModifier workbenchModifier, boolean performWorkbenchModifierAutomatically) {
-      super(tool.getName(), tool.getName(), "Read the tool description carefully before continuing.", false, false);
+      super(tool.getName(), tool.getName(), "Read the tool description carefully before continuing.", false, false, true);
       this.tool = tool;
       this.workbenchModifier = workbenchModifier;
       this.performWorkbenchModifierAutomatically = performWorkbenchModifierAutomatically;

@@ -64,13 +64,12 @@ public class Statistics {
                         AbstractPageInput<?> pageInput = pageInputs.get(0);
                         if (pageInput.getPage().isToolBased()) {
                            List<Tool> tools = answer.getTools(pageInput.getPage());
-                           if (tools == null) {
-                              throw new IllegalStateException("Tools are missing.");
+                           if (tools != null) {
+                              if (tools.size() > 1) {
+                                 throw new IllegalStateException("Multiple tools found.");
+                              }
+                              filteredStatistics.update(pageInput, tools.get(0));
                            }
-                           if (tools.size() > 1) {
-                              throw new IllegalStateException("Multiple tools found.");
-                           }
-                           filteredStatistics.update(pageInput, tools.get(0));
                         }
                         else {
                            filteredStatistics.update(pageInput, null);
@@ -102,13 +101,12 @@ public class Statistics {
             QuestionInput questionInput = questionInputs.get(0);
             if (questionInput.getPageInput().getPage().isToolBased()) {
                List<Tool> tools = answer.getTools(questionInput.getPageInput().getPage());
-               if (tools == null) {
-                  throw new IllegalStateException("Tools are missing.");
+               if (tools != null) {
+                  if (tools.size() > 1) {
+                     throw new IllegalStateException("Multiple tools found.");
+                  }
+                  filteredStatistics.update(questionInput, tools.get(0));
                }
-               if (tools.size() > 1) {
-                  throw new IllegalStateException("Multiple tools found.");
-               }
-               filteredStatistics.update(questionInput, tools.get(0));
             }
             else {
                filteredStatistics.update(questionInput, null);

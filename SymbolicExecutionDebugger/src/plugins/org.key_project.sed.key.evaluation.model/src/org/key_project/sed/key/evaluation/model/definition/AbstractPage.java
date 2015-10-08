@@ -14,13 +14,16 @@ public abstract class AbstractPage {
    
    private final boolean toolBased;
    
-   public AbstractPage(String name, String title, String message, boolean wrapLayout, boolean toolBased) {
+   private final boolean enabled;
+   
+   public AbstractPage(String name, String title, String message, boolean wrapLayout, boolean toolBased, boolean enabled) {
       assert name != null;
       this.name = name;
       this.title = title;
       this.message = message;
       this.wrapLayout = wrapLayout;
       this.toolBased = toolBased;
+      this.enabled = enabled;
    }
 
    public boolean isToolBased() {
@@ -49,6 +52,10 @@ public abstract class AbstractPage {
 
    public boolean isWrapLayout() {
       return wrapLayout;
+   }
+
+   public boolean isEnabled() {
+      return enabled;
    }
 
    public void setForm(AbstractForm form) {

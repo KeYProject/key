@@ -16,7 +16,12 @@ import org.key_project.util.java.CollectionUtil;
 
 public class ReviewingCodeEvaluation extends AbstractEvaluation {
    /**
-    * If this flag is true the evaluation will ask for changed locations.
+    * If this flag is {@code true} the participant can choose between 4 or 6 examples.
+    */
+   public static final boolean SHORT_EVALUATION_ENABLED = true;
+   
+   /**
+    * If this flag is {@code true} the evaluation will ask for changed locations.
     */
    public static final boolean ASK_FOR_CHANGED_LOCATIONS = false;
    
@@ -39,6 +44,11 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
     * The name of the introduction form.
     */
    public static final String INTRODUCTION_FORM_NAME = "introductionForm";
+   
+   /**
+    * The name of the extend page.
+    */
+   public static final String EXTEND_PAGE_NAME = "extentPage";
 
    /**
     * The name of the used random order computer.
@@ -99,6 +109,16 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
     * Page name of the summary page.
     */
    public static final String FEEDBACK_PAGE = "feedback";
+
+   /**
+    * Question name of the question defining the number of examples.
+    */
+   public static final String NUMBER_OF_EXAMPLES_QUESTION = "numberOfExamples";
+
+   /**
+    * Value of choice defining 4 examples.
+    */
+   public static final String FOUR_EXAMPLES_CHOICE_VALUE = "4 Examples";
    
    /**
     * Forbid additional instances.
@@ -185,6 +205,22 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               new Choice("None", "None"), 
                                                                               new Choice("< 1 year", "Less than 1 year"), 
                                                                               new Choice(">= 1 year", "More than 1 year")));
+      QuestionPage extendPage = new QuestionPage(EXTEND_PAGE_NAME, 
+                                                 "Evaluation Extent", 
+                                                 "Please define the extent of the evaluation.",
+                                                 true,
+                                                 true,
+                                                 false,
+                                                 SHORT_EVALUATION_ENABLED,
+                                                 null,
+                                                 new RadioButtonsQuestion(NUMBER_OF_EXAMPLES_QUESTION,
+                                                                          "Number of examples", 
+                                                                          true,
+                                                                          "6 Examples", 
+                                                                          new NotUndefinedValueValidator("Number of examples"), 
+                                                                          false,
+                                                                          new Choice("4 Examples (45 to 60 minutes)", FOUR_EXAMPLES_CHOICE_VALUE), 
+                                                                          new Choice("6 Examples (45 to 90 minutes)", "6 Examples")));
       SendFormPage sendConditionsPage = new SendFormPage("sendConditions", 
                                                          "Confirm Sending Background Knowledge (used to order proof attempts)", 
                                                          "Optionally, inspect the answers to be sent.", 
@@ -194,6 +230,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                  RANDOM_COMPUTER_NAME,
                                                  conditionsPage, 
                                                  backgroundPage,
+                                                 extendPage,
                                                  sendConditionsPage);
       // Create evaluation form
       URL evaluationURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/EvaluationIntroduction-Screencast.html") : null;

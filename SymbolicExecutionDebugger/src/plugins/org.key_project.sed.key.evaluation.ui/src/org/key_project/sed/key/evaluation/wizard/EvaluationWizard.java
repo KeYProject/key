@@ -62,23 +62,25 @@ public class EvaluationWizard extends Wizard {
    public void addPages() {
       for (AbstractFormInput<?> form : evaluationInput.getFormInputs()) {
          for (AbstractPageInput<?> page : form.getPageInputs()) {
-            if (page instanceof QuestionPageInput) {
-               lastPage = new QuestionWizardPage((QuestionPageInput) page, imageDescriptor);
+            if (page.getPage().isEnabled()) {
+               if (page instanceof QuestionPageInput) {
+                  lastPage = new QuestionWizardPage((QuestionPageInput) page, imageDescriptor);
+               }
+               else if (page instanceof SendFormPageInput) {
+                  SendFormPageInput sendPage = (SendFormPageInput) page;
+                  lastPage = new SendFormWizardPage(sendPage, evaluationInput.getFormInput(sendPage.getPage().getForm()), imageDescriptor);
+               }
+               else if (page instanceof ToolPageInput) {
+                  lastPage = new ToolWizardPage((ToolPageInput) page, imageDescriptor);
+               }
+               else if (page instanceof InstructionPageInput) {
+                  lastPage = new InstructionWizardPage((InstructionPageInput) page, imageDescriptor);
+               }
+               else {
+                  throw new IllegalStateException("Unsupported page input: " + page);
+               }
+               addPage(lastPage);
             }
-            else if (page instanceof SendFormPageInput) {
-               SendFormPageInput sendPage = (SendFormPageInput) page;
-               lastPage = new SendFormWizardPage(sendPage, evaluationInput.getFormInput(sendPage.getPage().getForm()), imageDescriptor);
-            }
-            else if (page instanceof ToolPageInput) {
-               lastPage = new ToolWizardPage((ToolPageInput) page, imageDescriptor);
-            }
-            else if (page instanceof InstructionPageInput) {
-               lastPage = new InstructionWizardPage((InstructionPageInput) page, imageDescriptor);
-            }
-            else {
-               throw new IllegalStateException("Unsupported page input: " + page);
-            }
-            addPage(lastPage);
          }
       }
    }
