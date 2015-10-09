@@ -28,8 +28,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({ RunAllProofsFunctional.class,
-                RunAllProofsInfFlow.class })
+@SuiteClasses({ RunAllProofsInfFlow.class,
+                RunAllProofsFunctional.class})
 public class RunAllProofsTestSuite {
     // no members
 }
