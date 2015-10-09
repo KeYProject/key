@@ -31,7 +31,7 @@ import org.key_project.util.java.CollectionUtil;
  * Appends the hypotheses tests.
  * @author Martin Hentschel
  */
-public class HTMLReviewingCodeHypotheses implements IHTMLSectionAppender {
+public class HTMLHypotheses implements IHTMLSectionAppender {
    /**
     * {@inheritDoc}
     */
