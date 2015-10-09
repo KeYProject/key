@@ -417,4 +417,20 @@ public class QuestionInput extends Bean {
          return null;
       }
    }
+
+   /**
+    * Normalizes the trust score to ensure positive values.
+    * @param trustScore The trust score to normalize.
+    * @return The normalized trust score.
+    */
+   public static int normalizeTrust(int trustScore) {
+      switch (trustScore) {
+         case -2 : return 0;
+         case -1 : return 1;
+         case  0 : return 2;
+         case  1 : return 3;
+         case  2 : return 4;
+         default : throw new IllegalArgumentException("Unsupported trust score: " + trustScore);
+      }
+   }
 }

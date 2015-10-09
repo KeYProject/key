@@ -7,10 +7,12 @@ import java.util.Map;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
+import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLAnswersSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLChoiceSectionAppender;
+import org.key_project.sed.key.evaluation.server.report.html.HTMLReviewingCodeHypotheses;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLToolSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLUnderstandingProofAttemptsBalancingSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.IHTMLSectionAppender;
@@ -69,6 +71,9 @@ public class HTMLReportEngine extends AbstractReportEngine {
     */
    public List<IHTMLSectionAppender> getSectionAppender(AbstractEvaluation evaluation) {
       List<IHTMLSectionAppender> result = new LinkedList<IHTMLSectionAppender>();
+      if (evaluation instanceof ReviewingCodeEvaluation) {
+         result.add(new HTMLReviewingCodeHypotheses());
+      }
       result.add(new HTMLToolSectionAppender());
       result.add(new HTMLChoiceSectionAppender());
       if (evaluation instanceof UnderstandingProofAttemptsEvaluation) {
