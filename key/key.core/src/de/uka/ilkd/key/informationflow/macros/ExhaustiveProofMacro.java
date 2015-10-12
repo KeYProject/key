@@ -13,7 +13,6 @@
 package de.uka.ilkd.key.informationflow.macros;
 
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros
@@ -49,7 +49,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     /** Cache for nodes which have already been checked for an applicable
         position. */
     private static Map<Node, PosInOccurrence> applicableOnNodeAtPos =
-            new HashMap<Node, PosInOccurrence>();
+            new LinkedHashMap<Node, PosInOccurrence>();
 
     private PosInOccurrence getApplicablePosInOcc(Proof proof,
                                                   Goal goal,
@@ -97,6 +97,11 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
         for (final Goal goal: goals) {
             seq = goal.sequent();
             if (!applicableOnNodeAtPos.containsKey(goal.node())) {
+                for (final Node n: applicableOnNodeAtPos.keySet()) {
+                    if (!n.sequent().equals(seq)) {
+                        applicableOnNodeAtPos.remove(n);
+                    }
+                }
                 // node has not been checked before, so do it
                 for (int i = 1; i <= seq.size() &&
                                 applicableOnNodeAtPos.get(goal.node()) == null; i++) {
@@ -146,6 +151,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 info = new ProofMacroFinishedInfo(this, info);
             }
         }
+        applicableOnNodeAtPos.clear();
         return info;
     }
 
