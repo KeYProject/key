@@ -62,8 +62,4 @@ the mentioned Eclipse version!
 
    int start = content.indexOf("String");
    int length = "String".length();
-   IJavaElement[] declarations = cu.codeSelect(start, length);
-
-2. Avoid CommentLocator and replace it with JDT functionality.
-   Ensure that a single JML comment can be parsed without scanning the full document!
-   => Current performance bottleneck!
+   IJavaElement[] declarations = cu.codeSelect(sta

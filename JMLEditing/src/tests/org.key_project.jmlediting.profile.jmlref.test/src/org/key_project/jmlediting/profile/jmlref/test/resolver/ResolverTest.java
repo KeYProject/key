@@ -123,8 +123,7 @@ public class ResolverTest {
        
        // Parse JML
        final IJMLParser parser = JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject()).createParser();
-       final CommentLocator locator = new CommentLocator(cu.getSource());
-       for (final CommentRange jmlCommentRange : locator.findJMLCommentRanges()) {
+       for (final CommentRange jmlCommentRange : CommentLocator.listJMLCommentRanges(cu.getSource())) {
            try {
                iASTList.add(parser.parse(cu.getSource(), jmlCommentRange));
            }
@@ -133,8 +132,7 @@ public class ResolverTest {
            }
        }
        final IJMLParser parser2 = JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject()).createParser();
-       final CommentLocator locator2 = new CommentLocator(cuParam.getSource());
-       for (final CommentRange jmlCommentRange : locator2.findJMLCommentRanges()) {
+       for (final CommentRange jmlCommentRange : CommentLocator.listJMLCommentRanges(cuParam.getSource())) {
            try {
                iASTListParam.add(parser2.parse(cuParam.getSource(), jmlCommentRange));
            }
@@ -143,8 +141,7 @@ public class ResolverTest {
            }
        }
        final IJMLParser parser3 = JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject()).createParser();
-       final CommentLocator locator3 = new CommentLocator(cuParam2.getSource());
-       for (final CommentRange jmlCommentRange : locator3.findJMLCommentRanges()) {
+       for (final CommentRange jmlCommentRange : CommentLocator.listJMLCommentRanges(cuParam2.getSource())) {
            try {
                iASTListParam2 .add(parser3.parse(cuParam2.getSource(), jmlCommentRange));
            }

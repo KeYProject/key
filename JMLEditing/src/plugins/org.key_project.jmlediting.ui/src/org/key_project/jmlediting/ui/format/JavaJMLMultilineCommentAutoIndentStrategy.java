@@ -62,8 +62,8 @@ DefaultIndentLineAutoEditStrategy {
    public void customizeDocumentCommand(final IDocument document,
          final DocumentCommand command) {
       // Detect whether JML or not
-      final CommentLocator loc = new CommentLocator(document.get());
-      if (loc.isInJMLComment(command.offset)) {
+      ITypedRegion region = CommentLocator.findCommentRegion(document, command.offset);
+      if (region != null && CommentLocator.isJMLComment(document.get(), region.getOffset())) {
          if (!this.isSmartMode()) {
             return;
          }

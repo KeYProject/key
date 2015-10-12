@@ -52,18 +52,16 @@ public abstract class AbstractRefactoringComputer implements IRefactoringCompute
     * @throws JavaModelException Thrown when the source file cannot be loaded from
     *            {@link ICompilationUnit} or he JMLcomments could not be received.
     */
-   public final ArrayList<ReplaceEdit> computeNeededChangesToJML(ICompilationUnit unit,
-            IJavaProject project) throws JavaModelException {
+   public final ArrayList<ReplaceEdit> computeNeededChangesToJML(ICompilationUnit unit, IJavaProject project) throws JavaModelException {
 
       final ArrayList<ReplaceEdit> changesToMake = new ArrayList<ReplaceEdit>();
 
       // Look through the JML comments and find the potential references which
       // might need to be renamed
       final String source = unit.getSource();
-      final CommentLocator loc = new CommentLocator(source);
 
       // Get all JML comments
-      for (final CommentRange range : loc.findJMLCommentRanges()) {
+      for (final CommentRange range : CommentLocator.listJMLCommentRanges(source)) {
 
          // Filter the comments
          final HashMap<IASTNode, List<IStringNode>> foundReferences = getReferencesInJMLcomments(

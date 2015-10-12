@@ -60,8 +60,7 @@ public class TypeComputerTest {
       
       // Parse JML
       final IJMLParser parser = JMLPreferencesHelper.getProjectJMLProfile(javaProject.getProject()).createParser();
-      final CommentLocator locator = new CommentLocator(icu.getSource());
-      for (final CommentRange jmlCommentRange : locator.findJMLCommentRanges()) {
+      for (final CommentRange jmlCommentRange : CommentLocator.listJMLCommentRanges(icu.getSource())) {
           try {
               iASTList.add(parser.parse(icu.getSource(), jmlCommentRange));
           }

@@ -80,7 +80,7 @@ public class JMLFormattingStrategy<T extends IFormattingStrategy & IFormattingSt
                "null is not allowed as wrapped strategy");
       }
       this.wrappedStrategy = wrappedStrategy;
-      this.tasks = new ArrayList<JMLFormattingStrategy.JMLFormatTask>();
+      this.tasks = new ArrayList<JMLFormatTask>();
    }
 
    @Override
@@ -127,8 +127,7 @@ public class JMLFormattingStrategy<T extends IFormattingStrategy & IFormattingSt
       // comment is shorter than the marker
       int offset = 0;
       // Filter the existing comment
-      for (final CommentRange comment : new CommentLocator(content)
-            .findJMLCommentRanges()) {
+      for (final CommentRange comment : CommentLocator.listJMLCommentRanges(content)) {
          // Only handle comments in formatter position
          if (position.overlapsWith(comment.getBeginOffset(),
                comment.getLength())) {
@@ -179,8 +178,7 @@ public class JMLFormattingStrategy<T extends IFormattingStrategy & IFormattingSt
 
             // Filter the comment ranges in the document for the marker comments
             final List<CommentRange> destinations = new ArrayList<CommentRange>();
-            for (final CommentRange range : new CommentLocator(doc.get())
-                  .findCommentRanges()) {
+            for (final CommentRange range : CommentLocator.listCommentRanges(doc.get())) {
                // Because the marker can only occur in the marker comments, a
                // contains check is valid
                if (doc.get(range.getBeginOffset(), range.getLength()).contains(

@@ -415,6 +415,6 @@ public class JMLEditingUITestUtils {
    }
 
    public static List<CommentRange> getAllJMLCommentsInEditor(final SWTBotEclipseEditor editor) {
-      return new CommentLocator(editor.getText()).findJMLCommentRanges();
+      return CommentLocator.listJMLCommentRanges(editor.getText());
    }
 }
