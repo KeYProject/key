@@ -97,11 +97,6 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
         for (final Goal goal: goals) {
             seq = goal.sequent();
             if (!applicableOnNodeAtPos.containsKey(goal.node())) {
-                for (final Node n: applicableOnNodeAtPos.keySet()) {
-                    if (!n.sequent().equals(seq)) {
-                        applicableOnNodeAtPos.remove(n);
-                    }
-                }
                 // node has not been checked before, so do it
                 for (int i = 1; i <= seq.size() &&
                                 applicableOnNodeAtPos.get(goal.node()) == null; i++) {
