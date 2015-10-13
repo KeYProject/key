@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
+import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -48,11 +49,21 @@ public abstract class AbstractMonomialSmallerThanFeature
 
     protected int introductionTime(Operator op, ServiceCaches caches) {
         if ( op == add || op == mul || op == Z ) return -1;
-        Integer res = caches.getIntroductionTimeCache().get ( op );
+
+        final LRUCache<Operator, Integer> introductionTimeCache = caches.getIntroductionTimeCache();
+        Integer res;
+        
+        synchronized (introductionTimeCache) {
+            res = introductionTimeCache.get ( op );
+        }
+        
         if ( res == null ) {
             res = Integer.valueOf ( introductionTimeHelp ( op ) );
-            caches.getIntroductionTimeCache().put ( op, res );
+            synchronized (introductionTimeCache) {
+                introductionTimeCache.put ( op, res );
+            }
         }
+        
         return res.intValue ();
     }
 

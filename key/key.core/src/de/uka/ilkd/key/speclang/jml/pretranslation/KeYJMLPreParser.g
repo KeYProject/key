@@ -131,9 +131,18 @@ options {
        return flipHeaps(declString, result, false);
     }
 
+    /*
+     * This method prepends a String to a given PositionedString and removes whitespaces from
+     * heap brackets at the beginning of it. (Why is this necessary?)
+     * 
+     * Note: Static manipulation of Strings that are passed to KeYJMLParser is fragile when it
+     * comes to error reporting. Original JML input should be left unmodified as much as possible
+     * so that correct error location can be reported to the user. Functionality of this method
+     * should be replaced by a more accurate implementation. (Kai Wallisch 07/2015)
+     */
     private PositionedString flipHeaps(String declString, PositionedString result, boolean allowPreHeaps) {
       String t = result.text;
-      String p = declString+" ";
+      String p = declString;
 
       List<Name> validHeapNames = new ArrayList<Name>();
 
@@ -150,10 +159,22 @@ options {
         if(t.startsWith(l) || t.startsWith(lsp)) {
            p = l + p;
            t = t.substring(t.startsWith(lsp) ? lsp.length() : l.length());
+           result = new PositionedString(t, result.fileName, result.pos);
         }
-        result = new PositionedString(t, result.fileName, result.pos);
       }
-      result = result.prepend(p);
+      if (p.contains("<")) {
+        /*
+         * Using normal prepend without update of position in case p contains a heap
+         * because in that case prependAndUpdatePosition() might produce a negative
+         * column value. However, this alternative is also not ideal because it does
+         * not update the position after prepending a string. A rewrite of this
+         * method that does not rely on low-level string manipulation is recommended
+         * to fix this issue.
+         */
+         result = result.prepend(p + " ");
+      } else {
+        result = result.prependAndUpdatePosition(p + " ");
+      }
       return result;
     }
     
@@ -712,6 +733,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
+   |   ps=joinproc_clause        { sc.addJoinProcs(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
@@ -1467,7 +1489,7 @@ assume_keyword
 expression returns [PositionedString result = null]
 @init {
     int parenthesesCounter = 0;
-    final StringBuilder text = new StringBuilder();
+    // final StringBuilder text = new StringBuilder();
     Token begin = null;
 }
 :
@@ -1478,11 +1500,14 @@ expression returns [PositionedString result = null]
         |   { parenthesesCounter > 0 }? t=SEMICOLON
         |   t=~(LPAREN | RPAREN | SEMICOLON)
         )
-        { if (begin == null) { begin = t; } text.append(" " + t.getText()); }
+        { if (begin == null) { begin = t; } /*text.append(" " + t.getText());*/ }
     )*
-    { parenthesesCounter == 0 }? t=SEMICOLON { if (begin == null) { begin = t; } text.append(t.getText()); }
+    { parenthesesCounter == 0 }? t=SEMICOLON { if (begin == null) { begin = t; } /*text.append(t.getText());*/ }
     {
-	result = createPositionedString(text.toString(), begin);
+       // take the string from the token stream
+       // (do not reconstruct it with false whitespaces)
+       String coveredText = input.toString(begin, input.LT(-1));
+       result = createPositionedString(coveredText, begin);
     }
 ;
 
@@ -1574,6 +1599,21 @@ returns_clause
 returns_keyword
 :
 	RETURNS
+;
+
+joinproc_clause
+   returns [PositionedString r = null]
+   throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+   joinproc_keyword result=expression { result = result.prepend("join_proc "); }
+;
+
+
+joinproc_keyword
+:
+   JOIN_PROC
 ;
 
 

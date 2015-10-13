@@ -42,9 +42,8 @@ public class InfFlowProof extends Proof {
     }
 
     public InfFlowProof(String name, Term problem, String header,
-            TacletIndex rules, BuiltInRuleIndex builtInRules,
             InitConfig initConfig) {
-        super(name, problem, header, rules, builtInRules, initConfig);
+        super(name, problem, header, initConfig);
     }
 
     public InfFlowProof(String name, InitConfig initConfig) {
@@ -136,7 +135,7 @@ public class InfFlowProof extends Proof {
         	}
         	proof.sideProofStatistics = null;
         }
-        addSideProofStatistics(proof.statistics());
+        addSideProofStatistics(proof.getStatistics());
     }
 
     private void addSideProofStatistics(Statistics stat) {

@@ -12,26 +12,34 @@
 //
 package de.uka.ilkd.key.proof.init;
 
+import org.antlr.runtime.RecognitionException;
+
 /**
  * Reading prover input failed
  */
-public class ProofInputException extends Exception {
+@SuppressWarnings("serial")
+public class ProofInputException extends RecognitionException {
 
-    /**
-     * Serial UID (generated)
-     */
-    private static final long serialVersionUID = 1627043675372779404L;
+   private final String message;
 
-    public ProofInputException(Exception e) {
-        super(e);
-    }
+   public ProofInputException(Exception e) {
+      this(e.getMessage(), e);
+   }
 
-    public ProofInputException(String s) {
-        super(s);
-    }
+   public ProofInputException(String s) {
+      this(s, null);
+   }
 
-    public ProofInputException(String message, Throwable cause) {
-        super(message, cause);
-    }
+   public ProofInputException(String message, Throwable cause) {
+      this.message = message;
+      if(cause != null) {
+    	  initCause(cause);
+      }
+   }
+
+   @Override
+   public String getMessage() {
+      return message;
+   }
 
 }

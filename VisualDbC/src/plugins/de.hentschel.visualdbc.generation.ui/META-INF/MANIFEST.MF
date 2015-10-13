@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  de.hentschel.visualdbc.generation;bundle-version="1.0.0",
  de.hentschel.visualdbc.dbcmodel.diagram;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Martin Hentschel
 Export-Package: de.hentschel.visualdbc.generation.ui.util,
  de.hentschel.visualdbc.generation.ui.wizard

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<project name="key.core.symbolic_execution.example" default="deploy" basedir=".">
+	<property name="src.dir"   value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/bin" />
+	<property name="dist.dir"  value="${basedir}/../deployment" />
+
+	<path id="key.ui.class.path">
+	  <pathelement path="${basedir}/../key.util/bin"/>
+	  <pathelement path="${basedir}/../key.core/bin"/>
+	  <pathelement path="${basedir}/../key.core.symbolic_execution/bin"/>
+	  <pathelement location="${basedir}/../key.core/lib/antlr.jar"/>
+	  <pathelement location="${basedir}/../key.core/lib/recoderKey.jar"/>
+	</path>
+
+	<path id="key.ui.run.class.path">
+	  <pathelement path="${basedir}/../key.core.symbolic_execution.example/bin"/>
+	  <path refid="key.ui.class.path"/>
+	</path>
+
+	<target name="start" depends="compile" description="Starts KeY.">
+		<java classname="example.Main"
+		      classpathref="key.ui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
+	</target>
+
+	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/components"/>
+		<jar destfile="${dist.dir}/components/key.core.symbolic_execution.example.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+
+	<target name="compile" depends="copy" description="Compile all source files into the build directory.">
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir= "${src.dir}" 
+		       destdir="${build.dir}" 
+		       includeantruntime="false" 
+		       source="1.7" 
+		       target="1.7"
+		       deprecation="off" 
+		       debug="on" 
+		       depend="${build.depend}" 
+		       optimize="off">
+		  <classpath refid="key.ui.class.path"/>
+		</javac>
+	</target>
+
+	<target name="copy" description="Copy all resources into the binary directory.">
+		<copy todir="${build.dir}/example">
+			<fileset dir="${basedir}/example"/>
+		</copy>
+	</target>
+
+	<target name="clean" description="Deletes all generated files and folders.">
+		<delete failonerror="false" includeemptydirs="true"> 
+			<fileset dir="${build.dir}" includes="**/*" />
+			<fileset file="${dist.dir}/components/key.core.symbolic_execution.example.jar" />
+		</delete>
+	</target>
+</project>

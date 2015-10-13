@@ -642,7 +642,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     public ImmutableSet<NoPosTacletApp> getCapturedTaclets() {
         ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.nil();
-        if(indices != null) {
+        synchronized (this) {
             for (int i = 0; i < indices.length; i++) {
                 result = result.union(indices[i].allNoPosTacletApps());
             }

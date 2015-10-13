@@ -35,6 +35,16 @@ on or off all taclets axiomatising JavaCard specific features like transac-
 tion.
 </entry>
 
+<entry key="joinGenerateIsWeakeningGoal">
+Specifies whether a special goal "Joined node is weakening" should be
+generated as a child of the partner node of a join operation.
+
+For join procedures formally proven correct, this should not be necessary.
+Enable this option when you are not sure whether a newly implemented join
+procedure is sound. In this case, the generated "is weakening" goals should
+only be closable if the concrete join instance is correct.
+</entry>
+
 <entry key="initialisation">
 Specifies whether static (class loading) initialization should be
 taken in consideration.

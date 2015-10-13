@@ -51,7 +51,7 @@ public class ShowProofStatistics extends MainWindowAction {
             if (openGoals > 0) stats = openGoals+" open goal"+(openGoals > 1? "s.":".");
             else stats = "Closed.";
             stats += "\n\n";
-            for (Pair<String,String> x: proof.statistics().getSummary()) {
+            for (Pair<String,String> x: proof.getStatistics().getSummary()) {
                 if ("".equals(x.second)) stats +="\n";
                 stats += x.first+": "+ x.second+"\n";
             }

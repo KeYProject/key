@@ -40,7 +40,8 @@ public class GeneralFailureJTextPaneDisplay extends ShowDisplayPane {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.notification.NotificationAction#execute(de.uka.ilkd.key.gui.notification.events.NotificationEvent)
      */
-    public boolean execute(NotificationEvent event) {
+    @Override
+   public boolean execute(NotificationEvent event) {
         if (event instanceof GeneralFailureEvent) {          
             setMessage(((GeneralFailureEvent)event).getErrorMessage());            
         } else {

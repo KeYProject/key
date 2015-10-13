@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project name="key" default="compileAll" basedir=".">
-        <property name="key.dir" value="${basedir}/../"/>
+	<property name="key.dir" value="${basedir}/../"/>
+	<property name="rep.dir" value="${basedir}/../../"/>
 	<property name="javadoc.dir" value="${key.dir}/deployment/api/"/>
 	<property environment="env"/>
 
@@ -8,7 +9,7 @@
 		<isset property="env.KEY_VERSION"/>
 	</condition>
 
-	<condition property="taclet.match" value="${taclet.match}" else="legacy">
+	<condition property="taclet.match" value="${taclet.match}" else="vm">
 		<isset property="taclet.match"/>
 	</condition>
 
@@ -30,6 +31,7 @@
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="compile" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="compile" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="compile" dir="${key.dir}/key.removegenerics" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 	</target>
 
 	<target name="deployAll">
@@ -40,7 +42,7 @@
 		</exec>	
 		<!-- Zip source code -->
 		<zip destfile="${key.dir}/deployment/key-src-${key.version}_${git.revision}.zip"
-		     basedir="${key.dir}/"
+		     basedir="${rep.dir}/"
 		     excludes="*-src-*,*.jnlp,**/deployment/**,**/bin/**,*~,**/oldStuff/**"
 		 />
 		<!-- Create Jar archives -->
@@ -52,6 +54,7 @@
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="deploy" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 		<!-- Deploy license -->
 		<copy todir="${key.dir}/deployment">
 			<fileset file="${key.dir}/LICENSE.TXT"/>
@@ -77,6 +80,7 @@
 		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="clean" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="clean" dir="${key.dir}/key.removegenerics" inheritall="false"/>
+		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
 		<!-- Delete deployed files -->
 		<delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false" />
 		<delete file="${key.dir}/deployment/KeY.jar" failonerror="false" />

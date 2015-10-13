@@ -237,7 +237,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame =
 	        JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
-	inv = inv.setTarget(innermostMethodFrame.getProgramMethod());
+	if (innermostMethodFrame != null) {
+	    inv = inv.setTarget(innermostMethodFrame.getProgramMethod());
+	}
 
 	final Term selfTerm = innermostMethodFrame == null
 	                      ? null

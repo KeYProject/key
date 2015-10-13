@@ -39,6 +39,8 @@ public class Node  {
 
     private static final String INTERACTIVE_GOAL = "INTERACTIVE GOAL";
 
+    private static final String LINKED_GOAL = "LINKED GOAL";
+
     private static final String OPEN_GOAL = "OPEN GOAL";
 
     private static final String CLOSED_GOAL = "Closed goal";
@@ -258,6 +260,10 @@ public class Node  {
      */
     public boolean root() {
 	return parent==null;
+    }
+
+    public Statistics statistics() {
+        return new Statistics(this);
     }
 
     /**
@@ -496,6 +502,8 @@ public class Node  {
                 Goal goal = proof().getGoal(this);
                 if ( goal == null || this.isClosed() )
                     return CLOSED_GOAL; // don't cache this
+                else if(goal.isLinked())
+                   cachedName = LINKED_GOAL;
                 else if(goal.isAutomatic())
                     cachedName = OPEN_GOAL;
                 else
@@ -558,6 +566,26 @@ public class Node  {
         }
         clearNameCache();
         return result;
+    }
+    
+    /**
+     * Opens a previously closed node and all its closed
+     * parents.<p>
+     * 
+     * This is, for instance, needed for the join rule: In
+     * a situation where a join node and its associated partners
+     * have been closed and the join node is then pruned away,
+     * the partners have to be reopened again. Otherwise, we
+     * have a soundness issue.
+     */
+    void reopen() {
+        closed = false;
+        Node tmp = parent;
+        while (tmp != null && tmp.isClosed()) {
+            tmp.closed = false;
+            tmp = tmp.parent();
+        }
+        clearNameCache();
     }
 
     /** checks if an inner node is closeable */
@@ -648,29 +676,37 @@ public class Node  {
      * @author bruns
      */
     private static class SubtreeIterator implements Iterator<Node> {
+        private final Node root;
         private Node n;
         private boolean atRoot = true; // special handle
 
         private SubtreeIterator(Node root) {
             assert root != null;
-            n = root;
+            this.n = root;
+            this.root = root;
         }
 
-        private static Node nextSibling(Node m) {
+        private Node nextSibling(Node m) {
             Node p = m.parent;
-            while (p != null) {
+            while (p != null && m != root) {
                 final int c = p.childrenCount();
                 final int x = p.getChildNr(m);
-                if (x+1 < c) return p.child(x+1);
-                m = p; p = m.parent;
+                if (x + 1 < c) {
+                    final Node result = p.child(x + 1);
+                    return result != root ? result : null;
+                }
+                m = p;
+                p = m.parent;
             }
             return null;
         }
 
         @Override
-        public boolean hasNext(){
-            if (atRoot) return true;
-            if (!n.leaf()) return true;
+        public boolean hasNext() {
+            if (atRoot)
+                return true;
+            if (!n.leaf())
+                return true;
             return nextSibling(n) != null;
         }
 
@@ -682,14 +718,16 @@ public class Node  {
             }
             if (n.leaf()) {
                 Node s = nextSibling(n);
-                if (s != null) n = s;
-            } else n = n.child(0);
+                if (s != null)
+                    n = s;
+            } else
+                n = n.child(0);
             return n;
         }
-        
+
         public void remove() {
-            throw new UnsupportedOperationException("Changing the proof tree " +
-                    "structure this way is not allowed.");
+            throw new UnsupportedOperationException("Changing the proof tree "
+                    + "structure this way is not allowed.");
         }
     }
 }

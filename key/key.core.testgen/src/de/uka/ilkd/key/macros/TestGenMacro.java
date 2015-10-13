@@ -152,4 +152,11 @@ public class TestGenMacro extends StrategyProofMacro {
 	public String getName() {
 		return "TestGen (finite loop unwinding)";
 	}
+
+	@Override
+	public String getCategory() {
+	    return null;
+	}
+
+
 }

@@ -53,9 +53,10 @@ public class FindTacletAppContainer extends TacletAppContainer {
     	positionTag         =
     	    p_goal.getFormulaTagManager().getTagForPos(p_pio.topLevel());
 
-        if ( positionTag == null )
+        if ( positionTag == null ) {            
             // faster than <code>assertFalse</code>
             Debug.fail ( "Formula " + p_pio + " does not exist" );
+        }
     }
 
 

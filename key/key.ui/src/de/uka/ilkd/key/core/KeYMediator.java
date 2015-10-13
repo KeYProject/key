@@ -545,7 +545,7 @@ public class KeYMediator {
                 keySelectionModel.fireSelectedProofChanged();
          }
       };
-      ThreadUtilities.invokeAndWait(interfaceSignaller);
+      ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
    }
 
    

@@ -13,7 +13,6 @@
 package de.uka.ilkd.key.informationflow.macros;
 
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros
@@ -49,7 +49,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     /** Cache for nodes which have already been checked for an applicable
         position. */
     private static Map<Node, PosInOccurrence> applicableOnNodeAtPos =
-            new HashMap<Node, PosInOccurrence>();
+            new LinkedHashMap<Node, PosInOccurrence>();
 
     private PosInOccurrence getApplicablePosInOcc(Proof proof,
                                                   Goal goal,
@@ -108,7 +108,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 }
             }
             applicable = applicable || applicableOnNodeAtPos.get(goal.node()) != null;
-        }        
+        }
         return applicable;
     }
 
@@ -135,7 +135,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             PosInOccurrence applicableAt = applicableOnNodeAtPos.get(goal.node());
             if (applicableAt != null) {
                 final ProverTaskListener pml =
-                        new ProofMacroListener(macro, listener);
+                        new ProofMacroListener(macro.getName(), listener);
                 pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, getName(), 0));
                 synchronized(macro) {
                     // wait for macro to terminate
@@ -146,6 +146,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 info = new ProofMacroFinishedInfo(this, info);
             }
         }
+        applicableOnNodeAtPos.clear();
         return info;
     }
 

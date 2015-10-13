@@ -23,8 +23,9 @@ import java.util.TreeMap;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 
-import antlr.Token;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -129,6 +130,7 @@ public final class JMLTranslator {
         REQUIRES_FREE ("requires_free"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
+        JOIN_PROC ("join_proc"),
 
         // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
@@ -344,6 +346,16 @@ public final class JMLTranslator {
         });
         translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
         translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.JOIN_PROC, new JMLTranslationMethod() {
+            
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                // TODO Auto-generated method stub
+                System.out.println("XXX");
+                return null;
+            }
+        });
 
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
 
@@ -1746,7 +1758,7 @@ public final class JMLTranslator {
             result = parser.top();
             // maybe return pair<T, Warnings>?
             //List<PositionedString> warnings = parser.getWarnings();            
-        } catch (antlr.ANTLRException e) {
+        } catch (RecognitionException e) {
             throw parser.getExceptionManager().convertException(e);
         }
         if (resultClass.equals(Term.class)) {
@@ -2377,11 +2389,7 @@ public final class JMLTranslator {
             checkNotType(e1,man);
             checkNotType(e2,man);
             SLExpression result = null;
-            try {
-                result = translate(jish,e1,e2);
-            } catch (SLTranslationException cause){
-                throw man.createException("Cannot create JML arithmetic expression", cause);
-            }
+            result = translate(jish,e1,e2);
             return result;
         }
 

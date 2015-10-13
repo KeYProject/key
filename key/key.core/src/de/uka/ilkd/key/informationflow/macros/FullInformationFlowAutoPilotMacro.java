@@ -31,6 +31,16 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
     }
 
     @Override
+    public String getCategory() {
+        return "Information Flow";
+    }
+
+    @Override
+    public String getScriptCommandName() {
+        return "infflow-autopilot";
+    }
+
+    @Override
     public String getDescription() {
         return "<html><ol><li>Search exhaustively for applicable position, then" +
                 "<li>Start auxiliary computation" +
@@ -55,6 +65,8 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
                     @Override
                     public String getName() { return ""; }
                     @Override
+                    public String getCategory() { return null; }
+                    @Override
                     public String getDescription() { return "Anonymous Macro"; }
         };
 
@@ -68,6 +80,8 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
                     @Override
                     public String getName() { return ""; }
                     @Override
+                    public String getCategory() { return null; }
+                    @Override
                     public String getDescription() { return "Anonymous Macro"; }
         };
 
@@ -75,6 +89,8 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
                 new AlternativeMacro() {
                     @Override
                     public String getName() { return ""; }
+                    @Override
+                    public String getCategory() { return null; }
                     @Override
                     public String getDescription() { return "Anonymous Macro"; }
                     @Override

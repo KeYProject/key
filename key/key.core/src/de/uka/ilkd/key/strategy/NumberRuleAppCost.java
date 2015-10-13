@@ -30,12 +30,15 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
         
-        NumberRuleAppCost ac = cache.get(p_cost);
-        if (ac != null) return ac;
-        
-        ac = new IntRuleAppCost(p_cost);
-        cache.put(p_cost, ac);
+        NumberRuleAppCost ac;
+        synchronized (cache) {
+            ac = cache.get(p_cost);
+            if (ac != null) return ac;
 
+            ac = new IntRuleAppCost(p_cost);
+            cache.put(p_cost, ac);
+        }
+        
         return ac;
     }
     

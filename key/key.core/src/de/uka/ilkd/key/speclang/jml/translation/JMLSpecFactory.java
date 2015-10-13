@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
@@ -211,6 +212,7 @@ public class JMLSpecFactory {
         public Term returns;
         public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
+        public JoinProcedure joinProcedure;
     }
 
     //-------------------------------------------------------------------------
@@ -468,8 +470,9 @@ public class JMLSpecFactory {
                 textualSpecCase.getReturns());
         clauses.infFlowSpecs =
                 translateInfFlowSpecClauses(pm, progVars.selfVar,
-                                            progVars.paramVars, progVars.resultVar,
+                                            progVars.paramVars, progVars.resultVar, progVars.excVar,
                                             textualSpecCase.getInfFlowSpecs());
+        clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;
     }
 
@@ -508,6 +511,7 @@ public class JMLSpecFactory {
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
                                     ProgramVariable resultVar,
+                                    ProgramVariable excVar,
                                     ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses.isEmpty()) {
@@ -519,11 +523,29 @@ public class JMLSpecFactory {
                 InfFlowSpec translated =
                             JMLTranslator.translate(expr, pm.getContainerType(),
                                                     selfVar, paramVars, resultVar,
-                                                    null, null, InfFlowSpec.class, services);
+                                                    excVar, null, InfFlowSpec.class, services);
                 result = result.append(translated);
             }
             return result;
         }
+    }
+    
+    private JoinProcedure translateJoinProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
+        if (originalClauses == null || originalClauses.size() == 0) {
+            return null;
+        }
+        
+        // Extract the name of the join procedure: Remove beginning "join_proc " and trailing ";".
+        String joinProcName = originalClauses.head().text.substring(10, originalClauses.head().text.length() - 1);
+        JoinProcedure chosenProc = JoinProcedure.getProcedureByName(joinProcName);
+        
+        if (chosenProc == null) {
+            throw new SLTranslationException("Unknown join procedure: \"" + joinProcName + "\"",
+                    originalClauses.head().fileName,
+                    originalClauses.head().pos);
+        }
+        
+        return chosenProc;
     }
         
     /**
@@ -1299,6 +1321,7 @@ public class JMLSpecFactory {
                                         final StatementBlock block,
                                         final TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
+        //TODO Take join_proc into account
         final Behavior behavior = specificationCase.getBehavior();
         final BlockContract.Variables variables =
                 BlockContract.Variables.create(block, labels, method, services);
@@ -1308,7 +1331,7 @@ public class JMLSpecFactory {
                 translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
             block, labels, method, behavior, variables, clauses.requires,
-            clauses.ensures, clauses.infFlowSpecs,
+            clauses.ensures, clauses.infFlowSpecs, clauses.joinProcedure,
             clauses.breaks, clauses.continues, clauses.returns, clauses.signals,
             clauses.signalsOnly, clauses.diverges, clauses.assignables,
             clauses.hasMod, services).create();
@@ -1439,6 +1462,7 @@ public class JMLSpecFactory {
             paramVars = paramVars.prepend(paramLocVar);
         }
         ProgramVariable resultVar = TB.resultVar(pm, false);
+        ProgramVariable excVar = TB.excVar(pm, false); // only for information flow
 
         final ImmutableList<LocationVariable> allHeaps =
                 services.getTypeConverter().getHeapLDT().getAllHeaps();
@@ -1513,7 +1537,7 @@ public class JMLSpecFactory {
         for(LocationVariable heap : allHeaps) {
             if (!originalInfFlowSpecs.isEmpty() && heap.equals(baseHeap)) {
                 infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, allVars,
-                                                                  resultVar, originalInfFlowSpecs);
+                                                                  resultVar, excVar, originalInfFlowSpecs);
             } else {
                 infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
             }

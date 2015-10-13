@@ -87,6 +87,11 @@ public class KeYSEDPreferences {
     * Preference key to enable or disable grouping of {@link ISEDGroupable}s.
     */
    public static final String GROUPING_ENABLED = "org.key_project.sed.key.core.preference.groupingEnabled";
+
+   /**
+    * Preference key to enable or disable simplification of conditions.
+    */
+   public static final String SIMPLIFY_CONDITIONS = "org.key_project.sed.key.core.preference.simplifyConditions";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -478,5 +483,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultGroupingEnabled(boolean defaultValue) {
       getStore().setDefault(GROUPING_ENABLED, defaultValue);
+   }
+   
+   /**
+    * Checks if conditions are simplified or not.
+    * @return Simplify conditions?
+    */
+   public static boolean isSimplifyConditions() {
+      return getStore().getBoolean(SIMPLIFY_CONDITIONS);
+   }
+   
+   /**
+    * Checks if conditions are simplified or not.
+    * @return Simplify conditions?
+    */
+   public static boolean isDefaultSimplifyConditions() {
+      return getStore().getDefaultBoolean(SIMPLIFY_CONDITIONS);
+   }
+   
+   /**
+    * Sets if conditions are simplified or not.
+    * @param value Simplify conditions?
+    */
+   public static void setSimplifyConditions(boolean value) {
+      getStore().setValue(SIMPLIFY_CONDITIONS, value);
+   }
+   
+   /**
+    * Sets if conditions are simplified or not.
+    * @param defaultValue Simplify conditions?
+    */
+   public static void setDefaultSimplifyConditions(boolean defaultValue) {
+      getStore().setDefault(SIMPLIFY_CONDITIONS, defaultValue);
    }
 }

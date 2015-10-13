@@ -44,6 +44,11 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
+import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithSignLattice;
 import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
@@ -248,7 +253,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-11000));
-      //  final Feature smtF = smtFeature(inftyConst());
+      
+
+        final Feature joinRuleF = setupJoinRule();
+        
+        //  final Feature smtF = smtFeature(inftyConst());
         
         return SumFeature.createSum (AutomatedRuleFeature.INSTANCE,
               NonDuplicateAppFeature.INSTANCE,
@@ -256,6 +265,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //              strengthenConstraints, 
               AgeFeature.INSTANCE,
               oneStepSimplificationF,
+              joinRuleF,
              // smtF, 
               methodSpecF, 
               queryF,
@@ -296,7 +306,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	return ConditionalFeature.createConditional(filter, cost);
     }
 
+    private Feature setupJoinRule() {
+    	SetRuleFilter filter = new SetRuleFilter();
+       	filter.addRuleToSet(JoinRule.INSTANCE);
 
+    	return ConditionalFeature.createConditional(filter, inftyConst());
+    }
+    
     //private Feature smtFeature(Feature cost) {
 	//ClassRuleFilter filter = new ClassRuleFilter(SMTRule.class);
         //return ConditionalFeature.createConditional(filter, cost);        
@@ -349,6 +365,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // always give infinite cost to obsolete rules
         bindRuleSet (d, "obsolete", inftyConst());
 
+        // taclets for special invariant handling
+        bindRuleSet (d, "loopInvariant", -20000 );
 
         setupSelectSimplification(d);
 

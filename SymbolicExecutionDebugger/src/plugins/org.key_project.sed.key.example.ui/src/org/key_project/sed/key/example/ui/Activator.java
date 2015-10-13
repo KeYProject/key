@@ -14,7 +14,6 @@
 package org.key_project.sed.key.example.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.key_project.sed.key.example.ui.util.KeYSEDExampleImages;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -48,7 +47,6 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-	   KeYSEDExampleImages.disposeImages();
 		plugin = null;
 		super.stop(context);
 	}

@@ -110,7 +110,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for "
                     + "snippet \"" + snippet.name() + " threw "
-                    + "TermCreationException: " + e.getMessage());
+                    + "TermCreationException: " + e.getMessage(), e);
         }
     }
 

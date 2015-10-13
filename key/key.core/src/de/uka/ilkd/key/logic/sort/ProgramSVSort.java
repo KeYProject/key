@@ -52,6 +52,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ConstructorReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.MetaClassReference;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -101,13 +102,16 @@ public abstract class ProgramSVSort extends AbstractSort {
     
     public static final ProgramSVSort LOCALVARIABLE
         = new LocalVariableSort();
-    
+
     public static final ProgramSVSort SIMPLEEXPRESSION 
 	= new SimpleExpressionSort();
 
     public static final ProgramSVSort NONSIMPLEEXPRESSION 
 	= new NonSimpleExpressionSort();
-    
+
+    public static final ProgramSVSort NONSIMPLEEXPRESSIONNOCLASSREFERENCE
+    = new NonSimpleExpressionNoClassReferenceSort();
+
     public static final ProgramSVSort EXPRESSION
 	= new ExpressionSort();
 
@@ -157,6 +161,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public static final ProgramSVSort TYPENOTPRIMITIVE
 	= new TypeReferenceNotPrimitiveSort();
+
+    public static final ProgramSVSort CLASSREFERENCE
+    = new MetaClassReferenceSort();
 
 
     //-----------Others-------------------------------------------------------
@@ -495,7 +502,6 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
     }
-    
 
 
     /**
@@ -555,6 +561,23 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
     }
 
+
+    private static class NonSimpleExpressionNoClassReferenceSort extends NonSimpleExpressionSort {
+
+        public NonSimpleExpressionNoClassReferenceSort() {
+            super(new Name("NonSimpleExpressionNoClassReference"));
+        }
+
+        /* Will not match on MetaClassReference variables */
+        public boolean canStandFor(ProgramElement check,
+                                   Services services) {
+            if (!super.canStandFor(check, services)
+                    || CLASSREFERENCE.canStandFor(check, services)) {
+                return false;
+            }
+            return true;
+        }
+    }
 
 
     /**
@@ -917,7 +940,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    return (check instanceof TypeReference);
 	}
     }
-    
+
 
     /**
      * This sort represents a type of program schema variables that
@@ -949,6 +972,21 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         public ProgramSVSort createInstance(String parameter) {
           return new TypeReferenceNotPrimitiveSort(parameter);
+        }
+    }
+
+    /**
+     * This sort represents a type of program schema variables that
+     * match only on meta class references.
+     */
+    private static final class MetaClassReferenceSort extends ProgramSVSort {
+
+        public MetaClassReferenceSort() {
+            super(new Name("ClassReference"));
+        }
+
+        protected boolean canStandFor(ProgramElement check, Services services) {
+            return (check instanceof MetaClassReference);
         }
     }
 

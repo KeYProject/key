@@ -42,4 +42,10 @@ public interface ITreeSettings {
     * @return {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
     */
    public boolean isVariablesAreOnlyComputedFromUpdates();
+   
+   /**
+    * Checks if conditions should be simplified or not.
+    * @return {@code true} simplify conditions, {@code false} do not simplify conditions.
+    */
+   public boolean isSimplifyConditions();
 }

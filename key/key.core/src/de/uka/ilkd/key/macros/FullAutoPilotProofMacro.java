@@ -44,6 +44,17 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
     }
 
     @Override
+    public String getCategory() {
+        return "Auto Pilot";
+    }
+
+    @Override
+    public String getScriptCommandName() {
+        return "autopilot";
+    }
+
+
+    @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" +
                 "<li>Separate proof obligations" +

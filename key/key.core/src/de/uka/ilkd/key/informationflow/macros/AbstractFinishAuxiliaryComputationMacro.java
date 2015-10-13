@@ -36,6 +36,11 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     }
 
     @Override
+    public String getCategory() {
+        return "Auxiliary Computation";
+    }
+
+    @Override
     public String getDescription() {
         return "Finish auxiliary computation.";
     }

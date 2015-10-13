@@ -47,7 +47,7 @@
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="next" isArrayIndex="false">
-                        <value name="next {or(and(not(equals(u_3,self)),equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null)),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(and(not(equals(u_3,self)),equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null)),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))">
+                        <value name="next {not(equals(u_3,self))}" isValueAnObject="false" isValueUnknown="true" conditionString="not(equals(u_3,self))">
                         </value>
                      </variable>
                      <variable name="previous" isArrayIndex="false">

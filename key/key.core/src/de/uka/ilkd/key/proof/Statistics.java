@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
+import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
 
@@ -27,6 +28,7 @@ public class Statistics {
     public final int interactiveSteps;
     public final int quantifierInstantiations;
     public final int ossApps;
+    public final int joinRuleApps;
     public final int totalRuleApps;
     public final int smtSolverApps;
     public final int dependencyContractApps;
@@ -44,6 +46,7 @@ public class Statistics {
                        int interactiveSteps,
                        int quantifierInstantiations,
                        int ossApps,
+                       int joinRuleApps,
                        int totalRuleApps,
                        int smtSolverApps,
                        int dependencyContractApps,
@@ -57,6 +60,7 @@ public class Statistics {
         this.interactiveSteps = interactiveSteps;
         this.quantifierInstantiations = quantifierInstantiations;
         this.ossApps = ossApps;
+        this.joinRuleApps = joinRuleApps;
         this.totalRuleApps = totalRuleApps;
         this.smtSolverApps = smtSolverApps;
         this.dependencyContractApps = dependencyContractApps;
@@ -73,6 +77,7 @@ public class Statistics {
                                   side.interactiveSteps,
                                   side.quantifierInstantiations,
                                   side.ossApps,
+                                  side.joinRuleApps,
                                   side.totalRuleApps,
                                   side.smtSolverApps,
                                   side.dependencyContractApps,
@@ -84,13 +89,18 @@ public class Statistics {
     }
 
     Statistics(Proof proof) {
-        final Iterator<Node> it = proof.root().subtreeIterator();
+        this(proof.root());
+    }
+
+    Statistics(Node startNode) {
+        final Iterator<Node> it = startNode.subtreeIterator();
 
         int tmpNodes = 0; // proof nodes
         int tmpBranches = 1; // proof branches
         int tmpInteractive = 0; // interactive steps
         int tmpQuant = 0; // quantifier instantiations
         int tmpOss = 0; // OSS applications
+        int tmpJoinApps = 0; // join rule applications
         int tmpOssCaptured = 0; // rules apps in OSS protocol
         int tmpSmt = 0; // SMT rule apps
         int tmpDep = 0; // dependency contract apps
@@ -111,7 +121,6 @@ public class Statistics {
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
-
                 if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
                     tmpOss++;
                     final Protocol protocol =
@@ -127,6 +136,8 @@ public class Statistics {
                     tmpContr++;
                 } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
                     tmpInv++;
+                } else if (ruleApp instanceof JoinRuleBuiltInRuleApp) {
+                    tmpJoinApps++;
                 } else if (ruleApp instanceof TacletApp) {
                     final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
                     final String tName = t.name().toString();
@@ -144,16 +155,17 @@ public class Statistics {
         this.interactiveSteps = tmpInteractive;
         this.quantifierInstantiations = tmpQuant;
         this.ossApps = tmpOss;
+        this.joinRuleApps = tmpJoinApps;
         this.totalRuleApps = tmpNodes + tmpOssCaptured -1;
         this.smtSolverApps = tmpSmt;
         this.dependencyContractApps = tmpDep;
         this.operationContractApps = tmpContr;
         this.loopInvApps = tmpInv;
-        this.autoModeTimeInNano = proof.getAutoModeTime();
-        this.timeInNano = (System.nanoTime() - proof.creationTime);
+        this.autoModeTimeInNano = startNode.proof().getAutoModeTime();
+        this.timeInNano = (System.nanoTime() - startNode.proof().creationTime);
         timePerStepInNano = nodes<=1? .0f: (autoModeTimeInNano/(float)(nodes-1));
 
-        generateSummary(proof);
+        generateSummary(startNode.proof());
     }
 
     private void generateSummary(Proof proof) {
@@ -212,6 +224,8 @@ public class Statistics {
                         stat.operationContractApps));
         summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
                         stat.loopInvApps));
+        summaryList.add(new Pair<String, String>("Join Rule apps", "" +
+                stat.joinRuleApps));
         summaryList.add(new Pair<String, String>("Total rule apps",
                         EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
     }
@@ -236,4 +250,5 @@ public class Statistics {
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
     }
+
 }

@@ -8,6 +8,7 @@ import java.util.Properties;
 
 public class TestGenerationSettings implements Settings, Cloneable {
 	// Default Values for option fields
+    private static final boolean DEFAULT_APPLYSYMBOLICEX = false;
 	private static final int DEFAULT_MAXUNWINDS = 3;
 	private static final int DEFAULT_CONCURRENTPROCESSES = 1;
 	private static final String DEFAULT_OUTPUTPATH = System
@@ -18,7 +19,9 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final boolean DEFAULT_INVARIANTFORALL = true;
 	private static final String DEFAULT_OPENJMLPATH = ".";
 	private static final String DEFAULT_OBJENESISPATH = ".";
+	private static final boolean DEFAULT_INCLUDEPOSTCONDITION = false;
 	// Option fields
+	private boolean applySymbolicExecution;
 	private int maxUnwinds;
 	private String outputPath;
 	private String openjmlPath;
@@ -28,8 +31,11 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private boolean useJunit;
 	private int concurrentProcesses;
 	private boolean invariantForAll;
+	private boolean includePostCondition;
+	
 	private final Collection<SettingsListener> listeners;
 	// Property name
+    private static final String propApplySymbolicExecution = "[TestGenSettings]applySymbolicExecution";
 	private static final String propMaxUwinds = "[TestGenSettings]maxUnwinds";
 	private static final String propOutputPath = "[TestGenSettings]OutputPath";
 	private static final String propRemoveDuplicates = "[TestGenSettings]RemoveDuplicates";
@@ -39,8 +45,12 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String propInvariantForAll = "[TestGenSettings]InvariantForAll";
 	private static final String propOpenjmlPath = "[TestGenSettings]OpenJMLPath";
 	private static final String propObjenesisPath = "[TestGenSettings]ObjenesisPath";
+	private static final String propIncludePostCondition = "[TestGenSettings]IncludePostCondition";
+	
+	
 	public TestGenerationSettings() {
 		listeners = new LinkedHashSet<SettingsListener>();
+		applySymbolicExecution = TestGenerationSettings.DEFAULT_APPLYSYMBOLICEX;
 		maxUnwinds = TestGenerationSettings.DEFAULT_MAXUNWINDS;
 		outputPath = TestGenerationSettings.DEFAULT_OUTPUTPATH;
 		removeDuplicates = TestGenerationSettings.DEFAULT_REMOVEDUPLICATES;
@@ -50,6 +60,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		invariantForAll = TestGenerationSettings.DEFAULT_INVARIANTFORALL;
 		openjmlPath = DEFAULT_OPENJMLPATH;
 		objenesisPath = DEFAULT_OBJENESISPATH;
+		includePostCondition  =DEFAULT_INCLUDEPOSTCONDITION;
 	}
 
 	public TestGenerationSettings(TestGenerationSettings data) {
@@ -57,6 +68,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		for (final SettingsListener l : data.listeners) {
 			listeners.add(l);
 		}
+		applySymbolicExecution = data.applySymbolicExecution;
 		maxUnwinds = data.maxUnwinds;
 		outputPath = data.outputPath;
 		removeDuplicates = data.removeDuplicates;
@@ -66,6 +78,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		invariantForAll = data.invariantForAll;
 		openjmlPath = data.openjmlPath;
 		objenesisPath  = data.objenesisPath;
+		includePostCondition = data.includePostCondition;
 		
 	}
 
@@ -84,7 +97,11 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		}
 	}
 
-	public int getMaximalUnwinds() {
+    public boolean getApplySymbolicExecution() {
+        return applySymbolicExecution;
+    }
+
+    public int getMaximalUnwinds() {
 		return maxUnwinds;
 	}
 
@@ -99,9 +116,16 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	public boolean invaraiantForAll() {
 		return invariantForAll;
 	}
+	
+	public boolean includePostCondition(){
+		return includePostCondition;
+	}
 
 	@Override
 	public void readSettings(Object sender, Properties props) {
+	    applySymbolicExecution =  SettingsConverter.read(props,
+                TestGenerationSettings.propApplySymbolicExecution,
+                TestGenerationSettings.DEFAULT_APPLYSYMBOLICEX);
 		maxUnwinds = SettingsConverter.read(props,
 		        TestGenerationSettings.propMaxUwinds,
 		        TestGenerationSettings.DEFAULT_MAXUNWINDS);
@@ -130,11 +154,19 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		objenesisPath = SettingsConverter.read(props,
 		        TestGenerationSettings.propObjenesisPath,
 		        TestGenerationSettings.DEFAULT_OBJENESISPATH);
+		
+		includePostCondition = SettingsConverter.read(props,
+				TestGenerationSettings.propIncludePostCondition,
+				TestGenerationSettings.DEFAULT_INCLUDEPOSTCONDITION);
 	}
 
 	public boolean removeDuplicates() {
 		return removeDuplicates;
 	}
+
+    public void setApplySymbolicExecution(boolean applySymbolicExecution) {
+        this.applySymbolicExecution = applySymbolicExecution;
+    }
 
 	public void setConcurrentProcesses(int concurrentProcesses) {
 		this.concurrentProcesses = concurrentProcesses;
@@ -156,6 +188,10 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		this.removeDuplicates = removeDuplicates;
 	}
 
+	public void setIncludePostCondition(boolean includePostCondition) {
+		this.includePostCondition = includePostCondition;
+	}
+	
 	public void setRFL(boolean useRFL) {
 		this.useRFL = useRFL;
 	}
@@ -194,6 +230,9 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	@Override
 	public void writeSettings(Object sender, Properties props) {
 		//System.out.println("Saving: "+maxUnwinds);
+        SettingsConverter.store(props,
+                TestGenerationSettings.propApplySymbolicExecution,
+                applySymbolicExecution);
 		SettingsConverter.store(props,
 		        TestGenerationSettings.propConcurrentProcesses,
 		        concurrentProcesses);
@@ -216,5 +255,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		        openjmlPath);
 		SettingsConverter.store(props, TestGenerationSettings.propObjenesisPath,
 		        objenesisPath);
+		SettingsConverter.store(props, TestGenerationSettings.propIncludePostCondition,
+				includePostCondition);
 	}
 }

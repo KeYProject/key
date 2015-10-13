@@ -16,6 +16,9 @@ package de.uka.ilkd.key.symbolic_execution.testcase;
 import java.io.File;
 import java.util.HashMap;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -38,7 +41,141 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  * {@link SymbolicExecutionGoalChooser}.
  * @author Martin Hentschel
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: /set/simpleIf
+    */
+   public void testSimpleIfNoConditionSimplification() throws Exception {
+      doSETTest(testCaseDirectory, 
+                "/set/simpleIf/test/SimpleIf.java", 
+                "SimpleIf", 
+                "min", 
+                null,
+                "/set/simpleIf/oracle/SimpleIf_NoConditionSimplification.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: /set/simpleStaticContractTest in the Symbolic Execution Profile
+    * and ensures that no rules are applied forever.
+    */
+   public void testSimpleStaticContractTest() throws Exception {
+      doSETTest(testCaseDirectory, 
+                "/set/simpleStaticContractTest/test/SimpleStaticContractTest.java", 
+                "SimpleStaticContractTest", 
+                "main", 
+                null,
+                "/set/simpleStaticContractTest/oracle/SimpleStaticContractTest.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
+   
+   /**
+    * Tests example: /set/anotherStaticContractTest in the Symbolic Execution Profile
+    * and ensures that no rules are applied forever.
+    */
+   public void testAnotherStaticContractTest() throws Exception {
+      doSETTest(testCaseDirectory, 
+                "/set/anotherStaticContractTest/test/AnotherStaticContractTest.java", 
+                "AnotherStaticContractTest", 
+                "main", 
+                null,
+                "/set/anotherStaticContractTest/oracle/AnotherStaticContractTest.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
+   
+   /**
+    * Tests example: /set/staticDefaultContractTest in the Symbolic Execution Profile
+    * and ensures that no rules are applied forever.
+    */
+   public void testStaticDefaultContractTest() throws Exception {
+      doSETTest(testCaseDirectory, 
+                "/set/staticDefaultContractTest/test/StaticDefaultContractTest.java", 
+                "StaticDefaultContractTest", 
+                "main", 
+                null,
+                "/set/staticDefaultContractTest/oracle/StaticDefaultContractTest.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
+   
+   /**
+    * Tests example: /set/anotherInstanceContractTest in the Symbolic Execution Profile
+    * and ensures that no rules are applied forever.
+    */
+   public void testAnotherInstanceContractTest() throws Exception {
+      doSETTest(testCaseDirectory, 
+                "/set/anotherInstanceContractTest/test/AnotherInstanceContractTest.java", 
+                "AnotherInstanceContractTest", 
+                "main", 
+                null,
+                "/set/anotherInstanceContractTest/oracle/AnotherInstanceContractTest.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
    
    /**
     * Tests example: /set/instanceOfNotInEndlessLoop in the Symbolic Execution Profile
@@ -63,7 +200,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                                                                         false,
                                                                         false,
                                                                         false,
-                                                                        false);
+                                                                        false,
+                                                                        true);
       try {
          int nodesCount = env.getProof().countNodes();
          assertTrue(nodesCount >= 100); // Currently 105 nodes are needed, +-5 are acceptable
@@ -112,7 +250,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInBaseDir, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false, true);
          IExecutionStart start = env.getBuilder().getStartNode();
          // Perform step into
          SymbolicExecutionCompletions completions = stepInto(env.getUi(), env.getBuilder(), "/set/symbolicExecutionCompletionsTest/oracle/SymbolicExecutionCompletionsTest", 1, ".xml", testCaseDirectory);
@@ -272,7 +410,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -297,7 +436,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -322,7 +462,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -347,7 +488,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -372,7 +514,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -397,7 +540,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -422,7 +566,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -447,7 +592,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -472,7 +618,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -497,7 +644,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -522,7 +670,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -547,7 +696,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -572,7 +722,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -597,7 +748,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -622,7 +774,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -647,7 +800,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -672,7 +826,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -697,7 +852,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -785,7 +941,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -810,7 +967,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -835,7 +993,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -860,7 +1019,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -885,7 +1045,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -910,7 +1071,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -935,7 +1097,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
 
    /**
@@ -960,7 +1123,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -985,7 +1149,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1010,7 +1175,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1035,7 +1201,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1060,7 +1227,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1085,7 +1253,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1110,7 +1279,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1135,7 +1305,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1160,7 +1331,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1185,7 +1357,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1210,7 +1383,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1235,7 +1409,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1260,7 +1435,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1285,7 +1461,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1310,7 +1487,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1335,7 +1513,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1360,7 +1539,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1385,7 +1565,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1410,7 +1591,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1435,7 +1617,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1460,7 +1643,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1485,7 +1669,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1510,7 +1695,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1535,7 +1721,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1559,7 +1746,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
 
    /**
@@ -1583,7 +1771,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
 
    /**
@@ -1607,7 +1796,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
 
    /**
@@ -1631,7 +1821,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1655,7 +1846,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1679,7 +1871,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1704,7 +1897,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1729,7 +1923,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1754,7 +1949,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1784,7 +1980,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1814,7 +2011,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1844,7 +2042,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1874,7 +2073,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1904,7 +2104,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1934,7 +2135,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1964,7 +2166,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -1994,7 +2197,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2024,7 +2228,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2054,7 +2259,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2084,7 +2290,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2114,7 +2321,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2144,7 +2352,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2174,7 +2383,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2204,7 +2414,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2234,7 +2445,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2264,7 +2476,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2294,7 +2507,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2324,7 +2538,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2354,7 +2569,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2384,7 +2600,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2414,7 +2631,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2444,7 +2662,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2469,7 +2688,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2494,7 +2714,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2520,7 +2741,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                                                                                false,
                                                                                false,
                                                                                false,
-                                                                               false);
+                                                                               false,
+                                                                               true);
       try {
          // Find both statements "mid = y;".
          IExecutionStart startNode = env.getBuilder().getStartNode();
@@ -2577,7 +2799,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2602,7 +2825,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2627,7 +2851,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2652,7 +2877,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2677,7 +2903,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2702,7 +2929,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2727,7 +2955,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2752,7 +2981,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2777,7 +3007,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2802,7 +3033,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2827,7 +3059,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2852,7 +3085,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2877,7 +3111,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2902,7 +3137,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2927,7 +3163,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -2952,7 +3189,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -2977,7 +3215,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3002,7 +3241,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3027,7 +3267,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3052,7 +3293,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3077,7 +3319,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3102,7 +3345,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3127,7 +3371,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -3152,7 +3397,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -3177,7 +3423,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -3202,7 +3449,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -3227,7 +3475,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3252,7 +3501,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3277,7 +3527,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3302,7 +3553,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3327,7 +3579,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3352,7 +3605,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3377,7 +3631,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3402,7 +3657,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3427,7 +3683,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3452,7 +3709,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3477,7 +3735,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3502,7 +3761,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3527,7 +3787,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3552,7 +3813,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3577,7 +3839,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3602,7 +3865,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3627,7 +3891,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3652,7 +3917,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3677,7 +3943,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3702,7 +3969,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3727,7 +3995,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3752,7 +4021,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3777,7 +4047,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3808,7 +4079,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -3833,7 +4105,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3858,7 +4131,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3883,7 +4157,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3908,7 +4183,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3933,7 +4209,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3958,7 +4235,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -3983,7 +4261,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -4008,7 +4287,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -4033,7 +4313,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -4058,7 +4339,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
    
    /**
@@ -4083,6 +4365,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
-                false);
+                false,
+                true);
    }
 }

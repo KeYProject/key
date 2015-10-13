@@ -43,7 +43,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    /**
     * Tests example: /set/nonExecutionBranchHidingArraysIndexOf
@@ -67,7 +68,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -92,7 +94,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -117,7 +120,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
    
    /**
@@ -142,7 +146,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -167,7 +172,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -192,7 +198,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -217,7 +224,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -242,7 +250,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -267,7 +276,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -292,7 +302,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -317,7 +328,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -342,7 +354,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -367,7 +380,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -392,7 +406,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -417,7 +432,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -442,7 +458,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -467,7 +484,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -492,7 +510,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -517,7 +536,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -542,7 +562,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -567,7 +588,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -592,7 +614,8 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 
    /**
@@ -617,6 +640,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
-                          false);
+                          false,
+                          true);
    }
 }

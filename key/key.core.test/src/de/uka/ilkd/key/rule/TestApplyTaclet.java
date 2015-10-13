@@ -42,6 +42,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 
@@ -898,7 +899,10 @@ public class TestApplyTaclet extends TestCase{
 	Term resultFormula  = goals.head().sequent().getFormulabyNr ( 1 ).formula ();
 	Term correctFormula = correctSeq.getFormulabyNr ( 1 ).formula ();
 
-	assertTrue("Wrong result", resultFormula.equalsModRenaming ( correctFormula ) );
+	assertTrue("Wrong result. Expected:" + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + 
+	        " But was:"+ 
+	        ProofSaver.printAnything(resultFormula,TacletForTests.services()), 
+	            resultFormula.equalsModRenaming ( correctFormula ) );
     }
 
     private Goal createGoal ( Node n, TacletIndex tacletIndex ) {

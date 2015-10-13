@@ -37,6 +37,11 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
     }
 
     @Override
+    public String getCategory() {
+        return "Information Flow";
+    }
+
+    @Override
     public String getDescription() {
         return "Applies all applicable information flow contract rules and " +
                 "prepares the information flow pre branches.";

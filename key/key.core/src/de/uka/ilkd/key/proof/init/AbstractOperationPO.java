@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -116,6 +117,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
    private Term uninterpretedPredicate;
 
    protected InitConfig proofConfig;
+   protected TermBuilder tb;
 
    /**
     * Constructor.
@@ -153,8 +155,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
    @Override
    public void readProblem() throws ProofInputException {
       assert proofConfig == null;
-      proofConfig = environmentConfig.deepCopy();
-      final Services proofServices = proofConfig.getServices();
+      final Services proofServices = postInit();
       final IProgramMethod pm = getProgramMethod();
       final boolean[] transactionFlags;
       final List<Term> termPOs = new ArrayList<Term>();
@@ -395,6 +396,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
       // for JML annotation statements
       generateWdTaclets(proofConfig);
+   }
+
+   protected Services postInit() {
+      proofConfig = environmentConfig.deepCopy();
+      final Services proofServices = proofConfig.getServices();
+      tb = proofServices.getTermBuilder();
+      return proofServices;
    }
 
    /**

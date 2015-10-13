@@ -1,3 +1,4 @@
+
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -68,6 +69,7 @@ options {
 
   import de.uka.ilkd.key.proof.init.*;
   import de.uka.ilkd.key.proof.io.*;
+  import static de.uka.ilkd.key.proof.io.IProofFileParser.*;
   
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.tacletbuilder.*;
@@ -93,9 +95,10 @@ options {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
-
+  
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
+  
   
 }
 
@@ -109,26 +112,32 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
-    static HashMap<String, Character> prooflabel2tag = new LinkedHashMap<String, Character>(15);
+    static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(15);
     static {
-      prooflabel2tag.put("branch", new Character('b'));
-      prooflabel2tag.put("rule", new Character('r'));
-      prooflabel2tag.put("term", new Character('t'));
-      prooflabel2tag.put("formula", new Character('f'));
-      prooflabel2tag.put("inst", new Character('i'));
-      prooflabel2tag.put("ifseqformula", new Character('q'));
-      prooflabel2tag.put("ifdirectformula", new Character('d'));
-      prooflabel2tag.put("heur", new Character('h'));
-      prooflabel2tag.put("builtin", new Character('n'));
-      prooflabel2tag.put("keyLog", new Character('l'));
-      prooflabel2tag.put("keyUser", new Character('u'));
-      prooflabel2tag.put("keyVersion", new Character('v'));
-      prooflabel2tag.put("keySettings", new Character('s'));
-      prooflabel2tag.put("contract", new Character('c'));
-      prooflabel2tag.put("ifInst", new Character('x'));		
-      prooflabel2tag.put("userinteraction", new Character('a'));
-      prooflabel2tag.put("newnames", new Character('w'));
-      prooflabel2tag.put("autoModeTime", new Character('e'));
+         prooflabel2tag.put("branch", ProofElementID.BRANCH);
+         prooflabel2tag.put("rule", ProofElementID.RULE);
+         prooflabel2tag.put("term", ProofElementID.TERM);
+         prooflabel2tag.put("formula", ProofElementID.FORMULA);
+         prooflabel2tag.put("inst", ProofElementID.INSTANTIATION);
+         prooflabel2tag.put("ifseqformula", ProofElementID.ASSUMES_FORMULA_IN_SEQUENT);
+         prooflabel2tag.put("ifdirectformula", ProofElementID.ASSUMES_FORMULA_DIRECT);
+         prooflabel2tag.put("heur", ProofElementID.RULESET);
+         prooflabel2tag.put("builtin", ProofElementID.BUILT_IN_RULE);
+         prooflabel2tag.put("keyLog", ProofElementID.KeY_LOG);
+         prooflabel2tag.put("keyUser", ProofElementID.KeY_USER);
+         prooflabel2tag.put("keyVersion", ProofElementID.KeY_VERSION);
+         prooflabel2tag.put("keySettings", ProofElementID.KeY_SETTINGS);
+         prooflabel2tag.put("contract", ProofElementID.CONTRACT);
+         prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
+         prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
+         prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
+         prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
+         prooflabel2tag.put("joinProc", ProofElementID.JOIN_PROCEDURE);
+         prooflabel2tag.put("nrJoinPartners", ProofElementID.NUMBER_JOIN_PARTNERS);
+         prooflabel2tag.put("distFormula", ProofElementID.JOIN_DIST_FORMULA);
+         prooflabel2tag.put("joinNode", ProofElementID.JOIN_NODE);
+         prooflabel2tag.put("joinId", ProofElementID.JOIN_ID);
+         prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
    }
 
    private NamespaceSet nss;
@@ -677,7 +686,7 @@ options {
         Term result = problem();
         // The parser may be ok if a totally unexpected token has turned up
         // We better check that either the file has ended or a "\proof" follows.
-        if(input.LA(1) != EOF && input.LA(1) != PROOF) {
+        if(input.LA(1) != EOF && input.LA(1) != PROOF && input.LA(1) != PROOFSCRIPT) {
             throw new NoViableAltException("after problem", -1, -1, input);
         }
         return result;
@@ -1493,6 +1502,27 @@ options {
         return result;
     }
 
+    private String unescapeString(String string) {
+      char[] chars = string.toCharArray();
+      StringBuilder sb = new StringBuilder();
+      for(int i = 0; i < chars.length; i++) {
+         if(chars[i] == '\\' && i < chars.length - 1) {
+          switch(chars[++i]) {
+            case 'n': sb.append("\n"); break;
+            case 'f': sb.append("\f"); break;
+            case 'r': sb.append("\r"); break;
+            case 't': sb.append("\t"); break;
+            case 'b': sb.append("\b"); break;
+            case ':': sb.append("\\:"); break; // this is so in KeY ...
+            default: sb.append(chars[i]); break; // this more relaxed than before, \a becomes a ...
+          }
+        } else {
+          sb.append(chars[i]);
+        }
+      }
+      return sb.toString();
+    }
+
     /* ---- antlr stuff ---- (Exception handling) */
 
     @Override
@@ -1844,7 +1874,7 @@ prog_var_decls
 string_literal returns [String lit = null]
    :
      id=STRING_LITERAL {
-       lit = id.getText();
+       lit = unescapeString(id.getText());
        lit = lit.substring(1,lit.length()-1);
        stringLiteralLine = id.getLine();
      }
@@ -3086,7 +3116,8 @@ atom returns [Term _atom = null]
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
         {
-            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
+            String s = unescapeString(literal.getText());
+            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(s));
         }   
     ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().addLabel(a, labels);} } RGUILLEMETS)?
     ;
@@ -3619,8 +3650,10 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
     int applicationRestriction = RewriteTaclet.NONE;
     choices_ = choices;
     switchToNormalMode();
+    ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
 }
     : 
+      (LEMMA {tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);})?
       name=IDENT (choices_=option_list[choices_])? 
       LBRACE 
       ( (formula RBRACE) => /* check for rbrace needed to distinguish from "label" : goalspec*/ 
@@ -3635,6 +3668,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
            addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null);
            b.setName(new Name(name.getText()));
            b.setChoices(choices_);
+           b.setAnnotations(tacletAnnotations);
            r = b.getTaclet(); 
            taclet2Builder.put(r,b);
          }
@@ -3664,6 +3698,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         modifiers[b]
         { 
             b.setChoices(choices_);
+            b.setAnnotations(tacletAnnotations);
             r = b.getTaclet(); 
             taclet2Builder.put(r,b);
 	  // dump local schema var decls
@@ -3762,7 +3797,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]
+    | varcond_differentFields[b]  
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -3783,6 +3818,7 @@ varexp[TacletBuilder b]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
+        | varcond_containsAssignment[b, negated]        
       )
   )
 ;
@@ -4000,7 +4036,15 @@ varcond_fieldtype [TacletBuilder b]
                                                                (GenericSort)s));
         }
     }
-;      
+;    
+
+varcond_containsAssignment[TacletBuilder b, boolean negated]
+:
+   CONTAINS_ASSIGNMENT LPAREN x=varId RPAREN 
+   {
+      b.addVariableCondition(new ContainsAssignmentCondition((SchemaVariable)x, negated));
+   }
+;  
 
 varcond_enumtype [TacletBuilder b, boolean negated]
 :
@@ -4596,7 +4640,20 @@ preferences returns [String _preferences = null]
 		(s = string_literal)?
 		RBRACE )?
 	;
-	
+
+// delivers: <Script, start line no, start column no>
+proofScript returns [ Triple<String, Integer, Integer> locatedString = null ]
+:
+    PROOFSCRIPT ps = STRING_LITERAL
+      { int line = ps.getLine();
+        // +1 for antlr starting at 0
+        // +1 for removing the leading "
+        int col = ps.getCharPositionInLine() + 2;
+        String content = ps.getText().substring(1, ps.getText().length()-1);
+        locatedString = new Triple<String, Integer, Integer>(content, line, col);
+      }
+    ;
+
 proof [IProofFileParser prl] :
         ( PROOF proofBody[prl] )?
     ;
@@ -4609,20 +4666,18 @@ proofBody [IProofFileParser prl] :
     ;
 
 
-pseudosexpr [IProofFileParser prl] @init{ eid='0'; str = ""; } :
-        LPAREN (eid=expreid
+pseudosexpr [IProofFileParser prl] @init{ str = ""; } :
+        LPAREN (proofElementId=expreid
             (str = string_literal )? 
-               { prl.beginExpr(eid,str); } 
+               { prl.beginExpr(proofElementId,str); } 
             ( pseudosexpr[prl] )* ) ?
-               { prl.endExpr(eid, stringLiteralLine); }
+               { prl.endExpr(proofElementId, stringLiteralLine); }
         RPAREN   
     ;
 
-expreid returns [ char eid = '0' ]
+expreid returns [ IProofFileParser.ProofElementID proofElementId = null ]
 :
    id = simple_ident {
-      Character c = prooflabel2tag.get(id);
-      if(c != null)
-         eid = c.charValue();
+      proofElementId = prooflabel2tag.get(id);
    }
 ;

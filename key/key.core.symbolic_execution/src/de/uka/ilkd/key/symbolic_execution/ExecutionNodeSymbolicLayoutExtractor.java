@@ -35,7 +35,8 @@ public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtracto
       super(executionNode.getProofNode(), 
             executionNode.getModalityPIO(),
             executionNode.getSettings().isUseUnicode(), 
-            executionNode.getSettings().isUsePrettyPrinting());
+            executionNode.getSettings().isUsePrettyPrinting(),
+            executionNode.getSettings().isSimplifyConditions());
       this.executionNode = executionNode;
    }
 

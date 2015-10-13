@@ -31,8 +31,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
@@ -227,9 +225,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final ImmutableSet<SchemaVariable> needed = app.uninstantiatedVars ();
         if ( needed.size () == 0 ) return true;
         for (SchemaVariable aNeeded : needed) {
-            final SchemaVariable sv = aNeeded;
-            if ( sv instanceof SkolemTermSV || sv instanceof VariableSV ) continue;
-            return false;
+            if ( app.isInstantiationRequired(aNeeded) ) {
+                return false;
+            }
         }
         return true;
     }

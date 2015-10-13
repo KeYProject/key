@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.util;
 
+import org.antlr.runtime.RecognitionException;
+
 import de.uka.ilkd.key.java.ParseExceptionInFile;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
@@ -25,24 +28,25 @@ public final class ExceptionTools {
         assert exc != null;
     
         Location location = null;
-    
-        if  (exc instanceof antlr.RecognitionException) { 
-            location = new Location(((antlr.RecognitionException)exc).getFilename(),
-                            ((antlr.RecognitionException) exc).getLine(),
-                            ((antlr.RecognitionException) exc).getColumn());
-        }
-        else if  (exc instanceof org.antlr.runtime.RecognitionException) {
-            org.antlr.runtime.RecognitionException recEx =
-                            (org.antlr.runtime.RecognitionException) exc;
+
+        if  (exc instanceof RecognitionException) {
+            RecognitionException recEx = (RecognitionException) exc;
             // ANTLR 3 - Recognition Exception.
-            String filename = "";
-            if(exc instanceof KeYSemanticException) {
-                filename = ((KeYSemanticException)exc).getFilename();
-            } else if(recEx.input != null) {
-                filename = recEx.input.getSourceName();
+            if (exc instanceof SLTranslationException) {
+               SLTranslationException ste = (SLTranslationException) exc;
+               location = new Location(ste.getFileName(), 
+                               ste.getLine(), 
+                               ste.getColumn());
             }
-    
-            location = new Location(filename, recEx.line, recEx.charPositionInLine);
+            else if(exc instanceof KeYSemanticException) {
+                KeYSemanticException kse = (KeYSemanticException) exc;
+             // ANTLR has 0-based column numbers, hence +1.
+                location = new Location(kse.getFilename(), kse.getLine(), kse.getColumn() + 1);
+            } else if(recEx.input != null) {
+                // ANTLR has 0-based column numbers, hence +1.
+                location = new Location(recEx.input.getSourceName(),
+                      recEx.line, recEx.charPositionInLine + 1);
+            }
         }
         else if (exc instanceof ParserException) {
             location = ((ParserException) exc).getLocation();
@@ -63,17 +67,16 @@ public final class ExceptionTools {
             if(token == null) {
                 location = null;
             } else {
+                // JavaCC has 1-based column numbers
                 location = new Location("", token.next.beginLine, token.next.beginColumn);
             }
-        } else if (exc instanceof SLTranslationException) {
-            SLTranslationException ste = (SLTranslationException) exc;
-            location = new Location(ste.getFileName(), 
-                            ste.getLine(), 
-                            ste.getColumn());
         } else if (exc instanceof SVInstantiationExceptionWithPosition) {	      
             location = new Location(null, 
                             ((SVInstantiationExceptionWithPosition)exc).getRow(),
                             ((SVInstantiationExceptionWithPosition)exc).getColumn());
+        } else if (exc instanceof ScriptException) {
+            // may still be null ...
+            location = ((ScriptException)exc).getLocation();
         } 
     
         if (location == null && exc.getCause() != null) {

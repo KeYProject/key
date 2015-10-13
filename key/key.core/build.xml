@@ -29,7 +29,8 @@
 		<javac srcdir= "${src.dir}:${gen.dir}" 
 		       destdir="${build.dir}" 
 		       includeantruntime="false" 
-		       source="1.7" 
+		       source="1.7"
+		       target="1.7"
 		       deprecation="off" 
 		       debug="on" 
 		       depend="${build.depend}" 
@@ -43,8 +44,14 @@
 		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
 			<arg value="rev-parse"/>
 			<arg value="HEAD"/>
-		</exec>		
+		</exec>
+		<exec executable="git" outputproperty="git.branch" failifexecutionfails="false">
+			<arg value="rev-parse"/>
+			<arg value="--abbrev-ref"/>
+			<arg value="HEAD"/>
+		</exec>
 		<echo file="${build.dir}/de/uka/ilkd/key/util/sha1">${git.revision}</echo> 
+		<echo file="${build.dir}/de/uka/ilkd/key/util/branch">${git.branch}</echo>
 		<echo file="${build.dir}/de/uka/ilkd/key/util/version">${key.version}</echo> 
 	</target>
 
@@ -86,13 +93,13 @@
    
    <uptodate property="jmllexer.notRequired"
         targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.java"
-        srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"/>
+        srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.g"/>
         
    <uptodate property="jmlparser.notRequired"
         targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.java">
      <srcfiles dir="${src.dir}/de/uka/ilkd/key/speclang/jml/translation">
-       <include name="jmllexer.g"/>
-       <include name="jmlparser.g"/>
+       <include name="KeYJMLLexer.g"/>
+       <include name="KeYJMLParser.g"/>
      </srcfiles>
    </uptodate>
 
@@ -163,18 +170,20 @@
   </target>
   
     <target name="jmllexer" unless="jmllexer.notRequired">
-        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+   <echo message="Running antlr ..."/>
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
             <arg value="-o" />
             <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
-            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.g" />
         </java>
     </target>
 
     <target name="jmlparser"  depends="jmllexer" unless="jmlparser.notRequired">
-        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+    <echo message="Running antlr ..."/>
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
             <arg value="-o" />
             <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
-            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g" />
         </java>
     </target>
 

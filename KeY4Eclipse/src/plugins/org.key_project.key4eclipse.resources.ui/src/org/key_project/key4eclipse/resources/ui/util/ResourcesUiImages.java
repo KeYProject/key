@@ -266,26 +266,4 @@ public final class ResourcesUiImages {
        Display.getDefault().syncExec(run);
        return run.getResult();
    }
-
-   /**
-     * Disposes all contained images. This method is automatically called
-     * when the plug-in is unloaded from the {@link Activator}.
-     * There is no need to call it from any other place!
-     */
-    public static void disposeImages() {
-       Display display = Display.getDefault();
-       if (!display.isDisposed()) {
-          display.syncExec(new Runnable() {
-            @Override
-            public void run() {
-               ImageRegistry registry = Activator.getDefault().getImageRegistry();
-               registry.remove(METHOD_CONTRACT);
-               registry.remove(METHOD_CONTRACT_BOX);
-               registry.remove(METHOD_CONTRACT_DIAMOND);
-               registry.remove(OBSERVER_FUNCTION);
-               registry.remove(OBSERVER_FUNCTION_CONTRACT);
-            }
-         });
-       }
-    }
 }

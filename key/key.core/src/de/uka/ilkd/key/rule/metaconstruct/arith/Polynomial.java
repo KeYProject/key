@@ -51,10 +51,17 @@ public class Polynomial {
 
     public static Polynomial create(Term polyTerm, Services services) {
        final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
-       Polynomial res = cache.get ( polyTerm );
-        if ( res == null ) {
+       
+       Polynomial res;
+       synchronized (cache) {
+           res = cache.get ( polyTerm );
+       }
+       
+       if ( res == null ) {
             res = createHelp ( polyTerm, services );
-            cache.put ( polyTerm, res );
+            synchronized (cache) {
+                cache.put ( polyTerm, res );
+            }
         }
         return res;
     }

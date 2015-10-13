@@ -71,4 +71,8 @@ public class KeYParserF extends KeYParser {
         return getErrorMessage(e, KeYLexerTokens.getTokennames());
     }
 
+    public boolean isAtProofScript() {
+        return input.LA(1) == PROOFSCRIPT;
+    }
+
 }

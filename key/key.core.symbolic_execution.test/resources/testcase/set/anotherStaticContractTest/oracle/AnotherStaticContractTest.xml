@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call AnotherStaticContractTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="return magic(x);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_0 = magic(x) catch(exc_0)
+pre: true
+post: (exc_0 = null -&gt; result_0 = 4711)
+&amp; (   !exc_0 = null
+   -&gt;   java.lang.Error::instance(exc_0) = TRUE
+      |   java.lang.RuntimeException::instance(exc_0)
+        = TRUE)
+&amp; (   x = 4
+   -&gt;   !exc_0 = null
+      &amp; (  java.lang.Error::instance(exc_0) = TRUE
+         |   java.lang.RuntimeException::instance(exc_0)
+           = TRUE))
+&amp; (x &gt;= 10 -&gt; result_0 = 10 &amp; exc_0 = null)
+&amp; (   x &lt; javaUnaryMinusInt(22)
+   -&gt; result_0 = javaUnaryMinusInt(22) &amp; exc_0 = null)
+&amp; (   x = javaUnaryMinusInt(3)
+   -&gt;   (   exc_0 = null
+         -&gt; result_0 = javaUnaryMinusInt(3))
+      &amp; (   !exc_0 = null
+         -&gt;   java.lang.Error::instance(exc_0) = TRUE
+            |   java.lang.RuntimeException::instance(exc_0)
+              = TRUE))
+mod: \if (true)
+         \then (     \if (true)
+                         \then (     \if (true)
+                                         \then (     \if (true)
+                                                         \then (allLocs)
+                                                         \else (allLocs)
+                                                \cap \if (  x
+                                                          = 4)
+                                                         \then (allLocs)
+                                                         \else (allLocs))
+                                         \else (allLocs)
+                                \cap \if (x &gt;= 10)
+                                         \then (allLocs)
+                                         \else (allLocs))
+                         \else (allLocs)
+                \cap \if (x &lt; javaUnaryMinusInt(22))
+                         \then (allLocs)
+                         \else (allLocs))
+         \else (allLocs)
+\cap \if (x = javaUnaryMinusInt(3))
+         \then (allLocs)
+         \else (allLocs)
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="or(or(gt(x,Z(9(#))),lt(x,Z(neglit(2(2(#)))))),equals(x,Z(neglit(3(#)))))" pathCondition="imp(and(leq(x,Z(9(#))),geq(x,Z(neglit(2(2(#)))))),equals(x,Z(neglit(3(#)))))" pathConditionChanged="true" branchCondition="or(or(gt(x,Z(9(#))),lt(x,Z(neglit(2(2(#)))))),equals(x,Z(neglit(3(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of AnotherStaticContractTest.main(x)&gt;" pathCondition="imp(and(leq(x,Z(9(#))),geq(x,Z(neglit(2(2(#)))))),equals(x,Z(neglit(3(#)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(and(leq(x,Z(9(#))),geq(x,Z(neglit(2(2(#)))))),equals(x,Z(neglit(3(#)))))">
+                  <termination name="&lt;end&gt;" pathCondition="imp(and(leq(x,Z(9(#))),geq(x,Z(neglit(2(2(#)))))),equals(x,Z(neglit(3(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </branchCondition>
+            <branchCondition name="or(equals(x,Z(4(#))),equals(x,Z(neglit(3(#)))))" pathCondition="or(equals(x,Z(4(#))),equals(x,Z(neglit(3(#)))))" pathConditionChanged="true" branchCondition="or(equals(x,Z(4(#))),equals(x,Z(neglit(3(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
+               <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call AnotherStaticContractTest.main(x)&gt;&gt;" pathCondition="or(equals(x,Z(4(#))),equals(x,Z(neglit(3(#)))))" pathConditionChanged="false" methodReturnCondition="or(equals(x,Z(4(#))),equals(x,Z(neglit(3(#)))))">
+                  <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="or(equals(x,Z(4(#))),equals(x,Z(neglit(3(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  </termination>
+               </exceptionalMethodReturn>
+            </branchCondition>
+         </operationContract>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0"/>
+</start>

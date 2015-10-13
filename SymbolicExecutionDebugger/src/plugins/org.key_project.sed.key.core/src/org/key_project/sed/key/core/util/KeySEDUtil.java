@@ -183,6 +183,11 @@ public final class KeySEDUtil {
      * The key of the attribute to store if grouping is enabled or not.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_GROUPING_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.groupingEnabled";
+
+    /**
+     * The key of the attribute to store if conditions are simplified or not.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS = "org.key_project.sed.key.core.launch.sed.key.attribute.simplifyConditions";
     
     /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
@@ -409,6 +414,16 @@ public final class KeySEDUtil {
      */
     public static boolean isGroupingEnabled(ILaunchConfiguration configuration) throws CoreException {
        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_GROUPING_ENABLED, KeYSEDPreferences.isGroupingEnabled()) : KeYSEDPreferences.isGroupingEnabled();
+    }
+
+    /**
+     * Checks if conditions are simplified or not.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} simplify conditions, {@code false} do not simplify conditions.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isSimplifyConditions(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, KeYSEDPreferences.isSimplifyConditions()) : KeYSEDPreferences.isSimplifyConditions();
     }
     
     /**

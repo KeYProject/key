@@ -29,15 +29,22 @@ public class ModelSettings implements IModelSettings {
     * {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
    private final boolean usePrettyPrinting;
+   
+   /**
+    * {@code true} simplify conditions, {@code false} do not simplify conditions.
+    */
+   private final boolean simplifyConditions;
 
    /**
     * Constructor.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
+    * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     */
-   public ModelSettings(boolean useUnicode, boolean usePrettyPrinting) {
+   public ModelSettings(boolean useUnicode, boolean usePrettyPrinting, boolean simplifyConditions) {
       this.useUnicode = useUnicode;
       this.usePrettyPrinting = usePrettyPrinting;
+      this.simplifyConditions = simplifyConditions;
    }
 
    /**
@@ -54,5 +61,13 @@ public class ModelSettings implements IModelSettings {
    @Override
    public boolean isUsePrettyPrinting() {
       return usePrettyPrinting;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isSimplifyConditions() {
+      return simplifyConditions;
    }
 }
