@@ -132,7 +132,7 @@ public class ServiceCaches {
    private LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = new LRUCache<Pair<Term, Term>, Term>(5000);
 
    /** Cache used by the exhaustive macro */
-   private Map<Node, PosInOccurrence> exhaustiveMacroCache = new LinkedHashMap<Node, PosInOccurrence>();;
+   private Map<Node, PosInOccurrence> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence>();;
 
    
    /**
