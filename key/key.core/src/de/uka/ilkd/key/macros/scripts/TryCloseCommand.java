@@ -27,9 +27,17 @@ public class TryCloseCommand extends AbstractCommand {
             macro = new TryCloseMacro();
         }
 
-        Node root = proof.root();
+        boolean branch = "branch".equals(args.get("#2"));
+
+        Node target;
+        if(branch) {
+            target = getFirstOpenGoal(proof, state).node();
+        } else {
+            target = proof.root();
+        }
+
         try {
-            macro.applyTo(uiControl, root, null, (ProverTaskListener)uiControl);
+            macro.applyTo(uiControl, target, null, (ProverTaskListener)uiControl);
         } catch (Exception e) {
             throw new ScriptException("tryclose caused an exception: " + e.getMessage(), e);
         }
