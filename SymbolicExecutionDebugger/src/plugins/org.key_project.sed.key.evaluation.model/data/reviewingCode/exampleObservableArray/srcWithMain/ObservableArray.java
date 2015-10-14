@@ -17,7 +17,7 @@ public class ObservableArray {
    /**
     * The optional available {@link ArrayListener} instances.
     * <p>
-    * If no listeners are available the array might be {@code null} or empty.
+    * If no listeners are available, array {@link arrayListeners} might be {@code null} or empty.
     * Also the value at an array index might be {@code null}.
     */
    private /*@ nullable @*/ ArrayListener[] arrayListeners;
