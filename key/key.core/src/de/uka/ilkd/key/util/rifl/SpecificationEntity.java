@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.util.rifl;
 
+import java.util.Arrays;
+
 /**
  * Program elements which may be named as sources or sinks in RIFL/Java.
  * Currently fields, method parameters, and method return values can be
@@ -101,7 +103,8 @@ public abstract class SpecificationEntity {
                 return (inPackage.equals(((Parameter) o).inPackage)
                         && inClass.equals(((Parameter) o).inClass)
                         && methodName.equals(((Parameter) o).methodName)
-                        && paramTypes.equals(((Parameter) o).paramTypes) && position == ((Parameter) o).position);
+                        && Arrays.equals(((Parameter) o).paramTypes, paramTypes)
+                        && position == ((Parameter) o).position);
             }
             return false;
         }
@@ -109,7 +112,7 @@ public abstract class SpecificationEntity {
         @Override
         public int hashCode() {
             return 3661 * (inPackage + inClass).hashCode() + 37
-                    * (methodName.hashCode() + paramTypes.hashCode())
+                    * (methodName.hashCode() + Arrays.hashCode(paramTypes))
                     + position;
         }
 
@@ -119,7 +122,11 @@ public abstract class SpecificationEntity {
             if (!"".equals(inPackage))
                 sb.append(inPackage + ".");
             sb.append(inClass + "#" + methodName + "(");
+            int i = 1;
             for (final String p : paramTypes) {
+                if (i++ == position) {
+                    sb.append(position + ":");
+                }
                 sb.append(p);
                 sb.append(',');
             }
@@ -166,8 +173,8 @@ public abstract class SpecificationEntity {
             if (o instanceof ReturnValue) {
                 return (inPackage.equals(((ReturnValue) o).inPackage)
                         && inClass.equals(((ReturnValue) o).inClass)
-                        && methodName.equals(((ReturnValue) o).methodName) && paramTypes
-                            .equals(((ReturnValue) o).paramTypes));
+                        && methodName.equals(((ReturnValue) o).methodName)
+                        && Arrays.equals(paramTypes, ((ReturnValue) o).paramTypes));
             } else
                 return false;
         }
@@ -175,7 +182,7 @@ public abstract class SpecificationEntity {
         @Override
         public int hashCode() {
             return 3721 * (inPackage + inClass).hashCode() + 79
-                    * methodName.hashCode() + paramTypes.hashCode();
+                    * methodName.hashCode() + Arrays.hashCode(paramTypes);
         }
 
         @Override

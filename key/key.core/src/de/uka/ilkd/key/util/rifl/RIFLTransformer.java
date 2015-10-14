@@ -161,7 +161,7 @@ public class RIFLTransformer {
         // parse
         while (walker.step()) {
             final String javaFile = walker.getCurrentName();
-            System.out.println("[RIFL] read file: "+ javaFile); // XXX
+            // System.out.println("[RIFL] Read file: "+ javaFile);
             final CompilationUnit cu;
             Reader fr = null;
             try {
@@ -195,15 +195,15 @@ public class RIFLTransformer {
         // step 1a: parse RIFL file
         final Runnable r = new Runnable () {
              public void run() {
-                 System.out.println("[RIFL] start RIFL reader"); // XXX
+                 // System.out.println("[RIFL] Start RIFL reader");
                  try {
                      sc = readRIFL(riflFilename);
                      // debug
-                     System.out.println(sc);
+                     // System.out.println(sc);
                  } catch (Exception e) {
                      threadExc = e;
                  } finally {
-                     System.out.println("[RIFL] finished RIFL reader"); // XXX
+                     // System.out.println("[RIFL] Finished RIFL reader");
                  }
              }
         };
@@ -214,13 +214,13 @@ public class RIFLTransformer {
         final String javaRoot = getBaseDirPath(source);
         final Runnable t = new Runnable() {
             public void run() {
-                System.out.println("[RIFL] start Java reader"); // XXX
+                // System.out.println("[RIFL] Start Java reader");
                 try {
                     readJava(javaRoot);
                 } catch (Exception e) {
                     threadExc = e;
                 } finally {
-                    System.out.println("[RIFL] finished Java reader"); // XXX
+                    // System.out.println("[RIFL] Finished Java reader");
                 }
             }
         };
@@ -271,11 +271,11 @@ public class RIFLTransformer {
         FileWriter writer = null;
         final String filePath = target + File.separator + fileName;
         try {
-            System.out.println("[RIFL] Trying to write file "+filePath); // XXX
+            // System.out.println("[RIFL] Trying to write file "+filePath);
             writer = new FileWriter(filePath);
             final String source = cu.toSource();
-            System.out.println("[RIFL] write the following contents to file:"); // XXX
-            System.out.println(source);
+            // System.out.println("[RIFL] Write the following contents to file:");
+            // System.out.println(source);
             writer.append(source);
         } catch (final IOException e) {
             throw e;

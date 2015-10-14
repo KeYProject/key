@@ -45,7 +45,7 @@ public class SpecificationInjector extends SourceVisitor {
         private static final String DEFAULT_INDENTATION = "  ";
         private static final String DEFAULT_KEY = "low";
         private static final String RESULT = "\\result";
-        private static final String RESPECTS = "separates";
+        private static final String DETERMINES = "determines";
         private static final String JML_END = "@*/\n";
         private static final String JML_START = "\n"+DEFAULT_INDENTATION+"/*@ ";
 
@@ -63,22 +63,22 @@ public class SpecificationInjector extends SourceVisitor {
             indentation = sb.toString();
         }
 
-        void addResultToRespects() {
+        void addResultToDetermines() {
             put(DEFAULT_KEY, RESULT);
         }
 
         // TODO allow more respects clauses
 
-        /** Adds \result to a respects clause labeled by key. */
-        void addResultToRespects(String key) {
+        /** Adds \result to a determines clause labeled by key. */
+        void addResultToDetermines(String key) {
             put(key, RESULT);
         }
 
-        void addToRespects(String name) {
+        void addToDetermines(String name) {
             put(DEFAULT_KEY, name);
         }
 
-        void addToRespects(String name, String key) {
+        void addToDetermines(String name, String key) {
             put(key, name);
         }
 
@@ -93,14 +93,14 @@ public class SpecificationInjector extends SourceVisitor {
                 sb.append(indentation);
                 sb.append(DEFAULT_INDENTATION);
                 sb.append("@ ");
-                sb.append(RESPECTS);
+                sb.append(DETERMINES);
                 for (final String elem : oneRespect) {
                     sb.append(" ");
                     sb.append(elem);
                     sb.append(",");
                 }
                 sb.deleteCharAt(sb.length() - 1);
-                sb.append(";\n");
+                sb.append(" \\by \\itself;\n");
             }
 
             // close JML
@@ -116,9 +116,9 @@ public class SpecificationInjector extends SourceVisitor {
             List<String> target = respects.get(key);
             if (target == null) {
                 target = new ArrayList<String>();
-                respects.put(key, target);
             }
             target.add(value);
+            respects.put(key, target);
         }
     } // private class end
 
@@ -190,14 +190,17 @@ public class SpecificationInjector extends SourceVisitor {
 
         // add return value
         final String returnDomain = sc.returnValue(md);
-        System.out.println(".... return domain: "+returnDomain); // XXX
-        factory.addResultToRespects(returnDomain);
+        // debug
+        // System.out.println(".... return domain: "+returnDomain);
+        factory.addResultToDetermines(returnDomain);
 
         // add parameters
         for (int i = 0; i < md.getParameterDeclarationCount(); i++) {
             final ParameterDeclaration pd = md.getParameterDeclarationAt(i);
-            factory.addToRespects(pd.getVariableSpecification().getName(),
-                    sc.parameter(md, i));
+            // debug
+            // System.out.println(".... "+ pd.getVariableSpecification().getName() +" domain: " + sc.parameter(md, i+1));
+            factory.addToDetermines(pd.getVariableSpecification().getName(),
+                    sc.parameter(md, i+1));
         }
 
         // add fields (TODO)
