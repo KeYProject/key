@@ -52,11 +52,11 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          if (tools.size() != 2) {
             throw new IllegalStateException("Exactly two tools are expected, but " + tools.size() + " tools are available.");
          }
-         Tool firstTool = evaluation.getTools()[0];
-         Tool secondTool = evaluation.getTools()[1];
+         Tool firstTool = evaluation.getTools()[1];
+         Tool secondTool = evaluation.getTools()[0];
          HypothesisToolData firstToolData = entry.getValue().getToolData(firstTool);
          HypothesisToolData secondToolData = entry.getValue().getToolData(secondTool);
-         double alpha = 0.5;
+         double alpha = 0.05;
          appendTest(firstToolData.listCorrectRatios(), 
                     secondToolData.listCorrectRatios(), 
                     alpha, 
@@ -81,7 +81,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                     "Time", 
                     sb);
          sb.append("<br>");
-         appendDataSets(entry.getValue(), tools, sb);
+         appendDataSets(entry.getValue(), CollectionUtil.toList(firstTool, secondTool), sb);
       }
    }
    
@@ -101,32 +101,37 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       // see https://commons.apache.org/proper/commons-math/userguide/stat.html
       sb.append("<table border=\"1\">");
       sb.append("<tr>");
-      sb.append("<td colspan=\"4\" align=\"center\"><b>" + hypotheses + "</b></td>");
+      sb.append("<td colspan=\"3\" align=\"center\"><b>" + hypotheses + "</b></td>");
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td>&nbsp;</td>");
-      sb.append("<td><b>Paired T-Test</b></td>");
-      sb.append("<td><b>T-Test</b></td>");
-      sb.append("<td><b>homoscedastic T-Test</b></td>");
+      sb.append("<td><b>Paired T-Test (two-sided)</b></td>");
+      sb.append("<td><b>Paired T-Test (one-sided)</b></td>");
+//      sb.append("<td><b>T-Test</b></td>");
+//      sb.append("<td><b>homoscedastic T-Test</b></td>");
       sb.append("</tr>");
       sb.append("<tr>");
-      sb.append("<td><b>t</b></td>");
-      sb.append("<td>" + TestUtils.pairedT(firstTool, secondTool) + "</td>");
-      sb.append("<td>" + TestUtils.t(firstTool, secondTool) + "</td>");
-      sb.append("<td>" + TestUtils.homoscedasticT(firstTool, secondTool) + "</td>");
+      sb.append("<td><b>t-statistic</b></td>");
+      sb.append("<td colspan=\"2\">" + TestUtils.pairedT(firstTool, secondTool) + "</td>");
+//      sb.append("<td>" + TestUtils.t(firstTool, secondTool) + "</td>");
+//      sb.append("<td>" + TestUtils.homoscedasticT(firstTool, secondTool) + "</td>");
       sb.append("</tr>");
       sb.append("<tr>");
-      sb.append("<td><b>p</b></td>");
-      sb.append("<td>" + TestUtils.pairedTTest(firstTool, secondTool) + "</td>");
-      sb.append("<td>" + TestUtils.tTest(firstTool, secondTool) + "</td>");
-      sb.append("<td>" + TestUtils.homoscedasticTTest(firstTool, secondTool) + "</td>");
+      double pairedTTest = TestUtils.pairedTTest(firstTool, secondTool);
+      sb.append("<td><b>p-value (smallest significance level)</b></td>");
+      sb.append("<td>" + pairedTTest + "</td>");
+      sb.append("<td>" + (pairedTTest / 2) + "</td>");
+//      sb.append("<td>" + TestUtils.tTest(firstTool, secondTool) + "</td>");
+//      sb.append("<td>" + TestUtils.homoscedasticTTest(firstTool, secondTool) + "</td>");
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td><b>sigTest(" + alpha + ")</b></td>");
       sb.append("<td>" + colorBoolean(TestUtils.pairedTTest(firstTool, secondTool, alpha)) + "</td>");
-      sb.append("<td>" + colorBoolean(TestUtils.tTest(firstTool, secondTool, alpha)) + "</td>");
-      sb.append("<td>" + colorBoolean(TestUtils.homoscedasticTTest(firstTool, secondTool, alpha)) + "</td>");
+      sb.append("<td>" + colorBoolean(TestUtils.pairedTTest(firstTool, secondTool, alpha * 2)) + "</td>");
+//      sb.append("<td>" + colorBoolean(TestUtils.tTest(firstTool, secondTool, alpha)) + "</td>");
+//      sb.append("<td>" + colorBoolean(TestUtils.homoscedasticTTest(firstTool, secondTool, alpha)) + "</td>");
       sb.append("</tr>");
+      sb.append("<tr>");
       sb.append("</table>");
    }
    
@@ -147,7 +152,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
     * @param tools The available {@link Tool}s.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendDataSets(HypothesisData data, Set<Tool> tools, StringBuffer sb) {
+   protected void appendDataSets(HypothesisData data, List<Tool> tools, StringBuffer sb) {
       sb.append("<table border=\"1\">");
       sb.append("<tr>");
       sb.append("<td><b>Tool</b></td>");
