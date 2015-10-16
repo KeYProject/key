@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import recoder.abstraction.ClassType;
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.list.generic.ASTArrayList;
@@ -203,8 +204,19 @@ public class SpecificationInjector extends SourceVisitor {
                     sc.parameter(md, i+1));
         }
 
-        // add fields (TODO)
-
+        // add fields
+        final ClassType ct = md.getContainingClassType();
+        final String pkg = ct.getPackage().getFullName();
+        final String cls = ct.getName();
+        for (int i = 0; i < md.getASTParent().getChildCount(); i++) {
+            final JavaProgramElement fd = (JavaProgramElement) md.getASTParent().getChildAt(i);
+            if (fd instanceof FieldDeclaration) {
+                final String field = ((FieldDeclaration) fd).getVariables().get(0).getName();
+                // debug
+                // System.out.println(".... "+ field +" domain: " + sc.field(pkg, cls, field));
+                factory.addToDetermines(field, sc.field(pkg, cls, field));
+            }
+        }
         addComment(md, factory.getSpecification());
     }
 
