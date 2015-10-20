@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.stat.inference.TestUtils;
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
@@ -26,6 +27,7 @@ import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.StatisticsUtil;
 
 /**
  * Appends the hypotheses tests.
@@ -98,38 +100,82 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                              double alpha, 
                              String hypotheses, 
                              StringBuffer sb) {
-      // see https://commons.apache.org/proper/commons-math/userguide/stat.html
+      // Perform t Test, see https://commons.apache.org/proper/commons-math/userguide/stat.html
+      Exception tException = null;
+      double pairedT = 0.0;
+      double pairedTTest = 0.0;
+      boolean pairedTTestAlpha = false;
+      try {
+         pairedT = TestUtils.pairedT(firstTool, secondTool);
+         pairedTTest = TestUtils.pairedTTest(firstTool, secondTool);
+         pairedTTestAlpha = TestUtils.pairedTTest(firstTool, secondTool, alpha * 2);
+      }
+      catch (Exception e) {
+         tException = e;
+      }
+      // Perform ChiSquare Test
+      long[] histogram = null;
+      double[] expected = null;
+      Exception chiSquareException = null;
+      double chiSquare = 0.0;
+      double chiSquareTest = 0.0;
+      boolean chiSquareTestAlpha = false;
+      try {
+         double[] allData = new double[firstTool.length + secondTool.length];
+         System.arraycopy(firstTool, 0, allData, 0, firstTool.length);
+         System.arraycopy(secondTool, 0, allData, firstTool.length, secondTool.length);
+         histogram = StatisticsUtil.computeNormalDistributionHistogram(allData);
+         final NormalDistribution unitNormal = new NormalDistribution(10d, 1d);
+         expected = unitNormal.sample(histogram.length);
+         chiSquare = TestUtils.chiSquare(expected, histogram);
+         chiSquareTest = TestUtils.chiSquareTest(expected, histogram);
+         chiSquareTestAlpha = TestUtils.chiSquareTest(expected, histogram, alpha);
+      }
+      catch (Exception e) {
+         chiSquareException = e;
+      }
+      // Extend HTML report
       sb.append("<table border=\"1\">");
       sb.append("<tr>");
       sb.append("<td colspan=\"3\" align=\"center\"><b>" + hypotheses + "</b></td>");
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td>&nbsp;</td>");
-      sb.append("<td><b>Paired T-Test (two-sided)</b></td>");
       sb.append("<td><b>Paired T-Test (one-sided)</b></td>");
-//      sb.append("<td><b>T-Test</b></td>");
-//      sb.append("<td><b>homoscedastic T-Test</b></td>");
+      sb.append("<td><b>ChiSquare Goodness of fit Test for Normal Distribution</b></td>");
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td><b>t-statistic</b></td>");
-      sb.append("<td colspan=\"2\">" + TestUtils.pairedT(firstTool, secondTool) + "</td>");
-//      sb.append("<td>" + TestUtils.t(firstTool, secondTool) + "</td>");
-//      sb.append("<td>" + TestUtils.homoscedasticT(firstTool, secondTool) + "</td>");
+      if (tException == null) {
+         sb.append("<td>" + pairedT + "</td>");
+      }
+      else {
+         sb.append("<td rowspan=\"3\">" + tException.getMessage() + "</td>");
+      }
+      if (chiSquareException == null) {
+         sb.append("<td>" + chiSquare + "</td>");
+      }
+      else {
+         sb.append("<td rowspan=\"3\">" + chiSquareException.getMessage() + "</td>");
+      }
       sb.append("</tr>");
       sb.append("<tr>");
-      double pairedTTest = TestUtils.pairedTTest(firstTool, secondTool);
       sb.append("<td><b>p-value (smallest significance level)</b></td>");
-      sb.append("<td>" + pairedTTest + "</td>");
-      sb.append("<td>" + (pairedTTest / 2) + "</td>");
-//      sb.append("<td>" + TestUtils.tTest(firstTool, secondTool) + "</td>");
-//      sb.append("<td>" + TestUtils.homoscedasticTTest(firstTool, secondTool) + "</td>");
+      if (tException == null) {
+         sb.append("<td>" + (pairedTTest / 2) + "</td>");
+      }
+      if (chiSquareException == null) {
+         sb.append("<td colspan=\"1\">" + chiSquareTest + "</td>");
+      }
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td><b>sigTest(" + alpha + ")</b></td>");
-      sb.append("<td>" + colorBoolean(TestUtils.pairedTTest(firstTool, secondTool, alpha)) + "</td>");
-      sb.append("<td>" + colorBoolean(TestUtils.pairedTTest(firstTool, secondTool, alpha * 2)) + "</td>");
-//      sb.append("<td>" + colorBoolean(TestUtils.tTest(firstTool, secondTool, alpha)) + "</td>");
-//      sb.append("<td>" + colorBoolean(TestUtils.homoscedasticTTest(firstTool, secondTool, alpha)) + "</td>");
+      if (tException == null) {
+         sb.append("<td>" + colorBoolean(pairedTTestAlpha) + "</td>");
+      }
+      if (chiSquareException == null) {
+         sb.append("<td colspan=\"1\">" + colorBoolean(chiSquareTestAlpha) + "</td>");
+      }
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("</table>");
