@@ -25,9 +25,9 @@ import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
+import org.key_project.sed.key.evaluation.server.util.StatisticsUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.StatisticsUtil;
 
 /**
  * Appends the hypotheses tests.
@@ -134,18 +134,30 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       catch (Exception e) {
          chiSquareException = e;
       }
+      // Perform sign test
+      double signTest = 0.0;
+      boolean signTestAlpha = false;
+      Exception signTestException = null;
+      try {
+         signTest = StatisticsUtil.signTest(secondTool, firstTool);
+         signTestAlpha = StatisticsUtil.signTest(secondTool, firstTool, alpha, false);
+      }
+      catch (Exception e) {
+         signTestException = e;
+      }
       // Extend HTML report
       sb.append("<table border=\"1\">");
       sb.append("<tr>");
-      sb.append("<td colspan=\"3\" align=\"center\"><b>" + hypotheses + "</b></td>");
+      sb.append("<td colspan=\"4\" align=\"center\"><b>" + hypotheses + "</b></td>");
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td>&nbsp;</td>");
       sb.append("<td><b>Paired T-Test (one-sided)</b></td>");
       sb.append("<td><b>ChiSquare Goodness of fit Test for Normal Distribution</b></td>");
+      sb.append("<td><b>Sign test</b></td>");
       sb.append("</tr>");
       sb.append("<tr>");
-      sb.append("<td><b>t-statistic</b></td>");
+      sb.append("<td><b>test statistic</b></td>");
       if (tException == null) {
          sb.append("<td>" + pairedT + "</td>");
       }
@@ -158,6 +170,12 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       else {
          sb.append("<td rowspan=\"3\">" + chiSquareException.getMessage() + "</td>");
       }
+      if (signTestException == null) {
+         sb.append("<td>&nbsp;</td>");
+      }
+      else {
+         sb.append("<td rowspan=\"3\">" + signTestException.getMessage() + "</td>");
+      }
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td><b>p-value (smallest significance level)</b></td>");
@@ -167,6 +185,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       if (chiSquareException == null) {
          sb.append("<td colspan=\"1\">" + chiSquareTest + "</td>");
       }
+      if (signTestException == null) {
+         sb.append("<td colspan=\"1\">" + signTest + "</td>");
+      }
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td><b>sigTest(" + alpha + ")</b></td>");
@@ -175,6 +196,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       }
       if (chiSquareException == null) {
          sb.append("<td colspan=\"1\">" + colorBoolean(chiSquareTestAlpha) + "</td>");
+      }
+      if (signTestException == null) {
+         sb.append("<td colspan=\"1\">" + colorBoolean(signTestAlpha) + "</td>");
       }
       sb.append("</tr>");
       sb.append("<tr>");

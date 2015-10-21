@@ -28,7 +28,6 @@ import org.junit.runners.Suite;
     org.key_project.util.testcase.java.IOUtilTest.class,
     org.key_project.util.testcase.java.NumberUtilTest.class,
     org.key_project.util.testcase.java.ObjectUtilTest.class,
-    org.key_project.util.testcase.java.StatisticsUtilTest.class,
     org.key_project.util.testcase.java.StringUtilTest.class,
     org.key_project.util.testcase.java.XMLUtilTest.class
 })

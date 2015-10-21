@@ -1,18 +1,59 @@
-package org.key_project.util.testcase.java;
+package org.key_project.sed.key.evaluation.server.test.testcase;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.apache.commons.math3.stat.inference.TestUtils;
 import org.junit.Test;
-import org.key_project.util.java.StatisticsUtil;
+import org.key_project.sed.key.evaluation.server.util.StatisticsUtil;
 
 /**
  * Tests for {@link StatisticsUtil}.
  * @author Martin Hentschel
  */
 public class StatisticsUtilTest {
+   /**
+    * Does not test any self implemented functionality, but is used
+    * to increase understanding of the paired t-Test offered by {@link TestUtils}.
+    * <p>
+    * The example is taken from 'Experimentation in Software Engineering', Claes Wohlin, Per Runeson, Martin Höst, Magnus C. Ohlsson, Björn Regnell and Anders Wesslén,
+    * Table 10.9, page 141.
+    */
+   @Test
+   public void testPairedTTest_ExperimentationInSoftwareEngineering() {
+      double[] firstData = {105, 137, 124, 111, 151, 150, 168, 159, 104, 102};
+      double[] secondData = {86.1, 115, 175, 94.9, 174, 120, 153, 178, 71.3, 110};
+      assertFalse(TestUtils.pairedTTest(firstData, secondData, 0.05));
+   }
+   
+   /**
+    * Tests {@link StatisticsUtil#signTest(double[], double[], double, boolean)}
+    * with the example from 'Experimentation in Software Engineering', Claes Wohlin, Per Runeson, Martin Höst, Magnus C. Ohlsson, Björn Regnell and Anders Wesslén,
+    * Table 10.9, page 141.
+    */
+   @Test
+   public void testSignTestAlpha_ExperimentationInSoftwareEngineering() {
+      double[] firstData = {105, 137, 124, 111, 151, 150, 168, 159, 104, 102};
+      double[] secondData = {86.1, 115, 175, 94.9, 174, 120, 153, 178, 71.3, 110};
+      assertFalse(StatisticsUtil.signTest(firstData, secondData, 0.05, true));
+      assertFalse(StatisticsUtil.signTest(firstData, secondData, 0.05, false));
+   }
+   
+   /**
+    * Tests {@link StatisticsUtil#signTest(double[], double[])}
+    * with the example from 'Experimentation in Software Engineering', Claes Wohlin, Per Runeson, Martin Höst, Magnus C. Ohlsson, Björn Regnell and Anders Wesslén,
+    * Table 10.9, page 141.
+    */
+   @Test
+   public void testSignTest_ExperimentationInSoftwareEngineering() {
+      double[] firstData = {105, 137, 124, 111, 151, 150, 168, 159, 104, 102};
+      double[] secondData = {86.1, 115, 175, 94.9, 174, 120, 153, 178, 71.3, 110};
+      assertEquals(0.3770, StatisticsUtil.signTest(firstData, secondData), 0.0001);
+   }
+   
    /**
     * Tests {@link StatisticsUtil#computeNormalItemsPerSegment(int, int)}.
     */

@@ -1,5 +1,6 @@
-package org.key_project.util.java;
+package org.key_project.sed.key.evaluation.server.util;
 
+import org.apache.commons.math3.util.CombinatoricsUtils;
 
 /**
  * Provides utility methods for statistics, e.g. in combination with
@@ -11,6 +12,113 @@ public final class StatisticsUtil {
     * Forbid instances.
     */
    private StatisticsUtil() {
+   }
+   
+   /**
+    * Tests the p-value of a sign test against a given alpha according to
+    * 'Experimentation in Software Engineering', Claes Wohlin, Per Runeson, Martin Höst, Magnus C. Ohlsson, Björn Regnell and Anders Wesslén,
+    * Table 10.11, page 142.
+    * <p>
+    * H0: P(+) = P(-) where + and - represent the two events that firstData_i > secondData_i and firstData_i < secondData_i
+    * <ul>
+    *    <li>Two Sided: (H1 : P(+) != P(-)): reject H0 if p < alpha/2</li>
+    *    <li>One Sided: (H1 : P(+) < P(-)): reject H0 if p < alpha and the + event is the most rare event in the sample</li>
+    * </ul>
+    * @param firstData The first data.
+    * @param secondData The second data.
+    * @param alpha The fixed alpha.
+    * @param twoSided {@code true} two sided test, {@code false} one side test.
+    * @return {@code true} if null hypothesis H0 is rejected at the alpha level, {@code false} otherwise.
+    * @throws IllegalArgumentException if the parameters are invalid.
+    */
+   public static boolean signTest(double[] firstData, double[] secondData, double alpha, boolean twoSided) throws IllegalArgumentException {
+      SignTestResult result = doSignTest(firstData, secondData);
+      if (twoSided) {
+         return result.p < (alpha / 2);
+      }
+      else {
+         return result.p < alpha && result.pPlusCount < result.pMinusCount;
+      }
+   }
+   
+   /**
+    * Computes the p-value of a sign test according to
+    * 'Experimentation in Software Engineering', Claes Wohlin, Per Runeson, Martin Höst, Magnus C. Ohlsson, Björn Regnell and Anders Wesslén,
+    * Table 10.11, page 142.
+    * <p>
+    * H0: P(+) = P(-) where + and - represent the two events that firstData_i > secondData_i and firstData_i < secondData_i
+    * @param firstData The first data.
+    * @param secondData The second data.
+    * @return The computed p-value.
+    * @throws IllegalArgumentException if the parameters are invalid.
+    */
+   public static double signTest(double[] firstData, double[] secondData) throws IllegalArgumentException {
+      return doSignTest(firstData, secondData).p;
+   }
+   
+   /**
+    * Utility method of {@link #signTest(double[], double[])} and
+    * {@link #signTest(double[], double[], double, boolean)}.
+    * @param firstData The first data.
+    * @param secondData The second data.
+    * @return The result.
+    * @throws IllegalArgumentException if the parameters are invalid.
+    */
+   private static SignTestResult doSignTest(double[] firstData, double[] secondData) throws IllegalArgumentException {
+      if (firstData.length != secondData.length) {
+         throw new IllegalArgumentException("First and second data have different lenght.");
+      }
+      int pPlusCount = 0;
+      int pMinusCount = 0;
+      for (int i = 0; i < firstData.length; i++) {
+         if (firstData[i] > secondData[i]) {
+            pPlusCount++;
+         }
+         else if (firstData[i] < secondData[i]) {
+            pMinusCount++;
+         }
+      }
+      int n = Math.min(pPlusCount, pMinusCount);
+      int N = pPlusCount + pMinusCount;
+      double tempSum = 0.0;
+      for (int i = 0; i <= n; i++) {
+         tempSum += CombinatoricsUtils.binomialCoefficientDouble(N, i);
+      }
+      double p = 1.0 / Math.pow(2.0, N) * tempSum;
+      return new SignTestResult(p, pPlusCount, pMinusCount);
+   }
+   
+   /**
+    * Helper class instantiated by {@link StatisticsUtil#doSignTest(double[], double[])}.
+    * @author Martin Hentschel
+    */
+   private final static class SignTestResult {
+      /**
+       * The p-value.
+       */
+      private final double p;
+      
+      /**
+       * The P(+) count.
+       */
+      private final int pPlusCount;
+      
+      /**
+       * The P(-) count.
+       */
+      private final int pMinusCount;
+
+      /**
+       * Constructor.
+       * @param p The p-value.
+       * @param pPlusCount The P(+) count.
+       * @param pMinusCount The P(-) count.
+       */
+      public SignTestResult(double p, int pPlusCount, int pMinusCount) {
+         this.p = p;
+         this.pPlusCount = pPlusCount;
+         this.pMinusCount = pMinusCount;
+      }
    }
    
    /**

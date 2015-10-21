@@ -19,6 +19,7 @@ import org.key_project.sed.key.evaluation.server.test.testcase.AbstractRandomCom
 import org.key_project.sed.key.evaluation.server.test.testcase.PermutationIndexTest;
 import org.key_project.sed.key.evaluation.server.test.testcase.ReviewingCodeRandomFormOrderComputerTest;
 import org.key_project.sed.key.evaluation.server.test.testcase.SEDServerTest;
+import org.key_project.sed.key.evaluation.server.test.testcase.StatisticsUtilTest;
 import org.key_project.sed.key.evaluation.server.test.testcase.UnderstandingProofAttemptsRandomFormOrderComputerTest;
 
 /**
@@ -31,6 +32,7 @@ import org.key_project.sed.key.evaluation.server.test.testcase.UnderstandingProo
    PermutationIndexTest.class,
    ReviewingCodeRandomFormOrderComputerTest.class,
    SEDServerTest.class,
+   StatisticsUtilTest.class,
    UnderstandingProofAttemptsRandomFormOrderComputerTest.class
 })
 public class AllEvaluationServerTests {
