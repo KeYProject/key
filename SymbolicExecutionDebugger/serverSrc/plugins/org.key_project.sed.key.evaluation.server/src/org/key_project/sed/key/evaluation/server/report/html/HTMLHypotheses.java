@@ -78,8 +78,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                     "Trust Score", 
                     sb);
          sb.append("<br>");
-         appendTest(firstToolData.listTimes(), 
-                    secondToolData.listTimes(), 
+         appendTest(secondToolData.listTimeRatios(), 
+                    firstToolData.listTimeRatios(), 
                     alpha, 
                     "Time", 
                     sb);
@@ -89,7 +89,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
    }
    
    /**
-    * Performs and appends the test.
+    * Performs and appends the test one sided test that firstTool > secondTool.
     * @param firstTool The data of the first tool.
     * @param secondTool The data of the second tool.
     * @param alpha The alpha to use.
@@ -265,6 +265,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       sb.append("<td><b>Maximal Normalized Trust Score</b></td>");
       sb.append("<td><b>Normalized Trust Score Ratio</b></td>");
       sb.append("<td><b>Time</b></td>");
+      sb.append("<td><b>Time Ratio</b></td>");
       sb.append("</tr>");
       for (Tool tool : tools) {
          HypothesisToolData toolData = data.getToolData(tool);
@@ -282,6 +283,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
             sb.append("<td>" + summary.getMaxNormalizedTrustScore() + "</td>");
             sb.append("<td>" + summary.computeNormalizedTrustScoreRatio() + "</td>");
             sb.append("<td>" + summary.getTime() + "</td>");
+            sb.append("<td>" + summary.getTimeRatio() + "</td>");
             sb.append("</tr>");
          }
       }
@@ -308,6 +310,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                      data = new HypothesisData();
                      dataMap.put(filter, data);
                   }
+                  Map<Tool, BigInteger> toolTimesSum = new HashMap<Tool, BigInteger>();
                   for (AbstractPage page : answer.getPages()) {
                      List<AbstractPageInput<?>> pageInputs = answer.getPageInputs(page);
                      if (!CollectionUtil.isEmpty(pageInputs)) {
@@ -327,11 +330,22 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                  summaryMap.put(tools.get(0), summary);
                               }
                               analyzePageInput(summary, pageInput);
+                              BigInteger toolTime = toolTimesSum.get(tools.get(0));
+                              if (toolTime == null) {
+                                 toolTime = BigInteger.ZERO;
+                              }
+                              toolTime = toolTime.add(BigInteger.valueOf(pageInput.getShownTime()));
+                              toolTimesSum.put(tools.get(0), toolTime);
                            }
                         }
                      }
                   }
+                  BigInteger totalTime = BigInteger.ZERO;
+                  for (BigInteger toolTime : toolTimesSum.values()) {
+                     totalTime = totalTime.add(toolTime);
+                  }
                   for (Entry<Tool, ParticipantResultSummary> summaryEntry : summaryMap.entrySet()) {
+                     summaryEntry.getValue().updateTimeRatio(toolTimesSum.get(summaryEntry.getKey()), totalTime);
                      HypothesisToolData toolData = data.getToolData(summaryEntry.getKey());
                      toolData.addSummary(summaryEntry.getValue());
                   }
@@ -455,11 +469,11 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          return result;
       }
       
-      public double[] listTimes() {
+      public double[] listTimeRatios() {
          double[] result = new double[participantResults.size()];
          int i = 0;
          for (ParticipantResultSummary summary : participantResults) {
-            result[i] = summary.getTime().doubleValue();
+            result[i] = summary.getTimeRatio().doubleValue();
             i++;
          }
          return result;
@@ -474,6 +488,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       private BigInteger maxCorrectnessScore = BigInteger.ZERO;
       private BigInteger normalizedTrustScore = BigInteger.ZERO;
       private BigInteger time = BigInteger.ZERO;
+      private BigDecimal timeRatio;
 
       public ParticipantResultSummary(String id) {
          this.id = id;
@@ -481,6 +496,10 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
 
       public void updateTime(long shownTime) {
          this.time = this.time.add(BigInteger.valueOf(shownTime));
+      }
+      
+      public void updateTimeRatio(BigInteger toolTime, BigInteger totalTime) {
+         timeRatio = new BigDecimal(toolTime).divide(new BigDecimal(totalTime), 6, RoundingMode.HALF_EVEN);
       }
 
       public void update(Boolean correct, Integer correctnessScore, Integer trustScore) {
@@ -532,6 +551,10 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
 
       public BigInteger getTime() {
          return time;
+      }
+
+      public BigDecimal getTimeRatio() {
+         return timeRatio;
       }
 
       public BigDecimal computeCorrectRatio() {
