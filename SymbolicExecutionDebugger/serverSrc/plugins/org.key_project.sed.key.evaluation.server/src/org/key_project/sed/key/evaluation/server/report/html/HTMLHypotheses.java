@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.stat.inference.TestUtils;
+import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
@@ -145,16 +146,31 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       catch (Exception e) {
          signTestException = e;
       }
+      // Perform wilcoxon signed rank test
+      double wilcoxon = 0.0;
+      double wilcoxonTest = 0.0;
+      boolean wilcoxonTestAlpha = false;
+      Exception wilcoxonException = null;
+      try {
+         WilcoxonSignedRankTest test = new WilcoxonSignedRankTest();
+         wilcoxon = test.wilcoxonSignedRank(firstTool, secondTool);
+         wilcoxonTest = test.wilcoxonSignedRankTest(firstTool, secondTool, true);
+         wilcoxonTestAlpha = wilcoxonTest < alpha * 2;
+      }
+      catch (Exception e) {
+         wilcoxonException = e;
+      }
       // Extend HTML report
       sb.append("<table border=\"1\">");
       sb.append("<tr>");
-      sb.append("<td colspan=\"4\" align=\"center\"><b>" + hypotheses + "</b></td>");
+      sb.append("<td colspan=\"5\" align=\"center\"><b>" + hypotheses + "</b></td>");
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td>&nbsp;</td>");
       sb.append("<td><b>Paired T-Test (one-sided)</b></td>");
       sb.append("<td><b>ChiSquare Goodness of fit Test for Normal Distribution</b></td>");
-      sb.append("<td><b>Sign test</b></td>");
+      sb.append("<td><b>Wilcoxon Signed Rank Test</b></td>");
+      sb.append("<td><b>Sign Test</b></td>");
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("<td><b>test statistic</b></td>");
@@ -169,6 +185,12 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       }
       else {
          sb.append("<td rowspan=\"3\">" + chiSquareException.getMessage() + "</td>");
+      }
+      if (wilcoxonException == null) {
+         sb.append("<td>" + wilcoxon + "</td>");
+      }
+      else {
+         sb.append("<td rowspan=\"3\">" + wilcoxonException.getMessage() + "</td>");
       }
       if (signTestException == null) {
          sb.append("<td>&nbsp;</td>");
@@ -185,6 +207,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       if (chiSquareException == null) {
          sb.append("<td colspan=\"1\">" + chiSquareTest + "</td>");
       }
+      if (wilcoxonException == null) {
+         sb.append("<td colspan=\"1\">" + (wilcoxonTest / 2) + "</td>");
+      }
       if (signTestException == null) {
          sb.append("<td colspan=\"1\">" + signTest + "</td>");
       }
@@ -196,6 +221,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       }
       if (chiSquareException == null) {
          sb.append("<td colspan=\"1\">" + colorBoolean(chiSquareTestAlpha) + "</td>");
+      }
+      if (wilcoxonException == null) {
+         sb.append("<td colspan=\"1\">" + colorBoolean(wilcoxonTestAlpha) + "</td>");
       }
       if (signTestException == null) {
          sb.append("<td colspan=\"1\">" + colorBoolean(signTestAlpha) + "</td>");

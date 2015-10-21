@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.apache.commons.math3.stat.inference.TestUtils;
+import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 import org.junit.Test;
 import org.key_project.sed.key.evaluation.server.util.StatisticsUtil;
 
@@ -15,6 +16,22 @@ import org.key_project.sed.key.evaluation.server.util.StatisticsUtil;
  * @author Martin Hentschel
  */
 public class StatisticsUtilTest {
+   /**
+    * Does not test any self implemented functionality, but is used
+    * to increase understanding of the Wilcoxon signed rank test offered by {@link WilcoxonSignedRankTest}.
+    * <p>
+    * The example is taken from 'Experimentation in Software Engineering', Claes Wohlin, Per Runeson, Martin Höst, Magnus C. Ohlsson, Björn Regnell and Anders Wesslén,
+    * Table 10.9, page 141.
+    */
+   @Test
+   public void testWilcoxonSignedRankTest_ExperimentationInSoftwareEngineering() {
+      double[] firstData = {105, 137, 124, 111, 151, 150, 168, 159, 104, 102};
+      double[] secondData = {86.1, 115, 175, 94.9, 174, 120, 153, 178, 71.3, 110};
+      WilcoxonSignedRankTest test = new WilcoxonSignedRankTest();
+      assertFalse(test.wilcoxonSignedRankTest(firstData, secondData, true) < 0.05);
+      assertFalse(test.wilcoxonSignedRankTest(firstData, secondData, false) < 0.05);
+   }
+   
    /**
     * Does not test any self implemented functionality, but is used
     * to increase understanding of the paired t-Test offered by {@link TestUtils}.
