@@ -12,7 +12,7 @@ import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.input.RandomFormInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
-import org.key_project.sed.key.evaluation.model.util.ServerSettings;
+import org.key_project.sed.key.evaluation.model.util.ServerPreferences;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
@@ -40,7 +40,7 @@ public class SendThread extends Thread {
    private long time;
    
    public SendThread(String message) {
-      this(message, ServerSettings.HOST, ServerSettings.PORT);
+      this(message, ServerPreferences.getHost(), ServerPreferences.getPort());
    }
 
    public SendThread(String message, String host, int port) {
@@ -126,15 +126,6 @@ public class SendThread extends Thread {
 
    public long getTime() {
       return time;
-   }
-
-   /**
-    * Pings the default server specified by the {@link ServerSettings}.
-    * @return The elapsed time.
-    * @throws Exception Occurred Exception.
-    */
-   public static long ping() throws Exception {
-      return ping(ServerSettings.HOST, ServerSettings.PORT);
    }
 
    /**

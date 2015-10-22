@@ -8,7 +8,7 @@ import java.net.Socket;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
-import org.key_project.sed.key.evaluation.model.util.ServerSettings;
+import org.key_project.sed.key.evaluation.model.util.ServerPreferences;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.sed.key.evaluation.server.random.RandomCompletionManager;
 import org.key_project.sed.key.evaluation.server.random.ReviewingCodeRandomFormOrderComputer;
@@ -71,7 +71,7 @@ public class SEDServer {
             createReports();
          }
          else {
-            SEDServer server = new SEDServer(FileStorage.FORM_STORAGE_LOCATION, ServerSettings.PORT);
+            SEDServer server = new SEDServer(FileStorage.FORM_STORAGE_LOCATION, ServerPreferences.getPort());
             server.start();
          }
       }
