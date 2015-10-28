@@ -42,8 +42,7 @@ public class UnderstandingProofAttemptsHandler extends AbstractHandler {
             throw new IllegalStateException("File " + STATE_LOCATION_FILE + " does not exist.");
          }
          else {
-            String xml = IOUtil.readFrom(STATE_LOCATION_FILE);
-            EvaluationInput readInput = EvaluationInputReader.parse(xml);
+            EvaluationInput readInput = EvaluationInputReader.parse(STATE_LOCATION_FILE);
             if (readInput.getEvaluation() instanceof UnderstandingProofAttemptsEvaluation) {
                INPUT_INSTANCE = readInput;
             }
@@ -76,7 +75,7 @@ public class UnderstandingProofAttemptsHandler extends AbstractHandler {
 	public static void saveEvaluationInput() {
 	   try {
          String xml = EvaluationInputWriter.toXML(INPUT_INSTANCE);
-         IOUtil.writeTo(new FileOutputStream(STATE_LOCATION_FILE), xml);
+         IOUtil.writeTo(new FileOutputStream(STATE_LOCATION_FILE), xml, IOUtil.DEFAULT_CHARSET);
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);

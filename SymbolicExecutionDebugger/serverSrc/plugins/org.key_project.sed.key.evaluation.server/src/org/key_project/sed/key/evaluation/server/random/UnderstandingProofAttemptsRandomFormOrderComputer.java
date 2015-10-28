@@ -1,7 +1,6 @@
 package org.key_project.sed.key.evaluation.server.random;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -58,7 +57,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       if (!ArrayUtil.isEmpty(instructionFiles)) {
          for (File file : instructionFiles) {
             try {
-               EvaluationInput evaluationInput = EvaluationInputReader.parse(new FileInputStream(file));
+               EvaluationInput evaluationInput = EvaluationInputReader.parse(file);
                AbstractFormInput<?> introductionFormInput = evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME));
                QuestionPageInput backgroundPageInput = (QuestionPageInput)introductionFormInput.getPageInput(UnderstandingProofAttemptsEvaluation.BACKGROUND_PAGE_NAME);
                QuestionInput keyInput = backgroundPageInput.getQuestionInput(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
@@ -161,7 +160,7 @@ public class UnderstandingProofAttemptsRandomFormOrderComputer extends AbstractR
       try {
          File evaluationFile = FileStorage.getFile(storageLocation, UnderstandingProofAttemptsEvaluation.INSTANCE.getName(), UnderstandingProofAttemptsEvaluation.EVALUATION_FORM_NAME, introductionInput.getUUID());
          if (evaluationFile != null) {
-            EvaluationInput evaluationInput = EvaluationInputReader.parse(new FileInputStream(evaluationFile));
+            EvaluationInput evaluationInput = EvaluationInputReader.parse(evaluationFile);
             return ObjectUtil.equals(evaluationInput.getUUID(), introductionInput.getUUID());
          }
          else {

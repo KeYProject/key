@@ -251,10 +251,35 @@ public final class IOUtil {
     * @throws IOException Occurred Exception.
     */
    public static void writeTo(OutputStream out, String content) throws IOException {
+      writeTo(out, content, (String) null);
+   }
+
+   /**
+    * Writes the given content into the given {@link OutputStream} and closes it.
+    * Nothing will be written if the content is {@code null}, but the stream will be closed.
+    * @param out The {@link OutputStream} to write to.
+    * @param content The content to write.
+    * @throws IOException Occurred Exception.
+    */
+   public static void writeTo(OutputStream out, String content, Charset encoding) throws IOException {
+      writeTo(out, content, encoding != null ? encoding.displayName() : null);
+   }
+
+   /**
+    * Writes the given content into the given {@link OutputStream} and closes it.
+    * Nothing will be written if the content is {@code null}, but the stream will be closed.
+    * @param out The {@link OutputStream} to write to.
+    * @param content The content to write.
+    * @param encoding The encoding to use.
+    * @throws IOException Occurred Exception.
+    */
+   public static void writeTo(OutputStream out, String content, String encoding) throws IOException {
       PrintStream printStream = null;
       try {
          if (out != null && content != null) {
-            printStream = new PrintStream(out);
+            printStream = encoding != null ? 
+                          new PrintStream(out, false, encoding) : 
+                          new PrintStream(out);
             printStream.print(content);
          }
       }

@@ -1,7 +1,6 @@
 package org.key_project.sed.key.evaluation.server.report;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,7 +83,7 @@ public abstract class AbstractReportEngine {
             List<EvaluationInput> list = new ArrayList<EvaluationInput>(files.length);
             result.put(form, list);
             for (File file : files) {
-               EvaluationInput fileInput = EvaluationInputReader.parse(new FileInputStream(file));
+               EvaluationInput fileInput = EvaluationInputReader.parse(file);
                list.add(fileInput);
             }
          }

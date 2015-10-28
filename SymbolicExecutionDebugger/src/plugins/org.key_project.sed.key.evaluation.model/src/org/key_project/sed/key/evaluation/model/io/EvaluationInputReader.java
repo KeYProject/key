@@ -1,6 +1,8 @@
 package org.key_project.sed.key.evaluation.model.io;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Deque;
@@ -27,6 +29,7 @@ import org.key_project.sed.key.evaluation.model.input.Trust;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.xml.sax.Attributes;
@@ -45,6 +48,18 @@ public class EvaluationInputReader {
    }
    
    /**
+    * Parses the given {@link File}.
+    * @param file The {@link File} text to parse.
+    * @return The parsed {@link EvaluationInput}.
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws IOException Occurred Exception
+    */
+   public static EvaluationInput parse(File file) throws ParserConfigurationException, SAXException, IOException {
+      return file != null ? parse(new FileInputStream(file)) : null;
+   }
+   
+   /**
     * Parses the given XML text.
     * @param xml The XML text to parse.
     * @return The parsed {@link EvaluationInput}.
@@ -53,7 +68,7 @@ public class EvaluationInputReader {
     * @throws IOException Occurred Exception
     */
    public static EvaluationInput parse(String xml) throws ParserConfigurationException, SAXException, IOException {
-      return xml != null ? parse(new ByteArrayInputStream(xml.getBytes())) : null;
+      return xml != null ? parse(new ByteArrayInputStream(xml.getBytes(IOUtil.DEFAULT_CHARSET))) : null;
    }
    
    /**

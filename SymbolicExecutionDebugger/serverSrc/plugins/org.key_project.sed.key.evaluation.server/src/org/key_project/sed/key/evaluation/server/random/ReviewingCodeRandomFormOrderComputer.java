@@ -1,7 +1,6 @@
 package org.key_project.sed.key.evaluation.server.random;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -57,7 +56,7 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
       if (!ArrayUtil.isEmpty(instructionFiles)) {
          for (File file : instructionFiles) {
             try {
-               EvaluationInput evaluationInput = EvaluationInputReader.parse(new FileInputStream(file));
+               EvaluationInput evaluationInput = EvaluationInputReader.parse(file);
                RandomFormInput evaluationFormInput = (RandomFormInput)evaluationInput.getFormInput(evaluationInput.getEvaluation().getForm(ReviewingCodeEvaluation.EVALUATION_FORM_NAME));
                String permutationKey = null;
                List<Tool> toolOrder = new LinkedList<Tool>();
@@ -138,7 +137,7 @@ public class ReviewingCodeRandomFormOrderComputer extends AbstractRandomCompleti
       try {
          File evaluationFile = FileStorage.getFile(storageLocation, ReviewingCodeEvaluation.INSTANCE.getName(), ReviewingCodeEvaluation.EVALUATION_FORM_NAME, introductionInput.getUUID());
          if (evaluationFile != null) {
-            EvaluationInput evaluationInput = EvaluationInputReader.parse(new FileInputStream(evaluationFile));
+            EvaluationInput evaluationInput = EvaluationInputReader.parse(evaluationFile);
             return ObjectUtil.equals(evaluationInput.getUUID(), introductionInput.getUUID());
          }
          else {
