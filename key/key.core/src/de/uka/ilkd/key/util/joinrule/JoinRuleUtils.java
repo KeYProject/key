@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.util.joinrule;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -52,12 +54,14 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
+import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -122,6 +126,27 @@ public class JoinRuleUtils {
     ////////////////// GENERAL LOGIC //////////////////
     //////////////////   (Syntax)    //////////////////
     ///////////////////////////////////////////////////
+    
+    /**
+     * Translates a String into a formula or to null if not applicable.
+     *
+     * @param services The services object.
+     * @param toTranslate The formula to be translated.
+     * @return The formula represented by the input or null if not applicable.
+     */
+    public static Term translateToFormula(final Services services, final String toTranslate) {
+        try {
+            final KeYParserF parser =
+                    new KeYParserF(ParserMode.TERM, new KeYLexerF(
+                            new StringReader(toTranslate), ""), services,
+                            services.getNamespaces());
+            final Term result = parser.term();
+            return result.sort() == Sort.FORMULA ? result : null;
+        }
+        catch (Throwable e) {
+            return null;
+        }
+    }
 
     /**
      * @param u
@@ -155,6 +180,31 @@ public class JoinRuleUtils {
     }
 
     /**
+     * Returns all elementary updates of a parallel update.
+     * 
+     * @param u
+     *            Parallel update to get elementary updates from.
+     * @return Elementary updates of the supplied parallel update.
+     */
+    public static LinkedList<Term> getElementaryUpdates(Term u) {
+        LinkedList<Term> result = new LinkedList<Term>();
+
+        if (u.op() instanceof ElementaryUpdate) {
+            result.add(u);
+        }
+        else if (u.op() instanceof UpdateJunctor) {
+            for (Term sub : u.subs()) {
+                result.addAll(getElementaryUpdates(sub));
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Expected an update!");
+        }
+
+        return result;
+    }
+
+    /**
      * Returns all program variables in the given term.
      * 
      * @param term
@@ -175,6 +225,51 @@ public class JoinRuleUtils {
 
             for (Term sub : term.subs()) {
                 result = result.union(getLocationVariables(sub, services));
+            }
+        }
+
+        return result;
+    }
+    
+    /**
+     * Returns all program variables in the given sequent.
+     * 
+     * @param sequent
+     *            The sequent to extract program variables from.
+     * @return All program variables of the given sequent.
+     */
+    public static HashSet<LocationVariable> getLocationVariablesHashSet(
+            Sequent sequent, Services services) {
+        HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+
+        for (SequentFormula f : sequent) {
+            result.addAll(getLocationVariablesHashSet(f.formula(), services));
+        }
+
+        return result;
+    } 
+
+    /**
+     * Returns all program variables in the given term.
+     * 
+     * @param term
+     *            The term to extract program variables from.
+     * @return All program variables of the given term.
+     */
+    public static HashSet<LocationVariable> getLocationVariablesHashSet(
+            Term term, Services services) {
+        HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+
+        if (term.op() instanceof LocationVariable) {
+            result.add((LocationVariable) term.op());
+        }
+        else {
+            if (!term.javaBlock().isEmpty()) {
+                result.addAll(getProgramLocationsHashSet(term, services));
+            }
+
+            for (Term sub : term.subs()) {
+                result.addAll(getLocationVariablesHashSet(sub, services));
             }
         }
 
@@ -624,10 +719,13 @@ public class JoinRuleUtils {
      *            Formula to prove.
      * @param services
      *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
-    public static boolean isProvable(Term toProve, Services services) {
-        return isProvable(toProve, services, false);
+    public static boolean isProvable(Term toProve, Services services, int timeout) {
+        return isProvable(toProve, services, false, timeout);
     }
 
     /**
@@ -638,11 +736,49 @@ public class JoinRuleUtils {
      *            Formula to prove.
      * @param services
      *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
     public static boolean isProvableWithSplitting(Term toProve,
-            Services services) {
-        return isProvable(toProve, services, true);
+            Services services, int timeout) {
+        return isProvable(toProve, services, true, timeout);
+    }
+
+    /**
+     * Tries to prove the given formula without splitting and returns whether
+     * the prove could be closed.
+     * 
+     * @param toProve
+     *            Sequent to prove.
+     * @param services
+     *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
+     * @return True iff the given formula has been successfully proven.
+     */
+    public static boolean isProvable(Sequent toProve, Services services, int timeout) {
+        return isProvable(toProve, services, false, timeout);
+    }
+
+    /**
+     * Tries to prove the given formula with splitting and returns whether the
+     * prove could be closed.
+     * 
+     * @param toProve
+     *            Sequent to prove.
+     * @param services
+     *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
+     * @return True iff the given formula has been successfully proven.
+     */
+    public static boolean isProvableWithSplitting(Sequent toProve,
+            Services services, int timeout) {
+        return isProvable(toProve, services, true, timeout);
     }
 
     /**
@@ -655,16 +791,19 @@ public class JoinRuleUtils {
      *            Second term to check.
      * @param services
      *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * 
      * @throws RuntimeException
      *             iff proving the equivalence of term1 and term2 fails.
      */
     public static void assertEquivalent(Term term1, Term term2,
-            Services services) {
+            Services services, int timeout) {
         TermBuilder tb = services.getTermBuilder();
 
         Term assertionForm = tb.and(tb.imp(term1, term2), tb.imp(term2, term1));
-        if (!isProvableWithSplitting(assertionForm, services)) {
+        if (!isProvableWithSplitting(assertionForm, services, timeout)) {
             throw new RuntimeException("Could not prove expected equivalence.");
         }
     }
@@ -679,7 +818,9 @@ public class JoinRuleUtils {
      * If this attempt is successful, i.e. the number of atoms in the simplified
      * formula is lower (and, if requested, also the number of disjunctions),
      * the simplified formula is returned; otherwise, the original formula is
-     * returned.
+     * returned.<p>
+     * 
+     * <i>Please note that using this method can consume a great amount of time!</i>
      * 
      * @param parentProof
      *            The parent {@link Proof}.
@@ -689,6 +830,9 @@ public class JoinRuleUtils {
      *            If set to true, the method also takes the number of
      *            disjunctions (in addition to the number of atoms) into account
      *            when judging about the complexity of the "simplified" formula.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return The simplified {@link Term} or the original term, if
      *         simplification was not successful.
      * 
@@ -696,10 +840,10 @@ public class JoinRuleUtils {
      * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     public static Term trySimplify(final Proof parentProof, final Term term,
-            boolean countDisjunctions) {
+            boolean countDisjunctions, int timeout) {
 
         try {
-            Term simplified = simplify(parentProof, term);
+            Term simplified = simplify(parentProof, term, timeout);
 
             if (countAtoms(simplified) < countAtoms(term)
                     && (!countDisjunctions || countDisjunctions(simplified,
@@ -810,11 +954,14 @@ public class JoinRuleUtils {
      *            Second path condition to join.
      * @param services
      *            The services object.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return A path condition that is equivalent to the disjunction of the two
      *         supplied formulae, but possibly simpler.
      */
     public static Term createSimplifiedDisjunctivePathCondition(
-            final Term cond1, final Term cond2, Services services) {
+            final Term cond1, final Term cond2, Services services, int simplificationTimeout) {
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -834,7 +981,7 @@ public class JoinRuleUtils {
                 if (!elem1.equals(elem2)) {
                     // Try to show that the different elements can be left
                     // out in the disjunction, since they are complementary
-                    if (isProvableWithSplitting(tb.or(elem1, elem2), services)) {
+                    if (isProvableWithSplitting(tb.or(elem1, elem2), services, simplificationTimeout)) {
                         cond1ConjElems.remove(elem1);
                         cond2ConjElems.remove(elem2);
                     }
@@ -886,7 +1033,7 @@ public class JoinRuleUtils {
             // common elements...
             Term equivalentToCommon = tb.and(tb.imp(result, commonElemsTerm),
                     tb.imp(commonElemsTerm, result));
-            if (isProvableWithSplitting(equivalentToCommon, services)) {
+            if (isProvableWithSplitting(equivalentToCommon, services, simplificationTimeout)) {
                 result = commonElemsTerm;
             }
         }
@@ -1056,8 +1203,6 @@ public class JoinRuleUtils {
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(
             Node node, PosInOccurrence pio, Services services) {
 
-        TermBuilder tb = services.getTermBuilder();
-
         ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent()
                 .asList());
@@ -1072,73 +1217,16 @@ public class JoinRuleUtils {
         }
 
         Term updateTerm = null;
-        ProgramElement programCounter = null;
-        Term postCondition = null;
-        Modality modality = null;
-
-        Term termAfterUpdate = null;
+        Term programCounter = null;
 
         if (selected.op() instanceof UpdateApplication) {
             updateTerm = selected.sub(0);
-            termAfterUpdate = selected.sub(1);
-        }
-        else {
-            termAfterUpdate = selected;
+            programCounter = selected.sub(1);
         }
 
-        if (termAfterUpdate.op() instanceof Modality) {
-            programCounter = termAfterUpdate.javaBlock().program();
-            postCondition = termAfterUpdate.sub(0);
-            modality = (Modality) termAfterUpdate.op();
-        }
-        else {
-            postCondition = termAfterUpdate;
-        }
-
-        // Note: We may not rename variables in the program counter that also
-        // occur in the post condition. Otherwise, we may render the goal
-        // unprovable.
-
-        LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
-                node, getLocationVariables(postCondition, services));
-
-        // Replace location variables in program counter by their
-        // branch-unique versions
-        Term progCntAndPostCond = null;
-        if (programCounter != null) {
-
-            ProgVarReplaceVisitor replVisitor = new ProgVarReplaceVisitor(
-                    programCounter, replMap, services);
-            replVisitor.start();
-            programCounter = replVisitor.result();
-            progCntAndPostCond = services.getTermBuilder().prog(modality,
-                    JavaBlock.createJavaBlock((StatementBlock) programCounter),
-                    postCondition);
-        }
-        else {
-            progCntAndPostCond = postCondition;
-        }
-
-        // Replace location variables in update by branch-unique versions
-        ImmutableList<Term> newElementaries = ImmutableSLList.nil();
-
-        if (updateTerm != null) {
-            LinkedList<Term> elementaries = getElementaryUpdates(selected
-                    .sub(0));
-            for (Term elementary : elementaries) {
-                ElementaryUpdate upd = (ElementaryUpdate) elementary.op();
-                LocationVariable lhs = (LocationVariable) upd.lhs();
-
-                newElementaries = newElementaries.prepend(tb.elementary(
-                        (LocationVariable) (replMap.get(lhs)),
-                        elementary.sub(0)));
-            }
-        }
-
-        return new SymbolicExecutionStateWithProgCnt(
-                tb.parallel(newElementaries), // Update
+        return new SymbolicExecutionStateWithProgCnt(updateTerm, // Update
                 joinListToAndTerm(pathConditionSet, services), // Path Condition
-                progCntAndPostCond, // Program Counter and Post Condition
+                programCounter, // Program Counter and Post Condition
                 node); // CorrespondingNode
     }
 
@@ -1208,31 +1296,6 @@ public class JoinRuleUtils {
     }
 
     /**
-     * Returns all elementary updates of a parallel update.
-     * 
-     * @param u
-     *            Parallel update to get elementary updates from.
-     * @return Elementary updates of the supplied parallel update.
-     */
-    private static LinkedList<Term> getElementaryUpdates(Term u) {
-        LinkedList<Term> result = new LinkedList<Term>();
-
-        if (u.op() instanceof ElementaryUpdate) {
-            result.add(u);
-        }
-        else if (u.op() instanceof UpdateJunctor) {
-            for (Term sub : u.subs()) {
-                result.addAll(getElementaryUpdates(sub));
-            }
-        }
-        else {
-            throw new IllegalArgumentException("Expected an update!");
-        }
-
-        return result;
-    }
-
-    /**
      * Returns all used program locations in the given term. The term must be of
      * the form \<{ ... }\> phi (or \[{ ... }\] phi).
      * 
@@ -1254,6 +1317,34 @@ public class JoinRuleUtils {
         progVars = progVars.union(visitor.getLocationVariables());
 
         return progVars;
+    }
+
+    /**
+     * Returns all used program locations in the given term. The term must be of
+     * the form \<{ ... }\> phi (or \[{ ... }\] phi).
+     * 
+     * @param programCounterTerm
+     *            The term (program counter) to extract locations from.
+     * @param services
+     *            The Services object.
+     * @return The set of contained program locations.
+     */
+    private static HashSet<LocationVariable> getProgramLocationsHashSet(
+            Term programCounterTerm, Services services) {
+        final JavaProgramElement program = programCounterTerm.javaBlock().program();
+        if (program instanceof StatementBlock &&
+                (((StatementBlock) program).isEmpty() ||
+                (((StatementBlock) program).getInnerMostMethodFrame() != null &&
+                 ((StatementBlock) program).getInnerMostMethodFrame().getBody().isEmpty()))) {
+            return new HashSet<>();
+        }
+        
+        CollectLocationVariablesVisitorHashSet visitor = new CollectLocationVariablesVisitorHashSet(
+                program, true, services);
+
+        // Collect program variables in Java block
+        visitor.start();
+        return visitor.getLocationVariables();
     }
 
     /**
@@ -1291,10 +1382,38 @@ public class JoinRuleUtils {
      *            The services object.
      * @param doSplit
      *            if true, splitting is allowed (normal mode).
+     * @param sideProofName
+     *            name for the generated side proof.
+     * @param timeout
+     *            A timeout for the proof in milliseconds.
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Term toProve,
-            Services services, boolean doSplit, String sideProofName) {
+            Services services, boolean doSplit, String sideProofName, int timeout) {
+        return tryToProve(Sequent.createSequent(
+                                    // Sequent to prove
+                                    Semisequent.EMPTY_SEMISEQUENT,
+                                    new Semisequent(new SequentFormula(toProve))),
+                          services, doSplit, sideProofName, timeout);
+    }
+
+    /**
+     * Tries to prove the given formula and returns the result.
+     * 
+     * @param toProve
+     *            Sequent to prove.
+     * @param services
+     *            The services object.
+     * @param doSplit
+     *            if true, splitting is allowed (normal mode).
+     * @param sideProofName
+     *            name for the generated side proof.
+     * @param timeout
+     *            A timeout for the proof in milliseconds.
+     * @return The proof result.
+     */
+    private static ApplyStrategyInfo tryToProve(Sequent toProve,
+            Services services, boolean doSplit, String sideProofName, int timeout) {
         final ProofEnvironment sideProofEnv = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
                         services.getProof(), // Parent Proof
@@ -1305,11 +1424,10 @@ public class JoinRuleUtils {
             ProofStarter proofStarter = SideProofUtil
                     .createSideProof(
                             sideProofEnv, // Proof environment
-                            Sequent.createSequent(
-                                    // Sequent to prove
-                                    Semisequent.EMPTY_SEMISEQUENT,
-                                    new Semisequent(new SequentFormula(toProve))),
-                                    sideProofName); // Proof name
+                            toProve,
+                            sideProofName); // Proof name
+            
+            proofStarter.setTimeout(timeout * 1000000);
 
             proofResult = proofStarter.start();
         }
@@ -1329,12 +1447,40 @@ public class JoinRuleUtils {
      *            The services object.
      * @param doSplit
      *            if true, splitting is allowed (normal mode).
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return True iff the given formula has been successfully proven.
      */
     private static boolean isProvable(Term toProve, Services services,
-            boolean doSplit) {
+            boolean doSplit, int timeout) {
 
-        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check");
+        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check", timeout);
+        boolean result = proofResult.getProof().closed();
+
+        return result;
+
+    }
+
+    /**
+     * Tries to prove the given formula and returns whether the prove could be
+     * closed.
+     * 
+     * @param toProve
+     *            Sequent to prove.
+     * @param services
+     *            The services object.
+     * @param doSplit
+     *            if true, splitting is allowed (normal mode).
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
+     * @return True iff the given formula has been successfully proven.
+     */
+    private static boolean isProvable(Sequent toProve, Services services,
+            boolean doSplit, int timeout) {
+
+        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check", timeout);
         boolean result = proofResult.getProof().closed();
 
         return result;
@@ -1350,18 +1496,21 @@ public class JoinRuleUtils {
      *            The parent {@link Proof}.
      * @param term
      *            The {@link Term} to simplify.
+     * @param timeout
+     *            Time in milliseconds after which the side proof
+     *            is aborted.
      * @return The simplified {@link Term}.
      * @throws ProofInputException
      *             Occurred Exception.
      * 
      * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
-    private static Term simplify(Proof parentProof, Term term)
+    private static Term simplify(Proof parentProof, Term term, int timeout)
             throws ProofInputException {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo info = tryToProve(term, services, true, "Term simplification");
+        final ApplyStrategyInfo info = tryToProve(term, services, true, "Term simplification", timeout);
 
         // The simplified formula is the conjunction of all open goals
         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
@@ -1591,6 +1740,36 @@ public class JoinRuleUtils {
          * @return All program locations in the given Java block.
          */
         public ImmutableSet<LocationVariable> getLocationVariables() {
+            return variables;
+        }
+
+    }
+
+    /**
+     * Visitor for collecting program locations in a Java block.
+     * 
+     * @author Dominic Scheurer
+     */
+    private static class CollectLocationVariablesVisitorHashSet extends
+            CreatingASTVisitor {
+        private HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
+
+        public CollectLocationVariablesVisitorHashSet(ProgramElement root,
+                boolean preservesPos, Services services) {
+            super(root, preservesPos, services);
+        }
+
+        @Override
+        public void performActionOnLocationVariable(LocationVariable x) {
+            variables.add(x);
+        }
+
+        /**
+         * Call start() before calling this method!
+         * 
+         * @return All program locations in the given Java block.
+         */
+        public HashSet<LocationVariable> getLocationVariables() {
             return variables;
         }
 

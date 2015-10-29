@@ -131,15 +131,20 @@ public class SequentViewSearchBar extends SearchBar {
             searchFlag = searchFlag | Pattern.LITERAL;
         }
 
+        // (DS) We replace non-breaking space ("&nbsp;") by ordinary space.
+        //      This became necessary due to the change to HTML Documents
+        //      in the course of the introduction of syntax highlighting.
+        
         Pattern p;
         try {
-            p = Pattern.compile(search, searchFlag);
+            p = Pattern.compile(search.replace("\u00A0", "\u0020"), searchFlag);
         } catch (PatternSyntaxException pse) {
             return false;
         } catch (IllegalArgumentException iae) {
             return false;
         }
-        Matcher m = p.matcher(sequentView.getText());
+        
+        Matcher m = p.matcher(sequentView.getText().replace("\u00A0", "\u0020"));
 
         boolean loopEnterd = false;
         while (m.find()) {

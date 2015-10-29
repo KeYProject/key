@@ -244,10 +244,11 @@ public class InfFlowContractAppFeature implements Feature {
         if (!app.ifInstsComplete()) {
             return NumberRuleAppCost.getZeroCost();
         }
-        
-        if (app.ifFormulaInstantiations().size() < 1 ||
-            !isInfFlowProof(goal.proof()) ||
-            duplicateFindTaclet(app, pos, goal)) {
+
+        if (!isInfFlowProof(goal.proof())
+                || app.ifFormulaInstantiations() == null
+                || app.ifFormulaInstantiations().size() < 1
+                || duplicateFindTaclet(app, pos, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
 

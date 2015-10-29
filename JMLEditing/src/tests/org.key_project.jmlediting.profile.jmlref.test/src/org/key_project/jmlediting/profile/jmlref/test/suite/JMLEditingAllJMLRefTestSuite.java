@@ -16,6 +16,8 @@ import org.key_project.jmlediting.profile.jmlref.test.parser.SpecificationStatem
 import org.key_project.jmlediting.profile.jmlref.test.parser.SpecificationStatementTest;
 import org.key_project.jmlediting.profile.jmlref.test.parser.StoreRefParserTest;
 import org.key_project.jmlediting.profile.jmlref.test.profile.JMLRefDerivedProfileTest;
+import org.key_project.jmlediting.profile.jmlref.test.resolver.ResolverTest;
+import org.key_project.jmlediting.profile.jmlref.test.resolver.typecomputer.TypeComputerTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -33,7 +35,10 @@ import org.key_project.jmlediting.profile.jmlref.test.profile.JMLRefDerivedProfi
    SpecificationStatementTest.class,
    StoreRefParserTest.class,
    // profile
-   JMLRefDerivedProfileTest.class
+   JMLRefDerivedProfileTest.class,
+   // Resolver
+   ResolverTest.class,
+   TypeComputerTest.class,
 })
 public class JMLEditingAllJMLRefTestSuite {
 

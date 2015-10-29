@@ -33,9 +33,7 @@ import org.key_project.jmlediting.ui.util.JMLEditingImages;
  * @author Martin Hentschel
  * @author Thomas Glaser
  */
-public class JMLCompletionProposalComputer implements
-      IJavaCompletionProposalComputer {
-
+public class JMLCompletionProposalComputer implements IJavaCompletionProposalComputer {
    /**
     *
     * @return the KeY-Image for the Keyword-Proposals
@@ -60,23 +58,12 @@ public class JMLCompletionProposalComputer implements
 
       final List<ICompletionProposal> result = new LinkedList<ICompletionProposal>();
 
-      final CommentLocator locator = new CommentLocator(context.getDocument()
-            .get());
-      final CommentRange comment = locator.getJMLComment(context
-            .getInvocationOffset());
-
-      // add proposals only if Content Assist is invoked in JML Code
-      // get the prefix to filter only fitting keywords
+      JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
+      int invocationOffset = context.getInvocationOffset();
+      
+      final CommentRange comment = CommentLocator.getJMLComment(context.getDocument(), invocationOffset);
       if (comment != null) {
-         IProject currentProject;
-         JavaContentAssistInvocationContext javaContext = null;
-         if (context instanceof JavaContentAssistInvocationContext) {
-            javaContext = (JavaContentAssistInvocationContext) context;
-            currentProject = javaContext.getProject().getProject();
-         }
-         else {
-            return result;
-         }
+         IProject currentProject = javaContext.getProject().getProject();
 
          final IJMLProfile currentJMLProfile = JMLPreferencesHelper
                .getProjectActiveJMLProfile(currentProject);
@@ -97,7 +84,7 @@ public class JMLCompletionProposalComputer implements
 
          // If Parser could parse or complete Error Recovery
          if (parseResult != null) {
-            final int caretPosition = context.getInvocationOffset();
+            final int caretPosition = invocationOffset;
             // Get keyword application node
             final IASTNode keywordApplNode = Nodes
                   .getNodeAtCaretPositionIncludeRightWhiteSpace(parseResult,
@@ -159,7 +146,6 @@ public class JMLCompletionProposalComputer implements
          return this.proposeToplevelKeywords(javaContext);
       }
       return result;
-
    }
 
    /**

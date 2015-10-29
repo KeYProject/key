@@ -68,14 +68,16 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -83,6 +85,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 
 public class ProofTreeView extends JPanel {
 
@@ -850,6 +853,8 @@ public class ProofTreeView extends JPanel {
 	private JMenuItem delayedCut = new JMenuItem("Delayed Cut");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(ICON_SIZE));
+    private JMenuItem subtreeStatistics = new JMenuItem(
+            "Show Subtree Statistics");
 
 	private TreePath path;
 	private TreePath branch;
@@ -907,8 +912,9 @@ public class ProofTreeView extends JPanel {
 	            }
 	        }
 	    }
-	    if (JoinMenuItem.FEATURE.active())
+	    if (Main.isExperimentalMode()) {
 	        this.add(delayedCut);
+        }
 
 	    // modifying the node
         this.add(new JSeparator());
@@ -966,6 +972,10 @@ public class ProofTreeView extends JPanel {
 //		bugdetection.setEnabled(true);
 //	        more.add(change);
 //	    }
+        
+        this.add(new JSeparator());
+        this.add(subtreeStatistics);
+        subtreeStatistics.addActionListener(this);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -1007,7 +1017,9 @@ public class ProofTreeView extends JPanel {
 				collapseOthers(branch);
 			} else if (e.getSource() == collapseBelow) {
 				collapseBelow();
-			} else if (e.getSource() == prevSibling) {
+			} else if (e.getSource() == subtreeStatistics) {
+                showSubtreeStatistics();
+            }  else if (e.getSource() == prevSibling) {
 				Object node = branch.getLastPathComponent();
 				TreeNode parent = ((GUIAbstractTreeNode) node).getParent();
 				if (parent == null) {
@@ -1140,6 +1152,42 @@ public class ProofTreeView extends JPanel {
                r.getUI().getProofControl().startAutoMode(r.getSelectedProof(), ImmutableSLList.<Goal>nil().prepend(invokedGoal));
             }
 	}
+
+    private void showSubtreeStatistics() {
+        final Proof proof = mediator().getSelectedProof();
+        if (proof == null) {
+            MainWindow.getInstance().notify(new GeneralInformationEvent(
+                    "No statistics available.",
+                    "If you wish to see the statistics "
+                            + "for a proof you have to load one first"));
+        } else {
+            int openGoals = 0;
+            
+            Iterator<Node> leavesIt = invokedNode.leavesIterator();
+            while (leavesIt.hasNext()) {
+                if (proof.getGoal(leavesIt.next()) != null) {
+                    openGoals++;
+                }
+            }
+            
+            String stats;
+            if (openGoals > 0)
+                stats = openGoals + " open goal"
+                        + (openGoals > 1 ? "s." : ".");
+            else
+                stats = "Closed.";
+            stats += "\n\n";
+            
+            for (Pair<String, String> x : invokedNode.statistics().getSummary()) {
+                if ("".equals(x.second))
+                    stats += "\n";
+                stats += x.first + ": " + x.second + "\n";
+            }
+
+            JOptionPane.showMessageDialog(MainWindow.getInstance(), stats,
+                    "Proof Statistics", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
 
 	/**
 	 * Action for enabling/disabling all goals below "node".

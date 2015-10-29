@@ -51,9 +51,9 @@ public class JoinWeaken extends JoinProcedure {
 
     @Override
     public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2,
-            Term valueInState2, Services services) {
+            Term v, SymbolicExecutionState state1, Term valueInState1,
+            SymbolicExecutionState state2, Term valueInState2,
+            Term distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 

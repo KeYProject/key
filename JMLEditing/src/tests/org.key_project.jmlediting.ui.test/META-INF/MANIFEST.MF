@@ -15,11 +15,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.swtbot.go;bundle-version="2.2.1",
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.util.test;bundle-version="1.0.0",
- org.key_project.javaeditor;bundle-version="1.0.0",
  org.key_project.jmlediting.core;bundle-version="1.0.0",
  org.key_project.jmlediting.core.test;bundle-version="1.0.0",
  org.key_project.jmlediting.ui;bundle-version="1.0.0",
- org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0"
+ org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0",
+ org.eclipse.swtbot.eclipse.finder
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project

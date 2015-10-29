@@ -561,8 +561,8 @@ determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC]
     ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
 }
 :
-    DETERMINES (NOTHING | det = infflowspeclist)
-    BY (NOTHING | (ITSELF {by = det;}) | by = infflowspeclist)
+    DETERMINES (NOTHING {det=ImmutableSLList.<Term>nil();} | det = infflowspeclist)
+    BY (NOTHING {by = ImmutableSLList.<Term>nil();} | (ITSELF {by = det;}) | by = infflowspeclist)
     (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
         (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
         (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
@@ -1500,6 +1500,10 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 	    } else
 	    result = new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType());
 	}
+	|
+	  EXCEPTION 
+	  { if (excVar==null) raiseError("\\exception may only appear in determines clauses");
+	    else result = new SLExpression(tb.var(excVar), excVar.getKeYJavaType()); }
     |
 	(LPAREN quantifier) => result=specquantifiedexpression
     |

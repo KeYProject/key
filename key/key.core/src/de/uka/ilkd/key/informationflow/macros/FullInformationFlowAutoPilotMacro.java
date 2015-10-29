@@ -36,6 +36,11 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
     }
 
     @Override
+    public String getScriptCommandName() {
+        return "infflow-autopilot";
+    }
+
+    @Override
     public String getDescription() {
         return "<html><ol><li>Search exhaustively for applicable position, then" +
                 "<li>Start auxiliary computation" +

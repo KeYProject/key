@@ -56,13 +56,41 @@ public class CountingBufferedReader extends BufferedReader {
 	chars=0;
     }
   
-    public int read() throws IOException{
-	chars++;
-	if (monitor != null && chars % step==0) {
-	    monitor.setProgress(chars);
-	}
-	return super.read();
+    private void incCharCounter(long inc) {
+        chars += inc;
+        if (monitor != null && chars % step==0) {
+            monitor.setProgress(chars);
+        }
     }
+    
+    @Override
+    public int read() throws IOException{
+       final int readChar = super.read();
+       if (readChar != -1) incCharCounter(1);
+       return readChar; 
+    }
+    
+    @Override
+    public int read(char cbuf[], int off, int len) throws IOException {
+        final int readChars = super.read(cbuf, off, len); 
+        if (readChars > 0) incCharCounter(readChars);
+        return readChars;
+    }
+
+    @Override
+    public String readLine() throws IOException {
+        final String line = super.readLine();
+        if (line != null) incCharCounter(line.length());
+        return line;
+    }
+ 
+    @Override
+    public long skip(long n) throws IOException {
+        final long skippedChars = super.skip(n);
+        if (skippedChars > 0) incCharCounter(skippedChars);
+        return skippedChars;
+    }
+    
 
     public int getNumberOfParsedChars(){
 	return chars;

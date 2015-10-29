@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
+import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -129,6 +131,9 @@ public class ServiceCaches {
 
    private LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = new LRUCache<Pair<Term, Term>, Term>(5000);
 
+   /** Cache used by the exhaustive macro */
+   private Map<Node, PosInOccurrence> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence>();;
+
    
    /**
     * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -184,6 +189,10 @@ public class ServiceCaches {
 
    public final LRUCache<Pair<Term, Term>, Term> getProvedByArithSndCache() {
       return provedByArithSndCache;
+   }
+
+   public final Map<Node, PosInOccurrence> getExhaustiveMacroCache() {
+       return exhaustiveMacroCache;
    }
 
    

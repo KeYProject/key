@@ -87,9 +87,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
          final ITypedRegion damage) {
       final RGB jmlColor = JMLUiPreferencesHelper
             .getWorkspaceJMLColor(ColorProperty.COMMENT);
-      final CommentLocator locator = new CommentLocator(this.doc.get());
-      final CommentRange surroundingComment = locator.getJMLComment(damage
-            .getOffset());
+      final CommentRange surroundingComment = CommentLocator.getJMLComment(doc.get(), damage);
       final TextAttribute ta;
       if (surroundingComment != null) {
          // JML Comment
@@ -122,9 +120,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
          final DocumentEvent event, final boolean documentPartitioningChanged) {
       final IRegion damage = this.wrappedInstance.getDamageRegion(partition,
             event, documentPartitioningChanged);
-      final CommentLocator locator = new CommentLocator(this.doc.get());
-      final CommentRange surroundingComment = locator.getCommentOfOffset(event
-            .getOffset()); // the Comment surrounding the Offset, null if there
+      final CommentRange surroundingComment = CommentLocator.getComment(doc.get(), partition);
       // is no Comment surrounding the offset
       if (surroundingComment == null) {
          return damage;

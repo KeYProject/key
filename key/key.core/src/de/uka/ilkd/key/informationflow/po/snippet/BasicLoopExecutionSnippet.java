@@ -75,11 +75,12 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
                                                    d.tb.FALSE());
         final Term guardPreEqTerm = d.tb.equals(d.origVars.guard,
                                                 vs.pre.guard);
-        final Term guardPreTerm = tb.prog(modality, jb.second, guardPreEqTerm);
         final Term bodyTerm = tb.prog(symbExecMod, jb.first, postTerm);
         final Term guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
         final Term guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
-        final Term programTerm = d.tb.and(guardPreTerm, guardTrueBody, guardFalseBody);
+        final Term guardPreAndTrueTerm =
+                tb.prog(modality, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
+        final Term programTerm = d.tb.and(guardPreAndTrueTerm, guardFalseBody);
 
         //create update
         Term update = tb.skip();

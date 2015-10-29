@@ -49,7 +49,10 @@ public class HandleArith {
      */
     public static Term provedByArith(Term problem, Services services) {
        final LRUCache<Term, Term> provedByArithCache = services.getCaches().getProvedByArithFstCache();
-       Term result = provedByArithCache.get(problem);
+       Term result; 
+       synchronized(provedByArithCache) { 
+           result = provedByArithCache.get(problem);
+       }
        if (result != null) {
           return result;
        }
@@ -63,21 +66,31 @@ public class HandleArith {
        final Term arithTerm = formatArithTerm ( problem, tb, integerLDT, services.getCaches());
        if ( arithTerm.equals ( falseT ) ) {
           result = provedArithEqual ( problem, tb, services );
-          provedByArithCache.put(problem, result);
+          putInTermCache(provedByArithCache, problem, result);
           return result;
        }
         Polynomial poly1 = Polynomial.create ( arithTerm.sub ( 0 ), services );
         Polynomial poly2 = Polynomial.create ( arithTerm.sub ( 1 ), services );
+
         if ( poly2.valueLeq ( poly1 ) ) {
-            provedByArithCache.put(problem, trueT);
+            putInTermCache(provedByArithCache, problem, trueT);
             return trueT;
         }
         if ( poly1.valueLess ( poly2 ) ) {
-            provedByArithCache.put(problem, falseT);
+            putInTermCache(provedByArithCache, problem, falseT);
             return falseT;
         }
-        provedByArithCache.put(problem, problem);
+        putInTermCache(provedByArithCache, problem, problem);
         return problem;
+    }
+
+
+
+    private static void putInTermCache(final LRUCache<Term, Term> provedByArithCache, 
+            final Term key, final Term value) {
+        synchronized(provedByArithCache) { 
+            provedByArithCache.put(key, value);
+        }
     }
         
     /**
@@ -126,7 +139,10 @@ public class HandleArith {
         final Pair<Term, Term> key = new Pair<Term, Term>(problem, axiom);
         final LRUCache<Pair<Term, Term>, Term> provedByArithCache = 
               services.getCaches().getProvedByArithSndCache();
-        Term result = provedByArithCache.get(key);
+        Term result; 
+        synchronized (provedByArithCache) {
+            result = provedByArithCache.get(key);   
+        }
         if (result != null) {
            return result;
         }
@@ -141,7 +157,9 @@ public class HandleArith {
         final Term falseT = tb.ff(); 
 
         if ( cd.op() == Junctor.FALSE || ab.op() == Junctor.FALSE ) {
-           provedByArithCache.put(key, problem);
+            synchronized (provedByArithCache) {
+                provedByArithCache.put(key, problem);
+            }
            return problem;
         }
         Function addfun = integerLDT.getAdd();
@@ -149,7 +167,9 @@ public class HandleArith {
                                   tb.func ( addfun, ab.sub ( 0 ), cd.sub ( 1 ) ) );
         Term res = provedByArith ( arithTerm, services );
         if ( res.op() == Junctor.TRUE ) {
-           provedByArithCache.put(key, trueT);
+            synchronized (provedByArithCache) {
+                provedByArithCache.put(key, trueT);
+            }
            return trueT;
         }
         Term t0 = formatArithTerm ( tb.not ( problem ), tb, integerLDT, caches );
@@ -157,10 +177,14 @@ public class HandleArith {
                              tb.func ( addfun, ab.sub ( 0 ), t0.sub ( 1 ) ) );
         res = provedByArith ( arithTerm, services );
         if ( res.op() == Junctor.TRUE ) {
-           provedByArithCache.put(key, falseT);
+            synchronized (provedByArithCache) {
+                provedByArithCache.put(key, falseT);
+            }
            return falseT;
         }
-        provedByArithCache.put(key, problem);
+        synchronized (provedByArithCache) {
+            provedByArithCache.put(key, problem);
+        }
         return problem;
     }
 
@@ -174,7 +198,10 @@ public class HandleArith {
      */
     private static Term formatArithTerm(final Term problem, TermBuilder tb, IntegerLDT ig, ServiceCaches caches) {
        final LRUCache<Term, Term> formattedTermCache = caches.getFormattedTermCache();
-       Term pro = formattedTermCache.get(problem); 
+       Term pro; 
+       synchronized (formattedTermCache) {
+           pro = formattedTermCache.get(problem); 
+       }
        if (pro != null) {
           return pro;
        }
@@ -187,8 +214,8 @@ public class HandleArith {
             pro = pro.sub ( 0 );
             op = pro.op ();
         }
-        Function geq = ig.getGreaterOrEquals ();
-        Function leq = ig.getLessOrEquals ();
+        final Function geq = ig.getGreaterOrEquals ();
+        final Function leq = ig.getLessOrEquals ();
         final Term falseT = tb.ff(); 
 
         if ( op == geq ) {
@@ -210,7 +237,7 @@ public class HandleArith {
                 pro = falseT;
         }
         
-        formattedTermCache.put(problem, pro);
+        putInTermCache(formattedTermCache, problem, pro);
         return pro;
     }
     

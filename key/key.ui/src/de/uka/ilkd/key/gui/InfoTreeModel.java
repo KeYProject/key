@@ -183,10 +183,13 @@ public class InfoTreeModel extends DefaultTreeModel {
                         removeNodeFromParent(lastNode);
                         InfoTreeNode oldParent = parent;
                         parent = new InfoTreeNode(getName(insNode), ruleExplanations);
+                        insNode.setTitleToAltName();
+                        lastNode.setTitleToAltName();
                         insertAsLast(parent, oldParent);
                         insertAsLast(lastNode, parent);
                     } else {
                         parent = lastNode;
+                        insNode.setTitleToAltName();
                     }
                 }
             }

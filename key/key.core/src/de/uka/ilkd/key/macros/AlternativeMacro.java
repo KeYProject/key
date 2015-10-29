@@ -92,7 +92,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
         for (final ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(proof, goals, posInOcc)) {
                 final ProverTaskListener pml =
-                        new ProofMacroListener(macro, listener);
+                        new ProofMacroListener(macro.getName(), listener);
                 pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
                 synchronized(macro) {
                     // wait for macro to terminate

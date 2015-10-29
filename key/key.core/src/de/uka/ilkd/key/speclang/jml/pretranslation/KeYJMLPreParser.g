@@ -173,7 +173,7 @@ options {
          */
          result = result.prepend(p + " ");
       } else {
-        result = result.prependAndUpdatePosition(p);
+        result = result.prependAndUpdatePosition(p + " ");
       }
       return result;
     }
@@ -1489,7 +1489,7 @@ assume_keyword
 expression returns [PositionedString result = null]
 @init {
     int parenthesesCounter = 0;
-    final StringBuilder text = new StringBuilder();
+    // final StringBuilder text = new StringBuilder();
     Token begin = null;
 }
 :
@@ -1500,11 +1500,14 @@ expression returns [PositionedString result = null]
         |   { parenthesesCounter > 0 }? t=SEMICOLON
         |   t=~(LPAREN | RPAREN | SEMICOLON)
         )
-        { if (begin == null) { begin = t; } text.append(" " + t.getText()); }
+        { if (begin == null) { begin = t; } /*text.append(" " + t.getText());*/ }
     )*
-    { parenthesesCounter == 0 }? t=SEMICOLON { if (begin == null) { begin = t; } text.append(t.getText()); }
+    { parenthesesCounter == 0 }? t=SEMICOLON { if (begin == null) { begin = t; } /*text.append(t.getText());*/ }
     {
-	result = createPositionedString(text.toString(), begin);
+       // take the string from the token stream
+       // (do not reconstruct it with false whitespaces)
+       String coveredText = input.toString(begin, input.LT(-1));
+       result = createPositionedString(coveredText, begin);
     }
 ;
 

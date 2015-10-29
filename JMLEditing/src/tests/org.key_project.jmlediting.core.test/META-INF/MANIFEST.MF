@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.junit;bundle-version="4.11.0",
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.util.test;bundle-version="1.0.0",
- org.key_project.jmlediting.core;bundle-version="1.0.0"
+ org.key_project.jmlediting.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project

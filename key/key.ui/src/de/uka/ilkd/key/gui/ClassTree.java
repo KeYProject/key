@@ -16,8 +16,10 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -32,6 +34,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -43,6 +46,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -53,7 +57,7 @@ public class ClassTree extends JTree {
      */
     private static final long serialVersionUID = -3006761219011776834L;
     private final Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons;
-    
+    private final Services services;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -67,6 +71,7 @@ public class ClassTree extends JTree {
 					      skipLibraryClasses, 
 					      services)));
 	this.targetIcons = targetIcons;
+	this.services = services;
 	getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 	setCellRenderer(new DefaultTreeCellRenderer() {
@@ -340,36 +345,40 @@ public class ClassTree extends JTree {
     
     private void open(KeYJavaType kjt, IObserverFunction target) {
         //get tree path to class
-        Vector<DefaultMutableTreeNode> pathVector 
-        	= new Vector<DefaultMutableTreeNode>();
-        String fullClassName = kjt.getFullName();
-        DefaultMutableTreeNode node 
-                = (DefaultMutableTreeNode) getModel().getRoot();
+        Vector<DefaultMutableTreeNode> pathVector  = new Vector<DefaultMutableTreeNode>();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) getModel().getRoot();
         assert node != null;        
         pathVector.add(node);
-        do {
-            if (fullClassName.startsWith(".")) {
-                fullClassName = fullClassName.substring(1);
-            }
-            //get next part of the name
-            DefaultMutableTreeNode childNode = null;
-            for (int i=0; i<node.getChildCount(); i++) {
-                childNode = (DefaultMutableTreeNode) node.getChildAt(i);
-                Entry e = (Entry) childNode.getUserObject();
-                if (fullClassName.startsWith(e.string)) {
-                    pathVector.add(childNode);
-                    fullClassName = fullClassName.substring(e.string.length());
-                    break;
-                } else childNode = null;
-            }
-	    if (childNode == null) {
-                System.err.println(
-                    "Cannot find ("+kjt.getFullName()+","+target + ") in dialog. "+
-                    "Unmatched fragment \""+fullClassName+"\"");
-                return;
-            }
-            node = childNode;
-        } while(fullClassName.length() > 0);
+        // Collect inner classes
+        Deque<KeYJavaType> types = new LinkedList<KeYJavaType>();
+        KeYJavaType currentKjt = kjt;
+        types.addFirst(currentKjt);
+        while (KeYTypeUtil.isInnerType(services, currentKjt)) {
+           String parentFullName = KeYTypeUtil.getParentName(services, kjt);
+           currentKjt = KeYTypeUtil.getType(services, parentFullName);
+           types.addFirst(currentKjt);
+        }
+        // extend tree path to root class
+        Iterator<KeYJavaType> typesIter = types.iterator();
+        KeYJavaType rootType = typesIter.next();
+        DefaultMutableTreeNode fullQualifiedNode = searchNode(node, rootType.getFullName());
+        if (fullQualifiedNode != null) {
+           pathVector.add(fullQualifiedNode);
+           node = fullQualifiedNode;
+        }
+        else {
+           String[] segments = rootType.getFullName().split("\\.");
+           for (String segment : segments) {
+              node = searchNode(node, segment);
+              pathVector.add(node);
+           }
+        }
+        // extend tree path to inner classes
+        while (typesIter.hasNext()) {
+           KeYJavaType innerType = typesIter.next();
+           node = searchNode(node, innerType.getName());
+           pathVector.add(node);
+        }
         TreePath path = new TreePath(pathVector.toArray());
         TreePath incompletePath = null;
         
@@ -387,6 +396,23 @@ public class ClassTree extends JTree {
         //open and select
         expandPath(incompletePath);
         setSelectionRow(getRowForPath(path));
+    }
+    
+    /**
+     * Searches the {@link DefaultMutableTreeNode} child with the given text.
+     * @param parent The {@link DefaultMutableTreeNode} to search in.
+     * @param text The text of the {@link DefaultMutableTreeNode} to search.
+     * @return The first found {@link DefaultMutableTreeNode} with the given text or {@code null} if no {@link DefaultMutableTreeNode} was found.
+     */
+    protected DefaultMutableTreeNode searchNode(DefaultMutableTreeNode parent, String text) {
+       for (int i = 0; i < parent.getChildCount(); i++) {
+          DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parent.getChildAt(i);
+          Entry e = (Entry) childNode.getUserObject();
+          if (ObjectUtil.equals(text, e.string)) {
+             return childNode;
+          }
+       }
+       return null;
     }
     
 

@@ -13,6 +13,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
+import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -185,4 +186,12 @@ public class JMLSourceViewerConfigurationExtension extends
       LogUtil.getLogger().logError("JMLContentFormatter could not be initialized, JML may be modified incorrectly", exception);
       return currentResult;
    }
+   
+   @Override
+    public IInformationPresenter getOutlinePresenter(
+            ISourceViewer sourceViewer, boolean doCodeResolve,
+            IInformationPresenter currentResult) {
+        // TODO Auto-generated method stub
+        return super.getOutlinePresenter(sourceViewer, doCodeResolve, currentResult);
+    }
 }

@@ -49,6 +49,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -61,6 +62,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
@@ -217,7 +219,20 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                if (macroChosen()) {
+                ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+                if(problemLoader.hasProofScript()) {
+                    Pair<String, Location> scriptAndLoc;
+                    try {
+                        scriptAndLoc = problemLoader.readProofScript();
+                        ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
+                                scriptAndLoc.first, scriptAndLoc.second);
+                        psw.init();
+                        psw.execute();
+                    } catch (ProofInputException e) {
+                        // TODO
+                        e.printStackTrace();
+                    }
+                } else if (macroChosen()) {
                     applyMacro();
                 }
             }

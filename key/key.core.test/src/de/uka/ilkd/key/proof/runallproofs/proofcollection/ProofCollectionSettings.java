@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -18,21 +19,26 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 /**
  * Immutable settings type for proof collections. Specifies settings used during
  * test run of {@link RunAllProofsTest}.
- * 
+ *
  * @author Kai Wallisch
  *
  */
 public class ProofCollectionSettings implements Serializable {
+
+   private static final long serialVersionUID = 8098789985911604781L;
 
    /*
     * Known constants for entries that may occur in field settingsMap.
     */
    private static final String BASE_DIRECTORY_KEY = "baseDirectory";
    private static final String KEY_SETTINGS_KEY = "keySettings";
+   private static final String LOCAL_SETTINGS_KEY = "localSettings";
    private static final String FORK_MODE = "forkMode";
    private static final String STATISTICS_FILE = "statisticsFile";
    private static final String RELOAD_ENABLED = "reloadEnabled";
    private static final String TEMP_DIR = "tempDir";
+   private static final String RUN_ONLY_ON = "runOnlyOn";
+   private static final String DIRECTORY = "directory";
 
    /**
     * File in which the present {@link ProofCollectionSettings} were declared.
@@ -59,6 +65,7 @@ public class ProofCollectionSettings implements Serializable {
     * "-Dkey.runallproofs.forkMode=perFile"
     */
    private static final List<Entry<String, String>> SYSTEM_PROPERTIES_ENTRIES;
+
    static {
       /*
        * Iterating over all system properties to get settings entries. System
@@ -188,7 +195,7 @@ public class ProofCollectionSettings implements Serializable {
    /**
     * Reads out generic settings, which were be specified as (key, value) pairs
     * during object creation.
-    * 
+    *
     * @see Entry
     */
    public String get(String key) {
@@ -244,6 +251,16 @@ public class ProofCollectionSettings implements Serializable {
    public String getGlobalKeYSettings() {
       String gks = get(KEY_SETTINGS_KEY);
       return gks == null ? "" : gks;
+   }
+
+   /**
+    * Returns the KeY settings modified locally in the group.
+    *
+    * @return <code>null</code> if not set, otherwise the local settings
+    */
+   public String getLocalKeYSettings() {
+      String lks = get(LOCAL_SETTINGS_KEY);
+      return lks;
    }
 
    /**
@@ -353,6 +370,39 @@ public class ProofCollectionSettings implements Serializable {
                   "Proof collection settings are immutable. Changing settings values is not allowed.");
          }
       };
+   }
+
+   /**
+    * Gets the list of groups on which the test should be run.
+    *
+    * <code>null</code> means all of them, otherwise a list of group names
+    *
+    * @return <code>null</code> or a list.
+    */
+   public List<String> getRunOnlyOn() {
+      String runOnly = get(RUN_ONLY_ON);
+      if(runOnly == null) {
+         return null;
+      } else {
+         return Arrays.asList(runOnly.trim().split(" *, *"));
+      }
+   }
+
+   /**
+    * Gets the directory for a group.
+    *
+    * If the groups has its own directory key, take it into consideration,
+    * return the base directory otherwise
+    *
+    * @return the directory for the current group.
+    */
+   public File getGroupDirectory() {
+      String localDir = get(DIRECTORY);
+      if(localDir != null) {
+         return new File(getBaseDirectory(), localDir);
+      } else {
+         return getBaseDirectory();
+      }
    }
 
 }

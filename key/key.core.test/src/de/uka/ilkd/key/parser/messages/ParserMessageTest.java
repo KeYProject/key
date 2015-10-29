@@ -28,7 +28,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
  * whose contents will be verified.
  * <p>
  * For further documentation, see: key/doc/README.parserMessageTest
- * 
+ *
  * @author Kai Wallisch
  */
 @RunWith(Parameterized.class)
@@ -55,7 +55,9 @@ public class ParserMessageTest {
       Collection<Object[]> data = new LinkedList<>();
       for (File file : testDataDir.listFiles()) {
          if (file.isDirectory()) {
-            data.add(new Object[] { file.getName(), file });
+             if (! new File(file, "IGNORE").exists()) {
+                 data.add(new Object[] { file.getName(), file });
+             }
          }
       }
       return data;
@@ -89,8 +91,9 @@ public class ParserMessageTest {
 
       try {
          KeYEnvironment.load(javaFile);
-         throw new RuntimeException("Parsing unexpectedly did not throw a "
+         fail("Parsing unexpectedly did not throw a "
                + "ProblemLoaderException for file " + javaFile);
+         throw new Error(); // to make the rest of the method unreachable
       }
       catch (ProblemLoaderException e) {
          exception = e;
@@ -136,8 +139,9 @@ public class ParserMessageTest {
             + "expected to occur.", secondLine.startsWith("//LINE "));
       int expectedLineNumber = Integer.parseInt(secondLine.substring(7));
 
-      assertEquals("Line number of retrieved parser message "
-            + "doesn't match expected line number.", expectedLineNumber,
+      assertEquals("Line number " + location.getLine() + " of retrieved parser message "
+            + "doesn't match expected line number " + expectedLineNumber + ".",
+            expectedLineNumber,
             location.getLine());
    }
 

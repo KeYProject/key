@@ -29,7 +29,7 @@
 			</classpath>
 			<formatter type="xml"/>
 			<test name="de.uka.ilkd.key.suite.TestKey" todir="${test.reports}" />
-			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest" todir="${test.reports}" />
+			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite" todir="${test.reports}" />
 			<test name="de.uka.ilkd.key.proof.proverules.ProveRulesTest" todir="${test.reports}" />
 		</junit>
 		<fail message="Test failure detected, check test results." if="test.failedOrError" />
@@ -93,8 +93,8 @@
 				<pathelement path="${basedir}/../key.util.test/bin"/>
 				<pathelement path="${build.dir}"/>
 			</classpath>
-			<formatter type="brief" usefile="false" />
-			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest" />
+			<formatter type="xml"/>
+			<test name="de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite" />
 		</junit>
 	</target>
 
@@ -136,6 +136,7 @@
 		       sourcepath="${src.dir}" 
 		       includeantruntime="false" 
 		       source="1.7" 
+		       target="1.7"
 		       deprecation="off" 
 		       debug="on" 
 		       depend="${build.depend}" 

@@ -601,4 +601,5 @@ public final class ProblemInitializer {
    public ImmutableSet<PositionedString> getWarnings() {
       return warnings;
    }
+
 }

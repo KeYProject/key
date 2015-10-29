@@ -470,7 +470,7 @@ public class JMLSpecFactory {
                 textualSpecCase.getReturns());
         clauses.infFlowSpecs =
                 translateInfFlowSpecClauses(pm, progVars.selfVar,
-                                            progVars.paramVars, progVars.resultVar,
+                                            progVars.paramVars, progVars.resultVar, progVars.excVar,
                                             textualSpecCase.getInfFlowSpecs());
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;
@@ -511,6 +511,7 @@ public class JMLSpecFactory {
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
                                     ProgramVariable resultVar,
+                                    ProgramVariable excVar,
                                     ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses.isEmpty()) {
@@ -522,7 +523,7 @@ public class JMLSpecFactory {
                 InfFlowSpec translated =
                             JMLTranslator.translate(expr, pm.getContainerType(),
                                                     selfVar, paramVars, resultVar,
-                                                    null, null, InfFlowSpec.class, services);
+                                                    excVar, null, InfFlowSpec.class, services);
                 result = result.append(translated);
             }
             return result;
@@ -1461,6 +1462,7 @@ public class JMLSpecFactory {
             paramVars = paramVars.prepend(paramLocVar);
         }
         ProgramVariable resultVar = TB.resultVar(pm, false);
+        ProgramVariable excVar = TB.excVar(pm, false); // only for information flow
 
         final ImmutableList<LocationVariable> allHeaps =
                 services.getTypeConverter().getHeapLDT().getAllHeaps();
@@ -1535,7 +1537,7 @@ public class JMLSpecFactory {
         for(LocationVariable heap : allHeaps) {
             if (!originalInfFlowSpecs.isEmpty() && heap.equals(baseHeap)) {
                 infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, allVars,
-                                                                  resultVar, originalInfFlowSpecs);
+                                                                  resultVar, excVar, originalInfFlowSpecs);
             } else {
                 infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
             }

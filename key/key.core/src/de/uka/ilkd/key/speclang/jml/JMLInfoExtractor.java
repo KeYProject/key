@@ -117,6 +117,54 @@ public final class JMLInfoExtractor {
         
         return checkFor(mod, coms);
     }    
+
+
+    /**
+     * Extracts the list of comments for a given field.
+     * The comments should usually be modifiers.
+     * @param fieldName
+     * @param containingClass
+     * @return
+     */
+	private static ImmutableList<Comment> extractFieldModifiers(String fieldName, KeYJavaType containingClass) {
+        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+		if(!(containingClass.getJavaType() instanceof TypeDeclaration)) {
+            return comments;
+        }
+
+        TypeDeclaration td = (TypeDeclaration) containingClass.getJavaType();
+        FieldDeclaration fd = null;
+        int position = 0;
+
+        for(final MemberDeclaration md : td.getMembers()) {
+            if (md instanceof FieldDeclaration) {
+                FieldDeclaration tmp = (FieldDeclaration) md;
+                ImmutableArray<FieldSpecification> aofs 
+                	= tmp.getFieldSpecifications();
+                for(int j = 0; j < aofs.size(); j++) {
+                    if(aofs.get(j).getProgramName().equals(fieldName)) {
+                        fd = tmp;
+                        position = j;
+                    }
+                }
+            }
+        }
+
+        if(fd == null) {
+            // Field not found
+            return comments;
+        }
+
+        comments = comments.prepend(fd.getComments());
+        comments = comments.prepend(fd.getTypeReference().getComments());
+        comments = comments.prepend(fd.getFieldSpecifications()
+        	                      .get(position).getComments());
+        
+        for(Modifier mod : fd.getModifiers()) {
+            comments = comments.prepend(mod.getComments());
+        }
+		return comments;
+	}
     
     
     //-------------------------------------------------------------------------
@@ -194,43 +242,8 @@ public final class JMLInfoExtractor {
     public static boolean isNullable(String fieldName,
 	    			     KeYJavaType containingClass) {
 
-        if(!(containingClass.getJavaType() instanceof TypeDeclaration)) {
-            return false;
-        }
-
-        TypeDeclaration td = (TypeDeclaration) containingClass.getJavaType();
-        FieldDeclaration fd = null;
-        int position = 0;
-
-        for(final MemberDeclaration md : td.getMembers()) {
-            if (md instanceof FieldDeclaration) {
-                FieldDeclaration tmp = (FieldDeclaration) md;
-                ImmutableArray<FieldSpecification> aofs 
-                	= tmp.getFieldSpecifications();
-                for(int j = 0; j < aofs.size(); j++) {
-                    if(aofs.get(j).getProgramName().equals(fieldName)) {
-                        fd = tmp;
-                        position = j;
-                    }
-                }
-            }
-        }
-
-        if(fd == null) {
-            // Field not found
-            return false;
-        }
-
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
-
-        comments = comments.prepend(fd.getComments());
-        comments = comments.prepend(fd.getTypeReference().getComments());
-        comments = comments.prepend(fd.getFieldSpecifications()
-        	                      .get(position).getComments());
-        
-        for(Modifier mod : fd.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
-        }
+        ImmutableList<Comment> comments = extractFieldModifiers(fieldName, containingClass);
+        if (comments.isEmpty()) return false;
 
         boolean non_null = checkFor("non_null", comments);
         boolean nullable = checkFor("nullable", comments);
@@ -241,7 +254,7 @@ public final class JMLInfoExtractor {
             return nullable;
         }
     }
-    
+
     
    
     /**

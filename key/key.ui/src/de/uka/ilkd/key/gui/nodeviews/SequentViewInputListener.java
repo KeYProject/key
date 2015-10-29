@@ -125,7 +125,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
     @Override
     public void mouseMoved(MouseEvent me) {
         showTermInfo(me.getPoint());
-        if (sequentView.refreshHighlightning && refresh) {
+        if (sequentView.refreshHighlightning && refresh && sequentView.getDocument().getLength() > 0) {
             sequentView.highlight(me.getPoint());
         }
     }

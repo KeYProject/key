@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="org.key_project.javaeditor.javaConfigurationExtensions" name="Java Configuration Extensions" schema="schema/org.key_project.javaeditor.javaConfigurationExtensions.exsd"/>
    <extension-point id="org.key_project.javaeditor.javaEditorPreferenceListener" name="Java Editor Preference Listener" schema="schema/org.key_project.javaeditor.javaEditorPreferenceListener.exsd"/>
+   <extension-point id="org.key_project.javaeditor.javaOutlineExtension" name="Java Outline Modify Extension" schema="schema/org.key_project.javaeditor.javaOutlineExtension.exsd"/>
    <extension
          point="org.eclipse.ui.startup">
       <startup

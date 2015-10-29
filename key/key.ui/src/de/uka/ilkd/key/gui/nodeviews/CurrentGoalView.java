@@ -167,6 +167,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
         if (ranges != null) {
             for (Range range : ranges) {
+                // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
+                // fix for a shift of highlighted areas to the left that occurred after the
+                // change to HTML documents in the JEditorPane (previous JTextArea). If
+                // something concerning highlighting does not work in the future, here could
+                // be a starting place to find the mistake.
+                range = new Range(range.start() + 1, range.end() + 1);
+                
                 Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
@@ -210,7 +217,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             do {
                 errorocc = false;
                 try {
-                    setText(getLogicPrinter().toString());
+                    setText(getSyntaxHighlighter().process(
+                            getLogicPrinter().toString(),
+                            getMainWindow().getMediator().getSelectedNode()));
                     MainWindow.getInstance().sequentViewSearchBar.search();
                 } catch (Error e) {
                     System.err.println("Error occurred while printing Sequent!");

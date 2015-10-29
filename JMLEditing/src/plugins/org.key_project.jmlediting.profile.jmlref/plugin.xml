@@ -13,5 +13,122 @@
             class="org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile">
       </profile>
    </extension>
-
+        <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+      <renameParticipant
+            class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLRenameParticipantFieldAndMethod"
+            id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantFieldAndMethod"
+            name="%JMLRenameParticipantFieldAndMethod">
+            <enablement>
+              <with variable="affectedNatures">
+                <iterate operator="or">
+                  <equals value="org.eclipse.jdt.core.javanature"/>
+                </iterate>
+              </with>
+               <or>
+                 <with variable="element">
+                     <instanceof value="org.eclipse.jdt.core.IMethod"/>
+                 </with>
+                  <with variable="element">
+                     <instanceof value="org.eclipse.jdt.core.IField"/>
+                 </with>
+               </or>
+            </enablement>
+      </renameParticipant>
+   </extension>
+     <extension
+   point="org.eclipse.ltk.core.refactoring.renameParticipants">
+<renameParticipant
+      class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLRenameParticipantParameters"
+      id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantParameters"
+      name="%JMLRenameParticipantParameters">
+      <enablement>
+        <with variable="affectedNatures">
+          <iterate operator="or">
+            <equals value="org.eclipse.jdt.core.javanature"/>
+          </iterate>
+        </with>
+        <with variable="element">
+          <instanceof value="org.eclipse.jdt.core.ILocalVariable"/>
+        </with>
+      </enablement>
+</renameParticipant>
+</extension>
+     <extension
+   point="org.eclipse.ltk.core.refactoring.renameParticipants">
+<renameParticipant
+      class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLRenameParticipantClass"
+      id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantClass"
+      name="%JMLRenameParticipantClass">
+      <enablement>
+        <with variable="affectedNatures">
+          <iterate operator="or">
+            <equals value="org.eclipse.jdt.core.javanature"/>
+          </iterate>
+        </with>
+        <with variable="element">
+          <instanceof value="org.eclipse.jdt.core.IType"/>
+        </with>
+      </enablement>
+</renameParticipant>
+</extension>
+<extension
+   point="org.eclipse.ltk.core.refactoring.renameParticipants">
+   <renameParticipant
+      class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLRenameParticipantPackage"
+      id="org.key_project.jmlediting.profile.jmlref.renameJMLParticipantPackage"
+      name="%JMLRenameParticipantPackage">
+      <enablement>
+        <with variable="affectedNatures">
+          <iterate operator="or">
+            <equals value="org.eclipse.jdt.core.javanature"/>
+          </iterate>
+        </with>
+        <with variable="element">
+          <instanceof value="org.eclipse.jdt.core.IPackageFragment"/>
+        </with>
+      </enablement>
+   </renameParticipant>
+</extension>
+     <extension
+point="org.eclipse.ltk.core.refactoring.moveParticipants">
+<moveParticipant
+     id="org.eclipse.jdt.junit.moveClassParticipant"
+     name="JML Move Participant Class"
+class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLMoveParticipantClass">
+     <enablement>
+       <with variable="affectedNatures">
+         <iterate operator="or">
+           <equals value="org.eclipse.jdt.core.javanature"/>
+         </iterate>
+       </with>
+       <with variable="element">
+         <instanceof value="org.eclipse.jdt.core.IType"/>
+       </with>
+     </enablement>
+</moveParticipant>
+         </extension>
+     <extension
+           point="org.eclipse.ltk.core.refactoring.moveParticipants">
+        <moveParticipant
+              class="org.key_project.jmlediting.profile.jmlref.refactoring.participants.JMLMoveParticipantSFieldAndMethod"
+              id="org.key_project.jmlediting.profile.jmlref.moveSFieldParticipant1"
+              name="JML Move Participant Static Fields and Methods">
+           <enablement>
+           <with variable="affectedNatures">
+                <iterate operator="or">
+                  <equals value="org.eclipse.jdt.core.javanature"/>
+                </iterate>
+              </with>
+              <or>
+              <with variable="element">
+                <instanceof value="org.eclipse.jdt.core.IField"/>
+              </with>
+               <with variable="element">
+                <instanceof value="org.eclipse.jdt.core.IMethod"/>
+              </with>
+              </or>
+              </enablement>
+        </moveParticipant>
+     </extension>
 </plugin>

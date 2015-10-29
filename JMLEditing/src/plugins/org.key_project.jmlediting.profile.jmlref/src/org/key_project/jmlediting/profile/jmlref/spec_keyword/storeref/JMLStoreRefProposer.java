@@ -243,10 +243,7 @@ public class JMLStoreRefProposer {
    private MethodDeclaration getMethodDeclaration() {
       final int offset = this.context.getInvocationOffset();
 
-      final CommentLocator locator = new CommentLocator(this.context
-            .getDocument().get());
-
-      final CommentRange range = locator.getJMLComment(offset);
+      final CommentRange range = CommentLocator.getJMLComment(this.context.getDocument(), offset);
 
       return this.parameterMap.get(range.getBeginOffset());
    }

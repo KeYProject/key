@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project name="key" default="compileAll" basedir=".">
-        <property name="key.dir" value="${basedir}/../"/>
+	<property name="key.dir" value="${basedir}/../"/>
+	<property name="rep.dir" value="${basedir}/../../"/>
 	<property name="javadoc.dir" value="${key.dir}/deployment/api/"/>
 	<property environment="env"/>
 
@@ -41,7 +42,7 @@
 		</exec>	
 		<!-- Zip source code -->
 		<zip destfile="${key.dir}/deployment/key-src-${key.version}_${git.revision}.zip"
-		     basedir="${key.dir}/"
+		     basedir="${rep.dir}/"
 		     excludes="*-src-*,*.jnlp,**/deployment/**,**/bin/**,*~,**/oldStuff/**"
 		 />
 		<!-- Create Jar archives -->

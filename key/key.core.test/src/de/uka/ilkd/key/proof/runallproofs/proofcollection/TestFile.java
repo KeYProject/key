@@ -6,10 +6,17 @@ import java.io.Serializable;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.util.Pair;
 
 import static org.junit.Assert.*;
 
@@ -23,6 +30,8 @@ import static org.junit.Assert.*;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestFile implements Serializable {
+
+   private static final long serialVersionUID = 7779439078807127045L;
 
    private final TestProperty testProperty;
    private final String path;
@@ -87,7 +96,7 @@ public class TestFile implements Serializable {
     *            not exist.
     */
    public File getKeYFile() throws IOException {
-      File baseDirectory = settings.getBaseDirectory();
+      File baseDirectory = settings.getGroupDirectory();
       File keyFile = getAbsoluteFile(baseDirectory, path);
 
       if (keyFile.isDirectory()) {
@@ -137,6 +146,8 @@ public class TestFile implements Serializable {
       // Initialize KeY settings.
       String gks = settings.getGlobalKeYSettings();
       ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
+      String lks = settings.getLocalKeYSettings();
+      ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
 
       // Name resolution for the available KeY file.
       File keyFile = getKeYFile();
@@ -151,7 +162,9 @@ public class TestFile implements Serializable {
       boolean success;
       try {
          // Initialize KeY environment and load proof.
-         env = KeYEnvironment.load(keyFile);
+         Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair = load(keyFile);
+         env = pair.first;
+         Pair<String, Location> script = pair.second;
          loadedProof = env.getLoadedProof();
 
          // For a reload test we are done at this point. Loading was successful.
@@ -163,7 +176,15 @@ public class TestFile implements Serializable {
          }
 
          // Run KeY prover.
+         if(script == null) {
+             // auto mode
          env.getProofControl().startAndWaitForAutoMode(loadedProof);
+         } else {
+             // ... script
+             ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+             pse.execute(env.getUi(), env.getLoadedProof());
+         }
+
          success = (testProperty == TestProperty.PROVABLE) == loadedProof
                .closed();
          if(verbose) {
@@ -185,19 +206,16 @@ public class TestFile implements Serializable {
             // Save the available proof to a temporary file.
             loadedProof.saveToFile(proofFile);
             reloadProof(proofFile);
-         }
-
-         if(verbose) {
-            System.err.println("... success: reloaded.");
+            if(verbose) {
+                System.err.println("... success: reloaded.");
+            }
          }
       }
       catch (Throwable t) {
          if(verbose) {
             t.printStackTrace(System.err);
          }
-         throw new Exception(
-               "Exception while attempting to prove file (see cause for details): "
-                     + keyFile, t);
+         throw t;
       }
       finally {
          if (loadedProof != null) {
@@ -209,6 +227,20 @@ public class TestFile implements Serializable {
       }
 
       return getRunAllProofsTestResult(success, settings);
+   }
+
+   /*
+    * has resemblances with KeYEnvironment.load ...
+    */
+   private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(File keyFile) throws ProblemLoaderException, ProofInputException {
+       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+       AbstractProblemLoader loader = ui.load(null, keyFile, null, null, null, null, false);
+       InitConfig initConfig = loader.getInitConfig();
+       KeYEnvironment<DefaultUserInterfaceControl> env =
+               new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig,
+                       loader.getProof(), loader.getResult());
+       Pair<String, Location> proofScript = loader.hasProofScript() ? loader.readProofScript() : null;
+       return new Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>>(env, proofScript);
    }
 
    /**

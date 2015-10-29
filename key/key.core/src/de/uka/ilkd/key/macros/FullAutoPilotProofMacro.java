@@ -48,6 +48,11 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
         return "Auto Pilot";
     }
 
+    @Override
+    public String getScriptCommandName() {
+        return "autopilot";
+    }
+
 
     @Override
     public String getDescription() {

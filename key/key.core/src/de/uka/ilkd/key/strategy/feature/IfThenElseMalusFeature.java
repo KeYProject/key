@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import org.key_project.util.LRUCache;
+
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -38,8 +40,14 @@ public class IfThenElseMalusFeature implements Feature {
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
         if ( pos == null ) return NumberRuleAppCost.getZeroCost();
 
-        ServiceCaches caches = goal.proof().getServices().getCaches();
-        RuleAppCost resInt = caches.getIfThenElseMalusCache().get ( pos );
+        final ServiceCaches caches = goal.proof().getServices().getCaches();
+        
+        RuleAppCost resInt;
+        final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache = caches.getIfThenElseMalusCache();
+        synchronized(ifThenElseMalusCache) {
+            resInt = ifThenElseMalusCache.get ( pos );
+        }
+        
         if ( resInt != null ) {
             return resInt;
         }
@@ -56,7 +64,11 @@ public class IfThenElseMalusFeature implements Feature {
         }
 
         resInt = NumberRuleAppCost.create ( res );
-        caches.getIfThenElseMalusCache().put ( pos, resInt );
+
+        synchronized(ifThenElseMalusCache) {
+            ifThenElseMalusCache.put ( pos, resInt );
+        }
+
         return resInt;
     }
 }
