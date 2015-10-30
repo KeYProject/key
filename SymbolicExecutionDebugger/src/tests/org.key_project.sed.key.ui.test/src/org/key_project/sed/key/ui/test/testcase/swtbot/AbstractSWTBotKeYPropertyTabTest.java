@@ -179,7 +179,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
     * @throws Exception Occurred Exception.
     */
    protected void selectLoopBodyTermination(SWTBotView debugView) throws Exception {
-      TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 0, 4, 0, 2);
+      TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 0, 4, 0, 3);
    }
 
    /**
