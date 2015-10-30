@@ -13,20 +13,20 @@
 
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchStatement;
-import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
-import org.key_project.sed.core.model.ISEDExceptionalTermination;
-import org.key_project.sed.core.model.ISEDLoopBodyTermination;
-import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDLoopStatement;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodContract;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEBranchStatement;
+import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEExceptionalTermination;
+import org.key_project.sed.core.model.ISELoopBodyTermination;
+import org.key_project.sed.core.model.ISELoopCondition;
+import org.key_project.sed.core.model.ISELoopInvariant;
+import org.key_project.sed.core.model.ISELoopStatement;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISEMethodContract;
+import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISETermination;
+import org.key_project.sed.core.model.ISEThread;
 
 /**
  * <p>
@@ -47,107 +47,107 @@ public interface IExecutionTreeImageConstants {
    public static final String PREFIX = "org.key_project.sed.ui.visualization.";
    
    /**
-    * Key of the image for {@link ISEDBranchCondition}s.
+    * Key of the image for {@link ISEBranchCondition}s.
     */
    public static final String IMG_BRANCH_CONDITION = PREFIX + "branchCondition";
 
    /**
-    * Key of the image for {@link ISEDBranchStatement}s.
+    * Key of the image for {@link ISEBranchStatement}s.
     */
    public static final String IMG_BRANCH_STATEMENT = PREFIX + "branchStatement";
 
    /**
-    * Key of the image for {@link ISEDExceptionalTermination}s.
+    * Key of the image for {@link ISEExceptionalTermination}s.
     */
    public static final String IMG_EXCEPTIONAL_TERMINATION = PREFIX + "exceptionalTermination";
 
    /**
-    * Key of the image for {@link ISEDExceptionalTermination}s.
+    * Key of the image for {@link ISEExceptionalTermination}s.
     */
    public static final String IMG_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = PREFIX + "exceptionalTerminationNotVerified";
 
    /**
-    * Key of the image for {@link ISEDLoopCondition}s.
+    * Key of the image for {@link ISELoopCondition}s.
     */
    public static final String IMG_LOOP_CONDITION = PREFIX + "loopCondition";
 
    /**
-    * Key of the image for {@link ISEDLoopStatement}s.
+    * Key of the image for {@link ISELoopStatement}s.
     */
    public static final String IMG_LOOP_STATEMENT = PREFIX + "loopStatement";
 
    /**
-    * Key of the image for {@link ISEDMethodCall}s.
+    * Key of the image for {@link ISEMethodCall}s.
     */
    public static final String IMG_METHOD_CALL = PREFIX + "methodCall";
 
    /**
-    * Key of the image for {@link ISEDMethodReturn}s.
+    * Key of the image for {@link ISEMethodReturn}s.
     */
    public static final String IMG_METHOD_RETURN = PREFIX + "methodReturn";
 
    /**
-    * Key of the image for {@link ISEDExceptionalMethodReturn}s.
+    * Key of the image for {@link ISEExceptionalMethodReturn}s.
     */
    public static final String IMG_EXCEPTIONAL_METHOD_RETURN = PREFIX + "exceptionalMethodReturn";
 
    /**
-    * Key of the image for {@link ISEDStatement}s.
+    * Key of the image for {@link ISEStatement}s.
     */
    public static final String IMG_STATEMENT = PREFIX + "statement";
 
    /**
-    * Key of the image for {@link ISEDTermination}s.
+    * Key of the image for {@link ISETermination}s.
     */
    public static final String IMG_TERMINATION = PREFIX + "termination";
 
    /**
-    * Key of the image for {@link ISEDTermination}s.
+    * Key of the image for {@link ISETermination}s.
     */
    public static final String IMG_TERMINATION_NOT_VERIFIED = PREFIX + "terminationNotVerified";
 
    /**
-    * Key of the image for {@link ISEDMethodContract}s.
+    * Key of the image for {@link ISEMethodContract}s.
     */
    public static final String IMG_METHOD_CONTRACT = PREFIX + "methodContract";
 
    /**
-    * Key of the image for {@link ISEDMethodContract}s.
+    * Key of the image for {@link ISEMethodContract}s.
     */
    public static final String IMG_METHOD_CONTRACT_NOT_NPC = PREFIX + "methodContractNotNpc";
 
    /**
-    * Key of the image for {@link ISEDMethodContract}s.
+    * Key of the image for {@link ISEMethodContract}s.
     */
    public static final String IMG_METHOD_CONTRACT_NOT_PRE = PREFIX + "methodContractNotPre";
 
    /**
-    * Key of the image for {@link ISEDMethodContract}s.
+    * Key of the image for {@link ISEMethodContract}s.
     */
    public static final String IMG_METHOD_CONTRACT_NOT_PRE_NOT_NPC = PREFIX + "methodContractNotPreAndNotNpc";
 
    /**
-    * Key of the image for {@link ISEDLoopInvariant}s.
+    * Key of the image for {@link ISELoopInvariant}s.
     */
    public static final String IMG_LOOP_INVARIANT = PREFIX + "loopInvariant";
 
    /**
-    * Key of the image for {@link ISEDLoopInvariant}s.
+    * Key of the image for {@link ISELoopInvariant}s.
     */
    public static final String IMG_LOOP_INVARIANT_INITIALLY_INVALID = PREFIX + "loopInvariantInitiallyInvalid";
 
    /**
-    * Key of the image for {@link ISEDLoopBodyTermination}s.
+    * Key of the image for {@link ISELoopBodyTermination}s.
     */
    public static final String IMG_LOOP_BODY_TERMINATION = PREFIX + "loopBodyTermination";
 
    /**
-    * Key of the image for {@link ISEDLoopBodyTermination}s.
+    * Key of the image for {@link ISELoopBodyTermination}s.
     */
    public static final String IMG_LOOP_BODY_TERMINATION_NOT_VERIFIED = PREFIX + "loopBodyTerminationNotVerified";
    
    /**
-    * Key of the image for {@link ISEDThread}s.
+    * Key of the image for {@link ISEThread}s.
     */
    public static final String IMG_THREAD = PREFIX + "thread";
 

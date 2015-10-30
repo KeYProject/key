@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.key.evaluation.model.Activator;
 import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
@@ -293,8 +293,8 @@ public class ReviewingCodeJavaProjectModifier extends AbstractSEDJavaProjectModi
                   if (found) {
                      IDebugTarget target = launch.getDebugTarget();
                      toSelect.add(target);
-                     if (target instanceof ISEDDebugTarget) {
-                        CollectionUtil.addAll(toSelect, ((ISEDDebugTarget) target).getSymbolicThreads());
+                     if (target instanceof ISEDebugTarget) {
+                        CollectionUtil.addAll(toSelect, ((ISEDebugTarget) target).getSymbolicThreads());
                      }
                      else {
                         CollectionUtil.addAll(toSelect, target.getThreads());

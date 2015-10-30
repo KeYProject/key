@@ -32,8 +32,8 @@ import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
@@ -80,7 +80,7 @@ public final class ExecutionTreeUtil {
     * Checks if grouping is supported.
     * @param fp The {@link IFeatureProvider} to use.
     * @param context The {@link IPictogramElementContext} to check.
-    * @return {@code false} {@link ISEDGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEDGroupable} might be part of the symbolic execution tree.
+    * @return {@code false} {@link ISEGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEGroupable} might be part of the symbolic execution tree.
     */
    public static boolean isGroupingSupported(IFeatureProvider fp, IPictogramElementContext context) {
       PictogramElement pe = context.getPictogramElement();
@@ -101,13 +101,13 @@ public final class ExecutionTreeUtil {
    /**
     * Checks if grouping is supported.
     * @param element The {@link IDebugElement} to check.
-    * @return {@code false} {@link ISEDGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEDGroupable} might be part of the symbolic execution tree.
+    * @return {@code false} {@link ISEGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEGroupable} might be part of the symbolic execution tree.
     */
    public static boolean isGroupingSupported(IDebugElement element) {
       if (element != null) {
          IDebugTarget target = ((IDebugElement) element).getDebugTarget();
-         if (target instanceof ISEDDebugTarget) {
-            return ((ISEDDebugTarget) target).isGroupingSupported();
+         if (target instanceof ISEDebugTarget) {
+            return ((ISEDebugTarget) target).isGroupingSupported();
          }
          else {
             return false;
@@ -179,25 +179,25 @@ public final class ExecutionTreeUtil {
    }
    
    /**
-    * Returns all {@link ISEDDebugTarget}s which are linked to the
+    * Returns all {@link ISEDebugTarget}s which are linked to the
     * {@link Diagram} managed by the given {@link IDiagramTypeProvider}.
     * @param diagramTypeProvider The {@link IDiagramTypeProvider}.
-    * @return The linked {@link ISEDDebugTarget}s.
+    * @return The linked {@link ISEDebugTarget}s.
     */
-   public static ISEDDebugTarget[] getAllDebugTargets(IDiagramTypeProvider diagramTypeProvider) {
-      List<ISEDDebugTarget> result = new LinkedList<ISEDDebugTarget>();
+   public static ISEDebugTarget[] getAllDebugTargets(IDiagramTypeProvider diagramTypeProvider) {
+      List<ISEDebugTarget> result = new LinkedList<ISEDebugTarget>();
       if (diagramTypeProvider != null) {
          IFeatureProvider featureProvider = diagramTypeProvider.getFeatureProvider();
          if (featureProvider != null) {
             Object[] bos = featureProvider.getAllBusinessObjectsForPictogramElement(diagramTypeProvider.getDiagram());
             for (Object bo : bos) {
-               if (bo instanceof ISEDDebugTarget) {
-                  result.add((ISEDDebugTarget)bo);
+               if (bo instanceof ISEDebugTarget) {
+                  result.add((ISEDebugTarget)bo);
                }
             }
          }
       }
-      return result.toArray(new ISEDDebugTarget[result.size()]);
+      return result.toArray(new ISEDebugTarget[result.size()]);
    }
    
    /**

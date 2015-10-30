@@ -15,11 +15,11 @@ package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISourcePathProvider;
-import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.impl.AbstractSEBranchCondition;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
@@ -30,11 +30,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDBranchCondition} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEBranchCondition} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYBranchCondition extends AbstractSEDBranchCondition implements IKeYSEDDebugNode<IExecutionBranchCondition> {
+public class KeYBranchCondition extends AbstractSEBranchCondition implements IKeYSENode<IExecutionBranchCondition> {
    /**
     * The {@link IExecutionBranchCondition} to represent by this debug node.
     */
@@ -43,12 +43,12 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The constraints
@@ -63,7 +63,7 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
    
    /**
     * Constructor.
@@ -73,7 +73,7 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
     * @param executionNode The {@link IExecutionBranchCondition} to represent by this debug node.
     */
    public KeYBranchCondition(KeYDebugTarget target, 
-                             IKeYSEDDebugNode<?> parent, 
+                             IKeYSENode<?> parent, 
                              KeYThread thread, 
                              IExecutionBranchCondition executionNode) throws DebugException {
       super(target, parent, thread);
@@ -103,15 +103,15 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -173,7 +173,7 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -263,8 +263,8 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    public String getSourcePath() {
       try {
          // Return source path of the parent which is not a branch condition.
-         ISEDDebugNode parent = getParent();
-         while (parent != null && parent instanceof ISEDBranchCondition) {
+         ISENode parent = getParent();
+         while (parent != null && parent instanceof ISEBranchCondition) {
             parent = parent.getParent();
          }
          if (parent instanceof ISourcePathProvider) {
@@ -283,7 +283,7 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -296,7 +296,7 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 

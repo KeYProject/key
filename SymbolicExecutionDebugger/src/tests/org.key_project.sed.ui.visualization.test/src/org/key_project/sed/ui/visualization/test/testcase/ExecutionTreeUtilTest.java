@@ -35,8 +35,8 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.memory.SEMemoryDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -56,7 +56,7 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
    @Test
    public void testGetAllDebugTargets() throws CoreException, IOException {
       // Test null
-      ISEDDebugTarget[] targets = ExecutionTreeUtil.getAllDebugTargets(null);
+      ISEDebugTarget[] targets = ExecutionTreeUtil.getAllDebugTargets(null);
       assertDebugTargets(targets);
       // Test diagram type provider without diagram
       final IDiagramTypeProvider typeProvider = GraphitiUi.getExtensionManager().createDiagramTypeProvider(ExecutionTreeDiagramTypeProvider.PROVIDER_ID);
@@ -72,7 +72,7 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets);
       // Test empty linked debug targets
-      final ISEDDebugTarget[] expectedTargets = new ISEDDebugTarget[0];
+      final ISEDebugTarget[] expectedTargets = new ISEDebugTarget[0];
       TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(diagram);
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override
@@ -83,8 +83,8 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets);
       // Test one linked debug target
-      SEDMemoryDebugTarget firstTarget = new SEDMemoryDebugTarget(null, false);
-      final ISEDDebugTarget[] expectedTargetsOne = {firstTarget};
+      SEMemoryDebugTarget firstTarget = new SEMemoryDebugTarget(null, false);
+      final ISEDebugTarget[] expectedTargetsOne = {firstTarget};
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override
          protected void doExecute() {
@@ -94,8 +94,8 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets, firstTarget);
       // Test two linked debug targets
-      SEDMemoryDebugTarget secondTarget = new SEDMemoryDebugTarget(null, false);
-      final ISEDDebugTarget[] expectedTargetsTwo = {firstTarget, secondTarget};
+      SEMemoryDebugTarget secondTarget = new SEMemoryDebugTarget(null, false);
+      final ISEDebugTarget[] expectedTargetsTwo = {firstTarget, secondTarget};
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override
          protected void doExecute() {
@@ -107,12 +107,12 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
    }
    
    /**
-    * Makes sure that the correct {@link ISEDDebugTarget} are given.
-    * @param actualTargets The current {@link ISEDDebugTarget}s.
-    * @param expectedTargets The expected {@link ISEDDebugTarget}s.
+    * Makes sure that the correct {@link ISEDebugTarget} are given.
+    * @param actualTargets The current {@link ISEDebugTarget}s.
+    * @param expectedTargets The expected {@link ISEDebugTarget}s.
     * @throws DebugException Occurred Exception.
     */
-   protected void assertDebugTargets(ISEDDebugTarget[] actualTargets, ISEDDebugTarget...expectedTargets) throws DebugException {
+   protected void assertDebugTargets(ISEDebugTarget[] actualTargets, ISEDebugTarget...expectedTargets) throws DebugException {
       assertNotNull(actualTargets);
       assertEquals(actualTargets.length, expectedTargets.length);
       for (int i = 0; i < actualTargets.length; i++) {

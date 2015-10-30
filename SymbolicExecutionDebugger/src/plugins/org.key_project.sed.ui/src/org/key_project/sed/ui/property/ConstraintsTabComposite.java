@@ -29,10 +29,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.core.model.ISEDConstraint;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDValue;
-import org.key_project.sed.core.model.ISEDVariable;
+import org.key_project.sed.core.model.ISEConstraint;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEValue;
+import org.key_project.sed.core.model.ISEVariable;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.sed.ui.util.SEDUIPreferenceUtil;
@@ -46,7 +46,7 @@ import org.key_project.util.java.ObjectUtil;
  * {@link ConstraintsVariablePropertySection}.
  * @author Martin Hentschel
  */
-public class ConstraintsTabComposite implements ISEDDebugNodeTabContent, IVariableTabContent {
+public class ConstraintsTabComposite implements ISENodeTabContent, IVariableTabContent {
    /**
     * The {@link Color} used to highlight relevant constraints.
     */
@@ -69,8 +69,8 @@ public class ConstraintsTabComposite implements ISEDDebugNodeTabContent, IVariab
       @Override
       protected String getText(Object element) {
          try {
-            if (element instanceof ISEDConstraint) {
-               return ((ISEDConstraint) element).getName();
+            if (element instanceof ISEConstraint) {
+               return ((ISEConstraint) element).getName();
             }
             else {
                return ObjectUtil.toString(element);
@@ -129,28 +129,28 @@ public class ConstraintsTabComposite implements ISEDDebugNodeTabContent, IVariab
       showAllConstraintsAction.setChecked(SEDUIPreferenceUtil.isShowAllConstraints());
    }
    
-   private ISEDConstraint[] allConstraints;
+   private ISEConstraint[] allConstraints;
    
-   private Set<ISEDConstraint> relevantConstraints;
+   private Set<ISEConstraint> relevantConstraints;
 
    /**
     * {@inheritDoc}
     */
    @Override
    public void updateContent(IVariable variable) {
-      if (variable instanceof ISEDVariable) {
-         IStackFrame frame = ((ISEDVariable) variable).getStackFrame();
-         if (frame instanceof ISEDDebugNode) {
-            ISEDValue value = null;
+      if (variable instanceof ISEVariable) {
+         IStackFrame frame = ((ISEVariable) variable).getStackFrame();
+         if (frame instanceof ISENode) {
+            ISEValue value = null;
             try {
-               if (variable.getValue() instanceof ISEDValue) {
-                  value = (ISEDValue) variable.getValue();
+               if (variable.getValue() instanceof ISEValue) {
+                  value = (ISEValue) variable.getValue();
                }
             }
             catch (DebugException e) {
                // Nothing to do.
             }
-            doUpdateContent((ISEDDebugNode) frame, value);
+            doUpdateContent((ISENode) frame, value);
          }
          else {
             doUpdateContent(null, null);
@@ -165,23 +165,23 @@ public class ConstraintsTabComposite implements ISEDDebugNodeTabContent, IVariab
     * {@inheritDoc}
     */
    @Override
-   public void updateContent(ISEDDebugNode node) {
+   public void updateContent(ISENode node) {
       doUpdateContent(node, null);
    }
 
    /**
     * Updates the shown content.
-    * @param node The {@link ISEDDebugNode} which provides the content to show.
+    * @param node The {@link ISENode} which provides the content to show.
     */
-   protected void doUpdateContent(ISEDDebugNode node, ISEDValue value) {
+   protected void doUpdateContent(ISENode node, ISEValue value) {
       try {
          allConstraints = node != null && node.hasConstraints() ?
                           node.getConstraints() : 
-                          new ISEDConstraint[0];
+                          new ISEConstraint[0];
          if (value != null) {
-            relevantConstraints = new LinkedHashSet<ISEDConstraint>();
-            ISEDConstraint[] availableRelevantConstraints = value.getRelevantConstraints();
-            for (ISEDConstraint constraint : allConstraints) {
+            relevantConstraints = new LinkedHashSet<ISEConstraint>();
+            ISEConstraint[] availableRelevantConstraints = value.getRelevantConstraints();
+            for (ISEConstraint constraint : allConstraints) {
                if (ArrayUtil.contains(availableRelevantConstraints, constraint)) {
                   relevantConstraints.add(constraint);
                }

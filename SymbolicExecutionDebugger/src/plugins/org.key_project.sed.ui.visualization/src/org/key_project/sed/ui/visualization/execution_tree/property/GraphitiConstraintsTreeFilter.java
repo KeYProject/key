@@ -16,13 +16,13 @@ package org.key_project.sed.ui.visualization.execution_tree.property;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.util.java.ArrayUtil;
 
 /**
  * {@link IFilter} implementation used to check if
- * {@link ISEDGroupable#getGroupEndConditions()} is not empty.
+ * {@link ISEGroupable#getGroupEndConditions()} is not empty.
  * @author Martin Hentschel
  */
 public class GraphitiConstraintsTreeFilter extends GraphitiReadonlyDebugNodeTreeFilter {
@@ -33,7 +33,7 @@ public class GraphitiConstraintsTreeFilter extends GraphitiReadonlyDebugNodeTree
    protected boolean accept(PictogramElement pe, AbstractGraphitiDebugNodePropertySection section) {
       try {
          if (super.accept(pe, section)) {
-            ISEDDebugNode node = section.getDebugNode(pe);
+            ISENode node = section.getDebugNode(pe);
             return node != null && !ArrayUtil.isEmpty(node.getConstraints());
          }
          else {

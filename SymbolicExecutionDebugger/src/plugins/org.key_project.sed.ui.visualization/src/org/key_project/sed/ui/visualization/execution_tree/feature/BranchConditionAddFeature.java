@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDBranchCondition}s.
+ * Implementation of {@link IAddFeature} for {@link ISEBranchCondition}s.
  * @author Martin Hentschel
  */
 public class BranchConditionAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,14 +37,14 @@ public class BranchConditionAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDBranchCondition;
+      return businessObject instanceof ISEBranchCondition;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
+   protected String getImageId(ISENode node) {
       return IExecutionTreeImageConstants.IMG_BRANCH_CONDITION;
    }
 }

@@ -14,19 +14,19 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEGroupable;
 
 /**
- * {@link ISection} implementation to show the group ending conditions of an {@link ISEDGroupable}
- * which is provided via {@link ISEDGroupable#getGroupEndConditions()}.
+ * {@link ISection} implementation to show the group ending conditions of an {@link ISEGroupable}
+ * which is provided via {@link ISEGroupable#getGroupEndConditions()}.
  * @author Martin Hentschel
  */
-public class GroupEndConditionsPropertySection extends AbstractSEDDebugNodePropertySection {
+public class GroupEndConditionsPropertySection extends AbstractSENodePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new GroupEndConditionsTabComposite();
    }
 

@@ -15,10 +15,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
-import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 
 /**
- * Implementation of {@link IUpdateFeature} for {@link ISEDExceptionalMethodReturn}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISEExceptionalMethodReturn}s.
  * @author Martin Hentschel
  */
 public class ExceptionalMethodReturnUpdateFeature extends AbstractDebugNodeUpdateFeature {
@@ -35,6 +35,6 @@ public class ExceptionalMethodReturnUpdateFeature extends AbstractDebugNodeUpdat
     */
    @Override
    protected boolean canUpdateBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDExceptionalMethodReturn;
+      return businessObject instanceof ISEExceptionalMethodReturn;
    }
 }

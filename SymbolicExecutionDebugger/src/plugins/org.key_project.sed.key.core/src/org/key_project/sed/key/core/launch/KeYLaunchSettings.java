@@ -20,7 +20,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
-import org.key_project.sed.core.model.ISEDMethodReturn;
+import org.key_project.sed.core.model.ISEMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 
@@ -71,9 +71,9 @@ public class KeYLaunchSettings {
    private final String precondition;
    
    /**
-    * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
+    * If this is {@code true} an {@link ISEMethodReturn} will contain the return value,
     * but the performance will suffer.
-    * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
+    * If it is {@code false} only the name of the returned method is shown in an {@link ISEMethodReturn}.
     */
    private final boolean showMethodReturnValues;
    
@@ -175,7 +175,7 @@ public class KeYLaunchSettings {
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
     * @param precondition The precondition.
-    * @param showMethodReturnValues Show method return values of {@link ISEDMethodReturn} instances?
+    * @param showMethodReturnValues Show method return values of {@link ISEMethodReturn} instances?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
@@ -297,8 +297,8 @@ public class KeYLaunchSettings {
    }
 
    /**
-    * Checks if method return values of {@link ISEDMethodReturn} instances should be shown.
-    * @return Show method return values of {@link ISEDMethodReturn} instances?
+    * Checks if method return values of {@link ISEMethodReturn} instances should be shown.
+    * @return Show method return values of {@link ISEMethodReturn} instances?
     */
    public boolean isShowMethodReturnValues() {
       return showMethodReturnValues;

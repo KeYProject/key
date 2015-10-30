@@ -9,7 +9,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveSetAsWizard;
@@ -32,7 +32,7 @@ public class SWTBotSaveSetAsTest extends AbstractSymbolicExecutionTreeTest {
       final PathReplacement pr = new PathReplacement("D:\\Forschung\\Development\\SymbolicExecutionDebugger\\runtime-SymbolicExecutionDebugger.product\\SED Examples\\src\\Number.java", "Number.java");
       IDiagramTestSteps testSteps = new AbstractDiagramTestSteps() {
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             // Test launch
             assertSavedFile(bot, debugView, debugTree, project, "SavedLaunchSetFile", 0);
             // Test debug target

@@ -32,12 +32,12 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.util.ISEDIterator;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.util.ISEIterator;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -45,15 +45,15 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
- * {@link WizardPage} to define the initial values of new {@link ISEDDebugNode}s.
+ * {@link WizardPage} to define the initial values of new {@link ISENode}s.
  * @author Martin Hentschel
  * @see CreateDebugNodeWizard
  */
 public class CreateDebugNodeWizardPage extends WizardPage {
    /**
-    * The existing {@link ISEDDebugTarget}s shown in {@link #targetCombo}.
+    * The existing {@link ISEDebugTarget}s shown in {@link #targetCombo}.
     */
-   private ISEDDebugTarget[] debugTargets;
+   private ISEDebugTarget[] debugTargets;
    
    /**
     * Indicates that threads should be created.
@@ -71,41 +71,41 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    private Text nameText;
    
    /**
-    * {@link Combo} to select {@link ISEDDebugTarget}s.
+    * {@link Combo} to select {@link ISEDebugTarget}s.
     */
    private Combo targetCombo;
    
    /**
-    * {@link Combo} to select {@link ISEDThread}s.
+    * {@link Combo} to select {@link ISEThread}s.
     */
    private Combo threadCombo;
    
    /**
-    * Input field to define the parent in the {@link ISEDThread}.
+    * Input field to define the parent in the {@link ISEThread}.
     */
    private Combo parentCombo;
    
    /**
-    * The shown {@link ISEDThread}s in {@link #threadCombo}.
+    * The shown {@link ISEThread}s in {@link #threadCombo}.
     */
-   private ISEDThread[] threads;
+   private ISEThread[] threads;
    
    /**
-    * The shown {@link ISEDDebugNode}s in {@link #parentCombo}.
+    * The shown {@link ISENode}s in {@link #parentCombo}.
     */
-   private List<ISEDDebugNode> parents;
+   private List<ISENode> parents;
    
    /**
     * Constructor.
     * @param pageName The page name.
     * @param nodeType The name of the node type which should be created.
-    * @param debugTargets The existing {@link ISEDDebugTarget}s.
+    * @param debugTargets The existing {@link ISEDebugTarget}s.
     * @param threadCreation Indicates that threads should be created.
     * @param featureProvider The {@link IFeatureProvider} to use.
     */
    public CreateDebugNodeWizardPage(String pageName, 
                                     String nodeType, 
-                                    ISEDDebugTarget[] debugTargets,
+                                    ISEDebugTarget[] debugTargets,
                                     boolean threadCreation,
                                     IFeatureProvider featureProvider) {
       super(pageName);
@@ -151,7 +151,7 @@ public class CreateDebugNodeWizardPage extends WizardPage {
                updatePageCompleted();
             }
          });
-         for (ISEDDebugTarget target : debugTargets) {
+         for (ISEDebugTarget target : debugTargets) {
             SWTUtil.add(targetCombo, ObjectUtil.toString(target));
          }
       }
@@ -190,7 +190,7 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    }
 
    /**
-    * Updates the available {@link ISEDThread}s in {@link #threadCombo}.
+    * Updates the available {@link ISEThread}s in {@link #threadCombo}.
     */
    protected void updateThreads() {
       try {
@@ -198,10 +198,10 @@ public class CreateDebugNodeWizardPage extends WizardPage {
             // Remove old items
             threadCombo.removeAll();
             // Add new items if possible
-            ISEDDebugTarget target = getTarget();
+            ISEDebugTarget target = getTarget();
             if (target != null) {
                threads = target.getSymbolicThreads();
-               for (ISEDThread thread : threads) {
+               for (ISEThread thread : threads) {
                   SWTUtil.add(threadCombo, ObjectUtil.toString(thread));
                }
                // Select first item
@@ -218,7 +218,7 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    }
    
    /**
-    * Updates the available {@link ISEDDebugNode}s in {@link #parentCombo}.
+    * Updates the available {@link ISENode}s in {@link #parentCombo}.
     */   
    protected void updateParents() {
       try {
@@ -226,10 +226,10 @@ public class CreateDebugNodeWizardPage extends WizardPage {
             // Remove old items
             parentCombo.removeAll();
             // Add new items if possible
-            ISEDThread thread = getThread();
+            ISEThread thread = getThread();
             if (thread != null) {
                parents = listParents(thread);
-               for (ISEDDebugNode parent : parents) {
+               for (ISENode parent : parents) {
                   SWTUtil.add(parentCombo, ObjectUtil.toString(parent));
                }
                // Select first item
@@ -244,20 +244,20 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    }
    
    /**
-    * Collects the contained {@link ISEDDebugNode}s in the given {@link ISEDThread}.
-    * @param thread The given {@link ISEDThread}.
-    * @return The contained {@link ISEDDebugNode}s.
+    * Collects the contained {@link ISENode}s in the given {@link ISEThread}.
+    * @param thread The given {@link ISEThread}.
+    * @return The contained {@link ISENode}s.
     * @throws DebugException Occurred Exception.
     */
-   protected List<ISEDDebugNode> listParents(ISEDThread thread) throws DebugException {
-      LinkedList<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
-      ISEDIterator iter = new SEDPreorderIterator(thread);
+   protected List<ISENode> listParents(ISEThread thread) throws DebugException {
+      LinkedList<ISENode> children = new LinkedList<ISENode>();
+      ISEIterator iter = new SEPreorderIterator(thread);
       while (iter.hasNext()) {
-         ISEDDebugElement next = iter.next();
-         if (next instanceof ISEDDebugNode) {
+         ISEDebugElement next = iter.next();
+         if (next instanceof ISENode) {
             PictogramElement pe = featureProvider.getPictogramElementForBusinessObject(next);
             if (pe != null) { // Do not include hidden (removed) elements
-               children.addFirst((ISEDDebugNode)next);
+               children.addFirst((ISENode)next);
             }
          }
       }
@@ -317,18 +317,18 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    }
    
    /**
-    * Checks if {@link ISEDThread}s should be created.
-    * @return {@code true} create threads, {@code false} create other {@link ISEDDebugNode}s.
+    * Checks if {@link ISEThread}s should be created.
+    * @return {@code true} create threads, {@code false} create other {@link ISENode}s.
     */
    public boolean isThreadCreation() {
       return threadCreation;
    }
    
    /**
-    * Returns the selected {@link ISEDDebugTarget}.
-    * @return The selected {@link ISEDDebugTarget}.
+    * Returns the selected {@link ISEDebugTarget}.
+    * @return The selected {@link ISEDebugTarget}.
     */
-   public ISEDDebugTarget getTarget() {
+   public ISEDebugTarget getTarget() {
       if (isTargetComboShown()) {
          int index = targetCombo.getSelectionIndex();
          if (index >= 0 && index < debugTargets.length) {
@@ -344,10 +344,10 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    }
    
    /**
-    * Returns the selected parent {@link ISEDDebugNode}.
-    * @return The parent {@link ISEDDebugNode}.
+    * Returns the selected parent {@link ISENode}.
+    * @return The parent {@link ISENode}.
     */
-   public ISEDDebugNode getParent() {
+   public ISENode getParent() {
       if (!isThreadCreation()) {
          int index = parentCombo.getSelectionIndex();
          if (index >= 0 && index < parents.size()) {
@@ -363,10 +363,10 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    }
    
    /**
-    * Returns the selected {@link ISEDThread}.
-    * @return The selected {@link ISEDThread}.
+    * Returns the selected {@link ISEThread}.
+    * @return The selected {@link ISEThread}.
     */
-   public ISEDThread getThread() {
+   public ISEThread getThread() {
       if (!isThreadCreation()) {
          int index = threadCombo.getSelectionIndex();
          if (index >= 0 && index < threads.length) {

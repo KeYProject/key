@@ -18,7 +18,7 @@ import org.eclipse.jdt.internal.debug.ui.JDIModelPresentation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
-import org.key_project.sed.ui.presentation.AbstractSEDDebugModelPresentation;
+import org.key_project.sed.ui.presentation.AbstractSEDebugModelPresentation;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 
@@ -28,7 +28,7 @@ import org.key_project.sed.ui.util.SEDImages;
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class KeYDebugModelPresentation extends AbstractSEDDebugModelPresentation implements IDebugModelPresentation {
+public class KeYDebugModelPresentation extends AbstractSEDebugModelPresentation implements IDebugModelPresentation {
    /**
     * Helper {@link IDebugModelPresentation} from Java Debug API.
     */

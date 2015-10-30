@@ -24,7 +24,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODFactory;
@@ -48,19 +48,19 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * An {@link ICustomFeature} that generates an object diagram based
  * on the state provided via a {@link Model}.
- * The {@link ISEDDebugNode} is specified via property {@link #PROPERTY_MODEL} 
+ * The {@link ISENode} is specified via property {@link #PROPERTY_MODEL} 
  * of the given {@link ICustomContext}.
  * @author Martin Hentschel
  */
 public class GenerateObjectDiagramFromModelCustomFeature extends AbstractGenerateObjectDiagramCustomFeature {
    /**
-    * Property for an {@link ISEDDebugNode} instance which provides
+    * Property for an {@link ISENode} instance which provides
     * the state to visualize as object diagram.
     */
    public static final String PROPERTY_MODEL = "model";
    
    /**
-    * Property for an {@link ISEDDebugNode} instance which provides
+    * Property for an {@link ISENode} instance which provides
     * the state to visualize as object diagram.
     */
    public static final String PROPERTY_MODEL_NAME = "modelName";

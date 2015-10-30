@@ -24,11 +24,11 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.impl.AbstractSEMethodCall;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.collection.ImmutableList;
@@ -45,11 +45,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDMethodCall} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEMethodCall} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebugNode<IExecutionMethodCall> {
+public class KeYMethodCall extends AbstractSEMethodCall implements IKeYSENode<IExecutionMethodCall> {
    /**
     * The {@link IExecutionMethodCall} to represent by this debug node.
     */
@@ -58,7 +58,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The source name.
@@ -83,7 +83,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The up to know discovered {@link IKeYBaseMethodReturn} nodes.
@@ -93,7 +93,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -103,7 +103,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * @param executionNode The {@link IExecutionMethodCall} to represent by this debug node.
     */
    public KeYMethodCall(KeYDebugTarget target, 
-                        IKeYSEDDebugNode<?> parent, 
+                        IKeYSENode<?> parent, 
                         KeYThread thread, 
                         IExecutionMethodCall executionNode) throws DebugException {
       super(target, parent, thread);
@@ -133,15 +133,15 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -396,7 +396,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -422,10 +422,10 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * {@inheritDoc}
     */
    @Override
-   public ISEDBranchCondition[] getMethodReturnConditions() throws DebugException {
+   public ISEBranchCondition[] getMethodReturnConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          ImmutableList<IExecutionBaseMethodReturn<?>> executionReturns = executionNode.getMethodReturns();
-         ISEDBranchCondition[] result = new ISEDBranchCondition[executionReturns.size()];
+         ISEBranchCondition[] result = new ISEBranchCondition[executionReturns.size()];
          int i = 0;
          for (IExecutionBaseMethodReturn<?> executionReturn : executionReturns) {
             IKeYBaseMethodReturn keyReturn = getMethodReturn(executionReturn);
@@ -461,7 +461,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * {@inheritDoc}
     */
    @Override
-   public ISEDBranchCondition[] getGroupEndConditions() throws DebugException {
+   public ISEBranchCondition[] getGroupEndConditions() throws DebugException {
       return getMethodReturnConditions();
    }
 
@@ -469,7 +469,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -482,7 +482,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 

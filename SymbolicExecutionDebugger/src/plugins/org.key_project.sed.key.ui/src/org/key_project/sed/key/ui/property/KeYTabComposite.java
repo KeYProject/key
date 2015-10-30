@@ -25,7 +25,7 @@ import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -41,12 +41,12 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class KeYTabComposite extends Composite {
    /**
-    * Shows the node id with applied rule of the node in KeY's proof tree represented by the current {@link IKeYSEDDebugNode}.
+    * Shows the node id with applied rule of the node in KeY's proof tree represented by the current {@link IKeYSENode}.
     */
    private Text nodeText;
    
    /**
-    * Shows the {@link Sequent} of the node in KeY's proof tree represented by the current {@link IKeYSEDDebugNode}.
+    * Shows the {@link Sequent} of the node in KeY's proof tree represented by the current {@link IKeYSENode}.
     */
    private SourceViewer sequentViewer;
    
@@ -101,9 +101,9 @@ public class KeYTabComposite extends Composite {
    
    /**
     * Updates the shown content.
-    * @param node The {@link IKeYSEDDebugNode} which provides the new content.
+    * @param node The {@link IKeYSENode} which provides the new content.
     */
-   public void updateContent(IKeYSEDDebugNode<?> node) {
+   public void updateContent(IKeYSENode<?> node) {
       String name = null;
       Node keyNode = null;
       NotationInfo notationInfo = null;

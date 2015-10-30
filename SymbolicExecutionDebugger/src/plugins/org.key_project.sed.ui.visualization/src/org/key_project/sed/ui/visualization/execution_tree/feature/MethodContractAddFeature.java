@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDMethodContract;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEMethodContract;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDMethodContract}s.
+ * Implementation of {@link IAddFeature} for {@link ISEMethodContract}s.
  * @author Martin Hentschel
  */
 public class MethodContractAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,15 +37,15 @@ public class MethodContractAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDMethodContract;
+      return businessObject instanceof ISEMethodContract;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
-      ISEDMethodContract contractNode = (ISEDMethodContract)node;
+   protected String getImageId(ISENode node) {
+      ISEMethodContract contractNode = (ISEMethodContract)node;
       if (contractNode.isPreconditionComplied()) {
          if (!contractNode.hasNotNullCheck() || contractNode.isNotNullCheckComplied()) {
             return IExecutionTreeImageConstants.IMG_METHOD_CONTRACT;

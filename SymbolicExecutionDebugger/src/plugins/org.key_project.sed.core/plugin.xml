@@ -18,18 +18,18 @@
                type="org.eclipse.debug.core.model.IStackFrame">
          </propertyTester>
          <propertyTester
-               class="org.key_project.sed.core.propertyTester.HasSEDDebugTargetPropertyTester"
+               class="org.key_project.sed.core.propertyTester.HasSEDebugTargetPropertyTester"
                id="org.key_project.sed.core.hasSEDDebugTargetPropertyTester"
                namespace="org.key_project.sed.core"
                properties="hasSEDDebugTarget"
                type="org.eclipse.debug.core.ILaunch">
          </propertyTester>
          <propertyTester
-               class="org.key_project.sed.core.propertyTester.HasSEDSlicerPropertyTester"
+               class="org.key_project.sed.core.propertyTester.HasSESlicerPropertyTester"
                id="org.key_project.sed.core.hasSEDSlicerPropertyTester"
                namespace="org.key_project.sed.core"
                properties="hasSEDSlicerPropertyTester"
-               type="org.key_project.sed.core.model.ISEDVariable">
+               type="org.key_project.sed.core.model.ISEVariable">
          </propertyTester>
       </extension>
       <extension

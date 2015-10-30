@@ -16,10 +16,10 @@ import org.key_project.sed.core.annotation.impl.CommentAnnotation;
 import org.key_project.util.java.StringUtil;
 
 /**
- * An {@link ISEDAnnotationEditor} to edit {@link CommentAnnotation}s.
+ * An {@link ISEAnnotationEditor} to edit {@link CommentAnnotation}s.
  * @author Martin Hentschel
  */
-public class CommentAnnotationEditor extends AbstractSEDAnnotationEditor {
+public class CommentAnnotationEditor extends AbstractSEAnnotationEditor {
    /**
     * Defines the comment type.
     */

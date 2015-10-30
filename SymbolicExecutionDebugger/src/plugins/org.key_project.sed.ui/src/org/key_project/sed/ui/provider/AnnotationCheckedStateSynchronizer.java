@@ -8,14 +8,14 @@ import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.ui.services.IDisposable;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.event.ISEDAnnotationListener;
-import org.key_project.sed.core.model.event.SEDAnnotationEvent;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.event.ISEAnnotationListener;
+import org.key_project.sed.core.model.event.SEAnnotationEvent;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * Synchronizes {@link ISEDAnnotation#isEnabled()} with the check boxes
+ * Synchronizes {@link ISEAnnotation#isEnabled()} with the check boxes
  * of a {@link CheckboxTableViewer}.
  * @author Martin Hentschel
  */
@@ -23,29 +23,29 @@ public class AnnotationCheckedStateSynchronizer implements IDisposable {
    /**
     * The model to synchronize with.
     */
-   private final ISEDDebugTarget model;
+   private final ISEDebugTarget model;
    
    /**
     * Observes {@link #modelListener}.
     */
-   private final ISEDAnnotationListener modelListener = new ISEDAnnotationListener() {
+   private final ISEAnnotationListener modelListener = new ISEAnnotationListener() {
       @Override
-      public void annotationRegistered(SEDAnnotationEvent e) {
+      public void annotationRegistered(SEAnnotationEvent e) {
          handleAnnotationRegistered(e);
       }
 
       @Override
-      public void annotationUnregistered(SEDAnnotationEvent e) {
+      public void annotationUnregistered(SEAnnotationEvent e) {
          handleAnnotationUnregistered(e);
       }
 
       @Override
-      public void annotationMoved(SEDAnnotationEvent e) {
+      public void annotationMoved(SEAnnotationEvent e) {
       }      
    };
    
    /**
-    * Observes {@link ISEDAnnotation}s provided by {@link #model}.
+    * Observes {@link ISEAnnotation}s provided by {@link #model}.
     */
    private final PropertyChangeListener annotationListener = new PropertyChangeListener() {
       @Override
@@ -74,43 +74,43 @@ public class AnnotationCheckedStateSynchronizer implements IDisposable {
     * @param model The model to synchronize with.
     * @param viewer The {@link CheckboxTableViewer} to synchronize with.
     */
-   public AnnotationCheckedStateSynchronizer(ISEDDebugTarget model, CheckboxTableViewer viewer) {
+   public AnnotationCheckedStateSynchronizer(ISEDebugTarget model, CheckboxTableViewer viewer) {
       Assert.isNotNull(model);
       Assert.isNotNull(viewer);
       this.model = model;
       this.model.addAnnotationListener(modelListener);
       this.viewer = viewer;
       this.viewer.addCheckStateListener(viewerListener);
-      for (ISEDAnnotation annotation : model.getRegisteredAnnotations()) {
-         annotation.addPropertyChangeListener(ISEDAnnotation.PROP_ENABLED, annotationListener);
+      for (ISEAnnotation annotation : model.getRegisteredAnnotations()) {
+         annotation.addPropertyChangeListener(ISEAnnotation.PROP_ENABLED, annotationListener);
          viewer.setChecked(annotation, annotation.isEnabled());
       }
    }
 
    /**
-    * When a new {@link ISEDAnnotation} is registered.
+    * When a new {@link ISEAnnotation} is registered.
     * @param e The event.
     */
-   protected void handleAnnotationRegistered(SEDAnnotationEvent e) {
-      ISEDAnnotation annotation = e.getAnnotation();
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_ENABLED, annotationListener);
+   protected void handleAnnotationRegistered(SEAnnotationEvent e) {
+      ISEAnnotation annotation = e.getAnnotation();
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_ENABLED, annotationListener);
       SWTUtil.setChecked(viewer, annotation, annotation.isEnabled());
    }
 
    /**
-    * When an existing {@link ISEDAnnotation} was unregistered.
+    * When an existing {@link ISEAnnotation} was unregistered.
     * @param e The event.
     */
-   protected void handleAnnotationUnregistered(SEDAnnotationEvent e) {
-      e.getAnnotation().removePropertyChangeListener(ISEDAnnotation.PROP_ENABLED, annotationListener);
+   protected void handleAnnotationUnregistered(SEAnnotationEvent e) {
+      e.getAnnotation().removePropertyChangeListener(ISEAnnotation.PROP_ENABLED, annotationListener);
    }
 
    /**
-    * When {@link ISEDAnnotation#isEnabled()} has changed.
+    * When {@link ISEAnnotation#isEnabled()} has changed.
     * @param evt The event.
     */
    protected void handlePropertyChange(PropertyChangeEvent evt) {
-      ISEDAnnotation annotation = (ISEDAnnotation)evt.getSource();
+      ISEAnnotation annotation = (ISEAnnotation)evt.getSource();
       SWTUtil.setChecked(viewer, annotation, annotation.isEnabled());
    }
 
@@ -119,8 +119,8 @@ public class AnnotationCheckedStateSynchronizer implements IDisposable {
     * @param event The event.
     */
    protected void handleCheckStateChanged(CheckStateChangedEvent event) {
-      if (event.getElement() instanceof ISEDAnnotation) {
-         ((ISEDAnnotation)event.getElement()).setEnabled(event.getChecked());
+      if (event.getElement() instanceof ISEAnnotation) {
+         ((ISEAnnotation)event.getElement()).setEnabled(event.getChecked());
       }
    }
 
@@ -130,8 +130,8 @@ public class AnnotationCheckedStateSynchronizer implements IDisposable {
    @Override
    public void dispose() {
       this.model.removeAnnotationListener(modelListener);
-      for (ISEDAnnotation annotation : model.getRegisteredAnnotations()) {
-         annotation.removePropertyChangeListener(ISEDAnnotation.PROP_ENABLED, annotationListener);
+      for (ISEAnnotation annotation : model.getRegisteredAnnotations()) {
+         annotation.removePropertyChangeListener(ISEAnnotation.PROP_ENABLED, annotationListener);
       }
       this.viewer.removeCheckStateListener(viewerListener);
    }

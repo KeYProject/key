@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
-import org.key_project.sed.core.model.ISEDVariable;
-import org.key_project.sed.core.model.impl.AbstractSEDVariable;
+import org.key_project.sed.core.model.ISEVariable;
+import org.key_project.sed.core.model.impl.AbstractSEVariable;
 import org.key_project.sed.core.util.LogUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -27,11 +27,11 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
- * Implementation of {@link ISEDVariable} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEVariable} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYVariable extends AbstractSEDVariable {
+public class KeYVariable extends AbstractSEVariable {
    /**
     * The {@link IExecutionVariable} to represent in debug model.
     */
@@ -45,7 +45,7 @@ public class KeYVariable extends AbstractSEDVariable {
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
-    * @param stackFrame The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
+    * @param stackFrame The parent {@link IStackFrame} in which this {@link ISEVariable} is shown.
     * @param executionVariable The {@link IExecutionVariable} to represent in debug model.
     */
    public KeYVariable(KeYDebugTarget target, IStackFrame stackFrame, IExecutionVariable executionVariable) {

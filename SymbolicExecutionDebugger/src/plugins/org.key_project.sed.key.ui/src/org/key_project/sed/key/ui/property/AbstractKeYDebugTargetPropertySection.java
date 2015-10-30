@@ -17,10 +17,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.ui.launch.AbstractTabbedPropertiesAndLaunchConfigurationTabComposite;
-import org.key_project.sed.ui.property.AbstractSEDDebugTargetPropertySection;
+import org.key_project.sed.ui.property.AbstractSEDebugTargetPropertySection;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
@@ -28,7 +28,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
  * via {@link AbstractTabbedPropertiesAndLaunchConfigurationTabComposite} instances.
  * @author Martin Hentschel
  */
-public abstract class AbstractKeYDebugTargetPropertySection extends AbstractSEDDebugTargetPropertySection {
+public abstract class AbstractKeYDebugTargetPropertySection extends AbstractSEDebugTargetPropertySection {
    /**
     * The shown content.
     */
@@ -75,7 +75,7 @@ public abstract class AbstractKeYDebugTargetPropertySection extends AbstractSEDD
     * @return The {@link KeYDebugTarget} or {@code null} if conversion is not possible.
     */
    public static KeYDebugTarget getKeYDebugTarget(Object object) {
-      ISEDDebugTarget target = AbstractKeYDebugTargetPropertySection.getDebugTarget(object);
+      ISEDebugTarget target = AbstractKeYDebugTargetPropertySection.getDebugTarget(object);
       return target instanceof KeYDebugTarget ? (KeYDebugTarget)target : null;
    }
 }

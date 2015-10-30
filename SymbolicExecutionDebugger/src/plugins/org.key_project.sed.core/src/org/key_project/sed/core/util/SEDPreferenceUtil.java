@@ -24,7 +24,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.key_project.sed.core.Activator;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 
 /**
  * Provides utility methods to edit the SED preferences.
@@ -37,22 +37,22 @@ public final class SEDPreferenceUtil {
    public static final String PROP_SHOW_COMPACT_EXECUTION_TREE = "org.key_project.sed.preference.showCompactExecutionTree";
 
    /**
-    * Prefix to store {@link ISEDAnnotationType#isHighlightBackground()}.
+    * Prefix to store {@link ISEAnnotationType#isHighlightBackground()}.
     */
    public static final String PROP_ANNOTATION_TYPE_HIGHLIGHT_BACKGROUND_PREFIX = "org.key_project.sed.preference.annotationType.highlightBackground_";
 
    /**
-    * Prefix to store {@link ISEDAnnotationType#getBackgroundColor()}.
+    * Prefix to store {@link ISEAnnotationType#getBackgroundColor()}.
     */
    public static final String PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX = "org.key_project.sed.preference.annotationType.backgroundColor_";
 
    /**
-    * Prefix to store {@link ISEDAnnotationType#isHighlightForeground()}.
+    * Prefix to store {@link ISEAnnotationType#isHighlightForeground()}.
     */   
    public static final String PROP_ANNOTATION_TYPE_HIGHLIGHT_FOREGROUND_PREFIX = "org.key_project.sed.preference.annotationType.highlightForeground_";
 
    /**
-    * Prefix to store {@link ISEDAnnotationType#getForegroundColor()}.
+    * Prefix to store {@link ISEAnnotationType#getForegroundColor()}.
     */
    public static final String PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX = "org.key_project.sed.preference.annotationType.foregroundColor_";
    
@@ -130,141 +130,141 @@ public final class SEDPreferenceUtil {
    
    /**
     * Returns the current value.
-    * @param type The {@link ISEDAnnotationType} to get its value.
+    * @param type The {@link ISEAnnotationType} to get its value.
     * @return The current value.
     */
-   public static boolean isAnnotationTypeHighlightBackground(ISEDAnnotationType type) {
+   public static boolean isAnnotationTypeHighlightBackground(ISEAnnotationType type) {
       return getStore().getBoolean(PROP_ANNOTATION_TYPE_HIGHLIGHT_BACKGROUND_PREFIX + type.getTypeId());
    }
    
    /**
     * Returns the default value.
-    * @param type The {@link ISEDAnnotationType} to get its value.
+    * @param type The {@link ISEAnnotationType} to get its value.
     * @return The default value.
     */
-   public static boolean isDefaultAnnotationTypeHighlightBackground(ISEDAnnotationType type) {
+   public static boolean isDefaultAnnotationTypeHighlightBackground(ISEAnnotationType type) {
       return getStore().getDefaultBoolean(PROP_ANNOTATION_TYPE_HIGHLIGHT_BACKGROUND_PREFIX + type.getTypeId());
    }
    
    /**
     * Sets the current value.
-    * @param type The {@link ISEDAnnotationType} to set its value.
+    * @param type The {@link ISEAnnotationType} to set its value.
     * @param value The new value to set.
     */
-   public static void setAnnotationTypeHighlightBackground(ISEDAnnotationType type, boolean value) {
+   public static void setAnnotationTypeHighlightBackground(ISEAnnotationType type, boolean value) {
       getStore().setValue(PROP_ANNOTATION_TYPE_HIGHLIGHT_BACKGROUND_PREFIX + type.getTypeId(), value);
    }
    
    /**
     * Sets the default value.
-    * @param type The {@link ISEDAnnotationType} to set its value.
+    * @param type The {@link ISEAnnotationType} to set its value.
     */
-   public static void setDefaultAnnotationTypeHighlightBackground(ISEDAnnotationType type) {
+   public static void setDefaultAnnotationTypeHighlightBackground(ISEAnnotationType type) {
       getStore().setDefault(PROP_ANNOTATION_TYPE_HIGHLIGHT_BACKGROUND_PREFIX + type.getTypeId(), type.isDefaultHighlightBackground());
    }
    
    /**
     * Returns the current value.
-    * @param type The {@link ISEDAnnotationType} to get its value.
+    * @param type The {@link ISEAnnotationType} to get its value.
     * @return The current value.
     */
-   public static RGB getAnnotationTypeBackgroundColor(ISEDAnnotationType type) {
+   public static RGB getAnnotationTypeBackgroundColor(ISEAnnotationType type) {
       return PreferenceConverter.getColor(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId());
    }
    
    /**
     * Returns the default value.
-    * @param type The {@link ISEDAnnotationType} to get its value.
+    * @param type The {@link ISEAnnotationType} to get its value.
     * @return The default value.
     */
-   public static RGB getDefaultAnnotationTypeBackgroundColor(ISEDAnnotationType type) {
+   public static RGB getDefaultAnnotationTypeBackgroundColor(ISEAnnotationType type) {
       return PreferenceConverter.getDefaultColor(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId());
    }
    
    /**
     * Sets the current value.
-    * @param type The {@link ISEDAnnotationType} to set its value.
+    * @param type The {@link ISEAnnotationType} to set its value.
     * @param value The new value to set.
     */
-   public static void setAnnotationTypeBackgroundColor(ISEDAnnotationType type, RGB value) {
+   public static void setAnnotationTypeBackgroundColor(ISEAnnotationType type, RGB value) {
       PreferenceConverter.setValue(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId(), value);
    }
    
    /**
     * Sets the default value.
-    * @param type The {@link ISEDAnnotationType} to set its value.
+    * @param type The {@link ISEAnnotationType} to set its value.
     */
-   public static void setDefaultAnnotationTypeBackgroundColor(ISEDAnnotationType type) {
+   public static void setDefaultAnnotationTypeBackgroundColor(ISEAnnotationType type) {
       PreferenceConverter.setDefault(getStore(), PROP_ANNOTATION_TYPE_BACKGROUND_COLOR_PREFIX + type.getTypeId(), type.getDefaultBackgroundColor());
    }
    
    /**
     * Returns the current value.
-    * @param type The {@link ISEDAnnotationType} to get its value.
+    * @param type The {@link ISEAnnotationType} to get its value.
     * @return The current value.
     */
-   public static boolean isAnnotationTypeHighlightForeground(ISEDAnnotationType type) {
+   public static boolean isAnnotationTypeHighlightForeground(ISEAnnotationType type) {
       return getStore().getBoolean(PROP_ANNOTATION_TYPE_HIGHLIGHT_FOREGROUND_PREFIX + type.getTypeId());
    }
    
    /**
     * Returns the default value.
-    * @param type The {@link ISEDAnnotationType} to get its value.
+    * @param type The {@link ISEAnnotationType} to get its value.
     * @return The default value.
     */
-   public static boolean isDefaultAnnotationTypeHighlightForeground(ISEDAnnotationType type) {
+   public static boolean isDefaultAnnotationTypeHighlightForeground(ISEAnnotationType type) {
       return getStore().getDefaultBoolean(PROP_ANNOTATION_TYPE_HIGHLIGHT_FOREGROUND_PREFIX + type.getTypeId());
    }
    
    /**
     * Sets the current value.
-    * @param type The {@link ISEDAnnotationType} to set its value.
+    * @param type The {@link ISEAnnotationType} to set its value.
     * @param value The new value to set.
     */
-   public static void setAnnotationTypeHighlightForeground(ISEDAnnotationType type, boolean value) {
+   public static void setAnnotationTypeHighlightForeground(ISEAnnotationType type, boolean value) {
       getStore().setValue(PROP_ANNOTATION_TYPE_HIGHLIGHT_FOREGROUND_PREFIX + type.getTypeId(), value);
    }
    
    /**
     * Sets the default value.
-    * @param type The {@link ISEDAnnotationType} to set its value.
+    * @param type The {@link ISEAnnotationType} to set its value.
     */
-   public static void setDefaultAnnotationTypeHighlightForeground(ISEDAnnotationType type) {
+   public static void setDefaultAnnotationTypeHighlightForeground(ISEAnnotationType type) {
       getStore().setDefault(PROP_ANNOTATION_TYPE_HIGHLIGHT_FOREGROUND_PREFIX + type.getTypeId(), type.isDefaultHighlightForeground());
    }
    
    /**
     * Returns the current value.
-    * @param type The {@link ISEDAnnotationType} to get its value.
+    * @param type The {@link ISEAnnotationType} to get its value.
     * @return The current value.
     */
-   public static RGB getAnnotationTypeForegroundColor(ISEDAnnotationType type) {
+   public static RGB getAnnotationTypeForegroundColor(ISEAnnotationType type) {
       return PreferenceConverter.getColor(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId());
    }
    
    /**
     * Returns the default value.
-    * @param type The {@link ISEDAnnotationType} to get its value.
+    * @param type The {@link ISEAnnotationType} to get its value.
     * @return The default value.
     */
-   public static RGB getDefaultAnnotationTypeForegroundColor(ISEDAnnotationType type) {
+   public static RGB getDefaultAnnotationTypeForegroundColor(ISEAnnotationType type) {
       return PreferenceConverter.getDefaultColor(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId());
    }
    
    /**
     * Sets the current value.
-    * @param type The {@link ISEDAnnotationType} to set its value.
+    * @param type The {@link ISEAnnotationType} to set its value.
     * @param value The new value to set.
     */
-   public static void setAnnotationTypeForegroundColor(ISEDAnnotationType type, RGB value) {
+   public static void setAnnotationTypeForegroundColor(ISEAnnotationType type, RGB value) {
       PreferenceConverter.setValue(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId(), value);
    }
    
    /**
     * Sets the default value.
-    * @param type The {@link ISEDAnnotationType} to set its value.
+    * @param type The {@link ISEAnnotationType} to set its value.
     */
-   public static void setDefaultAnnotationTypeForegroundColor(ISEDAnnotationType type) {
+   public static void setDefaultAnnotationTypeForegroundColor(ISEAnnotationType type) {
       PreferenceConverter.setDefault(getStore(), PROP_ANNOTATION_TYPE_FOREGROUND_COLOR_PREFIX + type.getTypeId(), type.getDefaultForegroundColor());
    }
 }

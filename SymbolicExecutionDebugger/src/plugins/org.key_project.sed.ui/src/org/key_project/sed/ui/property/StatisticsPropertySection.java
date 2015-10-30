@@ -25,15 +25,15 @@ import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * An {@link ISection} implementation to show statistics of an {@link ISEDDebugTarget}.
+ * An {@link ISection} implementation to show statistics of an {@link ISEDebugTarget}.
  * @author Martin Hentschel
  */
-public class StatisticsPropertySection extends AbstractSEDDebugTargetPropertySection {
+public class StatisticsPropertySection extends AbstractSEDebugTargetPropertySection {
    /**
     * The {@link Composite} which shows {@link #composite}.
     */
@@ -75,7 +75,7 @@ public class StatisticsPropertySection extends AbstractSEDDebugTargetPropertySec
     */
    @Override
    public void refresh() {
-      final ISEDDebugTarget target = getDebugTarget();
+      final ISEDebugTarget target = getDebugTarget();
       if (target != null) {
          showLabel("Please wait until statisitcs are computed.");
          AbstractDependingOnObjectsJob.cancelJobs(this);

@@ -14,8 +14,8 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.util.ISEDConstants;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.util.ISEConstants;
 
 
 /**
@@ -38,14 +38,14 @@ public class CallStackTabComposite extends AbstractNodeTreeTabComposite {
     */
    @Override
    protected PresentationContext createPresentationContext() {
-      return new PresentationContext(ISEDConstants.ID_CALL_STACK);
+      return new PresentationContext(ISEConstants.ID_CALL_STACK);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected void configurePresentationContext(PresentationContext viewerContext, ISEDDebugNode node) {
-      viewerContext.setProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT, node);
+   protected void configurePresentationContext(PresentationContext viewerContext, ISENode node) {
+      viewerContext.setProperty(ISEConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT, node);
    }
 }

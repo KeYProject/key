@@ -8,7 +8,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.impl.CommentAnnotation;
 import org.key_project.util.java.StringUtil;
 
@@ -20,7 +20,7 @@ public class NewCommentWizardPage extends CommentWizardPage {
    /**
     * All available comment annotations.
     */
-   private final ISEDAnnotation[] commentAnnotations;
+   private final ISEAnnotation[] commentAnnotations;
    
    /**
     * Defines the comment type.
@@ -33,7 +33,7 @@ public class NewCommentWizardPage extends CommentWizardPage {
     * @param title The title to show.
     * @param description The description to show.
     */
-   public NewCommentWizardPage(String pageName, String title, String description, String initialComment, ISEDAnnotation[] commentAnnotations) {
+   public NewCommentWizardPage(String pageName, String title, String description, String initialComment, ISEAnnotation[] commentAnnotations) {
       super(pageName, title, description, initialComment);
       this.commentAnnotations = commentAnnotations;
    }
@@ -48,7 +48,7 @@ public class NewCommentWizardPage extends CommentWizardPage {
       commentTypeCombo = new Combo(parent, SWT.NONE);
       String initialText = null;
       if (commentAnnotations != null) {
-         for (ISEDAnnotation annotation : commentAnnotations) {
+         for (ISEAnnotation annotation : commentAnnotations) {
             if (annotation instanceof CommentAnnotation) {
                String type = ((CommentAnnotation) annotation).getCommentType();
                if (initialText == null) {

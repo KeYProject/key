@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDBranchStatement;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEBranchStatement;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDBranchStatement}s.
+ * Implementation of {@link IAddFeature} for {@link ISEBranchStatement}s.
  * @author Martin Hentschel
  */
 public class BranchStatementAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,14 +37,14 @@ public class BranchStatementAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDBranchStatement;
+      return businessObject instanceof ISEBranchStatement;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
+   protected String getImageId(ISENode node) {
       return IExecutionTreeImageConstants.IMG_BRANCH_STATEMENT;
    }
 }

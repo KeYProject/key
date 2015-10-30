@@ -24,8 +24,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLReader;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.serialization.SEXMLReader;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.SETFileLaunchUtil;
 
@@ -50,10 +50,10 @@ public class SETFileLaunchConfigurationDelegate extends LaunchConfigurationDeleg
          Assert.isNotNull(file);
          Assert.isTrue(file.exists());
          // Load file
-         SEDXMLReader reader = new SEDXMLReader(launch, false);
+         SEXMLReader reader = new SEXMLReader(launch, false);
          // Configure launch
-         List<ISEDDebugTarget> targets = reader.read(file);
-         for (ISEDDebugTarget target : targets) {
+         List<ISEDebugTarget> targets = reader.read(file);
+         for (ISEDebugTarget target : targets) {
             launch.addDebugTarget(target);
          }
       }

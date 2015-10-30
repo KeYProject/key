@@ -14,19 +14,19 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDBaseMethodReturn;
+import org.key_project.sed.core.model.ISEBaseMethodReturn;
 
 /**
- * {@link ISection} implementation to show the call state of an {@link ISEDBaseMethodReturn}
- * which is provided via {@link ISEDBaseMethodReturn#getCallStateVariables()}.
+ * {@link ISection} implementation to show the call state of an {@link ISEBaseMethodReturn}
+ * which is provided via {@link ISEBaseMethodReturn#getCallStateVariables()}.
  * @author Martin Hentschel
  */
-public class CallStatePropertySection extends AbstractSEDDebugNodePropertySection {
+public class CallStatePropertySection extends AbstractSENodePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new CallStateTabComposite();
    }
 

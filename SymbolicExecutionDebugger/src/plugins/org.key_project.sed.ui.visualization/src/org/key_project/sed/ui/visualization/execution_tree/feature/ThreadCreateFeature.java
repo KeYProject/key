@@ -17,14 +17,14 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.memory.SEDMemoryThread;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.memory.SEMemoryThread;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link ICreateFeature} for {@link ISEDThread}s.
+ * Implementation of {@link ICreateFeature} for {@link ISEThread}s.
  * @author Martin Hentschel
  */
 public class ThreadCreateFeature extends AbstractDebugNodeCreateFeature {
@@ -64,11 +64,11 @@ public class ThreadCreateFeature extends AbstractDebugNodeCreateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
-                                              ISEDDebugNode parent,
-                                              ISEDThread thread,
+   protected ISENode createNewDebugNode(ISEDebugTarget target,
+                                              ISENode parent,
+                                              ISEThread thread,
                                               String name) throws DebugException {
-      SEDMemoryThread result = new SEDMemoryThread(target, false);
+      SEMemoryThread result = new SEMemoryThread(target, false);
       result.setName(name);
       return result;
    }

@@ -53,21 +53,21 @@ import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchStatement;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
-import org.key_project.sed.core.model.ISEDExceptionalTermination;
-import org.key_project.sed.core.model.ISEDLoopBodyTermination;
-import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDLoopStatement;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodContract;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEBranchStatement;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEExceptionalTermination;
+import org.key_project.sed.core.model.ISELoopBodyTermination;
+import org.key_project.sed.core.model.ISELoopCondition;
+import org.key_project.sed.core.model.ISELoopInvariant;
+import org.key_project.sed.core.model.ISELoopStatement;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISEMethodContract;
+import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISETermination;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionLayoutFeature;
@@ -127,7 +127,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadAddFeat
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadUpdateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
+import org.key_project.sed.ui.visualization.execution_tree.service.SEIndependenceSolver;
 
 /**
  * {@link IFeatureProvider} specific implementation for execution tree diagrams.
@@ -145,15 +145,15 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
     */
    public ExecutionTreeFeatureProvider(IDiagramTypeProvider dtp) {
       super(dtp);
-      setIndependenceSolver(new SEDIndependenceSolver());
+      setIndependenceSolver(new SEIndependenceSolver());
    }
 
    /**
-    * Returns the used {@link SEDIndependenceSolver}.
-    * @return The used {@link SEDIndependenceSolver}.
+    * Returns the used {@link SEIndependenceSolver}.
+    * @return The used {@link SEIndependenceSolver}.
     */
-   public SEDIndependenceSolver getSEDIndependenceSolver() {
-      return (SEDIndependenceSolver)getIndependenceSolver();
+   public SEIndependenceSolver getSEDIndependenceSolver() {
+      return (SEIndependenceSolver)getIndependenceSolver();
    }
 
    /**
@@ -187,46 +187,46 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
     */
    @Override
    public IAddFeature getAddFeature(IAddContext context) {
-      if (context.getNewObject() instanceof ISEDBranchCondition) {
+      if (context.getNewObject() instanceof ISEBranchCondition) {
          return new BranchConditionAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDBranchStatement) {
+      else if (context.getNewObject() instanceof ISEBranchStatement) {
          return new BranchStatementAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDExceptionalTermination) {
+      else if (context.getNewObject() instanceof ISEExceptionalTermination) {
          return new ExceptionalTerminationAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDLoopBodyTermination) {
+      else if (context.getNewObject() instanceof ISELoopBodyTermination) {
          return new LoopBodyTerminationAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDLoopCondition) {
+      else if (context.getNewObject() instanceof ISELoopCondition) {
          return new LoopConditionAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDLoopStatement) {
+      else if (context.getNewObject() instanceof ISELoopStatement) {
          return new LoopStatementAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDMethodCall) {
+      else if (context.getNewObject() instanceof ISEMethodCall) {
          return new MethodCallAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDMethodReturn) {
+      else if (context.getNewObject() instanceof ISEMethodReturn) {
          return new MethodReturnAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDExceptionalMethodReturn) {
+      else if (context.getNewObject() instanceof ISEExceptionalMethodReturn) {
          return new ExceptionalMethodReturnAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDStatement) {
+      else if (context.getNewObject() instanceof ISEStatement) {
          return new StatementAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDTermination) {
+      else if (context.getNewObject() instanceof ISETermination) {
          return new TerminationAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDThread) {
+      else if (context.getNewObject() instanceof ISEThread) {
          return new ThreadAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDMethodContract) {
+      else if (context.getNewObject() instanceof ISEMethodContract) {
          return new MethodContractAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDLoopInvariant) {
+      else if (context.getNewObject() instanceof ISELoopInvariant) {
          return new LoopInvariantAddFeature(this);
       }
       else {
@@ -240,49 +240,49 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
    @Override
    public IUpdateFeature getUpdateFeature(IUpdateContext context) {
       Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
-      if (bo instanceof ISEDDebugTarget) {
+      if (bo instanceof ISEDebugTarget) {
          return new DebugTargetUpdateFeature(this);
       }
-      else if (bo instanceof ISEDBranchCondition) {
+      else if (bo instanceof ISEBranchCondition) {
          return new BranchConditionUpdateFeature(this);
       }
-      else if (bo instanceof ISEDBranchStatement) {
+      else if (bo instanceof ISEBranchStatement) {
          return new BranchStatementUpdateFeature(this);
       }
-      else if (bo instanceof ISEDExceptionalTermination) {
+      else if (bo instanceof ISEExceptionalTermination) {
          return new ExceptionalTerminationUpdateFeature(this);
       }
-      else if (bo instanceof ISEDLoopBodyTermination) {
+      else if (bo instanceof ISELoopBodyTermination) {
          return new LoopBodyTerminationUpdateFeature(this);
       }
-      else if (bo instanceof ISEDLoopCondition) {
+      else if (bo instanceof ISELoopCondition) {
          return new LoopConditionUpdateFeature(this);
       }
-      else if (bo instanceof ISEDLoopStatement) {
+      else if (bo instanceof ISELoopStatement) {
          return new LoopStatementUpdateFeature(this);
       }
-      else if (bo instanceof ISEDMethodCall) {
+      else if (bo instanceof ISEMethodCall) {
          return new MethodCallUpdateFeature(this);
       }
-      else if (bo instanceof ISEDMethodReturn) {
+      else if (bo instanceof ISEMethodReturn) {
          return new MethodReturnUpdateFeature(this);
       }
-      else if (bo instanceof ISEDExceptionalMethodReturn) {
+      else if (bo instanceof ISEExceptionalMethodReturn) {
          return new ExceptionalMethodReturnUpdateFeature(this);
       }
-      else if (bo instanceof ISEDStatement) {
+      else if (bo instanceof ISEStatement) {
          return new StatementUpdateFeature(this);
       }
-      else if (bo instanceof ISEDTermination) {
+      else if (bo instanceof ISETermination) {
          return new TerminationUpdateFeature(this);
       }
-      else if (bo instanceof ISEDThread) {
+      else if (bo instanceof ISEThread) {
          return new ThreadUpdateFeature(this);
       }
-      else if (bo instanceof ISEDMethodContract) {
+      else if (bo instanceof ISEMethodContract) {
          return new MethodContractUpdateFeature(this);
       }
-      else if (bo instanceof ISEDLoopInvariant) {
+      else if (bo instanceof ISELoopInvariant) {
          return new LoopInvariantUpdateFeature(this);
       }
       else {
@@ -297,46 +297,46 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
    public ILayoutFeature getLayoutFeature(ILayoutContext context) {
       PictogramElement pictogramElement = context.getPictogramElement();
       Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-      if (bo instanceof ISEDBranchCondition) {
+      if (bo instanceof ISEBranchCondition) {
           return new BranchConditionLayoutFeature(this);
       }
-      else if (bo instanceof ISEDBranchStatement) {
+      else if (bo instanceof ISEBranchStatement) {
          return new BranchStatementLayoutFeature(this);
       }
-      else if (bo instanceof ISEDExceptionalTermination) {
+      else if (bo instanceof ISEExceptionalTermination) {
          return new ExceptionalTerminationLayoutFeature(this);
       }
-      else if (bo instanceof ISEDLoopCondition) {
+      else if (bo instanceof ISELoopCondition) {
          return new LoopConditionLayoutFeature(this);
       }
-      else if (bo instanceof ISEDLoopBodyTermination) {
+      else if (bo instanceof ISELoopBodyTermination) {
          return new LoopBodyTerminationLayoutFeature(this);
       }
-      else if (bo instanceof ISEDLoopStatement) {
+      else if (bo instanceof ISELoopStatement) {
          return new LoopStatementLayoutFeature(this);
       }
-      else if (bo instanceof ISEDMethodCall) {
+      else if (bo instanceof ISEMethodCall) {
          return new MethodCallLayoutFeature(this);
       }
-      else if (bo instanceof ISEDMethodReturn) {
+      else if (bo instanceof ISEMethodReturn) {
          return new MethodReturnLayoutFeature(this);
       }
-      else if (bo instanceof ISEDExceptionalMethodReturn) {
+      else if (bo instanceof ISEExceptionalMethodReturn) {
          return new ExceptionalMethodReturnLayoutFeature(this);
       }
-      else if (bo instanceof ISEDStatement) {
+      else if (bo instanceof ISEStatement) {
          return new StatementLayoutFeature(this);
       }
-      else if (bo instanceof ISEDTermination) {
+      else if (bo instanceof ISETermination) {
          return new TerminationLayoutFeature(this);
       }
-      else if (bo instanceof ISEDThread) {
+      else if (bo instanceof ISEThread) {
          return new ThreadLayoutFeature(this);
       }
-      else if (bo instanceof ISEDMethodContract) {
+      else if (bo instanceof ISEMethodContract) {
          return new MethodContractLayoutFeature(this);
       }
-      else if (bo instanceof ISEDLoopInvariant) {
+      else if (bo instanceof ISELoopInvariant) {
          return new LoopInvariantLayoutFeature(this);
       }
       else {

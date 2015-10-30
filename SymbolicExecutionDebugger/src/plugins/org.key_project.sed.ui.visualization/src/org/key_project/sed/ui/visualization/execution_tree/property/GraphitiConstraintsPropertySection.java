@@ -14,12 +14,12 @@
 package org.key_project.sed.ui.visualization.execution_tree.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.property.ConstraintsTabComposite;
-import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
+import org.key_project.sed.ui.property.ISENodeTabContent;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * {@link ISection} implementation to show the properties of {@link ISENode}s.
  * @author Martin Hentschel
  */
 public class GraphitiConstraintsPropertySection extends AbstractGraphitiDebugNodePropertySection {
@@ -27,7 +27,7 @@ public class GraphitiConstraintsPropertySection extends AbstractGraphitiDebugNod
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new ConstraintsTabComposite();
    }
 }

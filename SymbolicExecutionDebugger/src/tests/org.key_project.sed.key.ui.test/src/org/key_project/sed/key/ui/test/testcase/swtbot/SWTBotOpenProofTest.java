@@ -28,7 +28,7 @@ import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.starter.KeYIDEProofStarter;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
@@ -56,7 +56,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
       try {
          IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
-            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
                // Resume on thread
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                stepInto(bot, item, target);
@@ -115,7 +115,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
       try {
          IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
-            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
                // Make sure that open proof is not available
                try {
                   TestUtilsUtil.clickContextMenu(debugTree, "Open Proof"); // Behavior in Eclipse 3.x is to throw an Exception because not available, in Eclipse 4.x the item is disabled and no Exception is thrown. 

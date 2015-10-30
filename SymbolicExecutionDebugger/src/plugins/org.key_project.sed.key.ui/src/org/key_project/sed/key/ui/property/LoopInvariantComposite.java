@@ -15,7 +15,7 @@ package org.key_project.sed.key.ui.property;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopInvariant;
 import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
@@ -54,7 +54,7 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Node computeNodeToShow(IKeYSEDDebugNode<?> node, 
+   protected Node computeNodeToShow(IKeYSENode<?> node, 
                                     IExecutionNode<?> executionNode) {
       if (node instanceof KeYLoopInvariant) {
          Node invariantNode = super.computeNodeToShow(node, executionNode);
@@ -71,7 +71,7 @@ public class LoopInvariantComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node, 
+   protected Pair<Term, Term> computeTermToShow(IKeYSENode<?> node, 
                                                 IExecutionNode<?> executionNode, 
                                                 final Node keyNode) {
       if (node instanceof KeYLoopBodyTermination) {

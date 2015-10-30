@@ -15,10 +15,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
+import org.key_project.sed.core.model.ISELoopInvariant;
 
 /**
- * Implementation of {@link IUpdateFeature} for {@link ISEDLoopInvariant}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISELoopInvariant}s.
  * @author Martin Hentschel
  */
 public class LoopInvariantUpdateFeature extends AbstractDebugNodeUpdateFeature {
@@ -35,6 +35,6 @@ public class LoopInvariantUpdateFeature extends AbstractDebugNodeUpdateFeature {
     */
    @Override
    protected boolean canUpdateBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDLoopInvariant;
+      return businessObject instanceof ISELoopInvariant;
    }
 }

@@ -14,8 +14,8 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.util.ISEDConstants;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.util.ISEConstants;
 
 /**
  * This composite provides the content shown in {@link CallStackPropertySection}
@@ -37,14 +37,14 @@ public class GroupEndConditionsTabComposite extends AbstractNodeTreeTabComposite
     */
    @Override
    protected PresentationContext createPresentationContext() {
-      return new PresentationContext(ISEDConstants.ID_GROUP_END_CONDITIONS);
+      return new PresentationContext(ISEConstants.ID_GROUP_END_CONDITIONS);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected void configurePresentationContext(PresentationContext viewerContext, ISEDDebugNode node) {
-      viewerContext.setProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT, node);
+   protected void configurePresentationContext(PresentationContext viewerContext, ISENode node) {
+      viewerContext.setProperty(ISEConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT, node);
    }
 }

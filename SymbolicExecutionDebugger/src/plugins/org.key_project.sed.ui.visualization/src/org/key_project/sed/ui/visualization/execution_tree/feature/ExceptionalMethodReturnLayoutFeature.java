@@ -16,10 +16,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
-import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 
 /**
- * Implementation of {@link ILayoutFeature} for {@link ISEDExceptionalMethodReturn}s.
+ * Implementation of {@link ILayoutFeature} for {@link ISEExceptionalMethodReturn}s.
  * @author Martin Hentschel
  */
 public class ExceptionalMethodReturnLayoutFeature extends AbstractDebugNodeLayoutFeature {
@@ -36,6 +36,6 @@ public class ExceptionalMethodReturnLayoutFeature extends AbstractDebugNodeLayou
     */
    @Override
    protected boolean canLayoutBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDExceptionalMethodReturn;
+      return businessObject instanceof ISEExceptionalMethodReturn;
    }
 }

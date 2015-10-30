@@ -6,43 +6,43 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.Image;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
-import org.key_project.sed.core.model.event.SEDAnnotationLinkEvent;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.event.ISEAnnotationLinkListener;
+import org.key_project.sed.core.model.event.SEAnnotationLinkEvent;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.swt.viewer.AbstractLabelProvider;
 import org.key_project.util.java.ObjectUtil;
 
 /**
  * An {@link ITableLabelProvider} which shows the registered 
- * {@link ISEDAnnotationLink}s of an {@link ISEDDebugNode}. 
+ * {@link ISEAnnotationLink}s of an {@link ISENode}. 
  * @author Martin Hentschel
  */
 public class AnnotationLinkLabelProvider extends AbstractLabelProvider implements ITableLabelProvider {
    /**
-    * The observed {@link ISEDDebugNode}.
+    * The observed {@link ISENode}.
     */
-   private final ISEDDebugNode node;
+   private final ISENode node;
    
    /**
     * Listens for changes on {@link #node}.
     */
-   private final ISEDAnnotationLinkListener nodeListener = new ISEDAnnotationLinkListener() {
+   private final ISEAnnotationLinkListener nodeListener = new ISEAnnotationLinkListener() {
       @Override
-      public void annotationLinkAdded(SEDAnnotationLinkEvent e) {
+      public void annotationLinkAdded(SEAnnotationLinkEvent e) {
          handleAnnotationLinkAdded(e);
       }
       
       @Override
-      public void annotationLinkRemoved(SEDAnnotationLinkEvent e) {
+      public void annotationLinkRemoved(SEAnnotationLinkEvent e) {
          handleAnnotationLinkRemoved(e);
       }
    };
    
    /**
-    * Listens for changes on {@link ISEDAnnotationLink}s.
+    * Listens for changes on {@link ISEAnnotationLink}s.
     */
    private final PropertyChangeListener annotationLinkListener = new PropertyChangeListener() {
       @Override
@@ -53,13 +53,13 @@ public class AnnotationLinkLabelProvider extends AbstractLabelProvider implement
    
    /**
     * Constructor.
-    * @param node The {@link ISEDDebugNode} which provides the {@link ISEDAnnotationLink}s to observe.
+    * @param node The {@link ISENode} which provides the {@link ISEAnnotationLink}s to observe.
     */
-   public AnnotationLinkLabelProvider(ISEDDebugNode node) {
+   public AnnotationLinkLabelProvider(ISENode node) {
       this.node = node;
       if (node != null) {
-         ISEDAnnotationLink[] links = node.getAnnotationLinks();
-         for (ISEDAnnotationLink link : links) {
+         ISEAnnotationLink[] links = node.getAnnotationLinks();
+         for (ISEAnnotationLink link : links) {
             link.addPropertyChangeListener(annotationLinkListener);
          }
          node.addAnnotationLinkListener(nodeListener);
@@ -70,7 +70,7 @@ public class AnnotationLinkLabelProvider extends AbstractLabelProvider implement
     * When a new annotation link is added.
     * @param e The event.
     */
-   protected void handleAnnotationLinkAdded(SEDAnnotationLinkEvent e) {
+   protected void handleAnnotationLinkAdded(SEAnnotationLinkEvent e) {
       e.getLink().addPropertyChangeListener(annotationLinkListener);
    }
 
@@ -78,17 +78,17 @@ public class AnnotationLinkLabelProvider extends AbstractLabelProvider implement
     * When an existing annotation link is removed.
     * @param e The event.
     */
-   protected void handleAnnotationLinkRemoved(SEDAnnotationLinkEvent e) {
+   protected void handleAnnotationLinkRemoved(SEAnnotationLinkEvent e) {
       e.getLink().removePropertyChangeListener(annotationLinkListener);
    }
 
    /**
-    * When a property of an {@link ISEDAnnotation} has changed.
+    * When a property of an {@link ISEAnnotation} has changed.
     * @param evt The event.
     */
    protected void handlePropertyChange(PropertyChangeEvent evt) {
-      if (!ISEDAnnotationLink.PROP_SOURCE.equals(evt.getPropertyName()) &&
-          !ISEDAnnotationLink.PROP_TARGET.equals(evt.getPropertyName())) {
+      if (!ISEAnnotationLink.PROP_SOURCE.equals(evt.getPropertyName()) &&
+          !ISEAnnotationLink.PROP_TARGET.equals(evt.getPropertyName())) {
          fireLabelProviderChangedThreadSave(new LabelProviderChangedEvent(this, evt.getSource()));
       }
    }
@@ -107,8 +107,8 @@ public class AnnotationLinkLabelProvider extends AbstractLabelProvider implement
    @Override
    public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
-         if (element instanceof ISEDAnnotationLink) {
-            return SEDUIUtil.getAnnotationTypeImage(((ISEDAnnotationLink) element).getSource().getType());
+         if (element instanceof ISEAnnotationLink) {
+            return SEDUIUtil.getAnnotationTypeImage(((ISEAnnotationLink) element).getSource().getType());
          }
          else {
             return null;
@@ -126,8 +126,8 @@ public class AnnotationLinkLabelProvider extends AbstractLabelProvider implement
    public void dispose() {
       super.dispose();
       if (node != null) {
-         ISEDAnnotationLink[] links = node.getAnnotationLinks();
-         for (ISEDAnnotationLink link : links) {
+         ISEAnnotationLink[] links = node.getAnnotationLinks();
+         for (ISEAnnotationLink link : links) {
             link.removePropertyChangeListener(annotationLinkListener);
          }
          node.removeAnnotationLinkListener(nodeListener);

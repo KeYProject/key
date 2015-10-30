@@ -21,8 +21,8 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromSEDNodeCustomFeature;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromSENodeCustomFeature;
 import org.key_project.sed.ui.visualization.object_diagram.wizard.SaveAsObjectDiagramWizard;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
 import org.key_project.util.java.StringUtil;
@@ -84,17 +84,17 @@ public class ObjectDiagramEditor extends PaletteHideableDiagramEditor {
    }
    
    /**
-    * Generates an object diagram for the given {@link ISEDDebugNode}.
-    * @param node The {@link ISEDDebugNode} to generate object diagram for.
+    * Generates an object diagram for the given {@link ISENode}.
+    * @param node The {@link ISENode} to generate object diagram for.
     * @throws DebugException Occurred Exception.
     */
-   public void generateObjectDiagram(ISEDDebugNode node) throws DebugException {
+   public void generateObjectDiagram(ISENode node) throws DebugException {
       if (node != null) {
          IDiagramTypeProvider typeProvider = getDiagramTypeProvider();
          IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
-         IFeature feature = new GenerateObjectDiagramFromSEDNodeCustomFeature(featureProvider);
+         IFeature feature = new GenerateObjectDiagramFromSENodeCustomFeature(featureProvider);
          ICustomContext context = new CustomContext();
-         context.putProperty(GenerateObjectDiagramFromSEDNodeCustomFeature.PROPERTY_NODE, node);
+         context.putProperty(GenerateObjectDiagramFromSENodeCustomFeature.PROPERTY_NODE, node);
          executeFeatureInJob("Generating Object Diagram for \"" + StringUtil.toSingleLinedString(node.getName()) + "\"", feature, context);
       }
    }

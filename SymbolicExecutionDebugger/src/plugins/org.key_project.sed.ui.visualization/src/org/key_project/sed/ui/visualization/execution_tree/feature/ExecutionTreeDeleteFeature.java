@@ -26,21 +26,21 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.impl.DeleteContext;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
-import org.key_project.sed.core.model.memory.ISEDMemoryDebugTarget;
-import org.key_project.sed.core.util.ISEDIterator;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.memory.ISEMemoryNode;
+import org.key_project.sed.core.model.memory.ISEMemoryDebugTarget;
+import org.key_project.sed.core.util.ISEIterator;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.util.EditableMultiDeleteInfo;
 
 /**
  * <p>
- * Implementation of {@link IDeleteFeature} for {@link ISEDDebugNode}s
- * to make sure that the complete subtree of the selected {@link ISEDDebugNode}
+ * Implementation of {@link IDeleteFeature} for {@link ISENode}s
+ * to make sure that the complete subtree of the selected {@link ISENode}
  * is deleted and removed from the diagram.
  * </p>
  * <p> 
@@ -86,10 +86,10 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
             Object[] businessObjectsForPictogramElement = getAllBusinessObjectsForPictogramElement(pe);
             EditableMultiDeleteInfo multiDeleteInfo = new EditableMultiDeleteInfo(true, false);
             for (Object businessObject : businessObjectsForPictogramElement) {
-               if (businessObject instanceof ISEDDebugElement) {
-                  ISEDIterator iter = new SEDPreorderIterator((ISEDDebugElement)businessObject);
+               if (businessObject instanceof ISEDebugElement) {
+                  ISEIterator iter = new SEPreorderIterator((ISEDebugElement)businessObject);
                   while (iter.hasNext()) {
-                     ISEDDebugElement next = iter.next();
+                     ISEDebugElement next = iter.next();
                      PictogramElement childPe = getFeatureProvider().getPictogramElementForBusinessObject(next);
                      if (childPe != null) {
                         DeleteContext childContext = new DeleteContext(childPe);
@@ -128,8 +128,8 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
       PictogramElement pe = ((IDeleteContext)context).getPictogramElement();
       Object[] businessObjectsForPictogramElement = getAllBusinessObjectsForPictogramElement(pe);
       for (Object businessObject : businessObjectsForPictogramElement) {
-         if (businessObject instanceof ISEDDebugNode) {
-            ISEDDebugNode node = (ISEDDebugNode)businessObject;
+         if (businessObject instanceof ISENode) {
+            ISENode node = (ISENode)businessObject;
             DeleteUndoRedoContext undoRedoContext = new DeleteUndoRedoContext(node);
             removeFromParent(undoRedoContext);
             undoRedoContexts.add(undoRedoContext);
@@ -138,26 +138,26 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
    }
    
    /**
-    * Deletes the {@link ISEDDebugNode} defined by the given
+    * Deletes the {@link ISENode} defined by the given
     * {@link DeleteUndoRedoContext} in the business model.
     * @param context The {@link DeleteUndoRedoContext} to work with.
     */
    protected void removeFromParent(DeleteUndoRedoContext context) {
       try {
-         ISEDDebugNode node = context.getNode();
-         if (node instanceof ISEDThread) {
-            ISEDThread thread = (ISEDThread)node;
-            ISEDDebugTarget target = thread.getDebugTarget();
-            Assert.isTrue(target instanceof ISEDMemoryDebugTarget);
-            ISEDMemoryDebugTarget debugTarget = (ISEDMemoryDebugTarget)target;
+         ISENode node = context.getNode();
+         if (node instanceof ISEThread) {
+            ISEThread thread = (ISEThread)node;
+            ISEDebugTarget target = thread.getDebugTarget();
+            Assert.isTrue(target instanceof ISEMemoryDebugTarget);
+            ISEMemoryDebugTarget debugTarget = (ISEMemoryDebugTarget)target;
             int index = debugTarget.indexOfSymbolicThread(thread);
             context.setIndexOnParent(index);
             debugTarget.removeSymbolicThread(thread);
          }
          else {
-            ISEDDebugNode parent = node.getParent();
-            Assert.isTrue(parent instanceof ISEDMemoryDebugNode);
-            ISEDMemoryDebugNode parentNode = (ISEDMemoryDebugNode)parent;
+            ISENode parent = node.getParent();
+            Assert.isTrue(parent instanceof ISEMemoryNode);
+            ISEMemoryNode parentNode = (ISEMemoryNode)parent;
             int index = parentNode.indexOfChild(node);
             context.setIndexOnParent(index);
             parentNode.removeChild(node);
@@ -186,18 +186,18 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
     */
    protected void addToParent(DeleteUndoRedoContext context) {
       try {
-         ISEDDebugNode node = context.getNode();
-         if (node instanceof ISEDThread) {
-            ISEDThread thread = (ISEDThread)node;
-            ISEDDebugTarget target = thread.getDebugTarget();
-            Assert.isTrue(target instanceof ISEDMemoryDebugTarget);
-            ISEDMemoryDebugTarget debugTarget = (ISEDMemoryDebugTarget)target;
+         ISENode node = context.getNode();
+         if (node instanceof ISEThread) {
+            ISEThread thread = (ISEThread)node;
+            ISEDebugTarget target = thread.getDebugTarget();
+            Assert.isTrue(target instanceof ISEMemoryDebugTarget);
+            ISEMemoryDebugTarget debugTarget = (ISEMemoryDebugTarget)target;
             debugTarget.addSymbolicThread(context.getIndexOnParent(), thread);
          }
          else {
-            ISEDDebugNode parent = node.getParent();
-            Assert.isTrue(parent instanceof ISEDMemoryDebugNode);
-            ISEDMemoryDebugNode parentNode = (ISEDMemoryDebugNode)parent;
+            ISENode parent = node.getParent();
+            Assert.isTrue(parent instanceof ISEMemoryNode);
+            ISEMemoryNode parentNode = (ISEMemoryNode)parent;
             parentNode.addChild(context.indexOnParent, node);
          }
       }
@@ -232,9 +232,9 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
     */
    protected static class DeleteUndoRedoContext {
       /**
-       * The {@link ISEDDebugNode} to delete.
+       * The {@link ISENode} to delete.
        */
-      private ISEDDebugNode node;
+      private ISENode node;
       
       /**
        * The index on the parent from that {@link #node} was removed.
@@ -243,17 +243,17 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
 
       /**
        * Constructor.
-       * @param node The {@link ISEDDebugNode} to delete.
+       * @param node The {@link ISENode} to delete.
        */
-      public DeleteUndoRedoContext(ISEDDebugNode node) {
+      public DeleteUndoRedoContext(ISENode node) {
          this.node = node;
       }
 
       /**
-       * Returns the {@link ISEDDebugNode} to delete.
-       * @return The {@link ISEDDebugNode} to delete.
+       * Returns the {@link ISENode} to delete.
+       * @return The {@link ISENode} to delete.
        */
-      public ISEDDebugNode getNode() {
+      public ISENode getNode() {
          return node;
       }
 

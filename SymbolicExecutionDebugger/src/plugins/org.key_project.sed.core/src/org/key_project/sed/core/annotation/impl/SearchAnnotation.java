@@ -1,15 +1,15 @@
 package org.key_project.sed.core.annotation.impl;
 
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.util.SEAnnotationUtil;
 
 /**
- * The {@link ISEDAnnotation} representing a search.
+ * The {@link ISEAnnotation} representing a search.
  * @author Martin Hentschel
  * @see SearchAnnotationType
  */
-public class SearchAnnotation extends AbstractSEDAnnotation {
+public class SearchAnnotation extends AbstractSEAnnotation {
    /**
     * Property {@link #getSearch()}.
     */
@@ -24,7 +24,7 @@ public class SearchAnnotation extends AbstractSEDAnnotation {
     * Constructor.
     */
    public SearchAnnotation() {
-      super(SEDAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID), true);
+      super(SEAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID), true);
    }
 
    /**
@@ -49,7 +49,7 @@ public class SearchAnnotation extends AbstractSEDAnnotation {
     * {@inheritDoc}
     */
    @Override
-   public boolean canDelete(ISEDDebugTarget target) {
+   public boolean canDelete(ISEDebugTarget target) {
       return true;
    }
 

@@ -14,13 +14,13 @@
 package org.key_project.sed.ui.visualization.execution_tree.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.sed.ui.property.GroupEndConditionsTabComposite;
-import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
+import org.key_project.sed.ui.property.ISENodeTabContent;
 
 /**
- * {@link ISection} implementation to show the group ending conditions of an {@link ISEDGroupable}
- * which is provided via {@link ISEDGroupable#getGroupEndConditions()}.
+ * {@link ISection} implementation to show the group ending conditions of an {@link ISEGroupable}
+ * which is provided via {@link ISEGroupable#getGroupEndConditions()}.
  * @author Martin Hentschel
  */
 public class GraphitiGroupEndConditionsPropertySection extends AbstractGraphitiDebugNodePropertySection {
@@ -28,7 +28,7 @@ public class GraphitiGroupEndConditionsPropertySection extends AbstractGraphitiD
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new GroupEndConditionsTabComposite();
    }
 }

@@ -7,12 +7,12 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
 
 /**
  * An proposal for {@link SymbolicallyReachedAnnotation}s which selects an
- * {@link ISEDDebugNode} as solution.
+ * {@link ISENode} as solution.
  * @author Martin Hentschel
  */
 public class SymbolicallyReachedCompletionProposal extends AbstractSymbolicallyReachedCompletionProposal {
@@ -29,9 +29,9 @@ public class SymbolicallyReachedCompletionProposal extends AbstractSymbolicallyR
    /**
     * Constructor.
     * @param shell The parent {@link Shell} which provides the {@link IDebugView}.
-    * @param debugNode The {@link ISEDDebugNode} to select.
+    * @param debugNode The {@link ISENode} to select.
     */
-   public SymbolicallyReachedCompletionProposal(Shell shell, ISEDDebugNode debugNode) {
+   public SymbolicallyReachedCompletionProposal(Shell shell, ISENode debugNode) {
       super(shell, Collections.singletonList(debugNode));
       IDebugModelPresentation debugModelPresentation = DebugUITools.newDebugModelPresentation();
       try {

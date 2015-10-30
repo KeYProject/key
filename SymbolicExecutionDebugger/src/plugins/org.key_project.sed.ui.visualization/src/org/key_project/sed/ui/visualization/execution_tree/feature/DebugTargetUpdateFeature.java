@@ -18,11 +18,11 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
 
 /**
- * Implementation of {@link IUpdateFeature} for {@link ISEDDebugTarget}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISEDebugTarget}s.
  * @author Martin Hentschel
  */
 public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
@@ -39,7 +39,7 @@ public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
     */
    @Override
    protected boolean canUpdateBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDDebugTarget;
+      return businessObject instanceof ISEDebugTarget;
    }
 
    /**
@@ -59,8 +59,8 @@ public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
       boolean childrenHavePictogramElement = true;
       Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
       for (Object bo : bos) {
-         if (bo instanceof ISEDDebugTarget) {
-            ISEDThread[] threads = ((ISEDDebugTarget)bo).getSymbolicThreads();
+         if (bo instanceof ISEDebugTarget) {
+            ISEThread[] threads = ((ISEDebugTarget)bo).getSymbolicThreads();
             int i = 0;
             while (childrenHavePictogramElement && i < threads.length) {
                PictogramElement threadPE = getPictogramElementForBusinessObject(threads[i], groupingSupported);

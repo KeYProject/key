@@ -18,7 +18,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.ui.IWorkbenchPart;
-import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
+import org.key_project.sed.ui.property.ISENodeTabContent;
 import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -40,7 +40,7 @@ public class GraphitiDebugNodeTreeFilter extends AbstractPropertySectionFilter {
          }
          AbstractGraphitiDebugNodePropertySection section = new AbstractGraphitiDebugNodePropertySection() {
             @Override
-            protected ISEDDebugNodeTabContent createContent() {
+            protected ISENodeTabContent createContent() {
                return null; // Is never used.
             }
          };

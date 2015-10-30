@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDMethodCall}s.
+ * Implementation of {@link IAddFeature} for {@link ISEMethodCall}s.
  * @author Martin Hentschel
  */
 public class MethodCallAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,14 +37,14 @@ public class MethodCallAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDMethodCall;
+      return businessObject instanceof ISEMethodCall;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
+   protected String getImageId(ISENode node) {
       return IExecutionTreeImageConstants.IMG_METHOD_CALL;
    }
 }

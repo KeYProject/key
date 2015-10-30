@@ -15,12 +15,12 @@ package org.key_project.sed.key.ui.property;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.key.core.model.IKeYTerminationNode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * {@link ISection} implementation to show the properties of {@link ISENode}s.
  * @author Martin Hentschel
  */
 public class PostconditionPropertySection extends AbstractTruthValuePropertySection {

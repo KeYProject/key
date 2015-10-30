@@ -15,13 +15,13 @@ package org.key_project.sed.core.test.example.presentation;
 
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.ui.IEditorInput;
-import org.key_project.sed.ui.presentation.AbstractSEDDebugModelPresentation;
+import org.key_project.sed.ui.presentation.AbstractSEDebugModelPresentation;
 
 /**
  * {@link IDebugModelPresentation} for the fixed example.
  * @author Martin Hentschel
  */
-public class FixedExampleDebugModelPresentation extends AbstractSEDDebugModelPresentation implements IDebugModelPresentation {
+public class FixedExampleDebugModelPresentation extends AbstractSEDebugModelPresentation implements IDebugModelPresentation {
    /**
     * {@inheritDoc}
     */

@@ -28,13 +28,13 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.notification.INotificationService;
 import org.eclipse.graphiti.platform.IDiagramBehavior;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLReader;
-import org.key_project.sed.core.model.serialization.SEDXMLWriter;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.memory.SEMemoryDebugTarget;
+import org.key_project.sed.core.model.serialization.SEXMLReader;
+import org.key_project.sed.core.model.serialization.SEXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramBehavior;
-import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
-import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
+import org.key_project.sed.ui.visualization.execution_tree.service.SEIndependenceSolver;
+import org.key_project.sed.ui.visualization.execution_tree.service.SENotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -67,14 +67,14 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
    private ExecutionTreeToolBehaviorProvider[] toolBehaviorProviders;
    
    /**
-    * Contains the available {@link ISEDDebugTarget}s.
+    * Contains the available {@link ISEDebugTarget}s.
     */
-   private List<ISEDDebugTarget> debugTargets = new LinkedList<ISEDDebugTarget>();
+   private List<ISEDebugTarget> debugTargets = new LinkedList<ISEDebugTarget>();
    
    /**
     * The used {@link INotificationService}.
     */
-   private SEDNotificationService notificationService;
+   private SENotificationService notificationService;
    
    /**
     * Constructor.
@@ -95,9 +95,9 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * {@inheritDoc}
     */
    @Override
-   public SEDNotificationService getNotificationService() {
+   public SENotificationService getNotificationService() {
       if (notificationService == null) {
-         notificationService = new SEDNotificationService(this);
+         notificationService = new SENotificationService(this);
       }
       return notificationService;
    }
@@ -131,11 +131,11 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          // Load domain model file
          IFeatureProvider featureProvider = getFeatureProvider();
          if(featureProvider instanceof ExecutionTreeFeatureProvider) {
-            SEDIndependenceSolver solver = ((ExecutionTreeFeatureProvider)featureProvider).getSEDIndependenceSolver();
+            SEIndependenceSolver solver = ((ExecutionTreeFeatureProvider)featureProvider).getSEDIndependenceSolver();
             // Open input stream to domain file
             InputStream in = ExecutionTreeUtil.readDomainFile(diagram);
             // Load domain file
-            SEDXMLReader reader = new SEDXMLReader();
+            SEXMLReader reader = new SEXMLReader();
             debugTargets = reader.read(in);
             solver.init(debugTargets);
          }
@@ -161,8 +161,8 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          // Save domain file
          if (ObjectUtil.equals(getDiagram(), diagram)) {
             OutputStream out = ExecutionTreeUtil.writeDomainFile(diagram);
-            SEDXMLWriter writer = new SEDXMLWriter();
-            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out, true, true, true, null);
+            SEXMLWriter writer = new SEXMLWriter();
+            writer.write(getDebugTargets(), SEXMLWriter.DEFAULT_ENCODING, out, true, true, true, null);
          }
       }
       catch (Exception e) {
@@ -172,12 +172,12 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
    }
 
    /**
-    * Makes sure that at least one {@link ISEDDebugTarget} is available
+    * Makes sure that at least one {@link ISEDebugTarget} is available
     * via {@link #getDebugTargets()}.
     */
    public void makeSureThatDebugTargetIsAvailable() {
       if (debugTargets.isEmpty()) {
-         SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
+         SEMemoryDebugTarget target = new SEMemoryDebugTarget(null, false);
          target.setName("Default Symbolic Debug Target");
          getFeatureProvider().link(getDiagram(), target);
          debugTargets.add(target);
@@ -185,10 +185,10 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
    }
 
    /**
-    * Returns the available {@link ISEDDebugTarget}s.
-    * @return The available {@link ISEDDebugTarget}s.
+    * Returns the available {@link ISEDebugTarget}s.
+    * @return The available {@link ISEDebugTarget}s.
     */
-   public ISEDDebugTarget[] getDebugTargets() {
-      return debugTargets.toArray(new ISEDDebugTarget[debugTargets.size()]);
+   public ISEDebugTarget[] getDebugTargets() {
+      return debugTargets.toArray(new ISEDebugTarget[debugTargets.size()]);
    }
 }

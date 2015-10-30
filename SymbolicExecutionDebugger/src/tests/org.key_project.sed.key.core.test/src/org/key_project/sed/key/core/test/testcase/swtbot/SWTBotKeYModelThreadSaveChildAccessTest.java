@@ -25,44 +25,44 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
- * Tests access of {@link ISEDDebugNode#getChildren()} from different threads
- * to make sure that in KeY's implementation no multiple {@link IKeYSEDDebugNode}s are
+ * Tests access of {@link ISENode#getChildren()} from different threads
+ * to make sure that in KeY's implementation no multiple {@link IKeYSENode}s are
  * created for the same {@link IExecutionNode}.
  * @author Martin Hentschel
  */
 public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTargetTestCase {
    /**
-    * Tests access of {@link ISEDDebugNode#getChildren()} from different threads
-    * to make sure that in KeY's implementation no multiple {@link IKeYSEDDebugNode}s are
+    * Tests access of {@link ISENode#getChildren()} from different threads
+    * to make sure that in KeY's implementation no multiple {@link IKeYSENode}s are
     * created for the same {@link IExecutionNode}.
     */
    @Test
    public void testChildAccessOfElseIfTest() throws Exception {
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
             // Resume
             resume(bot, item, target);
             // Start with threads
-            List<ISEDDebugNode> toTest = new LinkedList<ISEDDebugNode>();
+            List<ISENode> toTest = new LinkedList<ISENode>();
             CollectionUtil.addAll(toTest, target.getSymbolicThreads());
             assertFalse(toTest.isEmpty());
             // Iterate over the whole containment hierarchy
             while (!toTest.isEmpty()) {
                // Define current node
-               ISEDDebugNode current = toTest.remove(0);
+               ISENode current = toTest.remove(0);
                // Access ISEDDebugNode#getChildren() from different threads
                ChildAccessThread[] threads = new ChildAccessThread[3];
                for (int i = 0; i < threads.length; i++) {
@@ -73,7 +73,7 @@ public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTar
                }
                ObjectUtil.waitForThreads(threads);
                // Test result
-               ISEDDebugNode[] children = current.getChildren();
+               ISENode[] children = current.getChildren();
                assertNotNull(children);
                for (ChildAccessThread thread : threads) {
                   assertNull(thread.getException());
@@ -107,20 +107,20 @@ public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTar
    }
    
    /**
-    * A {@link Thread} which executes {@link ISEDDebugNode#getChildren()}
+    * A {@link Thread} which executes {@link ISENode#getChildren()}
     * and provides the result.
     * @author Martin Hentschel
     */
    private static class ChildAccessThread extends Thread {
       /**
-       * The parent to execute {@link ISEDDebugNode#getChildren()} on.
+       * The parent to execute {@link ISENode#getChildren()} on.
        */
-      private ISEDDebugNode parent;
+      private ISENode parent;
       
       /**
-       * The result of The parent to execute {@link ISEDDebugNode#getChildren()} on.
+       * The result of The parent to execute {@link ISENode#getChildren()} on.
        */
-      private ISEDDebugNode[] children;
+      private ISENode[] children;
       
       /**
        * The occurred exception or {@code null} if access was successful.
@@ -129,9 +129,9 @@ public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTar
       
       /**
        * Constructor. 
-       * @param parent The parent to execute {@link ISEDDebugNode#getChildren()} on.
+       * @param parent The parent to execute {@link ISENode#getChildren()} on.
        */
-      public ChildAccessThread(ISEDDebugNode parent) {
+      public ChildAccessThread(ISENode parent) {
          super();
          this.parent = parent;
       }
@@ -150,10 +150,10 @@ public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTar
       }
 
       /**
-       * Returns the result of The parent to execute {@link ISEDDebugNode#getChildren()} on.
-       * @return The result of The parent to execute {@link ISEDDebugNode#getChildren()} on.
+       * Returns the result of The parent to execute {@link ISENode#getChildren()} on.
+       * @return The result of The parent to execute {@link ISENode#getChildren()} on.
        */
-      public ISEDDebugNode[] getChildren() {
+      public ISENode[] getChildren() {
          return children;
       }
 

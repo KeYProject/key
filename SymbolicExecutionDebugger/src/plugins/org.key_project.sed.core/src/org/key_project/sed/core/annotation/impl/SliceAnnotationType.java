@@ -2,16 +2,16 @@ package org.key_project.sed.core.annotation.impl;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.RGB;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
+import org.key_project.sed.core.model.ISENode;
 
 /**
- * The {@link ISEDAnnotationType} used for slicing.
+ * The {@link ISEAnnotationType} used for slicing.
  * @author Martin Hentschel
  * @see SliceAnnotation
  */
-public class SliceAnnotationType extends AbstractSEDAnnotationType {
+public class SliceAnnotationType extends AbstractSEAnnotationType {
    /**
     * The ID of this annotation type.
     */
@@ -77,7 +77,7 @@ public class SliceAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public SliceAnnotationLink createLink(ISEDAnnotation source, ISEDDebugNode target) {
+   public SliceAnnotationLink createLink(ISEAnnotation source, ISENode target) {
       return new SliceAnnotationLink(source, target);
    }
 
@@ -85,7 +85,7 @@ public class SliceAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public String saveAnnotation(ISEDAnnotation annotation) {
+   public String saveAnnotation(ISEAnnotation annotation) {
       Assert.isTrue(annotation instanceof SliceAnnotation);
       return ((SliceAnnotation)annotation).getSeed();
    }
@@ -94,7 +94,7 @@ public class SliceAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public void restoreAnnotation(ISEDAnnotation annotation, String savedContent) {
+   public void restoreAnnotation(ISEAnnotation annotation, String savedContent) {
       Assert.isTrue(annotation instanceof SliceAnnotation);
       ((SliceAnnotation)annotation).setSeed(savedContent);
    }

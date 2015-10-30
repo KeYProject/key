@@ -15,10 +15,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
-import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEMethodCall;
 
 /**
- * Implementation of {@link IUpdateFeature} for {@link ISEDMethodCall}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISEMethodCall}s.
  * @author Martin Hentschel
  */
 public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
@@ -35,6 +35,6 @@ public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
     */
    @Override
    protected boolean canUpdateBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDMethodCall;
+      return businessObject instanceof ISEMethodCall;
    }
 }

@@ -3,18 +3,18 @@ package org.key_project.sed.core.annotation.impl;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.swt.graphics.RGB;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.util.java.StringUtil;
 
 /**
- * The {@link ISEDAnnotationType} used for searches.
+ * The {@link ISEAnnotationType} used for searches.
  * @author Martin Hentschel
  * @see SearchAnnotation
  */
-public class SearchAnnotationType extends AbstractSEDAnnotationType {
+public class SearchAnnotationType extends AbstractSEAnnotationType {
    /**
     * The ID of this annotation type.
     */
@@ -80,7 +80,7 @@ public class SearchAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public ISEDAnnotationLink createLink(ISEDAnnotation source, ISEDDebugNode target) {
+   public ISEAnnotationLink createLink(ISEAnnotation source, ISENode target) {
       return new SearchAnnotationLink(source, target);
    }
 
@@ -88,7 +88,7 @@ public class SearchAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public String saveAnnotation(ISEDAnnotation annotation) {
+   public String saveAnnotation(ISEAnnotation annotation) {
       Assert.isTrue(annotation instanceof SearchAnnotation);
       return ((SearchAnnotation)annotation).getSearch();
    }
@@ -97,7 +97,7 @@ public class SearchAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public void restoreAnnotation(ISEDAnnotation annotation, String savedContent) {
+   public void restoreAnnotation(ISEAnnotation annotation, String savedContent) {
       Assert.isTrue(annotation instanceof SearchAnnotation);
       ((SearchAnnotation)annotation).setSearch(savedContent);
    }
@@ -106,7 +106,7 @@ public class SearchAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public void initializeNode(ISEDDebugNode node, ISEDAnnotation annotation) throws DebugException {
+   public void initializeNode(ISENode node, ISEAnnotation annotation) throws DebugException {
       Assert.isTrue(annotation instanceof SearchAnnotation);
       if (accept(node, ((SearchAnnotation)annotation).getSearch())) {
          node.addAnnotationLink(createLink(annotation, node));
@@ -114,13 +114,13 @@ public class SearchAnnotationType extends AbstractSEDAnnotationType {
    }
    
    /**
-    * Checks if the given {@link ISEDDebugNode} matches the search criteria.
-    * @param node The {@link ISEDDebugNode} to check.
+    * Checks if the given {@link ISENode} matches the search criteria.
+    * @param node The {@link ISENode} to check.
     * @param search The text to search.
     * @return {@code true} match, {@code false} not match.
     * @throws DebugException Occurred Exception.
     */
-   public static boolean accept(ISEDDebugNode node, String search) throws DebugException {
+   public static boolean accept(ISENode node, String search) throws DebugException {
       if (node != null) {
          String name = node.getName();
          return StringUtil.contains(name, search);

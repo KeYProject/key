@@ -11,11 +11,11 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
@@ -83,14 +83,14 @@ public abstract class AbstractSEDJavaProjectModifier extends JavaProjectModifier
    
    protected void performLazyWork(IDebugTarget target) {
       try {
-         if (target instanceof ISEDDebugTarget) {
-            for (ISEDThread thread : ((ISEDDebugTarget) target).getSymbolicThreads()) {
+         if (target instanceof ISEDebugTarget) {
+            for (ISEThread thread : ((ISEDebugTarget) target).getSymbolicThreads()) {
                try {
-                  SEDPreorderIterator iterator = new SEDPreorderIterator(thread);
+                  SEPreorderIterator iterator = new SEPreorderIterator(thread);
                   while (iterator.hasNext()) {
-                     ISEDDebugElement next = iterator.next();
-                     if (next instanceof ISEDDebugNode) {
-                        ((ISEDDebugNode) next).getName(); // May performs side proofs
+                     ISEDebugElement next = iterator.next();
+                     if (next instanceof ISENode) {
+                        ((ISENode) next).getName(); // May performs side proofs
                      }
                   }
                }

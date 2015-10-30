@@ -10,7 +10,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveSetAsWizard;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
@@ -26,28 +26,28 @@ public class SaveSetAsCommand extends AbstractHandler {
    @Override
    public Object execute(ExecutionEvent event) throws ExecutionException {
       Object[] selection = SWTUtil.toArray(HandlerUtil.getCurrentSelection(event));
-      List<ISEDDebugTarget> targets = new LinkedList<ISEDDebugTarget>();
+      List<ISEDebugTarget> targets = new LinkedList<ISEDebugTarget>();
       for (Object obj : selection) {
          if (obj instanceof ILaunch) {
             IDebugTarget[] launchTargets = ((ILaunch) obj).getDebugTargets();
             for (IDebugTarget target : launchTargets) {
-               if (target instanceof ISEDDebugTarget) {
-                  targets.add((ISEDDebugTarget)target);
+               if (target instanceof ISEDebugTarget) {
+                  targets.add((ISEDebugTarget)target);
                }
             }
          }
-         else if (obj instanceof ISEDDebugTarget) {
-            targets.add((ISEDDebugTarget)obj);
+         else if (obj instanceof ISEDebugTarget) {
+            targets.add((ISEDebugTarget)obj);
          }
          else if (obj instanceof IDebugElement) {
             IDebugTarget target = ((IDebugElement) obj).getDebugTarget();
-            if (target instanceof ISEDDebugTarget) {
-               targets.add((ISEDDebugTarget)target);
+            if (target instanceof ISEDebugTarget) {
+               targets.add((ISEDebugTarget)target);
             }
          }
          SaveSetAsWizard.openWizard(HandlerUtil.getActiveShell(event),  
                                     HandlerUtil.getActiveWorkbenchWindow(event),
-                                    targets.toArray(new ISEDDebugTarget[targets.size()]));
+                                    targets.toArray(new ISEDebugTarget[targets.size()]));
       }
       return null;
    }

@@ -1,20 +1,20 @@
 package org.key_project.sed.core.annotation.impl;
 
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISENode;
 
 /**
- * An {@link ISEDAnnotationLink} which represents a search result.
+ * An {@link ISEAnnotationLink} which represents a search result.
  * @author Martin Hentschel
  */
-public class SliceAnnotationLink extends AbstractSEDAnnotationLink {
+public class SliceAnnotationLink extends AbstractSEAnnotationLink {
    /**
     * Constructor.
-    * @param source The source {@link ISEDAnnotation}.
-    * @param target The target {@link ISEDDebugNode}.
+    * @param source The source {@link ISEAnnotation}.
+    * @param target The target {@link ISENode}.
     */
-   public SliceAnnotationLink(ISEDAnnotation source, ISEDDebugNode target) {
+   public SliceAnnotationLink(ISEAnnotation source, ISENode target) {
       super(source, target);
    }
 

@@ -29,7 +29,7 @@ import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaWatchpoint;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -354,7 +354,7 @@ public class KeYBreakpointManager {
       return keys.toArray(new IBreakpoint[keys.size()]);
    }
 
-   public boolean checkBreakpointHit(IBreakpoint breakpoint, IKeYSEDDebugNode<IExecutionNode<?>> node) {
+   public boolean checkBreakpointHit(IBreakpoint breakpoint, IKeYSENode<IExecutionNode<?>> node) {
       de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint keyBreakpoint = breakpointMap.get(breakpoint);
       if (keyBreakpoint != null) {
          IExecutionNode<?> enode = node.getExecutionNode();

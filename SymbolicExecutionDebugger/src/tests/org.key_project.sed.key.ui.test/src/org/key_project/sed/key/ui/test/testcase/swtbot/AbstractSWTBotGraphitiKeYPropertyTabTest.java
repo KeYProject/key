@@ -19,8 +19,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.SWTGefBot;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.eclipse.ui.IPageLayout;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
 import org.key_project.util.eclipse.BundleUtil;
@@ -161,7 +161,7 @@ public class AbstractSWTBotGraphitiKeYPropertyTabTest extends AbstractSWTBotKeYP
     */
    protected static interface IEditorTestSteps {
       /**
-       * Do some assertions on an {@link ISEDThread}.
+       * Do some assertions on an {@link ISEThread}.
        * @param editor The editor.
        * @param propertiesView The properties view.
        * @param tabs The properties tabs.
@@ -170,7 +170,7 @@ public class AbstractSWTBotGraphitiKeYPropertyTabTest extends AbstractSWTBotKeYP
       public void assertThread(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDStatement}.
+       * Do some assertions on an {@link ISEStatement}.
        * @param editor The editor.
        * @param propertiesView The properties view.
        * @param tabs The properties tabs.

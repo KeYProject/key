@@ -22,7 +22,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
 
@@ -34,7 +34,7 @@ public class SWTBotAddBreakpointsPostResume extends AbstractKeYDebugTargetTestCa
    public void test() throws Exception{
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {            
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {            
             // Get debug target TreeItem
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             

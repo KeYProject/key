@@ -14,10 +14,10 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEValue;
 
 /**
- * {@link ISection} implementation to show the constraints of an {@link ISEDValue}.
+ * {@link ISection} implementation to show the constraints of an {@link ISEValue}.
  * @author Martin Hentschel
  */
 public class ConstraintsVariablePropertySection extends AbstractVariablePropertySection {

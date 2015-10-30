@@ -13,9 +13,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.sed.core.annotation.impl.SliceAnnotation;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.slicing.ISEDSlicer;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.slicing.ISESlicer;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.slicing.KeYThinBackwardSlicer;
 import org.key_project.sed.key.core.test.Activator;
@@ -33,22 +33,22 @@ public class SWTBotKeYThinBackwardSlicerTest extends AbstractKeYDebugTargetTestC
    public void testSimpleLocalVariables() throws Exception {
       IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             // Resume
             SWTBotTreeItem launchTreeItem = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0);
             resume(bot, launchTreeItem, target);
             assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/simpleLocalVariables/oracle/SimpleLocalVariables.xml", true, false, false);
             // Find seed
-            ISEDDebugNode thread = target.getSymbolicThreads()[0];
-            ISEDDebugNode call = thread.getChildren()[0];
-            ISEDDebugNode xDecl = call.getChildren()[0];
-            ISEDDebugNode yDecl = xDecl.getChildren()[0];
-            ISEDDebugNode zDecl = yDecl.getChildren()[0];
-            ISEDDebugNode resultComp = zDecl.getChildren()[0];
-            ISEDDebugNode resultReturn = resultComp.getChildren()[0];
+            ISENode thread = target.getSymbolicThreads()[0];
+            ISENode call = thread.getChildren()[0];
+            ISENode xDecl = call.getChildren()[0];
+            ISENode yDecl = xDecl.getChildren()[0];
+            ISENode zDecl = yDecl.getChildren()[0];
+            ISENode resultComp = zDecl.getChildren()[0];
+            ISENode resultReturn = resultComp.getChildren()[0];
             IVariable seedVariable = ((IStackFrame) resultReturn).getVariables()[1];
             // Perform slicing
-            ISEDSlicer slicer = target.getSlicer(resultReturn, seedVariable, KeYThinBackwardSlicer.NAME);
+            ISESlicer slicer = target.getSlicer(resultReturn, seedVariable, KeYThinBackwardSlicer.NAME);
             assertNotNull(slicer);
             SliceAnnotation annotation = slicer.slice(resultReturn, seedVariable, null, new NullProgressMonitor());
             // Check slicing result

@@ -25,10 +25,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.ui.action.ISEAnnotationLinkEditAction;
 import org.key_project.sed.ui.provider.AnnotationLinkColorTableSynchronizer;
 import org.key_project.sed.ui.provider.AnnotationLinkContentProvider;
 import org.key_project.sed.ui.provider.AnnotationLinkLabelProvider;
@@ -38,10 +38,10 @@ import org.key_project.sed.ui.util.SEDUIUtil.SEDAnnotationLinkActionDescription;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * The {@link ISEDDebugNodeTabContent} shown in {@link AnnotationLinkPropertySection}.
+ * The {@link ISENodeTabContent} shown in {@link AnnotationLinkPropertySection}.
  * @author Martin Hentschel
  */
-public class AnnotationLinkTabComposite implements ISEDDebugNodeTabContent {
+public class AnnotationLinkTabComposite implements ISENodeTabContent {
    /**
     * Contains all available action buttons.
     */
@@ -63,32 +63,32 @@ public class AnnotationLinkTabComposite implements ISEDDebugNodeTabContent {
    private AnnotationLinkLabelProvider annotationLinksLabelProvider;
    
    /**
-    * Ensures that the colors defined by an {@link ISEDAnnotation} are used in {@link #annoationLinksViewer}.
+    * Ensures that the colors defined by an {@link ISEAnnotation} are used in {@link #annoationLinksViewer}.
     */
    private AnnotationLinkColorTableSynchronizer annotationLinksColorSynchronizer;
    
    /**
-    * The currently shown {@link ISEDDebugNode}.
+    * The currently shown {@link ISENode}.
     */
-   private ISEDDebugNode node;
+   private ISENode node;
 
    /**
-    * The {@link Button} to edit a selected {@link ISEDAnnotation}.
+    * The {@link Button} to edit a selected {@link ISEAnnotation}.
     */
    private Button editButton;
    
    /**
-    * The {@link Button} to delete selected {@link ISEDAnnotation}s.
+    * The {@link Button} to delete selected {@link ISEAnnotation}s.
     */
    private Button deleteButton;
    
    /**
-    * Context menu item of {@link #annoationLinksViewer} to edit the {@link ISEDAnnotationLink}.
+    * Context menu item of {@link #annoationLinksViewer} to edit the {@link ISEAnnotationLink}.
     */
    private Action editAction;
 
    /**
-    * Context menu item of {@link #annoationLinksViewer} to delete the {@link ISEDAnnotationLink}s.
+    * Context menu item of {@link #annoationLinksViewer} to delete the {@link ISEAnnotationLink}s.
     */
    private Action deleteAction;
    
@@ -215,13 +215,13 @@ public class AnnotationLinkTabComposite implements ISEDDebugNodeTabContent {
    }
 
    /**
-    * Edits the currently selected {@link ISEDAnnotationLink}.
+    * Edits the currently selected {@link ISEAnnotationLink}.
     */
    public void editAnnotationLink() {
       Object obj = SWTUtil.getFirstElement(annoationLinksViewer.getSelection());
-      if (obj instanceof ISEDAnnotationLink) {
-         ISEDAnnotationLink link = (ISEDAnnotationLink)obj;
-         ISEDAnnotationLinkEditAction action = SEDUIUtil.getAnnotationLinkEditAction(link.getSource().getType().getTypeId());
+      if (obj instanceof ISEAnnotationLink) {
+         ISEAnnotationLink link = (ISEAnnotationLink)obj;
+         ISEAnnotationLinkEditAction action = SEDUIUtil.getAnnotationLinkEditAction(link.getSource().getType().getTypeId());
          if (action != null && action.canEdit(link)) {
             action.edit(editButton.getShell(), link);
          }
@@ -229,13 +229,13 @@ public class AnnotationLinkTabComposite implements ISEDDebugNodeTabContent {
    }
    
    /**
-    * Deletes selected {@link ISEDAnnotationLink}s.
+    * Deletes selected {@link ISEAnnotationLink}s.
     */
    public void deleteAnnotationLinks() {
       Object[] selected = SWTUtil.toArray(annoationLinksViewer.getSelection());
       for (Object obj : selected) {
-         if (obj instanceof ISEDAnnotationLink) {
-            ISEDAnnotationLink link = (ISEDAnnotationLink)obj;
+         if (obj instanceof ISEAnnotationLink) {
+            ISEAnnotationLink link = (ISEAnnotationLink)obj;
             link.delete();
          }
       }
@@ -251,8 +251,8 @@ public class AnnotationLinkTabComposite implements ISEDDebugNodeTabContent {
       boolean canEdit = false;
       int i = 0;
       while (i < selected.length && (!canDelete || !canEdit)) {
-         if (selected[i] instanceof ISEDAnnotationLink) {
-            ISEDAnnotationLink link = (ISEDAnnotationLink)selected[i];
+         if (selected[i] instanceof ISEAnnotationLink) {
+            ISEAnnotationLink link = (ISEAnnotationLink)selected[i];
             if (!canDelete && link.canDelete()) {
                canDelete = true;
             }
@@ -273,7 +273,7 @@ public class AnnotationLinkTabComposite implements ISEDDebugNodeTabContent {
     * {@inheritDoc}
     */
    @Override
-   public void updateContent(ISEDDebugNode node) {
+   public void updateContent(ISENode node) {
       this.node = node;
       if (annotationLinksLabelProvider != null) {
          annotationLinksLabelProvider.dispose();

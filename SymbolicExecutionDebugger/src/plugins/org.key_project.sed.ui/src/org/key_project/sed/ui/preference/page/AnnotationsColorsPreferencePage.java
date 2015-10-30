@@ -23,12 +23,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
+import org.key_project.sed.core.util.SEAnnotationUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 
 /**
- * Preference page for the colors of {@link ISEDAnnotationType}s.
+ * Preference page for the colors of {@link ISEAnnotationType}s.
  * @author Martin Hentschel
  */
 public class AnnotationsColorsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
@@ -53,7 +53,7 @@ public class AnnotationsColorsPreferencePage extends FieldEditorPreferencePage i
    @Override
    protected void createFieldEditors() {
       GridLayout parentlLayout = (GridLayout)getFieldEditorParent().getLayout();
-      for (ISEDAnnotationType type : SEDAnnotationUtil.getAnnotationtypes()) {
+      for (ISEAnnotationType type : SEAnnotationUtil.getAnnotationtypes()) {
          final Group group = new Group(getFieldEditorParent(), SWT.NONE);
          GridData groupLayoutData = new GridData(GridData.FILL_HORIZONTAL);
          groupLayoutData.horizontalSpan = parentlLayout.numColumns + 1;

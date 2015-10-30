@@ -17,13 +17,13 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.page.CreateDebugNodeWizardPage;
 
 /**
- * {@link Wizard} to define the initial values of new {@link ISEDDebugNode}s.
+ * {@link Wizard} to define the initial values of new {@link ISENode}s.
  * @author Martin Hentschel
  * @see CreateDebugNodeWizardPage
  */
@@ -39,9 +39,9 @@ public class CreateDebugNodeWizard extends Wizard {
    private String nodeType;
 
    /**
-    * The existing {@link ISEDDebugTarget}s.
+    * The existing {@link ISEDebugTarget}s.
     */
-   private ISEDDebugTarget[] debugTargets;
+   private ISEDebugTarget[] debugTargets;
    
    /**
     * Indicates that threads should be created.
@@ -61,12 +61,12 @@ public class CreateDebugNodeWizard extends Wizard {
    /**
     * Constructor.
     * @param nodeType The name of the node type which should be created.
-    * @param debugTargets The existing {@link ISEDDebugTarget}s.
+    * @param debugTargets The existing {@link ISEDebugTarget}s.
     * @param threadCreation Indicates that threads should be created.
     * @param featureProvider The {@link IFeatureProvider} to use.
     */
    public CreateDebugNodeWizard(String nodeType, 
-                                ISEDDebugTarget[] debugTargets,
+                                ISEDebugTarget[] debugTargets,
                                 boolean threadCreation,
                                 IFeatureProvider featureProvider) {
       super();
@@ -114,14 +114,14 @@ public class CreateDebugNodeWizard extends Wizard {
     * Opens the this {@link Wizard} in an {@link WizardDialog}.
     * @param parentShell The parent {@link Shell} to use.
     * @param nodeType The name of the node type which should be created.
-    * @param debugTargets The existing {@link ISEDDebugTarget}s.
+    * @param debugTargets The existing {@link ISEDebugTarget}s.
     * @param threadCreation Indicates that threads should be created.
     * @param featureProvider The {@link IFeatureProvider} to use.
     * @return The wizard result or {@code null} if the wizard was canceled.
     */
    public static CreateDebugNodeWizardResult openWizard(Shell parentShell, 
                                                         String nodeType, 
-                                                        ISEDDebugTarget[] debugTargets,
+                                                        ISEDebugTarget[] debugTargets,
                                                         boolean threadCreation,
                                                         IFeatureProvider featureProvider) {
       CreateDebugNodeWizard wizard = new CreateDebugNodeWizard(nodeType, 
@@ -144,36 +144,36 @@ public class CreateDebugNodeWizard extends Wizard {
     */
    public static class CreateDebugNodeWizardResult {
       /**
-       * The name of the {@link ISEDDebugNode} to create.
+       * The name of the {@link ISENode} to create.
        */
       private String name;
       
       /**
-       * The selected {@link ISEDDebugTarget}.
+       * The selected {@link ISEDebugTarget}.
        */
-      private ISEDDebugTarget target;
+      private ISEDebugTarget target;
 
       /**
-       * The selected parent {@link ISEDDebugNode} or {@code null} if an {@link ISEDThread} should be created.
+       * The selected parent {@link ISENode} or {@code null} if an {@link ISEThread} should be created.
        */
-      private ISEDDebugNode parent;
+      private ISENode parent;
       
       /**
-       * The selected {@link ISEDThread} or {@code null} if an {@link ISEDThread} should be created.
+       * The selected {@link ISEThread} or {@code null} if an {@link ISEThread} should be created.
        */
-      private ISEDThread thread;
+      private ISEThread thread;
       
       /**
        * Constructor.
-       * @param name The name of the {@link ISEDDebugNode} to create.
-       * @param target The selected {@link ISEDDebugTarget}.
-       * @param parent The selected parent {@link ISEDDebugNode} or {@code null} if an {@link ISEDThread} should be created.
-       * @param thread The selected {@link ISEDThread} or {@code null} if an {@link ISEDThread} should be created.
+       * @param name The name of the {@link ISENode} to create.
+       * @param target The selected {@link ISEDebugTarget}.
+       * @param parent The selected parent {@link ISENode} or {@code null} if an {@link ISEThread} should be created.
+       * @param thread The selected {@link ISEThread} or {@code null} if an {@link ISEThread} should be created.
        */
       public CreateDebugNodeWizardResult(String name, 
-                                         ISEDDebugTarget target, 
-                                         ISEDDebugNode parent, 
-                                         ISEDThread thread) {
+                                         ISEDebugTarget target, 
+                                         ISENode parent, 
+                                         ISEThread thread) {
          super();
          this.name = name;
          this.target = target;
@@ -182,34 +182,34 @@ public class CreateDebugNodeWizard extends Wizard {
       }
 
       /**
-       * Returns the name of the {@link ISEDDebugNode} to create.
-       * @return The name of the {@link ISEDDebugNode} to create.
+       * Returns the name of the {@link ISENode} to create.
+       * @return The name of the {@link ISENode} to create.
        */
       public String getName() {
          return name;
       }
 
       /**
-       * Returns the selected {@link ISEDDebugTarget}.
-       * @return The selected {@link ISEDDebugTarget}.
+       * Returns the selected {@link ISEDebugTarget}.
+       * @return The selected {@link ISEDebugTarget}.
        */
-      public ISEDDebugTarget getTarget() {
+      public ISEDebugTarget getTarget() {
          return target;
       }
 
       /**
-       * Returns the selected parent {@link ISEDDebugNode} or {@code null} if an {@link ISEDThread} should be created.
-       * @return The selected parent {@link ISEDDebugNode} or {@code null} if an {@link ISEDThread} should be created.
+       * Returns the selected parent {@link ISENode} or {@code null} if an {@link ISEThread} should be created.
+       * @return The selected parent {@link ISENode} or {@code null} if an {@link ISEThread} should be created.
        */
-      public ISEDDebugNode getParent() {
+      public ISENode getParent() {
          return parent;
       }
 
       /**
-       * Returns the selected {@link ISEDThread} or {@code null} if an {@link ISEDThread} should be created.
-       * @return The selected {@link ISEDThread} or {@code null} if an {@link ISEDThread} should be created.
+       * Returns the selected {@link ISEThread} or {@code null} if an {@link ISEThread} should be created.
+       * @return The selected {@link ISEThread} or {@code null} if an {@link ISEThread} should be created.
        */
-      public ISEDThread getThread() {
+      public ISEThread getThread() {
          return thread;
       }
    }

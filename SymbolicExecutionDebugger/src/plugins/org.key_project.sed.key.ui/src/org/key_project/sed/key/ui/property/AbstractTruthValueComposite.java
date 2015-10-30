@@ -40,7 +40,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.common.ui.decorator.TruthValueEvaluationViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.java.ObjectUtil;
@@ -118,9 +118,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    private final Color unknownColor;
    
    /**
-    * The currently shown {@link IKeYSEDDebugNode}.
+    * The currently shown {@link IKeYSENode}.
     */
-   private IKeYSEDDebugNode<?> currentNode;
+   private IKeYSENode<?> currentNode;
    
    /**
     * Constructor.
@@ -156,9 +156,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Updates the shown content.
-    * @param node The {@link IKeYSEDDebugNode} which provides the new content.
+    * @param node The {@link IKeYSENode} which provides the new content.
     */
-   public void updateContent(final IKeYSEDDebugNode<?> node) {
+   public void updateContent(final IKeYSENode<?> node) {
       if (!ObjectUtil.equals(currentNode, node)) {
          currentNode = node;
          showEvaluatingInformation();
@@ -210,9 +210,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Shows new content.
-    * @param node The {@link IKeYSEDDebugNode} which provides the new content.
+    * @param node The {@link IKeYSENode} which provides the new content.
     */
-   protected void computeAndAddNewContent(final IKeYSEDDebugNode<?> node) {
+   protected void computeAndAddNewContent(final IKeYSENode<?> node) {
       try {
          if (node != null) {
             // Get required information
@@ -255,11 +255,11 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Computes the {@link Node} to show.
-    * @param node The {@link IKeYSEDDebugNode}.
+    * @param node The {@link IKeYSENode}.
     * @param executionNode The {@link IExecutionNode}.
     * @return The {@link Node} to show.
     */
-   protected Node computeNodeToShow(IKeYSEDDebugNode<?> node, IExecutionNode<?> executionNode) {
+   protected Node computeNodeToShow(IKeYSENode<?> node, IExecutionNode<?> executionNode) {
       return executionNode.getProofNode();
    }
    
@@ -279,12 +279,12 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Computes the {@link Sequent} to show.
-    * @param node The {@link IKeYSEDDebugNode}.
+    * @param node The {@link IKeYSENode}.
     * @param executionNode The {@link IExecutionNode}.
     * @param keyNode The {@link Node}.
     * @return The {@link Sequent} to show and optionally the uninterpreted predicate.
     */
-   protected abstract Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node, 
+   protected abstract Pair<Term, Term> computeTermToShow(IKeYSENode<?> node, 
                                                          IExecutionNode<?> executionNode, 
                                                          Node keyNode);
 
@@ -293,7 +293,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @param result The {@link TruthValueEvaluationResult} to consider.
     * @param succedent The {@link Term} to show as succedent.
     * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link FormulaTermLabel}.
-    * @param node The {@link IKeYSEDDebugNode} which provides the new content.
+    * @param node The {@link IKeYSENode} which provides the new content.
     */
    protected void addNewContent(TruthValueEvaluationResult result,
                                 Term succedent,

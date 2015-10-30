@@ -14,19 +14,19 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 
 /**
- * {@link ISection} implementation to show the call stack of an {@link ISEDDebugNode}
- * which is provided via {@link ISEDDebugNode#getCallStack()}.
+ * {@link ISection} implementation to show the call stack of an {@link ISENode}
+ * which is provided via {@link ISENode#getCallStack()}.
  * @author Martin Hentschel
  */
-public class CallStackPropertySection extends AbstractSEDDebugNodePropertySection {
+public class CallStackPropertySection extends AbstractSENodePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new CallStackTabComposite();
    }
 

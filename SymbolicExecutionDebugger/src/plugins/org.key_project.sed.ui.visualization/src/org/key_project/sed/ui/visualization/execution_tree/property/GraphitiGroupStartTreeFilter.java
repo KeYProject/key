@@ -18,14 +18,14 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.ui.IWorkbenchPart;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.ui.property.ISENodeTabContent;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
 
 /**
  * {@link IFilter} implementation used to check if
- * {@link ISEDDebugNode#getGroupStartConditions()} is not empty.
+ * {@link ISENode#getGroupStartConditions()} is not empty.
  * @author Martin Hentschel
  */
 public class GraphitiGroupStartTreeFilter extends AbstractPropertySectionFilter {
@@ -38,7 +38,7 @@ public class GraphitiGroupStartTreeFilter extends AbstractPropertySectionFilter 
       if (part != null) {
          AbstractGraphitiDebugNodePropertySection section = new AbstractGraphitiDebugNodePropertySection() {
             @Override
-            protected ISEDDebugNodeTabContent createContent() {
+            protected ISENodeTabContent createContent() {
                return null; // Is never used.
             }
          };
@@ -58,7 +58,7 @@ public class GraphitiGroupStartTreeFilter extends AbstractPropertySectionFilter 
     */
    protected boolean accept(PictogramElement pe, AbstractGraphitiDebugNodePropertySection section) {
       try {
-         ISEDDebugNode node = section.getDebugNode(pe);
+         ISENode node = section.getDebugNode(pe);
          return node != null && !ArrayUtil.isEmpty(node.getGroupStartConditions());
       }
       catch (DebugException e) {

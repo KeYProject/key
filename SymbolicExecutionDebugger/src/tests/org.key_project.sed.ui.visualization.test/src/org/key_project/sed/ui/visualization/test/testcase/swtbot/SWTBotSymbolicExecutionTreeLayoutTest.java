@@ -18,7 +18,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.feature.AbstractDebugNodeUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
@@ -49,7 +49,7 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
       IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
 
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             assertDiagram(bot, project, "ThesisExample.set", "data/ThesisExample/oracle", null);
             SWTBotGefEditor editor = TestVisualizationUtil.getSymbolicExecutionTreeViewGefEditor(bot);
             editor.select("<call self.magic(other)>");
@@ -78,7 +78,7 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
       IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
 
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             assertDiagram(bot, project, "ThesisExample.set", "data/ThesisExample/oracle", null);
             SWTBotGefEditor editor = TestVisualizationUtil.getSymbolicExecutionTreeViewGefEditor(bot);
             editor.select("if (this.intValue==other.intValue)");
@@ -107,7 +107,7 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
       IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
 
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             assertDiagram(bot, project, "ThesisExample.set", "data/ThesisExample/oracle", null);
             SWTBotGefEditor editor = TestVisualizationUtil.getSymbolicExecutionTreeViewGefEditor(bot);
             editor.select("for ( int i = 0; i<2; i++ )");
@@ -136,7 +136,7 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
       IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
 
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             assertDiagram(bot, project, "ThesisExample.set", "data/ThesisExample/oracle", null);
             SWTBotGefEditor editor = TestVisualizationUtil.getSymbolicExecutionTreeViewGefEditor(bot);
             

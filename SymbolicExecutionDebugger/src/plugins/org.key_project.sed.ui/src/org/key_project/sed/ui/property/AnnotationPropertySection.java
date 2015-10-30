@@ -26,9 +26,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.ui.dialog.AnnotationLinksDialog;
 import org.key_project.sed.ui.provider.AnnotationCheckedStateSynchronizer;
 import org.key_project.sed.ui.provider.AnnotationColorTableSynchronizer;
@@ -41,11 +41,11 @@ import org.key_project.sed.ui.wizard.EditWizard;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * An {@link ISection} implementation to edit the {@link ISEDAnnotation}s
- * of an {@link ISEDDebugTarget}.
+ * An {@link ISection} implementation to edit the {@link ISEAnnotation}s
+ * of an {@link ISEDebugTarget}.
  * @author Martin Hentschel
  */
-public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySection {
+public class AnnotationPropertySection extends AbstractSEDebugTargetPropertySection {
    /**
     * Contains all available action buttons.
     */
@@ -67,67 +67,67 @@ public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySec
    private AnnotationLabelProvider annotationsLabelProvider;
    
    /**
-    * The {@link AnnotationCheckedStateSynchronizer} used to synchronize the checked states of {@link #annoationsViewer} with {@link ISEDAnnotation#isEnabled()}.
+    * The {@link AnnotationCheckedStateSynchronizer} used to synchronize the checked states of {@link #annoationsViewer} with {@link ISEAnnotation#isEnabled()}.
     */
    private AnnotationCheckedStateSynchronizer annotationsSelectionSynchronizer;
    
    /**
-    * Ensures that the colors defined by an {@link ISEDAnnotation} are used in {@link #annoationsViewer}.
+    * Ensures that the colors defined by an {@link ISEAnnotation} are used in {@link #annoationsViewer}.
     */
    private AnnotationColorTableSynchronizer annotationsColorSynchronizer;
    
    /**
-    * The currently shown {@link ISEDDebugTarget}.
+    * The currently shown {@link ISEDebugTarget}.
     */
-   private ISEDDebugTarget target;
+   private ISEDebugTarget target;
 
    /**
-    * The {@link Button} to edit a selected {@link ISEDAnnotation}.
+    * The {@link Button} to edit a selected {@link ISEAnnotation}.
     */
    private Button editButton;
    
    /**
-    * The {@link Button} to move selected {@link ISEDAnnotation}s up.
+    * The {@link Button} to move selected {@link ISEAnnotation}s up.
     */
    private Button upButton;
 
    /**
-    * The {@link Button} to move selected {@link ISEDAnnotation}s down.
+    * The {@link Button} to move selected {@link ISEAnnotation}s down.
     */
    private Button downButton;
    
    /**
-    * The {@link Button} to delete selected {@link ISEDAnnotation}s.
+    * The {@link Button} to delete selected {@link ISEAnnotation}s.
     */
    private Button deleteButton;
    
    /**
-    * The {@link Button} to show all links of an {@link ISEDAnnotation}.
+    * The {@link Button} to show all links of an {@link ISEAnnotation}.
     */
    private Button linksButton;
    
    /**
-    * Context menu item of {@link #annoationsViewer} to edit the {@link ISEDAnnotation}.
+    * Context menu item of {@link #annoationsViewer} to edit the {@link ISEAnnotation}.
     */
    private Action editAction;
 
    /**
-    * Context menu item of {@link #annoationsViewer} to move the {@link ISEDAnnotation}s up.
+    * Context menu item of {@link #annoationsViewer} to move the {@link ISEAnnotation}s up.
     */
    private Action upAction;
 
    /**
-    * Context menu item of {@link #annoationsViewer} to move the {@link ISEDAnnotation}s down.
+    * Context menu item of {@link #annoationsViewer} to move the {@link ISEAnnotation}s down.
     */
    private Action downAction;
 
    /**
-    * Context menu item of {@link #annoationsViewer} to show {@link ISEDAnnotationLink}s of the {@link ISEDAnnotation}.
+    * Context menu item of {@link #annoationsViewer} to show {@link ISEAnnotationLink}s of the {@link ISEAnnotation}.
     */
    private Action linksAction;
 
    /**
-    * Context menu item of {@link #annoationsViewer} to delete the {@link ISEDAnnotation}s.
+    * Context menu item of {@link #annoationsViewer} to delete the {@link ISEAnnotation}s.
     */
    private Action deleteAction;
    
@@ -295,22 +295,22 @@ public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySec
    }
    
    /**
-    * Edits the currently selected {@link ISEDAnnotation}.
+    * Edits the currently selected {@link ISEAnnotation}.
     */
    public void editAnnotation() {
       Object obj = SWTUtil.getFirstElement(annoationsViewer.getSelection());
-      if (obj instanceof ISEDAnnotation) {
-         EditWizard.openWizard(editButton.getShell(), target, (ISEDAnnotation)obj);
+      if (obj instanceof ISEAnnotation) {
+         EditWizard.openWizard(editButton.getShell(), target, (ISEAnnotation)obj);
       }
    }
 
    /**
-    * Shows the links of an {@link ISEDAnnotation}.
+    * Shows the links of an {@link ISEAnnotation}.
     */
    public void showAnnotationLinks() {
       Object obj = SWTUtil.getFirstElement(annoationsViewer.getSelection());
-      if (obj instanceof ISEDAnnotation) {
-         AnnotationLinksDialog dialog = new AnnotationLinksDialog(linksButton.getShell(), target, (ISEDAnnotation)obj);
+      if (obj instanceof ISEAnnotation) {
+         AnnotationLinksDialog dialog = new AnnotationLinksDialog(linksButton.getShell(), target, (ISEAnnotation)obj);
          dialog.setBlockOnOpen(false);
          dialog.setHelpAvailable(false);
          dialog.open();
@@ -318,13 +318,13 @@ public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySec
    }
 
    /**
-    * Moves selected {@link ISEDAnnotation}s one up.
+    * Moves selected {@link ISEAnnotation}s one up.
     */
    public void moveAnnotationsUp() {
       Object[] selected = SWTUtil.toArray(annoationsViewer.getSelection());
       for (Object obj : selected) {
-         if (obj instanceof ISEDAnnotation) {
-            ISEDAnnotation annotation = (ISEDAnnotation)obj;
+         if (obj instanceof ISEAnnotation) {
+            ISEAnnotation annotation = (ISEAnnotation)obj;
             int index = target.indexOfRegisteredAnnotation(annotation);
             if (index >= 1) {
                target.moveRegisteredAnnotation(annotation, index - 1);
@@ -335,13 +335,13 @@ public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySec
    }
 
    /**
-    * Moves selected {@link ISEDAnnotation}s one down.
+    * Moves selected {@link ISEAnnotation}s one down.
     */
    public void moveAnnotationsDown() {
       Object[] selected = SWTUtil.toArray(annoationsViewer.getSelection());
       for (int i = selected.length - 1; i >= 0; i--) {
-         if (selected[i] instanceof ISEDAnnotation) {
-            ISEDAnnotation annotation = (ISEDAnnotation)selected[i];
+         if (selected[i] instanceof ISEAnnotation) {
+            ISEAnnotation annotation = (ISEAnnotation)selected[i];
             int index = target.indexOfRegisteredAnnotation(annotation);
             if (index < target.countRegisteredAnnotations() - 1) {
                target.moveRegisteredAnnotation(annotation, index + 1);
@@ -352,13 +352,13 @@ public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySec
    }
    
    /**
-    * Deletes selected {@link ISEDAnnotation}s.
+    * Deletes selected {@link ISEAnnotation}s.
     */
    public void deleteAnnotations() {
       Object[] selected = SWTUtil.toArray(annoationsViewer.getSelection());
       for (Object obj : selected) {
-         if (obj instanceof ISEDAnnotation) {
-            ISEDAnnotation annotation = (ISEDAnnotation)obj;
+         if (obj instanceof ISEAnnotation) {
+            ISEAnnotation annotation = (ISEAnnotation)obj;
             annotation.delete(target);
          }
       }
@@ -375,8 +375,8 @@ public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySec
       boolean canDelete = false;
       int i = 0;
       while (i < selected.length && (!canMoveUp || !canMoveDown || !canDelete)) {
-         if (selected[i] instanceof ISEDAnnotation) {
-            ISEDAnnotation annotation = (ISEDAnnotation)selected[i];
+         if (selected[i] instanceof ISEAnnotation) {
+            ISEAnnotation annotation = (ISEAnnotation)selected[i];
             if (!canMoveUp || !canMoveDown) {
                int index = target.indexOfRegisteredAnnotation(annotation);
                if (!canMoveUp && index >= 1) {

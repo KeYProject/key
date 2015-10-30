@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDExceptionalMethodReturn}s.
+ * Implementation of {@link IAddFeature} for {@link ISEExceptionalMethodReturn}s.
  * @author Martin Hentschel
  */
 public class ExceptionalMethodReturnAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,14 +37,14 @@ public class ExceptionalMethodReturnAddFeature extends AbstractDebugNodeAddFeatu
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDExceptionalMethodReturn;
+      return businessObject instanceof ISEExceptionalMethodReturn;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
+   protected String getImageId(ISENode node) {
       return IExecutionTreeImageConstants.IMG_EXCEPTIONAL_METHOD_RETURN;
    }
 }

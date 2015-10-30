@@ -25,7 +25,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.property.SourceTabComposite;
 
 /**
@@ -76,7 +76,7 @@ public class GraphitiSourcePropertySection extends GFPropertySection {
             IFeatureProvider featureProvider = diagramProvider.getFeatureProvider();
             if (featureProvider != null) {
                Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-               if (bo instanceof ISEDDebugNode && bo instanceof IStackFrame) {
+               if (bo instanceof ISENode && bo instanceof IStackFrame) {
                   IStackFrame frame = (IStackFrame)bo;
                   if (frame.getLaunch() != null) {
                      node = frame;

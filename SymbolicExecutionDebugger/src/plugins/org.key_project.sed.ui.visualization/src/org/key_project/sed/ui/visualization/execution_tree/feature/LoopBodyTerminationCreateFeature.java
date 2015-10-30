@@ -17,15 +17,15 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDLoopBodyTermination;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISELoopBodyTermination;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.memory.SEMemoryLoopBodyTermination;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link ICreateFeature} for {@link ISEDLoopBodyTermination}s.
+ * Implementation of {@link ICreateFeature} for {@link ISELoopBodyTermination}s.
  * @author Martin Hentschel
  */
 public class LoopBodyTerminationCreateFeature extends AbstractDebugNodeCreateFeature {
@@ -57,11 +57,11 @@ public class LoopBodyTerminationCreateFeature extends AbstractDebugNodeCreateFea
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
-                                              ISEDDebugNode parent,
-                                              ISEDThread thread,
+   protected ISENode createNewDebugNode(ISEDebugTarget target,
+                                              ISENode parent,
+                                              ISEThread thread,
                                               String name) throws DebugException {
-      SEDMemoryLoopBodyTermination result = new SEDMemoryLoopBodyTermination(target, parent, thread, true);
+      SEMemoryLoopBodyTermination result = new SEMemoryLoopBodyTermination(target, parent, thread, true);
       result.setName(name);
       return result;
    }

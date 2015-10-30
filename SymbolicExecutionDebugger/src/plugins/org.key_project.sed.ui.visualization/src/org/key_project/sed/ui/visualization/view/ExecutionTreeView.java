@@ -48,8 +48,8 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
@@ -67,7 +67,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
- * This view shows the symbolic execution tree of selected {@link ISEDDebugTarget}s
+ * This view shows the symbolic execution tree of selected {@link ISEDebugTarget}s
  * graphically as Graphiti diagram.
  * @author Martin Hentschel
  */
@@ -84,14 +84,14 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    public static final String MESSAGE_DEBUG_VIEW_NOT_OPENED = "View \"Debug\" is not opened.";
 
    /**
-    * The message which is shown if no {@link ISEDDebugTarget} is selected.
+    * The message which is shown if no {@link ISEDebugTarget} is selected.
     */
    private static final String MESSAGE_NO_DEBUG_TARGET_SELECTED = "No symbolic debug target is selected in View \"Debug\".";
   
    /**
     * Contains the shown debug targets.
     */
-   private Set<ISEDDebugTarget> shownDebugTargets;
+   private Set<ISEDebugTarget> shownDebugTargets;
    
    /**
     * <p>
@@ -361,9 +361,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    }
    
    /**
-    * Updates the {@link Diagram} in a way that only {@link ISEDDebugTarget}
+    * Updates the {@link Diagram} in a way that only {@link ISEDebugTarget}
     * contained in the given {@link ISelection} are visible.
-    * @param debugViewSelection The {@link ISelection} with the new {@link ISEDDebugTarget}s to show.
+    * @param debugViewSelection The {@link ISelection} with the new {@link ISEDebugTarget}s to show.
     */
    protected void updateDiagram(ISelection debugViewSelection) {
       try {
@@ -371,17 +371,17 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
          // Make sure that the editor is already created; ignore event otherwise.
          if (editor != null && editor.getGraphicalViewer() != null) { 
             // Collect ISEDDebugTargets to show
-            final Set<ISEDDebugTarget> targets = new LinkedHashSet<ISEDDebugTarget>();
+            final Set<ISEDebugTarget> targets = new LinkedHashSet<ISEDebugTarget>();
             Object[] elements = SWTUtil.toArray(debugViewSelection);
             for (Object element : elements) {
-               if (element instanceof ISEDDebugElement) {
-                  targets.add(((ISEDDebugElement)element).getDebugTarget());
+               if (element instanceof ISEDebugElement) {
+                  targets.add(((ISEDebugElement)element).getDebugTarget());
                }
                else if (element instanceof ILaunch) {
                   IDebugTarget[] launchTargets = ((ILaunch)element).getDebugTargets();
                   for (IDebugTarget target : launchTargets) {
-                     if (target instanceof ISEDDebugTarget) {
-                        targets.add((ISEDDebugTarget)target);
+                     if (target instanceof ISEDebugTarget) {
+                        targets.add((ISEDebugTarget)target);
                      }
                   }
                }
@@ -404,7 +404,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                   Assert.isTrue(featureProvider instanceof ExecutionTreeFeatureProvider);
                   ICustomFeature feature = new DebugTargetConnectFeature((ExecutionTreeFeatureProvider)featureProvider);
                   ICustomContext context = new CustomContext(new PictogramElement[] {typeProvider.getDiagram()});
-                  context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets.toArray(new ISEDDebugTarget[targets.size()]));
+                  context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets.toArray(new ISEDebugTarget[targets.size()]));
                   context.putProperty(DebugTargetConnectFeature.PROPERTY_ELEMENTS_TO_SELECT, elements);
                   context.putProperty(DebugTargetConnectFeature.PROPERTY_PROGRESS_HANDLER, new IProgressHandler() {
                      @Override

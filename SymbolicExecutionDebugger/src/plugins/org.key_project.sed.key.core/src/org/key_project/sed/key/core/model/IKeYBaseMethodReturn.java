@@ -1,7 +1,7 @@
 package org.key_project.sed.key.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 
@@ -14,5 +14,5 @@ public interface IKeYBaseMethodReturn {
    
    public IExecutionBaseMethodReturn<?> getExecutionNode();
    
-   public SEDMemoryBranchCondition getMethodReturnCondition() throws DebugException;
+   public SEMemoryBranchCondition getMethodReturnCondition() throws DebugException;
 }

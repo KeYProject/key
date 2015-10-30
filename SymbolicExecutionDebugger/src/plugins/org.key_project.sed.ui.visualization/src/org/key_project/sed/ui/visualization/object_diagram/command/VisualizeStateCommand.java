@@ -22,7 +22,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramEditor;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -44,7 +44,7 @@ public class VisualizeStateCommand extends AbstractHandler {
          Object[] elements = SWTUtil.toArray(selection);
          for (Object element : elements) {
             if (canVisualize(element)) {
-               visualizeState((ISEDDebugNode)element,
+               visualizeState((ISENode)element,
                               HandlerUtil.getActivePart(event).getSite().getPage());
             }
          }
@@ -63,18 +63,18 @@ public class VisualizeStateCommand extends AbstractHandler {
     */
    public static boolean canVisualize(Object element) throws DebugException {
       return element instanceof IStackFrame && 
-             element instanceof ISEDDebugNode &&
+             element instanceof ISENode &&
              ((IStackFrame)element).hasVariables();
    }
 
    /**
-    * Visualizes the state of the given {@link ISEDDebugNode} which
+    * Visualizes the state of the given {@link ISENode} which
     * is also an {@link IStackFrame}.
-    * @param node The {@link ISEDDebugNode} to visualize.
+    * @param node The {@link ISENode} to visualize.
     * @param activePage The active {@link IWorkbenchPage}.
     * @throws Exception Occurred Exception.
     */
-   public static void visualizeState(ISEDDebugNode node,
+   public static void visualizeState(ISENode node,
                                      IWorkbenchPage activePage) throws Exception {
       // Open editor
       ReadonlyObjectDiagramEditor readonlyEditor = ReadonlyObjectDiagramEditor.openEditor(activePage, node.getName(), node.getId());

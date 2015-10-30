@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
@@ -64,7 +64,7 @@ public class SourcePropertySection extends AbstractPropertySection {
     * @return The {@link IStackFrame} or {@code null} if conversion is not possible.
     */
    public static IStackFrame getStackFrame(Object object) {
-      if (object instanceof ISEDDebugNode && // Only in symbolic debug nodes
+      if (object instanceof ISENode && // Only in symbolic debug nodes
           object instanceof IStackFrame) {
          IStackFrame frame = (IStackFrame)object;
          if (frame.getLaunch() != null) {

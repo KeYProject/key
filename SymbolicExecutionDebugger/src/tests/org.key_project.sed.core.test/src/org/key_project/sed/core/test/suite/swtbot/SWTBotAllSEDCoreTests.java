@@ -16,7 +16,7 @@ package org.key_project.sed.core.test.suite.swtbot;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.sed.core.test.testcase.swtbot.SWTBotDebugViewHierarchyTest;
-import org.key_project.sed.core.test.testcase.swtbot.SWTBotSEDIteratorTest;
+import org.key_project.sed.core.test.testcase.swtbot.SWTBotSEIteratorTest;
 import org.key_project.sed.core.test.testcase.swtbot.SWTBotSerializationTest;
 
 /**
@@ -26,7 +26,7 @@ import org.key_project.sed.core.test.testcase.swtbot.SWTBotSerializationTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    SWTBotDebugViewHierarchyTest.class,
-   SWTBotSEDIteratorTest.class,
+   SWTBotSEIteratorTest.class,
    SWTBotSerializationTest.class
 })
 public class SWTBotAllSEDCoreTests {

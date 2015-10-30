@@ -22,7 +22,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
@@ -40,7 +40,7 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
    public void testDifferentValues() throws Exception {
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             int originalMaximalNumberOfSetNodesPerBranchOnRun = KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun();
             try {
                // Get debug target TreeItem

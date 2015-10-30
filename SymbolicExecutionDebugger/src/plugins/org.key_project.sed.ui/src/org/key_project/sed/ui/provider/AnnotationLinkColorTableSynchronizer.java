@@ -14,41 +14,41 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.services.IDisposable;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
-import org.key_project.sed.core.model.event.SEDAnnotationLinkEvent;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.event.ISEAnnotationLinkListener;
+import org.key_project.sed.core.model.event.SEAnnotationLinkEvent;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 
 /**
- * Shows the colors defined by {@link ISEDAnnotation} in an {@link TableViewer}.
+ * Shows the colors defined by {@link ISEAnnotation} in an {@link TableViewer}.
  * @author Martin Hentschel
  */
 public class AnnotationLinkColorTableSynchronizer implements IDisposable {
    /**
     * The model to synchronize with.
     */
-   private final ISEDDebugNode model;
+   private final ISENode model;
    
    /**
     * Observes {@link #modelListener}.
     */
-   private final ISEDAnnotationLinkListener modelListener = new ISEDAnnotationLinkListener() {
+   private final ISEAnnotationLinkListener modelListener = new ISEAnnotationLinkListener() {
       @Override
-      public void annotationLinkAdded(SEDAnnotationLinkEvent e) {
+      public void annotationLinkAdded(SEAnnotationLinkEvent e) {
          handleAnnotationLinkAdded(e);
       }
       
       @Override
-      public void annotationLinkRemoved(SEDAnnotationLinkEvent e) {
+      public void annotationLinkRemoved(SEAnnotationLinkEvent e) {
          handleAnnotationLinkRemoved(e);
       }
    };
    
    /**
-    * Observes {@link ISEDAnnotation}s provided by {@link #model}.
+    * Observes {@link ISEAnnotation}s provided by {@link #model}.
     */
    private final PropertyChangeListener annotationListener = new PropertyChangeListener() {
       @Override
@@ -79,16 +79,16 @@ public class AnnotationLinkColorTableSynchronizer implements IDisposable {
 
    /**
     * Constructor.
-    * @param model The {@link ISEDDebugTarget} which provides the {@link ISEDAnnotation}s.
+    * @param model The {@link ISEDebugTarget} which provides the {@link ISEAnnotation}s.
     * @param viewer The {@link TableViewer} to show colors in.
     */
-   public AnnotationLinkColorTableSynchronizer(ISEDDebugNode model, TableViewer viewer) {
+   public AnnotationLinkColorTableSynchronizer(ISENode model, TableViewer viewer) {
       Assert.isNotNull(model);
       Assert.isNotNull(viewer);
       this.model = model;
       this.model.addAnnotationLinkListener(modelListener);
       SEDPreferenceUtil.getStore().addPropertyChangeListener(storeListener);
-      for (ISEDAnnotationLink link : model.getAnnotationLinks()) {
+      for (ISEAnnotationLink link : model.getAnnotationLinks()) {
          addListener(link);
       }
       this.viewer = viewer;
@@ -98,48 +98,48 @@ public class AnnotationLinkColorTableSynchronizer implements IDisposable {
    }
 
    /**
-    * When a new {@link ISEDAnnotationLink} is added.
+    * When a new {@link ISEAnnotationLink} is added.
     * @param e The event.
     */
-   protected void handleAnnotationLinkAdded(SEDAnnotationLinkEvent e) {
+   protected void handleAnnotationLinkAdded(SEAnnotationLinkEvent e) {
       addListener(e.getLink());
       updateColor(e.getLink());
    }
    
    /**
-    * Adds all required listener to the {@link ISEDAnnotationLink}.
-    * @param link The {@link ISEDAnnotationLink} to observe.
+    * Adds all required listener to the {@link ISEAnnotationLink}.
+    * @param link The {@link ISEAnnotationLink} to observe.
     */
-   protected void addListener(ISEDAnnotationLink link) {
-      ISEDAnnotation annotation = link.getSource();
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_HIGHLIGHT_BACKGROUND, annotationListener);
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_BACKGROUND_COLOR, annotationListener);
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_HIGHLIGHT_FOREGROUND, annotationListener);
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_FOREGROUND_COLOR, annotationListener);
+   protected void addListener(ISEAnnotationLink link) {
+      ISEAnnotation annotation = link.getSource();
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_HIGHLIGHT_BACKGROUND, annotationListener);
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_BACKGROUND_COLOR, annotationListener);
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_HIGHLIGHT_FOREGROUND, annotationListener);
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_FOREGROUND_COLOR, annotationListener);
    }
 
    /**
-    * When an existing {@link ISEDAnnotationLink} was removed.
+    * When an existing {@link ISEAnnotationLink} was removed.
     * @param e The event.
     */
-   protected void handleAnnotationLinkRemoved(SEDAnnotationLinkEvent e) {
+   protected void handleAnnotationLinkRemoved(SEAnnotationLinkEvent e) {
       removeListener(e.getLink());
    }
    
    /**
-    * Removes all listener from the {@link ISEDAnnotationLink}.
-    * @param link The {@link ISEDAnnotationLink} to remove listener from.
+    * Removes all listener from the {@link ISEAnnotationLink}.
+    * @param link The {@link ISEAnnotationLink} to remove listener from.
     */
-   protected void removeListener(ISEDAnnotationLink link) {
-      ISEDAnnotation annotation = link.getSource();
-      annotation.removePropertyChangeListener(ISEDAnnotation.PROP_HIGHLIGHT_BACKGROUND, annotationListener);
-      annotation.removePropertyChangeListener(ISEDAnnotation.PROP_BACKGROUND_COLOR, annotationListener);
-      annotation.removePropertyChangeListener(ISEDAnnotation.PROP_HIGHLIGHT_FOREGROUND, annotationListener);
-      annotation.removePropertyChangeListener(ISEDAnnotation.PROP_FOREGROUND_COLOR, annotationListener);
+   protected void removeListener(ISEAnnotationLink link) {
+      ISEAnnotation annotation = link.getSource();
+      annotation.removePropertyChangeListener(ISEAnnotation.PROP_HIGHLIGHT_BACKGROUND, annotationListener);
+      annotation.removePropertyChangeListener(ISEAnnotation.PROP_BACKGROUND_COLOR, annotationListener);
+      annotation.removePropertyChangeListener(ISEAnnotation.PROP_HIGHLIGHT_FOREGROUND, annotationListener);
+      annotation.removePropertyChangeListener(ISEAnnotation.PROP_FOREGROUND_COLOR, annotationListener);
    }
 
    /**
-    * When {@link ISEDAnnotation#isEnabled()} has changed.
+    * When {@link ISEAnnotation#isEnabled()} has changed.
     * @param evt The event.
     */
    protected void handlePropertyChange(PropertyChangeEvent evt) {
@@ -182,9 +182,9 @@ public class AnnotationLinkColorTableSynchronizer implements IDisposable {
     * @param item The {@link TableItem} to update its colors.
     */
    protected void updateColor(TableItem item) {
-      if (item.getData() instanceof ISEDAnnotationLink) {
-         ISEDAnnotationLink link = (ISEDAnnotationLink)item.getData();
-         ISEDAnnotation annotation = link.getSource();
+      if (item.getData() instanceof ISEAnnotationLink) {
+         ISEAnnotationLink link = (ISEAnnotationLink)item.getData();
+         ISEAnnotation annotation = link.getSource();
          if (annotation.isHighlightBackground()) {
             item.setBackground(createColor(annotation.getBackgroundColor(), item.getDisplay()));
          }
@@ -222,7 +222,7 @@ public class AnnotationLinkColorTableSynchronizer implements IDisposable {
    public void dispose() {
       SEDPreferenceUtil.getStore().removePropertyChangeListener(storeListener);
       model.removeAnnotationLinkListener(modelListener);
-      for (ISEDAnnotationLink link : model.getAnnotationLinks()) {
+      for (ISEAnnotationLink link : model.getAnnotationLinks()) {
          removeListener(link);
       }
       for (Color color : colorMap.values()) {

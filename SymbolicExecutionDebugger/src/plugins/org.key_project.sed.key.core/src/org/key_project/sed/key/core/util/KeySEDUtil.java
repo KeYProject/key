@@ -34,9 +34,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -710,14 +710,14 @@ public final class KeySEDUtil {
     }
 
    /**
-    * Prints the {@link ISEDDebugTarget} into the console via {@link System#out}.
-    * @param target The {@link ISEDDebugTarget} to print.
+    * Prints the {@link ISEDebugTarget} into the console via {@link System#out}.
+    * @param target The {@link ISEDebugTarget} to print.
     * @throws DebugException Occurred Exception.
     */
-   public static void printDebugTarget(ISEDDebugTarget target) throws DebugException {
+   public static void printDebugTarget(ISEDebugTarget target) throws DebugException {
       if (target != null) {
          System.out.println(target + "    (" + target.getClass() + ")");
-         for (ISEDThread thread : target.getSymbolicThreads()) {
+         for (ISEThread thread : target.getSymbolicThreads()) {
             printDebugNode(thread, 1);
          }
       }
@@ -727,12 +727,12 @@ public final class KeySEDUtil {
    }
 
    /**
-    * Prints the given {@link ISEDDebugNode} into the console via {@link System#out}.
-    * @param node The {@link ISEDDebugNode} to print.
+    * Prints the given {@link ISENode} into the console via {@link System#out}.
+    * @param node The {@link ISENode} to print.
     * @param level The level.
     * @throws DebugException Occurred Exception.
     */
-   public static void printDebugNode(ISEDDebugNode node, int level) throws DebugException {
+   public static void printDebugNode(ISENode node, int level) throws DebugException {
       // Print level
       for (int i = 0; i < level; i++) {
          System.out.print("\t");
@@ -740,7 +740,7 @@ public final class KeySEDUtil {
       // Print node and children
       if (node != null) {
          System.out.println(node);
-         for (ISEDDebugNode child : node.getChildren()) {
+         for (ISENode child : node.getChildren()) {
             printDebugNode(child, level + 1);
          }
       }

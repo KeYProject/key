@@ -34,10 +34,10 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Before;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.launch.KeYSourceLookupDirector;
@@ -98,7 +98,7 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
+         ISEDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Click on "Resume" and wait until step was executed.
          final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
          DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
@@ -150,7 +150,7 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
       // Select statement in debug tree
       SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, pathToStatementInTree);
       // Get statement that should be selected in opened editor.
-      ISEDStatement statement = (ISEDStatement)TestUtilsUtil.getTreeItemData(item);
+      ISEStatement statement = (ISEStatement)TestUtilsUtil.getTreeItemData(item);
       // Make sure that an editor is opened
       SWTBotEditor editor = TestUtilsUtil.waitForEditor(bot);
       assertNotNull(editor);
@@ -195,7 +195,7 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
+         ISEDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          ILaunch launch = target.getLaunch();
          // Click on "Resume" and wait until step was executed.
          final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
@@ -210,13 +210,13 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
          TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Get stack frame for lookup
          assertEquals(1, target.getSymbolicThreads().length);
-         ISEDThread thread = target.getSymbolicThreads()[0];
+         ISEThread thread = target.getSymbolicThreads()[0];
          assertTrue(thread.getChildren().length >= 1);
-         assertTrue(thread.getChildren()[0] instanceof ISEDMethodCall);
-         ISEDMethodCall call = (ISEDMethodCall)thread.getChildren()[0];
+         assertTrue(thread.getChildren()[0] instanceof ISEMethodCall);
+         ISEMethodCall call = (ISEMethodCall)thread.getChildren()[0];
          assertTrue(call.getChildren().length >= 1);
-         assertTrue(call.getChildren()[0] instanceof ISEDStatement);
-         ISEDStatement s1 = (ISEDStatement)call.getChildren()[0];
+         assertTrue(call.getChildren()[0] instanceof ISEStatement);
+         ISEStatement s1 = (ISEStatement)call.getChildren()[0];
          // Test KeYSourceLookupParticipant directly
          KeYSourceLookupParticipant participant = new KeYSourceLookupParticipant();
          assertEquals(File.separator + method.getResource().getName(), participant.getSourceName(s1));

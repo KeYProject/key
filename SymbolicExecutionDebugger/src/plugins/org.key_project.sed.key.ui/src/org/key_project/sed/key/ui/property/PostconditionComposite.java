@@ -15,7 +15,7 @@ package org.key_project.sed.key.ui.property;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 import org.key_project.util.collection.ImmutableList;
 
@@ -48,7 +48,7 @@ public class PostconditionComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node,
+   protected Pair<Term, Term> computeTermToShow(IKeYSENode<?> node,
                                                 IExecutionNode<?> executionNode, 
                                                 Node keyNode) {
       Term term = keyNode.getAppliedRuleApp().posInOccurrence().subTerm();

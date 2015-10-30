@@ -27,13 +27,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.event.ISEDAnnotationListener;
-import org.key_project.sed.core.model.event.SEDAnnotationEvent;
-import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
-import org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.event.ISEAnnotationListener;
+import org.key_project.sed.core.model.event.SEAnnotationEvent;
+import org.key_project.sed.core.provider.SEDebugNodeContentProvider;
+import org.key_project.sed.ui.action.ISEAnnotationLinkEditAction;
 import org.key_project.sed.ui.provider.AnnotationAnnotationLinkLabelProvider;
 import org.key_project.sed.ui.provider.AnnotationAnnotationLinkLazyContentProvider;
 import org.key_project.sed.ui.util.LogUtil;
@@ -43,8 +43,8 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
 /**
- * This {@link Dialog} is used to list all {@link ISEDAnnotationLink}s of
- * an {@link ISEDAnnotation}.
+ * This {@link Dialog} is used to list all {@link ISEAnnotationLink}s of
+ * an {@link ISEAnnotation}.
  * @author Martin Hentschel
  */
 public class AnnotationLinksDialog extends TitleAreaDialog {
@@ -54,35 +54,35 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
    public static final int CLOSE = 2;
    
    /**
-    * The {@link ISEDDebugTarget} in which {@link #annotation} is used.
+    * The {@link ISEDebugTarget} in which {@link #annotation} is used.
     */
-   private final ISEDDebugTarget target;
+   private final ISEDebugTarget target;
    
    /**
     * Listens for changes on {@link #target}.
     */
-   private final ISEDAnnotationListener targetListener = new ISEDAnnotationListener() {
+   private final ISEAnnotationListener targetListener = new ISEAnnotationListener() {
       @Override
-      public void annotationUnregistered(SEDAnnotationEvent e) {
+      public void annotationUnregistered(SEAnnotationEvent e) {
          handleAnnotationUnregistered(e);
       }
       
       @Override
-      public void annotationRegistered(SEDAnnotationEvent e) {
+      public void annotationRegistered(SEAnnotationEvent e) {
       }
       
       @Override
-      public void annotationMoved(SEDAnnotationEvent e) {
+      public void annotationMoved(SEAnnotationEvent e) {
       }
    };
    
    /**
-    * The {@link ISEDAnnotation} which provides the shown {@link ISEDAnnotationLink}s.
+    * The {@link ISEAnnotation} which provides the shown {@link ISEAnnotationLink}s.
     */
-   private final ISEDAnnotation annotation;
+   private final ISEAnnotation annotation;
    
    /**
-    * Shows the {@link ISEDAnnotationLink}s.
+    * Shows the {@link ISEAnnotationLink}s.
     */
    private TableViewer linksViewer;
    
@@ -97,29 +97,29 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
    private AnnotationAnnotationLinkLabelProvider linksLabelProvider;
 
    /**
-    * Context menu item of {@link #linksViewer} to follow the {@link ISEDAnnotationLink}.
+    * Context menu item of {@link #linksViewer} to follow the {@link ISEAnnotationLink}.
     */
    private Action followAction;
 
    /**
-    * Context menu item of {@link #linksViewer} to edit the {@link ISEDAnnotationLink}.
+    * Context menu item of {@link #linksViewer} to edit the {@link ISEAnnotationLink}.
     */
    private Action editAction;
 
    /**
-    * Context menu item of {@link #linksViewer} to delete the {@link ISEDAnnotationLink}.
+    * Context menu item of {@link #linksViewer} to delete the {@link ISEAnnotationLink}.
     */
    private Action deleteAction;
    
    /**
     * Constructor.
     * @param parentShell The parent {@link Shell}.
-    * @param target The {@link ISEDDebugTarget} in which {@link #annotation} is used.
-    * @param annotation The {@link ISEDAnnotation} which provides the shown {@link ISEDAnnotationLink}s.
+    * @param target The {@link ISEDebugTarget} in which {@link #annotation} is used.
+    * @param annotation The {@link ISEAnnotation} which provides the shown {@link ISEAnnotationLink}s.
     */
    public AnnotationLinksDialog(Shell parentShell, 
-                                ISEDDebugTarget target,
-                                ISEDAnnotation annotation) {
+                                ISEDebugTarget target,
+                                ISEAnnotation annotation) {
       super(parentShell);
       Assert.isNotNull(target);
       Assert.isNotNull(annotation);
@@ -226,20 +226,20 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
    }
 
    /**
-    * Follows the currently selected {@link ISEDAnnotationLink} if possible.
+    * Follows the currently selected {@link ISEAnnotationLink} if possible.
     */
    public void selectLinkTarget() {
       followLink(linksViewer.getSelection());
    }
 
    /**
-    * Edits the currently selected {@link ISEDAnnotationLink} if possible.
+    * Edits the currently selected {@link ISEAnnotationLink} if possible.
     */
    public void editLink() {
       Object object = SWTUtil.getFirstElement(linksViewer.getSelection());
-      if (object instanceof ISEDAnnotationLink) {
-         ISEDAnnotationLink link = (ISEDAnnotationLink)object;
-         ISEDAnnotationLinkEditAction action = SEDUIUtil.getAnnotationLinkEditAction(link.getSource().getType().getTypeId());
+      if (object instanceof ISEAnnotationLink) {
+         ISEAnnotationLink link = (ISEAnnotationLink)object;
+         ISEAnnotationLinkEditAction action = SEDUIUtil.getAnnotationLinkEditAction(link.getSource().getType().getTypeId());
          if (action != null && action.canEdit(link)) {
             action.edit(getShell(), link);
          }
@@ -247,12 +247,12 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
    }
 
    /**
-    * Deletes the currently selected {@link ISEDAnnotationLink} if possible.
+    * Deletes the currently selected {@link ISEAnnotationLink} if possible.
     */
    public void deleteLink() {
       Object object = SWTUtil.getFirstElement(linksViewer.getSelection());
-      if (object instanceof ISEDAnnotationLink) {
-         ISEDAnnotationLink link = (ISEDAnnotationLink)object;
+      if (object instanceof ISEAnnotationLink) {
+         ISEAnnotationLink link = (ISEAnnotationLink)object;
          if (link.canDelete()) {
             link.delete();
          }
@@ -265,10 +265,10 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
     */
    protected void handleSelectionChanged(SelectionChangedEvent event) {
       Object object = SWTUtil.getFirstElement(event.getSelection());
-      if (object instanceof ISEDAnnotationLink) {
-         ISEDAnnotationLink link = (ISEDAnnotationLink)object;
+      if (object instanceof ISEAnnotationLink) {
+         ISEAnnotationLink link = (ISEAnnotationLink)object;
          followAction.setEnabled(link.getTarget() != null);
-         ISEDAnnotationLinkEditAction action = SEDUIUtil.getAnnotationLinkEditAction(link.getSource().getType().getTypeId());
+         ISEAnnotationLinkEditAction action = SEDUIUtil.getAnnotationLinkEditAction(link.getSource().getType().getTypeId());
          editAction.setEnabled(action != null && action.canEdit(link));
          deleteAction.setEnabled(link.canDelete());
       }
@@ -288,15 +288,15 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
    }
 
    /**
-    * Follows the {@link ISEDAnnotationLink} of the {@link ISelection}.
+    * Follows the {@link ISEAnnotationLink} of the {@link ISelection}.
     * @param selection The {@link ISelection}.
     */
    protected void followLink(ISelection selection) {
       try {
          Object object = SWTUtil.getFirstElement(selection);
-         if (object instanceof ISEDAnnotationLink) {
-            ISEDAnnotationLink link = (ISEDAnnotationLink)object;
-            if (SEDDebugNodeContentProvider.getDefaultInstance().isShown(link.getTarget())) {
+         if (object instanceof ISEAnnotationLink) {
+            ISEAnnotationLink link = (ISEAnnotationLink)object;
+            if (SEDebugNodeContentProvider.getDefaultInstance().isShown(link.getTarget())) {
                IDebugView debugView = SEDUIUtil.getDebugView(getParentShell());
                if (debugView != null) {
                   SEDUIUtil.selectInDebugView(debugView.getSite().getPart(), 
@@ -354,10 +354,10 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
    }
 
    /**
-    * When an {@link ISEDAnnotation} was removed from {@link #target}.
+    * When an {@link ISEAnnotation} was removed from {@link #target}.
     * @param e The event.
     */
-   protected void handleAnnotationUnregistered(SEDAnnotationEvent e) {
+   protected void handleAnnotationUnregistered(SEAnnotationEvent e) {
       if (e.getAnnotation() == annotation) {
          getShell().getDisplay().syncExec(new Runnable() {
             @Override

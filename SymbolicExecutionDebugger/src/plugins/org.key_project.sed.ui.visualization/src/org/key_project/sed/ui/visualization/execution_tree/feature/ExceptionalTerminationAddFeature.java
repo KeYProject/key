@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEExceptionalTermination;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDExceptionalTermination}s.
+ * Implementation of {@link IAddFeature} for {@link ISEExceptionalTermination}s.
  * @author Martin Hentschel
  */
 public class ExceptionalTerminationAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,15 +37,15 @@ public class ExceptionalTerminationAddFeature extends AbstractDebugNodeAddFeatur
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDExceptionalTermination;
+      return businessObject instanceof ISEExceptionalTermination;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
-      ISEDExceptionalTermination terminationNode = (ISEDExceptionalTermination)node;
+   protected String getImageId(ISENode node) {
+      ISEExceptionalTermination terminationNode = (ISEExceptionalTermination)node;
       if (terminationNode.isVerified()) {
          return IExecutionTreeImageConstants.IMG_EXCEPTIONAL_TERMINATION;
       }

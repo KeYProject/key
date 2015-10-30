@@ -23,19 +23,19 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.ui.property.ISENodeTabContent;
 
 /**
  * Provides the basic implementation of {@link AbstractPropertySection}s
- * which shows content of an {@link ISEDDebugNode}.
+ * which shows content of an {@link ISENode}.
  * @author Martin Hentschel
  */
 public abstract class AbstractGraphitiDebugNodePropertySection extends GFPropertySection {
    /**
     * The shown content.
     */
-   private ISEDDebugNodeTabContent content;
+   private ISENodeTabContent content;
    
    /**
     * {@inheritDoc}
@@ -50,10 +50,10 @@ public abstract class AbstractGraphitiDebugNodePropertySection extends GFPropert
    }
    
    /**
-    * Creates the {@link ISEDDebugNodeTabContent} which shows the content.
-    * @return The created {@link ISEDDebugNodeTabContent}.
+    * Creates the {@link ISENodeTabContent} which shows the content.
+    * @return The created {@link ISENodeTabContent}.
     */
-   protected abstract ISEDDebugNodeTabContent createContent();
+   protected abstract ISENodeTabContent createContent();
 
    /**
     * {@inheritDoc}
@@ -64,28 +64,28 @@ public abstract class AbstractGraphitiDebugNodePropertySection extends GFPropert
    }
    
    /**
-    * Returns the {@link ISEDDebugNode} to show.
-    * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
+    * Returns the {@link ISENode} to show.
+    * @return The {@link ISENode} to show or {@code null} if no one should be shown.
     */
-   public ISEDDebugNode getDebugNode() {
+   public ISENode getDebugNode() {
       return getDebugNode(getSelectedPictogramElement());
    }
    
    /**
-    * Returns the {@link ISEDDebugNode} to show.
+    * Returns the {@link ISENode} to show.
     * @param pe The currently selected {@link PictogramElement}.
-    * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
+    * @return The {@link ISENode} to show or {@code null} if no one should be shown.
     */
-   public ISEDDebugNode getDebugNode(PictogramElement pe) {
-      ISEDDebugNode node = null;
+   public ISENode getDebugNode(PictogramElement pe) {
+      ISENode node = null;
       if (pe != null) {
          IDiagramTypeProvider diagramProvider = getDiagramTypeProvider();
          if (diagramProvider != null) {
             IFeatureProvider featureProvider = diagramProvider.getFeatureProvider();
             if (featureProvider != null) {
                Object bo = featureProvider.getBusinessObjectForPictogramElement(pe);
-               if (bo instanceof ISEDDebugNode) {
-                  node = (ISEDDebugNode)bo;
+               if (bo instanceof ISENode) {
+                  node = (ISENode)bo;
                }
             }
          }

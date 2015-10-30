@@ -21,7 +21,7 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.page.ModelFileSaveOptionsWizardPage;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
@@ -58,7 +58,7 @@ public class SaveAsExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagr
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugTarget[] getDebugTargetsToSave() {
+   protected ISEDebugTarget[] getDebugTargetsToSave() {
       Assert.isNotNull(diagramTypeProvider);
       Assert.isNotNull(diagramTypeProvider.getFeatureProvider());
       return ExecutionTreeUtil.getAllDebugTargets(diagramTypeProvider);

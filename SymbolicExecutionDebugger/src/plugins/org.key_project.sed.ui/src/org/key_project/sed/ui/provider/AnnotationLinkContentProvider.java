@@ -2,16 +2,16 @@ package org.key_project.sed.ui.provider;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
-import org.key_project.sed.core.model.event.SEDAnnotationEvent;
-import org.key_project.sed.core.model.event.SEDAnnotationLinkEvent;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.event.ISEAnnotationLinkListener;
+import org.key_project.sed.core.model.event.SEAnnotationEvent;
+import org.key_project.sed.core.model.event.SEAnnotationLinkEvent;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * An {@link IStructuredContentProvider} which shows the registered 
- * {@link ISEDAnnotationLink}s of an {@link ISEDDebugNode}. 
+ * {@link ISEAnnotationLink}s of an {@link ISENode}. 
  * @author Martin Hentschel
  */
 public class AnnotationLinkContentProvider implements IStructuredContentProvider {
@@ -21,21 +21,21 @@ public class AnnotationLinkContentProvider implements IStructuredContentProvider
    private Viewer viewer;
    
    /**
-    * The currently shown and observed {@link ISEDDebugNode}.
+    * The currently shown and observed {@link ISENode}.
     */
-   private ISEDDebugNode target;
+   private ISENode target;
    
    /**
     * Listens for changes on {@link #target}.
     */
-   private final ISEDAnnotationLinkListener listener = new ISEDAnnotationLinkListener() {
+   private final ISEAnnotationLinkListener listener = new ISEAnnotationLinkListener() {
       @Override
-      public void annotationLinkAdded(SEDAnnotationLinkEvent e) {
+      public void annotationLinkAdded(SEAnnotationLinkEvent e) {
          handleAnnotationLinkAdded(e);
       }
       
       @Override
-      public void annotationLinkRemoved(SEDAnnotationLinkEvent e) {
+      public void annotationLinkRemoved(SEAnnotationLinkEvent e) {
          handleAnnotationLinkRemoved(e);
       }
    };
@@ -49,8 +49,8 @@ public class AnnotationLinkContentProvider implements IStructuredContentProvider
       if (this.target != null) {
          this.target.removeAnnotationLinkListener(listener);
       }
-      if (newInput instanceof ISEDDebugNode) {
-         this.target = (ISEDDebugNode)newInput;
+      if (newInput instanceof ISENode) {
+         this.target = (ISENode)newInput;
          this.target.addAnnotationLinkListener(listener);
       }
       else {
@@ -62,12 +62,12 @@ public class AnnotationLinkContentProvider implements IStructuredContentProvider
     * {@inheritDoc}
     */
    @Override
-   public ISEDAnnotationLink[] getElements(Object inputElement) {
-      if (inputElement instanceof ISEDDebugNode) {
-         return ((ISEDDebugNode) inputElement).getAnnotationLinks();
+   public ISEAnnotationLink[] getElements(Object inputElement) {
+      if (inputElement instanceof ISENode) {
+         return ((ISENode) inputElement).getAnnotationLinks();
       }
       else {
-         return new ISEDAnnotationLink[0];
+         return new ISEAnnotationLink[0];
       }
    }
 
@@ -75,7 +75,7 @@ public class AnnotationLinkContentProvider implements IStructuredContentProvider
     * When a new annotation link is added.
     * @param e The event.
     */
-   protected void handleAnnotationLinkAdded(SEDAnnotationLinkEvent e) {
+   protected void handleAnnotationLinkAdded(SEAnnotationLinkEvent e) {
       SWTUtil.refresh(viewer);
    }
 
@@ -83,7 +83,7 @@ public class AnnotationLinkContentProvider implements IStructuredContentProvider
     * When an existing annotation link is removed.
     * @param e The event.
     */
-   protected void handleAnnotationLinkRemoved(SEDAnnotationLinkEvent e) {
+   protected void handleAnnotationLinkRemoved(SEAnnotationLinkEvent e) {
       SWTUtil.refresh(viewer);
    }
 
@@ -91,7 +91,7 @@ public class AnnotationLinkContentProvider implements IStructuredContentProvider
     * When an existing annotation has moved.
     * @param e The event.
     */
-   protected void handleAnnotationMoved(SEDAnnotationEvent e) {
+   protected void handleAnnotationMoved(SEAnnotationEvent e) {
       SWTUtil.refresh(viewer);
    }
 

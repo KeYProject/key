@@ -20,9 +20,9 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.core.model.ISEDValue;
-import org.key_project.sed.core.model.ISEDVariable;
-import org.key_project.sed.core.model.impl.AbstractSEDValue;
+import org.key_project.sed.core.model.ISEValue;
+import org.key_project.sed.core.model.ISEVariable;
+import org.key_project.sed.core.model.impl.AbstractSEValue;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
@@ -33,11 +33,11 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
- * Implementation of {@link ISEDValue} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEValue} for the symbolic execution debugger (SED)
  * based on KeY which represents one {@link IExecutionValue}.
  * @author Martin Hentschel
  */
-public class KeYValue extends AbstractSEDValue {
+public class KeYValue extends AbstractSEValue {
    /**
     * The constant name which is shown to a user if the value is unknown.
     */
@@ -62,9 +62,9 @@ public class KeYValue extends AbstractSEDValue {
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
     * @param executionValue The {@link IExecutionValue} to represent in debug model.
-    * @param parent The parent {@link ISEDVariable}.
+    * @param parent The parent {@link ISEVariable}.
     */
-   public KeYValue(KeYDebugTarget target, ISEDVariable parent, IExecutionValue executionValue) {
+   public KeYValue(KeYDebugTarget target, ISEVariable parent, IExecutionValue executionValue) {
       super(target, parent);
       Assert.isNotNull(executionValue);
       this.executionValue = executionValue;
@@ -196,7 +196,7 @@ public class KeYValue extends AbstractSEDValue {
                Set<IExecutionConstraint> relevantExecutionConstraints = new HashSet<IExecutionConstraint>();
                CollectionUtil.addAll(relevantExecutionConstraints, executionValue.getConstraints());
                List<KeYConstraint> constraints = new LinkedList<KeYConstraint>();
-               KeYConstraint[] allConstraints = ((IKeYSEDDebugNode<?>)getParent().getStackFrame()).getConstraints();
+               KeYConstraint[] allConstraints = ((IKeYSENode<?>)getParent().getStackFrame()).getConstraints();
                for (KeYConstraint constraint : allConstraints) {
                   if (relevantExecutionConstraints.remove(constraint.getExecutionConstraint())) {
                      constraints.add(constraint);

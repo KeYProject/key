@@ -18,12 +18,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * {@link ISection} implementation to show the properties of {@link ISENode}s.
  * @author Martin Hentschel
  */
 public class KeYDebugNodePropertySection extends AbstractPropertySection {
@@ -50,20 +50,20 @@ public class KeYDebugNodePropertySection extends AbstractPropertySection {
    }
    
    /**
-    * Returns the {@link ISEDDebugNode} to show.
-    * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
+    * Returns the {@link ISENode} to show.
+    * @return The {@link ISENode} to show or {@code null} if no one should be shown.
     */
-   protected IKeYSEDDebugNode<?> getDebugNode() {
+   protected IKeYSENode<?> getDebugNode() {
       Object object = SWTUtil.getFirstElement(getSelection());
       return getDebugNode(object);
    }
    
    /**
-    * Converts the given {@link Object} into an {@link IKeYSEDDebugNode} if possible.
+    * Converts the given {@link Object} into an {@link IKeYSENode} if possible.
     * @param object The given {@link Object}.
-    * @return The {@link IKeYSEDDebugNode} or {@code null} if conversion is not possible.
+    * @return The {@link IKeYSENode} or {@code null} if conversion is not possible.
     */
-   public static IKeYSEDDebugNode<?> getDebugNode(Object object) {
-      return object instanceof IKeYSEDDebugNode<?> ? (IKeYSEDDebugNode<?>)object : null;
+   public static IKeYSENode<?> getDebugNode(Object object) {
+      return object instanceof IKeYSENode<?> ? (IKeYSENode<?>)object : null;
    }
 }

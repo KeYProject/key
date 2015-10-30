@@ -23,11 +23,11 @@ import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
-import org.key_project.sed.core.model.memory.ISEDMemoryDebugTarget;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.memory.ISEMemoryNode;
+import org.key_project.sed.core.model.memory.ISEMemoryDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard.CreateDebugNodeWizardResult;
@@ -35,17 +35,17 @@ import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
- * Provides a basic implementation of {@link ICreateFeature} for {@link ISEDDebugNode}s.
+ * Provides a basic implementation of {@link ICreateFeature} for {@link ISENode}s.
  * @author Martin Hentschel
  */
 public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeature implements ICustomUndoableFeature {
    /**
-    * The created {@link ISEDDebugNode}.
+    * The created {@link ISENode}.
     */
-   private ISEDDebugNode createdNode;
+   private ISENode createdNode;
    
    /**
-    * The index on {@link ISEDDebugNode#getParent()} where the created node ({@link #createdNode}) was added to.
+    * The index on {@link ISENode#getParent()} where the created node ({@link #createdNode}) was added to.
     */
    private int indexOnParent;
    
@@ -79,17 +79,17 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
                                                                                getFeatureProvider()); 
          if (result != null) {
             // Create new business object
-            ISEDDebugTarget target = result.getTarget();
-            ISEDDebugNode parent = result.getParent();
+            ISEDebugTarget target = result.getTarget();
+            ISENode parent = result.getParent();
             createdNode = createNewDebugNode(target, parent, result.getThread(), result.getName());
             if (isThreadCreation()) {
-               Assert.isTrue(target instanceof ISEDMemoryDebugTarget);
-               Assert.isTrue(createdNode instanceof ISEDThread);
-               ((ISEDMemoryDebugTarget)target).addSymbolicThread((ISEDThread)createdNode);
+               Assert.isTrue(target instanceof ISEMemoryDebugTarget);
+               Assert.isTrue(createdNode instanceof ISEThread);
+               ((ISEMemoryDebugTarget)target).addSymbolicThread((ISEThread)createdNode);
             }
             else {
-               Assert.isTrue(parent instanceof ISEDMemoryDebugNode);
-               ((ISEDMemoryDebugNode)parent).addChild(createdNode);
+               Assert.isTrue(parent instanceof ISEMemoryNode);
+               ((ISEMemoryNode)parent).addChild(createdNode);
             }
             // Do the add
             addGraphicalRepresentation(context, createdNode);
@@ -107,10 +107,10 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
    }
    
    /**
-    * Returns the available {@link ISEDDebugTarget}s.
-    * @return The available {@link ISEDDebugTarget}s.
+    * Returns the available {@link ISEDebugTarget}s.
+    * @return The available {@link ISEDebugTarget}s.
     */
-   protected ISEDDebugTarget[] getAvailableDebugTargets()  {
+   protected ISEDebugTarget[] getAvailableDebugTargets()  {
       IDiagramTypeProvider dtp = getFeatureProvider().getDiagramTypeProvider();
       Assert.isTrue(dtp instanceof ExecutionTreeDiagramTypeProvider);
       ExecutionTreeDiagramTypeProvider provider = (ExecutionTreeDiagramTypeProvider)dtp;
@@ -119,8 +119,8 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
    }
    
    /**
-    * Defines if {@link ISEDThread}s or other {@link ISEDDebugNode}s should be created.
-    * @return {@code true} create {@link ISEDThread}s, {@code false} create other {@link ISEDDebugNode}s.
+    * Defines if {@link ISEThread}s or other {@link ISENode}s should be created.
+    * @return {@code true} create {@link ISEThread}s, {@code false} create other {@link ISENode}s.
     */
    protected boolean isThreadCreation() {
       return false;
@@ -133,14 +133,14 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
    protected abstract String getNodeType();
 
    /**
-    * Creates a new {@link ISEDDebugNode} to use as business object.
+    * Creates a new {@link ISENode} to use as business object.
     * @param initialValues The initial values to use.
-    * @return The created {@link ISEDDebugNode}.
+    * @return The created {@link ISENode}.
     * @throws DebugException Occurred Exception.
     */
-   protected abstract ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
-                                                       ISEDDebugNode parent,
-                                                       ISEDThread thread,
+   protected abstract ISENode createNewDebugNode(ISEDebugTarget target,
+                                                       ISENode parent,
+                                                       ISEThread thread,
                                                        String name) throws DebugException;
 
    /**
@@ -150,15 +150,15 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
    public void undo(IContext context) {
       try {
          if (isThreadCreation()) {
-            if (createdNode.getDebugTarget() instanceof ISEDMemoryDebugTarget) {
-               ISEDMemoryDebugTarget target = (ISEDMemoryDebugTarget)createdNode.getDebugTarget();
-               indexOnParent = target.indexOfSymbolicThread((ISEDThread)createdNode);
-               target.removeSymbolicThread((ISEDThread)createdNode);
+            if (createdNode.getDebugTarget() instanceof ISEMemoryDebugTarget) {
+               ISEMemoryDebugTarget target = (ISEMemoryDebugTarget)createdNode.getDebugTarget();
+               indexOnParent = target.indexOfSymbolicThread((ISEThread)createdNode);
+               target.removeSymbolicThread((ISEThread)createdNode);
             }
          }
          else {
-            if (createdNode.getParent() instanceof ISEDMemoryDebugNode) {
-               ISEDMemoryDebugNode parent = (ISEDMemoryDebugNode)createdNode.getParent();
+            if (createdNode.getParent() instanceof ISEMemoryNode) {
+               ISEMemoryNode parent = (ISEMemoryNode)createdNode.getParent();
                indexOnParent = parent.indexOfChild(createdNode);
                parent.removeChild(createdNode);
             }
@@ -185,14 +185,14 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
    public void redo(IContext context) {
       try {
          if (isThreadCreation()) {
-            if (createdNode.getDebugTarget() instanceof ISEDMemoryDebugTarget) {
-               ISEDMemoryDebugTarget target = (ISEDMemoryDebugTarget)createdNode.getDebugTarget();
-               target.addSymbolicThread(indexOnParent, (ISEDThread)createdNode);
+            if (createdNode.getDebugTarget() instanceof ISEMemoryDebugTarget) {
+               ISEMemoryDebugTarget target = (ISEMemoryDebugTarget)createdNode.getDebugTarget();
+               target.addSymbolicThread(indexOnParent, (ISEThread)createdNode);
             }
          }
          else {
-            if (createdNode.getParent() instanceof ISEDMemoryDebugNode) {
-               ISEDMemoryDebugNode parent = (ISEDMemoryDebugNode)createdNode.getParent();
+            if (createdNode.getParent() instanceof ISEMemoryNode) {
+               ISEMemoryNode parent = (ISEMemoryNode)createdNode.getParent();
                parent.addChild(indexOnParent, createdNode);
             }
          }

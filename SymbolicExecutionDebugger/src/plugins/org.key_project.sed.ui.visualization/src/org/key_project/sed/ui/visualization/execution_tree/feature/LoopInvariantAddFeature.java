@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISELoopInvariant;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDLoopInvariant}s.
+ * Implementation of {@link IAddFeature} for {@link ISELoopInvariant}s.
  * @author Martin Hentschel
  */
 public class LoopInvariantAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,15 +37,15 @@ public class LoopInvariantAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDLoopInvariant;
+      return businessObject instanceof ISELoopInvariant;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
-      ISEDLoopInvariant invariantNode = (ISEDLoopInvariant)node;
+   protected String getImageId(ISENode node) {
+      ISELoopInvariant invariantNode = (ISELoopInvariant)node;
       if (invariantNode.isInitiallyValid()) {
          return IExecutionTreeImageConstants.IMG_LOOP_INVARIANT;
       }
