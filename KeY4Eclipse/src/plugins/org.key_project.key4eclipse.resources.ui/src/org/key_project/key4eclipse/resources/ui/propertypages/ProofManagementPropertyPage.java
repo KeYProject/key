@@ -55,12 +55,15 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    private Button autoDeleteProofFilesButton;
 
    private Button generateTestCasesButton;
+
+   private Button generateCounterExamplesButton;
    
    private Button autoDeleteTestCasesButton;
    
    private Text fillText;
-   
+
    private static final String generateTestCasesButtonText = "Generate test cases";
+   private static final String generateCounterExamplesButtonText = "Generate counter exampels";
 
    
    private SelectionListener buttonSelectionListener = new SelectionListener() {
@@ -81,9 +84,6 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       
       @Override
       public void widgetSelected(SelectionEvent e) {
-         if(enableMultiThreadingButton.getSelection() && !KeYProjectProperties.TEST_CASE_GENERATION_SUPPORTS_MULTITHREADING){
-            generateTestCasesButton.setSelection(false);
-         }
          update();
       }
       
@@ -183,13 +183,25 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       testCaseGenComposite.setLayout(new GridLayout(1, false));
       
       generateTestCasesButton = new Button(testCaseGenComposite, SWT.CHECK);
-      generateTestCasesButton.setText("Generate test cases");
+      generateTestCasesButton.setText(generateTestCasesButtonText);
       generateTestCasesButton.addSelectionListener(generateTestCasesButtonSelectionListener);
       generateTestCasesButton.setSelection(KeYProjectProperties.isGenerateTestCases(getProject()));
       
       autoDeleteTestCasesButton = new Button(testCaseGenComposite, SWT.CHECK);
       autoDeleteTestCasesButton.setText("Delete unnecessary test cases automatically");
       autoDeleteTestCasesButton.setSelection(KeYProjectProperties.isAutoDeleteTestCases(getProject()));
+      
+      Group counterExampleSettings = new Group(builderSettingsComposite, SWT.NONE);
+      counterExampleSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      counterExampleSettings.setLayout(new GridLayout(1, false));
+      counterExampleSettings.setText("Counter Example Generation");
+      Composite counterExampleComposite = new Composite(counterExampleSettings, SWT.NONE);
+      counterExampleComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      counterExampleComposite.setLayout(new GridLayout(1, false));
+      
+      generateCounterExamplesButton = new Button(counterExampleComposite, SWT.CHECK);
+      generateCounterExamplesButton.setText(generateCounterExamplesButtonText);
+      generateCounterExamplesButton.setSelection(KeYProjectProperties.isGenerateCounterExamples(getProject()));
 
       update();
       return root;
@@ -210,11 +222,17 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          generateTestCasesButton.setText(generateTestCasesButtonText + " - SMT Solver Z3 not installed!");
          generateTestCasesButton.setEnabled(false);
          autoDeleteTestCasesButton.setEnabled(false);
+         
+         generateCounterExamplesButton.setText(generateCounterExamplesButtonText + " - SMT Solver Z3 not installed!");
+         generateCounterExamplesButton.setEnabled(false);
       }
       else {
-         generateTestCasesButton.setText(generateTestCasesButtonText);
-         generateTestCasesButton.setEnabled(buildsEnabled);
-         autoDeleteTestCasesButton.setEnabled(generateTestCasesButton.getSelection() && generateTestCasesButton.getEnabled());
+          generateTestCasesButton.setText(generateTestCasesButtonText);
+          generateTestCasesButton.setEnabled(buildsEnabled && (!multiThreadingEnabled || KeYProjectProperties.TEST_CASE_GENERATION_SUPPORTS_MULTITHREADING));
+          autoDeleteTestCasesButton.setEnabled(generateTestCasesButton.getSelection() && generateTestCasesButton.getEnabled());
+
+          generateCounterExamplesButton.setText(generateCounterExamplesButtonText);
+          generateCounterExamplesButton.setEnabled(buildsEnabled);
       }
    }
    
@@ -246,9 +264,11 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection() && autoDeleteProofFilesButton.isEnabled());
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection() && enableMultiThreadingButton.isEnabled());
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreadsSpinner.getSelection()));
-         boolean triggerBuild = !KeYProjectProperties.isGenerateTestCases(project) && (generateTestCasesButton.isEnabled() && generateTestCasesButton.getSelection());
+         boolean triggerBuild = (!KeYProjectProperties.isGenerateTestCases(project) && (generateTestCasesButton.isEnabled() && generateTestCasesButton.getSelection())) 
+                 || (!KeYProjectProperties.isGenerateCounterExamples(project) && (generateCounterExamplesButton.isEnabled() && generateCounterExamplesButton.getSelection()));
          KeYProjectProperties.setGenerateTestCases(project, generateTestCasesButton.getSelection() && generateTestCasesButton.isEnabled());
          KeYProjectProperties.setAutoDeleteTestCases(project, autoDeleteTestCasesButton.getSelection() && autoDeleteTestCasesButton.isEnabled());
+         KeYProjectProperties.setGenerateCounterExamples(project, generateCounterExamplesButton.getSelection() && generateCounterExamplesButton.isEnabled());
          if(triggerBuild) {
             KeYResourcesUtil.synchronizeProject(project);
             KeYProjectBuildProperties properties = new KeYProjectBuildProperties(project);
@@ -279,6 +299,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       numberOfThreadsSpinner.setSelection(2);
       generateTestCasesButton.setSelection(false);
       autoDeleteTestCasesButton.setSelection(false);
+      generateCounterExamplesButton.setSelection(false);
       update();
       super.performDefaults();
    }

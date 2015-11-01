@@ -44,6 +44,9 @@
       <attribute
             name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
       </attribute>
+      <attribute
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.counterExamples">
+      </attribute>
    </extension>
    <extension
          id="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker"
@@ -60,6 +63,9 @@
       </persistent>
       <attribute
             name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
+      </attribute>
+      <attribute
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.counterExamples">
       </attribute>
    </extension>
    <extension
@@ -88,6 +94,9 @@
       </persistent>
       <attribute
             name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
+      </attribute>
+      <attribute
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.counterExamples">
       </attribute>
    </extension>
    <extension
