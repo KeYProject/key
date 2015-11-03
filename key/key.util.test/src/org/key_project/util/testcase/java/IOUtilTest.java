@@ -755,8 +755,8 @@ public class IOUtilTest extends TestCase {
     */
    @Test
    public void testWriteTo_Charstet() throws Exception {
-      byte[] utf8 = doWriteCharsetAsXmlTest("Hello “world”…", Charset.forName("UTF-8"));
-      byte[] utf16 = doWriteCharsetAsXmlTest("Hello “world”…", Charset.forName("UTF-16"));
+      byte[] utf8 = doWriteCharsetAsXmlTest("Hello \u201Cworld\u201D\u2026", Charset.forName("UTF-8"));
+      byte[] utf16 = doWriteCharsetAsXmlTest("Hello \u201Cworld\u201D\u2026", Charset.forName("UTF-16"));
       assertNotEquals(utf8.length, utf16.length);
    }
    
