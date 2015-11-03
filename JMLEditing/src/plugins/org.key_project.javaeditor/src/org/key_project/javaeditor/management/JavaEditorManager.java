@@ -366,6 +366,7 @@ public final class JavaEditorManager {
       if (outlinePage instanceof JavaOutlinePage) {
          
          final JavaOutlinePage joutline = (JavaOutlinePage) outlinePage; 
+         final Display display = joutline.getSite().getShell().getDisplay();
     
          final TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
          final ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
@@ -385,22 +386,20 @@ public final class JavaEditorManager {
                outlineViewer.setContentProvider(contentProvierWrapper);
                //add Listener That gets called to ElementChanges in ICompilationunits
                JavaCore.addElementChangedListener(new IElementChangedListener() {
-                  
                   @Override
                   public void elementChanged(final ElementChangedEvent event) {
-                     //only update if it is extendable in properties
-                     if(PreferenceUtil.isExtensionsEnabled()){
-                        if (event.getDelta().getElement() instanceof ICompilationUnit){
-                            //update only if change is in ICompilationUnit and all of the changes happened to a comment
-                            // check for length == 0 makes sure that no outline update is triggered by JDT.
-                           if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0){
-                               if (Display.getDefault() != null && !Display.getDefault().isDisposed()){
-                                 Display.getDefault().syncExec(new Runnable() {
-                                    
+                     // only update if it is extendable in properties
+                     if (PreferenceUtil.isExtensionsEnabled()){
+                        if (event.getDelta().getElement() instanceof ICompilationUnit) {
+                           // update only if change is in ICompilationUnit and all of the changes happened to a comment
+                           // check for length == 0 makes sure that no outline update is triggered by JDT.
+                           if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0) {
+                               if (display != null && !display.isDisposed()){
+                                  display.asyncExec(new Runnable() { // Needs to be asynchronously because the UI waits for the compilation reconciler which triggers this event. Otherwise deadlocks are possible.
                                     @Override
                                     public void run() {
-                                      //refresh outline with Content
-                                       if (outlineViewer != null && joutline.getControl() != null){
+                                       //refresh outline with Content
+                                       if (outlineViewer != null && !outlineViewer.getControl().isDisposed() && joutline.getControl() != null) {
                                           contentProvierWrapper.changeDetected(event);
                                           outlineViewer.refresh(true);
                                        }
