@@ -6,13 +6,10 @@ import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 
 /**
  * Interface for extension for the standard Java outline.
- * 
  * @author Timm Lippert
- *
  */
 @SuppressWarnings("restriction")
 public interface IOutlineModifier {
-
    /**
     * Method to extend the standard Outline and adds the returning children to to the parent
     * element.

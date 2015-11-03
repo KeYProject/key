@@ -12,7 +12,10 @@ import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.swt.graphics.Image;
+import org.key_project.javaeditor.outline.IOutlineImageProvider;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.ui.util.JMLEditingImages;
 
 /**
  * JML Outline Element can be used as a child to return and get shown in the Outline.
@@ -20,7 +23,7 @@ import org.key_project.jmlediting.core.dom.IASTNode;
  * @author Timm Lippert
  *
  */
-public class JMLOutlineElement implements IJavaElement, ISourceReference {
+public class JMLOutlineElement implements IJavaElement, ISourceReference, IOutlineImageProvider {
    private IJavaElement parent;
    private static final int type = 100;
    private IASTNode jmlNode;
@@ -169,4 +172,8 @@ public class JMLOutlineElement implements IJavaElement, ISourceReference {
       };
    }
 
+   @Override
+   public Image getImage() {
+      return JMLEditingImages.getImage(JMLEditingImages.JML_LOGO);
+   }
 }

@@ -1,10 +1,15 @@
 package org.key_project.javaeditor.outline;
 
 import org.eclipse.jdt.core.ElementChangedEvent;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IElementChangedListener;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.key_project.javaeditor.util.ExtendableOutlineUtil;
+import org.key_project.javaeditor.util.PreferenceUtil;
 import org.key_project.util.java.ArrayUtil;
 
 /**
@@ -26,18 +31,35 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
    private final JavaOutlinePage javaOutlinePage;
 
    /**
+    * The {@link TreeViewer} of {@link #javaOutlinePage}.
+    */
+   private final TreeViewer outlineViewer;
+
+   /**
     * The available {@link IOutlineModifier}.
     */
    private final IOutlineModifier[] outlineModifier = ExtendableOutlineUtil.createEnabledJavaExtensions();
 
    /**
+    * Listens for changes on {@link JavaCore}.
+    */
+   private final IElementChangedListener changedListener = new IElementChangedListener() {
+      @Override
+      public void elementChanged(ElementChangedEvent event) {
+         handleElementChanged(event);
+      }
+   };
+   
+   /**
     * Constructor.
     * @param originalProvider The original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
     * @param javaOutlinePage The {@link JavaOutlinePage} in which {@link #originalProvider} and this instance is used.
     */
-   public OutlineContentProviderWrapper(ITreeContentProvider originalProvider, JavaOutlinePage javaOutlinePage) {
+   public OutlineContentProviderWrapper(ITreeContentProvider originalProvider, JavaOutlinePage javaOutlinePage, TreeViewer outlineViewer) {
       this.originalProvider = originalProvider;
       this.javaOutlinePage = javaOutlinePage;
+      this.outlineViewer = outlineViewer;
+      JavaCore.addElementChangedListener(changedListener);
    }
 
    /**
@@ -45,7 +67,32 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
     */
    @Override
    public final void dispose() {
+      JavaCore.removeElementChangedListener(changedListener);
       originalProvider.dispose();
+   }
+
+   protected void handleElementChanged(final ElementChangedEvent event) {
+      // only update if it is extendable in properties
+      if (PreferenceUtil.isExtensionsEnabled()){
+         if (event.getDelta().getElement() instanceof ICompilationUnit) {
+            // update only if change is in ICompilationUnit and all of the changes happened to a comment
+            // check for length == 0 makes sure that no outline update is triggered by JDT.
+            if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0) {
+                if (outlineViewer != null && !outlineViewer.getControl().isDisposed()) {
+                   outlineViewer.getControl().getDisplay().asyncExec(new Runnable() { // Needs to be asynchronously because the UI waits for the compilation reconciler which triggers this event. Otherwise deadlocks are possible.
+                     @Override
+                     public void run() {
+                        //refresh outline with Content
+                        if (outlineViewer != null && !outlineViewer.getControl().isDisposed()) {
+                           changeDetected(event);
+                           outlineViewer.refresh(true);
+                        }
+                     }
+                  });
+                }
+            }
+         }
+      }
    }
 
    /**

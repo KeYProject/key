@@ -28,7 +28,7 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
    private JMLASTCommentLocator comments = null;
    private IJavaElement root = null;
 
-   public final Object[] modify(Object parent, Object[] currentChildren, JavaOutlinePage javaOutlinePage) {
+   public Object[] modify(Object parent, Object[] currentChildren, JavaOutlinePage javaOutlinePage) {
       Object[] cachedChildren = cache.get(parent);
       if (cachedChildren == null) {
          cachedChildren = computeChildren(parent, currentChildren, javaOutlinePage);

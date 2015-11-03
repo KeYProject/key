@@ -18,10 +18,6 @@ import java.util.Arrays;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.eclipse.jdt.core.ElementChangedEvent;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IElementChangedListener;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.eclipse.jdt.internal.ui.javaeditor.SemanticHighlightingManager;
@@ -37,7 +33,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
@@ -57,7 +52,7 @@ import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
 import org.key_project.javaeditor.outline.OutlineContentProviderWrapper;
-import org.key_project.javaeditor.outline.OutlineLableWrapper;
+import org.key_project.javaeditor.outline.OutlineLabelProviderWrapper;
 import org.key_project.javaeditor.util.ExtendableConfigurationUtil;
 import org.key_project.javaeditor.util.LogUtil;
 import org.key_project.javaeditor.util.PreferenceUtil;
@@ -364,53 +359,35 @@ public final class JavaEditorManager {
     */
    private static void updateOutline(IPage outlinePage) throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
       if (outlinePage instanceof JavaOutlinePage) {
-         
-         final JavaOutlinePage joutline = (JavaOutlinePage) outlinePage; 
-         final Display display = joutline.getSite().getShell().getDisplay();
-    
-         final TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
-         final ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
-         
-         //Set new LableProvider to an extended one with overwritten getImage method and the old AppearanceAwareLableProvier
-         OutlineLableWrapper wrapper =  new OutlineLableWrapper((AppearanceAwareLabelProvider)((DecoratingJavaLabelProvider)outlineViewer.getLabelProvider()).getStyledStringProvider());
-         outlineViewer.setLabelProvider(wrapper);
-         
+         JavaOutlinePage joutline = (JavaOutlinePage) outlinePage;
+         TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
+         ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();
+         DecoratingJavaLabelProvider labelProvider = (DecoratingJavaLabelProvider) outlineViewer.getLabelProvider();
+         // Check content provider
          if (contentProvider instanceof OutlineContentProviderWrapper) {
-            if (!PreferenceUtil.isExtensionsEnabled()) { // Restore input if required
+            if (!PreferenceUtil.isExtensionsEnabled()) { // Restore content provider if required
                outlineViewer.setContentProvider(((OutlineContentProviderWrapper) contentProvider).getOriginalProvider());
+               contentProvider.dispose();
             }
          }
          else {
-            if (PreferenceUtil.isExtensionsEnabled()) { // Change input if required
-               final OutlineContentProviderWrapper contentProvierWrapper = new OutlineContentProviderWrapper(contentProvider, joutline);
+            if (PreferenceUtil.isExtensionsEnabled()) { // Change content provider if required
+               OutlineContentProviderWrapper contentProvierWrapper = new OutlineContentProviderWrapper(contentProvider, joutline, outlineViewer);
                outlineViewer.setContentProvider(contentProvierWrapper);
-               //add Listener That gets called to ElementChanges in ICompilationunits
-               JavaCore.addElementChangedListener(new IElementChangedListener() {
-                  @Override
-                  public void elementChanged(final ElementChangedEvent event) {
-                     // only update if it is extendable in properties
-                     if (PreferenceUtil.isExtensionsEnabled()){
-                        if (event.getDelta().getElement() instanceof ICompilationUnit) {
-                           // update only if change is in ICompilationUnit and all of the changes happened to a comment
-                           // check for length == 0 makes sure that no outline update is triggered by JDT.
-                           if (event.getDelta().getAffectedChildren().length == 0 && event.getDelta().getAnnotationDeltas().length == 0 && event.getDelta().getChangedChildren().length == 0) {
-                               if (display != null && !display.isDisposed()){
-                                  display.asyncExec(new Runnable() { // Needs to be asynchronously because the UI waits for the compilation reconciler which triggers this event. Otherwise deadlocks are possible.
-                                    @Override
-                                    public void run() {
-                                       //refresh outline with Content
-                                       if (outlineViewer != null && !outlineViewer.getControl().isDisposed() && joutline.getControl() != null) {
-                                          contentProvierWrapper.changeDetected(event);
-                                          outlineViewer.refresh(true);
-                                       }
-                                    }
-                                 });
-                               }
-                           }
-                        }
-                     }
-                  }
-               });
+            }
+         }
+         // Check label provider
+         if (labelProvider instanceof OutlineLabelProviderWrapper) {
+            if (!PreferenceUtil.isExtensionsEnabled()) { // Restore label provider if required
+               outlineViewer.setLabelProvider(new DecoratingJavaLabelProvider((AppearanceAwareLabelProvider) labelProvider.getStyledStringProvider()));
+               labelProvider.dispose();
+            }
+         }
+         else {
+            if (PreferenceUtil.isExtensionsEnabled()) { // Change label provider if required
+               OutlineLabelProviderWrapper outlineProviderwrapper = new OutlineLabelProviderWrapper((AppearanceAwareLabelProvider) labelProvider.getStyledStringProvider());
+               outlineViewer.setLabelProvider(outlineProviderwrapper);
+               labelProvider.dispose();
             }
          }
       }
