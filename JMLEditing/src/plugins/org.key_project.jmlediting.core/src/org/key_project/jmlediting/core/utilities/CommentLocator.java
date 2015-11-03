@@ -61,10 +61,10 @@ public final class CommentLocator {
    public static CommentRange createCommentRange(int startPosition, int length, boolean isLineComment) {
       int endContentOffset = isLineComment ? 0 : 2; 
       return new CommentRange(startPosition, 
-            startPosition + length - 1, 
-            startPosition + 2, 
-            startPosition + length - 1 - endContentOffset,
-            isLineComment ? CommentType.SINGLE_LINE : CommentType.MULTI_LINE);
+                              startPosition + length - 1, 
+                              startPosition + 2, 
+                              startPosition + length - 1 - endContentOffset,
+                              isLineComment ? CommentType.SINGLE_LINE : CommentType.MULTI_LINE);
    }
    
    /**

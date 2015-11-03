@@ -381,12 +381,13 @@ public final class JavaEditorManager {
          }
          else {
             if (PreferenceUtil.isExtensionsEnabled()) { // Change input if required
-               outlineViewer.setContentProvider(new OutlineContentProviderWrapper(contentProvider));
+               final OutlineContentProviderWrapper contentProvierWrapper = new OutlineContentProviderWrapper(contentProvider, joutline);
+               outlineViewer.setContentProvider(contentProvierWrapper);
                //add Listener That gets called to ElementChanges in ICompilationunits
                JavaCore.addElementChangedListener(new IElementChangedListener() {
                   
                   @Override
-                  public void elementChanged(ElementChangedEvent event) {
+                  public void elementChanged(final ElementChangedEvent event) {
                      //only update if it is extendable in properties
                      if(PreferenceUtil.isExtensionsEnabled()){
                         if (event.getDelta().getElement() instanceof ICompilationUnit){
@@ -400,6 +401,7 @@ public final class JavaEditorManager {
                                     public void run() {
                                       //refresh outline with Content
                                        if (outlineViewer != null && joutline.getControl() != null){
+                                          contentProvierWrapper.changeDetected(event);
                                           outlineViewer.refresh(true);
                                        }
                                     }

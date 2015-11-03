@@ -1,5 +1,6 @@
 package org.key_project.javaeditor.outline;
 
+import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -17,22 +18,26 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
    /**
     * The original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
     */
-   private ITreeContentProvider originalProvider;
+   private final ITreeContentProvider originalProvider;
+   
+   /**
+    * The {@link JavaOutlinePage} in which {@link #originalProvider} and this instance is used.
+    */
+   private final JavaOutlinePage javaOutlinePage;
 
    /**
     * The available {@link IOutlineModifier}.
     */
-   private final IOutlineModifier[] outlineModifier = ExtendableOutlineUtil
-            .createEnabledJavaExtensions();
+   private final IOutlineModifier[] outlineModifier = ExtendableOutlineUtil.createEnabledJavaExtensions();
 
    /**
     * Constructor.
-    * 
-    * @param originalProvider The original {@link ITreeContentProvider} of a
-    *           {@link JavaOutlinePage}.
+    * @param originalProvider The original {@link ITreeContentProvider} of a {@link JavaOutlinePage}.
+    * @param javaOutlinePage The {@link JavaOutlinePage} in which {@link #originalProvider} and this instance is used.
     */
-   public OutlineContentProviderWrapper(ITreeContentProvider originalProvider) {
+   public OutlineContentProviderWrapper(ITreeContentProvider originalProvider, JavaOutlinePage javaOutlinePage) {
       this.originalProvider = originalProvider;
+      this.javaOutlinePage = javaOutlinePage;
    }
 
    /**
@@ -58,7 +63,7 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
    public final Object[] getElements(Object inputElement) {
       Object[] elements = originalProvider.getElements(inputElement);
       for (IOutlineModifier modifyer : outlineModifier) {
-         elements = modifyer.modify(inputElement, elements);
+         elements = modifyer.modify(inputElement, elements, javaOutlinePage);
       }
       return elements;
    }
@@ -70,9 +75,19 @@ public class OutlineContentProviderWrapper implements ITreeContentProvider {
    public final Object[] getChildren(Object parentElement) {
       Object[] elements = originalProvider.getChildren(parentElement);
       for (IOutlineModifier modifyer : outlineModifier) {
-         elements = modifyer.modify(parentElement, elements);
+         elements = modifyer.modify(parentElement, elements, javaOutlinePage);
       }
       return elements;
+   }
+
+   /**
+    * When a change is detected.
+    * @param event The {@link ElementChangedEvent}.
+    */
+   public void changeDetected(ElementChangedEvent event) {
+      for (IOutlineModifier modifyer : outlineModifier) {
+         modifyer.changeDetected(event);
+      }
    }
 
    /**

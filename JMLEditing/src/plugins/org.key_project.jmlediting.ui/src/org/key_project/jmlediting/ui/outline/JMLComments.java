@@ -2,7 +2,6 @@ package org.key_project.jmlediting.ui.outline;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.Comment;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
@@ -15,20 +14,20 @@ import org.key_project.jmlediting.core.dom.INodeTraverser;
  */
 
 public class JMLComments implements IASTNode {
-
-   private Comment node;
-   private String text;
+   private final String text;
+   private final int startOffset;
+   private final int endOffset;
 
    /**
     * 
     * @param commenttext The Text that should be shown in the Outline.
-    * @param node The Comment {@link IASTNode}.
-    * @param type type of the Comment.
+    * @param startOffset The start offset.
+    * @param endOffset The end offset.
     */
-
-   public JMLComments(String commenttext, Comment node) {
-      text = commenttext;
-      this.node = node;
+   public JMLComments(String commenttext, int startOffset, int endOffset) {
+      this.text = commenttext;
+      this.startOffset = startOffset;
+      this.endOffset = endOffset;
    }
 
    @Override
@@ -38,12 +37,12 @@ public class JMLComments implements IASTNode {
 
    @Override
    public final int getStartOffset() {
-      return node.getStartPosition();
+      return startOffset;
    }
 
    @Override
    public final int getEndOffset() {
-      return node.getLength() + node.getStartPosition();
+      return endOffset;
    }
 
    @Override

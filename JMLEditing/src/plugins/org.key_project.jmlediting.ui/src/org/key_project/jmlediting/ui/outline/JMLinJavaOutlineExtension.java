@@ -1,12 +1,17 @@
 package org.key_project.jmlediting.ui.outline;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.key_project.javaeditor.outline.IOutlineModifier;
 import org.key_project.javaeditor.util.LogUtil;
 
@@ -16,13 +21,23 @@ import org.key_project.javaeditor.util.LogUtil;
  * @author Timm Lippert
  *
  */
+@SuppressWarnings("restriction")
 public class JMLinJavaOutlineExtension implements IOutlineModifier {
+   private Map<Object, Object[]> cache = new HashMap<Object, Object[]>();
 
    private JMLASTCommentLocator comments = null;
    private IJavaElement root = null;
 
-   public final Object[] modify(Object parent, Object[] currentChildren) {
-
+   public final Object[] modify(Object parent, Object[] currentChildren, JavaOutlinePage javaOutlinePage) {
+      Object[] cachedChildren = cache.get(parent);
+      if (cachedChildren == null) {
+         cachedChildren = computeChildren(parent, currentChildren, javaOutlinePage);
+         cache.put(parent, cachedChildren);
+      }
+      return cachedChildren;
+   }
+   
+   protected Object[] computeChildren(Object parent, Object[] currentChildren, JavaOutlinePage javaOutlinePage) {
       if (!(parent instanceof IJavaElement)) {
          return currentChildren;
       }
@@ -31,7 +46,15 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
 
       // first call with i compilation unit initialize everything
       if (javaParent.getParent().getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
-         comments = new JMLASTCommentLocator((ICompilationUnit) javaParent);
+         CompilationUnit cu = null;
+//         try {
+//            JavaEditor javaEditor = ObjectUtil.get(javaOutlinePage, "fEditor");
+//            cu = JDTUtil.getSharedCompilationUnit(javaEditor);
+//         }
+//         catch (Exception e) {
+//            LogUtil.getLogger().logWarning("JDT implementation has changed: " + e.getMessage());
+//         }
+         comments = new JMLASTCommentLocator((ICompilationUnit) javaParent, cu);
          root = javaParent;
       }
       else if (comments == null)
@@ -121,5 +144,10 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
       }
 
       return currentChildren;
+   }
+
+   @Override
+   public void changeDetected(ElementChangedEvent event) {
+      cache = new HashMap<Object, Object[]>();
    }
 }
