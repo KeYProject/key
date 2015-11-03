@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaOutlinePage;
 import org.key_project.javaeditor.outline.IOutlineModifier;
 import org.key_project.javaeditor.util.LogUtil;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 
 /**
  * Extends the Java Outline with JML Specifications.
@@ -29,12 +30,17 @@ public class JMLinJavaOutlineExtension implements IOutlineModifier {
    private IJavaElement root = null;
 
    public Object[] modify(Object parent, Object[] currentChildren, JavaOutlinePage javaOutlinePage) {
-      Object[] cachedChildren = cache.get(parent);
-      if (cachedChildren == null) {
-         cachedChildren = computeChildren(parent, currentChildren, javaOutlinePage);
-         cache.put(parent, cachedChildren);
+      if (JMLPreferencesHelper.isExtensionEnabled()) {
+         Object[] cachedChildren = cache.get(parent);
+         if (cachedChildren == null) {
+            cachedChildren = computeChildren(parent, currentChildren, javaOutlinePage);
+            cache.put(parent, cachedChildren);
+         }
+         return cachedChildren;
       }
-      return cachedChildren;
+      else {
+         return currentChildren;
+      }
    }
    
    protected Object[] computeChildren(Object parent, Object[] currentChildren, JavaOutlinePage javaOutlinePage) {
