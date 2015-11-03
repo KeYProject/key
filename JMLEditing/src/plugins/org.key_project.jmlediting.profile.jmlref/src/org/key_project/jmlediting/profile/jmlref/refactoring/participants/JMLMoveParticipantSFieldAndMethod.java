@@ -18,6 +18,7 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
 import org.eclipse.text.edits.ReplaceEdit;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.FieldAndMethodMoveRefactoringComputer;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtil;
 
@@ -40,6 +41,10 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
     */
    @Override
    protected final boolean initialize(Object element) {
+      if (!JMLPreferencesHelper.isExtensionEnabled()) {
+         return false;
+      }
+      
       IJavaElement elementToMove = (IJavaElement) element;
       fProject = elementToMove.getJavaProject();
       elementName = elementToMove.getElementName();
@@ -87,8 +92,10 @@ public class JMLMoveParticipantSFieldAndMethod extends MoveParticipant {
     *
     */
    @Override
-   public final Change createChange(IProgressMonitor pm) throws CoreException,
-         OperationCanceledException {
+   public final Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
+      if (!JMLPreferencesHelper.isExtensionEnabled()) {
+         return null;
+      }
 
       // Only non empty change objects will be added
       ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();

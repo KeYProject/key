@@ -14,6 +14,7 @@ import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.ReplaceEdit;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefactoringComputer;
 
 /**
@@ -45,6 +46,10 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     */
    @Override
    protected final boolean initialize(final Object element) {
+      if (!JMLPreferencesHelper.isExtensionEnabled()) {
+         return false;
+      }
+      
       fmethodParameter = (ILocalVariable) element;
 
       // check if it is a method parameter
@@ -92,8 +97,10 @@ public class JMLRenameParticipantParameters extends RenameParticipant {
     *         java changes.
     */
    @Override
-   public final Change createChange(final IProgressMonitor pm) throws CoreException,
-         OperationCanceledException {
+   public final Change createChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
+      if (!JMLPreferencesHelper.isExtensionEnabled()) {
+         return null;
+      }
 
       final RenameRefactoringComputer changesComputer = new RenameRefactoringComputer(
             fmethodParameter, fOldName, fNewName);

@@ -17,6 +17,7 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.text.edits.ReplaceEdit;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RefactoringUtil;
 import org.key_project.jmlediting.profile.jmlref.refactoring.utility.RenameRefactoringComputer;
 
@@ -62,6 +63,10 @@ public class JMLRenameParticipantClass extends RenameParticipant {
     */
    @Override
    protected final boolean initialize(final Object element) {
+      if (!JMLPreferencesHelper.isExtensionEnabled()) {
+         return false;
+      }
+      
       fNewName = getArguments().getNewName();
       fJavaElementToRename = (IJavaElement) element;
       fProject = fJavaElementToRename.getJavaProject();
@@ -101,8 +106,10 @@ public class JMLRenameParticipantClass extends RenameParticipant {
     *         </p>
     */
    @Override
-   public final Change createPreChange(final IProgressMonitor pm) throws CoreException,
-         OperationCanceledException {
+   public final Change createPreChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
+      if (!JMLPreferencesHelper.isExtensionEnabled()) {
+         return null;
+      }
 
       // Only non empty change objects will be added
       ArrayList<TextFileChange> changesToFilesWithoutJavaChanges = new ArrayList<TextFileChange>();
