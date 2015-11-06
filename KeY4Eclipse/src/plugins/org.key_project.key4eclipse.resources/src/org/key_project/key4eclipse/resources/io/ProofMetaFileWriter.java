@@ -346,8 +346,8 @@ public class ProofMetaFileWriter {
               }
               XMLUtil.appendEndTag(level+1, TAG_COUNTER_EXAMPLE, sb);
           }
+          XMLUtil.appendEndTag(level, TAG_COUNTER_EXAMPLES, sb);
        }
-       XMLUtil.appendEndTag(level, TAG_COUNTER_EXAMPLES, sb);
    }
    
    private static void appendCounterExampleModelNode(TreeElement e, int level, StringBuffer sb){

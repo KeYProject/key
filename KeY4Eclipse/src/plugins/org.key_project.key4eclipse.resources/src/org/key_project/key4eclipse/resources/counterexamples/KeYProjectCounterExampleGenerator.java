@@ -76,6 +76,8 @@ public class KeYProjectCounterExampleGenerator extends AbstractSideProofCounterE
             if (problem.getSolver().getType() == SolverType.Z3_CE_SOLVER &&
                     problem.getSolver().getSocket().getQuery() != null) {
                 Model model = problem.getSolver().getSocket().getQuery().getModel();
+                model.removeUnnecessaryObjects();
+                model.addAliases();
                 keYProjectCounterExamples.add(new KeYProjectCounterExample(computeProblemId(problem), computeProblemName(problem), model));
             }
         }
