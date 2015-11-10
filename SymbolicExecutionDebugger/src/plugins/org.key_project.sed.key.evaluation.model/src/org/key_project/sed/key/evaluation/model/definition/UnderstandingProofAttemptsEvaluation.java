@@ -284,7 +284,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createPreconditionText("summand != null"), createPreconditionValue()),
                                                               new Choice(createPostconditionText("value == \\old(value) + summand.value"), createPostconditionValue(), true),
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), locationQuestion),
-                                                              new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion()),
+                                                              new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion(false)),
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
                                                               createGiveupWhyOpenChoice());
@@ -335,7 +335,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createPostconditionText("array == null || array.length == 0 ==> \\result == -1"), createPostconditionValue("Not found"), createMinTerminationQuestion("postNotFoundTermination", false, false)),
                                                               new Choice(createPostconditionText("array != null && array.length >= 1 ==> (\\forall int i; i >= 0 && i < array.length; array[\\result] <= array[i])"), createPostconditionValue("Found"), true, createMinTerminationQuestion("postFoundTermination", true, false)),
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), createMinLocationQuestion("whichMethodLocationsHaveChanged"), createMinTerminationQuestion("methodAssignableTermination", false, false)),
-                                                              new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion()),
+                                                              new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion(false)),
                                                               new Choice(createLoopInvariantInitiallyText("i >= 1 && i <= array.length"), createLoopInvariantInitiallyValue("i"), createMinTerminationQuestion("initialITermination", false, false)),
                                                               new Choice(createLoopInvariantInitiallyText("minIndex >= 0 && minIndex < i"), createLoopInvariantInitiallyValue("minIndex"), createMinTerminationQuestion("initialMinIndexTermination", false, false)),
                                                               new Choice(createLoopInvariantInitiallyText("\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]"), createLoopInvariantInitiallyValue("array elements"), createMinTerminationQuestion("initialArrayElementsTermination", false, false)),
@@ -395,7 +395,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                               executedQuestion);
    }
 
-   private CheckboxQuestion createThrownExceptionsQuestion() {
+   private CheckboxQuestion createThrownExceptionsQuestion(boolean arrayStoreExceptionExpected) {
       String thrownExceptionTitle = "Which exception(s) are thrown?";
       CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsAreThrown", 
                                                                       thrownExceptionTitle, 
@@ -406,7 +406,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException"),
-                                                                      new Choice("java.lang.ArrayStoreException", "java.lang.ArrayStoreException"),
+                                                                      new Choice("java.lang.ArrayStoreException", "java.lang.ArrayStoreException", arrayStoreExceptionExpected),
                                                                       new Choice("java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException"),
                                                                       new Choice("java.lang.IllegalStateException", "java.lang.IllegalStateException"),
                                                                       new Choice("java.lang.invoke.WrongMethodTypeException", "java.lang.invoke.WrongMethodTypeException"),
@@ -446,7 +446,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
                                   new Choice("Termination 1: array != null & array.length == 0", "Termination 1"),
-                                  new Choice("Termination 2: array != null & array.length == 1", "Termination 2"),
+                                  new Choice("Termination 2: array != null & array.length == 1", "Termination 2", termination2expected),
                                   new Choice("Termination 3: array != null & array.length > 1", "Termination 3"),
                                   new Choice("Termination 4: array == null", "Termination 4"),
                                   new Choice("Loop Body Termination 1: array[i] < array[minIndex]", "Loop Body Termination 1", loop1expected),
@@ -468,7 +468,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createPostconditionText("entrySize == \\old(entrySize) + 1"), createPostconditionValue("EntrySize"), createCalendarTerminationQuestion("postEntrySizeTermination", false)),
                                                               new Choice(createClassInvariantPreservedText("entrySize >= 0 && entrySize < entries.length"), createClassInvariantPreservedValue(), true, createCalendarTerminationQuestion("invariantNotPreservedTermination", true)),
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), createCalendarLocationQuestion("whichMethodLocationsHaveChanged"), createCalendarTerminationQuestion("assignableTermination", false)),
-                                                              new Choice(createExceptionThrownText(), createExceptionThrownValue(), true, createThrownExceptionsQuestion()),
+                                                              new Choice(createExceptionThrownText(), createExceptionThrownValue(), true, createThrownExceptionsQuestion(true)),
                                                               new Choice(createLoopInvariantInitiallyText("i >= 0 && i <= entries.length"), createLoopInvariantInitiallyValue("i"), createCalendarTerminationQuestion("loopInvariantIInitialTermination", false)),
                                                               new Choice(createLoopInvariantInitiallyText("\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]"), createLoopInvariantInitiallyValue("array elements"), createCalendarTerminationQuestion("loopInvariantArrayElementsInitialTermination", false)),
                                                               new Choice(createLoopInvariantPreservedText("i >= 0 && i <= entries.length"), createLoopInvariantPreservedValue("i"), createCalendarTerminationQuestion("loopInvariantIPreservedTermination", false)),
@@ -573,7 +573,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createPreconditionText("amount > 0", "withdraw(int)"), createPreconditionValue("withdraw"), createAccountTerminationQuestion("withdrawPreconditionTermination", false)),
                                                               new Choice(createPreconditionText("amount > 0", "canWithdraw(int)"), createPreconditionValue("canWithdraw"), createAccountTerminationQuestion("canWithdrawPreconditionTermination", false)),
                                                               new Choice(createPreconditionText("true", "getBalance()"), createPreconditionValue("getBalance"), createAccountTerminationQuestion("getBalancePreconditionTermination", false)),
-                                                              new Choice(createExceptionThrownText("checkAndWithdraw(int)"), createExceptionThrownValue(), createThrownExceptionsQuestion()),
+                                                              new Choice(createExceptionThrownText("checkAndWithdraw(int)"), createExceptionThrownValue(), createThrownExceptionsQuestion(false)),
                                                               createBugfreeChoice(),
                                                               createSomethingElseIsReasonChoice(),
                                                               createGiveupWhyOpenChoice());
