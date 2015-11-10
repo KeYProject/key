@@ -14,7 +14,6 @@ import java.util.Set;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.stat.inference.TestUtils;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
-import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractPage;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
@@ -76,6 +75,12 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                     secondToolData.listNormalizedTrustScoreRatios(), 
                     alpha, 
                     "Trust Score", 
+                    sb);
+         sb.append("<br>");
+         appendTest(firstToolData.listNormalizedPartialTrustScoreRatios(), 
+                    secondToolData.listNormalizedPartialTrustScoreRatios(), 
+                    alpha, 
+                    "Partial Trust Score", 
                     sb);
          sb.append("<br>");
          appendTest(secondToolData.listTimeRatios(), 
@@ -262,7 +267,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       sb.append("<td><b>Normalized Trust Score</b></td>");
       sb.append("<td><b>Maximal Normalized Trust Score</b></td>");
       sb.append("<td><b>Normalized Trust Score Ratio</b></td>");
-      sb.append("<td><b>Time</b></td>");
+      sb.append("<td><b>Normalized Partial Trust Score</b></td>");
+      sb.append("<td><b>Maximal Normalized Partial Trust Score</b></td>");
+      sb.append("<td><b>Normalized Partial Trust Score Ratio</b></td>");
       sb.append("<td><b>Time Ratio</b></td>");
       sb.append("</tr>");
       for (Tool tool : tools) {
@@ -278,7 +285,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
             sb.append("<td>" + summary.getNormalizedTrustScore() + "</td>");
             sb.append("<td>" + summary.getMaxNormalizedTrustScore() + "</td>");
             sb.append("<td>" + summary.computeNormalizedTrustScoreRatio() + "</td>");
-            sb.append("<td>" + summary.getTime() + "</td>");
+            sb.append("<td>" + summary.getNormalizedPartialTrustScore() + "</td>");
+            sb.append("<td>" + summary.getMaxNormalizedPartialTrustScore() + "</td>");
+            sb.append("<td>" + summary.computeNormalizedPartialTrustScoreRatio() + "</td>");
             sb.append("<td>" + summary.getTimeRatio() + "</td>");
             sb.append("</tr>");
          }
@@ -378,18 +387,11 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
    protected void analyzeQuestionInput(ParticipantResultSummary summary, QuestionInput questionInput) {
       // Update achieved values
       if (questionInput.getValue() != null) {
-         Integer maxCorrectnessScore = null;
-         if (questionInput.getQuestion() instanceof AbstractChoicesQuestion) {
-            AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) questionInput.getQuestion();
-            Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
-            if (!CollectionUtil.isEmpty(correctChoices)) {
-               maxCorrectnessScore = correctChoices.size();
-            }
-         }
          summary.update(questionInput.checkCorrectness(), 
                         questionInput.computeCorrectnessScore(),
-                        maxCorrectnessScore,
-                        questionInput.computeTrustScore());
+                        questionInput.getMaximalCorrectnessScore(),
+                        questionInput.computeTrustScore(),
+                        questionInput.computePartialTrustScore());
          
       }
       // Handle child questions
@@ -466,6 +468,16 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          return result;
       }
       
+      public double[] listNormalizedPartialTrustScoreRatios() {
+         double[] result = new double[participantResults.size()];
+         int i = 0;
+         for (ParticipantResultSummary summary : participantResults) {
+            result[i] = summary.computeNormalizedPartialTrustScoreRatio().doubleValue();
+            i++;
+         }
+         return result;
+      }
+      
       public double[] listTimeRatios() {
          double[] result = new double[participantResults.size()];
          int i = 0;
@@ -484,6 +496,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       private BigDecimal correctnessScoreRatioSum = BigDecimal.ZERO; // sum of (scorePerQuestion / maxScoreOfQuestion)
       private BigInteger correctnessScoreRatioCount = BigInteger.ZERO;
       private BigInteger normalizedTrustScore = BigInteger.ZERO;
+      private BigInteger normalizedPartialTrustScore = BigInteger.ZERO;
       private BigInteger time = BigInteger.ZERO;
       private BigDecimal timeRatio;
 
@@ -502,7 +515,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       public void update(Boolean correct, 
                          Integer correctnessScore, 
                          Integer maxCorrectnessScore, 
-                         Integer trustScore) {
+                         Integer trustScore,
+                         Integer partialTrustScore) {
          if (correct != null) {
             if (correct.booleanValue()) {
                correctCount = correctCount.add(BigInteger.ONE);
@@ -517,6 +531,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          }
          if (trustScore != null) {
             this.normalizedTrustScore = this.normalizedTrustScore.add(BigInteger.valueOf(QuestionInput.normalizeTrust(trustScore.intValue())));
+         }
+         if (partialTrustScore != null) {
+            this.normalizedPartialTrustScore = this.normalizedPartialTrustScore.add(BigInteger.valueOf(QuestionInput.normalizeTrust(partialTrustScore.intValue())));
          }
       }
 
@@ -536,12 +553,16 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          return normalizedTrustScore;
       }
 
+      public BigInteger getNormalizedPartialTrustScore() {
+         return normalizedPartialTrustScore;
+      }
+
       public BigInteger getMaxNormalizedTrustScore() {
          return maxCorrectCount.multiply(BigInteger.valueOf(4l));
       }
 
-      public BigInteger getTime() {
-         return time;
+      public BigInteger getMaxNormalizedPartialTrustScore() {
+         return maxCorrectCount.multiply(BigInteger.valueOf(4l));
       }
 
       public BigDecimal getTimeRatio() {
@@ -558,6 +579,10 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
 
       public BigDecimal computeNormalizedTrustScoreRatio() {
          return new BigDecimal(normalizedTrustScore).divide(new BigDecimal(getMaxNormalizedTrustScore()), 2, RoundingMode.HALF_EVEN);
+      }
+
+      public BigDecimal computeNormalizedPartialTrustScoreRatio() {
+         return new BigDecimal(normalizedPartialTrustScore).divide(new BigDecimal(getMaxNormalizedPartialTrustScore()), 2, RoundingMode.HALF_EVEN);
       }
    }
 }

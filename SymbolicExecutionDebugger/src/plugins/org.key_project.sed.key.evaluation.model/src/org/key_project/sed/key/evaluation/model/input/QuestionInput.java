@@ -383,6 +383,26 @@ public class QuestionInput extends Bean {
    }
    
    /**
+    * Returns the maximal achievable correctness score.
+    * @return The maximal achievable correctness score or {@code null} if not available.
+    */
+   public Integer getMaximalCorrectnessScore() {
+      if (question instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+         Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
+         if (!CollectionUtil.isEmpty(correctChoices)) {
+            return correctChoices.size();
+         }
+         else {
+            return 0;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
     * Computes the achieved trust score as follows:
     * <table border="1">
     *    <tr><td>&nbsp;</td><td>Correct</td><td>Wrong</td></tr>
@@ -395,22 +415,109 @@ public class QuestionInput extends Bean {
    public Integer computeTrustScore() {
       if (trust != null) {
          Boolean correct = checkCorrectness();
-         if (correct != null) {
+         return doTrustScoreComputation(correct);
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Utility method of {@link #computeTrustScore()}.
+    * @param correct The achieved correctness.
+    * @return The computed trust score or {@code null} if not available.
+    */
+   private Integer doTrustScoreComputation(Boolean correct) {
+      if (correct != null) {
+         if (Trust.SURE.equals(trust)) {
+            return correct.booleanValue() ? 2 : -2;
+         }
+         else if (Trust.EDUCATED_GUESS.equals(trust)) {
+            return correct.booleanValue() ? 1 : -1;
+         }
+         else if (Trust.UNSURE.equals(trust)) {
+            return correct.booleanValue() ? -1 : 1;
+         }
+         else {
+            throw new IllegalStateException("Unsupported trust: " + trust);
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Computes the achieved trust score as follows:
+    * <table border="1">
+    *    <tr><td>&nbsp;</td><td>CorrectnessScore = MaxScore</td><td>CorrectnessScore > 0</td><td>CorrectnessScore <= 0</td></tr>
+    *    <tr><td>{@link Trust#SURE}</td><td>2</td><td>1</td><td>-2</td></tr>
+    *    <tr><td>{@link Trust#EDUCATED_GUESS}</td><td>1</td><td>2</td><td>-1</td></tr>
+    *    <tr><td>{@link Trust#UNSURE}</td><td>-2</td><td>-1</td><td>1</td></tr>
+    * </table>
+    * @return The computed trust score or {@code null} if no result is available.
+    */
+   public Integer computePartialTrustScore() {
+      if (trust != null) {
+         return doTrustScoreComputation(computeCorrectnessScore(), 
+                                        getMaximalCorrectnessScore());
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Utility method of {@link #computePartialTrustScore()}.
+    * @param correctnessScore The current correctness score.
+    * @param maxCorrectnessScore The maximal correctness score.
+    * @return The computed trust score or {@code null} if not available.
+    */
+   private Integer doTrustScoreComputation(Integer correctnessScore, Integer maxCorrectnessScore) {
+      if (correctnessScore != null) {
+         assert maxCorrectnessScore != null;
+         assert correctnessScore.intValue() <= maxCorrectnessScore.intValue();
+         if (correctnessScore.equals(maxCorrectnessScore)) {
             if (Trust.SURE.equals(trust)) {
-               return correct.booleanValue() ? 2 : -2;
+               return 2;
             }
             else if (Trust.EDUCATED_GUESS.equals(trust)) {
-               return correct.booleanValue() ? 1 : -1;
+               return 1;
             }
             else if (Trust.UNSURE.equals(trust)) {
-               return correct.booleanValue() ? -1 : 1;
+               return -2;
+            }
+            else {
+               throw new IllegalStateException("Unsupported trust: " + trust);
+            }
+         }
+         else if (correctnessScore.intValue() > 0) {
+            if (Trust.SURE.equals(trust)) {
+               return 1;
+            }
+            else if (Trust.EDUCATED_GUESS.equals(trust)) {
+               return 2;
+            }
+            else if (Trust.UNSURE.equals(trust)) {
+               return -1;
             }
             else {
                throw new IllegalStateException("Unsupported trust: " + trust);
             }
          }
          else {
-            return null;
+            if (Trust.SURE.equals(trust)) {
+               return -2;
+            }
+            else if (Trust.EDUCATED_GUESS.equals(trust)) {
+               return -1;
+            }
+            else if (Trust.UNSURE.equals(trust)) {
+               return 1;
+            }
+            else {
+               throw new IllegalStateException("Unsupported trust: " + trust);
+            }
          }
       }
       else {
