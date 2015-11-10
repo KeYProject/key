@@ -387,8 +387,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                         questionInput.computeCorrectnessScore(),
                         questionInput.getMaximalCorrectnessScore(),
                         questionInput.computeTrustScore(),
-                        questionInput.computePartialTrustScore(),
-                        questionInput.getMaximalPartialCorrectnessScore());
+                        questionInput.computePartialTrustScore());
          
       }
       // Handle child questions
@@ -514,8 +513,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                          Integer correctnessScore, 
                          Integer maxCorrectnessScore, 
                          Integer trustScore,
-                         Integer partialTrustScore,
-                         Integer maximalPartialTrustScore) {
+                         Integer partialTrustScore) {
          if (correct != null) {
             if (correct.booleanValue()) {
                correctCount = correctCount.add(BigInteger.ONE);
@@ -527,15 +525,14 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
             BigDecimal questionScoreRatio = new BigDecimal(correctnessScore).divide(new BigDecimal(maxCorrectnessScore), 2, RoundingMode.HALF_EVEN);
             this.correctnessScoreRatioSum = this.correctnessScoreRatioSum.add(questionScoreRatio);
             this.correctnessScoreRatioCount = this.correctnessScoreRatioCount.add(BigInteger.ONE);
+            if (partialTrustScore != null) {
+               BigDecimal trustScoreRatio = new BigDecimal(partialTrustScore).multiply(questionScoreRatio);
+               this.partialTrustScoreRatioSum = this.partialTrustScoreRatioSum.add(trustScoreRatio);
+               this.partialTrustScoreRatioCount = this.partialTrustScoreRatioCount.add(BigInteger.ONE);
+            }
          }
          if (trustScore != null) {
             this.normalizedTrustScore = this.normalizedTrustScore.add(BigInteger.valueOf(QuestionInput.normalizeTrust(trustScore.intValue())));
-         }
-         if (partialTrustScore != null) {
-            assert maximalPartialTrustScore != null;
-            BigDecimal trustScoreRatio = new BigDecimal(partialTrustScore).divide(new BigDecimal(maximalPartialTrustScore), 2, RoundingMode.HALF_EVEN);
-            this.partialTrustScoreRatioSum = this.partialTrustScoreRatioSum.add(trustScoreRatio);
-            this.partialTrustScoreRatioCount = this.partialTrustScoreRatioCount.add(BigInteger.ONE);
          }
       }
 

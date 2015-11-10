@@ -446,15 +446,6 @@ public class QuestionInput extends Bean {
          return null;
       }
    }
-
-   /**
-    * Returns the maximal achievable correctness score.
-    * @return
-    */
-   public Integer getMaximalPartialCorrectnessScore() {
-      Integer maxScore = getMaximalCorrectnessScore();
-      return maxScore != null ? maxScore.intValue() * 2 : null;
-   }
    
    /**
     * Computes the achieved trust score as follows:
