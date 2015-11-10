@@ -66,8 +66,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                     "Average Correct Answers", 
                     sb);
          sb.append("<br>");
-         appendTest(firstToolData.listCorrectnessScoreRatios(), 
-                    secondToolData.listCorrectnessScoreRatios(), 
+         appendTest(firstToolData.listOverallCorrectnessScoreRatios(), 
+                    secondToolData.listOverallCorrectnessScoreRatios(), 
                     alpha, 
                     "Correctness Score", 
                     sb);
@@ -258,9 +258,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       sb.append("<td><b>Correct</b></td>");
       sb.append("<td><b>Maximal Correct</b></td>");
       sb.append("<td><b>Correct Ratio</b></td>");
-      sb.append("<td><b>Correctness Score</b></td>");
-      sb.append("<td><b>Maximal Correctness Score</b></td>");
-      sb.append("<td><b>Correctness Score Ratio</b></td>");
+      sb.append("<td><b>Overall Correctness Score Ratio</b></td>");
       sb.append("<td><b>Normalized Trust Score</b></td>");
       sb.append("<td><b>Maximal Normalized Trust Score</b></td>");
       sb.append("<td><b>Normalized Trust Score Ratio</b></td>");
@@ -276,9 +274,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
             sb.append("<td>" + summary.getCorrectCount() + "</td>");
             sb.append("<td>" + summary.getMaxCorrectCount() + "</td>");
             sb.append("<td>" + summary.computeCorrectRatio() + "</td>");
-            sb.append("<td>" + summary.getCorrectnessScore() + "</td>");
-            sb.append("<td>" + summary.getMaxCorrectnessScore() + "</td>");
-            sb.append("<td>" + summary.computeCorrectnessScoreRatio() + "</td>");
+            sb.append("<td>" + summary.computeOverallCorrectnessScoreRatio() + "</td>");
             sb.append("<td>" + summary.getNormalizedTrustScore() + "</td>");
             sb.append("<td>" + summary.getMaxNormalizedTrustScore() + "</td>");
             sb.append("<td>" + summary.computeNormalizedTrustScoreRatio() + "</td>");
@@ -382,18 +378,19 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
    protected void analyzeQuestionInput(ParticipantResultSummary summary, QuestionInput questionInput) {
       // Update achieved values
       if (questionInput.getValue() != null) {
+         Integer maxCorrectnessScore = null;
+         if (questionInput.getQuestion() instanceof AbstractChoicesQuestion) {
+            AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) questionInput.getQuestion();
+            Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
+            if (!CollectionUtil.isEmpty(correctChoices)) {
+               maxCorrectnessScore = correctChoices.size();
+            }
+         }
          summary.update(questionInput.checkCorrectness(), 
                         questionInput.computeCorrectnessScore(),
+                        maxCorrectnessScore,
                         questionInput.computeTrustScore());
          
-      }
-      // Update maximal values
-      if (questionInput.getQuestion() instanceof AbstractChoicesQuestion) {
-         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) questionInput.getQuestion();
-         Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
-         if (!CollectionUtil.isEmpty(correctChoices)) {
-            summary.updateMaximal(correctChoices.size());
-         }
       }
       // Handle child questions
       for (Choice choice : questionInput.getChoices()) {
@@ -449,11 +446,11 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          return result;
       }
       
-      public double[] listCorrectnessScoreRatios() {
+      public double[] listOverallCorrectnessScoreRatios() {
          double[] result = new double[participantResults.size()];
          int i = 0;
          for (ParticipantResultSummary summary : participantResults) {
-            result[i] = summary.computeCorrectnessScoreRatio().doubleValue();
+            result[i] = summary.computeOverallCorrectnessScoreRatio().doubleValue();
             i++;
          }
          return result;
@@ -484,8 +481,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       private final String id;
       private BigInteger correctCount = BigInteger.ZERO;
       private BigInteger maxCorrectCount = BigInteger.ZERO;
-      private BigInteger correctnessScore = BigInteger.ZERO;
-      private BigInteger maxCorrectnessScore = BigInteger.ZERO;
+      private BigDecimal correctnessScoreRatioSum = BigDecimal.ZERO; // sum of (scorePerQuestion / maxScoreOfQuestion)
+      private BigInteger correctnessScoreRatioCount = BigInteger.ZERO;
       private BigInteger normalizedTrustScore = BigInteger.ZERO;
       private BigInteger time = BigInteger.ZERO;
       private BigDecimal timeRatio;
@@ -502,23 +499,25 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          timeRatio = new BigDecimal(toolTime).divide(new BigDecimal(totalTime), 6, RoundingMode.HALF_EVEN);
       }
 
-      public void update(Boolean correct, Integer correctnessScore, Integer trustScore) {
+      public void update(Boolean correct, 
+                         Integer correctnessScore, 
+                         Integer maxCorrectnessScore, 
+                         Integer trustScore) {
          if (correct != null) {
             if (correct.booleanValue()) {
                correctCount = correctCount.add(BigInteger.ONE);
             }
+            this.maxCorrectCount = this.maxCorrectCount.add(BigInteger.ONE);
          }
          if (correctnessScore != null) {
-            this.correctnessScore = this.correctnessScore.add(BigInteger.valueOf(correctnessScore.longValue()));
+            assert maxCorrectnessScore != null;
+            BigDecimal questionScoreRatio = new BigDecimal(correctnessScore).divide(new BigDecimal(maxCorrectnessScore), 2, RoundingMode.HALF_EVEN);
+            this.correctnessScoreRatioSum = this.correctnessScoreRatioSum.add(questionScoreRatio);
+            this.correctnessScoreRatioCount = this.correctnessScoreRatioCount.add(BigInteger.ONE);
          }
          if (trustScore != null) {
             this.normalizedTrustScore = this.normalizedTrustScore.add(BigInteger.valueOf(QuestionInput.normalizeTrust(trustScore.intValue())));
          }
-      }
-
-      public void updateMaximal(int maxCorrectnessScore) {
-         this.maxCorrectCount = this.maxCorrectCount.add(BigInteger.ONE);
-         this.maxCorrectnessScore = this.maxCorrectnessScore.add(BigInteger.valueOf(maxCorrectnessScore));
       }
 
       public String getId() {
@@ -531,14 +530,6 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
 
       public BigInteger getMaxCorrectCount() {
          return maxCorrectCount;
-      }
-      
-      public BigInteger getCorrectnessScore() {
-         return correctnessScore;
-      }
-
-      public BigInteger getMaxCorrectnessScore() {
-         return maxCorrectnessScore;
       }
 
       public BigInteger getNormalizedTrustScore() {
@@ -557,12 +548,12 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          return timeRatio;
       }
 
-      public BigDecimal computeCorrectRatio() {
-         return new BigDecimal(correctCount).divide(new BigDecimal(maxCorrectCount), 2, RoundingMode.HALF_EVEN);
+      public BigDecimal computeOverallCorrectnessScoreRatio() {
+         return correctnessScoreRatioSum.divide(new BigDecimal(correctnessScoreRatioCount), 2, RoundingMode.HALF_EVEN);
       }
 
-      public BigDecimal computeCorrectnessScoreRatio() {
-         return new BigDecimal(correctnessScore).divide(new BigDecimal(maxCorrectnessScore), 2, RoundingMode.HALF_EVEN);
+      public BigDecimal computeCorrectRatio() {
+         return new BigDecimal(correctCount).divide(new BigDecimal(maxCorrectCount), 2, RoundingMode.HALF_EVEN);
       }
 
       public BigDecimal computeNormalizedTrustScoreRatio() {
