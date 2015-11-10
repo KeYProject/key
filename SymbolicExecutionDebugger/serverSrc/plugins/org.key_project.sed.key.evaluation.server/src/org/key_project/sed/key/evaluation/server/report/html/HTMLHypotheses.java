@@ -77,8 +77,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                     "Trust Score", 
                     sb);
          sb.append("<br>");
-         appendTest(firstToolData.listNormalizedPartialTrustScoreRatios(), 
-                    secondToolData.listNormalizedPartialTrustScoreRatios(), 
+         appendTest(firstToolData.listOverallPartialTrustScoreRatio(), 
+                    secondToolData.listOverallPartialTrustScoreRatio(), 
                     alpha, 
                     "Partial Trust Score", 
                     sb);
@@ -267,9 +267,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       sb.append("<td><b>Normalized Trust Score</b></td>");
       sb.append("<td><b>Maximal Normalized Trust Score</b></td>");
       sb.append("<td><b>Normalized Trust Score Ratio</b></td>");
-      sb.append("<td><b>Normalized Partial Trust Score</b></td>");
-      sb.append("<td><b>Maximal Normalized Partial Trust Score</b></td>");
-      sb.append("<td><b>Normalized Partial Trust Score Ratio</b></td>");
+      sb.append("<td><b>Overall Partial Trust Score Ratio</b></td>");
       sb.append("<td><b>Time Ratio</b></td>");
       sb.append("</tr>");
       for (Tool tool : tools) {
@@ -285,9 +283,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
             sb.append("<td>" + summary.getNormalizedTrustScore() + "</td>");
             sb.append("<td>" + summary.getMaxNormalizedTrustScore() + "</td>");
             sb.append("<td>" + summary.computeNormalizedTrustScoreRatio() + "</td>");
-            sb.append("<td>" + summary.getNormalizedPartialTrustScore() + "</td>");
-            sb.append("<td>" + summary.getMaxNormalizedPartialTrustScore() + "</td>");
-            sb.append("<td>" + summary.computeNormalizedPartialTrustScoreRatio() + "</td>");
+            sb.append("<td>" + summary.computeOverallPartialTrustScoreRatio() + "</td>");
             sb.append("<td>" + summary.getTimeRatio() + "</td>");
             sb.append("</tr>");
          }
@@ -391,7 +387,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                         questionInput.computeCorrectnessScore(),
                         questionInput.getMaximalCorrectnessScore(),
                         questionInput.computeTrustScore(),
-                        questionInput.computePartialTrustScore());
+                        questionInput.computePartialTrustScore(),
+                        questionInput.getMaximalPartialCorrectnessScore());
          
       }
       // Handle child questions
@@ -468,11 +465,11 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          return result;
       }
       
-      public double[] listNormalizedPartialTrustScoreRatios() {
+      public double[] listOverallPartialTrustScoreRatio() {
          double[] result = new double[participantResults.size()];
          int i = 0;
          for (ParticipantResultSummary summary : participantResults) {
-            result[i] = summary.computeNormalizedPartialTrustScoreRatio().doubleValue();
+            result[i] = summary.computeOverallPartialTrustScoreRatio().doubleValue();
             i++;
          }
          return result;
@@ -496,7 +493,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       private BigDecimal correctnessScoreRatioSum = BigDecimal.ZERO; // sum of (scorePerQuestion / maxScoreOfQuestion)
       private BigInteger correctnessScoreRatioCount = BigInteger.ZERO;
       private BigInteger normalizedTrustScore = BigInteger.ZERO;
-      private BigInteger normalizedPartialTrustScore = BigInteger.ZERO;
+      private BigDecimal partialTrustScoreRatioSum = BigDecimal.ZERO;
+      private BigInteger partialTrustScoreRatioCount = BigInteger.ZERO;
       private BigInteger time = BigInteger.ZERO;
       private BigDecimal timeRatio;
 
@@ -516,7 +514,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                          Integer correctnessScore, 
                          Integer maxCorrectnessScore, 
                          Integer trustScore,
-                         Integer partialTrustScore) {
+                         Integer partialTrustScore,
+                         Integer maximalPartialTrustScore) {
          if (correct != null) {
             if (correct.booleanValue()) {
                correctCount = correctCount.add(BigInteger.ONE);
@@ -533,7 +532,10 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
             this.normalizedTrustScore = this.normalizedTrustScore.add(BigInteger.valueOf(QuestionInput.normalizeTrust(trustScore.intValue())));
          }
          if (partialTrustScore != null) {
-            this.normalizedPartialTrustScore = this.normalizedPartialTrustScore.add(BigInteger.valueOf(QuestionInput.normalizeTrust(partialTrustScore.intValue())));
+            assert maximalPartialTrustScore != null;
+            BigDecimal trustScoreRatio = new BigDecimal(partialTrustScore).divide(new BigDecimal(maximalPartialTrustScore), 2, RoundingMode.HALF_EVEN);
+            this.partialTrustScoreRatioSum = this.partialTrustScoreRatioSum.add(trustScoreRatio);
+            this.partialTrustScoreRatioCount = this.partialTrustScoreRatioCount.add(BigInteger.ONE);
          }
       }
 
@@ -553,15 +555,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          return normalizedTrustScore;
       }
 
-      public BigInteger getNormalizedPartialTrustScore() {
-         return normalizedPartialTrustScore;
-      }
-
       public BigInteger getMaxNormalizedTrustScore() {
-         return maxCorrectCount.multiply(BigInteger.valueOf(4l));
-      }
-
-      public BigInteger getMaxNormalizedPartialTrustScore() {
          return maxCorrectCount.multiply(BigInteger.valueOf(4l));
       }
 
@@ -581,8 +575,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          return new BigDecimal(normalizedTrustScore).divide(new BigDecimal(getMaxNormalizedTrustScore()), 2, RoundingMode.HALF_EVEN);
       }
 
-      public BigDecimal computeNormalizedPartialTrustScoreRatio() {
-         return new BigDecimal(normalizedPartialTrustScore).divide(new BigDecimal(getMaxNormalizedPartialTrustScore()), 2, RoundingMode.HALF_EVEN);
+      public BigDecimal computeOverallPartialTrustScoreRatio() {
+         return partialTrustScoreRatioSum.divide(new BigDecimal(partialTrustScoreRatioCount), 2, RoundingMode.HALF_EVEN);
       }
    }
 }
