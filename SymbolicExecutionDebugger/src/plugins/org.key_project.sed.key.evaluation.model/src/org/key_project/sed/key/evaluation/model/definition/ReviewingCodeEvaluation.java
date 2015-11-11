@@ -595,7 +595,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                              new Choice("Average is returned instead of the middle value", "AverageInsteadOfMiddle"), 
                                                              new Choice("Average is computed wrongly", "WrongAverage"), 
                                                              new Choice("A documented exception might be thrown instead of returning median value", "ExceptionThrown"), 
-                                                             new Choice("Media value might be returned instead of throwing a documented exception", "ValueReturned"), 
+                                                             new Choice("Median value might be returned instead of throwing a documented exception", "ValueReturned"), 
                                                              createThrownExceptionsQuestionChoice(description, false, false, false, false, true, false),
                                                              createElseWrongChoice(description));
       String implementedAsDocumentedTitle = createImplementedAsDocumentedTitle(method, false);
@@ -1222,7 +1222,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               true,
                                                                               new Choice("Yes", "Yes"), 
                                                                               new Choice("No", "No", true, methodProblems));
-      String returnValueTitle = "Which claims about the returned value of " + method + " are true?";
+      String returnValueTitle = "Which claims about the returned value of " + method + " are true? (Expressions are evaluated in the pre state before method call.)";
       CheckboxQuestion returnValue = new CheckboxQuestion("returnValue", 
                                                           returnValueTitle, 
                                                           description,
