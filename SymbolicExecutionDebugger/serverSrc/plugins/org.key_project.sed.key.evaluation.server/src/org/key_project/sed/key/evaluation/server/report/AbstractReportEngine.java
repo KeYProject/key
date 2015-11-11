@@ -23,6 +23,7 @@ import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter
 import org.key_project.sed.key.evaluation.server.report.filter.UnderstandingProofAttemptsKeYExperienceFilter;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
 
 /**
@@ -51,9 +52,22 @@ public abstract class AbstractReportEngine {
     * @throws Exception Occurred Exception.
     */
    public boolean saveReport(AbstractEvaluation evaluation, File target) throws Exception {
-      String report = createReport(evaluation);
+      ReportContent report = createReport(evaluation);
       if (report != null) {
-         IOUtil.writeTo(new FileOutputStream(target), report);
+         IOUtil.writeTo(new FileOutputStream(target), report.getContent(), IOUtil.DEFAULT_CHARSET);
+         if (!CollectionUtil.isEmpty(report.getAdditionalFiles())) {
+            File directory = target.getParentFile();
+            for (AdditionalFile additionalFile : report.getAdditionalFiles()) {
+               File file = new File(directory, IOUtil.getFileNameWithoutExtension(target.getName()) + additionalFile.getNameSuffix());
+               FileOutputStream out = new FileOutputStream(file);
+               try {
+                  out.write(additionalFile.getContent());
+               }
+               finally {
+                  out.close();
+               }
+            }
+         }
          return true;
       }
       else {
@@ -67,7 +81,26 @@ public abstract class AbstractReportEngine {
     * @return The created report or {@code null} if no results are available.
     * @throws Exception Occurred Exception.
     */
-   public abstract String createReport(AbstractEvaluation evaluation) throws Exception;
+   public abstract ReportContent createReport(AbstractEvaluation evaluation) throws Exception;
+   
+   public static class ReportContent {
+      private final String content;
+      
+      private final List<AdditionalFile> additionalFiles;
+
+      public ReportContent(String content, List<AdditionalFile> additionalFiles) {
+         this.content = content;
+         this.additionalFiles = additionalFiles;
+      }
+
+      public String getContent() {
+         return content;
+      }
+
+      public List<AdditionalFile> getAdditionalFiles() {
+         return additionalFiles;
+      }
+   }
    
    /**
     * Lists all available {@link EvaluationInput}s.

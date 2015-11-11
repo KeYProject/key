@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.server.report.html;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractQuestion;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.IQuestionWithCildren;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
+import org.key_project.sed.key.evaluation.server.report.AdditionalFile;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
 import org.key_project.sed.key.evaluation.server.report.statiscs.ChoiceStatistics;
@@ -28,7 +30,7 @@ public class HTMLChoiceSectionAppender implements IHTMLSectionAppender {
     * {@inheritDoc}
     */
    @Override
-   public void appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb) {
+   public Collection<AdditionalFile> appendSection(File storageLocation, AbstractEvaluation evaluation, EvaluationResult result, Statistics statistics, StringBuffer sb) {
       sb.append("<h1><a name=\"choices\">Choices</a></h1>");
       sb.append("<table border=\"1\">");
       // Append header
@@ -93,6 +95,7 @@ public class HTMLChoiceSectionAppender implements IHTMLSectionAppender {
       if (statistics.isMultipleValuedAnswersIgnored()) {
          sb.append("<p><a href=\"#answers\">Answers with multiple values (gray colored) are ignored.</a></p>");
       }
+      return null;
    }
 
    /**

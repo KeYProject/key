@@ -4,6 +4,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,13 +22,16 @@ import org.key_project.sed.key.evaluation.model.definition.Tool;
 import org.key_project.sed.key.evaluation.model.input.AbstractPageInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.model.input.QuestionPageInput;
+import org.key_project.sed.key.evaluation.server.report.AdditionalFile;
 import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
+import org.key_project.sed.key.evaluation.server.util.LatexUtil;
 import org.key_project.sed.key.evaluation.server.util.StatisticsUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IOUtil;
 
 /**
  * Appends the hypotheses tests.
@@ -38,11 +42,12 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
     * {@inheritDoc}
     */
    @Override
-   public void appendSection(File storageLocation, 
-                             AbstractEvaluation evaluation, 
-                             EvaluationResult result, 
-                             Statistics statistics, 
-                             StringBuffer sb) {
+   public Collection<AdditionalFile> appendSection(File storageLocation, 
+                                                   AbstractEvaluation evaluation, 
+                                                   EvaluationResult result, 
+                                                   Statistics statistics, 
+                                                   StringBuffer sb) {
+      List<AdditionalFile> additionalFiles = new LinkedList<AdditionalFile>();
       // Collect data for hypotheses test
       Map<IStatisticsFilter, HypothesisData> dataMap = computeHypothesisData(result, statistics);
       // Append hypotheses test
@@ -59,38 +64,77 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          HypothesisToolData firstToolData = entry.getValue().getToolData(firstTool);
          HypothesisToolData secondToolData = entry.getValue().getToolData(secondTool);
          double alpha = 0.05;
-         appendTest(firstToolData.listCorrectRatios(), 
-                    secondToolData.listCorrectRatios(), 
-                    alpha, 
-                    "Average Correct Answers", 
-                    sb);
+         appendTestAndDiagrams(firstToolData.listCorrectRatios(), 
+                               secondToolData.listCorrectRatios(), 
+                               alpha, 
+                               "Average Correct Answers", 
+                               sb,
+                               new String[] {firstTool.getName(), secondTool.getName()},
+                               IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_AverageCorrectAnswers",
+                               additionalFiles);
          sb.append("<br>");
-         appendTest(firstToolData.listOverallCorrectnessScoreRatios(), 
-                    secondToolData.listOverallCorrectnessScoreRatios(), 
-                    alpha, 
-                    "Correctness Score", 
-                    sb);
+         appendTestAndDiagrams(firstToolData.listOverallCorrectnessScoreRatios(), 
+                               secondToolData.listOverallCorrectnessScoreRatios(), 
+                               alpha, 
+                               "Correctness Score", 
+                               sb,
+                               new String[] {firstTool.getName(), secondTool.getName()},
+                               IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_CorrectnessScore",
+                               additionalFiles);
          sb.append("<br>");
-         appendTest(firstToolData.listNormalizedTrustScoreRatios(), 
-                    secondToolData.listNormalizedTrustScoreRatios(), 
-                    alpha, 
-                    "Trust Score", 
-                    sb);
+         appendTestAndDiagrams(firstToolData.listNormalizedTrustScoreRatios(), 
+                               secondToolData.listNormalizedTrustScoreRatios(), 
+                               alpha, 
+                               "Trust Score", 
+                               sb,
+                               new String[] {firstTool.getName(), secondTool.getName()},
+                               IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_TrustScore",
+                               additionalFiles);
          sb.append("<br>");
-         appendTest(firstToolData.listOverallPartialTrustScoreRatio(), 
-                    secondToolData.listOverallPartialTrustScoreRatio(), 
-                    alpha, 
-                    "Partial Trust Score", 
-                    sb);
+         appendTestAndDiagrams(firstToolData.listOverallPartialTrustScoreRatio(), 
+                               secondToolData.listOverallPartialTrustScoreRatio(), 
+                               alpha, 
+                               "Partial Trust Score", 
+                               sb,
+                               new String[] {firstTool.getName(), secondTool.getName()},
+                               IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_PartialTrustScore",
+                               additionalFiles);
          sb.append("<br>");
-         appendTest(secondToolData.listTimeRatios(), 
-                    firstToolData.listTimeRatios(), 
-                    alpha, 
-                    "Time", 
-                    sb);
+         appendTestAndDiagrams(secondToolData.listTimeRatios(), 
+                               firstToolData.listTimeRatios(), 
+                               alpha, 
+                               "Time", 
+                               sb,
+                               new String[] {secondTool.getName(), firstTool.getName()},
+                               IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_Time",
+                               additionalFiles);
          sb.append("<br>");
          appendDataSets(entry.getValue(), CollectionUtil.toList(firstTool, secondTool), sb);
       }
+      return additionalFiles;
+   }
+   
+   /**
+    * Performs and appends the test one sided test that firstTool > secondTool.
+    * @param firstTool The data of the first tool.
+    * @param secondTool The data of the second tool.
+    * @param alpha The alpha to use.
+    * @param hypotheses The tested hypotheses.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendTestAndDiagrams(double[] firstTool, 
+                                        double[] secondTool, 
+                                        double alpha, 
+                                        String hypotheses, 
+                                        StringBuffer sb,
+                                        String[] toolLabels,
+                                        String boxplotName,
+                                        List<AdditionalFile> additionalFiles) {
+      // Append test
+      appendTest(firstTool, secondTool, alpha, hypotheses, sb);
+      // Create latex file with boxplot of data
+      String content = LatexUtil.createLatexBoxPlot(new double[][] {firstTool, secondTool}, toolLabels, 1.5);
+      additionalFiles.add(new AdditionalFile(boxplotName + LatexUtil.TEX_FILE_EXTENSION_WITH_DOT, content.getBytes(IOUtil.DEFAULT_CHARSET)));
    }
    
    /**
