@@ -385,7 +385,6 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       if (questionInput.getValue() != null) {
          summary.update(questionInput.checkCorrectness(), 
                         questionInput.computeCorrectnessScore(),
-                        questionInput.getMaximalCorrectnessScore(),
                         questionInput.computeTrustScore(),
                         questionInput.computePartialTrustScore());
          
@@ -510,8 +509,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       }
 
       public void update(Boolean correct, 
-                         Integer correctnessScore, 
-                         Integer maxCorrectnessScore, 
+                         BigDecimal correctnessScore, 
                          Integer trustScore,
                          Integer partialTrustScore) {
          if (correct != null) {
@@ -521,12 +519,10 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
             this.maxCorrectCount = this.maxCorrectCount.add(BigInteger.ONE);
          }
          if (correctnessScore != null) {
-            assert maxCorrectnessScore != null;
-            BigDecimal questionScoreRatio = new BigDecimal(correctnessScore).divide(new BigDecimal(maxCorrectnessScore), 2, RoundingMode.HALF_EVEN);
-            this.correctnessScoreRatioSum = this.correctnessScoreRatioSum.add(questionScoreRatio);
+            this.correctnessScoreRatioSum = this.correctnessScoreRatioSum.add(correctnessScore);
             this.correctnessScoreRatioCount = this.correctnessScoreRatioCount.add(BigInteger.ONE);
             if (partialTrustScore != null) {
-               BigDecimal trustScoreRatio = new BigDecimal(partialTrustScore).multiply(questionScoreRatio);
+               BigDecimal trustScoreRatio = new BigDecimal(partialTrustScore).multiply(correctnessScore);
                this.partialTrustScoreRatioSum = this.partialTrustScoreRatioSum.add(trustScoreRatio);
                this.partialTrustScoreRatioCount = this.partialTrustScoreRatioCount.add(BigInteger.ONE);
             }

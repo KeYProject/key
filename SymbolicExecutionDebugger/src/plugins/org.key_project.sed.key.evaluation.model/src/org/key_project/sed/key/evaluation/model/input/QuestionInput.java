@@ -1,5 +1,7 @@
 package org.key_project.sed.key.evaluation.model.input;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -328,8 +330,10 @@ public class QuestionInput extends Bean {
                boolean correct = true;
                int i = 0;
                while (correct && i < selectedChoices.length) {
-                  if (!remainingCorrectChoices.remove(selectedChoices[i])) {
-                     correct = false;
+                  if (choiceQuestion.isChoiceCorrectnessRelevant(selectedChoices[i])) { // Skip for instance the gave up choice in the understanding proof attempts evaluation.
+                     if (!remainingCorrectChoices.remove(selectedChoices[i])) {
+                        correct = false;
+                     }
                   }
                   i++;
                }
@@ -348,7 +352,24 @@ public class QuestionInput extends Bean {
       }
    }
    
-   public Integer computeCorrectnessScore() {
+   public BigDecimal computeCorrectnessScore() {
+      Integer difference = computeCorrectWrongDifference();
+      if (difference != null) {
+         if (difference.intValue() > 0) {
+            Integer correctCount = countCorrectAnswers();
+            return new BigDecimal(difference).divide(new BigDecimal(correctCount), 2, RoundingMode.HALF_EVEN);
+         }
+         else {
+            Integer wrongCount = countWrongAnswers();
+            return new BigDecimal(difference).divide(new BigDecimal(wrongCount), 2, RoundingMode.HALF_EVEN);
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   public Integer computeCorrectWrongDifference() {
       if (question.isEditable()) {
          if (question instanceof TextQuestion) {
             return null; // Correctness not supported
@@ -360,11 +381,13 @@ public class QuestionInput extends Bean {
                Choice[] selectedChoices = getSelectedChoices();
                int correctCount = 0;
                for (Choice choice : selectedChoices) {
-                  if (correctChoices.contains(choice)) {
-                     correctCount++;
-                  }
-                  else {
-                     correctCount--;
+                  if (choiceQuestion.isChoiceCorrectnessRelevant(choice)) { // Skip for instance the gave up choice in the understanding proof attempts evaluation.
+                     if (correctChoices.contains(choice)) {
+                        correctCount++;
+                     }
+                     else {
+                        correctCount--;
+                     }
                   }
                }
                return correctCount;
@@ -383,10 +406,10 @@ public class QuestionInput extends Bean {
    }
    
    /**
-    * Returns the maximal achievable correctness score.
-    * @return The maximal achievable correctness score or {@code null} if not available.
+    * Returns the number of correct answers.
+    * @return The number of correct answers or {@code null} if not available.
     */
-   public Integer getMaximalCorrectnessScore() {
+   public Integer countCorrectAnswers() {
       if (question instanceof AbstractChoicesQuestion) {
          AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
          Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
@@ -396,6 +419,29 @@ public class QuestionInput extends Bean {
          else {
             return 0;
          }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns the number of wrong answers.
+    * @return The number of wrong answers or {@code null} if not available.
+    */
+   public Integer countWrongAnswers() {
+      if (question instanceof AbstractChoicesQuestion) {
+         AbstractChoicesQuestion choiceQuestion = (AbstractChoicesQuestion) question;
+         Set<Choice> correctChoices = choiceQuestion.getCorrectChoices();
+         int wrongCount = 0;
+         for (Choice choice : choiceQuestion.getChoices()) {
+            if (choiceQuestion.isChoiceCorrectnessRelevant(choice)) { // Skip for instance the gave up choice in the understanding proof attempts evaluation.
+               if (!correctChoices.contains(choice)) {
+                  wrongCount++;
+               }
+            }
+         }
+         return wrongCount;
       }
       else {
          return null;
@@ -459,7 +505,7 @@ public class QuestionInput extends Bean {
     */
    public Integer computePartialTrustScore() {
       if (trust != null) {
-         Integer correctnessScore = computeCorrectnessScore();
+         Integer correctnessScore = computeCorrectWrongDifference();
          Boolean correct = correctnessScore != null ? correctnessScore.intValue() > 0 : null;
          Integer trustScore = doTrustScoreComputation(correct);
          return trustScore != null ? trustScore.intValue() * correctnessScore.intValue() : null;

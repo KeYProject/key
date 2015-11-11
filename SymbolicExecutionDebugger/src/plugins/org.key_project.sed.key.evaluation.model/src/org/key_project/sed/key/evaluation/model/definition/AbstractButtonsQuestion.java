@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.model.definition;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 import org.key_project.sed.key.evaluation.model.validation.IValueValidator;
@@ -32,7 +33,11 @@ public abstract class AbstractButtonsQuestion extends AbstractChoicesQuestion {
    }
 
    public AbstractButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled, List<Choice> choices) {
-      super(name, label, description, defaultChoice, validator, askForTrust, relatedTools, enabled, choices);
+      this(name, label, description, image, vertical, defaultChoice, validator, askForTrust, relatedTools, enabled, choices, null);
+   }
+
+   public AbstractButtonsQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled, List<Choice> choices, Set<String> notCorrectnessRelevantChoiceValues) {
+      super(name, label, description, defaultChoice, validator, askForTrust, relatedTools, enabled, choices, notCorrectnessRelevantChoiceValues);
       this.image = image;
       this.vertical = vertical;
    }

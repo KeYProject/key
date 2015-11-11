@@ -123,7 +123,7 @@ public class HTMLAnswersSectionAppender implements IHTMLSectionAppender {
                      if (!StringUtil.isTrimmedEmpty(questionInput.getValue())) {
                         Boolean correct = questionInput.checkCorrectness();
                         appendReceivedAnswersTableCellValue(questionInput.getValue(), correct, questionInput.getValueSetAt(), sb);
-                        Integer correctessScore = questionInput.computeCorrectnessScore();
+                        Integer correctessScore = questionInput.computeCorrectWrongDifference();
                         if (correctessScore != null) {
                            appendReceivedAnswersTableCellValue(" {score:&nbsp;" + correctessScore + "}", correctessScore > 0, -1, sb);
                         }

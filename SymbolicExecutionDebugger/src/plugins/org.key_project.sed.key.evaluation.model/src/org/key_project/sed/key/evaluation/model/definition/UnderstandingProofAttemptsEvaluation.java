@@ -1,6 +1,7 @@
 package org.key_project.sed.key.evaluation.model.definition;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import org.key_project.sed.key.evaluation.model.tooling.JavaProjectModifier;
@@ -106,6 +107,11 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     * The value for more than 2 years of KeY experience.
     */
    public static final String KEY_EXPERIENCE_MORE_THAN_2_YEARS_VALUE = "More than 2 years";
+   
+   /**
+    * The value used for the give up {@link Choice}.
+    */
+   public static final String GIVE_UP_VALUE = "Give up";
 
    /**
     * Forbid additional instances.
@@ -267,6 +273,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + locationTitle + "' not answered."), 
                                                                true,
+                                                               Collections.singleton(GIVE_UP_VALUE),
                                                                new Choice("self", "self"),
                                                                new Choice("self.value", "self.value"),
                                                                new Choice("summand", "summand"),
@@ -281,6 +288,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
+                                                              Collections.singleton(GIVE_UP_VALUE),
                                                               new Choice(createPreconditionText("summand != null"), createPreconditionValue()),
                                                               new Choice(createPostconditionText("value == \\old(value) + summand.value"), createPostconditionValue(), true),
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), locationQuestion),
@@ -331,6 +339,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
+                                                              Collections.singleton(GIVE_UP_VALUE),
                                                               new Choice(createPreconditionText("array != null"), createPreconditionValue(), createMinTerminationQuestion("preconditionTermination", false, false)),
                                                               new Choice(createPostconditionText("array == null || array.length == 0 ==> \\result == -1"), createPostconditionValue("Not found"), createMinTerminationQuestion("postNotFoundTermination", false, false)),
                                                               new Choice(createPostconditionText("array != null && array.length >= 1 ==> (\\forall int i; i >= 0 && i < array.length; array[\\result] <= array[i])"), createPostconditionValue("Found"), true, createMinTerminationQuestion("postFoundTermination", true, false)),
@@ -363,6 +372,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
+                                                               Collections.singleton(GIVE_UP_VALUE),
                                                                new Choice("None of the statements was executed", "None"),
                                                                new Choice("Line 8: if (array != null)", "Line 8", true),
                                                                new Choice("Line 9: if (array.length == 0)", "Line 9", true),
@@ -403,6 +413,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
                                                                       true,
+                                                                      Collections.singleton(GIVE_UP_VALUE),
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException"),
@@ -426,6 +437,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("array", "array"),
                                   new Choice("array.length", "array.length"),
                                   new Choice("array[0]", "array[0]"),
@@ -445,6 +457,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("Termination 1: array != null & array.length == 0", "Termination 1"),
                                   new Choice("Termination 2: array != null & array.length == 1", "Termination 2", termination2expected),
                                   new Choice("Termination 3: array != null & array.length > 1", "Termination 3"),
@@ -462,6 +475,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
+                                                              Collections.singleton(GIVE_UP_VALUE),
                                                               new Choice(createPreconditionText("entry != null"), createPreconditionValue(), createCalendarTerminationQuestion("preconditionTermination", false)),
                                                               new Choice(createClassInvariantInitiallyText("entrySize >= 0 && entrySize < entries.length"), createClassInvariantInitiallyValue(), createCalendarTerminationQuestion("invariantEstablishedTermination", false)),
                                                               new Choice(createPostconditionText("entries[\\old(entrySize)] == entry"), createPostconditionValue("Entry"), createCalendarTerminationQuestion("postEntryTermination", false)),
@@ -494,6 +508,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
+                                                               Collections.singleton(GIVE_UP_VALUE),
                                                                new Choice("None of the statements was executed", "None"),
                                                                new Choice("Line 14: if (entrySize == entries.length)", "Line 14", true),
                                                                new Choice("Line 15: Entry[] newEntries = new Entry[entries.length * 2]", "Line 15"),
@@ -530,6 +545,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("entries", "entries"),
                                   new Choice("entries[entrySize]", "entries[entrySize]"),
                                   new Choice("entries[*]", "entries[*]"),
@@ -552,6 +568,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("Continuation After Then: entrySize == entries.length", "Continuation After Then"),
                                   new Choice("Continuation After Else: entrySize != entries.length", "Continuation After Else", expectedAfterElse),
                                   new Choice("Loop Body Termination (of the 'Body Preserves Invariant' branch)", "Loop Body Termination"),
@@ -566,6 +583,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
+                                                              Collections.singleton(GIVE_UP_VALUE),
                                                               new Choice(createPreconditionText("amount > 0", "checkAndWithdraw(int)"), createPreconditionValue("checkAndWithdraw"), createAccountTerminationQuestion("checkAndWithdrawPreTermination", false)),
                                                               new Choice(createPostconditionText("balance == \\old(balance) - \\result", "checkAndWithdraw(int)"), createPostconditionValue("checkAndWithdraw", "Balance"), createAccountTerminationQuestion("checkAndWithdrawPostconditionBalanceTermination", false)),
                                                               new Choice(createPostconditionText("\\result == amount", "checkAndWithdraw(int)"), createPostconditionValue("checkAndWithdraw", "Result"), true, createAccountTerminationQuestion("checkAndWithdrawPostcondtionResultTermination", true)),
@@ -593,6 +611,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
+                                                               Collections.singleton(GIVE_UP_VALUE),
                                                                new Choice("None of the statements was executed", "None"),
                                                                new Choice("Line 11: if (canWithdraw(amount))", "Line 11", true),
                                                                new Choice("Line 12: withdraw(amount)", "Line 12", true),
@@ -609,6 +628,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                 null, 
                                                                 new NotUndefinedValueValidator("Question '" + contractsTitle + "' not answered."), 
                                                                 true,
+                                                                Collections.singleton(GIVE_UP_VALUE),
                                                                 new Choice("None of the contracts was applied", "None"),
                                                                 new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
                                                                 new Choice("Contract of method withdraw(int)", "withdraw", true),
@@ -656,27 +676,27 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    }
    
    private Choice createGiveupWhyOpenChoice() {
-      return new Choice("I tried my best to find out what (else) is wrong, but after 10 minutes I gave up.", "Give up");
+      return new Choice("I tried my best to find out what (else) is wrong, but after 10 minutes I gave up.", GIVE_UP_VALUE);
    }
    
    private Choice createGiveupExecutedChoice() {
-      return new Choice("I tried my best to find out what (else) is executed, but after 10 minutes I gave up.", "Give up");
+      return new Choice("I tried my best to find out what (else) is executed, but after 10 minutes I gave up.", GIVE_UP_VALUE);
    }
    
    private Choice createGiveupAppliedContractsChoice() {
-      return new Choice("I tried my best to find out what (else) was applied, but after 10 minutes I gave up.", "Give up");
+      return new Choice("I tried my best to find out what (else) was applied, but after 10 minutes I gave up.", GIVE_UP_VALUE);
    }
    
    private Choice createGiveupLocationChoice() {
-      return new Choice("I tried my best to find out what (else) has changed, but after 10 minutes I gave up.", "Give up");
+      return new Choice("I tried my best to find out what (else) has changed, but after 10 minutes I gave up.", GIVE_UP_VALUE);
    }
    
    private Choice createGiveupExceptionChoice() {
-      return new Choice("I tried my best to find out what (else) can be thrown, but after 10 minutes I gave up.", "Give up");
+      return new Choice("I tried my best to find out what (else) can be thrown, but after 10 minutes I gave up.", GIVE_UP_VALUE);
    }
    
    private Choice createGiveupTerminationPathChoice() {
-      return new Choice("I tried my best to find out at which execution path(s), but after 10 minutes I gave up.", "Give up");
+      return new Choice("I tried my best to find out at which execution path(s), but after 10 minutes I gave up.", GIVE_UP_VALUE);
    }
 
 
@@ -688,6 +708,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("balance", "balance"),
                                   new Choice("amount", "amount"),
                                   new Choice("something else", "something else", createElseLocationSubQuestion()),
@@ -703,6 +724,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
+                                  Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("Termination 1: canWithdraw(amount)", "Termination 1"),
                                   new Choice("Termination 2: !canWithdraw(amount)", "Termination 2", termination2expected),
                                   createGiveupTerminationPathChoice());
