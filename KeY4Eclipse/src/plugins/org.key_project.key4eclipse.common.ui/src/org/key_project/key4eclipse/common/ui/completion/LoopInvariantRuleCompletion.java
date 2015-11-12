@@ -1,12 +1,24 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 /**
@@ -35,6 +47,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
     * @author Martin Hentschel
     */
    public static class Perform extends AbstractInteractiveRuleApplicationCompletionPerform {
+      
+      private Composite root = null;
       /**
        * Constructor.
        * @param app The DefaultBuiltInRuleApp to be completed.
@@ -67,8 +81,40 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public void createControl(Composite root) {
-         Label label = new Label(root, SWT.NONE);
-         label.setText("This functionality will be available soon...");
+         this.root = root;
+         
+         FillLayout horlayout = new FillLayout(SWT.HORIZONTAL);
+         root.setLayout(horlayout);
+         FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
+         
+         //Set up loop preview:
+         Composite codeColumn = new Composite(root, SWT.NO_BACKGROUND);
+         codeColumn.setLayout(vertlayout);
+         Label code = new Label(codeColumn, SWT.BORDER);
+         Font monospace = JFaceResources.getFont(JFaceResources.TEXT_FONT);//new Font(root.getDisplay(), "Monospaced", 10, SWT.NORMAL);
+         code.setFont(monospace);
+         code.setBackground(root.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+         code.setText("This is example soure code.\n  This should align nicely.\n  Lorem ipsum and so forth. ");
+         
+         //Set up state view:
+         Group stateColumn = new Group(root, SWT.SHADOW_IN);
+         stateColumn.setLayout(vertlayout);
+         Label invStatus = new Label(stateColumn, SWT.BORDER);
+         invStatus.setText("state here");
+         TabFolder modStatus = new TabFolder(stateColumn, SWT.TOP);
+         TabFolder variantStatus = new TabFolder(stateColumn, SWT.TOP);
+         
+         //set up invariantEditor:
+         Group invariantColumn = new Group(root, SWT.SHADOW_IN);
+         invariantColumn.setLayout(vertlayout);
+         Label d = new Label(invariantColumn, SWT.BORDER);
+         d.setText("More Stuff!");
+         //TabFolder invariants = new TabFolder(stateColumn, SWT.TOP);
+         TabFolder modifies = new TabFolder(stateColumn, SWT.TOP);
+         TabFolder variant = new TabFolder(stateColumn, SWT.TOP);
+         
+         
+         //root.layout(true, true);
       }
 
       /**
@@ -84,6 +130,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public void dispose() {
+         root.dispose();
       }
    }
 }
