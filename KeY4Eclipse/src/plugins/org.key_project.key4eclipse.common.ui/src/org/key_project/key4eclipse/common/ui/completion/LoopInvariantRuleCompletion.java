@@ -2,6 +2,8 @@ package org.key_project.key4eclipse.common.ui.completion;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
@@ -10,9 +12,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Text;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -49,6 +54,13 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
    public static class Perform extends AbstractInteractiveRuleApplicationCompletionPerform {
       
       private Composite root = null;
+      private Label invariantStatus = null;
+      private Label modifiesStatus = null;
+      private Label variantStatus = null;
+      private Text invariantText = null;
+      
+      
+      
       /**
        * Constructor.
        * @param app The DefaultBuiltInRuleApp to be completed.
@@ -99,22 +111,64 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //Set up state view:
          Group stateColumn = new Group(root, SWT.SHADOW_IN);
          stateColumn.setLayout(vertlayout);
-         Label invStatus = new Label(stateColumn, SWT.BORDER);
-         invStatus.setText("state here");
-         TabFolder modStatus = new TabFolder(stateColumn, SWT.TOP);
-         TabFolder variantStatus = new TabFolder(stateColumn, SWT.TOP);
+         invariantStatus = new Label(stateColumn, SWT.BORDER);
+         invariantStatus.setText("Invariant Status\nOk");
+         
+         TabFolder modifiesStatusTab = new TabFolder(stateColumn, SWT.TOP);
+         modifiesStatus = (Label)addTextTabItem("heap", "Modifies - Status:\nOk", false, modifiesStatusTab);
+         
+         TabFolder variantStatusTab = new TabFolder(stateColumn, SWT.TOP);
+         variantStatus = (Label)addTextTabItem("heap", "Variant status ok", false, variantStatusTab);
+         
          
          //set up invariantEditor:
          Group invariantColumn = new Group(root, SWT.SHADOW_IN);
          invariantColumn.setLayout(vertlayout);
-         Label d = new Label(invariantColumn, SWT.BORDER);
-         d.setText("More Stuff!");
-         //TabFolder invariants = new TabFolder(stateColumn, SWT.TOP);
-         TabFolder modifies = new TabFolder(stateColumn, SWT.TOP);
-         TabFolder variant = new TabFolder(stateColumn, SWT.TOP);
+         TabFolder invariants = new TabFolder(invariantColumn, SWT.TOP);
+         invariantText = (Text)addTextTabItem("inv 0", "some invariant text, probably monospace", true, invariants);
+         TabFolder modifies = new TabFolder(invariantColumn, SWT.TOP);
+         Text modifiesText = (Text)addTextTabItem("heap", "Modifies\nEmpty", true, modifies);
+         TabFolder variant = new TabFolder(invariantColumn, SWT.TOP);
+         Text invariantText = (Text)addTextTabItem("heap", "Variant: someCode", true, variant);
          
+         modifiesText.addModifyListener(new ModifyListener(){
+            public void modifyText(ModifyEvent event) {
+               Text text = (Text) event.widget;
+               //do something with the text.
+            }
+         });
          
-         //root.layout(true, true);
+         invariantText.addModifyListener(new ModifyListener(){
+            public void modifyText(ModifyEvent event) {
+               Text text = (Text) event.widget;
+               //do something with the text.
+            }
+         });
+      }
+      
+      /**
+       * @param head - title of the tabitem
+       * @param body - text within the tabitem
+       * @param writable - is the text user-editable
+       * @param parent - where to attach the item
+       * @return the generated TabItem
+       */
+      private Control addTextTabItem(String head, String body, boolean writable, TabFolder parent){
+         TabItem t = new TabItem (parent, SWT.NONE);
+         t.setText(head);
+         Control c = null;
+         if (writable){
+            Text l = new Text(parent, SWT.MULTI);
+            l.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
+            l.setText(body);
+            c = l;
+         } else {
+            Label l = new Label(parent, SWT.NONE);
+            l.setText(body);
+            c = l;
+         }
+         t.setControl(c);
+         return c;
       }
 
       /**
