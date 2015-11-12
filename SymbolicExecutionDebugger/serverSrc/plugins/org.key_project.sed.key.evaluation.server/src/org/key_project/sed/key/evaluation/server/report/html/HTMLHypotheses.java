@@ -67,11 +67,12 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          appendTestAndDiagrams(firstToolData.listCorrectRatios(), 
                                secondToolData.listCorrectRatios(), 
                                alpha, 
-                               "Average Correct Answers", 
+                               "Correct Answers", 
                                sb,
                                new String[] {firstTool.getName(), secondTool.getName()},
-                               IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_AverageCorrectAnswers",
-                               additionalFiles);
+                               IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_CorrectAnswers",
+                               additionalFiles,
+                               false);
          sb.append("<br>");
          appendTestAndDiagrams(firstToolData.listOverallCorrectnessScoreRatios(), 
                                secondToolData.listOverallCorrectnessScoreRatios(), 
@@ -80,7 +81,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                sb,
                                new String[] {firstTool.getName(), secondTool.getName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_CorrectnessScore",
-                               additionalFiles);
+                               additionalFiles,
+                               false);
          sb.append("<br>");
          appendTestAndDiagrams(firstToolData.listNormalizedTrustScoreRatios(), 
                                secondToolData.listNormalizedTrustScoreRatios(), 
@@ -89,7 +91,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                sb,
                                new String[] {firstTool.getName(), secondTool.getName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_TrustScore",
-                               additionalFiles);
+                               additionalFiles,
+                               false);
          sb.append("<br>");
          appendTestAndDiagrams(firstToolData.listOverallPartialTrustScoreRatio(), 
                                secondToolData.listOverallPartialTrustScoreRatio(), 
@@ -98,7 +101,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                sb,
                                new String[] {firstTool.getName(), secondTool.getName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_PartialTrustScore",
-                               additionalFiles);
+                               additionalFiles,
+                               false);
          sb.append("<br>");
          appendTestAndDiagrams(secondToolData.listTimeRatios(), 
                                firstToolData.listTimeRatios(), 
@@ -107,7 +111,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                sb,
                                new String[] {secondTool.getName(), firstTool.getName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_Time",
-                               additionalFiles);
+                               additionalFiles,
+                               true);
          sb.append("<br>");
          appendDataSets(entry.getValue(), CollectionUtil.toList(firstTool, secondTool), sb);
       }
@@ -128,13 +133,14 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                         String hypotheses, 
                                         StringBuffer sb,
                                         String[] toolLabels,
-                                        String boxplotName,
-                                        List<AdditionalFile> additionalFiles) {
+                                        String boxplotFileName,
+                                        List<AdditionalFile> additionalFiles,
+                                        boolean reverseOrder) {
       // Append test
       appendTest(firstTool, secondTool, alpha, hypotheses, sb);
       // Create latex file with boxplot of data
-      String content = LatexUtil.createLatexBoxPlot(new double[][] {firstTool, secondTool}, toolLabels, 1.5);
-      additionalFiles.add(new AdditionalFile(boxplotName + LatexUtil.TEX_FILE_EXTENSION_WITH_DOT, content.getBytes(IOUtil.DEFAULT_CHARSET)));
+      String content = LatexUtil.createLatexBoxPlot(new double[][] {firstTool, secondTool}, toolLabels, null, 1.5, reverseOrder);
+      additionalFiles.add(new AdditionalFile(boxplotFileName + LatexUtil.TEX_FILE_EXTENSION_WITH_DOT, content.getBytes(IOUtil.DEFAULT_CHARSET)));
    }
    
    /**

@@ -23,11 +23,26 @@ public final class LatexUtil {
    /**
     * Creates a latex document showing the given data as boxplots.
     * @param allData Each {@code double[]} array will be printed as one boxplot.
-    * @param labels The labels to show at each boxplot.
+    * @param yLabels The y labels to show at each boxplot.
+    * @param xLabel The x label to show at the overall boxplot.
     * @param k The k-value used to compute the whiskers.
+    * @param reverseOrder Reverse order of box plots?
     * @return The created latex document.
     */
-   public static String createLatexBoxPlot(double[][] allData, String[] labels, double k) {
+   public static String createLatexBoxPlot(double[][] allData, String[] yLabels, String xLabel, double k, boolean reverseOrder) {
+      // Change order if reverse order is requested.
+      if (reverseOrder) {
+         double[][] allDataReverse = new double[allData.length][];
+         for (int i = 0; i < allData.length; i++) {
+            allDataReverse[allDataReverse.length - 1 - i] = allData[i];
+         }
+         allData = allDataReverse;
+         String[] yLabelsReverse = new String[yLabels.length];
+         for (int i = 0; i < yLabels.length; i++) {
+            yLabelsReverse[yLabelsReverse.length - 1 - i] = yLabels[i];
+         }
+         yLabels = yLabelsReverse;
+      }
       // Compute data for boxplot
       double[] median = new double[allData.length]; // The median values
       double[] lowerQuartiles = new double[allData.length]; // The lower quartiles
@@ -54,15 +69,56 @@ public final class LatexUtil {
       }
       // Create latex file
       StringBuffer sb = new StringBuffer();
-      sb.append("\\documentclass{article}" + StringUtil.NEW_LINE);
-      sb.append("\\usepackage{pgfplots}" + StringUtil.NEW_LINE);
-      sb.append("\\pgfplotsset{compat=1.8}" + StringUtil.NEW_LINE);
-      sb.append("\\usepgfplotslibrary{statistics}" + StringUtil.NEW_LINE);
-      sb.append("\\begin{document}" + StringUtil.NEW_LINE);
-      
+      // preamble
+      sb.append("%\\documentclass{article}" + StringUtil.NEW_LINE);
+      sb.append("%\\usepackage{pgfplots}" + StringUtil.NEW_LINE);
+      sb.append("%\\pgfplotsset{compat=1.12} % Ensures correct results!" + StringUtil.NEW_LINE);
+      sb.append("%\\usepgfplotslibrary{statistics}" + StringUtil.NEW_LINE);
+      sb.append("%\\begin{document}" + StringUtil.NEW_LINE);
+      // preset boxplot
+      sb.append("%\\begin{tikzpicture}" + StringUtil.NEW_LINE);
+      sb.append("%\\begin{axis}" + StringUtil.NEW_LINE);
+      sb.append("%[" + StringUtil.NEW_LINE);
+      if (!StringUtil.isEmpty(xLabel)) {
+         sb.append("%xlabel={" + xLabel + "}," + StringUtil.NEW_LINE);
+      }
+      sb.append("%ytick={");
+      for (int i = 0; i < allData.length; i++) {
+         if (i > 0) {
+            sb.append(", ");
+         }
+         sb.append(i + 1);
+      }
+      sb.append("%}," + StringUtil.NEW_LINE);
+      sb.append("%yticklabels={");
+      for (int i = 0; i < allData.length; i++) {
+         if (i > 0) {
+            sb.append(", ");
+         }
+         sb.append(yLabels[i]);
+      }
+      sb.append("%}," + StringUtil.NEW_LINE);
+      sb.append("%]" + StringUtil.NEW_LINE);
+      for (int i = 0; i < allData.length; i++) {
+         sb.append("%\\addplot+[" + StringUtil.NEW_LINE);
+         sb.append("%boxplot prepared={median=" + median[i]
+                   + ", upper quartile=" + upperQuartiles[i]
+                   + ", lower quartile=" + lowerQuartiles[i]
+                   + ", upper whisker=" + upperWhiskers[i]
+                   + ", lower whisker=" + lowerWhiskers[i]
+                   + "}," + StringUtil.NEW_LINE);
+         sb.append("%] coordinates {};" + StringUtil.NEW_LINE);
+      }
+      sb.append("%\\end{axis}" + StringUtil.NEW_LINE);
+      sb.append("%\\end{tikzpicture}" + StringUtil.NEW_LINE);
+      // auto computed boxplot
+      sb.append(StringUtil.NEW_LINE + StringUtil.NEW_LINE);
       sb.append("\\begin{tikzpicture}" + StringUtil.NEW_LINE);
       sb.append("\\begin{axis}" + StringUtil.NEW_LINE);
       sb.append("[" + StringUtil.NEW_LINE);
+      if (!StringUtil.isEmpty(xLabel)) {
+         sb.append("xlabel={" + xLabel + "}," + StringUtil.NEW_LINE);
+      }
       sb.append("ytick={");
       for (int i = 0; i < allData.length; i++) {
          if (i > 0) {
@@ -76,24 +132,26 @@ public final class LatexUtil {
          if (i > 0) {
             sb.append(", ");
          }
-         sb.append(labels[i]);
+         sb.append(yLabels[i]);
       }
       sb.append("}," + StringUtil.NEW_LINE);
       sb.append("]" + StringUtil.NEW_LINE);
       for (int i = 0; i < allData.length; i++) {
-         sb.append("\\addplot+[" + StringUtil.NEW_LINE);
-         sb.append("boxplot prepared={median=" + median[i]
-                   + ", upper quartile=" + upperQuartiles[i]
-                   + ", lower quartile=" + lowerQuartiles[i]
-                   + ", upper whisker=" + upperWhiskers[i]
-                   + ", lower whisker=" + lowerWhiskers[i]
-                   + "}," + StringUtil.NEW_LINE);
-         sb.append("] coordinates {};" + StringUtil.NEW_LINE);
+         sb.append("\\addplot+[boxplot={}] " + StringUtil.NEW_LINE);
+         sb.append("table[row sep=\\\\,y index=0] {");
+         for (int j = 0; j < allData[i].length; j++) {
+            if (j > 0) {
+               sb.append(" ");
+            }
+            sb.append(allData[i][j] + " \\\\");
+         }
+         sb.append("};");
+         sb.append("coordinates {};" + StringUtil.NEW_LINE);
       }
       sb.append("\\end{axis}" + StringUtil.NEW_LINE);
       sb.append("\\end{tikzpicture}" + StringUtil.NEW_LINE);
-      
-      sb.append("\\end{document}" + StringUtil.NEW_LINE);
+      // end of document
+      sb.append("%\\end{document}" + StringUtil.NEW_LINE);
       return sb.toString();
    }
    
@@ -117,22 +175,25 @@ public final class LatexUtil {
     * @param index The index to start search at.
     * @param array The array to search in.
     * @param reference The reference value to search its nearest occurrence in the array.
-    * @return The nearest found value or the reference value if none was found.
+    * @return The nearest found value not exceeding the reference or the reference value if none was found.
     */
    public static double trunkateDecreasing(int index, double[] array, double reference) {
       double previousDifference = Double.MAX_VALUE;
       int indexWithNearestValue = -1;
+      boolean previousInitialzed = false;
       while (index >= 0) {
          double difference = array[index] - reference;
          if (difference < 0) {
-            difference = difference * -1;
+            break; // Outliners reached
          }
-         if (difference < previousDifference) {
+         else if (!previousInitialzed) {
             previousDifference = difference;
             indexWithNearestValue = index;
+            previousInitialzed = true;
          }
-         else if (difference < previousDifference) { // Continued in case of equal difference
-            break;
+         else if (difference < previousDifference) {
+            previousDifference = difference;
+            indexWithNearestValue = index;
          }
          index--;
       }
@@ -149,22 +210,25 @@ public final class LatexUtil {
     * @param index The index to start search at.
     * @param array The array to search in.
     * @param reference The reference value to search its nearest occurrence in the array.
-    * @return The nearest found value or the reference value if none was found.
+    * @return The nearest found value not exceeding the reference or the reference value if none was found.
     */
    public static double trunkateIncreasing(int index, double[] array, double reference) {
-      double previousDifference = Double.MAX_VALUE;
+      double previousDifference = Double.MIN_VALUE;
       int indexWithNearestValue = -1;
+      boolean previousInitialzed = false;
       while (index < array.length) {
          double difference = array[index] - reference;
-         if (difference < 0) {
-            difference = difference * -1;
+         if (difference > 0) {
+            break; // Outliners reached
          }
-         if (difference < previousDifference) {
+         else if (!previousInitialzed) {
             previousDifference = difference;
             indexWithNearestValue = index;
+            previousInitialzed = true;
          }
-         else if (difference < previousDifference) { // Continued in case of equal difference
-            break;
+         else if (previousDifference < difference) {
+            previousDifference = difference;
+            indexWithNearestValue = index;
          }
          index++;
       }
