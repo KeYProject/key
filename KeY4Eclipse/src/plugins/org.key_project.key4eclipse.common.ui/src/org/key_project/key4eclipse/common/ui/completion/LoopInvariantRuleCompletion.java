@@ -1,5 +1,7 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import java.io.StringWriter;
+
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -87,6 +89,24 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       public String getTitle() {
          return "Invariant Configurator";
       }
+      
+      /**
+       * extracts loop from app
+       * @author Anna Marie Filighera
+       * @return complete loop as String
+       */
+      private String getLoopText() {
+        StringWriter writer = new StringWriter();
+        String text = "";
+        LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) getApp();
+        try {
+           loopApp.getLoopStatement().prettyPrint(new PrettyPrinter(writer));
+           text = writer.toString();
+       } catch (Exception e) {
+           text = loopApp.getLoopStatement().toSource();
+       } 
+        return text.trim();
+      }
 
       /**
        * {@inheritDoc}
@@ -106,7 +126,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          Font monospace = JFaceResources.getFont(JFaceResources.TEXT_FONT);//new Font(root.getDisplay(), "Monospaced", 10, SWT.NORMAL);
          code.setFont(monospace);
          code.setBackground(root.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-         code.setText("This is example soure code.\n  This should align nicely.\n  Lorem ipsum and so forth. ");
+         code.setText(getLoopText());
          
          //Set up state view:
          Group stateColumn = new Group(root, SWT.SHADOW_IN);
