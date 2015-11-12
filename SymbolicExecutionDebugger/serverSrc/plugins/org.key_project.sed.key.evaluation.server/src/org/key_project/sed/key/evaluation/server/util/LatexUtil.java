@@ -138,7 +138,7 @@ public final class LatexUtil {
       sb.append("]" + StringUtil.NEW_LINE);
       for (int i = 0; i < allData.length; i++) {
          sb.append("\\addplot+[boxplot={}] " + StringUtil.NEW_LINE);
-         sb.append("table[row sep=\\\\,y index=0] {");
+         sb.append("table[row sep=\\\\,y index=0] {data \\\\");
          for (int j = 0; j < allData[i].length; j++) {
             if (j > 0) {
                sb.append(" ");
