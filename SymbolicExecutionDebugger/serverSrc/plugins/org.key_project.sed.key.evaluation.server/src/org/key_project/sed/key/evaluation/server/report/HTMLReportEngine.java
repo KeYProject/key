@@ -12,6 +12,7 @@ import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAtt
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLAnswersSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLChoiceSectionAppender;
+import org.key_project.sed.key.evaluation.server.report.html.HTMLExpectedAnswersComparison;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLHypotheses;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLToolSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLUnderstandingProofAttemptsBalancingSectionAppender;
@@ -79,6 +80,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
       List<IHTMLSectionAppender> result = new LinkedList<IHTMLSectionAppender>();
       result.add(new HTMLHypotheses());
       result.add(new HTMLToolSectionAppender());
+      result.add(new HTMLExpectedAnswersComparison());
       result.add(new HTMLChoiceSectionAppender());
       if (evaluation instanceof UnderstandingProofAttemptsEvaluation) {
          result.add(new UnderstandingProofAttemptsKnowledgeExport());
