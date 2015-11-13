@@ -65,10 +65,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private Label invariantStatus = null;
       private Label modifiesStatus = null;
       private Label variantStatus = null;
-      private Text invariantText = null;
-      private TabFolder invariants = null;
+      //private Text invariantText = null;
       private DefaultTermParser parser = new DefaultTermParser();
       private Services services = getGoal().proof().getServices();
+      private TabFolder editorTab = null;
       
       
       
@@ -165,7 +165,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //Set up right column
          Composite rightColumn = new Composite(root, SWT.NO_BACKGROUND);
          rightColumn.setLayout(vertlayout);
-         final TabFolder editorTab = new TabFolder(rightColumn, SWT.TOP);
+         //TODO: register a listener to the TabFolder so we can see what the user is looking at.
+         editorTab = new TabFolder(rightColumn, SWT.TOP);
          //Set up initial Tab
          addTab("some invariant text, probably monospace", "e", "f", 0, editorTab);
          // set up store button
@@ -176,56 +177,21 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             // adds new tab 
             @Override
             public void widgetSelected(SelectionEvent e) {
-               int currentTab = invariants.getSelectionIndex();
-               int amountTabs = invariants.getItemCount();
-               
-               addTab("","","",1,editorTab);
-               
+               //TODO
+               int currentTabID = editorTab.getSelectionIndex();
+               //assert(editorTab.getSelection().length == 1);
+               TabItem currentTab = editorTab.getSelection()[0];//Might fail if !=1 items selected.
+               Composite textCtr = (Composite) currentTab.getControl();
+               int amountTabs = editorTab.getItemCount();
+               addTab(
+                  ((Text)((Group)textCtr.getChildren()[0]).getChildren()[0]).getText(),
+                  ((Text)((Group)textCtr.getChildren()[1]).getChildren()[0]).getText(),
+                  ((Text)((Group)textCtr.getChildren()[2]).getChildren()[0]).getText(),
+                  amountTabs, editorTab);
             }
          });
-         //TODO move these down into the addTab aux function.
-         Text invariant, modifies, variants; // Stub to shut the compiler up.
-         invariant.addModifyListener(new ModifyListener(){
-            public void modifyText(ModifyEvent event) {
-               Text text = (Text) event.widget;
-               try {
-                  // TODO: give term to ???
-                  Term inputInvariant = parser.parse(new StringReader(text.getText()), Sort.FORMULA, services, services.getNamespaces(), getAbbrevMap());
-                  invariantStatus.setText("OK");
-               }  catch(Exception e){
-                  invariantStatus.setText(e.getMessage());
-               }
-            }
-         });
-         
-         modifies.addModifyListener(new ModifyListener(){
-            public void modifyText(ModifyEvent event) {
-               Text text = (Text) event.widget;
-               try {
-                  // TODO: give term to ???
-                  Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
-                  Term inputMod = parser.parse(new StringReader(text.getText()), modSort, services, services.getNamespaces(), getAbbrevMap());
-                  modifiesStatus.setText("OK");
-               }  catch(Exception e){
-                  modifiesStatus.setText(e.getMessage());
-               }
-            }
-         });
-         
-         variants.addModifyListener(new ModifyListener(){
-            public void modifyText(ModifyEvent event) {
-               Text text = (Text) event.widget;
-               try {
-                  // TODO: give term to ???
-                  Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                  Term inputVar = parser.parse(new StringReader(text.getText()), varSort, services, services.getNamespaces(), getAbbrevMap());
-                  variantStatus.setText("OK");
-               }  catch(Exception e){
-                  variantStatus.setText(e.getMessage());
-               }
-            }
-         });
-         
+         //Potential expansion: Discard rule application if Completion dialog was aborted.
+         //TODO: Status tab should be updated after GUI setup, and after tab switch also.
       }
       
       private AbbrevMap getAbbrevMap() {
@@ -233,6 +199,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
+       * @author Viktor Pfanschilling
        * @param head - title of the tabitem
        * @param body - text within the tabitem
        * @param writable - is the text user-editable
@@ -261,7 +228,48 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          modifiesT.setText(modifies);
          var1.setText("variants");
          variantsT.setText(variants);
-         //TODO: register listeners here
+         
+         invariantT.addModifyListener(new ModifyListener(){
+            public void modifyText(ModifyEvent event) {
+               Text text = (Text) event.widget;
+               try {
+                  // TODO: give term to ???
+                  Term inputInvariant = parser.parse(new StringReader(text.getText()), Sort.FORMULA, services, services.getNamespaces(), getAbbrevMap());
+                  invariantStatus.setText("OK");
+               }  catch(Exception e){
+                  invariantStatus.setText(e.getMessage());
+               }
+            }
+         });
+         
+         modifiesT.addModifyListener(new ModifyListener(){
+            public void modifyText(ModifyEvent event) {
+               Text text = (Text) event.widget;
+               try {
+                  // TODO: give term to ???
+                  Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+                  Term inputMod = parser.parse(new StringReader(text.getText()), modSort, services, services.getNamespaces(), getAbbrevMap());
+                  modifiesStatus.setText("OK");
+               }  catch(Exception e){
+                  modifiesStatus.setText(e.getMessage());
+               }
+            }
+         });
+         
+         variantsT.addModifyListener(new ModifyListener(){
+            public void modifyText(ModifyEvent event) {
+               Text text = (Text) event.widget;
+               try {
+                  // TODO: give term to ???
+                  Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                  Term inputVar = parser.parse(new StringReader(text.getText()), varSort, services, services.getNamespaces(), getAbbrevMap());
+                  variantStatus.setText("OK");
+               }  catch(Exception e){
+                  variantStatus.setText(e.getMessage());
+               }
+            }
+         });
+         
          return textContainer;
       }
 
