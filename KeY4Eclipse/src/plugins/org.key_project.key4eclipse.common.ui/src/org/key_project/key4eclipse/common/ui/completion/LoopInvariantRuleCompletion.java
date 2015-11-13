@@ -1,5 +1,6 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.eclipse.jface.resource.JFaceResources;
@@ -21,7 +22,13 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -60,6 +67,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private Label variantStatus = null;
       private Text invariantText = null;
       private TabFolder invariants = null;
+      private DefaultTermParser parser = new DefaultTermParser();
+      private Services services = getGoal().proof().getServices();
       
       
       
@@ -179,24 +188,48 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          invariant.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               //do something with the text.
+               try {
+                  // TODO: give term to ???
+                  Term inputInvariant = parser.parse(new StringReader(text.getText()), Sort.FORMULA, services, services.getNamespaces(), getAbbrevMap());
+                  invariantStatus.setText("OK");
+               }  catch(Exception e){
+                  invariantStatus.setText(e.getMessage());
+               }
             }
          });
          
          modifies.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               //do something with the text.
+               try {
+                  // TODO: give term to ???
+                  Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+                  Term inputMod = parser.parse(new StringReader(text.getText()), modSort, services, services.getNamespaces(), getAbbrevMap());
+                  modifiesStatus.setText("OK");
+               }  catch(Exception e){
+                  modifiesStatus.setText(e.getMessage());
+               }
             }
          });
          
          variants.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               //do something with the text.
+               try {
+                  // TODO: give term to ???
+                  Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                  Term inputVar = parser.parse(new StringReader(text.getText()), varSort, services, services.getNamespaces(), getAbbrevMap());
+                  variantStatus.setText("OK");
+               }  catch(Exception e){
+                  variantStatus.setText(e.getMessage());
+               }
             }
          });
          
+      }
+      
+      private AbbrevMap getAbbrevMap() {
+         return MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap();
       }
       
       /**
