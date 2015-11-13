@@ -4,6 +4,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,6 +33,7 @@ import org.key_project.sed.key.evaluation.server.util.StatisticsUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Appends the hypotheses tests.
@@ -64,7 +66,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          HypothesisToolData firstToolData = entry.getValue().getToolData(firstTool);
          HypothesisToolData secondToolData = entry.getValue().getToolData(secondTool);
          double alpha = 0.05;
-         appendTestAndDiagrams(firstToolData.listCorrectRatios(), 
+         TestResultContainer correctAnswers = appendTestAndDiagrams(firstToolData.listCorrectRatios(), 
                                secondToolData.listCorrectRatios(), 
                                alpha, 
                                "Correct Answers", 
@@ -74,7 +76,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                additionalFiles,
                                false);
          sb.append("<br>");
-         appendTestAndDiagrams(firstToolData.listOverallCorrectnessScoreRatios(), 
+         TestResultContainer correctnessScore = appendTestAndDiagrams(firstToolData.listOverallCorrectnessScoreRatios(), 
                                secondToolData.listOverallCorrectnessScoreRatios(), 
                                alpha, 
                                "Correctness Score", 
@@ -84,7 +86,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                additionalFiles,
                                false);
          sb.append("<br>");
-         appendTestAndDiagrams(firstToolData.listNormalizedTrustScoreRatios(), 
+         TestResultContainer trustScore = appendTestAndDiagrams(firstToolData.listNormalizedTrustScoreRatios(), 
                                secondToolData.listNormalizedTrustScoreRatios(), 
                                alpha, 
                                "Trust Score", 
@@ -94,7 +96,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                additionalFiles,
                                false);
          sb.append("<br>");
-         appendTestAndDiagrams(firstToolData.listOverallPartialTrustScoreRatio(), 
+         TestResultContainer partialTrustScore = appendTestAndDiagrams(firstToolData.listOverallPartialTrustScoreRatio(), 
                                secondToolData.listOverallPartialTrustScoreRatio(), 
                                alpha, 
                                "Partial Trust Score", 
@@ -104,7 +106,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                additionalFiles,
                                false);
          sb.append("<br>");
-         appendTestAndDiagrams(secondToolData.listTimeRatios(), 
+         TestResultContainer time = appendTestAndDiagrams(secondToolData.listTimeRatios(), 
                                firstToolData.listTimeRatios(), 
                                alpha, 
                                "Time", 
@@ -115,6 +117,63 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                true);
          sb.append("<br>");
          appendDataSets(entry.getValue(), CollectionUtil.toList(firstTool, secondTool), sb);
+         // Create paired ttest latex file
+         DecimalFormat df = new DecimalFormat("#.####");
+         StringBuffer latex = new StringBuffer();
+         latex.append("\\begin{tabular}{lrrc}" + StringUtil.NEW_LINE);
+         latex.append("\\toprule" + StringUtil.NEW_LINE);
+         latex.append("Hypothesis & t-value & p-value & rejected at $\\alpha = $" + alpha + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("\\midrule" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_Q}$ & " + df.format(correctAnswers.getPairedTTest().getTestStatistics()) + " & " + df.format(correctAnswers.getPairedTTest().getpValue()) + " & " + correctAnswers.getPairedTTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_{\\mathit{QS}}}$ & " + df.format(correctnessScore.getPairedTTest().getTestStatistics()) + " & " + df.format(correctnessScore.getPairedTTest().getpValue()) + " & " + correctnessScore.getPairedTTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_C}$ & " + df.format(trustScore.getPairedTTest().getTestStatistics()) + " & " + df.format(trustScore.getPairedTTest().getpValue()) + " & " + trustScore.getPairedTTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_{\\mathit{CS}}}$ & " + df.format(partialTrustScore.getPairedTTest().getTestStatistics()) + " & " + df.format(partialTrustScore.getPairedTTest().getpValue()) + " & " + partialTrustScore.getPairedTTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_T}$ & " + df.format(time.getPairedTTest().getTestStatistics()) + " & " + df.format(time.getPairedTTest().getpValue()) + " & " + time.getPairedTTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+         latex.append("\\end{tabular}" + StringUtil.NEW_LINE);
+         additionalFiles.add(new AdditionalFile("_pairedTTest_" + IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + ".tex", latex.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
+         // Create ChiSquare Goodness of fit Test latex file
+         latex = new StringBuffer();
+         latex.append("\\begin{tabular}{lrrc}" + StringUtil.NEW_LINE);
+         latex.append("\\toprule" + StringUtil.NEW_LINE);
+         latex.append("Hypothesis & chi-2-value & p-value & rejected at $\\alpha = $" + alpha + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("\\midrule" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_Q}$ & " + df.format(correctAnswers.getChiSquareGoodnessOfFitTest().getTestStatistics()) + " & " + df.format(correctAnswers.getChiSquareGoodnessOfFitTest().getpValue()) + " & " + correctAnswers.getChiSquareGoodnessOfFitTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_{\\mathit{QS}}}$ & " + df.format(correctnessScore.getChiSquareGoodnessOfFitTest().getTestStatistics()) + " & " + df.format(correctnessScore.getChiSquareGoodnessOfFitTest().getpValue()) + " & " + correctnessScore.getChiSquareGoodnessOfFitTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_C}$ & " + df.format(trustScore.getChiSquareGoodnessOfFitTest().getTestStatistics()) + " & " + df.format(trustScore.getChiSquareGoodnessOfFitTest().getpValue()) + " & " + trustScore.getChiSquareGoodnessOfFitTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_{\\mathit{CS}}}$ & " + df.format(partialTrustScore.getChiSquareGoodnessOfFitTest().getTestStatistics()) + " & " + df.format(partialTrustScore.getChiSquareGoodnessOfFitTest().getpValue()) + " & " + partialTrustScore.getChiSquareGoodnessOfFitTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_T}$ & " + df.format(time.getChiSquareGoodnessOfFitTest().getTestStatistics()) + " & " + df.format(time.getChiSquareGoodnessOfFitTest().getpValue()) + " & " + time.getChiSquareGoodnessOfFitTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+         latex.append("\\end{tabular}" + StringUtil.NEW_LINE);
+         additionalFiles.add(new AdditionalFile("_chiSquareGoodnessOfFitTest_" + IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + ".tex", latex.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
+         // Create Wilcoxon Signed Rank Test latex file
+         latex = new StringBuffer();
+         latex.append("\\begin{tabular}{lrrc}" + StringUtil.NEW_LINE);
+         latex.append("\\toprule" + StringUtil.NEW_LINE);
+         latex.append("Hypothesis & W-value & p-value & rejected at $\\alpha = $" + alpha + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("\\midrule" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_Q}$ & " + df.format(correctAnswers.getWilcoxonSignedRankTest().getTestStatistics()) + " & " + df.format(correctAnswers.getWilcoxonSignedRankTest().getpValue()) + " & " + correctAnswers.getWilcoxonSignedRankTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_{\\mathit{QS}}}$ & " + df.format(correctnessScore.getWilcoxonSignedRankTest().getTestStatistics()) + " & " + df.format(correctnessScore.getWilcoxonSignedRankTest().getpValue()) + " & " + correctnessScore.getWilcoxonSignedRankTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_C}$ & " + df.format(trustScore.getWilcoxonSignedRankTest().getTestStatistics()) + " & " + df.format(trustScore.getWilcoxonSignedRankTest().getpValue()) + " & " + trustScore.getWilcoxonSignedRankTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_{\\mathit{CS}}}$ & " + df.format(partialTrustScore.getWilcoxonSignedRankTest().getTestStatistics()) + " & " + df.format(partialTrustScore.getWilcoxonSignedRankTest().getpValue()) + " & " + partialTrustScore.getWilcoxonSignedRankTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_T}$ & " + df.format(time.getWilcoxonSignedRankTest().getTestStatistics()) + " & " + df.format(time.getWilcoxonSignedRankTest().getpValue()) + " & " + time.getWilcoxonSignedRankTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+         latex.append("\\end{tabular}" + StringUtil.NEW_LINE);
+         additionalFiles.add(new AdditionalFile("_wilcoxonSignedRankTest_" + IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + ".tex", latex.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
+         // Create Sign Test latex file
+         latex = new StringBuffer();
+         latex.append("\\begin{tabular}{lrc}" + StringUtil.NEW_LINE);
+         latex.append("\\toprule" + StringUtil.NEW_LINE);
+         latex.append("Hypothesis & p-value & rejected at $\\alpha = $" + alpha + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("\\midrule" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_Q}$ & " + df.format(correctAnswers.getSignTest().getpValue()) + " & " + correctAnswers.getSignTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_{\\mathit{QS}}}$ & " + df.format(correctnessScore.getSignTest().getpValue()) + " & " + correctnessScore.getSignTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_C}$ & " + df.format(trustScore.getSignTest().getpValue()) + " & " + trustScore.getSignTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_{\\mathit{CS}}}$ & " + df.format(partialTrustScore.getSignTest().getpValue()) + " & " + partialTrustScore.getSignTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("$H_{0_T}$ & " + df.format(time.getSignTest().getpValue()) + " & " + time.getSignTest().isRejected() + "\\\\" + StringUtil.NEW_LINE);
+         latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+         latex.append("\\end{tabular}" + StringUtil.NEW_LINE);
+         additionalFiles.add(new AdditionalFile("_signTest_" + IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + ".tex", latex.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
       }
       return additionalFiles;
    }
@@ -126,21 +185,23 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
     * @param alpha The alpha to use.
     * @param hypotheses The tested hypotheses.
     * @param sb The {@link StringBuffer} to append to.
+    * @return The {@link TestResultContainer} offering all computed results.
     */
-   protected void appendTestAndDiagrams(double[] firstTool, 
-                                        double[] secondTool, 
-                                        double alpha, 
-                                        String hypotheses, 
-                                        StringBuffer sb,
-                                        String[] toolLabels,
-                                        String boxplotFileName,
-                                        List<AdditionalFile> additionalFiles,
-                                        boolean reverseOrder) {
+   protected TestResultContainer appendTestAndDiagrams(double[] firstTool, 
+                                                       double[] secondTool, 
+                                                       double alpha, 
+                                                       String hypotheses, 
+                                                       StringBuffer sb,
+                                                       String[] toolLabels,
+                                                       String boxplotFileName,
+                                                       List<AdditionalFile> additionalFiles,
+                                                       boolean reverseOrder) {
       // Append test
-      appendTest(firstTool, secondTool, alpha, hypotheses, sb);
+      TestResultContainer testContainer = appendTest(firstTool, secondTool, alpha, hypotheses, sb);
       // Create latex file with boxplot of data
       String content = LatexUtil.createLatexBoxPlot(new double[][] {firstTool, secondTool}, toolLabels, null, 1.5, reverseOrder);
       additionalFiles.add(new AdditionalFile(boxplotFileName + LatexUtil.TEX_FILE_EXTENSION_WITH_DOT, content.getBytes(IOUtil.DEFAULT_CHARSET)));
+      return testContainer;
    }
    
    /**
@@ -150,20 +211,21 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
     * @param alpha The alpha to use.
     * @param hypotheses The tested hypotheses.
     * @param sb The {@link StringBuffer} to append to.
+    * @return The {@link TestResultContainer} offering all computed results.
     */
-   protected void appendTest(double[] firstTool, 
-                             double[] secondTool, 
-                             double alpha, 
-                             String hypotheses, 
-                             StringBuffer sb) {
+   protected TestResultContainer appendTest(double[] firstTool, 
+                                            double[] secondTool, 
+                                            double alpha, 
+                                            String hypotheses, 
+                                            StringBuffer sb) {
       // Perform t Test, see https://commons.apache.org/proper/commons-math/userguide/stat.html
       Exception tException = null;
-      double pairedT = 0.0;
-      double pairedTTest = 0.0;
+      double pairedT = Double.NaN;
+      double pairedTTest = Double.NaN;
       boolean pairedTTestAlpha = false;
       try {
          pairedT = TestUtils.pairedT(firstTool, secondTool);
-         pairedTTest = TestUtils.pairedTTest(firstTool, secondTool);
+         pairedTTest = TestUtils.pairedTTest(firstTool, secondTool) / 2;
          pairedTTestAlpha = TestUtils.pairedTTest(firstTool, secondTool, alpha * 2);
       }
       catch (Exception e) {
@@ -173,8 +235,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       long[] histogram = null;
       double[] expected = null;
       Exception chiSquareException = null;
-      double chiSquare = 0.0;
-      double chiSquareTest = 0.0;
+      double chiSquare = Double.NaN;
+      double chiSquareTest = Double.NaN;
       boolean chiSquareTestAlpha = false;
       try {
          double[] allData = new double[firstTool.length + secondTool.length];
@@ -191,7 +253,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          chiSquareException = e;
       }
       // Perform sign test
-      double signTest = 0.0;
+      double signTest = Double.NaN;
       boolean signTestAlpha = false;
       Exception signTestException = null;
       try {
@@ -202,8 +264,8 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          signTestException = e;
       }
       // Perform wilcoxon signed rank test
-      double wilcoxon = 0.0;
-      double wilcoxonTest = 0.0;
+      double wilcoxon = Double.NaN;
+      double wilcoxonTest = Double.NaN;
       boolean wilcoxonTestAlpha = false;
       Exception wilcoxonException = null;
       try {
@@ -211,6 +273,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
          wilcoxon = test.wilcoxonSignedRank(firstTool, secondTool);
          wilcoxonTest = test.wilcoxonSignedRankTest(firstTool, secondTool, true);
          wilcoxonTestAlpha = wilcoxonTest < alpha * 2;
+         wilcoxonTest = wilcoxonTest / 2;
       }
       catch (Exception e) {
          wilcoxonException = e;
@@ -257,13 +320,13 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       sb.append("<tr>");
       sb.append("<td><b>p-value (smallest significance level)</b></td>");
       if (tException == null) {
-         sb.append("<td>" + (pairedTTest / 2) + "</td>");
+         sb.append("<td>" + pairedTTest + "</td>");
       }
       if (chiSquareException == null) {
          sb.append("<td colspan=\"1\">" + chiSquareTest + "</td>");
       }
       if (wilcoxonException == null) {
-         sb.append("<td colspan=\"1\">" + (wilcoxonTest / 2) + "</td>");
+         sb.append("<td colspan=\"1\">" + wilcoxonTest + "</td>");
       }
       if (signTestException == null) {
          sb.append("<td colspan=\"1\">" + signTest + "</td>");
@@ -286,6 +349,70 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
       sb.append("</tr>");
       sb.append("<tr>");
       sb.append("</table>");
+      return new TestResultContainer(new TestResult(pairedT, pairedTTest, pairedTTestAlpha), // pairedTTest, 
+                                     new TestResult(chiSquare, chiSquareTest, chiSquareTestAlpha), //chiSquareGoodnessOfFitTest, 
+                                     new TestResult(wilcoxon, wilcoxonTest, wilcoxonTestAlpha), // wilcoxonSignedRankTest, 
+                                     new TestResult(Double.NaN, signTest, signTestAlpha)  /* signTest */);
+   }
+   
+   private static class TestResultContainer {
+      private final TestResult pairedTTest;
+      private final TestResult chiSquareGoodnessOfFitTest;
+      private final TestResult wilcoxonSignedRankTest;
+      private final TestResult signTest;
+      
+      public TestResultContainer(TestResult pairedTTest, 
+                                 TestResult chiSquareGoodnessOfFitTest, 
+                                 TestResult wilcoxonSignedRankTest, 
+                                 TestResult signTest) {
+         super();
+         this.pairedTTest = pairedTTest;
+         this.chiSquareGoodnessOfFitTest = chiSquareGoodnessOfFitTest;
+         this.wilcoxonSignedRankTest = wilcoxonSignedRankTest;
+         this.signTest = signTest;
+      }
+
+      public TestResult getPairedTTest() {
+         return pairedTTest;
+      }
+
+      public TestResult getChiSquareGoodnessOfFitTest() {
+         return chiSquareGoodnessOfFitTest;
+      }
+
+      public TestResult getWilcoxonSignedRankTest() {
+         return wilcoxonSignedRankTest;
+      }
+
+      public TestResult getSignTest() {
+         return signTest;
+      }
+   }
+   
+   private static class TestResult {
+      private final double testStatistics;
+      
+      private final double pValue;
+      
+      private final boolean rejected;
+
+      public TestResult(double testStatistics, double pValue, boolean rejected) {
+         this.testStatistics = testStatistics;
+         this.pValue = pValue;
+         this.rejected = rejected;
+      }
+
+      public double getTestStatistics() {
+         return testStatistics;
+      }
+
+      public double getpValue() {
+         return pValue;
+      }
+
+      public boolean isRejected() {
+         return rejected;
+      }
    }
    
    /**
