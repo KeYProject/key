@@ -154,31 +154,13 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          variantStatus.setText("Ok");
          
          //Set up right column
-         TabFolder editorTab = new TabFolder(root, SWT.TOP);
+         Composite rightColumn = new Composite(root, SWT.NO_BACKGROUND);
+         rightColumn.setLayout(vertlayout);
+         final TabFolder editorTab = new TabFolder(rightColumn, SWT.TOP);
          //Set up initial Tab
-         TabItem t = new TabItem (editorTab, SWT.NONE);
-         t.setText("inv 0");
-         Composite textContainer = new Composite(editorTab, SWT.NO_BACKGROUND);
-         t.setControl(textContainer);
-         Group inv1 = new Group(textContainer, SWT.SHADOW_IN);
-         Text invariant = new Text(inv1, SWT.MULTI);
-         Group mod1 = new Group(textContainer, SWT.SHADOW_IN);
-         Text modifies = new Text(mod1, SWT.MULTI);
-         Group var1 = new Group(textContainer, SWT.SHADOW_IN);
-         Text variants = new Text(var1, SWT.MULTI);
-         textContainer.setLayout(vertlayout);
-         inv1.setLayout(vertlayout);
-         mod1.setLayout(vertlayout);
-         var1.setLayout(vertlayout);
-         inv1.setText("invariant");
-         invariant.setText("some invariant text, probably monospace");//TODO
-         mod1.setText("modifies");
-         modifies.setText("d");//TODO
-         var1.setText("variants");
-         variants.setText("f");//TODO
-         
+         addTab("some invariant text, probably monospace", "e", "f", 0, editorTab);
          // set up store button
-         Button store = new Button(textContainer, SWT.PUSH);
+         Button store = new Button(rightColumn, SWT.PUSH);
          store.setText("Store");
          
          store.addSelectionListener(new SelectionAdapter(){
@@ -188,11 +170,12 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
                int currentTab = invariants.getSelectionIndex();
                int amountTabs = invariants.getItemCount();
                
-               addTextTabItem("Inv " + amountTabs, ((Text) invariants.getItem(currentTab).getControl()).getText(), true, invariants);
+               addTab("","","",1,editorTab);
                
             }
          });
-         
+         //TODO move these down into the addTab aux function.
+         Text invariant, modifies, variants; // Stub to shut the compiler up.
          invariant.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
@@ -223,22 +206,30 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @param parent - where to attach the item
        * @return the generated TabItem
        */
-      private Control addTextTabItem(String head, String body, boolean writable, TabFolder parent){
+      private Control addTab(String invariant, String modifies, String variants, int id, TabFolder parent){
+         FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
          TabItem t = new TabItem (parent, SWT.NONE);
-         t.setText(head);
-         Control c = null;
-         if (writable){
-            Text l = new Text(parent, SWT.MULTI);
-            l.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
-            l.setText(body);
-            c = l;
-         } else {
-            Label l = new Label(parent, SWT.NONE);
-            l.setText(body);
-            c = l;
-         }
-         t.setControl(c);
-         return c;
+         t.setText("inv " + id);
+         Composite textContainer = new Composite(parent, SWT.NO_BACKGROUND);
+         t.setControl(textContainer);
+         Group inv1 = new Group(textContainer, SWT.SHADOW_IN);
+         Text invariantT = new Text(inv1, SWT.MULTI);
+         Group mod1 = new Group(textContainer, SWT.SHADOW_IN);
+         Text modifiesT = new Text(mod1, SWT.MULTI);
+         Group var1 = new Group(textContainer, SWT.SHADOW_IN);
+         Text variantsT = new Text(var1, SWT.MULTI);
+         textContainer.setLayout(vertlayout);
+         inv1.setLayout(vertlayout);
+         mod1.setLayout(vertlayout);
+         var1.setLayout(vertlayout);
+         inv1.setText("invariant");
+         invariantT.setText(invariant);
+         mod1.setText("modifies");
+         modifiesT.setText(modifies);
+         var1.setText("variants");
+         variantsT.setText(variants);
+         //TODO: register listeners here
+         return textContainer;
       }
 
       /**
