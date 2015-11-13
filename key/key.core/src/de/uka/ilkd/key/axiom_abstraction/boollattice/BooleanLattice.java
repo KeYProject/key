@@ -10,7 +10,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
  * 
  * @author Dominic Scheurer
  */
-public class BooleanLattice extends AbstractDomainLattice<Boolean> {
+public class BooleanLattice extends AbstractDomainLattice {
    
    /**
     * All elements of this abstract domain.
@@ -37,15 +37,6 @@ public class BooleanLattice extends AbstractDomainLattice<Boolean> {
     */
    public static BooleanLattice getInstance() {
       return INSTANCE;
-   }
-   
-   @Override
-   public AbstractDomainElement abstractFrom(Boolean elem) {
-      if (elem) {
-         return True.getInstance();
-      } else {
-         return False.getInstance();
-      }
    }
 
    @Override

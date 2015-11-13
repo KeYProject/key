@@ -54,6 +54,14 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
    }
    
    private static final String DISPLAY_NAME = "JoinByIfThenElseAntecedent";
+   
+   /* (non-Javadoc)
+    * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+    */
+   @Override
+   public boolean complete() {
+       return true;
+   }
 
    @Override
    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(

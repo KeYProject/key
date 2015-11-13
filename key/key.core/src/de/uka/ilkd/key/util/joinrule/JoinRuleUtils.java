@@ -122,6 +122,19 @@ public class JoinRuleUtils {
         }
     }
 
+    /**
+     * Power function for integers.
+     *
+     * @param a
+     *            The base.
+     * @param b
+     *            The exponent.
+     * @return a^b.
+     */
+    public static int intPow(int a, int b) {
+        return (int) Math.round(Math.pow(a, b));
+    }
+
     ///////////////////////////////////////////////////
     ////////////////// GENERAL LOGIC //////////////////
     //////////////////   (Syntax)    //////////////////

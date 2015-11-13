@@ -58,6 +58,14 @@ public class JoinIfThenElse extends JoinProcedure {
 
     private static final String DISPLAY_NAME = "JoinByIfThenElse";
     static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     */
+    @Override
+    public boolean complete() {
+        return true;
+    }
 
     @Override
     public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(

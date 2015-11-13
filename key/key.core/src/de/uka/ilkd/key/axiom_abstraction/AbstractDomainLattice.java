@@ -1,6 +1,14 @@
 package de.uka.ilkd.key.axiom_abstraction;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isProvableWithSplitting;
+
 import java.util.Iterator;
+
+import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
  * An abstract domain is a countable lattice with a partial order
@@ -11,10 +19,13 @@ import java.util.Iterator;
  * @author Dominic Scheurer
  *
  * @param <AbstrDomElem>
- * @param <ConcrDomElem>
  */
-public abstract class AbstractDomainLattice<ConcrDomElem>
+public abstract class AbstractDomainLattice
 implements PartialComparator<AbstractDomainElement>, Iterable<AbstractDomainElement> {
+    
+    /** Time in milliseconds after which a proof attempt of
+     *  a defining axiom times out. */
+    private static final int AXIOM_PROVE_TIMEOUT_MS = 1000;
    
    /**
     * Abstracts from a given element of the concrete domain by
@@ -26,7 +37,26 @@ implements PartialComparator<AbstractDomainElement>, Iterable<AbstractDomainElem
     * @param elem Element to abstract from.
     * @return A suitable abstract domain element.
     */
-   public abstract AbstractDomainElement abstractFrom(ConcrDomElem elem);
+   public AbstractDomainElement abstractFrom(
+           SymbolicExecutionState state, Term term, Services services) {
+
+       TermBuilder tb = services.getTermBuilder();
+
+       Iterator<AbstractDomainElement> it = iterator();
+       while (it.hasNext()) {
+           AbstractDomainElement elem = it.next();
+
+           Term axiom = elem.getDefiningAxiom(term, services);
+           Term appl = tb.apply(state.first, axiom);
+           Term toProve = tb.imp(state.second, appl);
+
+           if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
+               return elem;
+           }
+       }
+
+       return Top.getInstance();
+   }
    
    /**
     * A lattice join operation; finds an abstract element that is

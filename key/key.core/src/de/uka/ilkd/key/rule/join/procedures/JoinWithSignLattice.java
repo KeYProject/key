@@ -42,9 +42,17 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
     }
 
     private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     */
+    @Override
+    public boolean complete() {
+        return true;
+    }
 
     @Override
-    protected AbstractDomainLattice<?> getAbstractDomainForSort(Sort s,
+    protected AbstractDomainLattice getAbstractDomainForSort(Sort s,
             Services services) {
         final Sort intSort = (Sort) services.getNamespaces().sorts()
                 .lookup(new Name("int"));

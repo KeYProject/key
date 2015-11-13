@@ -14,16 +14,12 @@
 package de.uka.ilkd.key.rule.join.procedures;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.isProvableWithSplitting;
-
-import java.util.Iterator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
-import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -43,9 +39,6 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  * @author Dominic Scheurer
  */
 public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
-    /** Time in milliseconds after which a proof attempt of
-     *  a defining axiom times out. */
-    private static final int AXIOM_PROVE_TIMEOUT_MS = 1000;
 
     /**
      * Returns the abstract domain lattice for the given sort or null if there
@@ -57,8 +50,16 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
      *            The services object.
      * @return The abstract domain lattice suitable for the given sort.
      */
-    protected abstract AbstractDomainLattice<?> getAbstractDomainForSort(
+    protected abstract AbstractDomainLattice getAbstractDomainForSort(
             Sort s, Services services);
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
+     */
+    @Override
+    public boolean complete() {
+        return true;
+    }
 
     @Override
     public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
@@ -70,16 +71,16 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
 
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
 
-        AbstractDomainLattice<?> lattice = getAbstractDomainForSort(
+        AbstractDomainLattice lattice = getAbstractDomainForSort(
                 valueInState1.sort(), services);
 
         if (lattice != null) {
 
             // Join with abstract domain lattice.
-            AbstractDomainElement abstrElem1 = determineAbstractElem(state1,
-                    valueInState1, lattice, services);
-            AbstractDomainElement abstrElem2 = determineAbstractElem(state2,
-                    valueInState2, lattice, services);
+            AbstractDomainElement abstrElem1 = lattice.abstractFrom(state1,
+                    valueInState1, services);
+            AbstractDomainElement abstrElem2 = lattice.abstractFrom(state2,
+                    valueInState2, services);
 
             AbstractDomainElement joinElem = lattice.join(abstrElem1,
                     abstrElem2);
@@ -123,44 +124,6 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
     @Override
     public boolean requiresDistinguishablePathConditions() {
         return false;
-    }
-
-    /**
-     * Determines the abstract element suitable for the given term. This is
-     * accomplished by iterating through the abstract elements (from bottom to
-     * top) and trying to verify the corresponding axiom instances.
-     * 
-     * @param state
-     *            State in which the evaluation of the defining axioms should be
-     *            tested.
-     * @param term
-     *            The term to find an abstract description for.
-     * @param lattice
-     *            The underlying abstract domain.
-     * @param services
-     *            The services object.
-     * @return A suitable abstract element for the given location variable.
-     */
-    private AbstractDomainElement determineAbstractElem(
-            SymbolicExecutionState state, Term term,
-            AbstractDomainLattice<?> lattice, Services services) {
-
-        TermBuilder tb = services.getTermBuilder();
-
-        Iterator<AbstractDomainElement> it = lattice.iterator();
-        while (it.hasNext()) {
-            AbstractDomainElement elem = it.next();
-
-            Term axiom = elem.getDefiningAxiom(term, services);
-            Term appl = tb.apply(state.first, axiom);
-            Term toProve = tb.imp(state.second, appl);
-
-            if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
-                return elem;
-            }
-        }
-
-        return Top.getInstance();
     }
 
 }
