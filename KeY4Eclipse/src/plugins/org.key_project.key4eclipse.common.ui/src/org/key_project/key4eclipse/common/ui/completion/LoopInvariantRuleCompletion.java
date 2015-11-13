@@ -6,8 +6,12 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -55,6 +59,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private Label modifiesStatus = null;
       private Label variantStatus = null;
       private Text invariantText = null;
+      private TabFolder invariants = null;
       
       
       
@@ -91,16 +96,16 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @return complete loop as String
        */
       private String getLoopText() {
-        StringWriter writer = new StringWriter();
-        String text = "";
-        LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) getApp();
-        try {
-           loopApp.getLoopStatement().prettyPrint(new PrettyPrinter(writer));
-           text = writer.toString();
-       } catch (Exception e) {
-           text = loopApp.getLoopStatement().toSource();
-       } 
-        return text.trim();
+         StringWriter writer = new StringWriter();
+         String text = "";
+         LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) getApp();
+         try {
+            loopApp.getLoopStatement().prettyPrint(new PrettyPrinter(writer));
+            text = writer.toString();
+         } catch (Exception e) {
+            text = loopApp.getLoopStatement().toSource();
+         } 
+         return text.trim();
       }
       
       private void updateStatusText(){
@@ -172,6 +177,22 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          var1.setText("variants");
          variants.setText("f");//TODO
          
+         // set up store button
+         Button store = new Button(textContainer, SWT.PUSH);
+         store.setText("Store");
+         
+         store.addSelectionListener(new SelectionAdapter(){
+            // adds new tab 
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               int currentTab = invariants.getSelectionIndex();
+               int amountTabs = invariants.getItemCount();
+               
+               addTextTabItem("Inv " + amountTabs, ((Text) invariants.getItem(currentTab).getControl()).getText(), true, invariants);
+               
+            }
+         });
+         
          invariant.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
@@ -192,6 +213,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
                //do something with the text.
             }
          });
+         
       }
       
       /**
