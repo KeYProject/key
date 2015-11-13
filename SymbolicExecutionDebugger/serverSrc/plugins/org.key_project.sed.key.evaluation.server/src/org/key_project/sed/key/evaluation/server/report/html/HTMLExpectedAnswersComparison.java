@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -28,6 +29,8 @@ import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 
 public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
    @Override
@@ -205,7 +208,124 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
       }
       sb.append("</tr>");
       sb.append("</table>");
-      return null;
+      return Collections.singletonList(createLatexFile(evaluation, statistics, recordsCount, pageMap));
+   }
+   
+   private AdditionalFile createLatexFile(AbstractEvaluation evaluation, Statistics statistics, Map<IStatisticsFilter, BigInteger> recordsCount, Map<AbstractPage, PageStatistic> pageMap) {
+      StringBuffer latex = new StringBuffer();
+      latex.append("\\begin{tabularx}{1.0\\textwidth}{lXXrrrrrrrr}" + StringUtil.NEW_LINE);
+      latex.append("\\toprule" + StringUtil.NEW_LINE);
+      latex.append("\\multirow{3}{*}{\\rotatebox{90}{\\parbox{1.4cm}{Proof Attempt}}}&&&\\multicolumn{8}{c}{\\KeY experience}\\\\" + StringUtil.NEW_LINE);
+      latex.append("&&");
+      for (IStatisticsFilter filter : statistics.getFilters()) {
+         latex.append("& \\multicolumn{2}{c}{" + filter.getLatexName() + " (" + recordsCount.get(filter) + ")}");
+      }
+      latex.append("\\\\" + StringUtil.NEW_LINE);
+      latex.append("& Question & Answer");
+      for (@SuppressWarnings("unused") IStatisticsFilter filter : statistics.getFilters()) {
+         for (Tool tool : evaluation.getTools()) {
+            latex.append("&" + tool.getName());
+         }
+      }
+      latex.append("\\\\" + StringUtil.NEW_LINE);
+      Map<IStatisticsFilter, Map<Tool, BigInteger>> winningMap = new HashMap<IStatisticsFilter, Map<Tool, BigInteger>>();
+      for (PageStatistic ps : pageMap.values()) {
+         latex.append("\\midrule" + StringUtil.NEW_LINE);
+         Collection<QuestionStatistic> qss = ps.getQuestionStatistics();
+         boolean pagePrinted = false;
+         for (QuestionStatistic qs : qss) {
+            boolean questionPrinted = false;
+            Collection<ChoiceStatistic> css = qs.getChoiceStatistics();
+            for (ChoiceStatistic cs : css) {
+               if (!pagePrinted) {
+                  int choicesCount = 0;
+                  for (QuestionStatistic currentQs : qss) {
+                     choicesCount += currentQs.getChoiceStatistics().size();
+                  }
+                  latex.append("\\multirow{" + choicesCount + "}{*}{\\rotatebox{90}{\\parbox{1.4cm}{" + ps.getPage().getLatexTitle() + "}}}");
+                  pagePrinted = true;
+               }
+               if (!questionPrinted) {
+                  latex.append(" & \\multirow{" + css.size() + "}{*}{" + qs.getQuestion().getLatexLabel() + "}");
+                  questionPrinted = true;
+               }
+               else {
+                  latex.append("&");
+               }
+               latex.append("&" + cs.getChoice().getLatexText());
+               for (IStatisticsFilter filter : statistics.getFilters()) {
+                  List<Tool> winningTools = cs.computeWinningTools(filter, evaluation.getTools());
+                  if (winningTools.size() == 1) {
+                     Map<Tool, BigInteger> filterMap = winningMap.get(filter);
+                     if (filterMap == null) {
+                        filterMap = new HashMap<Tool, BigInteger>();
+                        winningMap.put(filter, filterMap);
+                     }
+                     BigInteger currentValue = filterMap.get(winningTools.get(0));
+                     if (currentValue == null) {
+                        currentValue = BigInteger.ONE;
+                     }
+                     else {
+                        currentValue = currentValue.add(BigInteger.ONE);
+                     }
+                     filterMap.put(winningTools.get(0), currentValue);
+                  }
+                  for (Tool tool : evaluation.getTools()) {
+                     Statistic s = cs.getStatistic(filter, tool);
+                     if (winningTools.size() == 1 && winningTools.contains(tool)) {
+                        latex.append("&\\textcolor{blue}{" + s.computePercentage(0) + "}");
+                     }
+                     else {
+                        latex.append("&" + s.computePercentage(0));
+                     }
+                  }
+               }
+               latex.append("\\\\" + StringUtil.NEW_LINE);
+            }
+         }
+      }
+      latex.append("\\midrule");
+      latex.append("&&");
+      for (IStatisticsFilter filter : statistics.getFilters()) {
+         Map<Tool, BigInteger> filterMap = winningMap.get(filter);
+         List<Tool> winningTools = new LinkedList<Tool>();
+         if (filterMap != null) {
+            BigInteger winningCount = null;
+            for (Tool tool : evaluation.getTools()) {
+               BigInteger current = filterMap.get(tool);
+               if (current == null) {
+                  current = BigInteger.ZERO;
+               }
+               if (winningCount == null) {
+                  winningTools.add(tool);
+                  winningCount = current;
+               }
+               else {
+                  if (winningCount.compareTo(current) == 0) {
+                     winningTools.add(tool);
+                  }
+                  else if (winningCount.compareTo(current) < 0) {
+                     winningTools.clear();
+                     winningTools.add(tool);
+                     winningCount = current;
+                  }
+               }
+            }
+         }
+         for (Tool tool : evaluation.getTools()) {
+            BigInteger value = filterMap != null ? filterMap.get(tool) : null;
+            if (winningTools.size() == 1 && winningTools.contains(tool)) {
+               latex.append("&\\textcolor{blue}{" + (value != null ? value : BigInteger.ZERO) + "}");
+            }
+            else {
+               latex.append("&" + (value != null ? value : BigInteger.ZERO));
+            }
+         }
+      }
+      latex.append("\\\\" + StringUtil.NEW_LINE);
+      latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+      latex.append("\\end{tabularx}" + StringUtil.NEW_LINE);
+      return new AdditionalFile("_ExpectedAnswersComparison.tex", latex.toString().getBytes(IOUtil.DEFAULT_CHARSET));
    }
    
    private static class PageStatistic {
@@ -323,8 +443,12 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
       }
 
       public BigDecimal computePercentage() {
+         return computePercentage(2);
+      }
+
+      public BigDecimal computePercentage(int decimalDigits) {
          BigInteger mul100 = selectedCount.multiply(BigInteger.valueOf(100));
-         return new BigDecimal(mul100).divide(new BigDecimal(maxCount), 2, RoundingMode.HALF_EVEN);
+         return new BigDecimal(mul100).divide(new BigDecimal(maxCount), decimalDigits, RoundingMode.HALF_EVEN);
       }
    }
 

@@ -38,7 +38,11 @@ public abstract class AbstractChoicesQuestion extends AbstractQuestion {
    }
 
    public AbstractChoicesQuestion(String name, String label, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled, List<Choice> choices, Set<String> notCorrectnessRelevantChoiceValues) {
-      super(name, label, description, defaultChoice, validator, askForTrust, relatedTools, enabled);
+      this(name, label, label, description, defaultChoice, validator, askForTrust, relatedTools, enabled, choices, notCorrectnessRelevantChoiceValues);
+   }
+
+   public AbstractChoicesQuestion(String name, String label, String latexLabel, String description, String defaultChoice, IValueValidator validator, boolean askForTrust, Tool[] relatedTools, boolean enabled, List<Choice> choices, Set<String> notCorrectnessRelevantChoiceValues) {
+      super(name, label, latexLabel, description, defaultChoice, validator, askForTrust, relatedTools, enabled);
       this.choices = choices;
       this.notCorrectnessRelevantChoiceValues = notCorrectnessRelevantChoiceValues;
       validateChocies(choices);

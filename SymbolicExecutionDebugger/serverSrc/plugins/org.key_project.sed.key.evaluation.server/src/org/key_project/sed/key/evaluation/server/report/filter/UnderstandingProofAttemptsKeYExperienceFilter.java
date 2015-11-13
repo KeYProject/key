@@ -40,6 +40,25 @@ public class UnderstandingProofAttemptsKeYExperienceFilter implements IStatistic
     * {@inheritDoc}
     */
    @Override
+   public String getLatexName() {
+      if (UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_NON_VALUE.equals(choice.getValue())) {
+         return "None";
+      }
+      else if (UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_LESS_THAN_2_YEARS_VALUE.equals(choice.getValue())) {
+         return "$<$ 2 y.";
+      }
+      else if (UnderstandingProofAttemptsEvaluation.KEY_EXPERIENCE_MORE_THAN_2_YEARS_VALUE.equals(choice.getValue())) {
+         return "$\\geq$ 2 y.";
+      }
+      else {
+         return getName();
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean accept(EvaluationAnswers answer) {
       List<AbstractFormInput<?>> formInputs = answer.getFormInputs(UnderstandingProofAttemptsEvaluation.INSTANCE.getForm(UnderstandingProofAttemptsEvaluation.INTRODUCTION_FORM_NAME));
       if (formInputs != null && formInputs.size() == 1) {

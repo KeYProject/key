@@ -9,6 +9,8 @@ import org.key_project.util.java.CollectionUtil;
 public class Choice {
    private final String text;
    
+   private final String latexText;
+   
    private final String value;
    
    private final String tooltip;
@@ -37,8 +39,17 @@ public class Choice {
       this(text, value, tooltip, expectedChecked, CollectionUtil.toList(childQuestions));
    }
 
+   public Choice(String text, String latexText, String value, String tooltip, boolean expectedChecked, AbstractQuestion... childQuestions) {
+      this(text, latexText, value, tooltip, expectedChecked, CollectionUtil.toList(childQuestions));
+   }
+
    public Choice(String text, String value, String tooltip, boolean expectedChecked, List<AbstractQuestion> childQuestions) {
+      this(text, text, value, tooltip, expectedChecked, childQuestions);
+   }
+
+   public Choice(String text, String latexText, String value, String tooltip, boolean expectedChecked, List<AbstractQuestion> childQuestions) {
       this.text = text;
+      this.latexText = latexText;
       this.value = value;
       this.tooltip = tooltip;
       this.expectedChecked = expectedChecked;
@@ -64,6 +75,10 @@ public class Choice {
 
    public String getText() {
       return text;
+   }
+
+   public String getLatexText() {
+      return latexText;
    }
 
    public String getValue() {

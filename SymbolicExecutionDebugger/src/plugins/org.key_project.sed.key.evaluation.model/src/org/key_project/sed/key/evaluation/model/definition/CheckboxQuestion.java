@@ -15,6 +15,10 @@ public class CheckboxQuestion extends AbstractButtonsQuestion {
    public CheckboxQuestion(String name, String label, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Set<String> notCorrectnessRelevantChoiceValues, Choice... choices) {
       this(name, label, null, null, vertical, defaultChoice, validator, askForTrust, notCorrectnessRelevantChoiceValues, choices);
    }
+   
+   public CheckboxQuestion(String name, String label, String latexLabel, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Set<String> notCorrectnessRelevantChoiceValues, Choice... choices) {
+      this(name, label, latexLabel, null, null, vertical, defaultChoice, validator, askForTrust, notCorrectnessRelevantChoiceValues, choices);
+   }
 
    public CheckboxQuestion(String name, String label, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, List<Choice> choices) {
       this(name, label, null, null, vertical, defaultChoice, validator, askForTrust, choices);
@@ -42,6 +46,10 @@ public class CheckboxQuestion extends AbstractButtonsQuestion {
 
    public CheckboxQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Set<String> notCorrectnessRelevantChoiceValues, Choice... choices) {
       super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, null, true, CollectionUtil.toList(choices), notCorrectnessRelevantChoiceValues);
+   }
+
+   public CheckboxQuestion(String name, String label, String latexLabel, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Set<String> notCorrectnessRelevantChoiceValues, Choice... choices) {
+      super(name, label, latexLabel, description, image, vertical, defaultChoice, validator, askForTrust, null, true, CollectionUtil.toList(choices), notCorrectnessRelevantChoiceValues);
    }
 
    public CheckboxQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, List<Choice> choices) {

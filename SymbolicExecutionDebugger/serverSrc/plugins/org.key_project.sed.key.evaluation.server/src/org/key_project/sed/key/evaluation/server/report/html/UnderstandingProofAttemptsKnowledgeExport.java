@@ -124,7 +124,7 @@ public class UnderstandingProofAttemptsKnowledgeExport implements IHTMLSectionAp
          csv.append("\\ $<$ $x$ years, " + javaSummary.getLess() + ", " + jmlSummary.getLess() + ", " + keySummary.getLess() + ", " + sedSummary.getLess() + StringUtil.NEW_LINE);
          csv.append("\\ $\\geq$ $x$ years, " + javaSummary.getMore() + ", " + jmlSummary.getMore() + ", " + keySummary.getMore() + ", " + sedSummary.getMore());
          additionalFiles.add(new AdditionalFile("_Knowledge_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".csv", csv.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
-         // Crate Ltex file
+         // Crate Latex file
          StringBuffer latex = new StringBuffer();
          latex.append("\\begin{tabular}{lllll}" + StringUtil.NEW_LINE);
          latex.append("\\toprule" + StringUtil.NEW_LINE);

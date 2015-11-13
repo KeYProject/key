@@ -19,6 +19,14 @@ public class AllStatisticsFilter implements IStatisticsFilter {
     * {@inheritDoc}
     */
    @Override
+   public String getLatexName() {
+      return "All";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean accept(EvaluationAnswers answer) {
       return true;
    }

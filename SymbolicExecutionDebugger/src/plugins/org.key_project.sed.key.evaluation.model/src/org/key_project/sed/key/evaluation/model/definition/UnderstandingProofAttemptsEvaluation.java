@@ -344,13 +344,16 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
                                                               whyOpenTitle, 
+                                                              "Why not verified?",
+                                                              null,
+                                                              null,
                                                               true,
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
                                                               true,
                                                               Collections.singleton(GIVE_UP_VALUE),
                                                               new Choice(createPreconditionText("summand != null"), createPreconditionValue()),
-                                                              new Choice(createPostconditionText("value == \\old(value) + summand.value"), createPostconditionValue(), true),
+                                                              new Choice(createPostconditionText("value == \\old(value) + summand.value"), createPostconditionLatexText(), createPostconditionValue(), null, true),
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), locationQuestion),
                                                               new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion(false)),
                                                               createBugfreeChoice(),
@@ -359,6 +362,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String openQuestionTitle = "Is the method successfully verified (Is the proof closed)?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
+                                                                   "Is Verified?",
+                                                                   null,
+                                                                   null,
                                                                    true,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
@@ -368,14 +374,18 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String executedTitle = "Was statement (value += summand.value) at line 9 executed during symbolic execution of the proof?";
       RadioButtonsQuestion executedQuestion = new RadioButtonsQuestion("executedStatements", 
                                                                        executedTitle, 
+                                                                       "What is executed?",
+                                                                       null,
+                                                                       null,
                                                                        true,
                                                                        null, 
                                                                        new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                        true,
-                                                                       new Choice("Yes", "Yes", true),
+                                                                       new Choice("Yes", "Line 9", "Yes", null, true),
                                                                        new Choice("No", "No"));
       return new QuestionPage(pageName, 
                               title, 
+                              "\\lstinline+My+ \\lstinline+Integer+",
                               createQuestionPageMessage(), 
                               true,
                               true,
@@ -395,6 +405,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
                                                               whyOpenTitle, 
+                                                              "Why not verified?",
                                                               true,
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
@@ -402,7 +413,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               Collections.singleton(GIVE_UP_VALUE),
                                                               new Choice(createPreconditionText("array != null"), createPreconditionValue(), createMinTerminationQuestion("preconditionTermination", false, false)),
                                                               new Choice(createPostconditionText("array == null || array.length == 0 ==> \\result == -1"), createPostconditionValue("Not found"), createMinTerminationQuestion("postNotFoundTermination", false, false)),
-                                                              new Choice(createPostconditionText("array != null && array.length >= 1 ==> (\\forall int i; i >= 0 && i < array.length; array[\\result] <= array[i])"), createPostconditionValue("Found"), true, createMinTerminationQuestion("postFoundTermination", true, false)),
+                                                              new Choice(createPostconditionText("array != null && array.length >= 1 ==> (\\forall int i; i >= 0 && i < array.length; array[\\result] <= array[i])"), createPostconditionLatexText(), createPostconditionValue("Found"), null, true, createMinTerminationQuestion("postFoundTermination", "When does not hold?", true, false)),
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), createMinLocationQuestion("whichMethodLocationsHaveChanged"), createMinTerminationQuestion("methodAssignableTermination", false, false)),
                                                               new Choice(createExceptionThrownText(), createExceptionThrownValue(), createThrownExceptionsQuestion(false)),
                                                               new Choice(createLoopInvariantInitiallyText("i >= 1 && i <= array.length"), createLoopInvariantInitiallyValue("i"), createMinTerminationQuestion("initialITermination", false, false)),
@@ -410,7 +421,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createLoopInvariantInitiallyText("\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]"), createLoopInvariantInitiallyValue("array elements"), createMinTerminationQuestion("initialArrayElementsTermination", false, false)),
                                                               new Choice(createLoopInvariantPreservedText("i >= 1 && i <= array.length"), createLoopInvariantPreservedValue("i"), createMinTerminationQuestion("preservedITermination", false, false)),
                                                               new Choice(createLoopInvariantPreservedText("minIndex >= 0 && minIndex < i"), createLoopInvariantPreservedValue("minIndex"), createMinTerminationQuestion("preservedMinIndexTermination", false, false)),
-                                                              new Choice(createLoopInvariantPreservedText("\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]"), createLoopInvariantPreservedValue("array elements"), true, createMinTerminationQuestion("preservedArrayElementsTermination", false, true)),
+                                                              new Choice(createLoopInvariantPreservedText("\\forall int j; j >= 0 && j < i; array[minIndex] <= array[j]"), createLoopInvariantPreservedLatexText(), createLoopInvariantPreservedValue("array elements"), null, true, createMinTerminationQuestion("preservedArrayElementsTermination", "When not preserved?", false, true)),
                                                               new Choice(createDecreasingText("array.length - i"), createDecreasingValue(), createMinTerminationQuestion("decreasingTermination", false, false)),
                                                               new Choice(createLoopAssignableText(), createLoopAssignableValue(), createMinLocationQuestion("whichLoopLocationsHaveChanged"), createMinTerminationQuestion("loopAssignableTermination", false, false)),
                                                               createBugfreeChoice(),
@@ -419,6 +430,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String openQuestionTitle = "Is the method successfully verified (Is the proof closed)?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
+                                                                   "Is Verified?",
+                                                                   null,
+                                                                   null,
                                                                    true,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
@@ -428,28 +442,30 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
+                                                               "What is executed?",
                                                                true,
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                Collections.singleton(GIVE_UP_VALUE),
                                                                new Choice("None of the statements was executed", "None"),
-                                                               new Choice("Line 8: if (array != null)", "Line 8", true),
-                                                               new Choice("Line 9: if (array.length == 0)", "Line 9", true),
-                                                               new Choice("Line 10: return -1", "Line 10", true),
-                                                               new Choice("Line 13: array.length == 1", "Line 13", true),
-                                                               new Choice("Line 14: return array[0]", "Line 14", true),
-                                                               new Choice("Line 17: int minIndex = 0", "Line 17", true),
-                                                               new Choice("Line 25: int i = 1", "Line 25 initial", true),
-                                                               new Choice("Line 25: i < array.length", "Line 25 condition", true),
-                                                               new Choice("Line 25: i++", "Line 25 update", true),
-                                                               new Choice("Line 26: if (array[i] < array[minIndex])", "Line 26", true),
-                                                               new Choice("Line 27: minIndex = 1", "Line 27", true),
-                                                               new Choice("Line 34: return minIndex", "Line 34", true),
-                                                               new Choice("Line 39: return -1", "Line 39", true),
+                                                               new Choice("Line 8: if (array != null)", "Line 8", "Line 8", null, true),
+                                                               new Choice("Line 9: if (array.length == 0)", "Line 9", "Line 9", null, true),
+                                                               new Choice("Line 10: return -1", "Line 10", "Line 10", null, true),
+                                                               new Choice("Line 13: array.length == 1", "Line 13", "Line 13", null, true),
+                                                               new Choice("Line 14: return array[0]", "Line 14", "Line 14", null, true),
+                                                               new Choice("Line 17: int minIndex = 0", "Line 17", "Line 17", null, true),
+                                                               new Choice("Line 25: int i = 1", "Line 25: init.", "Line 25 initial", null, true),
+                                                               new Choice("Line 25: i < array.length", "Line 25: termin.", "Line 25 condition", null, true),
+                                                               new Choice("Line 25: i++", "Line 25: increment", "Line 25 update", null, true),
+                                                               new Choice("Line 26: if (array[i] < array[minIndex])", "Line 26", "Line 26", null, true),
+                                                               new Choice("Line 27: minIndex = 1", "Line 27", "Line 27", null, true),
+                                                               new Choice("Line 34: return minIndex", "Line 34", "Line 34", null, true),
+                                                               new Choice("Line 39: return -1", "Line 39", "Line 39", null, true),
                                                                createGiveupExecutedChoice());
       return new QuestionPage(pageName, 
                               title, 
+                              "\\lstinline+ArrayUtil+",
                               createQuestionPageMessage(), 
                               true,
                               true,
@@ -469,6 +485,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String thrownExceptionTitle = "Which exception(s) are thrown?";
       CheckboxQuestion thrownExceptionQuestion = new CheckboxQuestion("whichExceptionsAreThrown", 
                                                                       thrownExceptionTitle, 
+                                                                      "What is thrown?",
                                                                       true,
                                                                       null, 
                                                                       new NotUndefinedValueValidator("Question '" + thrownExceptionTitle + "' not answered."), 
@@ -477,7 +494,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                       new Choice("java.lang.NullPointerException", "java.lang.NullPointerException"),
                                                                       new Choice("java.lang.ArithmeticException", "java.lang.ArithmeticException"),
                                                                       new Choice("java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayIndexOutOfBoundsException"),
-                                                                      new Choice("java.lang.ArrayStoreException", "java.lang.ArrayStoreException", arrayStoreExceptionExpected),
+                                                                      new Choice("java.lang.ArrayStoreException", "\\lstinline+ArrayStoreExc.+", "java.lang.ArrayStoreException", null, arrayStoreExceptionExpected),
                                                                       new Choice("java.lang.IllegalArgumentException", "java.lang.IllegalArgumentException"),
                                                                       new Choice("java.lang.IllegalStateException", "java.lang.IllegalStateException"),
                                                                       new Choice("java.lang.invoke.WrongMethodTypeException", "java.lang.invoke.WrongMethodTypeException"),
@@ -508,21 +525,26 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("none", "none"),
                                   createGiveupLocationChoice());
    }
-   
+
    private CheckboxQuestion createMinTerminationQuestion(String name, boolean termination2expected, boolean loop1expected) {
+      return createMinTerminationQuestion(name, null, termination2expected, loop1expected);
+   }
+
+   private CheckboxQuestion createMinTerminationQuestion(String name, String latexTitle, boolean termination2expected, boolean loop1expected) {
       String title = "At which execution path?";
       return new CheckboxQuestion(name, 
                                   title, 
+                                  latexTitle != null ? latexTitle : title,
                                   true,
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
                                   Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("Termination 1: array != null & array.length == 0", "Termination 1"),
-                                  new Choice("Termination 2: array != null & array.length == 1", "Termination 2", termination2expected),
+                                  new Choice("Termination 2: array != null & array.length == 1", "Termination 2", "Termination 2", null, termination2expected),
                                   new Choice("Termination 3: array != null & array.length > 1", "Termination 3"),
                                   new Choice("Termination 4: array == null", "Termination 4"),
-                                  new Choice("Loop Body Termination 1: array[i] < array[minIndex]", "Loop Body Termination 1", loop1expected),
+                                  new Choice("Loop Body Termination 1: array[i] < array[minIndex]", "Loop Body T.~1", "Loop Body Termination 1", null, loop1expected),
                                   new Choice("Loop Body Termination 2: array[i] >= array[minIndex]", "Loop Body Termination 2"),
                                   createGiveupTerminationPathChoice());
    }
@@ -531,6 +553,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
                                                               whyOpenTitle, 
+                                                              "Why not verified?",
+                                                              null,
+                                                              null,
                                                               true,
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
@@ -540,9 +565,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               new Choice(createClassInvariantInitiallyText("entrySize >= 0 && entrySize < entries.length"), createClassInvariantInitiallyValue(), createCalendarTerminationQuestion("invariantEstablishedTermination", false)),
                                                               new Choice(createPostconditionText("entries[\\old(entrySize)] == entry"), createPostconditionValue("Entry"), createCalendarTerminationQuestion("postEntryTermination", false)),
                                                               new Choice(createPostconditionText("entrySize == \\old(entrySize) + 1"), createPostconditionValue("EntrySize"), createCalendarTerminationQuestion("postEntrySizeTermination", false)),
-                                                              new Choice(createClassInvariantPreservedText("entrySize >= 0 && entrySize < entries.length"), createClassInvariantPreservedValue(), true, createCalendarTerminationQuestion("invariantNotPreservedTermination", true)),
+                                                              new Choice(createClassInvariantPreservedText("entrySize >= 0 && entrySize < entries.length"), createClassInvariantPreservedLatexText(), createClassInvariantPreservedValue(), null, true, createCalendarTerminationQuestion("invariantNotPreservedTermination", "When not preserved?", true)),
                                                               new Choice(createMethodAssignableText(), createMethodAssignableValue(), createCalendarLocationQuestion("whichMethodLocationsHaveChanged"), createCalendarTerminationQuestion("assignableTermination", false)),
-                                                              new Choice(createExceptionThrownText(), createExceptionThrownValue(), true, createThrownExceptionsQuestion(true)),
+                                                              new Choice(createExceptionThrownText(), createExceptionThrownLatexText(), createExceptionThrownValue(), null, true, createThrownExceptionsQuestion(true)),
                                                               new Choice(createLoopInvariantInitiallyText("i >= 0 && i <= entries.length"), createLoopInvariantInitiallyValue("i"), createCalendarTerminationQuestion("loopInvariantIInitialTermination", false)),
                                                               new Choice(createLoopInvariantInitiallyText("\\forall int j; j >= 0 && j < i; newEntries[j] == entries[j]"), createLoopInvariantInitiallyValue("array elements"), createCalendarTerminationQuestion("loopInvariantArrayElementsInitialTermination", false)),
                                                               new Choice(createLoopInvariantPreservedText("i >= 0 && i <= entries.length"), createLoopInvariantPreservedValue("i"), createCalendarTerminationQuestion("loopInvariantIPreservedTermination", false)),
@@ -555,6 +580,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String openQuestionTitle = "Is the method successfully verified (Is the proof closed)?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
                                                                    openQuestionTitle, 
+                                                                   "Is Verified?",
+                                                                   null,
+                                                                   null,
                                                                    true,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
@@ -564,24 +592,28 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
+                                                               "What is executed?",
+                                                               null,
+                                                               null,
                                                                true,
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                Collections.singleton(GIVE_UP_VALUE),
                                                                new Choice("None of the statements was executed", "None"),
-                                                               new Choice("Line 14: if (entrySize == entries.length)", "Line 14", true),
+                                                               new Choice("Line 14: if (entrySize == entries.length)", "Line 14", "Line 14", null, true),
                                                                new Choice("Line 15: Entry[] newEntries = new Entry[entries.length * 2]", "Line 15"),
                                                                new Choice("Line 22: int i = 0", "Line 22 initial"),
                                                                new Choice("Line 22: i < entries.length", "Line 22 condition"),
                                                                new Choice("Line 22: i++", "Line 22 update"),
                                                                new Choice("Line 23: newEntries[i] = entries[i]", "Line 23"),
                                                                new Choice("Line 26: entries = newEntries", "Line 26"),
-                                                               new Choice("Line 32: entries[entrySize] = entry", "Line 32", true),
-                                                               new Choice("Line 33: entrySize++", "Line 33", true),
+                                                               new Choice("Line 32: entries[entrySize] = entry", "Line 32", "Line 32", null, true),
+                                                               new Choice("Line 33: entrySize++", "Line 33", "Line 33", null, true),
                                                                createGiveupExecutedChoice());
       return new QuestionPage(pageName, 
                               title, 
+                              "\\lstinline+Calendar+",
                               createQuestionPageMessage(), 
                               true,
                               true,
@@ -619,18 +651,23 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("none", "none"),
                                   createGiveupLocationChoice());
    }
-   
+
    private CheckboxQuestion createCalendarTerminationQuestion(String name, boolean expectedAfterElse) {
+      return createCalendarTerminationQuestion(name, null, expectedAfterElse);
+   }
+
+   private CheckboxQuestion createCalendarTerminationQuestion(String name, String latexTitle, boolean expectedAfterElse) {
       String title = "At which execution path?";
       return new CheckboxQuestion(name, 
                                   title, 
+                                  latexTitle != null ? latexTitle : title,
                                   true,
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
                                   Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("Continuation After Then: entrySize == entries.length", "Continuation After Then"),
-                                  new Choice("Continuation After Else: entrySize != entries.length", "Continuation After Else", expectedAfterElse),
+                                  new Choice("Continuation After Else: entrySize != entries.length", "After Else", "Continuation After Else", null, expectedAfterElse),
                                   new Choice("Loop Body Termination (of the 'Body Preserves Invariant' branch)", "Loop Body Termination"),
                                   createGiveupTerminationPathChoice());
    }
@@ -639,6 +676,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String whyOpenTitle = "Why is the proof still open?";
       CheckboxQuestion whyOpenQuestion = new CheckboxQuestion("whyOpen", 
                                                               whyOpenTitle, 
+                                                              "Why not verified?",
+                                                              null,
+                                                              null,
                                                               true,
                                                               null, 
                                                               new NotUndefinedValueValidator("Question '" + whyOpenTitle + "' not answered."), 
@@ -646,7 +686,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               Collections.singleton(GIVE_UP_VALUE),
                                                               new Choice(createPreconditionText("amount > 0", "checkAndWithdraw(int)"), createPreconditionValue("checkAndWithdraw"), createAccountTerminationQuestion("checkAndWithdrawPreTermination", false)),
                                                               new Choice(createPostconditionText("balance == \\old(balance) - \\result", "checkAndWithdraw(int)"), createPostconditionValue("checkAndWithdraw", "Balance"), createAccountTerminationQuestion("checkAndWithdrawPostconditionBalanceTermination", false)),
-                                                              new Choice(createPostconditionText("\\result == amount", "checkAndWithdraw(int)"), createPostconditionValue("checkAndWithdraw", "Result"), true, createAccountTerminationQuestion("checkAndWithdrawPostcondtionResultTermination", true)),
+                                                              new Choice(createPostconditionText("\\result == amount", "checkAndWithdraw(int)"), createPostconditionLatexText(), createPostconditionValue("checkAndWithdraw", "Result"), null, true, createAccountTerminationQuestion("checkAndWithdrawPostcondtionResultTermination", "When does not hold?", true)),
                                                               new Choice(createMethodAssignableText("balance", "checkAndWithdraw(int)"), createMethodAssignableValue("checkAndWithdraw)"), createAccountLocationQuestion("checkAndWithdrawLocations"), createAccountTerminationQuestion("checkAndWithdrawAssignableTermination", false)),
                                                               new Choice(createPreconditionText("amount > 0", "withdraw(int)"), createPreconditionValue("withdraw"), createAccountTerminationQuestion("withdrawPreconditionTermination", false)),
                                                               new Choice(createPreconditionText("amount > 0", "canWithdraw(int)"), createPreconditionValue("canWithdraw"), createAccountTerminationQuestion("canWithdrawPreconditionTermination", false)),
@@ -657,7 +697,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                               createGiveupWhyOpenChoice());
       String openQuestionTitle = "Is the method successfully verified (Is the proof closed)?";
       RadioButtonsQuestion openQuestion = new RadioButtonsQuestion("openOrClosed", 
-                                                                   openQuestionTitle, 
+                                                                   openQuestionTitle,
+                                                                   "Is Verified?",
+                                                                   null,
+                                                                   null,
                                                                    true,
                                                                    null, 
                                                                    new NotUndefinedValueValidator("Question '" + openQuestionTitle + "' not answered."), 
@@ -667,16 +710,19 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String executedTitle = "Which statement(s) are executed at least once during symbolic execution of the proof?";
       CheckboxQuestion executedQuestion = new CheckboxQuestion("executedStatements", 
                                                                executedTitle, 
+                                                               "What is executed?",
+                                                               null,
+                                                               null,
                                                                true,
                                                                null, 
                                                                new NotUndefinedValueValidator("Question '" + executedTitle + "' not answered."), 
                                                                true,
                                                                Collections.singleton(GIVE_UP_VALUE),
                                                                new Choice("None of the statements was executed", "None"),
-                                                               new Choice("Line 11: if (canWithdraw(amount))", "Line 11", true),
-                                                               new Choice("Line 12: withdraw(amount)", "Line 12", true),
-                                                               new Choice("Line 13: return amount", "Line 13", true),
-                                                               new Choice("Line 16: return 0", "Line 16", true),
+                                                               new Choice("Line 11: if (canWithdraw(amount))", "Line 11", "Line 11", null, true),
+                                                               new Choice("Line 12: withdraw(amount)", "Line 12", "Line 12", null, true),
+                                                               new Choice("Line 13: return amount", "Line 13", "Line 13", null, true),
+                                                               new Choice("Line 16: return 0", "Line 16", "Line 16", null, true),
                                                                new Choice("Line 26: balance -= amount", "Line 26"),
                                                                new Choice("Line 35: return amount > 0", "Line 35"),
                                                                new Choice("Line 44: return balance", "Line 44"),
@@ -684,6 +730,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String contractsTitle = "Which method contracts are applied at least once during symbolic execution of the proof?";
       CheckboxQuestion contractsQuestion = new CheckboxQuestion("appliedContracts", 
                                                                 contractsTitle, 
+                                                                "What is applied?",
+                                                                null,
+                                                                null,
                                                                 true,
                                                                 null, 
                                                                 new NotUndefinedValueValidator("Question '" + contractsTitle + "' not answered."), 
@@ -691,12 +740,13 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                 Collections.singleton(GIVE_UP_VALUE),
                                                                 new Choice("None of the contracts was applied", "None"),
                                                                 new Choice("Contract of method checkAndWithdraw(int)", "checkAndWithdraw"),
-                                                                new Choice("Contract of method withdraw(int)", "withdraw", true),
-                                                                new Choice("Contract of method canWithdraw(int)", "canWithdraw", true),
+                                                                new Choice("Contract of method withdraw(int)", "MC \\lstinline+withdraw+", "withdraw", null, true),
+                                                                new Choice("Contract of method canWithdraw(int)", "MC \\lstinline+canWithdraw+", "canWithdraw", null, true),
                                                                 new Choice("Contract of method getBalance()", "getBalance"),
                                                                 createGiveupAppliedContractsChoice());
       return new QuestionPage(pageName, 
                               title, 
+                              "\\lstinline+Account+",
                               createQuestionPageMessage(), 
                               true,
                               true,
@@ -775,18 +825,23 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                   new Choice("none", "none"),
                                   createGiveupLocationChoice());
    }
-   
+
    private CheckboxQuestion createAccountTerminationQuestion(String name, boolean termination2expected) {
+      return createAccountTerminationQuestion(name, null, termination2expected);
+   }
+
+   private CheckboxQuestion createAccountTerminationQuestion(String name, String latexTitle, boolean termination2expected) {
       String title = "At which execution path?";
       return new CheckboxQuestion(name, 
                                   title, 
+                                  latexTitle != null ? latexTitle : title,
                                   true,
                                   null, 
                                   new NotUndefinedValueValidator("Question '" + title + "' not answered."), 
                                   true,
                                   Collections.singleton(GIVE_UP_VALUE),
                                   new Choice("Termination 1: canWithdraw(amount)", "Termination 1"),
-                                  new Choice("Termination 2: !canWithdraw(amount)", "Termination 2", termination2expected),
+                                  new Choice("Termination 2: !canWithdraw(amount)", "Termination 2", "Termination 2", null, termination2expected),
                                   createGiveupTerminationPathChoice());
    }
    
@@ -957,6 +1012,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       return "Postcondition (" + postcondition + ") of " + method + " does not hold";
    }
 
+   protected String createPostconditionLatexText() {
+      return "Post. does not hold";
+   }
+
    protected String createMethodAssignableText() {
       return "Assignable clause of method contract violated";
    }
@@ -976,9 +1035,17 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    protected String createClassInvariantPreservedText(String invariant) {
       return "Class Invariant (" + invariant + ") is not preserved";
    }
+
+   protected String createClassInvariantPreservedLatexText() {
+      return "Inv. not preserved";
+   }
    
    protected String createExceptionThrownText() {
       return "Exception is thrown (normal_behavior violated)";
+   }
+   
+   protected String createExceptionThrownLatexText() {
+      return "Exc. is thrown";
    }
    
    protected String createExceptionThrownText(String method) {
@@ -991,6 +1058,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
 
    protected String createLoopInvariantPreservedText(String loopInvariant) {
       return "Loop invariant (" + loopInvariant + ") is not preserved by loop guard and loop body";
+   }
+
+   protected String createLoopInvariantPreservedLatexText() {
+      return "L. inv. not preserv.";
    }
 
    protected String createDecreasingText(String decreasingTerm) {

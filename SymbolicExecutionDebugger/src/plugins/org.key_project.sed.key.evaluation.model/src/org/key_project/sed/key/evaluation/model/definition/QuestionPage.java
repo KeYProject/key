@@ -20,6 +20,10 @@ public class QuestionPage extends AbstractPage implements IPageWithWorkbenchModi
       this(name, title, message, true, wrapLayout, toolBased, workbenchModifier, questions);
    }
 
+   public QuestionPage(String name, String title, String latexTitle, String message, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, AbstractQuestion... questions) {
+      this(name, title, latexTitle, message, true, wrapLayout, toolBased, true, workbenchModifier, CollectionUtil.toList(questions));
+   }
+
    public QuestionPage(String name, String title, String message, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
       this(name, title, message, true, wrapLayout, toolBased, workbenchModifier, questions);
    }
@@ -37,7 +41,11 @@ public class QuestionPage extends AbstractPage implements IPageWithWorkbenchModi
    }
 
    public QuestionPage(String name, String title, String message, boolean useForm, boolean wrapLayout, boolean toolBased, boolean enabled, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
-      super(name, title, message, wrapLayout, toolBased, enabled);
+      this(name, name, title, message, useForm, wrapLayout, toolBased, enabled, workbenchModifier, questions);
+   }
+
+   public QuestionPage(String name, String title, String latexTitle, String message, boolean useForm, boolean wrapLayout, boolean toolBased, boolean enabled, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
+      super(name, title, latexTitle, message, wrapLayout, toolBased, enabled);
       this.workbenchModifier = workbenchModifier;
       this.questions = questions;
       this.useForm = useForm;
