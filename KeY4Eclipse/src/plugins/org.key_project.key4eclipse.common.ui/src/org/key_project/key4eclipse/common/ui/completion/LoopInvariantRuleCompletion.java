@@ -6,13 +6,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -107,6 +102,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        } 
         return text.trim();
       }
+      
+      private void updateStatusText(){
+         return; //TODO
+      }
 
       /**
        * {@inheritDoc}
@@ -119,46 +118,75 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          root.setLayout(horlayout);
          FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
          
+         //Set up right column:
+         Composite stateColumn = new Composite(root, SWT.NO_BACKGROUND);
+         stateColumn.setLayout(vertlayout);
+         
          //Set up loop preview:
-         Composite codeColumn = new Composite(root, SWT.NO_BACKGROUND);
-         codeColumn.setLayout(vertlayout);
-         Label code = new Label(codeColumn, SWT.BORDER);
+         Label code = new Label(stateColumn, SWT.BORDER);
          Font monospace = JFaceResources.getFont(JFaceResources.TEXT_FONT);//new Font(root.getDisplay(), "Monospaced", 10, SWT.NORMAL);
          code.setFont(monospace);
          code.setBackground(root.getDisplay().getSystemColor(SWT.COLOR_WHITE));
          code.setText(getLoopText());
          
          //Set up state view:
-         Group stateColumn = new Group(root, SWT.SHADOW_IN);
-         stateColumn.setLayout(vertlayout);
-         invariantStatus = new Label(stateColumn, SWT.BORDER);
-         invariantStatus.setText("Invariant Status\nOk");
+         Group invStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
+         invStatusGrp.setLayout(vertlayout);
+         invStatusGrp.setText("Invariant - Status:");
+         invariantStatus = new Label(invStatusGrp, SWT.BORDER);
+         invariantStatus.setText("Ok");
+
+         Group modStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
+         modStatusGrp.setLayout(vertlayout);
+         modStatusGrp.setText("Modifies - Status:");
+         modifiesStatus = new Label(modStatusGrp, SWT.BORDER);
+         modifiesStatus.setText("Ok");
+
+         Group varStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
+         varStatusGrp.setLayout(vertlayout);
+         varStatusGrp.setText("Variant - Status:");
+         variantStatus = new Label(varStatusGrp, SWT.BORDER);
+         variantStatus.setText("Ok");
          
-         TabFolder modifiesStatusTab = new TabFolder(stateColumn, SWT.TOP);
-         modifiesStatus = (Label)addTextTabItem("heap", "Modifies - Status:\nOk", false, modifiesStatusTab);
+         //Set up right column
+         TabFolder editorTab = new TabFolder(root, SWT.TOP);
+         //Set up initial Tab
+         TabItem t = new TabItem (editorTab, SWT.NONE);
+         t.setText("inv 0");
+         Composite textContainer = new Composite(editorTab, SWT.NO_BACKGROUND);
+         t.setControl(textContainer);
+         Group inv1 = new Group(textContainer, SWT.SHADOW_IN);
+         Text invariant = new Text(inv1, SWT.MULTI);
+         Group mod1 = new Group(textContainer, SWT.SHADOW_IN);
+         Text modifies = new Text(mod1, SWT.MULTI);
+         Group var1 = new Group(textContainer, SWT.SHADOW_IN);
+         Text variants = new Text(var1, SWT.MULTI);
+         textContainer.setLayout(vertlayout);
+         inv1.setLayout(vertlayout);
+         mod1.setLayout(vertlayout);
+         var1.setLayout(vertlayout);
+         inv1.setText("invariant");
+         invariant.setText("some invariant text, probably monospace");//TODO
+         mod1.setText("modifies");
+         modifies.setText("d");//TODO
+         var1.setText("variants");
+         variants.setText("f");//TODO
          
-         TabFolder variantStatusTab = new TabFolder(stateColumn, SWT.TOP);
-         variantStatus = (Label)addTextTabItem("heap", "Variant status ok", false, variantStatusTab);
-         
-         
-         //set up invariantEditor:
-         Group invariantColumn = new Group(root, SWT.SHADOW_IN);
-         invariantColumn.setLayout(vertlayout);
-         TabFolder invariants = new TabFolder(invariantColumn, SWT.TOP);
-         invariantText = (Text)addTextTabItem("inv 0", "some invariant text, probably monospace", true, invariants);
-         TabFolder modifies = new TabFolder(invariantColumn, SWT.TOP);
-         Text modifiesText = (Text)addTextTabItem("heap", "Modifies\nEmpty", true, modifies);
-         TabFolder variant = new TabFolder(invariantColumn, SWT.TOP);
-         Text invariantText = (Text)addTextTabItem("heap", "Variant: someCode", true, variant);
-         
-         modifiesText.addModifyListener(new ModifyListener(){
+         invariant.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
                //do something with the text.
             }
          });
          
-         invariantText.addModifyListener(new ModifyListener(){
+         modifies.addModifyListener(new ModifyListener(){
+            public void modifyText(ModifyEvent event) {
+               Text text = (Text) event.widget;
+               //do something with the text.
+            }
+         });
+         
+         variants.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
                //do something with the text.
