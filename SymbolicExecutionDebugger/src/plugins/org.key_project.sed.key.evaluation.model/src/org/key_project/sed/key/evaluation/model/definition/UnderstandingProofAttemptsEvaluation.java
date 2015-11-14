@@ -209,11 +209,13 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       URL keyWizardURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/KeY-ScreencastWizard.html") : null;
       URL sedURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/SED-Screencast.html") : null;
       URL sedWizardURL = isUIAvailable() ? toLocalURL("data/understandingProofAttempts/instructions/SED-ScreencastWizard.html") : null;
-      Tool key = new Tool(KEY_TOOL_NAME, 
+      Tool key = new Tool(KEY_TOOL_NAME,
+                          "\\KeY",
                           keyURL, 
                           keyWizardURL,
                           isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_LOGO) : null);
       Tool sed = new Tool(SED_TOOL_NAME, 
+                          "\\SED",
                           sedURL, 
                           sedWizardURL,
                           isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);

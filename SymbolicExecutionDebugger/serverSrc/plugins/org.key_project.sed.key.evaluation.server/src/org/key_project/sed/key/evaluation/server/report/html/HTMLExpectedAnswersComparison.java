@@ -228,7 +228,7 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
       latex.append("& Question & Answer");
       for (@SuppressWarnings("unused") IStatisticsFilter filter : statistics.getFilters()) {
          for (Tool tool : evaluation.getTools()) {
-            latex.append("&" + tool.getName());
+            latex.append("&\\rotatebox{90}{" + tool.getLatexName() + "~(\\%)}");
          }
       }
       latex.append("\\\\" + StringUtil.NEW_LINE);
@@ -289,7 +289,7 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
          }
       }
       latex.append("\\midrule");
-      latex.append("&&");
+      latex.append("\\multicolumn{3}{r}{\\textbf{Winning Tool Count}} ");
       for (IStatisticsFilter filter : statistics.getFilters()) {
          Map<Tool, BigInteger> filterMap = winningMap.get(filter);
          List<Tool> winningTools = new LinkedList<Tool>();
@@ -319,10 +319,10 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
          for (Tool tool : evaluation.getTools()) {
             BigInteger value = filterMap != null ? filterMap.get(tool) : null;
             if (winningTools.size() == 1 && winningTools.contains(tool)) {
-               latex.append("&\\textcolor{blue}{" + (value != null ? value : BigInteger.ZERO) + "}");
+               latex.append("&\\textbf{\\textcolor{blue}{" + (value != null ? value : BigInteger.ZERO) + "}}");
             }
             else {
-               latex.append("&" + (value != null ? value : BigInteger.ZERO));
+               latex.append("&\\textbf{" + (value != null ? value : BigInteger.ZERO) + "}");
             }
          }
       }
