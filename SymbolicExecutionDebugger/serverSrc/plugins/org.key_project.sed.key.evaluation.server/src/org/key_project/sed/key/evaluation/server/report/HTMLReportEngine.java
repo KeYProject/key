@@ -18,6 +18,7 @@ import org.key_project.sed.key.evaluation.server.report.html.HTMLToolSectionAppe
 import org.key_project.sed.key.evaluation.server.report.html.HTMLUnderstandingProofAttemptsBalancingSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.IHTMLSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsKnowledgeExport;
+import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsSummaryExport;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.CollectionUtil;
 
@@ -84,6 +85,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
       result.add(new HTMLChoiceSectionAppender());
       if (evaluation instanceof UnderstandingProofAttemptsEvaluation) {
          result.add(new UnderstandingProofAttemptsKnowledgeExport());
+         result.add(new UnderstandingProofAttemptsSummaryExport());
          result.add(new HTMLUnderstandingProofAttemptsBalancingSectionAppender());
       }
       result.add(new HTMLAnswersSectionAppender());

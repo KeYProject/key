@@ -172,6 +172,26 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
     * The value used for the give up {@link Choice}.
     */
    public static final String GIVE_UP_VALUE = "Give up";
+   
+   /**
+    * The name of the feedback section for KeY.
+    */
+   public static final String KEY_FEEDBACK_SECTION = "KeY";
+   
+   /**
+    * The name of the feedback section for SED.
+    */
+   public static final String SED_FEEDBACK_SECTION = "SED";
+
+   /**
+    * The name of the feedback section comparing KeY and SED.
+    */
+   public static final String KEY_VS_SED_FEEDBACK_SECTION = "KeYvsSED";
+
+   /**
+    * The name of the question comparing KeY and SED.
+    */
+   public static final String KEY_VS_SED_QUESTION = "toolPreference";
 
    /**
     * Forbid additional instances.
@@ -858,7 +878,9 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       // KeY
       String proofTreeTitle = "Shown proof tree (tab 'Proof')";
       RadioButtonsQuestion proofTreeQuestion = new RadioButtonsQuestion("proofTree", 
-                                                                        proofTreeTitle, 
+                                                                        proofTreeTitle,
+                                                                        "Proof Tree",
+                                                                        null,
                                                                         isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_PROOF_TREE) : null,
                                                                         false,
                                                                         null, 
@@ -868,6 +890,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String goalsTitle = "Shown goals  (tab 'Goals')";
       RadioButtonsQuestion goalsQuestion = new RadioButtonsQuestion("goals", 
                                                                     goalsTitle,
+                                                                    "Goals",
+                                                                    null,
                                                                     isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_GOALS) : null,
                                                                     false,
                                                                     null, 
@@ -877,6 +901,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String sequentTitle = "Shown sequent";
       RadioButtonsQuestion sequentQuestion = new RadioButtonsQuestion("sequent", 
                                                                       sequentTitle, 
+                                                                      "Sequent",
+                                                                      null,
                                                                       isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_SEQUENT) : null,
                                                                       false,
                                                                       null, 
@@ -886,6 +912,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String hideTitle = "Hiding of intermediate proofsteps";
       RadioButtonsQuestion hideQuestion = new RadioButtonsQuestion("hideIntermediateProofsteps", 
                                                                    hideTitle, 
+                                                                   "Hide Steps",
+                                                                   null,
                                                                    isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_HIDE_ITERMEDIATE_STEPS) : null,
                                                                    false,
                                                                    null, 
@@ -911,17 +939,21 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String listContractsTitle = "List of applied contracts";
       RadioButtonsQuestion listContractsQuestion = new RadioButtonsQuestion("listContracts", 
                                                                             listContractsTitle, 
+                                                                            "App. Cont.",
+                                                                            null,
                                                                             isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_APPLIED_CONTRACTS) : null,
                                                                             false,
                                                                             null, 
                                                                             new NotUndefinedValueValidator("Question '" + listContractsTitle + "' not answered."), 
                                                                             false,
                                                                             choices);
-      SectionQuestion keySection = new SectionQuestion("KeY", "KeY", false, proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, listContractsQuestion);
+      SectionQuestion keySection = new SectionQuestion(KEY_FEEDBACK_SECTION, "KeY", false, proofTreeQuestion, goalsQuestion, sequentQuestion, hideQuestion, listContractsQuestion);
       // SED
       String setTitle = "Shown symbolic execution tree";
       RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
                                                                   setTitle, 
+                                                                  "SET",
+                                                                  null,
                                                                   isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_SET) : null,
                                                                   false,
                                                                   null, 
@@ -931,6 +963,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String reachedTitle = "Highlighting of source code reached during symbolic execution";
       RadioButtonsQuestion reachedQuestion = new RadioButtonsQuestion("reachedSourceCode", 
                                                                       reachedTitle, 
+                                                                      "Highlighting",
+                                                                      null,
                                                                       isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_REACHED) : null,
                                                                       false,
                                                                       null, 
@@ -940,6 +974,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String variablesTitle = "Shown variables of a node (view 'Variables')";
       RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
                                                                         variablesTitle, 
+                                                                        "Variables",
+                                                                        null,
                                                                         isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_VARIABLES) : null,
                                                                         false,
                                                                         null, 
@@ -949,6 +985,8 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String layoutTitle = "Visualization of memory layouts";
       RadioButtonsQuestion layoutQuestion = new RadioButtonsQuestion("layouts", 
                                                                      layoutTitle, 
+                                                                     "Layouts",
+                                                                     null,
                                                                      isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_MEMORY_LAYOUTS) : null,
                                                                      false,
                                                                      null, 
@@ -958,16 +996,18 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String truthTitle = "Truth value evaluation of postconditions, preconditions and loop invariants";
       RadioButtonsQuestion truthQuestion = new RadioButtonsQuestion("truth", 
                                                                     truthTitle, 
+                                                                    "Truth Values",
+                                                                    null,
                                                                     isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_TRUTH) : null,
                                                                     false,
                                                                     null, 
                                                                     new NotUndefinedValueValidator("Question '" + truthTitle + "' not answered."), 
                                                                     false,
                                                                     choices);
-      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, reachedQuestion, variablesQuestion, layoutQuestion, truthQuestion);
+      SectionQuestion sedSection = new SectionQuestion(SED_FEEDBACK_SECTION, "SED", false, setQuestion, reachedQuestion, variablesQuestion, layoutQuestion, truthQuestion);
       // KeY vs SED
       String keyVsSedTitle = "I prefer to inspect proofs with";
-      RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion("toolPreference", 
+      RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion(KEY_VS_SED_QUESTION, 
                                                                        keyVsSedTitle, 
                                                                        true,
                                                                        null, 
@@ -978,7 +1018,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                        new Choice("KeY and SED, depending on the proof", "KeYandSEDproof"),
                                                                        new Choice("KeY and SED, both are equally bad and should be improved", "KeYandSEDbad"),
                                                                        new Choice("SED", "SED"));
-      SectionQuestion keyVsSedSection = new SectionQuestion("KeYvsSED", "KeY vs SED", false, keyVsSedQuestion);
+      SectionQuestion keyVsSedSection = new SectionQuestion(KEY_VS_SED_FEEDBACK_SECTION, "KeY vs SED", false, keyVsSedQuestion);
       // Feedback
       SectionQuestion feedbackSection = new SectionQuestion("feedback", 
                                                             "Feedback", 

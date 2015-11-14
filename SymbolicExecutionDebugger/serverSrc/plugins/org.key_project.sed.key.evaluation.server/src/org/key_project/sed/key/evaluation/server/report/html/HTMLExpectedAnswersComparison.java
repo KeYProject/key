@@ -32,6 +32,10 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 
+/**
+ * Exports the knowledge of the participants as LaTeX file.
+ * @author Martin Hentschel
+ */
 public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
    @Override
    public Collection<AdditionalFile> appendSection(File storageLocation, 
