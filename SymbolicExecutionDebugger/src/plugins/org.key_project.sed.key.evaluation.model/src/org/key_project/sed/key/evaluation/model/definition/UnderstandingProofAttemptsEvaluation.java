@@ -891,7 +891,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String proofTreeTitle = "Shown proof tree (tab 'Proof')";
       RadioButtonsQuestion proofTreeQuestion = new RadioButtonsQuestion("proofTree", 
                                                                         proofTreeTitle,
-                                                                        "Proof Tree",
+                                                                        "Proof Tree View",
                                                                         null,
                                                                         isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_PROOF_TREE) : null,
                                                                         false,
@@ -902,7 +902,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String goalsTitle = "Shown goals  (tab 'Goals')";
       RadioButtonsQuestion goalsQuestion = new RadioButtonsQuestion("goals", 
                                                                     goalsTitle,
-                                                                    "Goals",
+                                                                    "Goals Tab",
                                                                     null,
                                                                     isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_GOALS) : null,
                                                                     false,
@@ -913,7 +913,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String sequentTitle = "Shown sequent";
       RadioButtonsQuestion sequentQuestion = new RadioButtonsQuestion("sequent", 
                                                                       sequentTitle, 
-                                                                      "Sequent",
+                                                                      "Sequent View",
                                                                       null,
                                                                       isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_SEQUENT) : null,
                                                                       false,
@@ -924,7 +924,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String hideTitle = "Hiding of intermediate proofsteps";
       RadioButtonsQuestion hideQuestion = new RadioButtonsQuestion("hideIntermediateProofsteps", 
                                                                    hideTitle, 
-                                                                   "Hide Steps",
+                                                                   "Hide Intermediate Steps",
                                                                    null,
                                                                    isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_HIDE_ITERMEDIATE_STEPS) : null,
                                                                    false,
@@ -951,7 +951,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String listContractsTitle = "List of applied contracts";
       RadioButtonsQuestion listContractsQuestion = new RadioButtonsQuestion("listContracts", 
                                                                             listContractsTitle, 
-                                                                            "App. Cont.",
+                                                                            "List Applied Contracts",
                                                                             null,
                                                                             isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.KEY_APPLIED_CONTRACTS) : null,
                                                                             false,
@@ -964,7 +964,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String setTitle = "Shown symbolic execution tree";
       RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
                                                                   setTitle, 
-                                                                  "SET",
+                                                                  "Symbolic Exec. Tree",
                                                                   null,
                                                                   isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_SET) : null,
                                                                   false,
@@ -975,7 +975,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String reachedTitle = "Highlighting of source code reached during symbolic execution";
       RadioButtonsQuestion reachedQuestion = new RadioButtonsQuestion("reachedSourceCode", 
                                                                       reachedTitle, 
-                                                                      "Highlighting",
+                                                                      "Reached Source Code",
                                                                       null,
                                                                       isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_REACHED) : null,
                                                                       false,
@@ -986,7 +986,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String variablesTitle = "Shown variables of a node (view 'Variables')";
       RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
                                                                         variablesTitle, 
-                                                                        "Variables",
+                                                                        "Variables View",
                                                                         null,
                                                                         isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_VARIABLES) : null,
                                                                         false,
@@ -997,7 +997,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String layoutTitle = "Visualization of memory layouts";
       RadioButtonsQuestion layoutQuestion = new RadioButtonsQuestion("layouts", 
                                                                      layoutTitle, 
-                                                                     "Layouts",
+                                                                     "Memory Layouts",
                                                                      null,
                                                                      isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_MEMORY_LAYOUTS) : null,
                                                                      false,
@@ -1008,7 +1008,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String truthTitle = "Truth value evaluation of postconditions, preconditions and loop invariants";
       RadioButtonsQuestion truthQuestion = new RadioButtonsQuestion("truth", 
                                                                     truthTitle, 
-                                                                    "Truth Values",
+                                                                    "Truth Value Evaluation",
                                                                     null,
                                                                     isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_TRUTH) : null,
                                                                     false,
