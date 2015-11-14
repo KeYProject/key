@@ -13,7 +13,9 @@ import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.SectionQuestion;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
+import org.key_project.sed.key.evaluation.model.input.QuestionInput;
 import org.key_project.sed.key.evaluation.server.report.AdditionalFile;
+import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
 import org.key_project.sed.key.evaluation.server.report.EvaluationResult;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
 import org.key_project.sed.key.evaluation.server.report.statiscs.FilteredStatistics;
@@ -41,11 +43,14 @@ public class UnderstandingProofAttemptsSummaryExport implements IHTMLSectionAppe
       SectionQuestion keySection = (SectionQuestion) feedbackPage.getQuestion(UnderstandingProofAttemptsEvaluation.KEY_FEEDBACK_SECTION);
       SectionQuestion sedSection = (SectionQuestion) feedbackPage.getQuestion(UnderstandingProofAttemptsEvaluation.SED_FEEDBACK_SECTION);
       SectionQuestion keyVsSedSection = (SectionQuestion) feedbackPage.getQuestion(UnderstandingProofAttemptsEvaluation.KEY_VS_SED_FEEDBACK_SECTION);
+      SectionQuestion feedbackSection = (SectionQuestion) feedbackPage.getQuestion(UnderstandingProofAttemptsEvaluation.FEEDBACK_SECTION);
       AbstractChoicesQuestion keyVsSedQuestion = (AbstractChoicesQuestion) keyVsSedSection.getChildQuestions()[0];
+      AbstractQuestion feedbackQuestion = feedbackSection.getChildQuestions()[0];
       // Crate Latex file
       String keyFeatures = createFeatureLatex(keySection, statistics);
       String sedFeatures = createFeatureLatex(sedSection, statistics);
       String keyVsSed = createQuestionLatex(keyVsSedQuestion, statistics);
+      String feedback = createValueLatex(feedbackQuestion, result);
       List<AdditionalFile> additionalFiles = new LinkedList<AdditionalFile>();
       additionalFiles.add(new AdditionalFile("_KeY_Features.tex", keyFeatures.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
       additionalFiles.add(new AdditionalFile("_SED_Features.tex", sedFeatures.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
@@ -56,7 +61,33 @@ public class UnderstandingProofAttemptsSummaryExport implements IHTMLSectionAppe
          additionalFiles.add(new AdditionalFile("_KeY_Features_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", key.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
          additionalFiles.add(new AdditionalFile("_SED_Features_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", sed.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
       }
+      additionalFiles.add(new AdditionalFile("_Feedback.tex", feedback.toString().getBytes(IOUtil.DEFAULT_CHARSET)));
       return additionalFiles;
+   }
+
+   protected String createValueLatex(AbstractQuestion question, EvaluationResult result) {
+      StringBuffer latex = new StringBuffer();
+      latex.append("\\begin{tabularx}{1.0\\textwidth}{X}" + StringUtil.NEW_LINE);
+      latex.append("\\toprule" + StringUtil.NEW_LINE);
+      boolean afterFirst = false;
+      for (EvaluationAnswers answer : result.getIdInputMap().values()) {
+         List<QuestionInput> inputs = answer.getQuestionInputs(question);
+         if (inputs != null && inputs.size() == 1) {
+            String value = inputs.get(0).getValue();
+            if (!StringUtil.isTrimmedEmpty(value)) {
+               if (afterFirst) {
+                  latex.append("\\midrule" + StringUtil.NEW_LINE);
+               }
+               else {
+                  afterFirst = true;
+               }
+               latex.append("``" + value + "''\\\\");
+            }
+         }
+      }
+      latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+      latex.append("\\end{tabularx}" + StringUtil.NEW_LINE);
+      return latex.toString();
    }
 
    protected String createSingleFeatureLatex(SectionQuestion sectionQuestion, IStatisticsFilter filter, Statistics statistics) {

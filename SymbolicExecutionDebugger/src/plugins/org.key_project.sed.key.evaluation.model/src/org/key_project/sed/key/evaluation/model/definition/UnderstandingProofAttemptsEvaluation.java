@@ -189,9 +189,19 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    public static final String KEY_VS_SED_FEEDBACK_SECTION = "KeYvsSED";
 
    /**
+    * The name of the feedback section.
+    */
+   public static final String FEEDBACK_SECTION = "feedback";
+
+   /**
     * The name of the question comparing KeY and SED.
     */
    public static final String KEY_VS_SED_QUESTION = "toolPreference";
+
+   /**
+    * The name of the feedback question.
+    */
+   public static final String FEEDBACK_QUESTION = "feedback";
 
    /**
     * Forbid additional instances.
@@ -1022,10 +1032,10 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
                                                                        new Choice("SED", "SED"));
       SectionQuestion keyVsSedSection = new SectionQuestion(KEY_VS_SED_FEEDBACK_SECTION, "KeY vs SED", false, keyVsSedQuestion);
       // Feedback
-      SectionQuestion feedbackSection = new SectionQuestion("feedback", 
+      SectionQuestion feedbackSection = new SectionQuestion(FEEDBACK_SECTION, 
                                                             "Feedback", 
                                                             true, 
-                                                            new TextQuestion("feedback", "Feedback about the tools or the evaluation (optional)", null, null, false, 400, 200));
+                                                            new TextQuestion(FEEDBACK_QUESTION, "Feedback about the tools or the evaluation (optional)", null, null, false, 400, 200));
       return new QuestionPage(FEEDBACK_PAGE,
                               "Feedback", 
                               "Please answer the question to give us some feeback about the tools and the evaluation.", 
