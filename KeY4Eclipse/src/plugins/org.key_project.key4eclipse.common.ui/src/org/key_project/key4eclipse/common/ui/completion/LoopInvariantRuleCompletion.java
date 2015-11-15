@@ -132,7 +132,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private Term parseInputText(Text input, Sort sortType, Label status){
          Term result = null;
          try {
-            result = parser.parse(new StringReader(input.getText()), sortType, services, services.getNamespaces(), getAbbrevMap());
+            result = parser.parse(
+               new StringReader(input.getText()), sortType,
+               services, services.getNamespaces(),
+               MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
             status.setText("OK");
          }  catch(Exception e){
             status.setText(e.getMessage());
@@ -157,7 +160,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          
          //Set up loop preview:
          Label code = new Label(stateColumn, SWT.BORDER);
-         Font monospace = JFaceResources.getFont(JFaceResources.TEXT_FONT);//new Font(root.getDisplay(), "Monospaced", 10, SWT.NORMAL);
+         Font monospace = JFaceResources.getFont(JFaceResources.TEXT_FONT);
          code.setFont(monospace);
          code.setBackground(root.getDisplay().getSystemColor(SWT.COLOR_WHITE));
          code.setText(getLoopText());
@@ -187,7 +190,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //TODO: register a listener to the TabFolder so we can see what the user is looking at.
          editorTab = new TabFolder(rightColumn, SWT.TOP);
          
-
+         //get the initial state of the text fields.
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
          LoopInvariant loopInv = loopApp.getInvariant();
 
@@ -199,32 +202,18 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             Term i = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
             Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
-            if (i == null) {
-               //loopInvTexts[INV_IDX].put(heap.toString(), "true");
-               System.out.println("i is null; heap.tostring is: " + heap.toString());
-            } else {
-               //loopInvTexts[INV_IDX].put(heap.toString(), ProofSaver.printTerm(i, services, true).toString());
+            if (i != null) {
                invariantString = ProofSaver.printTerm(i,  services, true).toString();
-               System.out.println("i is valid; heap tostring i" + heap.toString() + " , printterm(i, services, true) is: " + ProofSaver.printTerm(i, services, true).toString());
-               System.out.println("i.toString is: " + i.toString());
             }
             
-            if (modifies == null) {
-               //loopInvTexts[INV_IDX].put(heap.toString(), "true");
-               System.out.println("heap tostring" + heap.toString());
-            } else {
-               //loopInvTexts[INV_IDX].put(heap.toString(), ProofSaver.printTerm(i, services, true).toString());
+            if (modifies != null) {
                modifiesString = ProofSaver.printTerm(modifies,  services, true).toString();
-               System.out.println("heap tostring" + heap.toString() + " , printterm: " + ProofSaver.printTerm(modifies, services, true).toString());
             }
          }
          
-         final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
-         if (variant == null) {
-            //loopInvTexts[VAR_IDX].put(DEFAULT,"");
-         } else {
+         Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
+         if (variant != null) {
             variantString = ProofSaver.printTerm(variant, services, true).toString();
-            //loopInvTexts[VAR_IDX].put(DEFAULT,printTerm(variant, true));
          }
          
          //Set up initial Tab
@@ -254,22 +243,21 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //TODO: Status tab should be updated after GUI setup, and after tab switch also.
       }
       
-      private AbbrevMap getAbbrevMap() {
-         return MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap();
-      }
-      
       /**
        * @author Viktor Pfanschilling
-       * @param head - title of the tabitem
-       * @param body - text within the tabitem
-       * @param writable - is the text user-editable
+       * @param invariant - invariant text of the tab
+       * @param modifies - modifies text of the tab
+       * @param variants - variants text of the tab
+       * @param id - id of the new tab
        * @param parent - where to attach the item
        * @return the generated TabItem
        */
       private Control addTab(String invariant, String modifies, String variants, int id, TabFolder parent){
          FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
+         //add a tab item
          TabItem t = new TabItem (parent, SWT.NONE);
          t.setText("inv " + id);
+         //inside, place a composite containing three groups (for pretty frames) with a Text item each.
          Composite textContainer = new Composite(parent, SWT.NO_BACKGROUND);
          t.setControl(textContainer);
          Group inv1 = new Group(textContainer, SWT.SHADOW_IN);
@@ -289,6 +277,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          var1.setText("variants");
          variantsT.setText(variants);
          
+         //add listeners.
          invariantT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
