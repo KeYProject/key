@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+   <center>
+      <TreeView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
+   <left>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="148.0" text="Button" />
+            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="186.0" text="Button" />
+            <ToggleButton mnemonicParsing="false" prefHeight="25.0" prefWidth="134.0" text="ToggleButton" />
+         </children>
+      </VBox>
+   </left>
+</BorderPane>
