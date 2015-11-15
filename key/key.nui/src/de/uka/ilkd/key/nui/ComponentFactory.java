@@ -9,13 +9,10 @@ import javafx.scene.layout.Pane;
 
 public class ComponentFactory {
 
-	private String resource;
+	private String resourceDir;
 
-	public ComponentFactory(String resource) {
-		this.resource = resource;
-	}
-
-	public ComponentFactory() {
+	public ComponentFactory(String resourceDir) {
+		this.resourceDir = resourceDir;
 	}
 
 	public Parent createTreeView(String id, Pane pane, HashMap<String, Pane> posComponent) {
@@ -31,7 +28,7 @@ public class ComponentFactory {
 	public Parent createComponent(String id, Pane pane, String resource, HashMap<String, Pane> posComponent) {
 		Parent component = null;
 		try {
-			component = FXMLLoader.load(getClass().getResource("components/" + resource));
+			component = FXMLLoader.load(getClass().getResource(this.resourceDir + resource));
 			component.setId(id);
 			posComponent.put(id, pane);
 			pane.getChildren().add(component);
