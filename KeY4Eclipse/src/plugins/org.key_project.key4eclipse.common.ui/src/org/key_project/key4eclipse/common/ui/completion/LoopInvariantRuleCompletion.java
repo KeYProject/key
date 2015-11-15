@@ -2,6 +2,7 @@ package org.key_project.key4eclipse.common.ui.completion;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Map;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -26,13 +27,16 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
  * The {@link InteractiveRuleApplicationCompletion} to treat {@link WhileInvariantRule} in the Eclipse context.
@@ -162,19 +166,19 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          Group invStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
          invStatusGrp.setLayout(vertlayout);
          invStatusGrp.setText("Invariant - Status:");
-         invariantStatus = new Label(invStatusGrp, SWT.BORDER);
+         invariantStatus = new Label(invStatusGrp, SWT.WRAP);
          invariantStatus.setText("Ok");
 
          Group modStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
          modStatusGrp.setLayout(vertlayout);
          modStatusGrp.setText("Modifies - Status:");
-         modifiesStatus = new Label(modStatusGrp, SWT.BORDER);
+         modifiesStatus = new Label(modStatusGrp, SWT.WRAP);
          modifiesStatus.setText("Ok");
 
          Group varStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
          varStatusGrp.setLayout(vertlayout);
          varStatusGrp.setText("Variant - Status:");
-         variantStatus = new Label(varStatusGrp, SWT.BORDER);
+         variantStatus = new Label(varStatusGrp, SWT.WRAP);
          variantStatus.setText("Ok");
          
          //Set up right column
@@ -182,8 +186,49 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          rightColumn.setLayout(vertlayout);
          //TODO: register a listener to the TabFolder so we can see what the user is looking at.
          editorTab = new TabFolder(rightColumn, SWT.TOP);
+         
+
+         LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
+         LoopInvariant loopInv = loopApp.getInvariant();
+
+         Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
+         String invariantString = "unable to load";
+         String modifiesString = "unable to load";
+         String variantString = "unable to load";
+         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            Term i = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
+            Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
+
+            if (i == null) {
+               //loopInvTexts[INV_IDX].put(heap.toString(), "true");
+               System.out.println("i is null; heap.tostring is: " + heap.toString());
+            } else {
+               //loopInvTexts[INV_IDX].put(heap.toString(), ProofSaver.printTerm(i, services, true).toString());
+               invariantString = ProofSaver.printTerm(i,  services, true).toString();
+               System.out.println("i is valid; heap tostring i" + heap.toString() + " , printterm(i, services, true) is: " + ProofSaver.printTerm(i, services, true).toString());
+               System.out.println("i.toString is: " + i.toString());
+            }
+            
+            if (modifies == null) {
+               //loopInvTexts[INV_IDX].put(heap.toString(), "true");
+               System.out.println("heap tostring" + heap.toString());
+            } else {
+               //loopInvTexts[INV_IDX].put(heap.toString(), ProofSaver.printTerm(i, services, true).toString());
+               modifiesString = ProofSaver.printTerm(modifies,  services, true).toString();
+               System.out.println("heap tostring" + heap.toString() + " , printterm: " + ProofSaver.printTerm(modifies, services, true).toString());
+            }
+         }
+         
+         final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
+         if (variant == null) {
+            //loopInvTexts[VAR_IDX].put(DEFAULT,"");
+         } else {
+            variantString = ProofSaver.printTerm(variant, services, true).toString();
+            //loopInvTexts[VAR_IDX].put(DEFAULT,printTerm(variant, true));
+         }
+         
          //Set up initial Tab
-         addTab("some invariant text, probably monospace", "e", "f", 0, editorTab);
+         addTab(invariantString, modifiesString, variantString, 0, editorTab);
          // set up store button
          Button store = new Button(rightColumn, SWT.PUSH);
          store.setText("Store");
