@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Menu?>
+<?import com.sun.javafx.scene.control.skin.ContextMenuContent?>
+
+<BorderPane fx:id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nui.NUIController">
+	<top>
+		<MenuBar BorderPane.alignment="CENTER">
+			<menus>
+				<Menu mnemonicParsing="false" text="File">
+					<items>
+						<MenuItem mnemonicParsing="false" onAction="#handleCloseWindow" text="Close" />
+					</items>
+				</Menu>
+				<Menu mnemonicParsing="false" text="Edit">
+					<items>
+						<MenuItem mnemonicParsing="false" text="Delete" />
+					</items>
+				</Menu>
+				<Menu mnemonicParsing="false" text="View">
+					<items>
+						<Menu mnemonicParsing="false" text="Add View">
+							<items>
+								<CheckMenuItem mnemonicParsing="false" onAction="#handleContextMenu" text="%proof" />
+								<CheckMenuItem mnemonicParsing="false" onAction="#handleLoadGoals" text="%goals" />
+								<CheckMenuItem mnemonicParsing="false" onAction="#handleLoadUserConstraint" text="%userConstraint" />
+								<CheckMenuItem mnemonicParsing="false" onAction="#handleLoadProofSearchStrategy" text="%proofSearch" />
+								<CheckMenuItem mnemonicParsing="false" onAction="#handleLoadRules" text="%rules" />
+							</items>
+						</Menu>
+					</items>
+				</Menu>
+				<Menu mnemonicParsing="false" text="%about">
+					<items>
+						<MenuItem mnemonicParsing="false" onAction="#handleAboutWindow" text="%aboutKey" />
+						<MenuItem mnemonicParsing="false" text="%license" />
+					</items>
+				</Menu>
+			</menus>
+		</MenuBar>
+	</top>
+	<center>
+		<SplitPane dividerPositions="0.25, 0.75" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+			<contextMenu>
+				<ContextMenu fx:id="contextMenu">
+					<items>
+						<Menu fx:id="addView" text="%configViews">
+							<items>
+								<CheckMenuItem fx:id="proof" onAction="#handleContextMenu" text="%proof" />
+								<CheckMenuItem fx:id="goals" onAction="#handleContextMenu" text="%goals" />
+								<CheckMenuItem fx:id="userConstraints" onAction="#handleContextMenu" text="%userConstraint" />
+								<CheckMenuItem fx:id="proofSearchStrategy" onAction="#handleContextMenu" text="%proofSearch" />
+								<CheckMenuItem fx:id="rules" onAction="#handleContextMenu" text="%rules" />
+							</items>
+						</Menu>
+					</items>
+				</ContextMenu>
+			</contextMenu>
+			<items>
+				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="552.0" prefWidth="266.0">
+					<children>
+						<VBox fx:id="left" layoutX="39.0" layoutY="108.0" onMouseClicked="#handleMouseClicked" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+					</children>
+				</AnchorPane>
+				<AnchorPane fx:id="middle" minHeight="0.0" minWidth="0.0" onMouseClicked="#handleMouseClicked" prefHeight="160.0" prefWidth="100.0" />
+				<AnchorPane prefHeight="200.0" prefWidth="200.0">
+					<children>
+						<VBox fx:id="right" onMouseClicked="#handleMouseClicked" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+					</children>
+				</AnchorPane>
+			</items>
+		</SplitPane>
+	</center>
+	<bottom>
+		<ToolBar prefHeight="21.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+			<items>
+				<Label fx:id="statustext" prefHeight="17.0" prefWidth="334.0" text="%status" />
+			</items>
+		</ToolBar>
+	</bottom>
+</BorderPane>
