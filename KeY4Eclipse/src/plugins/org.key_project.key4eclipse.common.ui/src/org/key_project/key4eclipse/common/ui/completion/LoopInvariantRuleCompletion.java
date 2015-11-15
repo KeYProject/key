@@ -117,8 +117,23 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          return text.trim();
       }
       
-      private void updateStatusText(){
-         return; //TODO
+      /**
+       * parses input text and updates status reports accordingly
+       * @author Anna Marie Filighera
+       * @param input - text to be parsed
+       * @param sortType - Sort of input text
+       * @param status - status label to be updated
+       * @return
+       */
+      private Term parseInputText(Text input, Sort sortType, Label status){
+         Term result = null;
+         try {
+            result = parser.parse(new StringReader(input.getText()), sortType, services, services.getNamespaces(), getAbbrevMap());
+            status.setText("OK");
+         }  catch(Exception e){
+            status.setText(e.getMessage());
+         }
+         return result;
       }
 
       /**
@@ -232,41 +247,23 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          invariantT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               try {
-                  // TODO: give term to ???
-                  Term inputInvariant = parser.parse(new StringReader(text.getText()), Sort.FORMULA, services, services.getNamespaces(), getAbbrevMap());
-                  invariantStatus.setText("OK");
-               }  catch(Exception e){
-                  invariantStatus.setText(e.getMessage());
-               }
+               Term inv = parseInputText(text, Sort.FORMULA, invariantStatus);
             }
          });
          
          modifiesT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               try {
-                  // TODO: give term to ???
-                  Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
-                  Term inputMod = parser.parse(new StringReader(text.getText()), modSort, services, services.getNamespaces(), getAbbrevMap());
-                  modifiesStatus.setText("OK");
-               }  catch(Exception e){
-                  modifiesStatus.setText(e.getMessage());
-               }
+               Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+               Term mod = parseInputText(text, modSort, modifiesStatus);
             }
          });
          
          variantsT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               try {
-                  // TODO: give term to ???
-                  Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                  Term inputVar = parser.parse(new StringReader(text.getText()), varSort, services, services.getNamespaces(), getAbbrevMap());
-                  variantStatus.setText("OK");
-               }  catch(Exception e){
-                  variantStatus.setText(e.getMessage());
-               }
+               Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
+               Term var = parseInputText(text, varSort, variantStatus);
             }
          });
          
