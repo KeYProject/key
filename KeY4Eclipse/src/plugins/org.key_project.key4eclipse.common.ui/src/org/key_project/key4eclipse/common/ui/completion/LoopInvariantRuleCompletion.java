@@ -69,7 +69,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private Label invariantStatus = null;
       private Label modifiesStatus = null;
       private Label variantStatus = null;
-      //private Text invariantText = null;
       private DefaultTermParser parser = new DefaultTermParser();
       private Services services = getGoal().proof().getServices();
       private TabFolder editorTab = null;
@@ -187,8 +186,13 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //Set up right column
          Composite rightColumn = new Composite(root, SWT.NO_BACKGROUND);
          rightColumn.setLayout(vertlayout);
-         //TODO: register a listener to the TabFolder so we can see what the user is looking at.
          editorTab = new TabFolder(rightColumn, SWT.TOP);
+         //this listener updates the state whenever tabs are switched.
+         editorTab.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+               resetStateTab();
+            }
+          });
          
          //get the initial state of the text fields.
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
@@ -217,7 +221,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          }
          
          //Set up initial Tab
-         addTab(invariantString, modifiesString, variantString, 0, editorTab);
+         addTab(invariantString, modifiesString, variantString, 0);
          // set up store button
          Button store = new Button(rightColumn, SWT.PUSH);
          store.setText("Store");
@@ -236,72 +240,116 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
                   ((Text)((Group)textCtr.getChildren()[0]).getChildren()[0]).getText(),
                   ((Text)((Group)textCtr.getChildren()[1]).getChildren()[0]).getText(),
                   ((Text)((Group)textCtr.getChildren()[2]).getChildren()[0]).getText(),
-                  amountTabs, editorTab);
+                  amountTabs);
             }
          });
+         
+         resetStateTab();
+         
          //Potential expansion: Discard rule application if Completion dialog was aborted.
-         //TODO: Status tab should be updated after GUI setup, and after tab switch also.
       }
       
       /**
+       * adds a new invariant tab to the specified TabFolder.
        * @author Viktor Pfanschilling
        * @param invariant - invariant text of the tab
        * @param modifies - modifies text of the tab
        * @param variants - variants text of the tab
        * @param id - id of the new tab
-       * @param parent - where to attach the item
-       * @return the generated TabItem
+       * @return the generated TabItem's Composite
        */
-      private Control addTab(String invariant, String modifies, String variants, int id, TabFolder parent){
+      private Control addTab(String invariant, String modifies, String variants, int id){
          FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
          //add a tab item
-         TabItem t = new TabItem (parent, SWT.NONE);
-         t.setText("inv " + id);
+         TabItem tab = new TabItem (editorTab, SWT.NONE);
+         tab.setText("inv " + id);
          //inside, place a composite containing three groups (for pretty frames) with a Text item each.
-         Composite textContainer = new Composite(parent, SWT.NO_BACKGROUND);
-         t.setControl(textContainer);
-         Group inv1 = new Group(textContainer, SWT.SHADOW_IN);
-         Text invariantT = new Text(inv1, SWT.MULTI);
-         Group mod1 = new Group(textContainer, SWT.SHADOW_IN);
-         Text modifiesT = new Text(mod1, SWT.MULTI);
-         Group var1 = new Group(textContainer, SWT.SHADOW_IN);
-         Text variantsT = new Text(var1, SWT.MULTI);
+         Composite textContainer = new Composite(editorTab, SWT.NO_BACKGROUND);
+         tab.setControl(textContainer);
+         Group invariantGroup = new Group(textContainer, SWT.SHADOW_IN);
+         Text invariantT = new Text(invariantGroup, SWT.MULTI);
+         Group modifiesGroup = new Group(textContainer, SWT.SHADOW_IN);
+         Text modifiesT = new Text(modifiesGroup, SWT.MULTI);
+         Group variantsGroup = new Group(textContainer, SWT.SHADOW_IN);
+         Text variantsT = new Text(variantsGroup, SWT.MULTI);
          textContainer.setLayout(vertlayout);
-         inv1.setLayout(vertlayout);
-         mod1.setLayout(vertlayout);
-         var1.setLayout(vertlayout);
-         inv1.setText("invariant");
+         invariantGroup.setLayout(vertlayout);
+         modifiesGroup.setLayout(vertlayout);
+         variantsGroup.setLayout(vertlayout);
+         invariantGroup.setText("invariant");
          invariantT.setText(invariant);
-         mod1.setText("modifies");
+         modifiesGroup.setText("modifies");
          modifiesT.setText(modifies);
-         var1.setText("variants");
+         variantsGroup.setText("variants");
          variantsT.setText(variants);
          
          //add listeners.
          invariantT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               Term inv = parseInputText(text, Sort.FORMULA, invariantStatus);
+               resetInvariantState(text);
             }
          });
          
          modifiesT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
-               Term mod = parseInputText(text, modSort, modifiesStatus);
+               resetModifiesState(text);
             }
          });
          
          variantsT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
                Text text = (Text) event.widget;
-               Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
-               Term var = parseInputText(text, varSort, variantStatus);
+               resetVariantsState(text);
             }
          });
          
          return textContainer;
+      }
+      
+      /**
+       * resets the state text for all three input fields.
+       * @author Viktor Pfanschilling
+       */
+      private void resetStateTab(){
+         TabItem[] selectedTabs = editorTab.getSelection();
+         if (selectedTabs.length == 1){
+            Composite txtcontainer = (Composite)selectedTabs[0].getControl();
+            resetInvariantState((Text)((Group)txtcontainer.getChildren()[0]).getChildren()[0]);
+            resetModifiesState((Text)((Group)txtcontainer.getChildren()[1]).getChildren()[0]);
+            resetVariantsState((Text)((Group)txtcontainer.getChildren()[2]).getChildren()[0]);
+         }
+      }
+      
+      /**
+       * resets the state text for the user-specified invariant
+       * @author Viktor Pfanschilling
+       * @param wdgt - the widget containing the user input
+       */
+      private void resetInvariantState(Text wdgt){
+         parseInputText(wdgt, Sort.FORMULA, invariantStatus);
+      }
+      
+      /**
+       * resets the state text for the user-specified modifies field
+       * @author Viktor Pfanschilling
+       * @param wdgt - the widget containing the user input
+       */
+      private void resetModifiesState(Text wdgt){
+         Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+         parseInputText(wdgt, modSort, modifiesStatus);
+      }
+      
+      /**
+       * resets the state text for the user-specified variants
+       * @author Viktor Pfanschilling
+       * @param wdgt - the widget containing the user input
+       */
+      private void resetVariantsState(Text wdgt){
+         Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
+         parseInputText(wdgt, varSort, variantStatus);
+         
       }
 
       /**
@@ -309,6 +357,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public IBuiltInRuleApp finish() {
+         //TODO
          return null;
       }
 
