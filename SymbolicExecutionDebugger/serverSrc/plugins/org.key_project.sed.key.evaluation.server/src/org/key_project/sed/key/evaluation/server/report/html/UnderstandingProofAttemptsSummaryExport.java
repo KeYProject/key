@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractChoicesQuestion;
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
@@ -67,11 +68,17 @@ public class UnderstandingProofAttemptsSummaryExport implements IHTMLSectionAppe
 
    protected String createValueLatex(AbstractQuestion question, EvaluationResult result) {
       StringBuffer latex = new StringBuffer();
-      latex.append("\\begin{tabularx}{1.0\\textwidth}{X}" + StringUtil.NEW_LINE);
+      latex.append("\\newcounter{upaFeedbackRowcount}" + StringUtil.NEW_LINE);
+      latex.append("\\setcounter{upaFeedbackRowcount}{0}" + StringUtil.NEW_LINE);
+      latex.append("\\newcommand{\\upaFeedbackRowcountautorefname}{ID}" + StringUtil.NEW_LINE);
+      latex.append("\\begin{tabularx}{1.0\\textwidth}{lX}" + StringUtil.NEW_LINE);
       latex.append("\\toprule" + StringUtil.NEW_LINE);
+      latex.append("ID & Feedback\\\\" + StringUtil.NEW_LINE);
+      latex.append("\\midrule" + StringUtil.NEW_LINE);
       boolean afterFirst = false;
-      for (EvaluationAnswers answer : result.getIdInputMap().values()) {
-         List<QuestionInput> inputs = answer.getQuestionInputs(question);
+      int i = 1;
+      for (Entry<String, EvaluationAnswers> entry : result.getIdInputMap().entrySet()) {
+         List<QuestionInput> inputs = entry.getValue().getQuestionInputs(question);
          if (inputs != null && inputs.size() == 1) {
             String value = inputs.get(0).getValue();
             if (!StringUtil.isTrimmedEmpty(value)) {
@@ -81,7 +88,8 @@ public class UnderstandingProofAttemptsSummaryExport implements IHTMLSectionAppe
                else {
                   afterFirst = true;
                }
-               latex.append("``" + value + "''\\\\");
+               latex.append(i + "\\refstepcounter{upaFeedbackRowcount}\\label{row:upa" + entry.getKey() + "} & ``" + value + "''\\\\" + StringUtil.NEW_LINE);
+               i++;
             }
          }
       }
