@@ -236,6 +236,10 @@
             </and>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler"
+            commandId="org.key_project.keyide.ui.commands.hideIntermediateProofsteps">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -370,6 +374,11 @@
                </with>
             </visibleWhen>
          </command>
+         <command
+               commandId="org.key_project.keyide.ui.commands.hideIntermediateProofsteps"
+               label="Hide Intermediate Proofsteps"
+               style="toggle">
+         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -433,6 +442,26 @@
                </parameter>
             </class>
          </state>            
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Hides all intermediate proofsteps"
+            id="org.key_project.keyide.ui.commands.hideIntermediateProofsteps"
+            name="Hide intermediate proofsteps">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="true">
+               </parameter>
+            </class>
+         </state>
       </command>
    </extension>
    <extension
