@@ -66,7 +66,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	private ProofTreeLabelProvider labelProvider;
 
 	private final KeYSelectionModel selectionModel;
-
+	
 	/**
 	 * {@link KeYSelectionListener} to sync the KeYSelection with the
 	 * {@link TreeSelection}.
@@ -106,43 +106,14 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		public void handleStateChange(State state, Object oldValue) {
 			if ((boolean) oldValue == false
 					&& (boolean) state.getValue() == true) {
-				hideIntermediateProofsteps();
+				getTreeViewer().expandAll();
+				getTreeViewer().remove(contentProvider.getIntermediateProofsteps());
 			} else {
 				getTreeViewer().setInput(proof);
 			}
 
 		}
 	};
-
-	/**
-	 * {@link ITreeViewerListener} to hide all intermediate proofsteps when the tree gets expanded or collapsed
-	 */
-	private ITreeViewerListener treeViewerListener = new ITreeViewerListener() {
-
-		@Override
-		public void treeExpanded(TreeExpansionEvent event) {
-			if ((boolean) getHideState().getValue() == true) {
-				hideIntermediateProofsteps();
-			}
-
-		}
-
-		@Override
-		public void treeCollapsed(TreeExpansionEvent event) {
-			if ((boolean) getHideState().getValue() == true) {
-				hideIntermediateProofsteps();
-			}
-
-		}
-	};
-
-	/**
-	 * hides all intermediate proofsteps
-	 */
-	private void hideIntermediateProofsteps() {
-		getTreeViewer().remove(contentProvider.getIntermediateProofsteps());
-	}
-
 
 	/**
 	 * Constructor.
@@ -174,7 +145,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		}
 
 		getHideState().removeListener(stateListener);
-		getTreeViewer().removeTreeListener(treeViewerListener);
 
 		super.dispose();
 	}
@@ -226,9 +196,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		// Update selected node
 		updateSelectedNode();
 
-		// add listeners for hiding intermediate proofsteps
+		// add listener for hiding intermediate proofsteps
+		getHideState().setValue(false);
 		getHideState().addListener(stateListener);
-		getTreeViewer().addTreeListener(treeViewerListener);
 	}
 
 	/**
@@ -333,7 +303,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		// refresh phase after stopping the auto mode
 		Node node = getSelectedNode(event.getSelection());
 		Node mediatorNode = selectionModel.getSelectedNode();
-		if (node != mediatorNode) {
+		if (node != mediatorNode && node != null) {
 			selectionModel.setSelectedNode(node);
 		}
 		
