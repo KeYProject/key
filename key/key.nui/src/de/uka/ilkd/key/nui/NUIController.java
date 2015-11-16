@@ -7,21 +7,15 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 public class NUIController {
-
-    // Used to determine where component should be placed on
-    private Pane lastClicked;
 
     // Stores the position of components added to the SplitPane
     private HashMap<String, Pane> posComponent = new HashMap<String, Pane>();
@@ -33,9 +27,11 @@ public class NUIController {
     @FXML
     VBox left;
     @FXML
-    AnchorPane middle;
+    VBox middle;
     @FXML
     VBox right;
+    @FXML
+    HBox down;
     @FXML
     Parent root;
     @FXML
@@ -43,16 +39,14 @@ public class NUIController {
     @FXML
     ContextMenu contextMenu;
     @FXML
-    MenuButton ButtonProof;
+    MenuButton ButtonProofView;
     @FXML
-    MenuButton ButtonGoals;
+    MenuButton ButtonGoalView;
     @FXML
-    MenuButton ButtonUserConstraint;
+    MenuButton ButtonOpenProofsView;
     @FXML
-    MenuButton ButtonProofSearchStrategy;
-    @FXML
-    MenuButton ButtonRules;
-
+    MenuButton ButtonTreeView;
+    
     @FXML
     protected void handleCloseWindow(ActionEvent e) {
         Platform.exit();
@@ -62,78 +56,59 @@ public class NUIController {
     protected void handleAboutWindow(ActionEvent e) {
         System.out.println("Clicked 'About'.");
     }
-    
 
     @FXML
     protected void handleLoadComponent(ActionEvent e) {
-        
+
         MenuItem clickedEntry = (MenuItem) e.getSource();
-        Map<Object, Object> m = clickedEntry.getProperties();    
+        Map<Object, Object> m = clickedEntry.getProperties();
         String componentName = (String) m.get("componentName");
-    
+        String componentResource = (String) m.get("componentResource");
+
         // Remove component from pane
         if (posComponent.containsKey(componentName)) {
             Pane pane = posComponent.get(componentName);
             pane.getChildren().removeIf(p -> p.getId().equals(componentName));
         }
-        
+
         // Determine proper menu button
         MenuButton mb = null;
         switch (componentName) {
-        case "proof":
-            mb = ButtonProof;
+        case "proofView":
+            mb = ButtonProofView;
             break;
-        case "goals":
-            mb = ButtonGoals;
+        case "goalView":
+            mb = ButtonGoalView;
             break;
-        case "userConstraint":
-            mb = ButtonUserConstraint;
+        case "openProofsView":
+            mb = ButtonOpenProofsView;
             break;
-        case "proofSearchStrategy":
-            mb = ButtonProofSearchStrategy;
-            break;
-        case "rules":
-            mb = ButtonRules;
+        case "treeView":
+            mb = ButtonTreeView;
             break;
         }
         // Update text of menu button
         mb.setText(clickedEntry.getText());
-        
+
         // Add component to selected pane and update text of menu button
         switch (clickedEntry.getId()) {
         case "toLeft":
-            componentFactory.createTreeView(componentName, left, posComponent);
+            componentFactory.createComponent(componentName, left,
+                    componentResource, posComponent);
             break;
         case "toMiddle":
-            componentFactory.createTreeView(componentName, middle, posComponent);
+            componentFactory.createComponent(componentName, middle,
+                    componentResource, posComponent);
             break;
         case "toRight":
-            componentFactory.createTreeView(componentName, right, posComponent);
+            componentFactory.createComponent(componentName, right,
+                    componentResource, posComponent);
             break;
+        case "toDown":
+            componentFactory.createComponent(componentName, down,
+                    componentResource, posComponent);
         default:
             break;
         }
-    }
-    
-    @FXML
-    protected void handleLoadGoals(ActionEvent e) {
-    }
-
-    @FXML
-    protected void handleLoadUserConstraint(ActionEvent e) {
-    }
-
-    @FXML
-    protected void handleLoadProofSearchStrategy(ActionEvent e) {
-    }
-
-    @FXML
-    protected void handleLoadRules(ActionEvent e) {
-    }
-
-    /**
-     * Initialization method for scene
-     */
-    public void initialize() {
     }
 }
