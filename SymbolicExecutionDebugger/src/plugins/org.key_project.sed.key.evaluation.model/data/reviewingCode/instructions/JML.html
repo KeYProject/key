@@ -1,0 +1,165 @@
+<html>
+   <head>
+      <title>JML</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
+   </head>
+   <body>
+      <h1>JML</h1>
+      <p>
+         The <a href="http://www.jmlspecs.org" target="_blank">Java Modeling Language (JML)</a> is a specification language used to specify the expected behavior of Java modules.
+      </p>
+      <p>
+         Some examples of this evaluation will contain some JML specifications to make the expected behavior more precise.
+         The relevant knowledge about JML is explained in the following sections.
+         <b>Please read them carefully before you continue.</b>
+         If you are familiar with JML, you can skip sections you know well.
+         <ul>
+            <li><a href="#comments">1 JML Comments</a></li>
+            <li><a href="#invariants">2 Class Invariants</a></li>
+            <li><a href="#mc">3 Method Contracts</a></li>
+            <li><a href="#loop">4 Loop Invariants</a></li>
+         </ul>
+      </p>
+      
+      <h2><a name="comments">1 JML Comments</a></h2>
+      <p>
+         JML specifications are placed as special comments within the Java source code.
+         Such comments have to start with the <code><font color="#55500A">@</font></code> character.
+         JML comments used in this evaluation look as follows:
+         <code>
+         <pre>
+<font color="#55500A">/*@ ...
+  @ ... 
+  @*/</font></pre></code>
+      </p>
+      
+      
+
+      <h2><a name="invariants">2 Class Invariants</a></h2>
+      <p>
+         A class invariant is a property used to limit the possible state space of instances.
+         All constructors of a class have to establish the invariant while all methods have to preserve it.
+         It can only be broken temporary within a method execution.
+      </p>
+      <p>
+         In JML keyword <code><font color="#C80064"><b>invariant</b></font></code> followed by a boolean expression defines a class invariant.
+         An expression is basically a normal Java expression as used for instance in <code><font color="#7F0055"><b>if</b></font></code> statements.
+         But additionally quantifiers (e.g. <code><font color="#6400C8"><b>\forall</b></font></code>) can be used.
+      </p>
+      <p>
+         The ability of a reference type to be <code><font color="#7F0055"><b>null</b></font></code> can be directly specified using keywords <code><font color="#C80064"><b>nullable</b></font></code> and <code><font color="#C80064"><b>non_null</b></font></code>.
+         An array reference specified as <code><font color="#C80064"><b>nullable</b></font></code>/<code><font color="#C80064"><b>non_null</b></font></code> forces also that the values at all array indices are <code><font color="#C80064"><b>nullable</b></font></code>/<code><font color="#C80064"><b>non_null</b></font></code>.
+      </p>
+      <p>
+         Consider the following example. 
+         The state space of instance field <code><font color="#0000C0">value</font></code> is limited to positive values (<code><font color="#55500A"><font color="#C80064"><b>invariant</b></font> value >= 0;</font></code>).
+         Additionally, <code><font color="#0000C0">description</font></code> might be <code><font color="#7F0055"><b>null</b></font></code> while <code><font color="#0000C0">id</font></code> will be never <code><font color="#7F0055"><b>null</b></font></code>.
+<code>
+<pre>
+<font color="#7F0055"><b>class</b></font> Entry {
+   <font color="#55500A">/*@ <font color="#C80064"><b>invariant</b></font> value >= 0;
+     @*/</font>
+   <font color="#7F0055"><b>protected int</b></font> <font color="#0000C0">value</font>;
+
+   <font color="#7F0055"><b>protected</b></font> <font color="#55500A">/*@ <font color="#C80064"><b>nullable</b></font> @*/</font> String <font color="#0000C0">description</font>;
+
+   <font color="#7F0055"><b>protected</b></font> <font color="#55500A">/*@ <font color="#C80064"><b>non_null</b></font> @*/</font> String <font color="#0000C0">id</font>;
+}
+</pre></code>
+      </p>
+      
+      
+
+      <h2><a name="mc">3 Method Contracts</a></h2>
+      <p>
+         A method contract specifies the expected behavior of a method in terms of pre- and postconditions.
+         Assuming that the precondition is fulfilled when the method is called, the method guarantees that the postcondition is established when it returns.
+         In JML the keywords <code><font color="#C80064"><b>normal_behavior</b></font></code> is used to specify that a method should terminate normally without a thrown exception.
+         Keyword <code><font color="#C80064"><b>requires</b></font></code> followed by a boolean expression defines a precondition while <code><font color="#C80064"><b>ensures</b></font></code> also followed by a boolean expression defines a postcondition.
+      </p>
+      <p>
+         Declaring a method as <code><font color="#C80064"><b>helper</b></font></code> also allows to call the method in a state in which the class invariant does not hold.
+         Such a helper method also does not need to reestablish the class invariant before it is returned.
+      </p>
+      <p>
+         The last part of a method contract is the assignable clause.
+         It lists all locations the method is allowed to change. 
+         Keyword <code><font color="#6400C8"><b>\everything</b></font></code> expresses that the method is allowed to change all reachable locations.
+      </p>
+      <p>
+         Consider the following example. 
+         The method contract of <code>accumulate</code> says that the method can be called in any state (<code><font color="#55500A"><font color="#C80064"><b>requires</b></font> true;</font></code>) even if the class invariant does not hold (<code><font color="#C80064"><b>helper</b></font></code>). 
+         The method will guarantee only true (<code><font color="#55500A"><font color="#C80064"><b>ensures</b></font> true;</font></code>) which means roughly that the behavior of the method is not specified.
+         A possible implementation can change any location (<code><font color="#C80064"><b>assignable</b></font> <font color="#6400C8"><b>\everything</b></font></code>).
+         The only specified restriction is that no exception will be thrown (<code><font color="#C80064"><b>normal_behavior</b></font></code>).
+<code><pre>
+<font color="#7F0055"><b>interface</b></font> Accumulator {
+   <font color="#55500A">/*@ <font color="#C80064"><b>normal_behavior</b></font>
+     @ <font color="#C80064"><b>requires</b></font> true;
+     @ <font color="#C80064"><b>ensures</b></font> true;
+     @ <font color="#C80064"><b>assignable</b></font> <font color="#6400C8"><b>\everything</b></font>;
+     @*/</font>
+   <font color="#7F0055"><b>public</b></font> <font color="#55500A">/*@ <font color="#C80064"><b>helper</b></font> @*/</font> <font color="#7F0055"><b>int</b></font> accumulate(<font color="#7F0055"><b>int</b></font> <font color="#6A3E3E">accumulation</font>, Entry <font color="#6A3E3E">entry</font>);
+}
+</pre></code>
+      </p>
+
+    
+      <h2><a name="loop">4 Loop Invariants</a></h2>
+      <p>
+         A loop invariant is a property which needs to hold before a loop is entered
+         and which is preserved by each loop iteration (loop guard and loop body). 
+         Thus it also holds after the loop. 
+      </p>
+      <p>
+         A loop invariant in JML consists of three parts:
+         <ul>
+            <li>Keyword <code><font color="#C80064"><b>loop_invariant</b></font></code> is used to specify a loop invariant.</li>
+            <li>Keyword <code><font color="#C80064"><b>decreasing</b></font></code> specifies a value which is always positive and strictly decreased in each loop iteration. It is used to prove termination of the loop. The decreasing clause is also named <i>variant</i>.</li>
+            <li>Keyword <code><font color="#C80064"><b>assignable</b></font></code> limits the locations may changed by the loop.</li>
+         </ul> 
+      </p>
+      <p>
+         The following example realizes a database consisting of Entry instances.
+         The class invariant says that instance field <font color="#0000C0">entries</font> is never <code><font color="#7F0055"><b>null</b></font></code> and of type Entry[] and also that all contained Entry instances are also not <code><font color="#7F0055"><b>null</b></font></code>.
+      </p>
+      <p>
+         The loop invariant in the example restricts the range of index variable <code><font color="#6A3E3E">i</font></code>.
+         Termination of the loop can be proven with help of the array length and the index variable (<code><font color="#C80064"><b>decreasing</b></font></code> term).
+         Finally, the loop is only allowed to change local variables <code><font color="#6A3E3E">accumulation</font></code> and <code><font color="#6A3E3E">i</font></code>.
+<code>
+<pre>
+<font color="#7F0055"><b>public class</b></font> Database {
+   <font color="#55500A">/*@ <font color="#C80064"><b>invariant</b></font> entries != null;
+     @ <font color="#C80064"><b>invariant</b></font> <font color="#6400C8"><b>\typeof</b></font>(entries) == <font color="#6400C8"><b>\type</b></font>(Entry[]);
+     @ <font color="#C80064"><b>invariant</b></font> (<font color="#6400C8"><b>\forall</b></font> int i; i >= 0 && i < entries.length; entries[i] != null);
+     @*/</font>
+   <font color="#7F0055"><b>private</b></font> Entry[] <font color="#0000C0">entries</font>;
+
+   <font color="#7F0055"><b>public</b></font> Database(Entry[] <font color="#6A3E3E">entries</font>) {
+      <font color="#7F0055"><b>this</b></font>.<font color="#0000C0">entries</font> = <font color="#6A3E3E">entries</font>;
+   }
+
+   <font color="#3F5FBF">/**
+    * Accumulates the value of all <font color="#3F3FBF">{@link Entry}</font> instances in the <font color="#3F3FBF">{@link Database}</font>
+    * with help of the given <font color="#3F3FBF">{@link Accumulator}</font>.
+    * <font color="#7F9FBF">@param</font> accumulator The <font color="#3F3FBF">{@link Accumulator}</font> to use which is not allowed to be {@code null}.
+    * <font color="#7F9FBF">@return</font> The computed accumulation.
+    */</font>
+   <font color="#7F0055"><b>public int</b></font> accumulateDatabase(<font color="#55500A">/*@ <font color="#C80064"><b>non_null</b></font> @*/</font> Accumulator <font color="#6A3E3E">accumulator</font>) {
+      <font color="#7F0055"><b>int</b></font> <font color="#6A3E3E">accumulation</font> = 0;
+      <font color="#55500A">/*@ <font color="#C80064"><b>loop_invariant</b></font> i >= 1 && i <= (entries.length + 1);
+        @ <font color="#C80064"><b>decreasing</b></font> entries.length - i;
+        @ <font color="#C80064"><b>assignable</b></font> accumulation, i;
+        @*/</font>
+      <font color="#7F0055"><b>for</b></font> (<font color="#7F0055"><b>int</b></font> <font color="#6A3E3E">i</font> = 1; <font color="#6A3E3E">i</font> <= <font color="#0000C0">entries</font>.<font color="#0000C0">length</font>; <font color="#6A3E3E">i</font>++) {
+         <font color="#6A3E3E">accumulator</font>.accumulate(<font color="#6A3E3E">accumulation</font>, <font color="#0000C0">entries</font>[<font color="#6A3E3E">i</font>]);
+      }
+      <font color="#7F0055"><b>return</b></font> <font color="#6A3E3E">accumulation</font>;
+   }
+}
+</pre></code>
+      </p>    
+    
+   </body>
+</html>

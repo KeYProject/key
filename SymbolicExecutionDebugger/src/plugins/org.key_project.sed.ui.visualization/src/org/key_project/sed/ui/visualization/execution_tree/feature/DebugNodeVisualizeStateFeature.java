@@ -19,14 +19,14 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.visualization.object_diagram.command.VisualizeStateCommand;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
  * An {@link ICustomFeature} which executes 
- * {@link VisualizeStateCommand#visualizeState(ISEDDebugNode, org.eclipse.ui.IWorkbenchPage)}
+ * {@link VisualizeStateCommand#visualizeState(ISENode, org.eclipse.ui.IWorkbenchPage)}
  * on selected business objects.
  * @author Martin Hentschel
  */
@@ -74,7 +74,7 @@ public class DebugNodeVisualizeStateFeature extends AbstractCustomFeature {
             for (PictogramElement pe : pes) {
                Object businessObject = getBusinessObjectForPictogramElement(pe);
                if (VisualizeStateCommand.canVisualize(businessObject)) {
-                  VisualizeStateCommand.visualizeState((ISEDDebugNode)businessObject, WorkbenchUtil.getActivePage());
+                  VisualizeStateCommand.visualizeState((ISENode)businessObject, WorkbenchUtil.getActivePage());
                }
             }
          }

@@ -11,14 +11,17 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                <callStackEntry path="/0"/>
                <branchCondition name="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="true" branchCondition="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
-                  <statement name="result_1++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false">
+                  <loopCondition name="i&lt;array.length" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false" blockOpened="false">
                      <callStackEntry path="/0"/>
-                     <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false">
+                     <statement name="result_1++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
-                        </termination>
+                        <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                           </termination>
+                        </statement>
                      </statement>
-                  </statement>
+                  </loopCondition>
                </branchCondition>
                <branchCondition name="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),equals(length(array),i_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),equals(length(array),i_0)))" pathConditionChanged="true" branchCondition="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_1_0,i_0)),equals(length(array),i_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <callStackEntry path="/0"/>
@@ -36,6 +39,6 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
       </statement>
       <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/1/0/0/0"/>
 </start>

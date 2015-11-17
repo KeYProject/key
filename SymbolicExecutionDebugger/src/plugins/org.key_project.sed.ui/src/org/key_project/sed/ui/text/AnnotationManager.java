@@ -34,11 +34,11 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
-import org.key_project.sed.core.sourcesummary.ISEDSourceRange;
-import org.key_project.sed.core.sourcesummary.ISEDSourceSummary;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.sourcesummary.ISESourceModel;
+import org.key_project.sed.core.sourcesummary.ISESourceRange;
+import org.key_project.sed.core.sourcesummary.ISESourceSummary;
 import org.key_project.sed.ui.util.LaunchViewManager;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -109,9 +109,9 @@ public class AnnotationManager implements IDisposable {
    };
    
    /**
-    * The currently annotated {@link ISEDDebugTarget}s.
+    * The currently annotated {@link ISEDebugTarget}s.
     */
-   private Set<ISEDDebugTarget> annotatedDebugTargets;
+   private Set<ISEDebugTarget> annotatedDebugTargets;
    
    /**
     * Constructor.
@@ -141,30 +141,30 @@ public class AnnotationManager implements IDisposable {
    
    /**
     * Updates the shown annotations according to the {@link ISelection}.
-    * @param selection The {@link ISelection} with the {@link ISEDDebugTarget}s to annotate.
+    * @param selection The {@link ISelection} with the {@link ISEDebugTarget}s to annotate.
     */
    protected void updateAnnotations(ISelection selection) {
-      Set<ISEDDebugTarget> newTargets = new HashSet<ISEDDebugTarget>();
+      Set<ISEDebugTarget> newTargets = new HashSet<ISEDebugTarget>();
       Object[] selected = SWTUtil.toArray(selection);
       for (Object element : selected) {
          if (element instanceof ILaunch) {
             ILaunch launch = (ILaunch)element;
             IDebugTarget[] targets = launch.getDebugTargets();
             for (IDebugTarget target : targets) {
-               if (target instanceof ISEDDebugTarget) {
-                  newTargets.add((ISEDDebugTarget)target);
+               if (target instanceof ISEDebugTarget) {
+                  newTargets.add((ISEDebugTarget)target);
                }
             }
          }
          else if (element instanceof IDebugTarget) {
-            if (element instanceof ISEDDebugTarget) {
-               newTargets.add((ISEDDebugTarget)element);
+            if (element instanceof ISEDebugTarget) {
+               newTargets.add((ISEDebugTarget)element);
             }
          }
          else if (element instanceof IDebugElement) {
             IDebugTarget target = ((IDebugElement)element).getDebugTarget();
-            if (target instanceof ISEDDebugTarget) {
-               newTargets.add((ISEDDebugTarget)target);
+            if (target instanceof ISEDebugTarget) {
+               newTargets.add((ISEDebugTarget)target);
             }
          }
       }
@@ -175,33 +175,33 @@ public class AnnotationManager implements IDisposable {
    
    /**
     * Changes the currently shown annotations.
-    * @param targets The new {@link ISEDDebugTarget}s to annotate, may {@code null}.
+    * @param targets The new {@link ISEDebugTarget}s to annotate, may {@code null}.
     */
-   protected void updateAnnotations(Set<ISEDDebugTarget> targets) {
+   protected void updateAnnotations(Set<ISEDebugTarget> targets) {
       if (annotatedDebugTargets != null) {
          if (targets == null) {
-            for (ISEDDebugTarget target : annotatedDebugTargets) {
+            for (ISEDebugTarget target : annotatedDebugTargets) {
                removeAnnotations(target);
             }
          }
          else {
-            for (ISEDDebugTarget target : annotatedDebugTargets) {
+            for (ISEDebugTarget target : annotatedDebugTargets) {
                if (!targets.contains(target)) {
                   removeAnnotations(target);
                }
             }
          }
       }
-      Set<ISEDDebugTarget> oldTargets = annotatedDebugTargets;
+      Set<ISEDebugTarget> oldTargets = annotatedDebugTargets;
       annotatedDebugTargets = targets;
       if (annotatedDebugTargets != null) {
          if (oldTargets == null) {
-            for (ISEDDebugTarget target : annotatedDebugTargets) {
+            for (ISEDebugTarget target : annotatedDebugTargets) {
                showAnnotations(target);
             }
          }
          else {
-            for (ISEDDebugTarget target : annotatedDebugTargets) {
+            for (ISEDebugTarget target : annotatedDebugTargets) {
                if (!oldTargets.contains(target)) {
                   showAnnotations(target);
                }
@@ -211,10 +211,10 @@ public class AnnotationManager implements IDisposable {
    }
 
    /**
-    * Removes all annotations of the given {@link ISEDDebugTarget}.
-    * @param target The {@link ISEDDebugTarget} to remove its annotations.
+    * Removes all annotations of the given {@link ISEDebugTarget}.
+    * @param target The {@link ISEDebugTarget} to remove its annotations.
     */
-   protected void removeAnnotations(ISEDDebugTarget target) {
+   protected void removeAnnotations(ISEDebugTarget target) {
       IEditorReference[] editorReferences = debugView.getSite().getPage().getEditorReferences();
       for (IEditorReference reference : editorReferences) {
          IEditorPart editor = reference.getEditor(false);
@@ -237,13 +237,13 @@ public class AnnotationManager implements IDisposable {
    }
 
    /**
-    * Removes the given {@link ISEDDebugTarget} from the {@link SymbolicallyReachedAnnotation}
+    * Removes the given {@link ISEDebugTarget} from the {@link SymbolicallyReachedAnnotation}
     * and the {@link SymbolicallyReachedAnnotation} if empty from the {@link IAnnotationModel}.
     * @param model The {@link IAnnotationModel}.
-    * @param annotation The {@link SymbolicallyReachedAnnotation} to {@link ISEDDebugTarget} in.
-    * @param target The {@link ISEDDebugTarget} to remove.
+    * @param annotation The {@link SymbolicallyReachedAnnotation} to {@link ISEDebugTarget} in.
+    * @param target The {@link ISEDebugTarget} to remove.
     */
-   protected void removeTarget(IAnnotationModel model, SymbolicallyReachedAnnotation annotation, ISEDDebugTarget target) {
+   protected void removeTarget(IAnnotationModel model, SymbolicallyReachedAnnotation annotation, ISEDebugTarget target) {
       annotation.removeTarget(target);
       if (!annotation.hasTargets()) {
          model.removeAnnotation(annotation);
@@ -251,10 +251,10 @@ public class AnnotationManager implements IDisposable {
    }
 
    /**
-    * Shows all annotations of the given {@link ISEDDebugTarget}.
-    * @param target The {@link ISEDDebugTarget} which provides the reached source code.
+    * Shows all annotations of the given {@link ISEDebugTarget}.
+    * @param target The {@link ISEDebugTarget} which provides the reached source code.
     */
-   protected void showAnnotations(ISEDDebugTarget target) {
+   protected void showAnnotations(ISEDebugTarget target) {
       IEditorReference[] editorReferences = debugView.getSite().getPage().getEditorReferences();
       for (IEditorReference reference : editorReferences) {
          IEditorPart editor = reference.getEditor(false);
@@ -263,12 +263,12 @@ public class AnnotationManager implements IDisposable {
    }
    
    /**
-    * Computes the {@link Position} of the given {@link ISEDSourceRange} in the given {@link IDocument}.
+    * Computes the {@link Position} of the given {@link ISESourceRange} in the given {@link IDocument}.
     * @param document The {@link IDocument} to compute the {@link Position} in.
-    * @param range The {@link ISEDSourceRange}.
+    * @param range The {@link ISESourceRange}.
     * @return The computed {@link Position} or {@code null} if not available.
     */
-   protected Position computePosition(IDocument document, ISEDSourceRange range) {
+   protected Position computePosition(IDocument document, ISESourceRange range) {
       if (range.getCharStart() >= 0 && range.getCharEnd() >= range.getCharStart()) {
          return new Position(range.getCharStart(), range.getCharEnd() - range.getCharStart());
       }
@@ -312,8 +312,8 @@ public class AnnotationManager implements IDisposable {
       if (annotatedDebugTargets != null) {
          for (DebugEvent event : events) {
             if (DebugEvent.SUSPEND == event.getKind() && 
-                event.getSource() instanceof ISEDDebugElement) {
-               ISEDDebugTarget target = ((ISEDDebugElement) event.getSource()).getDebugTarget();
+                event.getSource() instanceof ISEDebugElement) {
+               ISEDebugTarget target = ((ISEDebugElement) event.getSource()).getDebugTarget();
                if (annotatedDebugTargets.contains(target)) {
                   updateAnnotations(target);
                }
@@ -323,10 +323,10 @@ public class AnnotationManager implements IDisposable {
    }
 
    /**
-    * Updates the currently shown annotations of the given {@link ISEDDebugTarget}.
-    * @param target The {@link ISEDDebugTarget} to update its annotations.
+    * Updates the currently shown annotations of the given {@link ISEDebugTarget}.
+    * @param target The {@link ISEDebugTarget} to update its annotations.
     */
-   protected void updateAnnotations(ISEDDebugTarget target) {
+   protected void updateAnnotations(ISEDebugTarget target) {
       IEditorReference[] editorReferences = debugView.getSite().getPage().getEditorReferences();
       for (IEditorReference reference : editorReferences) {
          IEditorPart editor = reference.getEditor(false);
@@ -335,18 +335,18 @@ public class AnnotationManager implements IDisposable {
    }
    
    /**
-    * Updates the {@link Annotation}s in the given {@link IEditorPart} for the given {@link ISEDDebugTarget}.
+    * Updates the {@link Annotation}s in the given {@link IEditorPart} for the given {@link ISEDebugTarget}.
     * @param editor The {@link IEditorPart} to update its {@link Annotation}s.
-    * @param target The {@link ISEDDebugTarget} to handle.
+    * @param target The {@link ISEDebugTarget} to handle.
     */
-   protected void updateAnnotations(IEditorPart editor, ISEDDebugTarget target) {
+   protected void updateAnnotations(IEditorPart editor, ISEDebugTarget target) {
       try {
          if (editor instanceof ITextEditor) {
             Object editorSource = getEditorSource(editor);
-            ISEDSourceModel sourceModel = target.getSourceModel();
+            ISESourceModel sourceModel = target.getSourceModel();
             if (sourceModel != null) {
                sourceModel.ensureCompleteness();
-               ISEDSourceSummary summary = sourceModel.getSourceSummary(editorSource);
+               ISESourceSummary summary = sourceModel.getSourceSummary(editorSource);
                if (summary != null) {
                   ITextEditor te = (ITextEditor)editor;
                   IDocumentProvider provider = te.getDocumentProvider();
@@ -355,7 +355,7 @@ public class AnnotationManager implements IDisposable {
                   if (editorSource != null) {
                      Map<Position, SymbolicallyReachedAnnotation> existingAnnotations = createAnnotationRangeMap(model);
                      // Update existing annotations and add new annotations if not already present.
-                     for (ISEDSourceRange range : summary.getSourceRanges()) {
+                     for (ISESourceRange range : summary.getSourceRanges()) {
                         Position position = computePosition(document, range);
                         if (position != null) {
                            SymbolicallyReachedAnnotation annotation = existingAnnotations.remove(position);
@@ -407,7 +407,7 @@ public class AnnotationManager implements IDisposable {
     */
    protected void handlePartOpened(IWorkbenchPart part) {
       if (annotatedDebugTargets != null && part instanceof IEditorPart) {
-         for (ISEDDebugTarget target : annotatedDebugTargets) {
+         for (ISEDebugTarget target : annotatedDebugTargets) {
             updateAnnotations((IEditorPart)part, target);
          }
       }

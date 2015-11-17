@@ -18,10 +18,10 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.impl.AbstractSEDStatement;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.impl.AbstractSEStatement;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
@@ -32,11 +32,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDStatement} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEStatement} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNode<IExecutionStatement> {
+public class KeYStatement extends AbstractSEStatement implements IKeYSENode<IExecutionStatement> {
    /**
     * The {@link IExecutionStatement} to represent by this debug node.
     */
@@ -45,7 +45,7 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The source name.
@@ -70,12 +70,12 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -85,7 +85,7 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * @param executionNode The {@link IExecutionStatement} to represent by this debug node.
     */
    public KeYStatement(KeYDebugTarget target, 
-                       IKeYSEDDebugNode<?> parent, 
+                       IKeYSENode<?> parent, 
                        KeYThread thread, 
                        IExecutionStatement executionNode) throws DebugException {
       super(target, parent, thread);
@@ -115,15 +115,15 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -359,7 +359,7 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -372,7 +372,7 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -385,7 +385,7 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 

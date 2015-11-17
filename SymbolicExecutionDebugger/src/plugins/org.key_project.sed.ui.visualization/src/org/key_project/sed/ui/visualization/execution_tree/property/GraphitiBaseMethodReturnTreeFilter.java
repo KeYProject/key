@@ -17,8 +17,8 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.ui.IWorkbenchPart;
-import org.key_project.sed.core.model.ISEDBaseMethodReturn;
-import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
+import org.key_project.sed.core.model.ISEBaseMethodReturn;
+import org.key_project.sed.ui.property.ISENodeTabContent;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -36,7 +36,7 @@ public class GraphitiBaseMethodReturnTreeFilter extends AbstractPropertySectionF
       if (part != null) {
          AbstractGraphitiDebugNodePropertySection section = new AbstractGraphitiDebugNodePropertySection() {
             @Override
-            protected ISEDDebugNodeTabContent createContent() {
+            protected ISENodeTabContent createContent() {
                return null; // Is never used.
             }
          };
@@ -55,6 +55,6 @@ public class GraphitiBaseMethodReturnTreeFilter extends AbstractPropertySectionF
     * @return {@code true} accept, {@code false} do not accept.
     */
    protected boolean accept(PictogramElement pe, AbstractGraphitiDebugNodePropertySection section) {
-      return section.getDebugNode(pe) instanceof ISEDBaseMethodReturn;
+      return section.getDebugNode(pe) instanceof ISEBaseMethodReturn;
    }
 }

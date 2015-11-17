@@ -106,5 +106,4 @@ public interface IASTNode {
     * @return the AST in a pretty String representation.
     */
    String prettyPrintAST();
-
 }

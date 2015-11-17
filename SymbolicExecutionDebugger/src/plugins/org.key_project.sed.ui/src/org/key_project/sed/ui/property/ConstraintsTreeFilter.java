@@ -15,26 +15,26 @@ package org.key_project.sed.ui.property;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.core.model.ISEDConstraint;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEConstraint;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.util.java.ArrayUtil;
 
 /**
  * {@link IFilter} implementation used to check if
- * {@link ISEDGroupable#getGroupEndConditions()} is not empty.
+ * {@link ISEGroupable#getGroupEndConditions()} is not empty.
  * @author Martin Hentschel
  */
-public class ConstraintsTreeFilter extends SEDDebugNodeTreeFilter {
+public class ConstraintsTreeFilter extends SENodeTreeFilter {
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean select(Object toTest) {
       try {
-         ISEDDebugNode node = AbstractSEDDebugNodePropertySection.getDebugNode(toTest);
+         ISENode node = AbstractSENodePropertySection.getDebugNode(toTest);
          if (node != null) {
-            ISEDConstraint[] constraints = node.getConstraints();
+            ISEConstraint[] constraints = node.getConstraints();
             return !ArrayUtil.isEmpty(constraints);
          }
          else {

@@ -15,7 +15,7 @@ package org.key_project.sed.ui.visualization.execution_tree.wizard;
 
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.util.java.IOUtil;
 
@@ -28,8 +28,8 @@ public class NewExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagramS
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugTarget[] getDebugTargetsToSave() {
-      return new ISEDDebugTarget[0];
+   protected ISEDebugTarget[] getDebugTargetsToSave() {
+      return new ISEDebugTarget[0];
    }
 
    /**

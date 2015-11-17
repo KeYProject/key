@@ -18,10 +18,10 @@ import java.io.File;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDExceptionalTermination;
-import org.key_project.sed.core.model.impl.AbstractSEDExceptionalTermination;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEExceptionalTermination;
+import org.key_project.sed.core.model.impl.AbstractSEExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -33,11 +33,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDExceptionalTermination} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEExceptionalTermination} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination implements IKeYTerminationNode<IExecutionTermination> {
+public class KeYExceptionalTermination extends AbstractSEExceptionalTermination implements IKeYTerminationNode<IExecutionTermination> {
    /**
     * The {@link IExecutionTermination} to represent by this debug node.
     */
@@ -46,12 +46,12 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The constraints
@@ -66,7 +66,7 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -76,7 +76,7 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
     * @param executionNode The {@link IExecutionTermination} to represent by this debug node.
     */
    public KeYExceptionalTermination(KeYDebugTarget target, 
-                                    IKeYSEDDebugNode<?> parent, 
+                                    IKeYSENode<?> parent, 
                                     KeYThread thread, 
                                     IExecutionTermination executionNode) throws DebugException {
       super(target, parent, thread);
@@ -107,15 +107,15 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 
@@ -123,7 +123,7 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -174,7 +174,7 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -284,7 +284,7 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);

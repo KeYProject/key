@@ -11,13 +11,20 @@
 		<jar destfile="${dist.dir}/components/key.core.testgen.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
 	</target>
 
-	<target name="compile" description="Compile all source files into the build directory.">
-		<mkdir dir="${build.dir}"/>
+	<target name="copy" description="Copy all resources into the binary directory.">
+		<mkdir dir="${build.dir}" />
+		<copy todir="${build.dir}/META-INF">
+			<fileset dir="${basedir}/META-INF/"/>
+		</copy>
+	</target>
+
+	<target name="compile" depends="copy" description="Compile all source files into the build directory.">
 		<javac srcdir= "${src.dir}" 
 		       destdir="${build.dir}" 
 		       sourcepath="${src.dir}" 
 		       includeantruntime="false" 
 		       source="1.7" 
+		       target="1.7"
 		       deprecation="off" 
 		       debug="on" 
 		       depend="${build.depend}" 

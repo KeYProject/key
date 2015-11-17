@@ -18,11 +18,11 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * {@link ISection} implementation to show the properties of {@link ISENode}s.
  * @author Martin Hentschel
  */
 public class LoopInvariantGraphitiPropertySection extends AbstractTruthValueGraphitiPropertySection {
@@ -30,8 +30,8 @@ public class LoopInvariantGraphitiPropertySection extends AbstractTruthValueGrap
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getDebugNode(PictogramElement pe) {
-      IKeYSEDDebugNode<?> node = null;
+   public IKeYSENode<?> getDebugNode(PictogramElement pe) {
+      IKeYSENode<?> node = null;
       if (pe != null) {
          IDiagramTypeProvider diagramProvider = getDiagramTypeProvider();
          if (diagramProvider != null) {
@@ -50,6 +50,6 @@ public class LoopInvariantGraphitiPropertySection extends AbstractTruthValueGrap
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new LoopInvariantComposite(parent, getWidgetFactory());
+      return new LoopInvariantComposite(parent, getWidgetFactory(), this);
    }
 }

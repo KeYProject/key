@@ -21,7 +21,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.key_project.sed.core.model.ISEDStatement;
+import org.key_project.sed.core.model.ISEStatement;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
@@ -127,15 +127,15 @@ public class AbstractSWTBotVariablesPropertyTabTest extends AbstractSetupTestCas
    }
 
    /**
-    * Selects an {@link ISEDStatement}.
+    * Selects an {@link ISEStatement}.
     * @param debugView The {@link SWTBotView} to select in.
-    * @return The selected {@link ISEDStatement}.
+    * @return The selected {@link ISEStatement}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDStatement selectStatement(SWTBotView debugView) throws Exception {
+   protected ISEStatement selectStatement(SWTBotView debugView) throws Exception {
       Object data = selectInDebugTree(debugView, 0, 0, 0, 0);
-      assertTrue(data instanceof ISEDStatement);
-      return (ISEDStatement)data;
+      assertTrue(data instanceof ISEStatement);
+      return (ISEStatement)data;
    }
    
    /**

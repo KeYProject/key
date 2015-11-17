@@ -440,7 +440,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     */
    protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode, boolean returnFormatedCondition) throws ProofInputException {
       final InitConfig initConfig = getInitConfig();
-      if (initConfig != null && // Ohterwise Proof is disposed.
+      if (initConfig != null && // Otherwise Proof is disposed.
           completedBlocks.contains(completedNode)) {
          final Services services = initConfig.getServices();
          // Collect branch conditions
@@ -448,7 +448,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
          AbstractExecutionNode<?> parent = getParent();
          while (parent != null && parent != completedNode) {
             if (parent instanceof IExecutionBranchCondition) {
-               bcs.add(((IExecutionBranchCondition)parent).getBranchCondition());
+               Term bc = ((IExecutionBranchCondition)parent).getBranchCondition();
+               if (bc == null) {
+                  return null; // Proof disposed in between, computation not possible
+               }
+               bcs.add(bc);
             }
             parent = parent.getParent();
          }

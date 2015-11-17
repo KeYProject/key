@@ -17,15 +17,15 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISELoopCondition;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.memory.SEMemoryLoopCondition;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link ICreateFeature} for {@link ISEDLoopCondition}s.
+ * Implementation of {@link ICreateFeature} for {@link ISELoopCondition}s.
  * @author Martin Hentschel
  */
 public class LoopConditionCreateFeature extends AbstractDebugNodeCreateFeature {
@@ -57,11 +57,11 @@ public class LoopConditionCreateFeature extends AbstractDebugNodeCreateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
-                                              ISEDDebugNode parent,
-                                              ISEDThread thread,
+   protected ISENode createNewDebugNode(ISEDebugTarget target,
+                                              ISENode parent,
+                                              ISEThread thread,
                                               String name) throws DebugException {
-      SEDMemoryLoopCondition result = new SEDMemoryLoopCondition(target, parent, thread);
+      SEMemoryLoopCondition result = new SEMemoryLoopCondition(target, parent, thread);
       result.setName(name);
       return result;
    }

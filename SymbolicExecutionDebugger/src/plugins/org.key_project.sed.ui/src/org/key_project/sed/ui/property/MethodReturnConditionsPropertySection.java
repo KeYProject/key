@@ -14,19 +14,19 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEMethodCall;
 
 /**
- * {@link ISection} implementation to show the method return conditions of an {@link ISEDMethodCall}
- * which is provided via {@link ISEDMethodCall#getMethodReturnConditions()}.
+ * {@link ISection} implementation to show the method return conditions of an {@link ISEMethodCall}
+ * which is provided via {@link ISEMethodCall#getMethodReturnConditions()}.
  * @author Martin Hentschel
  */
-public class MethodReturnConditionsPropertySection extends AbstractSEDDebugNodePropertySection {
+public class MethodReturnConditionsPropertySection extends AbstractSENodePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new MethodReturnConditionsTabComposite();
    }
 

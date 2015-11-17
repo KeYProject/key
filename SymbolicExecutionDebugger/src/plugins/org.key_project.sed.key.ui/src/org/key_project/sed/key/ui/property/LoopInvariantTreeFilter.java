@@ -14,7 +14,7 @@
 package org.key_project.sed.key.ui.property;
 
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 
 /**
  * {@link IFilter} implementation used to define if a {@link LoopInvariantPropertySection}
@@ -27,7 +27,7 @@ public class LoopInvariantTreeFilter implements IFilter {
     */
    @Override
    public boolean select(Object toTest) {
-      IKeYSEDDebugNode<?> node = LoopInvariantPropertySection.getDebugNode(toTest);
+      IKeYSENode<?> node = LoopInvariantPropertySection.getDebugNode(toTest);
       return node != null && node.isTruthValueEvaluationEnabled();
    }
 }

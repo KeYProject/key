@@ -89,7 +89,11 @@ public class Statistics {
     }
 
     Statistics(Proof proof) {
-        final Iterator<Node> it = proof.root().subtreeIterator();
+        this(proof.root());
+    }
+
+    Statistics(Node startNode) {
+        final Iterator<Node> it = startNode.subtreeIterator();
 
         int tmpNodes = 0; // proof nodes
         int tmpBranches = 1; // proof branches
@@ -117,7 +121,6 @@ public class Statistics {
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
-
                 if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
                     tmpOss++;
                     final Protocol protocol =
@@ -158,11 +161,11 @@ public class Statistics {
         this.dependencyContractApps = tmpDep;
         this.operationContractApps = tmpContr;
         this.loopInvApps = tmpInv;
-        this.autoModeTimeInNano = proof.getAutoModeTime();
-        this.timeInNano = (System.nanoTime() - proof.creationTime);
+        this.autoModeTimeInNano = startNode.proof().getAutoModeTime();
+        this.timeInNano = (System.nanoTime() - startNode.proof().creationTime);
         timePerStepInNano = nodes<=1? .0f: (autoModeTimeInNano/(float)(nodes-1));
 
-        generateSummary(proof);
+        generateSummary(startNode.proof());
     }
 
     private void generateSummary(Proof proof) {

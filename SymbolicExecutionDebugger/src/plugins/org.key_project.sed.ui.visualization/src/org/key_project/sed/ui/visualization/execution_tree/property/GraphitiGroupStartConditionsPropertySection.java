@@ -14,13 +14,13 @@
 package org.key_project.sed.ui.visualization.execution_tree.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.property.GroupStartConditionsTabComposite;
-import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
+import org.key_project.sed.ui.property.ISENodeTabContent;
 
 /**
- * {@link ISection} implementation to show the group start conditions of an {@link ISEDDebugNode}
- * which is provided via {@link ISEDDebugNode#getGroupStartConditions()}.
+ * {@link ISection} implementation to show the group start conditions of an {@link ISENode}
+ * which is provided via {@link ISENode#getGroupStartConditions()}.
  * @author Martin Hentschel
  */
 public class GraphitiGroupStartConditionsPropertySection extends AbstractGraphitiDebugNodePropertySection {
@@ -28,7 +28,7 @@ public class GraphitiGroupStartConditionsPropertySection extends AbstractGraphit
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new GroupStartConditionsTabComposite();
    }
 }

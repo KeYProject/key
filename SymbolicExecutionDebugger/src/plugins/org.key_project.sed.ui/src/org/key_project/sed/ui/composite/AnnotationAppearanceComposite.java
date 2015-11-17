@@ -11,20 +11,20 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationAppearance;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationAppearance;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.AnnotationApperanceDefinition;
 
 /**
- * This {@link Composite} is used to edit the appearance of an {@link ISEDAnnotation}
+ * This {@link Composite} is used to edit the appearance of an {@link ISEAnnotation}
  * @author Martin Hentschel
  */
 public class AnnotationAppearanceComposite extends Composite {
    /**
-    * The optional {@link ISEDAnnotationType} defining the default values.
+    * The optional {@link ISEAnnotationType} defining the default values.
     */
-   private final ISEDAnnotationType annotationType;
+   private final ISEAnnotationType annotationType;
    
    /**
     * Highlight background?
@@ -65,9 +65,9 @@ public class AnnotationAppearanceComposite extends Composite {
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style to use.
-    * @param annotation The optional {@link ISEDAnnotationType} defining the default values.
+    * @param annotation The optional {@link ISEAnnotationType} defining the default values.
     */
-   public AnnotationAppearanceComposite(Composite parent, int style, ISEDAnnotationType annotationType) {
+   public AnnotationAppearanceComposite(Composite parent, int style, ISEAnnotationType annotationType) {
       super(parent, style);
       this.annotationType = annotationType;
       setLayout(new FillLayout());
@@ -131,7 +131,7 @@ public class AnnotationAppearanceComposite extends Composite {
    /**
     * Updates the shown content.
     */
-   public void showContent(ISEDAnnotationType annotationType) {
+   public void showContent(ISEAnnotationType annotationType) {
       if (annotationType != null) {
          highlightBackgroundButton.setSelection(annotationType.isHighlightBackground());
          backgroundSelector.setColorValue(annotationType.getBackgroundColor());
@@ -145,7 +145,7 @@ public class AnnotationAppearanceComposite extends Composite {
    /**
     * Updates the shown content.
     */
-   public void showContent(ISEDAnnotationAppearance appearance) {
+   public void showContent(ISEAnnotationAppearance appearance) {
       if (appearance != null) {
          highlightBackgroundButton.setSelection(appearance.isHighlightBackground());
          backgroundSelector.setColorValue(appearance.getBackgroundColor());
@@ -185,12 +185,12 @@ public class AnnotationAppearanceComposite extends Composite {
    }
 
    /**
-    * Applies the changes to the given {@link ISEDAnnotationAppearance}.
-    * @param appearance The {@link ISEDAnnotationAppearance} to modify.
+    * Applies the changes to the given {@link ISEAnnotationAppearance}.
+    * @param appearance The {@link ISEAnnotationAppearance} to modify.
     */
-   public void applyChanges(ISEDAnnotationAppearance appearance) {
+   public void applyChanges(ISEAnnotationAppearance appearance) {
       if (appearance != null) {
-         ISEDAnnotationType type = appearance.getType();
+         ISEAnnotationType type = appearance.getType();
          if (highlightBackgroundButton.getSelection() == type.isHighlightBackground()) {
             appearance.setCustomHighlightBackground(null);
          }
@@ -219,11 +219,11 @@ public class AnnotationAppearanceComposite extends Composite {
    }
    
    /**
-    * Returns the specified {@link ISEDAnnotationAppearance}.
-    * @return The specified {@link ISEDAnnotationAppearance}.
+    * Returns the specified {@link ISEAnnotationAppearance}.
+    * @return The specified {@link ISEAnnotationAppearance}.
     */
-   public ISEDAnnotationAppearance getAnnotationAppearance() {
-      ISEDAnnotationAppearance appearance = new AnnotationApperanceDefinition(annotationType);
+   public ISEAnnotationAppearance getAnnotationAppearance() {
+      ISEAnnotationAppearance appearance = new AnnotationApperanceDefinition(annotationType);
       applyChanges(appearance);
       return appearance;
    }

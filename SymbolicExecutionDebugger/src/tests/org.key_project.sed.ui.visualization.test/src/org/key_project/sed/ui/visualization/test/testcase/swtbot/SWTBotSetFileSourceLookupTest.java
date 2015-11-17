@@ -25,8 +25,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDStatement;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEStatement;
 import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.visualization.launch.SETFileSourceLookupDirector;
@@ -49,11 +49,11 @@ public class SWTBotSetFileSourceLookupTest extends AbstractSWTBotSetFileTest {
    public void testStatementSourceLocation() throws Exception {
       ISetFileTestSteps steps = new ISetFileTestSteps() {
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             // Select statement in debug tree
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 0, 0, 0);
             // Get statement that should be selected in opened editor.
-            ISEDStatement statement = (ISEDStatement)TestUtilsUtil.getTreeItemData(item);
+            ISEStatement statement = (ISEStatement)TestUtilsUtil.getTreeItemData(item);
             // Make sure that an editor is opened
             SWTBotEditor editor = TestUtilsUtil.waitForEditor(bot);
             assertNotNull(editor);

@@ -98,8 +98,8 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final IResource res = context.getWorkingCopy().getResource();
 
          // Detect all comments in the file and then parse it
-         final CommentLocator locator = new CommentLocator(source);
-         for (final CommentRange jmlComment : locator.findJMLCommentRanges()) {
+         List<CommentRange> jmlComments = CommentLocator.listJMLCommentRanges(source, context.getAST8());
+         for (final CommentRange jmlComment : jmlComments) {
             final IJMLParser parser = JMLPreferencesHelper
                   .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
@@ -150,17 +150,16 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final String source = new String(context.getContents());
          // Remove all JML Error markers from the file
          ErrorMarkerUpdater.removeErrorMarkers(res);
-         // Detect all comments in the file and then parse it
-         final CommentLocator locator = new CommentLocator(source);
-         final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
          // Start Preparation for Validation
          // Setup JDT Parser and Create JDT AST
-         final org.eclipse.jdt.core.dom.CompilationUnit ast = (org.eclipse.jdt.core.dom.CompilationUnit) JDTUtil.parse(source);
+         final CompilationUnit compilationUnit = (CompilationUnit) JDTUtil.parse(source);
          // Setup jmlParser
-         final IJMLParser jmlParser = JMLPreferencesHelper
-               .getProjectActiveJMLProfile(res.getProject()).createParser();
+         // Detect all comments in the file and then parse it
+         final List<CommentRange> jmlComments = CommentLocator.listJMLCommentRanges(source, compilationUnit);
+         
+         final IJMLParser jmlParser = JMLPreferencesHelper.getProjectActiveJMLProfile(res.getProject()).createParser();
          // Setup JML Validation engine
-         final JMLValidationEngine engine = this.prepareValidation(ast,
+         final JMLValidationEngine engine = this.prepareValidation(compilationUnit,
                jmlComments, jmlParser, res, source);
          // End of Preparation
          final List<JMLError> allErrors = new ArrayList<JMLError>();

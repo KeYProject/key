@@ -21,14 +21,21 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDMethodContract;
-import org.key_project.sed.core.model.impl.AbstractSEDMethodContract;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEMethodContract;
+import org.key_project.sed.core.model.impl.AbstractSEMethodContract;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
+import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequest;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
@@ -36,11 +43,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDMethodContract} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEMethodContract} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYMethodContract extends AbstractSEDMethodContract implements IKeYSEDDebugNode<IExecutionOperationContract> {
+public class KeYMethodContract extends AbstractSEMethodContract implements IKeYSENode<IExecutionOperationContract> {
    /**
     * The {@link IExecutionMethodContract} to represent by this debug node.
     */
@@ -49,7 +56,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The source name.
@@ -74,12 +81,17 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
+
+   /**
+    * The {@link SourceLocation} of the applied contract.
+    */
+   private SourceLocation contractSourceLocation;
 
    /**
     * Constructor.
@@ -89,7 +101,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * @param executionNode The {@link IExecutionMethodContract} to represent by this debug node.
     */
    public KeYMethodContract(KeYDebugTarget target, 
-                            IKeYSEDDebugNode<?> parent, 
+                            IKeYSENode<?> parent, 
                             KeYThread thread, 
                             IExecutionOperationContract executionNode) throws DebugException {
       super(target, parent, thread);
@@ -119,15 +131,15 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -167,7 +179,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    @Override
    public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getContractProgramMethod().getPositionInfo());
+         sourceName = SymbolicExecutionUtil.getSourcePath(computePositionInfo());
       }
       return sourceName;
    }
@@ -212,11 +224,64 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
+      SourceLocation location = KeYUtil.convertToSourceLocation(computePositionInfo());
+      return KeYModelUtil.updateLocationFromAST(this, location);
+   }
+   
+   /**
+    * Computes the current {@link PositionInfo}.
+    * @return The current {@link PositionInfo}.
+    */
+   protected PositionInfo computePositionInfo() {
+      Term term = executionNode.getProofNode().getAppliedRuleApp().posInOccurrence().subTerm();
+      term = TermBuilder.goBelowUpdates(term);
+      SourceElement firstElement = term.javaBlock().program().getFirstElement();
+      if (firstElement != null) {
+         firstElement = NodeInfo.computeActiveStatement(firstElement);
+         if (firstElement instanceof CopyAssignment) {
+            firstElement = ((CopyAssignment) firstElement).getLastElement();
+         }
+         return firstElement != null ? 
+                firstElement.getPositionInfo() : 
+                PositionInfo.UNDEFINED;
+      }
+      else {
+         return PositionInfo.UNDEFINED;
+      }
+   }
+   
+   /**
+    * Returns the path to the contract source.
+    * @return The path to the contract source or {@code null} if not available.
+    */
+   public String getContractSourcePath() {
+      return SymbolicExecutionUtil.getSourcePath(executionNode.getContractProgramMethod().getPositionInfo());
+   }
+   
+   /**
+    * Computes the source location of the applied contract.
+    * @return The source location of the applied contract or {@code null} if not available.
+    * @throws DebugException Occurred Exception.
+    */
+   public SourceLocation getContractSourceLocation() throws DebugException {
+      if (contractSourceLocation == null) {
+         contractSourceLocation = computeContractSourceLocation();
+      }
+      return contractSourceLocation;
+   }
+
+   /**
+    * Computes the source location of the applied contract lazily
+    * when {@link #getContractSourceLocation()} is called the first time.
+    * @return The computed {@link SourceLocation}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected SourceLocation computeContractSourceLocation() throws DebugException {
       SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getContractProgramMethod().getPositionInfo());
       // Try to update the position info with the position of the method name provided by JDT.
       try {
          if (location.getCharEnd() >= 0) {
-            ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(this);
+            ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(new SourceRequest(getDebugTarget(), getContractSourcePath()));
             if (compilationUnit != null) {
                IMethod method = JDTUtil.findJDTMethod(compilationUnit, location.getCharEnd());
                if (method != null) {
@@ -379,7 +444,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -416,7 +481,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -429,7 +494,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 

@@ -1,0 +1,98 @@
+Basic idea: 
+Run a renaming and compare the editor content to a given oracle, i.e. the result which should be achieved.
+
+
+1) Each test in its own folder. Separated in src and oracle.
+2) First, files are copied and oracle string is generated.
+3) Renaming is done (by selection a field/method from the outline or a package from the package explorer).
+4) Comparison of editor after renaming to oracle.
+
+
+@see TestUtilsRefactoring for the methods used in testing.
+
+
+What is tested:
+
+***** Testing Field Renaming *****
+
+Tested in file FieldRenameRefactoringTest:
+
+Test1: one occurrence in a simple assignable clause
+Test2: additional occurrences in requires and ensures clauses
+Test3: local variable with the same name (balance) and use of this qualifier
+Test4: a field from another class is accessed which has the same name as the field to be renamed (balance).
+Test5: the other class accesses and returns the balance field of the main class and thus need to change the name.
+Test6: the other class is additionally in another package and instead of returning the balance field of the main class
+      it sets the field with the local parameter called balance too.
+Test7: more complex usage of balance. More than one member access.
+Test8: Changes to the JML code in the other class but no changes to the java code. Other class accesses the balance field
+      from the main class by using getBalance() but refers to the field in the JML code.
+Test9: Like 8 but with 2 files without java changes.
+Test10: change within an invariant.
+Test11: combination of this qualifier and method with same name as the field.
+Test12: test11 plus a nested field call: TestClass balance; this.balance.balance()
+Test13: test12 with changed order: this.balance().balance
+Test14: test11/12 with more nesting: this.balance.balance == test.balance.balance().balance
+(Resolver problem) Test16: ArrayList access and equals: (classes.get(0)).balance.equals("5")
+(Resolver problem) Test17: test16 without the parentheses
+Test18: many MemberAccesses and MethodCalls plus distinguishing between String and field: 
+         project.getClass().getDeclaredField("balance").equals(balance)
+
+Tests with several projects: Run in file FieldRenameRefactoringTestSeveralProjects:
+
+Test19: Test with 2 Projects. One Project (referencingProject) references the balance-field of another project (referencedProject)
+Test20: Additional to test19, the referencingProject has an own field called balance.
+
+Tests with only one project:
+Test21: Accessing a field using a fully qualified class name.
+Test22: Class invariant but not written above the field it refers to.
+Test23: Static field access. Other class is in same package. Thus no package reference before class name needed.
+Test24: Using the JML Reference Profile AE.
+
+****** Testing Parameter Renaming *****
+Test1: One method, one parameter.
+Test2: One method, two parameters, renamed parameter is first.
+Test3: One method, two parameters, renamed parameter is second.
+Test4: Field with same name. Other method (constructor) using parameter with same name.
+Test5: Starting to rename a local variable, not a parameter of a method.
+
+****** Testing Class Renaming (oracle file has the name of the original class name) *****
+Test1: One class, one method which uses the class in java code and JML.
+Test2: One class, one method which only references the class in JML (twice!), i.e. no java text changes recorded for that class
+Test3: Two classes, same package. OtherClass initializes TestClass.
+Test4: like Test3 but without any reference to TestClass in OtherClass, thus no java changes in that class.
+Test5: Two classes, different package.
+Test6: Accessing a class using the fully qualified class name.
+Test7: No changes at all. Class with name String is renamed but java.lang.String used in the other class.
+Test8: Class to be renamed is referenced in a cast expression.
+
+****** Testing Package Renaming *****
+Test1: One class, one package reference in JML.
+Test2: Two classes, in same package. Each with one package reference in JML.
+Test3: Two classes, in same package. Each with two package references in JML.
+Test4: Two classes in the package which will be renamed. One class in otherPackage which references both classes in the renamed package.
+- Tests with sub folders:
+Test5: Like test4 but package to be renamed is a sub folder.
+Test6: One references class is in parent package and one referenced class is in sub package, which is to be renamed. 
+Test7: Like test6 but parent package is renamed. The "rename subpackages" option activated.
+Test8: Like test7 but option is deactivated - only the parent package is renamed.
+Test9: Renaming of an empty Package. TestClass has a field with the same name as the empty and to be renamed package. Checking if the folder was renamed correctly.
+Test10: One of the involved classes has no java changes but only changes to the JML annotations.
+
+****** Testing Method Renaming (usually renaming of getBalance() *****
+Test1: One class, one method calling another method in that class. No other method with same name in that class.
+Test2: Additionally to test1, one other method with same name but different signature in class.
+Test3: Like test2 but the method with the other signature, getBalance(boolean), is renamed. Check if getBalance() gets not replaced.
+Test4: Like test3 but with getBalance(int) to test differentiating and a getBalance(true) call which needs to change.
+Test5: Two classes. TestClass is calling a method from TestClassOther which gets renamed. Same package.
+Test6: Two classes. TestClass is calling an own method with the same name and signature like the method which is renamed in TestClassOther.
+Test7: Like test4 but TestClassOther is in a different package.
+Test8: Nested method calls: getBalance() argument of some other method.
+Test9: Nested method calls. getBalance() is argument to another method, valueOf(int).
+Test10: Successive method calls: method().getBalance()
+Test11: Successive method calls: like 11 but within another method call, i.e. as an argument to another method call.
+Test12: Successive method calls: three method calls and getBalance() in the middle.
+Test13: Successive method calls: like test 10 but the first method call is (unnecessarily) in a parenthesis.
+Test14: Successive method calls: the first method call has two arguments.
+Test15: Two classes, same package and getBalance() static.
+Test16: Two classes, different packages and getBalance() static.

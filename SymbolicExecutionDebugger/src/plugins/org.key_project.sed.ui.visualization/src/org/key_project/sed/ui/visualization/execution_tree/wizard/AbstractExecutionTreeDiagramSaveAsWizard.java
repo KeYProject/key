@@ -29,8 +29,8 @@ import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLWriter;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.serialization.SEXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.page.ModelFileSaveOptionsWizardPage;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -144,9 +144,9 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
             updateModelPage();
          }
          // Get debug targets
-         ISEDDebugTarget[] targets = getDebugTargetsToSave();
+         ISEDebugTarget[] targets = getDebugTargetsToSave();
          // Create model file
-         SEDXMLWriter writer = new SEDXMLWriter();
+         SEXMLWriter writer = new SEXMLWriter();
          String modelContent = writer.toXML(targets, 
                                             "UTF-8", 
                                             optionsPage != null && optionsPage.isSaveVariables(), 
@@ -201,10 +201,10 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
    }
 
    /**
-    * Returns the {@link ISEDDebugTarget}s to save.
-    * @return The {@link ISEDDebugTarget}s to save.
+    * Returns the {@link ISEDebugTarget}s to save.
+    * @return The {@link ISEDebugTarget}s to save.
     */
-   protected abstract ISEDDebugTarget[] getDebugTargetsToSave();
+   protected abstract ISEDebugTarget[] getDebugTargetsToSave();
 
    /**
     * Returns the {@link Diagram} to save.

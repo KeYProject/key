@@ -20,11 +20,11 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.impl.AbstractSEDThread;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISETermination;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.impl.AbstractSEThread;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
@@ -37,7 +37,6 @@ import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -61,11 +60,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDThread} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEThread} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IExecutionStart> {
+public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecutionStart> {
    /**
     * The {@link IExecutionStart} to represent by this debug node.
     */
@@ -74,17 +73,17 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
-    * The {@link IKeYSEDDebugNode} for which the auto mode was started the last time.
+    * The {@link IKeYSENode} for which the auto mode was started the last time.
     */
-   private IKeYSEDDebugNode<?> lastResumedKeyNode;
+   private IKeYSENode<?> lastResumedKeyNode;
    
    /**
     * The constraints
@@ -112,14 +111,14 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    };
    
    /**
-    * The up to know discovered {@link ISEDTermination} nodes.
+    * The up to know discovered {@link ISETermination} nodes.
     */
-   private final Map<IExecutionTermination, ISEDTermination> knownTerminations = new HashMap<IExecutionTermination, ISEDTermination>();
+   private final Map<IExecutionTermination, ISETermination> knownTerminations = new HashMap<IExecutionTermination, ISETermination>();
    
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -155,15 +154,15 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -214,7 +213,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -362,11 +361,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    }
    
    /**
-    * Checks if resuming on the given {@link IKeYSEDDebugNode} is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} to check.
+    * Checks if resuming on the given {@link IKeYSENode} is possible.
+    * @param keyNode The {@link IKeYSENode} to check.
     * @return {@code true} possible, {@code false} not possible.
     */
-   public boolean canResume(IKeYSEDDebugNode<?> keyNode) {
+   public boolean canResume(IKeYSENode<?> keyNode) {
       return canResume();
    }
 
@@ -379,11 +378,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    }
 
    /**
-    * Resumes the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} to resume.
+    * Resumes the given {@link IKeYSENode}.
+    * @param keyNode The {@link IKeYSENode} to resume.
     * @throws DebugException Occurred Exception.
     */
-   public void resume(IKeYSEDDebugNode<?> keyNode) throws DebugException {
+   public void resume(IKeYSENode<?> keyNode) throws DebugException {
       if (canResume()) {
          // Inform UI that the process is resumed
          super.resume();
@@ -404,7 +403,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param stepOver Include step over stop condition?
     * @param stepReturn Include step return condition?
     */
-   protected void runAutoMode(IKeYSEDDebugNode<?> keyNode,
+   protected void runAutoMode(IKeYSENode<?> keyNode,
                               int maximalNumberOfSetNodesToExecute, 
                               ImmutableList<Goal> goals, 
                               boolean stepOver,
@@ -458,11 +457,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    }
    
    /**
-    * Checks if suspending on the given {@link IKeYSEDDebugNode} is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} to check.
+    * Checks if suspending on the given {@link IKeYSENode} is possible.
+    * @param keyNode The {@link IKeYSENode} to check.
     * @return {@code true} possible, {@code false} not possible.
     */
-   public boolean canSuspend(IKeYSEDDebugNode<?> keyNode) {
+   public boolean canSuspend(IKeYSENode<?> keyNode) {
       return canSuspend();
    }
 
@@ -475,11 +474,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    }
    
    /**
-    * Suspends the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} to suspend.
+    * Suspends the given {@link IKeYSENode}.
+    * @param keyNode The {@link IKeYSENode} to suspend.
     * @throws DebugException Occurred Exception.
     */
-   public void suspend(IKeYSEDDebugNode<?> keyNode) throws DebugException {
+   public void suspend(IKeYSENode<?> keyNode) throws DebugException {
       if (canSuspend()) {
          getProofControl().stopAndWaitAutoMode();
          super.suspend();
@@ -496,10 +495,10 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
 
    /**
     * Checks if step into is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step into action.
+    * @param keyNode The {@link IKeYSENode} which requests the step into action.
     * @return {@code true} can step into, {@code false} can not step into.
     */
-   public boolean canStepInto(IKeYSEDDebugNode<?> keyNode) {
+   public boolean canStepInto(IKeYSENode<?> keyNode) {
       return canResume(keyNode);
    }
 
@@ -512,10 +511,10 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    }
 
    /**
-    * Executes the step into for the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step into.
+    * Executes the step into for the given {@link IKeYSENode}.
+    * @param keyNode The {@link IKeYSENode} which requests the step into.
     */
-   public void stepInto(IKeYSEDDebugNode<?> keyNode) throws DebugException {
+   public void stepInto(IKeYSENode<?> keyNode) throws DebugException {
       if (canStepInto()) {
          runAutoMode(keyNode,
                      ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP, 
@@ -536,10 +535,10 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
 
    /**
     * Checks if step over is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step over action.
+    * @param keyNode The {@link IKeYSENode} which requests the step over action.
     * @return {@code true} can step over, {@code false} can not step over.
     */
-   public boolean canStepOver(IKeYSEDDebugNode<?> keyNode) {
+   public boolean canStepOver(IKeYSENode<?> keyNode) {
       return canResume(keyNode);
    }
 
@@ -552,10 +551,10 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    }
 
    /**
-    * Executes the step over for the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step over.
+    * Executes the step over for the given {@link IKeYSENode}.
+    * @param keyNode The {@link IKeYSENode} which requests the step over.
     */
-   public void stepOver(IKeYSEDDebugNode<?> keyNode) throws DebugException {
+   public void stepOver(IKeYSENode<?> keyNode) throws DebugException {
       if (canStepOver()) {
          runAutoMode(keyNode,
                      KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
@@ -576,10 +575,10 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
 
    /**
     * Checks if step return is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step return action.
+    * @param keyNode The {@link IKeYSENode} which requests the step return action.
     * @return {@code true} can step return, {@code false} can not step return.
     */
-   public boolean canStepReturn(IKeYSEDDebugNode<?> keyNode) {
+   public boolean canStepReturn(IKeYSENode<?> keyNode) {
       return canResume(keyNode);
    }
 
@@ -592,10 +591,10 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    }
 
    /**
-    * Executes the step return for the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step return.
+    * Executes the step return for the given {@link IKeYSENode}.
+    * @param keyNode The {@link IKeYSENode} which requests the step return.
     */
-   public void stepReturn(IKeYSEDDebugNode<?> keyNode) throws DebugException {
+   public void stepReturn(IKeYSENode<?> keyNode) throws DebugException {
       if (canStepReturn()) {
          runAutoMode(keyNode,
                      KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
@@ -610,19 +609,19 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * {@inheritDoc}
     */
    @Override
-   public ISEDDebugNode[] getLeafsToSelect() throws DebugException {
+   public ISENode[] getLeafsToSelect() throws DebugException {
       return collectLeafs(lastResumedKeyNode != null ? lastResumedKeyNode : this);
    }
    
    /**
-    * Registers the given {@link ISEDTermination} on this node.
-    * @param termination The {@link ISEDTermination} to register.
+    * Registers the given {@link ISETermination} on this node.
+    * @param termination The {@link ISETermination} to register.
     */
-   public void addTermination(ISEDTermination termination) {
+   public void addTermination(ISETermination termination) {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          Assert.isNotNull(termination);
          @SuppressWarnings("unchecked")
-         ISEDTermination oldTermination = knownTerminations.put(((IKeYSEDDebugNode<IExecutionTermination>)termination).getExecutionNode(), termination);
+         ISETermination oldTermination = knownTerminations.put(((IKeYSENode<IExecutionTermination>)termination).getExecutionNode(), termination);
          Assert.isTrue(oldTermination == null);
       }
    }
@@ -631,16 +630,16 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * {@inheritDoc}
     */
    @Override
-   public ISEDTermination[] getTerminations() throws DebugException {
+   public ISETermination[] getTerminations() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          ImmutableList<IExecutionTermination> executionTerminations = executionNode.getTerminations();
-         ISEDTermination[] result = new ISEDTermination[executionTerminations.size()];
+         ISETermination[] result = new ISETermination[executionTerminations.size()];
          int i = 0;
          for (IExecutionTermination executionTermination : executionTerminations) {
-            ISEDTermination keyTermination = getTermination(executionTermination);
+            ISETermination keyTermination = getTermination(executionTermination);
             if (keyTermination == null) {
                // Create new method return, its parent will be set later when the full child hierarchy is explored.
-               keyTermination = (ISEDTermination)KeYModelUtil.createTermination(getDebugTarget(), this, null, executionTermination);
+               keyTermination = (ISETermination)KeYModelUtil.createTermination(getDebugTarget(), this, null, executionTermination);
             }
             result[i] = keyTermination;
             i++;
@@ -650,11 +649,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    }
    
    /**
-    * Returns the {@link ISEDTermination} with the given {@link IExecutionTermination} if available.
-    * @param executionTermination The {@link IExecutionTermination} to search its {@link ISEDTermination}.
-    * @return The found {@link ISEDTermination} or {@code null} if not available.
+    * Returns the {@link ISETermination} with the given {@link IExecutionTermination} if available.
+    * @param executionTermination The {@link IExecutionTermination} to search its {@link ISETermination}.
+    * @return The found {@link ISETermination} or {@code null} if not available.
     */
-   public ISEDTermination getTermination(final IExecutionTermination executionTermination) {
+   public ISETermination getTermination(final IExecutionTermination executionTermination) {
       return knownTerminations.get(executionTermination);
    }
    
@@ -751,7 +750,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -764,7 +763,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 

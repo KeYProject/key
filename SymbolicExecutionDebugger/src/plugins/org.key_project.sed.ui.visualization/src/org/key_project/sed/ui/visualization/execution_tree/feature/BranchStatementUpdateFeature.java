@@ -15,10 +15,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
-import org.key_project.sed.core.model.ISEDBranchStatement;
+import org.key_project.sed.core.model.ISEBranchStatement;
 
 /**
- * Implementation of {@link IUpdateFeature} for {@link ISEDBranchStatement}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISEBranchStatement}s.
  * @author Martin Hentschel
  */
 public class BranchStatementUpdateFeature extends AbstractDebugNodeUpdateFeature {
@@ -35,6 +35,6 @@ public class BranchStatementUpdateFeature extends AbstractDebugNodeUpdateFeature
     */
    @Override
    protected boolean canUpdateBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDBranchStatement;
+      return businessObject instanceof ISEBranchStatement;
    }
 }

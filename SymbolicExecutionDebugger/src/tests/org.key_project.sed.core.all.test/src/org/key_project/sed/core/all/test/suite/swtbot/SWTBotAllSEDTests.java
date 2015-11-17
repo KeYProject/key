@@ -18,7 +18,7 @@ import org.junit.runners.Suite;
 import org.key_project.key4eclipse.all.test.suite.swtbot.SWTBotAllTests;
 import org.key_project.sed.core.test.suite.swtbot.SWTBotAllSEDCoreTests;
 import org.key_project.sed.key.core.test.suite.swtbot.SWTBotAllSEDKeYTests;
-import org.key_project.sed.key.example.ui.test.suite.SWTBotAllSEDExampleUITests;
+import org.key_project.sed.key.example.ui.test.suite.swtbot.SWTBotAllSEDExampleUITests;
 import org.key_project.sed.key.ui.test.suite.swtbot.SWTBotAllSEDKeYUITests;
 import org.key_project.sed.ui.test.suite.swtbot.SWTBotAllSEDUITests;
 import org.key_project.sed.ui.visualization.test.suite.swtbot.SWTBotAllSEDUIVisualizationTests;

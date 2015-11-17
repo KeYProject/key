@@ -451,7 +451,7 @@ public final class IntegerLDT extends LDT {
         } else if (op instanceof LessOrEquals) {
             return getLessOrEquals();
         } else if (op instanceof Divide) {
-            return isLong ? getJavaDivLong() : (isBigint ? getDiv() : getJavaDivInt());
+            return isLong ? getJavaDivLong() : (isBigint ? getJDivision() : getJavaDivInt());
         } else if (op instanceof Times) {
             return isLong ? getJavaMulLong() : (isBigint ? getMul() : getJavaMulInt());
         } else if (op instanceof Plus) {
@@ -459,7 +459,7 @@ public final class IntegerLDT extends LDT {
         } else if (op instanceof Minus) {
             return isLong ? getJavaSubLong() : (isBigint ? getSub() : getJavaSubInt());
         } else if (op instanceof Modulo) {
-            return isBigint ? getMod() : getJavaMod();
+            return isBigint ? getJModulo() : getJavaMod();
         } else if (op instanceof ShiftLeft) {
             return isLong ? getJavaShiftLeftLong() : getJavaShiftLeftInt();
         } else if (op instanceof ShiftRight) {

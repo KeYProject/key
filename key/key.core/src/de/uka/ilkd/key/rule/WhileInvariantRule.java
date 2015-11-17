@@ -93,6 +93,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Loop Invariant");
 
+    public static final String BODY_PRESERVES_INVARIANT_LABEL = "Body Preserves Invariant";
+
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
 
@@ -587,7 +589,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
         fullInvariant = TermLabelManager.refactorTerm(termLabelState, services, null, fullInvariant, this, bodyGoal, FULL_INVARIANT_TERM_HINT, null);
-        Term bodyTerm = wir.transform(termLabelState, this, bodyGoal, applicationSequent,
+        Term bodyTerm = wir.transform(termLabelState, this, ruleApp, bodyGoal, applicationSequent,
                                       ruleApp.posInOccurrence(), inst.progPost,
                                       fullInvariant,
                                       svInst, services);
@@ -614,7 +616,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
         final ImmutableArray<TermLabel> instantiateLabels =
-                TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(), this, useGoal,
+                TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
                                                    "UseModality", null, inst.progPost.op(),
                                                    new ImmutableArray<Term>(inst.progPost.sub(0)),
                                                    null, useJavaBlock, inst.progPost.getLabels());
@@ -677,7 +679,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                             final Term[] uBeforeLoopDefAnonVariant,
                                             final Term uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
-        bodyGoal.setBranchLabel("Body Preserves Invariant");
+        bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
         bodyGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 true, 
                 false);         

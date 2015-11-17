@@ -21,18 +21,21 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDTermination;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.core.model.ISourcePathProvider;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
+import org.key_project.sed.key.core.launch.KeYSourceLookupDirector;
+import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant.SourceRequest;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchStatement;
 import org.key_project.sed.key.core.model.KeYConstraint;
@@ -73,8 +76,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.Terminatio
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
- * Provides utility methods which are used by {@link IKeYSEDDebugNode}
- * implementations to compute their content and child {@link IKeYSEDDebugNode}s.
+ * Provides utility methods which are used by {@link IKeYSENode}
+ * implementations to compute their content and child {@link IKeYSENode}s.
  * @author Martin Hentschel
  */
 public final class KeYModelUtil {
@@ -86,24 +89,24 @@ public final class KeYModelUtil {
 
    /**
     * <p>
-    * Creates new {@link IKeYSEDDebugNode}s for new {@link IExecutionNode}s
-    * which are added after the existing {@link IKeYSEDDebugNode}s.
+    * Creates new {@link IKeYSENode}s for new {@link IExecutionNode}s
+    * which are added after the existing {@link IKeYSENode}s.
     * </p>
     * <p>
     * The assumption is that new children are only added in the end and
     * that existing children are never replaced or removed.
     * </p>
-    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
-    * @param oldChildren The existing {@link IKeYSEDDebugNode}s to keep.
+    * @param parent The parent {@link IKeYSENode} in the debug model.
+    * @param oldChildren The existing {@link IKeYSENode}s to keep.
     * @param executionChildren The {@link IExecutionNode}s of the execution tree to create debug model representations for.
     * @return The created debug model representations.
     * @throws DebugException Occurred Exception.
     */
-   public static IKeYSEDDebugNode<?>[] updateChildren(IKeYSEDDebugNode<?> parent, 
-                                                      IKeYSEDDebugNode<?>[] oldChildren, 
+   public static IKeYSENode<?>[] updateChildren(IKeYSENode<?> parent, 
+                                                      IKeYSENode<?>[] oldChildren, 
                                                       IExecutionNode<?>[] executionChildren) throws DebugException {
       if (executionChildren != null) {
-         IKeYSEDDebugNode<?>[] result = new IKeYSEDDebugNode<?>[executionChildren.length];
+         IKeYSENode<?>[] result = new IKeYSENode<?>[executionChildren.length];
          // Add old children
          System.arraycopy(oldChildren, 0, result, 0, oldChildren.length);
          // Create new children
@@ -113,40 +116,40 @@ public final class KeYModelUtil {
          return result;
       }
       else {
-         return new IKeYSEDDebugNode<?>[0];
+         return new IKeYSENode<?>[0];
       }
    }
    
    /**
-    * Creates new {@link IKeYSEDDebugNode}s for the given {@link IExecutionNode}s.
-    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * Creates new {@link IKeYSENode}s for the given {@link IExecutionNode}s.
+    * @param parent The parent {@link IKeYSENode} in the debug model.
     * @param executionChildren The {@link IExecutionNode}s of the execution tree to create debug model representations for.
     * @return The created debug model representations.
     * @throws DebugException Occurred Exception.
     */
-   public static IKeYSEDDebugNode<?>[] createChildren(IKeYSEDDebugNode<?> parent, 
+   public static IKeYSENode<?>[] createChildren(IKeYSENode<?> parent, 
                                                       IExecutionNode<?>[] executionChildren) throws DebugException {
       if (executionChildren != null) {
-         IKeYSEDDebugNode<?>[] result = new IKeYSEDDebugNode<?>[executionChildren.length];
+         IKeYSENode<?>[] result = new IKeYSENode<?>[executionChildren.length];
          for (int i = 0; i < executionChildren.length; i++) {
             result[i] = createChild(parent, executionChildren[i]);
          }
          return result;
       }
       else {
-         return new IKeYSEDDebugNode<?>[0];
+         return new IKeYSENode<?>[0];
       }
    }
 
    /**
-    * Creates an {@link IKeYSEDDebugNode} for the given {@link IExecutionNode}
-    * as child of the given parent {@link IKeYSEDDebugNode}.
-    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * Creates an {@link IKeYSENode} for the given {@link IExecutionNode}
+    * as child of the given parent {@link IKeYSENode}.
+    * @param parent The parent {@link IKeYSENode} in the debug model.
     * @param executionNode The {@link IExecutionNode} of the execution tree.
-    * @return The created {@link IKeYSEDDebugNode}.
+    * @return The created {@link IKeYSENode}.
     * @throws DebugException Occurred Exception.
     */
-   protected static IKeYSEDDebugNode<?> createChild(IKeYSEDDebugNode<?> parent, IExecutionNode<?> executionNode) throws DebugException {
+   protected static IKeYSENode<?> createChild(IKeYSENode<?> parent, IExecutionNode<?> executionNode) throws DebugException {
       KeYDebugTarget target = parent.getDebugTarget();
       KeYThread thread = parent.getThread();
       return createNode(target, thread, parent, executionNode);
@@ -156,16 +159,16 @@ public final class KeYModelUtil {
     * Creates the {@link KeYMethodReturn} for the given {@link IExecutionMethodReturn}.
     * @param target The {@link KeYDebugTarget} to use.
     * @param thread The parent {@link KeYThread}.
-    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param parent The parent {@link IKeYSENode} in the debug model.
     * @param executionNode The {@link IExecutionNode} of the execution tree.
-    * @return The created {@link IKeYSEDDebugNode}.
+    * @return The created {@link IKeYSENode}.
     * @throws DebugException Occurred Exception.
     */
-   public static IKeYSEDDebugNode<?> createNode(KeYDebugTarget target, 
+   public static IKeYSENode<?> createNode(KeYDebugTarget target, 
                                                 KeYThread thread, 
-                                                IKeYSEDDebugNode<?> parent,
+                                                IKeYSENode<?> parent,
                                                 IExecutionNode<?> executionNode) throws DebugException {
-      IKeYSEDDebugNode<?> result = target.getDebugNode(executionNode);
+      IKeYSENode<?> result = target.getDebugNode(executionNode);
       if (result != null) {
          if (parent != null) {
             if (result.getParent() == null) {
@@ -194,14 +197,14 @@ public final class KeYModelUtil {
          }
          else if (executionNode instanceof IExecutionMethodReturn) {
             IExecutionMethodReturn executionReturn = ((IExecutionMethodReturn)executionNode);
-            IKeYSEDDebugNode<?> callNode = target.getDebugNode(executionReturn.getMethodCall());
+            IKeYSENode<?> callNode = target.getDebugNode(executionReturn.getMethodCall());
             Assert.isTrue(callNode instanceof KeYMethodCall);
             KeYMethodCall keyCall = (KeYMethodCall)callNode;
             result = createMethodReturn(target, thread, parent, keyCall, executionReturn);
          }
          else if (executionNode instanceof IExecutionExceptionalMethodReturn) {
             IExecutionExceptionalMethodReturn executionReturn = ((IExecutionExceptionalMethodReturn)executionNode);
-            IKeYSEDDebugNode<?> callNode = target.getDebugNode(executionReturn.getMethodCall());
+            IKeYSENode<?> callNode = target.getDebugNode(executionReturn.getMethodCall());
             Assert.isTrue(callNode instanceof KeYMethodCall);
             KeYMethodCall keyCall = (KeYMethodCall)callNode;
             result = createExceptionalMethodReturn(target, thread, parent, keyCall, executionReturn);
@@ -230,7 +233,7 @@ public final class KeYModelUtil {
     * Creates the {@link KeYMethodReturn} for the given {@link IExecutionMethodReturn}.
     * @param target The {@link KeYDebugTarget} to use.
     * @param thread The parent {@link KeYThread}.
-    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param parent The parent {@link IKeYSENode} in the debug model.
     * @param keyCall The {@link KeYMethodCall} which is returned by the given {@link IExecutionMethodReturn}.
     * @param executionReturn The {@link IExecutionMethodReturn} of the execution tree.
     * @return The {@link KeYMethodReturn} for the given {@link IExecutionTermination}.
@@ -238,7 +241,7 @@ public final class KeYModelUtil {
     */
    public static KeYMethodReturn createMethodReturn(KeYDebugTarget target, 
                                                     KeYThread thread, 
-                                                    IKeYSEDDebugNode<?> parent, 
+                                                    IKeYSENode<?> parent, 
                                                     KeYMethodCall keyCall, 
                                                     IExecutionMethodReturn executionReturn) throws DebugException {
       synchronized (keyCall) {
@@ -264,7 +267,7 @@ public final class KeYModelUtil {
     * Creates the {@link KeYExceptionalMethodReturn} for the given {@link IExecutionExceptionalMethodReturn}.
     * @param target The {@link KeYDebugTarget} to use.
     * @param thread The parent {@link KeYThread}.
-    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param parent The parent {@link IKeYSENode} in the debug model.
     * @param keyCall The {@link KeYMethodCall} which is returned by the given {@link IExecutionExceptionalMethodReturn}.
     * @param executionReturn The {@link IExecutionExceptionalMethodReturn} of the execution tree.
     * @return The {@link KeYExceptionalMethodReturn} for the given {@link IExecutionTermination}.
@@ -272,7 +275,7 @@ public final class KeYModelUtil {
     */
    public static KeYExceptionalMethodReturn createExceptionalMethodReturn(KeYDebugTarget target, 
                                                                           KeYThread thread, 
-                                                                          IKeYSEDDebugNode<?> parent, 
+                                                                          IKeYSENode<?> parent, 
                                                                           KeYMethodCall keyCall, 
                                                                           IExecutionExceptionalMethodReturn executionReturn) throws DebugException {
       synchronized (keyCall) {
@@ -298,17 +301,17 @@ public final class KeYModelUtil {
     * Creates the termination node for the given {@link IExecutionTermination}.
     * @param target The {@link KeYDebugTarget} to use.
     * @param thread The parent {@link KeYThread}.
-    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param parent The parent {@link IKeYSENode} in the debug model.
     * @param terminationExecutionNode The {@link IExecutionTermination} of the execution tree.
     * @return The termination node for the given {@link IExecutionTermination}.
     * @throws DebugException Occurred Exception.
     */
-   public static IKeYSEDDebugNode<?> createTermination(KeYDebugTarget target, 
+   public static IKeYSENode<?> createTermination(KeYDebugTarget target, 
                                                        KeYThread thread, 
-                                                       IKeYSEDDebugNode<?> parent, 
+                                                       IKeYSENode<?> parent, 
                                                        IExecutionTermination terminationExecutionNode) throws DebugException {
       synchronized (thread) {
-         ISEDTermination terminationNode = thread.getTermination(terminationExecutionNode);
+         ISETermination terminationNode = thread.getTermination(terminationExecutionNode);
          if (terminationNode != null) {
             // Reuse method return created by the method call and set its parent now
             if (terminationNode.getParent() == null) {
@@ -328,7 +331,7 @@ public final class KeYModelUtil {
             else {
                Assert.isTrue(terminationNode.getParent() == parent);
             }
-            return (IKeYSEDDebugNode<?>)terminationNode;
+            return (IKeYSENode<?>)terminationNode;
          }
          else {
             // Create new termination
@@ -407,6 +410,28 @@ public final class KeYModelUtil {
    }
 
    /**
+    * Tries to find an {@link ICompilationUnit} for the given {@link SourceRequest}.
+    * @param request The given {@link SourceRequest} for that is an {@link ICompilationUnit} required.
+    * @return The found {@link ICompilationUnit}.
+    */
+   public static ICompilationUnit findCompilationUnit(SourceRequest request) {
+      ICompilationUnit result = null;
+      if (request != null) {
+         ISourceLocator locator = request.getDebugTarget().getLaunch().getSourceLocator();
+         if (locator instanceof KeYSourceLookupDirector) {
+            Object source = ((KeYSourceLookupDirector) locator).getSourceElement(request);
+            if (source instanceof IFile) {
+               IJavaElement element = JavaCore.create((IFile)source);
+               if (element instanceof ICompilationUnit) {
+                  result = (ICompilationUnit)element;
+               }
+            }
+         }
+      }
+      return result;
+   }
+
+   /**
     * Tries to find an {@link ICompilationUnit} for the given {@link IStackFrame}.
     * @param frame The given {@link IStackFrame} for that is an {@link ICompilationUnit} required.
     * @return The found {@link ICompilationUnit}.
@@ -428,11 +453,11 @@ public final class KeYModelUtil {
    /**
     * Creates debug model representations for the {@link IExecutionVariable}s
     * contained in the given {@link IExecutionNode}.
-    * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
+    * @param debugNode The {@link IKeYSENode} which should be used as parent.
     * @param executionNode The {@link IExecutionNode} to return its variables.
     * @return The contained {@link KeYVariable}s as debug model representation.
     */
-   public static KeYVariable[] createCallStateVariables(IKeYSEDDebugNode<?> debugNode, 
+   public static KeYVariable[] createCallStateVariables(IKeYSENode<?> debugNode, 
                                                         IExecutionBaseMethodReturn<?> executionNode) throws DebugException {
       try {
          if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
@@ -451,11 +476,11 @@ public final class KeYModelUtil {
    /**
     * Creates debug model representations for the {@link IExecutionVariable}s
     * contained in the given {@link IExecutionNode}.
-    * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
+    * @param debugNode The {@link IKeYSENode} which should be used as parent.
     * @param executionNode The {@link IExecutionNode} to return its variables.
     * @return The contained {@link KeYVariable}s as debug model representation.
     */
-   public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
+   public static KeYVariable[] createVariables(IKeYSENode<?> debugNode, 
                                                IExecutionNode<?> executionNode) throws DebugException {
       try {
          if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
@@ -474,11 +499,11 @@ public final class KeYModelUtil {
    /**
     * Creates debug model representations for the {@link IExecutionVariable}s
     * contained in the given {@link IExecutionNode}.
-    * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
+    * @param debugNode The {@link IKeYSENode} which should be used as parent.
     * @param variables The {@link IExecutionVariable}s.
     * @return The contained {@link KeYVariable}s as debug model representation.
     */
-   public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
+   public static KeYVariable[] createVariables(IKeYSENode<?> debugNode, 
                                                IExecutionVariable[] variables) {
       if (variables != null) {
          KeYVariable[] result = new KeYVariable[variables.length];
@@ -494,17 +519,17 @@ public final class KeYModelUtil {
 
    /**
     * Converts the given call stack of {@link IExecutionNode} into 
-    * a call stack of {@link ISEDDebugNode}s.
-    * @param debugTarget The {@link KeYDebugTarget} which maps {@link IExecutionNode}s to {@link ISEDDebugNode}s.
+    * a call stack of {@link ISENode}s.
+    * @param debugTarget The {@link KeYDebugTarget} which maps {@link IExecutionNode}s to {@link ISENode}s.
     * @param callStack The call stack to convert.
     * @return The converted call stack.
     */
-   public static IKeYSEDDebugNode<?>[] createCallStack(KeYDebugTarget debugTarget, IExecutionNode<?>[] callStack) {
+   public static IKeYSENode<?>[] createCallStack(KeYDebugTarget debugTarget, IExecutionNode<?>[] callStack) {
       if (debugTarget != null && callStack != null) {
-         IKeYSEDDebugNode<?>[] result = new IKeYSEDDebugNode<?>[callStack.length];
+         IKeYSENode<?>[] result = new IKeYSENode<?>[callStack.length];
          int i = 0;
          for (IExecutionNode<?> executionNode : callStack) {
-            IKeYSEDDebugNode<?> debugNode = debugTarget.getDebugNode(executionNode);
+            IKeYSENode<?> debugNode = debugTarget.getDebugNode(executionNode);
             Assert.isNotNull(debugNode, "Can't find debug node for execution node \"" + executionNode + "\".");
             result[i] = debugNode;
             i++;
@@ -512,18 +537,18 @@ public final class KeYModelUtil {
          return result;
       }
       else {
-         return new IKeYSEDDebugNode<?>[0];
+         return new IKeYSENode<?>[0];
       }
    }
 
    /**
     * Creates debug model representations for the {@link IExecutionConstraint}s
     * contained in the given {@link IExecutionNode}.
-    * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
+    * @param debugNode The {@link IKeYSENode} which should be used as parent.
     * @param executionNode The {@link IExecutionNode} to return its constraints.
     * @return The contained {@link KeYConstraint}s as debug model representation.
     */
-   public static KeYConstraint[] createConstraints(IKeYSEDDebugNode<?> debugNode, 
+   public static KeYConstraint[] createConstraints(IKeYSENode<?> debugNode, 
                                                    IExecutionNode<?> executionNode) {
       if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
          IExecutionConstraint[] constraints = executionNode.getConstraints();
@@ -544,21 +569,21 @@ public final class KeYModelUtil {
    }
 
    /**
-    * Creates {@link ISEDBranchCondition}s for all completed code blocks.
-    * @param child The child {@link IKeYSEDDebugNode}.
-    * @return The created {@link ISEDBranchCondition}.
+    * Creates {@link ISEBranchCondition}s for all completed code blocks.
+    * @param child The child {@link IKeYSENode}.
+    * @return The created {@link ISEBranchCondition}.
     * @throws DebugException Occurred Exception.
     */
-   public static SEDMemoryBranchCondition[] createCompletedBlocksConditions(IKeYSEDDebugNode<?> child) throws DebugException {
+   public static SEMemoryBranchCondition[] createCompletedBlocksConditions(IKeYSENode<?> child) throws DebugException {
       try {
          ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = child.getExecutionNode().getCompletedBlocks();
          if (completedBlocks != null && completedBlocks.size() >= 1) {
-            SEDMemoryBranchCondition[] result = new SEDMemoryBranchCondition[completedBlocks.size()];
+            SEMemoryBranchCondition[] result = new SEMemoryBranchCondition[completedBlocks.size()];
             int i = 0;
             for (IExecutionBlockStartNode<?> completedBlock : completedBlocks) {
-               IKeYSEDDebugNode<?> parent = child.getDebugTarget().getDebugNode(completedBlock);
+               IKeYSENode<?> parent = child.getDebugTarget().getDebugNode(completedBlock);
                Assert.isNotNull(parent);
-               result[i] = new SEDMemoryBranchCondition(child.getDebugTarget(), parent, child.getThread());
+               result[i] = new SEMemoryBranchCondition(child.getDebugTarget(), parent, child.getThread());
                result[i].addChild(child);
                result[i].setCallStack(KeYModelUtil.createCallStack(parent.getDebugTarget(), parent.getExecutionNode().getCallStack()));
                result[i].setName(child.getExecutionNode().getFormatedBlockCompletionCondition(completedBlock));
@@ -571,7 +596,7 @@ public final class KeYModelUtil {
             return result;
          }
          else {
-            return new SEDMemoryBranchCondition[0];
+            return new SEMemoryBranchCondition[0];
          }
       }
       catch (ProofInputException e) {
@@ -581,27 +606,27 @@ public final class KeYModelUtil {
 
    /**
     * Computes the group end conditions.
-    * @param node The {@link IKeYSEDDebugNode} for which group end conditions are requested.
+    * @param node The {@link IKeYSENode} for which group end conditions are requested.
     * @return The up to now known group end conditions.
     * @throws DebugException Occurred Exception.
     */
-   public static ISEDBranchCondition[] computeGroupEndConditions(IKeYSEDDebugNode<? extends IExecutionBlockStartNode<?>> node) throws DebugException {
+   public static ISEBranchCondition[] computeGroupEndConditions(IKeYSENode<? extends IExecutionBlockStartNode<?>> node) throws DebugException {
       ImmutableList<IExecutionNode<?>> completions = node.getExecutionNode().getBlockCompletions();
-      ISEDBranchCondition[] result = new ISEDBranchCondition[completions.size()];
+      ISEBranchCondition[] result = new ISEBranchCondition[completions.size()];
       int i = 0;
       for (IExecutionNode<?> completion : completions) {
-         IKeYSEDDebugNode<?> keyCompletion = KeYModelUtil.createNode(node.getDebugTarget(), node.getThread(), null, completion);
+         IKeYSENode<?> keyCompletion = KeYModelUtil.createNode(node.getDebugTarget(), node.getThread(), null, completion);
          result[i] = keyCompletion.getGroupStartCondition(node);
          i++;
       }
       return result;
    }
 
-   public static void sortyByOccurrence(ISEDDebugNode current, SEDMemoryBranchCondition[] conditions) throws DebugException {
-      final Map<SEDMemoryBranchCondition, Integer> occurrenceOrder = computeOccurrenceOrder(current, conditions);
-      Arrays.sort(conditions, new Comparator<SEDMemoryBranchCondition>() {
+   public static void sortyByOccurrence(ISENode current, SEMemoryBranchCondition[] conditions) throws DebugException {
+      final Map<SEMemoryBranchCondition, Integer> occurrenceOrder = computeOccurrenceOrder(current, conditions);
+      Arrays.sort(conditions, new Comparator<SEMemoryBranchCondition>() {
          @Override
-         public int compare(SEDMemoryBranchCondition first, SEDMemoryBranchCondition second) {
+         public int compare(SEMemoryBranchCondition first, SEMemoryBranchCondition second) {
             Integer firstValue = occurrenceOrder.get(first);
             Integer secondValue = occurrenceOrder.get(second);
             if (firstValue != null && secondValue != null) {
@@ -614,15 +639,15 @@ public final class KeYModelUtil {
       });
    }
 
-   protected static Map<SEDMemoryBranchCondition, Integer> computeOccurrenceOrder(ISEDDebugNode current, SEDMemoryBranchCondition[] conditions) throws DebugException {
-      Map<ISEDDebugNode, SEDMemoryBranchCondition> starts = new HashMap<ISEDDebugNode, SEDMemoryBranchCondition>();
-      for (SEDMemoryBranchCondition condition : conditions) {
+   protected static Map<SEMemoryBranchCondition, Integer> computeOccurrenceOrder(ISENode current, SEMemoryBranchCondition[] conditions) throws DebugException {
+      Map<ISENode, SEMemoryBranchCondition> starts = new HashMap<ISENode, SEMemoryBranchCondition>();
+      for (SEMemoryBranchCondition condition : conditions) {
          starts.put(condition.getParent(), condition);
       }
-      Map<SEDMemoryBranchCondition, Integer> result = new HashMap<SEDMemoryBranchCondition, Integer>();
+      Map<SEMemoryBranchCondition, Integer> result = new HashMap<SEMemoryBranchCondition, Integer>();
       int removedCount = 0;
       while (current != null && !starts.isEmpty()) {
-         SEDMemoryBranchCondition condition = starts.remove(current);
+         SEMemoryBranchCondition condition = starts.remove(current);
          if (condition != null) {
             result.put(condition, conditions.length - removedCount);
             removedCount++;

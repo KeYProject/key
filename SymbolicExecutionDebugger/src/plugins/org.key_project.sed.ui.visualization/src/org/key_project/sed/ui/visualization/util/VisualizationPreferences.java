@@ -16,7 +16,7 @@ package org.key_project.sed.ui.visualization.util;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.visualization.Activator;
 
 /**
@@ -36,17 +36,17 @@ public class VisualizationPreferences {
    public static final String SWITCH_TO_STATE_VISUALIZATION_PERSPECTIVE = "org.key_project.sed.ui.visualization.preference.switchToStateVisualizationPerspective";
 
    /**
-    * Preference key for the first background color of {@link ISEDDebugNode}s.
+    * Preference key for the first background color of {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_FIRST_BACKGROUND_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeFirstBackgroundColor";
 
    /**
-    * Preference key for the second background color of {@link ISEDDebugNode}s.
+    * Preference key for the second background color of {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_SECOND_BACKGROUND_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeSecondBackgroundColor";
 
    /**
-    * Preference key for the direction of background colors in {@link ISEDDebugNode}s.
+    * Preference key for the direction of background colors in {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_BACKGROUND_DIRECTION = "org.key_project.sed.ui.visualization.preference.executionTreeNodeBackgroundDirection";
 
@@ -61,17 +61,17 @@ public class VisualizationPreferences {
    public static final String EXECUTION_TREE_NODE_BACKGROUND_DIRECTION_VERTICAL = "vertical";
 
    /**
-    * Preference key for the foreground color of {@link ISEDDebugNode}s.
+    * Preference key for the foreground color of {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_FOREGROUND_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeForegroundColor";
 
    /**
-    * Preference key for the text color of {@link ISEDDebugNode}s.
+    * Preference key for the text color of {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_TEXT_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeTextColor";
 
    /**
-    * Preference key for the connection color between {@link ISEDDebugNode}s.
+    * Preference key for the connection color between {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_CONNECTION_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeConnectionColor";
 

@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
 import org.key_project.sed.core.annotation.impl.SearchAnnotation;
 import org.key_project.sed.ui.wizard.SearchWizard;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -23,10 +23,10 @@ import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
- * An {@link ISEDAnnotationEditor} to edit {@link SearchAnnotation}s.
+ * An {@link ISEAnnotationEditor} to edit {@link SearchAnnotation}s.
  * @author Martin Hentschel
  */
-public class SearchAnnotationEditor extends AbstractSEDAnnotationEditor {
+public class SearchAnnotationEditor extends AbstractSEAnnotationEditor {
    /**
     * Defines the search text.
     */
@@ -81,18 +81,18 @@ public class SearchAnnotationEditor extends AbstractSEDAnnotationEditor {
       searchText.getDisplay().syncExec(searchRun);
       SearchAnnotation annotation = (SearchAnnotation)getAnnotation();
       if (!searchRun.getResult().equals(annotation.getSearch())) {
-         List<ISEDAnnotationLink> links = SearchWizard.search(annotation.getType(), annotation, getTarget(), searchRun.getResult(), monitor);
+         List<ISEAnnotationLink> links = SearchWizard.search(annotation.getType(), annotation, getTarget(), searchRun.getResult(), monitor);
          // Edit annotation
          SWTUtil.checkCanceled(monitor);
          annotation.setSearch(searchRun.getResult());
          monitor.worked(1);
-         ISEDAnnotationLink[] oldLinks = annotation.getLinks();
-         for (ISEDAnnotationLink link : oldLinks) {
+         ISEAnnotationLink[] oldLinks = annotation.getLinks();
+         for (ISEAnnotationLink link : oldLinks) {
             link.getTarget().removeAnnotationLink(link);
             monitor.worked(1);
          }
          monitor.worked(1);
-         for (ISEDAnnotationLink link : links) {
+         for (ISEAnnotationLink link : links) {
             link.getTarget().addAnnotationLink(link);
             monitor.worked(1);
          }

@@ -23,5 +23,7 @@ Export-Package: org.key_project.jmlediting.core.compilation,
  org.key_project.jmlediting.core.profile.persistence,
  org.key_project.jmlediting.core.profile.syntax,
  org.key_project.jmlediting.core.profile.syntax.user,
+ org.key_project.jmlediting.core.resolver,
+ org.key_project.jmlediting.core.resolver.typecomputer,
  org.key_project.jmlediting.core.utilities,
  org.key_project.jmlediting.core.validation

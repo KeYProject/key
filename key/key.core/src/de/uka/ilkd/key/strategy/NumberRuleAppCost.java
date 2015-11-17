@@ -20,6 +20,9 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
     private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost ( 0 );
+    /**
+     * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
+     */
     private static final LRUCache<Integer,NumberRuleAppCost> cache = new LRUCache<Integer,NumberRuleAppCost>(255);
 
     public static RuleAppCost getZeroCost() {
@@ -27,15 +30,17 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
     
     public static RuleAppCost create(int p_cost) {
-        
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
         
-        NumberRuleAppCost ac = cache.get(p_cost);
-        if (ac != null) return ac;
-        
-        ac = new IntRuleAppCost(p_cost);
-        cache.put(p_cost, ac);
+        NumberRuleAppCost ac;
+        synchronized (cache) { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse)
+            ac = cache.get(p_cost);
+            if (ac != null) return ac;
 
+            ac = new IntRuleAppCost(p_cost);
+            cache.put(p_cost, ac);
+        }
+        
         return ac;
     }
     

@@ -10,10 +10,10 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.key_project.sed.core.annotation.ISEDAnnotationAppearance;
+import org.key_project.sed.core.annotation.ISEAnnotationAppearance;
 import org.key_project.sed.core.annotation.impl.SliceAnnotationType;
-import org.key_project.sed.core.slicing.ISEDSlicer;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.slicing.ISESlicer;
+import org.key_project.sed.core.util.SEAnnotationUtil;
 import org.key_project.sed.ui.composite.AnnotationAppearanceComposite;
 import org.key_project.sed.ui.util.SEDImages;
 
@@ -23,9 +23,9 @@ import org.key_project.sed.ui.util.SEDImages;
  */
 public class SliceWizardPage extends WizardPage {
    /**
-    * The available {@link ISEDSlicer}.
+    * The available {@link ISESlicer}.
     */
-   private final ISEDSlicer[] slicer;
+   private final ISESlicer[] slicer;
    
    /**
     * The used {@link AnnotationAppearanceComposite}.
@@ -40,9 +40,9 @@ public class SliceWizardPage extends WizardPage {
    /**
     * Constructor.
     * @param pageName The name of this {@link WizardPage}.
-    * @param slicer The available {@link ISEDSlicer}.
+    * @param slicer The available {@link ISESlicer}.
     */
-   public SliceWizardPage(String pageName, ISEDSlicer[] slicer) {
+   public SliceWizardPage(String pageName, ISESlicer[] slicer) {
       super(pageName);
       this.slicer = slicer;
       setTitle("Slicing");
@@ -67,7 +67,7 @@ public class SliceWizardPage extends WizardPage {
       slicerLabel.setText("&Algorithm");
       slicerCombo = new Combo(slicingGroup, SWT.BORDER | SWT.READ_ONLY);
       slicerCombo.setLayoutData(new GridData(GridData.FILL_BOTH));
-      for (ISEDSlicer element : slicer) {
+      for (ISESlicer element : slicer) {
          slicerCombo.add(element.getName());
       }
       if (slicer.length >= 1) {
@@ -79,7 +79,7 @@ public class SliceWizardPage extends WizardPage {
             updatePageComplete();
          }
       });
-      annotationAppearanceComposite = new AnnotationAppearanceComposite(root, SWT.NONE, SEDAnnotationUtil.getAnnotationtype(SliceAnnotationType.TYPE_ID));
+      annotationAppearanceComposite = new AnnotationAppearanceComposite(root, SWT.NONE, SEAnnotationUtil.getAnnotationtype(SliceAnnotationType.TYPE_ID));
       annotationAppearanceComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       updatePageComplete();
    }
@@ -99,19 +99,19 @@ public class SliceWizardPage extends WizardPage {
    }
    
    /**
-    * Returns the selected {@link ISEDSlicer}.
-    * @return The selected {@link ISEDSlicer}.
+    * Returns the selected {@link ISESlicer}.
+    * @return The selected {@link ISESlicer}.
     */
-   public ISEDSlicer getSlicer() {
+   public ISESlicer getSlicer() {
       int index = slicerCombo.getSelectionIndex();
       return index >= 0 ? slicer[index] : null;
    }
    
    /**
-    * Returns the specified {@link ISEDAnnotationAppearance}.
-    * @return The specified {@link ISEDAnnotationAppearance}.
+    * Returns the specified {@link ISEAnnotationAppearance}.
+    * @return The specified {@link ISEAnnotationAppearance}.
     */
-   public ISEDAnnotationAppearance getAnnotationAppearance() {
+   public ISEAnnotationAppearance getAnnotationAppearance() {
       return annotationAppearanceComposite.getAnnotationAppearance();
    }
 }

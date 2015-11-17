@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.addEntry(_entry)&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (this.entrySize==this.entries.length)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
+         <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="this.entries[this.entrySize]=_entry;" pathCondition="true" pathConditionChanged="false">
+                  <branchCondition name="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" pathCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" pathConditionChanged="true" branchCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="this.entrySize++;" pathCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" pathConditionChanged="false">
+                        <branchCondition name="true" pathCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <branchCondition name="true" pathCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <branchCondition name="true" pathCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                 <methodReturn name="&lt;return of addEntry&gt;" signature="&lt;return of self.addEntry(_entry)&gt;" pathCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)">
+                                    <termination name="&lt;end&gt;" pathCondition="arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="false">
+                                    </termination>
+                                 </methodReturn>
+                              </branchCondition>
+                           </branchCondition>
+                        </branchCondition>
+                     </statement>
+                  </branchCondition>
+                  <branchCondition name="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="true" branchCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <branchCondition name="true" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <exceptionalMethodReturn name="&lt;throw java.lang.ArrayStoreException&gt;" signature="&lt;exceptional return of &lt;call self.addEntry(_entry)&gt;&gt;" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="false" methodReturnCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))">
+                           <branchCondition name="true" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <branchCondition name="true" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                 <branchCondition name="true" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                    <termination name="&lt;uncaught java.lang.ArrayStoreException&gt;" pathCondition="not(arrayStoreValid(Calendar.Entry[]::select(heap,self,Calendar::$entries),entry))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="false">
+                                    </termination>
+                                 </branchCondition>
+                              </branchCondition>
+                           </branchCondition>
+                        </exceptionalMethodReturn>
+                     </branchCondition>
+                  </branchCondition>
+               </statement>
+            </branchCondition>
+         </branchCondition>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0/0/0/0"/>
+</start>

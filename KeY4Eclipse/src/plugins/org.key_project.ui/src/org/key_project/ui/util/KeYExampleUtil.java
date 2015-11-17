@@ -60,13 +60,18 @@ public class KeYExampleUtil {
      * @return The local example directory or {@code null} if it is not available.
      */
     public static String getLocalExampleDirectory() {
-        File home = IOUtil.getProjectRoot(KeYExampleUtil.class); // Should be KeY4Eclipse\src\plugins
-        if (home != null) {
-           home = home.getParentFile().getParentFile().getParentFile();
-           return home.getAbsolutePath() +  File.separator + "key" + File.separator + "key.ui" + File.separator + ExampleChooser.EXAMPLES_PATH;
+        try {
+            File home = IOUtil.getProjectRoot(KeYExampleUtil.class); // Should be KeY4Eclipse\src\plugins
+            if (home != null) {
+                home = home.getParentFile().getParentFile().getParentFile();
+                return home.getAbsolutePath() + File.separator + "key" + File.separator + "key.ui" + File.separator + ExampleChooser.EXAMPLES_PATH;
+            }
+            else {
+                return null;
+            }
         }
-        else {
-           return null;
+        catch (Exception e) {
+            return null; // In case that something went wrong return null to increase stability in Eclipse products.
         }
     }
 

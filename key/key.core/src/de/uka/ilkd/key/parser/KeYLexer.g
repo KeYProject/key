@@ -326,6 +326,7 @@ lexer grammar KeYLexer;
         CHOOSECONTRACT : '\\chooseContract';
         PROOFOBLIGATION : '\\proofObligation';
         PROOF : '\\proof';
+        PROOFSCRIPT : '\\proofScript';
         CONTRACTS : '\\contracts';
         INVARIANTS : '\\invariants';
 
@@ -505,13 +506,7 @@ WS
       ;
 
 STRING_LITERAL
-@init {StringBuilder _literal = new StringBuilder(); }
-@after {setText('"' + _literal.toString() + '"'); }
-: '"' (  ESC { _literal.append(getText()); }
-       | newline='\n' {  _literal.appendCodePoint(newline); }
-       | normal=~('\n' | '"' | '\\' | '\uFFFF') { _literal.appendCodePoint(normal); }
-      )*
-  '"' ;
+  :'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 
 
 LESS_DISPATCH
@@ -579,22 +574,6 @@ CHAR_LITERAL
                 )
       '\''
  ;
-
-fragment
-ESC
-:	'\\'
-    (	'n'         { setText("\n"); }
-	|	'r' { setText("\r"); }
-	|	't' { setText("\t"); }
-	|	'b' { setText("\b"); }
-	|	'f' { setText("\f"); }
-	|	'"' { setText("\""); }
-	|	'\'' { setText("'"); }
-	|	'\\' { setText("\\"); }
-	|	':' { setText ("\\:"); }
-	|	' ' { setText ("\\ "); }
-    )
-    ;
 
 fragment
 QUOTED_STRING_LITERAL

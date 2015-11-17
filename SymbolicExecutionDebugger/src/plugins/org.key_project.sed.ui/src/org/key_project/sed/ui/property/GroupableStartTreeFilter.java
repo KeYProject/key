@@ -15,24 +15,24 @@ package org.key_project.sed.ui.property;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.util.java.ArrayUtil;
 
 /**
  * {@link IFilter} implementation used to check if
- * {@link ISEDDebugNode#getGroupStartConditions()} is not empty.
+ * {@link ISENode#getGroupStartConditions()} is not empty.
  * @author Martin Hentschel
  */
-public class GroupableStartTreeFilter extends SEDDebugNodeTreeFilter {
+public class GroupableStartTreeFilter extends SENodeTreeFilter {
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean select(Object toTest) {
       try {
-         if (super.select(toTest) &&  toTest instanceof ISEDDebugNode) {
-            ISEDBranchCondition[] conditions = ((ISEDDebugNode) toTest).getGroupStartConditions();
+         if (super.select(toTest) &&  toTest instanceof ISENode) {
+            ISEBranchCondition[] conditions = ((ISENode) toTest).getGroupStartConditions();
             return !ArrayUtil.isEmpty(conditions);
          }
          else {

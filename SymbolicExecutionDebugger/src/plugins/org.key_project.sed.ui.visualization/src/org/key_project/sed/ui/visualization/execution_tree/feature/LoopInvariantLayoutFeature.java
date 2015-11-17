@@ -16,10 +16,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
+import org.key_project.sed.core.model.ISELoopInvariant;
 
 /**
- * Implementation of {@link ILayoutFeature} for {@link ISEDLoopInvariant}s.
+ * Implementation of {@link ILayoutFeature} for {@link ISELoopInvariant}s.
  * @author Martin Hentschel
  */
 public class LoopInvariantLayoutFeature extends AbstractDebugNodeLayoutFeature {
@@ -36,6 +36,6 @@ public class LoopInvariantLayoutFeature extends AbstractDebugNodeLayoutFeature {
     */
    @Override
    protected boolean canLayoutBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDLoopInvariant;
+      return businessObject instanceof ISELoopInvariant;
    }
 }

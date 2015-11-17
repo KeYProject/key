@@ -13,6 +13,8 @@
 
 package org.key_project.util.java;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -338,7 +340,7 @@ public final class ArrayUtil {
     * @param array The array to convert.
     * @return The array as {@link String}.
     */
-   public static <T> String toString(T[] array) {
+   public static <T> String toString(@SuppressWarnings("unchecked") T... array) {
        return toString(array, ", ");
    }
    
@@ -562,5 +564,74 @@ public final class ArrayUtil {
       else {
          return null;
       }
+   }
+   
+   /**
+    * Computes all permutations of the given array using the
+    * '<a href="https://en.wikipedia.org/wiki/Heap's_algorithm">Heap's algorithm</a>'.
+    * @param array The array to generate its permutations.
+    * @return The generated permutations or {@code null} if the given array is {@code null}.
+    * @see https://en.wikipedia.org/wiki/Heap's_algorithm
+    */
+   public static <T> T[][] generatePermutations(T[] array) {
+      if (array != null) {
+         @SuppressWarnings("unchecked")
+         T[][] permutations = (T[][])Array.newInstance(array.getClass(), 
+                                                       array.length > 0 ? IntegerUtil.factorial(array.length) : 0);
+         generatePermutations(array, array.length, permutations, 0);
+         return permutations;
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Recursive implementation of the '<a href="https://en.wikipedia.org/wiki/Heap's_algorithm">Heap's algorithm</a>':
+    * <code>
+    * <pre>
+    * procedure generate(n : integer, A : array of any):
+    *    if n = 1 then
+    *       output(A)
+    *    else
+    *       for i := 0; i < n; i += 1 do
+    *          generate(n - 1, A)
+    *          if n is even then
+    *             swap(A[i], A[n-1])
+    *          else
+    *             swap(A[0], A[n-1])
+    *          end if
+    *       end for
+    *    end if
+    * </pre>
+    * </code>
+    * @param array The array to generate its permutations.
+    * @param n The recursive termination criterion.
+    * @param permutations The result {@link List} to fill.
+    * @return The next index in permutations to fill.
+    * @see https://en.wikipedia.org/wiki/Heap's_algorithm
+    */
+   private static <T> int generatePermutations(T[] array, int n, T[][] permutations, int permutationsIndex) {
+      if (n == 1) {
+         T[] copy = Arrays.copyOf(array, array.length);
+         permutations[permutationsIndex] = copy;
+         permutationsIndex++; 
+      }
+      else {
+         for (int i = 0; i < n; i++) {
+            permutationsIndex = generatePermutations(array, n - 1, permutations, permutationsIndex);
+            if (n % 2 != 0) {
+               T tmp = array[i];
+               array[i] = array[n - 1];
+               array[n - 1] = tmp;
+            }
+            else {
+               T tmp = array[0];
+               array[0] = array[n - 1];
+               array[n - 1] = tmp;
+            }
+         }
+      }
+      return permutationsIndex;
    }
 }

@@ -17,15 +17,15 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.memory.SEMemoryMethodReturn;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link ICreateFeature} for {@link ISEDMethodReturn}s.
+ * Implementation of {@link ICreateFeature} for {@link ISEMethodReturn}s.
  * @author Martin Hentschel
  */
 public class MethodReturnCreateFeature extends AbstractDebugNodeCreateFeature {
@@ -57,11 +57,11 @@ public class MethodReturnCreateFeature extends AbstractDebugNodeCreateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
-                                              ISEDDebugNode parent,
-                                              ISEDThread thread,
+   protected ISENode createNewDebugNode(ISEDebugTarget target,
+                                              ISENode parent,
+                                              ISEThread thread,
                                               String name) throws DebugException {
-      SEDMemoryMethodReturn result = new SEDMemoryMethodReturn(target, parent, thread);
+      SEMemoryMethodReturn result = new SEMemoryMethodReturn(target, parent, thread);
       result.setName(name);
       return result;
    }

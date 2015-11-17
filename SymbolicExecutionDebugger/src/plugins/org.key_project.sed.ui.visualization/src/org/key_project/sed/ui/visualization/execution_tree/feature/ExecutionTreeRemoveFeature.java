@@ -24,18 +24,18 @@ import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.util.ISEDIterator;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.util.ISEIterator;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 
 /**
  * <p>
- * Implementation of {@link IRemoveFeature} for {@link ISEDDebugNode}s
- * to make sure that the complete subtree of the selected {@link ISEDDebugNode}
+ * Implementation of {@link IRemoveFeature} for {@link ISENode}s
+ * to make sure that the complete subtree of the selected {@link ISENode}
  * is removed from the diagram.
  * </p>
  * <p> 
@@ -75,10 +75,10 @@ public class ExecutionTreeRemoveFeature extends DefaultRemoveFeature {
             PictogramElement pe = ((IRemoveContext)context).getPictogramElement();
             Object[] businessObjectsForPictogramElement = getAllBusinessObjectsForPictogramElement(pe);
             for (Object businessObject : businessObjectsForPictogramElement) {
-               if (businessObject instanceof ISEDDebugElement) {
-                  ISEDIterator iter = new SEDPreorderIterator((ISEDDebugElement)businessObject);
+               if (businessObject instanceof ISEDebugElement) {
+                  ISEIterator iter = new SEPreorderIterator((ISEDebugElement)businessObject);
                   while (iter.hasNext()) {
-                     ISEDDebugElement next = iter.next();
+                     ISEDebugElement next = iter.next();
                      
                      PictogramElement[] childPEs = getFeatureProvider().getAllPictogramElementsForBusinessObject(next);
                      
@@ -90,10 +90,10 @@ public class ExecutionTreeRemoveFeature extends DefaultRemoveFeature {
                         }
                      }
                      
-                     if(next instanceof ISEDMethodCall) {
-                        ISEDMethodCall mc =  (ISEDMethodCall) next;
+                     if(next instanceof ISEMethodCall) {
+                        ISEMethodCall mc =  (ISEMethodCall) next;
                         if(mc.isCollapsed()) {
-                           for(ISEDBranchCondition bc : mc.getMethodReturnConditions()) {
+                           for(ISEBranchCondition bc : mc.getMethodReturnConditions()) {
                               PictogramElement bcPE = getFeatureProvider().getPictogramElementForBusinessObject(bc);
                               if(bcPE != null) {
                                  children.add(new RemoveContext(bcPE));

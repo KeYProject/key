@@ -20,20 +20,20 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.CommentAnnotation;
 import org.key_project.sed.core.annotation.impl.CommentAnnotationLink;
 import org.key_project.sed.core.annotation.impl.CommentAnnotationType;
 import org.key_project.sed.core.annotation.impl.SearchAnnotation;
 import org.key_project.sed.core.annotation.impl.SearchAnnotationType;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.util.SEAnnotationUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -63,26 +63,26 @@ public class SWTBotAnnotationLinksTabTest extends AbstractSWTBotPropertyTabTest 
     */
    public static ITestSteps createFixedExampleSteps() {
       return new ITestSteps() {
-         private ISEDDebugTarget target;
+         private ISEDebugTarget target;
          
-         private ISEDAnnotationType commentType;
+         private ISEAnnotationType commentType;
          
-         private ISEDAnnotation commentAnnotation;
+         private ISEAnnotation commentAnnotation;
          
          private CommentAnnotationLink commentThreadLink;
          
-         private ISEDAnnotationType searchType;
+         private ISEAnnotationType searchType;
          
          private SearchAnnotation searchAnnotation;
          
-         private ISEDAnnotationLink searchThreadLink;
+         private ISEAnnotationLink searchThreadLink;
          
          @Override
          public void initializeLaunch(ILaunch launch) throws Exception {
-            target = (ISEDDebugTarget)launch.getDebugTarget();
-            ISEDThread thread = target.getSymbolicThreads()[0];
+            target = (ISEDebugTarget)launch.getDebugTarget();
+            ISEThread thread = target.getSymbolicThreads()[0];
             // Add comment link to thread
-            commentType = SEDAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID);
+            commentType = SEAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID);
             commentAnnotation = commentType.createAnnotation();
             commentAnnotation.setCustomHighlightBackground(Boolean.FALSE);
             commentAnnotation.setCustomHighlightForeground(Boolean.FALSE);
@@ -91,7 +91,7 @@ public class SWTBotAnnotationLinksTabTest extends AbstractSWTBotPropertyTabTest 
             commentThreadLink.setComment("CommentAnnotationLink on Thread");
             thread.addAnnotationLink(commentThreadLink);
             // Add search link to thread
-            searchType = SEDAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
+            searchType = SEAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
             searchAnnotation = (SearchAnnotation)searchType.createAnnotation();
             searchAnnotation.setSearch(thread.getName());
             searchAnnotation.setCustomHighlightBackground(Boolean.FALSE);
@@ -102,7 +102,7 @@ public class SWTBotAnnotationLinksTabTest extends AbstractSWTBotPropertyTabTest 
          }
          
          @Override
-         public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDThread thread) throws Exception {
+         public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEThread thread) throws Exception {
             assertTrue(tabs.selectTabItem("Annotation Links"));
             SWTBotTable table = propertiesView.bot().table();
             assertEquals(2, propertiesView.bot().table().rowCount());
@@ -125,7 +125,7 @@ public class SWTBotAnnotationLinksTabTest extends AbstractSWTBotPropertyTabTest 
          }
          
          @Override
-         public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDStatement statement) throws Exception {
+         public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEStatement statement) throws Exception {
             // Test initially empty links
             assertTrue(tabs.selectTabItem("Annotation Links"));
             SWTBotTable table = propertiesView.bot().table();
@@ -133,16 +133,16 @@ public class SWTBotAnnotationLinksTabTest extends AbstractSWTBotPropertyTabTest 
             // Create first comment of type "Type1"
             propertiesView.bot().button("New Comment").click();
             createComent(propertiesView, "Type1", "Type1Comment");
-            ISEDAnnotation[] annotations = target.getRegisteredAnnotations();
+            ISEAnnotation[] annotations = target.getRegisteredAnnotations();
             assertEquals(2, annotations.length);
             assertSame(searchAnnotation, annotations[0]);
             CommentAnnotation type1Annotation = (CommentAnnotation)annotations[1];
             assertEquals("Type1", type1Annotation.getCommentType());
-            ISEDAnnotationLink[] links = statement.getAnnotationLinks();
+            ISEAnnotationLink[] links = statement.getAnnotationLinks();
             assertEquals(1, links.length);
             CommentAnnotationLink firstLink = (CommentAnnotationLink)links[0];
             assertEquals("Type1Comment", firstLink.getComment());
-            ISEDAnnotationLink[] annotationLinks = type1Annotation.getLinks();
+            ISEAnnotationLink[] annotationLinks = type1Annotation.getLinks();
             assertEquals(1, annotationLinks.length);
             assertSame(firstLink, annotationLinks[0]);
             assertEquals(1, table.rowCount());
@@ -212,18 +212,18 @@ public class SWTBotAnnotationLinksTabTest extends AbstractSWTBotPropertyTabTest 
          }
          
          @Override
-         public void assertDebugTarget(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDDebugTarget target) throws Exception {
+         public void assertDebugTarget(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDebugTarget target) throws Exception {
             assertFalse(tabs.hasTabItem("Annotation Links"));
          }
 
          @Override
-         public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodReturn methodReturn) throws Exception {
+         public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEMethodReturn methodReturn) throws Exception {
             assertTrue(tabs.selectTabItem("Annotation Links"));
             assertEquals(0, propertiesView.bot().table().rowCount());
          }
 
          @Override
-         public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodCall methodCall) throws Exception {
+         public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEMethodCall methodCall) throws Exception {
             assertTrue(tabs.selectTabItem("Annotation Links"));
             assertEquals(0, propertiesView.bot().table().rowCount());
          }

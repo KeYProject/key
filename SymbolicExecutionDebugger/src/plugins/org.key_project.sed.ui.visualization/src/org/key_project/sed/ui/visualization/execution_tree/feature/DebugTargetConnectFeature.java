@@ -30,8 +30,8 @@ import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramBehavior;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramBehavior;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
@@ -40,15 +40,15 @@ import org.key_project.util.java.CollectionUtil;
 
 /**
  * An {@link ICustomFeature} that connects the given {@link Diagram}
- * with specified {@link ISEDDebugTarget}s. The {@link ISEDDebugTarget}
+ * with specified {@link ISEDebugTarget}s. The {@link ISEDebugTarget}
  * are specified via property {@link #PROPERTY_DEBUG_TARGETS} of the given
  * {@link ICustomContext}.
  * @author Martin Hentschel
  */
 public class DebugTargetConnectFeature extends AbstractCustomFeature {
    /**
-    * Property for an {@link ISEDDebugTarget} array which contains
-    * the {@link ISEDDebugTarget} to link with {@link #getDiagram()}.
+    * Property for an {@link ISEDebugTarget} array which contains
+    * the {@link ISEDebugTarget} to link with {@link #getDiagram()}.
     */
    public static final String PROPERTY_DEBUG_TARGETS = "debugTargets";
 
@@ -107,7 +107,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
    @Override
    public boolean canExecute(ICustomContext context) {
       Object obj = context.getProperty(PROPERTY_DEBUG_TARGETS);
-      return obj instanceof ISEDDebugTarget[];
+      return obj instanceof ISEDebugTarget[];
    }
 
    /**
@@ -127,14 +127,14 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
          IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
          // Change connection
          Object obj = context.getProperty(PROPERTY_DEBUG_TARGETS);
-         if (obj instanceof ISEDDebugTarget[]) {
+         if (obj instanceof ISEDebugTarget[]) {
             // Clear diagram
             monitor.beginTask("Change diagram content", 3);
             Object[] oldLinkedObjects = getAllBusinessObjectsForPictogramElement(getDiagram());
             for (Object oldObj : oldLinkedObjects) {
-               if (!monitor.isCanceled() && oldObj instanceof ISEDDebugTarget) {
-                  ISEDThread[] threads = ((ISEDDebugTarget)oldObj).getSymbolicThreads();
-                  for (ISEDThread thread : threads) {
+               if (!monitor.isCanceled() && oldObj instanceof ISEDebugTarget) {
+                  ISEThread[] threads = ((ISEDebugTarget)oldObj).getSymbolicThreads();
+                  for (ISEThread thread : threads) {
                      if (!monitor.isCanceled()) {
                         PictogramElement[] elements = getFeatureProvider().getAllPictogramElementsForBusinessObject(thread);
                         for (PictogramElement pictogramElement : elements) {
@@ -152,7 +152,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
             monitor.worked(1);
             // Recreate diagram with new content
             if (!monitor.isCanceled()) {
-               link(getDiagram(), (ISEDDebugTarget[])obj);
+               link(getDiagram(), (ISEDebugTarget[])obj);
             }
             // Update diagram
             if (!monitor.isCanceled()) {

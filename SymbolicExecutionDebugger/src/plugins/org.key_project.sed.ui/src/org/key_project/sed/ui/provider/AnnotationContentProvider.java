@@ -2,15 +2,15 @@ package org.key_project.sed.ui.provider;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.event.ISEDAnnotationListener;
-import org.key_project.sed.core.model.event.SEDAnnotationEvent;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.event.ISEAnnotationListener;
+import org.key_project.sed.core.model.event.SEAnnotationEvent;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * An {@link IStructuredContentProvider} which shows the registered 
- * {@link ISEDAnnotation}s of an {@link ISEDDebugTarget}. 
+ * {@link ISEAnnotation}s of an {@link ISEDebugTarget}. 
  * @author Martin Hentschel
  */
 public class AnnotationContentProvider implements IStructuredContentProvider {
@@ -20,26 +20,26 @@ public class AnnotationContentProvider implements IStructuredContentProvider {
    private Viewer viewer;
    
    /**
-    * The currently shown and observed {@link ISEDDebugTarget}.
+    * The currently shown and observed {@link ISEDebugTarget}.
     */
-   private ISEDDebugTarget target;
+   private ISEDebugTarget target;
    
    /**
     * Listens for changes on {@link #target}.
     */
-   private final ISEDAnnotationListener listener = new ISEDAnnotationListener() {
+   private final ISEAnnotationListener listener = new ISEAnnotationListener() {
       @Override
-      public void annotationRegistered(SEDAnnotationEvent e) {
+      public void annotationRegistered(SEAnnotationEvent e) {
          handleAnnotationRegistered(e);
       }
       
       @Override
-      public void annotationUnregistered(SEDAnnotationEvent e) {
+      public void annotationUnregistered(SEAnnotationEvent e) {
          handleAnnotationUnregistered(e);
       }
 
       @Override
-      public void annotationMoved(SEDAnnotationEvent e) {
+      public void annotationMoved(SEAnnotationEvent e) {
          handleAnnotationMoved(e);
       }
    };
@@ -53,8 +53,8 @@ public class AnnotationContentProvider implements IStructuredContentProvider {
       if (this.target != null) {
          this.target.removeAnnotationListener(listener);
       }
-      if (newInput instanceof ISEDDebugTarget) {
-         this.target = (ISEDDebugTarget)newInput;
+      if (newInput instanceof ISEDebugTarget) {
+         this.target = (ISEDebugTarget)newInput;
          this.target.addAnnotationListener(listener);
       }
       else {
@@ -66,12 +66,12 @@ public class AnnotationContentProvider implements IStructuredContentProvider {
     * {@inheritDoc}
     */
    @Override
-   public ISEDAnnotation[] getElements(Object inputElement) {
-      if (inputElement instanceof ISEDDebugTarget) {
-         return ((ISEDDebugTarget) inputElement).getRegisteredAnnotations();
+   public ISEAnnotation[] getElements(Object inputElement) {
+      if (inputElement instanceof ISEDebugTarget) {
+         return ((ISEDebugTarget) inputElement).getRegisteredAnnotations();
       }
       else {
-         return new ISEDAnnotation[0];
+         return new ISEAnnotation[0];
       }
    }
 
@@ -79,7 +79,7 @@ public class AnnotationContentProvider implements IStructuredContentProvider {
     * When a new annotation is registered.
     * @param e The event.
     */
-   protected void handleAnnotationRegistered(SEDAnnotationEvent e) {
+   protected void handleAnnotationRegistered(SEAnnotationEvent e) {
       SWTUtil.refresh(viewer);
    }
 
@@ -87,7 +87,7 @@ public class AnnotationContentProvider implements IStructuredContentProvider {
     * When an existing annotation is unregistered.
     * @param e The event.
     */
-   protected void handleAnnotationUnregistered(SEDAnnotationEvent e) {
+   protected void handleAnnotationUnregistered(SEAnnotationEvent e) {
       SWTUtil.refresh(viewer);
    }
 
@@ -95,7 +95,7 @@ public class AnnotationContentProvider implements IStructuredContentProvider {
     * When an existing annotation has moved.
     * @param e The event.
     */
-   protected void handleAnnotationMoved(SEDAnnotationEvent e) {
+   protected void handleAnnotationMoved(SEAnnotationEvent e) {
       SWTUtil.refresh(viewer);
    }
 

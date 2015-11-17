@@ -13,6 +13,8 @@
 
 package org.key_project.util.testcase.java;
 
+import static org.junit.Assert.assertNotEquals;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,10 +29,16 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import junit.framework.TestCase;
 
@@ -41,6 +49,10 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.IFileVisitor;
 import org.key_project.util.java.IOUtil.LineInformation;
+import org.key_project.util.java.XMLUtil;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Tests for {@link IOUtil}
@@ -54,7 +66,6 @@ public class IOUtilTest extends TestCase {
    public void testGetCurrentDirectory() {
       File currentDir = IOUtil.getCurrentDirectory();
       assertNotNull(currentDir);
-      System.out.println(currentDir);
    }
    
    /**
@@ -736,6 +747,81 @@ public class IOUtilTest extends TestCase {
          if (tempFile != null) {
              tempFile.delete();
          }
+      }
+   }
+   
+   /**
+    * Tests {@link IOUtil#writeTo(java.io.OutputStream, String, java.nio.charset.Charset)}
+    */
+   @Test
+   public void testWriteTo_Charstet() throws Exception {
+      byte[] utf8 = doWriteCharsetAsXmlTest("Hello \u201Cworld\u201D\u2026", Charset.forName("UTF-8"));
+      byte[] utf16 = doWriteCharsetAsXmlTest("Hello \u201Cworld\u201D\u2026", Charset.forName("UTF-16"));
+      assertNotEquals(utf8.length, utf16.length);
+   }
+   
+   /**
+    * Performs test steps of {@link #testWriteTo_Charstet()}.
+    * @param text The text to write.
+    * @param encoding The encoding to use.
+    * @return The written bytes.
+    * @throws Exception Occurred Exception.
+    */
+   protected byte[] doWriteCharsetAsXmlTest(String text, Charset encoding) throws Exception {
+      // Create XML
+      StringBuffer sb = new StringBuffer();
+      XMLUtil.appendXmlHeader(encoding != null ? encoding.displayName() : null, sb);
+      Map<String, String> attributes = new LinkedHashMap<String, String>();
+      attributes.put("text", XMLUtil.encodeText(text));
+      XMLUtil.appendEmptyTag(0, "root", attributes, sb);
+      // Write content
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      IOUtil.writeTo(out, sb.toString(), encoding);
+      // Parse output stream
+      SAXParserFactory factory = SAXParserFactory.newInstance();
+      factory.setNamespaceAware(true);
+      SAXParser saxParser = factory.newSAXParser();
+      RootHandler handler = new RootHandler();
+      saxParser.parse(new ByteArrayInputStream(out.toByteArray()), handler);
+      // Ensure that loaded text is the same
+      assertEquals(text, handler.getText());
+      return out.toByteArray();
+   }
+   
+   /**
+    * Helper class of {@link IOUtilTest#doWriteCharsetAsXmlTest(String, Charset)}.
+    * @author Martin Hentschel
+    */
+   private static final class RootHandler extends DefaultHandler {
+      /**
+       * The parsed text.
+       */
+      private String text;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+         if ("root".equals(qName)) {
+            if (text == null) {
+               text = attributes.getValue("text");
+            }
+            else {
+               throw new SAXException("Found root multiple times.");
+            }
+         }
+         else {
+            throw new SAXException("Unspported element: " + qName);
+         }
+      }
+
+      /**
+       * Returns the parsed text.
+       * @return The parsed text.
+       */
+      public String getText() {
+         return text;
       }
    }
    

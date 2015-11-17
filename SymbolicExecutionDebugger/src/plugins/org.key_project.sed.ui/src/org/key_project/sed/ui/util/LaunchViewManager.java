@@ -6,6 +6,7 @@ import java.util.Map;
 import org.eclipse.debug.internal.ui.views.launch.LaunchView;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
@@ -46,13 +47,19 @@ public final class LaunchViewManager extends AbstractWorkbenchPartManager {
     * {@inheritDoc}
     */
    @Override
-   protected void initView(IViewReference reference) {
+   protected void initView(final IViewReference reference) {
       super.initView(reference);
       if (IDebugUIConstants.ID_DEBUG_VIEW.equals(reference.getId())) {
-         IViewPart view = reference.getView(true);
-         if (view instanceof IDebugView) {
-            launchViewOpened((IDebugView)view);
-         }
+         Display display = reference.getPage().getWorkbenchWindow().getShell().getDisplay();
+         display.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               IViewPart view = reference.getView(true);
+               if (view instanceof IDebugView) {
+                  launchViewOpened((IDebugView)view);
+               }
+            }
+         });
       }
    }
 
@@ -60,13 +67,18 @@ public final class LaunchViewManager extends AbstractWorkbenchPartManager {
     * {@inheritDoc}
     */
    @Override
-   protected void deinitView(IViewReference reference) {
+   protected void deinitView(final IViewReference reference) {
       super.deinitView(reference);
       if (IDebugUIConstants.ID_DEBUG_VIEW.equals(reference.getId())) {
-         IViewPart view = reference.getView(false);
-         if (view instanceof IDebugView) {
-            launchViewClosed((IDebugView)view);
-         }
+         Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               IViewPart view = reference.getView(false);
+               if (view instanceof IDebugView) {
+                  launchViewClosed((IDebugView)view);
+               }
+            }
+         });
       }
    }
 

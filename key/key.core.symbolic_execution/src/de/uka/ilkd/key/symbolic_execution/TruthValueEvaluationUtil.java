@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -473,7 +474,8 @@ public final class TruthValueEvaluationUtil {
                                                                  final Map<String, MultiEvaluationResult> results) {
       final Node parentNode = childNode.parent();
       if (parentNode != null) {
-         final PosInOccurrence parentPio = parentNode.getAppliedRuleApp().posInOccurrence();
+         final RuleApp parentRuleApp = parentNode.getAppliedRuleApp();
+         final PosInOccurrence parentPio = parentRuleApp.posInOccurrence();
          if (parentPio != null) {
             // Check application term and all of its children and grand children
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
@@ -487,6 +489,15 @@ public final class TruthValueEvaluationUtil {
             while (!currentPio.isTopLevel()) {
                currentPio = currentPio.up();
                checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio, tb, results);
+            }
+            // Check if instations
+            if (parentRuleApp instanceof TacletApp) {
+               TacletApp ta = (TacletApp) parentRuleApp;
+               if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
+                  for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
+                     checkForNewMinorIds(childNode, ifInst.getConstrainedFormula().formula(), termLabelName, parentPio, tb, results);
+                  }
+               }
             }
          }
       }

@@ -10,13 +10,13 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.CommentAnnotationType;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.util.SEAnnotationUtil;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
 
 /**
@@ -30,15 +30,15 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testChangeForegroundColor() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getSource().setCustomForegroundColor(new RGB(43, 43, 43));
          }
       };
@@ -54,15 +54,15 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testChangeBackgroundColor() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getSource().setCustomBackgroundColor(new RGB(43, 43, 43));
          }
       };
@@ -78,16 +78,16 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testActivateForegroundAnnotation() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
             link.getSource().setCustomHighlightForeground(Boolean.FALSE);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getSource().setCustomHighlightForeground(Boolean.TRUE);
          }
       };
@@ -103,15 +103,15 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testDeactivateForegroundAnnotation() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getSource().setCustomHighlightForeground(Boolean.FALSE);
          }
       };
@@ -127,16 +127,16 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testActivateBackgroundAnnotation() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
             link.getSource().setCustomHighlightBackground(Boolean.FALSE);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getSource().setCustomHighlightBackground(Boolean.TRUE);
          }
       };
@@ -152,15 +152,15 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testDeactivateBackgroundAnnotation() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getSource().setCustomHighlightBackground(Boolean.FALSE);
          }
       };
@@ -176,16 +176,16 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testEnableAnnotation() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
             link.getSource().setEnabled(false);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getSource().setEnabled(true);
          }
       };
@@ -201,15 +201,15 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testDisableAnnotation() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getSource().setEnabled(false);
          }
       };
@@ -225,15 +225,15 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    @Test
    public void testRemoveAnnotationLink() throws Exception {
       IChange change = new IChange() {
-         private ISEDAnnotationLink link;
+         private ISEAnnotationLink link;
          
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link = addLinkToThread(target);
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             link.getTarget().removeAnnotationLink(link);
          }
       };
@@ -250,11 +250,11 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    public void testAddAnnotationLink() throws Exception {
       IChange change = new IChange() {
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
          }
 
          @Override
-         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             addLinkToThread(target);
          }
       };
@@ -265,22 +265,22 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
    }
    
    /**
-    * Creates an {@link ISEDAnnotationLink} and adds it to the first {@link ISEDThread} of the given {@link ISEDDebugTarget}.
-    * @param target The {@link ISEDDebugTarget} to modify.
-    * @return The created {@link ISEDAnnotationLink}.
+    * Creates an {@link ISEAnnotationLink} and adds it to the first {@link ISEThread} of the given {@link ISEDebugTarget}.
+    * @param target The {@link ISEDebugTarget} to modify.
+    * @return The created {@link ISEAnnotationLink}.
     * @throws DebugException Occurred Exception.
     */
-   protected ISEDAnnotationLink addLinkToThread(ISEDDebugTarget target) throws DebugException {
-      ISEDThread thread = target.getSymbolicThreads()[0];
-      ISEDAnnotationType type = SEDAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID);
-      ISEDAnnotation annotation = type.createAnnotation();
+   protected ISEAnnotationLink addLinkToThread(ISEDebugTarget target) throws DebugException {
+      ISEThread thread = target.getSymbolicThreads()[0];
+      ISEAnnotationType type = SEAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID);
+      ISEAnnotation annotation = type.createAnnotation();
       annotation.setCustomBackgroundColor(new RGB(255, 0, 0));
       annotation.setCustomForegroundColor(new RGB(0, 255, 0));
       annotation.setCustomHighlightBackground(Boolean.TRUE);
       annotation.setCustomHighlightForeground(Boolean.TRUE);
       annotation.setEnabled(true);
       annotation.setId("AnnotationUniqueID");
-      ISEDAnnotationLink link = type.createLink(annotation, thread);
+      ISEAnnotationLink link = type.createLink(annotation, thread);
       target.registerAnnotation(annotation);
       thread.addAnnotationLink(link);
       link.setId("AnnotationLinkUniqueID");
@@ -297,11 +297,11 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
       try {
          IChange change = new IChange() {
             @Override
-            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             }
 
             @Override
-            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
                VisualizationPreferences.setExecutionTreeNodeFirstBackgroundColor(new RGB(255, 0, 0));
             }
          };
@@ -325,11 +325,11 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
       try {
          IChange change = new IChange() {
             @Override
-            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             }
 
             @Override
-            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
                VisualizationPreferences.setExecutionTreeNodeSecondBackgroundColor(new RGB(255, 0, 0));
             }
          };
@@ -353,11 +353,11 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
       try {
          IChange change = new IChange() {
             @Override
-            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             }
 
             @Override
-            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
                VisualizationPreferences.setExecutionTreeNodeDirectionHorizontal(false);
             }
          };
@@ -381,11 +381,11 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
       try {
          IChange change = new IChange() {
             @Override
-            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             }
 
             @Override
-            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
                VisualizationPreferences.setExecutionTreeNodeForegroundColor(new RGB(255, 0, 0));
             }
          };
@@ -409,11 +409,11 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
       try {
          IChange change = new IChange() {
             @Override
-            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             }
 
             @Override
-            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
                VisualizationPreferences.setExecutionTreeNodeTextColor(new RGB(255, 0, 0));
             }
          };
@@ -437,11 +437,11 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
       try {
          IChange change = new IChange() {
             @Override
-            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             }
 
             @Override
-            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void change(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
                VisualizationPreferences.setExecutionTreeNodeConnectionColor(new RGB(255, 0, 0));
             }
          };
@@ -470,12 +470,12 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
                                final String afterOracleSuffix) throws Exception {
       IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
          @Override
-         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void init(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             change.init(bot, project, setFile, debugView, debugTree, launch, target);
          }
 
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             assertDiagram(bot, project, "Number.set", "data/Number/oracle", beforeOracleSuffix);
             change.change(bot, project, setFile, debugView, debugTree, launch, target);
             assertDiagram(bot, project, "Number.set", "data/Number/oracle", afterOracleSuffix);
@@ -501,7 +501,7 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
        * @param debugView The debug view.
        * @param debugTree The debug tree.
        * @param launch The {@link ILaunch}.
-       * @param target The {@link ISEDDebugTarget}.
+       * @param target The {@link ISEDebugTarget}.
        */
       public void init(SWTWorkbenchBot bot, 
                        IProject project, 
@@ -509,7 +509,7 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
                        SWTBotView debugView, 
                        SWTBotTree debugTree, 
                        ILaunch launch, 
-                       ISEDDebugTarget target) throws Exception;
+                       ISEDebugTarget target) throws Exception;
       
       /**
        * Performs the change.
@@ -519,7 +519,7 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
        * @param debugView The debug view.
        * @param debugTree The debug tree.
        * @param launch The {@link ILaunch}.
-       * @param target The {@link ISEDDebugTarget}.
+       * @param target The {@link ISEDebugTarget}.
        */
       public void change(SWTWorkbenchBot bot, 
                          IProject project, 
@@ -527,6 +527,6 @@ public class SWTBotSymbolicExecutionTreeStyleTest extends AbstractSymbolicExecut
                          SWTBotView debugView, 
                          SWTBotTree debugTree, 
                          ILaunch launch, 
-                         ISEDDebugTarget target) throws Exception;
+                         ISEDebugTarget target) throws Exception;
    }
 }

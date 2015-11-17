@@ -16,10 +16,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
-import org.key_project.sed.core.model.ISEDStatement;
+import org.key_project.sed.core.model.ISEStatement;
 
 /**
- * Implementation of {@link ILayoutFeature} for {@link ISEDStatement}s.
+ * Implementation of {@link ILayoutFeature} for {@link ISEStatement}s.
  * @author Martin Hentschel
  */
 public class StatementLayoutFeature extends AbstractDebugNodeLayoutFeature {
@@ -36,6 +36,6 @@ public class StatementLayoutFeature extends AbstractDebugNodeLayoutFeature {
     */
    @Override
    protected boolean canLayoutBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDStatement;
+      return businessObject instanceof ISEStatement;
    }
 }

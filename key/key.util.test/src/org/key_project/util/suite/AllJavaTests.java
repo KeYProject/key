@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     org.key_project.util.testcase.java.ArrayUtilTest.class,
     org.key_project.util.testcase.java.CollectionUtilTest.class,
+    org.key_project.util.testcase.java.IntegerUtilTest.class,
     org.key_project.util.testcase.java.IOUtilTest.class,
     org.key_project.util.testcase.java.NumberUtilTest.class,
     org.key_project.util.testcase.java.ObjectUtilTest.class,

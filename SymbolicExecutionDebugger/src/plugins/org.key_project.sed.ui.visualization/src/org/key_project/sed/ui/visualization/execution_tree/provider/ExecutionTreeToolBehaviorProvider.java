@@ -48,8 +48,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeCollapseFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
@@ -118,16 +118,16 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       if (isReadOnly()) {
          data.getGenericContextButtons().clear();
          
-         ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
-         if(ExecutionTreeUtil.isGroupingSupported(node) && node instanceof ISEDGroupable) {
-            ISEDGroupable groupStart = (ISEDGroupable) node;
+         ISENode node = (ISENode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
+         if(ExecutionTreeUtil.isGroupingSupported(node) && node instanceof ISEGroupable) {
+            ISEGroupable groupStart = (ISEGroupable) node;
             if(groupStart.isCollapsed()) {
                data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
             }
             else {
                try {
-                  ISEDDebugNode[] children = NodeUtil.getChildren((ISEDDebugNode) groupStart);
-                  if(groupStart.getGroupEndConditions().length > 0 && !(children.length == 1 && children[0].getGroupStartCondition((ISEDDebugNode) groupStart) != null)){
+                  ISENode[] children = NodeUtil.getChildren((ISENode) groupStart);
+                  if(groupStart.getGroupEndConditions().length > 0 && !(children.length == 1 && children[0].getGroupStartCondition((ISENode) groupStart) != null)){
                      data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
                   }
                }
@@ -184,10 +184,10 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       CollectionUtil.addAll(result, menuEntries);
       if (isReadOnly()) {
          Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElements()[0]);
-         if(bo instanceof ISEDDebugNode) {
-            ISEDDebugNode node = (ISEDDebugNode) bo;
-            if(ExecutionTreeUtil.isGroupingSupported(node) && node instanceof ISEDGroupable) {
-               ISEDGroupable groupStart = (ISEDGroupable) node;
+         if(bo instanceof ISENode) {
+            ISENode node = (ISENode) bo;
+            if(ExecutionTreeUtil.isGroupingSupported(node) && node instanceof ISEGroupable) {
+               ISEGroupable groupStart = (ISEGroupable) node;
                if(groupStart.isCollapsed()) {
                   result.add(createCustomContextMenuEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
                }

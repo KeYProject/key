@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SED Evaluation Model
+Bundle-SymbolicName: org.key_project.sed.key.evaluation.model;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.sed.key.evaluation.model.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.core.resources;bundle-version="3.9.1",
+ org.eclipse.jdt.core;bundle-version="3.10.2",
+ org.eclipse.jdt.ui;bundle-version="3.10.2",
+ org.eclipse.debug.core;bundle-version="3.9.1",
+ org.eclipse.debug.ui;bundle-version="3.10.2",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.core;bundle-version="1.0.0",
+ org.key_project.ui;bundle-version="1.0.0",
+ org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
+ org.key_project.key4eclipse.common.ui;bundle-version="1.0.0",
+ org.key_project.sed.core;bundle-version="1.0.0",
+ org.key_project.sed.ui;bundle-version="1.0.0",
+ org.key_project.sed.key.core;bundle-version="1.0.0",
+ org.key_project.sed.key.ui;bundle-version="1.0.0",
+ org.eclipse.ui.editors;bundle-version="3.8.200"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.sed.key.evaluation.model.definition,
+ org.key_project.sed.key.evaluation.model.input,
+ org.key_project.sed.key.evaluation.model.io,
+ org.key_project.sed.key.evaluation.model.tooling,
+ org.key_project.sed.key.evaluation.model.util,
+ org.key_project.sed.key.evaluation.model.validation

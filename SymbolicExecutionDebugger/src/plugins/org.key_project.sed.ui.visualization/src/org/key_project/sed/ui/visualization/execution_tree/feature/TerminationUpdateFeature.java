@@ -15,10 +15,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
-import org.key_project.sed.core.model.ISEDTermination;
+import org.key_project.sed.core.model.ISETermination;
 
 /**
- * Implementation of {@link IUpdateFeature} for {@link ISEDTermination}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISETermination}s.
  * @author Martin Hentschel
  */
 public class TerminationUpdateFeature extends AbstractDebugNodeUpdateFeature {
@@ -35,6 +35,6 @@ public class TerminationUpdateFeature extends AbstractDebugNodeUpdateFeature {
     */
    @Override
    protected boolean canUpdateBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDTermination;
+      return businessObject instanceof ISETermination;
    }
 }

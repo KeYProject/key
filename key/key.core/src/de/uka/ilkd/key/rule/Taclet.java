@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -739,6 +740,11 @@ public abstract class Taclet implements Rule, Named {
        private final Term term;
        
        /**
+        * The stack maintained during application of a taclet {@link Term}.
+        */
+       private Deque<Term> tacletTermStack;
+       
+       /**
         * Constructor.
         * @param tacletOperation The currently performed operation.
         * @param sequent The optional {@link Sequent} of the add or replace part of the taclet.
@@ -806,6 +812,22 @@ public abstract class Taclet implements Rule, Named {
        }
 
        /**
+        * Returns the stack maintained during application of a taclet {@link Term}.
+        * @return The stack maintained during application of a taclet {@link Term}.
+        */
+       public Deque<Term> getTacletTermStack() {
+          return tacletTermStack;
+       }
+
+       /**
+        * Sets the stack maintained during application of a taclet {@link Term}.
+        * @param tacletTermStack The stack maintained during application of a taclet {@link Term}.
+        */
+       public void setTacletTermStack(Deque<Term> tacletTermStack) {
+          this.tacletTermStack = tacletTermStack;
+       }
+
+      /**
         * Returns the optional replace {@link Term} of the taclet.
         * @return The optional replace {@link Term} of the taclet.
         */

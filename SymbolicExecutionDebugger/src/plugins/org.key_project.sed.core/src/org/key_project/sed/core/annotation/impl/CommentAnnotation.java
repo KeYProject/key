@@ -1,15 +1,15 @@
 package org.key_project.sed.core.annotation.impl;
 
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.util.SEAnnotationUtil;
 
 /**
- * The {@link ISEDAnnotation} representing comments.
+ * The {@link ISEAnnotation} representing comments.
  * @author Martin Hentschel
  * @see CommentAnnotationType
  */
-public class CommentAnnotation extends AbstractSEDAnnotation {
+public class CommentAnnotation extends AbstractSEAnnotation {
    /**
     * The default comment type.
     */
@@ -29,14 +29,14 @@ public class CommentAnnotation extends AbstractSEDAnnotation {
     * Constructor.
     */
    public CommentAnnotation() {
-      super(SEDAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID), false);
+      super(SEAnnotationUtil.getAnnotationtype(CommentAnnotationType.TYPE_ID), false);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public boolean canDelete(ISEDDebugTarget target) {
+   public boolean canDelete(ISEDebugTarget target) {
       return false;
    }
 

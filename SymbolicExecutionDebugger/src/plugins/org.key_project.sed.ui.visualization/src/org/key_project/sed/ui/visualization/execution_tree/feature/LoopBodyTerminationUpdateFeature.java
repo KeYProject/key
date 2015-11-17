@@ -15,10 +15,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
-import org.key_project.sed.core.model.ISEDLoopBodyTermination;
+import org.key_project.sed.core.model.ISELoopBodyTermination;
 
 /**
- * Implementation of {@link IUpdateFeature} for {@link ISEDLoopBodyTermination}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISELoopBodyTermination}s.
  * @author Martin Hentschel
  */
 public class LoopBodyTerminationUpdateFeature extends AbstractDebugNodeUpdateFeature {
@@ -35,6 +35,6 @@ public class LoopBodyTerminationUpdateFeature extends AbstractDebugNodeUpdateFea
     */
    @Override
    protected boolean canUpdateBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDLoopBodyTermination;
+      return businessObject instanceof ISELoopBodyTermination;
    }
 }

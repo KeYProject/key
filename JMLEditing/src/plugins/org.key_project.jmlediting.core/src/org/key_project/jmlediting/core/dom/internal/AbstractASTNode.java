@@ -123,5 +123,4 @@ public abstract class AbstractASTNode implements IASTNode {
       str += ")";
       return str;
    }
-
 }

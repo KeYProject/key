@@ -108,11 +108,12 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
      * @param file The {@link IFile} to launch.
      * @param method The optional {@link IMethod}.
      * @param mode The mode to use.
+     * @return The launched {@link ILaunchConfiguration} or {@code null} if the operation was cancelled.
      * @throws CoreException Occurred Exception.
      */
-    public static void launch(IFile file, 
-                              IMethod method,
-                              String mode) throws CoreException {
+    public static ILaunchConfiguration launch(IFile file, 
+                                              IMethod method,
+                                              String mode) throws CoreException {
         try {
             ILaunchConfiguration config = findLaunchConfiguration(file);
             if (config == null) {
@@ -121,9 +122,11 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
             if (config != null) {
                 DebugUITools.launch(config, mode);
             }
+            return config;
         }
         catch (OperationCanceledException e) {
             // Nothing to do
+           return null;
         }
     }
     

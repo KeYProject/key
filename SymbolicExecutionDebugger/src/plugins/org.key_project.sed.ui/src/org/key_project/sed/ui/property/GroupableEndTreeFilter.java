@@ -15,24 +15,24 @@ package org.key_project.sed.ui.property;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.util.java.ArrayUtil;
 
 /**
  * {@link IFilter} implementation used to check if
- * {@link ISEDGroupable#getGroupEndConditions()} is not empty.
+ * {@link ISEGroupable#getGroupEndConditions()} is not empty.
  * @author Martin Hentschel
  */
-public class GroupableEndTreeFilter extends SEDDebugNodeTreeFilter {
+public class GroupableEndTreeFilter extends SENodeTreeFilter {
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean select(Object toTest) {
       try {
-         if (super.select(toTest) &&  toTest instanceof ISEDGroupable) {
-            ISEDBranchCondition[] conditions = ((ISEDGroupable) toTest).getGroupEndConditions();
+         if (super.select(toTest) &&  toTest instanceof ISEGroupable) {
+            ISEBranchCondition[] conditions = ((ISEGroupable) toTest).getGroupEndConditions();
             return !ArrayUtil.isEmpty(conditions);
          }
          else {

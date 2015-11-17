@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -53,16 +54,20 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
+import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.internal.ui.util.CoreUtility;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.eclipse.jdt.ui.PreferenceConstants;
+import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
 import org.key_project.util.Activator;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -1205,5 +1210,27 @@ public class JDTUtil {
          }
       }
       return result;
+   }
+
+   /**
+    * Returns the shared {@link CompilationUnit} of the given {@link IEditorPart}.
+    * <p>
+    * Synchronization is not performed!
+    * @param editorPart The {@link IEditorPart}.
+    * @return The shared {@link CompilationUnit} if available.
+    */
+   public static CompilationUnit getSharedCompilationUnit(IEditorPart editorPart) {
+      if (editorPart != null) {
+         ITypeRoot typeRoot = EditorUtility.getEditorInputJavaElement(editorPart, false);
+         if (typeRoot != null) {
+            return SharedASTProvider.getAST(typeRoot, SharedASTProvider.WAIT_NO, null);
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
    }
 }

@@ -1,0 +1,41 @@
+<html>
+   <head>
+      <title>Direct Code Review</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
+   </head>
+   <body>
+      <h1>Direct Code Review</h1>
+      <p>
+         Please watch the introduction video (<b>no audio</b>). You can pause the video at any time to comprehend the content. 
+      </p>
+      <video width="1280" height="720" poster="NO_TOOL/videos/NO_TOOLScreencast.png" controls>
+         <source src="NO_TOOL/videos/NO_TOOLScreencast.mp4" type="video/mp4"></source>
+         <source src="NO_TOOL/videos/NO_TOOLScreencast.ogv" type="NO_TOOL/videos/ogg"></source>
+         <source src="NO_TOOL/videos/NO_TOOLScreencast.webm" type="NO_TOOL/videos/webm"></source>
+         <dl>
+            <a href="NO_TOOL/videos/NO_TOOLScreencast.mp4">
+               <dt><img src="NO_TOOL/videos/NO_TOOLScreencast.png" alt="Download Video" title="Download Video" width="1280" height="720"></dt>
+               <dd>Download Video</dt>
+            </a>
+         </dl>
+      </video>
+      
+      <h2><a name="best">Best Practices</a></h3>
+      <ol>
+         <li>Ensure that
+            <ol>
+               <li>uncaught exceptions are allowed according to the documentation.</li>
+               <li>returned values match with the documentation.</li>
+               <li>the class invariant is preserved.</li>
+               <li>all statements can be executed.</li>
+            </ol>
+         </li>
+         <li>If something is suspicious
+             <ol>
+                <li>write executable code if appropriate.</li>
+                <li>debug the method to review to comprehend performed steps if appropriate.</li>
+             </ol>
+         </li>
+      </ol>
+   </body>
+</html>

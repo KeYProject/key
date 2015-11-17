@@ -14,6 +14,8 @@
 package org.key_project.util.testcase.java;
 
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -28,6 +30,86 @@ import org.key_project.util.java.StringUtil;
  * @author Martin Hentschel
  */
 public class ArrayUtilTest extends TestCase {
+   /**
+    * Tests {@link ArrayUtil#generatePermutations(Object[])}
+    */
+   @Test
+   public void testGeneratePermutations() {
+      assertPermutations(null);
+      assertPermutations(new String[0]);
+      assertPermutations(new String[] {"A"}, 
+                         new String[] {"A"});
+      assertPermutations(new String[] {"A", "B"}, 
+                         new String[] {"A", "B"},
+                         new String[] {"B", "A"});
+      assertPermutations(new String[] {"A", "B", "C"}, 
+                         new String[] {"A", "B", "C"},
+                         new String[] {"B", "A", "C"},
+                         new String[] {"C", "B", "A"},
+                         new String[] {"B", "C", "A"},
+                         new String[] {"C", "A", "B"},
+                         new String[] {"A", "C", "B"});
+      assertPermutations(new String[] {"A", "B", "C", "D"}, 
+                         new String[] {"A", "B", "C", "D"},
+                         new String[] {"B", "A", "C", "D"},
+                         new String[] {"C", "B", "A", "D"},
+                         new String[] {"B", "C", "A", "D"},
+                         new String[] {"C", "A", "B", "D"},
+                         new String[] {"A", "C", "B", "D"},
+                         new String[] {"D", "A", "B", "C"},
+                         new String[] {"A", "D", "B", "C"},
+                         new String[] {"B", "A", "D", "C"},
+                         new String[] {"A", "B", "D", "C"},
+                         new String[] {"B", "D", "A", "C"},
+                         new String[] {"D", "B", "A", "C"},
+                         new String[] {"C", "D", "A", "B"},
+                         new String[] {"D", "C", "A", "B"},
+                         new String[] {"A", "D", "C", "B"},
+                         new String[] {"D", "A", "C", "B"},
+                         new String[] {"A", "C", "D", "B"},
+                         new String[] {"C", "A", "D", "B"},
+                         new String[] {"B", "C", "D", "A"},
+                         new String[] {"C", "B", "D", "A"},
+                         new String[] {"D", "C", "B", "A"},
+                         new String[] {"C", "D", "B", "A"},
+                         new String[] {"D", "B", "C", "A"},
+                         new String[] {"B", "D", "C", "A"});      
+   }
+   
+   /**
+    * Asserts that the correct permutations are computed by
+    * {@link ArrayUtil#generatePermutations(Object[])}.
+    * @param originalArray The original array to compute its permutations.
+    * @param expected The expected permutations.
+    */
+   private <T> void assertPermutations(T[] originalArray, @SuppressWarnings("unchecked") T[]... expected) {
+      T[][] current = ArrayUtil.generatePermutations(originalArray);
+      if (originalArray != null) {
+         assertNotNull(current);
+         assertEquals(current.length, expected.length);
+         Set<String> visitedExpectedPermutations = new HashSet<String>();
+         Set<String> visitedCurrentPermutations = new HashSet<String>();
+         for (int i = 0; i < current.length; i++) {
+            T[] currentArray = current[i];
+            T[] expectedArray = expected[i];
+            assertNotSame(originalArray, currentArray);
+            assertNotSame(originalArray, expectedArray);
+            assertEquals(originalArray.length, currentArray.length);
+            assertEquals(originalArray.length, expectedArray.length);
+            assertArrayEquals(currentArray, expectedArray);
+            assertTrue("Expected permutation found multiple times!", visitedExpectedPermutations.add(ArrayUtil.toString(expectedArray)));
+            assertTrue("Current permutation found multiple times!", visitedCurrentPermutations.add(ArrayUtil.toString(currentArray)));
+            for (T element : originalArray) {
+               assertTrue(ArrayUtil.contains(expectedArray, element));
+               assertTrue(ArrayUtil.contains(currentArray, element));
+            }
+         }
+      }
+      else {
+         assertNull(current);
+      }
+   }
+
    /**
     * Tests {@link ArrayUtil#insert(int[], int, int)}.
     */
@@ -442,7 +524,7 @@ public class ArrayUtilTest extends TestCase {
      * @param array The array.
      * @param expectedValues The expected values.
      */
-    protected void assertArrayEquals(String[] array, String... expectedValues) {
+    protected <T> void assertArrayEquals(T[] array, @SuppressWarnings("unchecked") T... expectedValues) {
         assertNotNull(array);
         assertEquals(expectedValues.length, array.length);
         for (int i = 0; i < expectedValues.length; i++) {

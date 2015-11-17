@@ -13,6 +13,7 @@
 
 package org.key_project.util.eclipse;
 
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
@@ -81,6 +82,18 @@ public class JobUtil {
                // Nothing to do.
             }
          }
+      }
+   }
+
+   /**
+    * Waits until all {@link Job}s are executed.
+    * @param sleepTime The sleep time.
+    */
+   public static void waitForJobs(int sleepTime) {
+      IJobManager manager = Job.getJobManager();
+      Job job;
+      while ((job = manager.currentJob()) != null) {
+         waitFor(job, sleepTime);
       }
    }
 }

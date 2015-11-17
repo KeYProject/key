@@ -8,14 +8,14 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * A basic implementation of a proposal for {@link SymbolicallyReachedAnnotation}s 
- * which selects {@link ISEDDebugNode}s as solution.
+ * which selects {@link ISENode}s as solution.
  * @author Martin Hentschel
  */
 public abstract class AbstractSymbolicallyReachedCompletionProposal implements ICompletionProposal {
@@ -25,23 +25,23 @@ public abstract class AbstractSymbolicallyReachedCompletionProposal implements I
    private final Shell shell;
    
    /**
-    * The {@link ISEDDebugNode}s to select.
+    * The {@link ISENode}s to select.
     */
-   private final List<ISEDDebugNode> debugNodes;
+   private final List<ISENode> debugNodes;
 
    /**
     * Constructor.
     * @param shell The parent {@link Shell} which provides the {@link IDebugView}.
-    * @param debugNodes The {@link ISEDDebugNode}s to select.
+    * @param debugNodes The {@link ISENode}s to select.
     */
-   public AbstractSymbolicallyReachedCompletionProposal(Shell shell, List<ISEDDebugNode> debugNodes) {
+   public AbstractSymbolicallyReachedCompletionProposal(Shell shell, List<ISENode> debugNodes) {
       this.shell = shell;
       this.debugNodes = debugNodes;
    }
    
    /**
-    * Returns the number of available {@link ISEDDebugNode}s.
-    * @return The number of available {@link ISEDDebugNode}s.
+    * Returns the number of available {@link ISENode}s.
+    * @return The number of available {@link ISENode}s.
     */
    protected int countNodes() {
       return debugNodes != null ? debugNodes.size() : 0;

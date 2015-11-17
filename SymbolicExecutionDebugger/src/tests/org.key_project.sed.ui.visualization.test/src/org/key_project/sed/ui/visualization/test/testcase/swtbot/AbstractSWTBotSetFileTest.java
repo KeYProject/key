@@ -33,8 +33,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLReader;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.serialization.SEXMLReader;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.sed.ui.visualization.test.Activator;
@@ -97,18 +97,18 @@ public abstract class AbstractSWTBotSetFileTest extends TestCase {
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
+         ISEDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          ILaunch launch = target.getLaunch();
          // Compare shown tree with SET file
-         SEDXMLReader reader = new SEDXMLReader();
-         List<ISEDDebugTarget> expectedTargets = reader.read(setFile);
+         SEXMLReader reader = new SEXMLReader();
+         List<ISEDebugTarget> expectedTargets = reader.read(setFile);
          IDebugTarget[] currentTargets = launch.getDebugTargets();
          assertEquals(expectedTargets.size(), currentTargets.length);
          int i = 0;
-         for (ISEDDebugTarget expectedTarget : expectedTargets) {
-            assertTrue(currentTargets[i] instanceof ISEDDebugTarget);
+         for (ISEDebugTarget expectedTarget : expectedTargets) {
+            assertTrue(currentTargets[i] instanceof ISEDebugTarget);
             TestSedCoreUtil.compareDebugTarget(expectedTarget, 
-                                               (ISEDDebugTarget)currentTargets[i], 
+                                               (ISEDebugTarget)currentTargets[i], 
                                                true,
                                                true,
                                                true,
@@ -208,7 +208,7 @@ public abstract class AbstractSWTBotSetFileTest extends TestCase {
        * @param debugView The debug view.
        * @param debugTree The debug tree.
        * @param launch The {@link ILaunch}.
-       * @param target The {@link ISEDDebugTarget}.
+       * @param target The {@link ISEDebugTarget}.
        */
       public void test(SWTWorkbenchBot bot,
                        IProject project,
@@ -216,6 +216,6 @@ public abstract class AbstractSWTBotSetFileTest extends TestCase {
                        SWTBotView debugView, 
                        SWTBotTree debugTree, 
                        ILaunch launch, 
-                       ISEDDebugTarget target) throws Exception;
+                       ISEDebugTarget target) throws Exception;
    }
 }

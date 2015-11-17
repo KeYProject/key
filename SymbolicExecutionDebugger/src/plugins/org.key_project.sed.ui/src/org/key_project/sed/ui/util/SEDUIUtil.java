@@ -53,19 +53,19 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
-import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.provider.SEDebugNodeContentProvider;
+import org.key_project.sed.core.provider.SEDebugTargetContentProvider;
 import org.key_project.sed.core.util.LogUtil;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.ui.Activator;
-import org.key_project.sed.ui.action.ISEDAnnotationAction;
-import org.key_project.sed.ui.action.ISEDAnnotationLinkAction;
-import org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction;
-import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
+import org.key_project.sed.ui.action.ISEAnnotationAction;
+import org.key_project.sed.ui.action.ISEAnnotationLinkAction;
+import org.key_project.sed.ui.action.ISEAnnotationLinkEditAction;
+import org.key_project.sed.ui.edit.ISEAnnotationEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -121,12 +121,12 @@ public final class SEDUIUtil {
    private static final List<SEDAnnotationLinkActionDescription> annotationLinkActionDescriptions = createAnnotationLinkActionDescriptions();
    
    /**
-    * All available {@link ISEDAnnotationLinkEditAction}s.
+    * All available {@link ISEAnnotationLinkEditAction}s.
     */
-   private static final Map<String, ISEDAnnotationLinkEditAction> annotationLinkEditActions = createAnnotationLinkEditActions();
+   private static final Map<String, ISEAnnotationLinkEditAction> annotationLinkEditActions = createAnnotationLinkEditActions();
    
    /**
-    * All available {@link Image}s of {@link ISEDAnnotationType}s.
+    * All available {@link Image}s of {@link ISEAnnotationType}s.
     */
    private static final Map<String, Image> annotationTypeImages = createAnnotationTypeImages();
    
@@ -166,11 +166,13 @@ public final class SEDUIUtil {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
+                  SWTUtil.checkCanceled(monitor);
                   // Expand viewer up to the elements to select.
                   final Viewer debugViewer = debugView.getViewer();
                   if (debugViewer instanceof TreeViewer) {
                      TreeViewer treeViewer = (TreeViewer)debugViewer;
                      for (Object element : selection) {
+                        SWTUtil.checkCanceled(monitor);
                         try {
                            monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
                            monitor.subTask("Collecting unknown elements");
@@ -185,6 +187,7 @@ public final class SEDUIUtil {
                      }
                   }
                   // Select new elements
+                  SWTUtil.checkCanceled(monitor);
                   monitor.beginTask("Select element", 1);
                   ISelection newSelection = SWTUtil.createSelection(selection);
                   SWTUtil.select(debugViewer, newSelection, true);
@@ -220,19 +223,19 @@ public final class SEDUIUtil {
                if (debugViewer instanceof TreeViewer) {
                   // Collect elements to expand
                   monitor.beginTask("Collecting unknown leafs", IProgressMonitor.UNKNOWN);
-                  List<ISEDDebugElement> leafs = new LinkedList<ISEDDebugElement>();
+                  List<ISEDebugElement> leafs = new LinkedList<ISEDebugElement>();
                   TreeViewer treeViewer = (TreeViewer)debugViewer;
                   for (Object element : toExpand) {
                      try {
                         if (element instanceof ILaunch) {
                            for (IDebugTarget target : ((ILaunch)element).getDebugTargets()) {
-                              if (target instanceof ISEDDebugTarget) {
-                                 collectElementsToExpand(monitor, treeViewer, (ISEDDebugTarget)target, leafs);
+                              if (target instanceof ISEDebugTarget) {
+                                 collectElementsToExpand(monitor, treeViewer, (ISEDebugTarget)target, leafs);
                               }
                            }
                         }
-                        else if (element instanceof ISEDDebugElement) {
-                           collectElementsToExpand(monitor, treeViewer, (ISEDDebugElement)element, leafs);
+                        else if (element instanceof ISEDebugElement) {
+                           collectElementsToExpand(monitor, treeViewer, (ISEDebugElement)element, leafs);
                         }
                      }
                      catch (DebugException e) {
@@ -242,7 +245,7 @@ public final class SEDUIUtil {
                   monitor.done();
                   // Inject unknown elements
                   monitor.beginTask("Injecting paths to leafs (" + leafs.size() + ")", leafs.size());
-                  for (ISEDDebugElement element : leafs) {
+                  for (ISEDebugElement element : leafs) {
                      try {
                         SWTUtil.checkCanceled(monitor);
                         monitor.subTask("Collecting unknown elements");
@@ -274,14 +277,14 @@ public final class SEDUIUtil {
          
          protected void collectElementsToExpand(IProgressMonitor monitor, 
                                                 TreeViewer treeViewer, 
-                                                ISEDDebugElement element, 
-                                                List<ISEDDebugElement> toFill) throws DebugException {
-            SEDPreorderIterator iterator = new SEDPreorderIterator(element);
+                                                ISEDebugElement element, 
+                                                List<ISEDebugElement> toFill) throws DebugException {
+            SEPreorderIterator iterator = new SEPreorderIterator(element);
             while (iterator.hasNext()) {
                SWTUtil.checkCanceled(monitor);
-               ISEDDebugElement next = iterator.next();
-               if (next instanceof ISEDDebugNode) {
-                  ISEDDebugNode node = (ISEDDebugNode)next;
+               ISEDebugElement next = iterator.next();
+               if (next instanceof ISENode) {
+                  ISENode node = (ISENode)next;
                   if (node.getChildren().length == 0) { // Test for leaf
                      if (isUnknownInTreeViewer(treeViewer, node)) { // Test if leaf is unknown in the TreeViewer
                         toFill.add(next);
@@ -355,11 +358,11 @@ public final class SEDUIUtil {
     * @throws DebugException Occurred Exception.
     */
    public static Object getParent(Object element) throws DebugException {
-      if (element instanceof ISEDDebugNode) {
-         return SEDDebugNodeContentProvider.getDefaultInstance().getDebugNodeParent(element);
+      if (element instanceof ISENode) {
+         return SEDebugNodeContentProvider.getDefaultInstance().getDebugNodeParent(element);
       }
-      else if (element instanceof ISEDDebugTarget) {
-         return SEDDebugTargetContentProvider.getDefaultInstance().getParent(element);
+      else if (element instanceof ISEDebugTarget) {
+         return SEDebugTargetContentProvider.getDefaultInstance().getParent(element);
       }
       else {
          return null;
@@ -374,11 +377,11 @@ public final class SEDUIUtil {
     * @throws DebugException Occurred Exception.
     */
    public static Object[] getChildren(Object element) throws DebugException {
-      if (element instanceof ISEDDebugTarget) {
-         return SEDDebugTargetContentProvider.getDefaultInstance().getAllChildren(element);
+      if (element instanceof ISEDebugTarget) {
+         return SEDebugTargetContentProvider.getDefaultInstance().getAllChildren(element);
       }
-      else if (element instanceof ISEDDebugNode) {
-         return SEDDebugNodeContentProvider.getDefaultInstance().getAllDebugNodeChildren(element);
+      else if (element instanceof ISENode) {
+         return SEDebugNodeContentProvider.getDefaultInstance().getAllDebugNodeChildren(element);
       }
       else {
          return null;
@@ -554,7 +557,7 @@ public final class SEDUIUtil {
                for (IConfigurationElement configElement : configElements) {
                   try {
                      String text = configElement.getAttribute("text");
-                     ISEDAnnotationAction action = (ISEDAnnotationAction)configElement.createExecutableExtension("class");
+                     ISEAnnotationAction action = (ISEAnnotationAction)configElement.createExecutableExtension("class");
                      String imagePath = configElement.getAttribute("icon");
                      String toolTipText = configElement.getAttribute("toolTipText");
                      Image image = null;;
@@ -608,7 +611,7 @@ public final class SEDUIUtil {
                for (IConfigurationElement configElement : configElements) {
                   try {
                      String text = configElement.getAttribute("text");
-                     ISEDAnnotationLinkAction action = (ISEDAnnotationLinkAction)configElement.createExecutableExtension("class");
+                     ISEAnnotationLinkAction action = (ISEAnnotationLinkAction)configElement.createExecutableExtension("class");
                      String imagePath = configElement.getAttribute("icon");
                      String toolTipText = configElement.getAttribute("toolTipText");
                      Image image = null;;
@@ -700,27 +703,27 @@ public final class SEDUIUtil {
     */
    public static final class SEDAnnotationActionDescription extends AbstractActionDescription {
       /**
-       * The {@link ISEDAnnotationAction}.
+       * The {@link ISEAnnotationAction}.
        */
-      private final ISEDAnnotationAction action;
+      private final ISEAnnotationAction action;
 
       /**
        * Constructor.
        * @param text The text.
        * @param image The image.
        * @param toolTipText The tool tip text.
-       * @param action The {@link ISEDAnnotationAction}.
+       * @param action The {@link ISEAnnotationAction}.
        */
-      public SEDAnnotationActionDescription(String text, Image image, String toolTipText, ISEDAnnotationAction action) {
+      public SEDAnnotationActionDescription(String text, Image image, String toolTipText, ISEAnnotationAction action) {
          super(text, image, toolTipText);
          this.action = action;
       }
 
       /**
-       * Returns the {@link ISEDAnnotationAction}.
-       * @return The {@link ISEDAnnotationAction}.
+       * Returns the {@link ISEAnnotationAction}.
+       * @return The {@link ISEAnnotationAction}.
        */
-      public ISEDAnnotationAction getAction() {
+      public ISEAnnotationAction getAction() {
          return action;
       }
    }
@@ -732,47 +735,47 @@ public final class SEDUIUtil {
     */
    public static final class SEDAnnotationLinkActionDescription extends AbstractActionDescription {
       /**
-       * The {@link ISEDAnnotationLinkAction}.
+       * The {@link ISEAnnotationLinkAction}.
        */
-      private final ISEDAnnotationLinkAction action;
+      private final ISEAnnotationLinkAction action;
 
       /**
        * Constructor.
        * @param text The text.
        * @param image The image.
        * @param toolTipText The tool tip text.
-       * @param action The {@link ISEDAnnotationLinkAction}.
+       * @param action The {@link ISEAnnotationLinkAction}.
        */
-      public SEDAnnotationLinkActionDescription(String text, Image image, String toolTipText, ISEDAnnotationLinkAction action) {
+      public SEDAnnotationLinkActionDescription(String text, Image image, String toolTipText, ISEAnnotationLinkAction action) {
          super(text, image, toolTipText);
          this.action = action;
       }
 
       /**
-       * Returns the {@link ISEDAnnotationLinkAction}.
-       * @return The {@link ISEDAnnotationLinkAction}.
+       * Returns the {@link ISEAnnotationLinkAction}.
+       * @return The {@link ISEAnnotationLinkAction}.
        */
-      public ISEDAnnotationLinkAction getAction() {
+      public ISEAnnotationLinkAction getAction() {
          return action;
       }
    }
    
    /**
-    * Returns the {@link ISEDAnnotationEditor} for the given {@link ISEDAnnotationType}.
-    * @param type The {@link ISEDAnnotationType}.
-    * @return A fresh created {@link ISEDAnnotationEditor} or {@code null} if not available.
+    * Returns the {@link ISEAnnotationEditor} for the given {@link ISEAnnotationType}.
+    * @param type The {@link ISEAnnotationType}.
+    * @return A fresh created {@link ISEAnnotationEditor} or {@code null} if not available.
     */
-   public static ISEDAnnotationEditor getAnnotationEditor(ISEDAnnotationType type) {
+   public static ISEAnnotationEditor getAnnotationEditor(ISEAnnotationType type) {
       return type != null ? getAnnotationEditor(type.getTypeId()) : null;
    }
    
    /**
-    * Returns the {@link ISEDAnnotationEditor} for the given annotation type ID.
+    * Returns the {@link ISEAnnotationEditor} for the given annotation type ID.
     * @param typeId The given annotation type ID.
-    * @return A fresh created {@link ISEDAnnotationEditor} or {@code null} if not available.
+    * @return A fresh created {@link ISEAnnotationEditor} or {@code null} if not available.
     */
-   public static ISEDAnnotationEditor getAnnotationEditor(String typeId) {
-      ISEDAnnotationEditor result = null;
+   public static ISEAnnotationEditor getAnnotationEditor(String typeId) {
+      ISEAnnotationEditor result = null;
       // Add drivers registered by the extension point
       IExtensionRegistry registry = Platform.getExtensionRegistry();
       if (registry != null) {
@@ -787,7 +790,7 @@ public final class SEDUIUtil {
                   try {
                      String annotationTypeID = configElement.getAttribute("annotationTypeID");
                      if (ObjectUtil.equals(annotationTypeID, typeId)) {
-                        result = (ISEDAnnotationEditor)configElement.createExecutableExtension("class");
+                        result = (ISEAnnotationEditor)configElement.createExecutableExtension("class");
                      }
                   }
                   catch (Exception e) {
@@ -808,20 +811,20 @@ public final class SEDUIUtil {
    }
    
    /**
-    * Returns the {@link ISEDAnnotationLinkEditAction} for the given annotation type id.
+    * Returns the {@link ISEAnnotationLinkEditAction} for the given annotation type id.
     * @param annotationTypeID The annotation type id.
-    * @return The {@link ISEDAnnotationLinkEditAction} if available or {@code null} otherwise.
+    * @return The {@link ISEAnnotationLinkEditAction} if available or {@code null} otherwise.
     */
-   public static ISEDAnnotationLinkEditAction getAnnotationLinkEditAction(String annotationTypeID) {
+   public static ISEAnnotationLinkEditAction getAnnotationLinkEditAction(String annotationTypeID) {
       return annotationLinkEditActions.get(annotationTypeID);
    }
    
    /**
-    * Lists all available {@link ISEDAnnotationLinkEditAction}s.
-    * @return All available {@link ISEDAnnotationLinkEditAction}s.
+    * Lists all available {@link ISEAnnotationLinkEditAction}s.
+    * @return All available {@link ISEAnnotationLinkEditAction}s.
     */
-   private static Map<String, ISEDAnnotationLinkEditAction> createAnnotationLinkEditActions() {
-      Map<String, ISEDAnnotationLinkEditAction> result = new HashMap<String, ISEDAnnotationLinkEditAction>();
+   private static Map<String, ISEAnnotationLinkEditAction> createAnnotationLinkEditActions() {
+      Map<String, ISEAnnotationLinkEditAction> result = new HashMap<String, ISEAnnotationLinkEditAction>();
       // Add drivers registered by the extension point
       IExtensionRegistry registry = Platform.getExtensionRegistry();
       if (registry != null) {
@@ -834,9 +837,9 @@ public final class SEDUIUtil {
                for (IConfigurationElement configElement : configElements) {
                   try {
                      String annotationTypeID = configElement.getAttribute("annotationTypeID");
-                     ISEDAnnotationLinkEditAction editAction = result.get(annotationTypeID);
+                     ISEAnnotationLinkEditAction editAction = result.get(annotationTypeID);
                      if (editAction == null) {
-                        result.put(annotationTypeID, (ISEDAnnotationLinkEditAction)configElement.createExecutableExtension("class"));
+                        result.put(annotationTypeID, (ISEAnnotationLinkEditAction)configElement.createExecutableExtension("class"));
                      }
                      else {
                         LogUtil.getLogger().logError("Annotion link edit action for annotation type \"" + annotationTypeID + "\" already found.");
@@ -875,11 +878,11 @@ public final class SEDUIUtil {
    }
 
    /**
-    * Returns the image of the given {@link ISEDAnnotationType}.
-    * @param type The {@link ISEDAnnotationType}.
+    * Returns the image of the given {@link ISEAnnotationType}.
+    * @param type The {@link ISEAnnotationType}.
     * @return The found {@link Image} or {@code null} if not available.
     */
-   public static Image getAnnotationTypeImage(ISEDAnnotationType type) {
+   public static Image getAnnotationTypeImage(ISEAnnotationType type) {
       if (type != null) {
          return getAnnotationTypeImage(type.getTypeId());
       }

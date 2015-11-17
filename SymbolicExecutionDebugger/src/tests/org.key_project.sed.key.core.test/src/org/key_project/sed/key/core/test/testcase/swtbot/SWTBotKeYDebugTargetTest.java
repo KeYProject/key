@@ -28,7 +28,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.core.test.util.SuspendingStopCondition;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
@@ -1172,11 +1172,11 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
    public void testSuspendResumeDebugTarget_Resume_Suspend_Resume() throws Exception {
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
             assertTrue(launch.canTerminate());
             assertFalse(launch.isTerminated());
-            assertTrue(target instanceof ISEDDebugTarget);
+            assertTrue(target instanceof ISEDebugTarget);
             assertTrue(target.canDisconnect());
             assertTrue(target.canResume());
             assertFalse(target.canSuspend());
@@ -1268,7 +1268,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
     * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
-    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
+    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDebugTarget} model.
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModelRunAndStepInto(String projectName,
@@ -1289,7 +1289,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
     * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
-    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
+    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDebugTarget} model.
     * @param includeCallStack Include call stack?
     * @param mergeBranchConditions Merge branch conditions?
     * @throws Exception Occurred Exception.
@@ -1313,15 +1313,15 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     *    <li>Extract code from bundle to a Java project with the defined name in the workspace.</li>
     *    <li>Select an {@link IMethod} to debug with the given {@link IMethodSelector}.</li>
     *    <li>Launch selected {@link IMethod} with the Symbolic Execution Debugger based on KeY.</li>
-    *    <li>Make sure that the initial SED model ({@link ISEDDebugTarget}) is opened.</li>
+    *    <li>Make sure that the initial SED model ({@link ISEDebugTarget}) is opened.</li>
     *    <li>Resume the execution.</li>
-    *    <li>Make sure that the final SED model ({@link ISEDDebugTarget}) specified by the oracle file expectedModelPathInBundle is reached.</li>
+    *    <li>Make sure that the final SED model ({@link ISEDebugTarget}) specified by the oracle file expectedModelPathInBundle is reached.</li>
     * </ol>
     * @param projectName The project name in the workspace.
     * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
     * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
-    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
+    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDebugTarget} model.
     * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @throws Exception Occurred Exception.
     */
@@ -1340,15 +1340,15 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     *    <li>Extract code from bundle to a Java project with the defined name in the workspace.</li>
     *    <li>Select an {@link IMethod} to debug with the given {@link IMethodSelector}.</li>
     *    <li>Launch selected {@link IMethod} with the Symbolic Execution Debugger based on KeY.</li>
-    *    <li>Make sure that the initial SED model ({@link ISEDDebugTarget}) is opened.</li>
+    *    <li>Make sure that the initial SED model ({@link ISEDebugTarget}) is opened.</li>
     *    <li>Resume the execution.</li>
-    *    <li>Make sure that the final SED model ({@link ISEDDebugTarget}) specified by the oracle file expectedModelPathInBundle is reached.</li>
+    *    <li>Make sure that the final SED model ({@link ISEDebugTarget}) specified by the oracle file expectedModelPathInBundle is reached.</li>
     * </ol>
     * @param projectName The project name in the workspace.
     * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
     * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
-    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
+    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDebugTarget} model.
     * @param showMethodReturnValues Show method return values?
     * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @throws Exception Occurred Exception.
@@ -1369,15 +1369,15 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     *    <li>Extract code from bundle to a Java project with the defined name in the workspace.</li>
     *    <li>Select an {@link IMethod} to debug with the given {@link IMethodSelector}.</li>
     *    <li>Launch selected {@link IMethod} with the Symbolic Execution Debugger based on KeY.</li>
-    *    <li>Make sure that the initial SED model ({@link ISEDDebugTarget}) is opened.</li>
+    *    <li>Make sure that the initial SED model ({@link ISEDebugTarget}) is opened.</li>
     *    <li>Resume the execution.</li>
-    *    <li>Make sure that the final SED model ({@link ISEDDebugTarget}) specified by the oracle file expectedModelPathInBundle is reached.</li>
+    *    <li>Make sure that the final SED model ({@link ISEDebugTarget}) specified by the oracle file expectedModelPathInBundle is reached.</li>
     * </ol>
     * @param projectName The project name in the workspace.
     * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
     * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
-    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
+    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDebugTarget} model.
     * @param showMethodReturnValues Show method return values?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param includeVariables Include variables?
@@ -1491,11 +1491,11 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                                        final int... pathToElementInDebugTreeWhichProvidesDisconnectMenuItem) throws Exception {
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
             assertTrue(launch.canTerminate());
             assertFalse(launch.isTerminated());
-            assertTrue(target instanceof ISEDDebugTarget);
+            assertTrue(target instanceof ISEDebugTarget);
             assertTrue(target.canDisconnect());
             assertTrue(target.canResume());
             assertFalse(target.canSuspend());
@@ -1520,7 +1520,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             TestSedCoreUtil.waitUntilLaunchIsDisconnected(bot, (IDisconnect)launch);
             assertTrue(launch.canTerminate());
             assertTrue(launch.isTerminated()); // Also disconnected debug targets are seen as terminated by the Eclipse Debug API.
-            assertTrue(target instanceof ISEDDebugTarget);
+            assertTrue(target instanceof ISEDebugTarget);
             assertFalse(target.canDisconnect());
             assertFalse(target.canResume());
             assertFalse(target.canSuspend());
@@ -1610,11 +1610,11 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                     final int... pathToElementInDebugTreeWhichProvidesTerminateMenuItem) throws Exception {
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
             assertTrue(launch.canTerminate());
             assertFalse(launch.isTerminated());
-            assertTrue(target instanceof ISEDDebugTarget);
+            assertTrue(target instanceof ISEDebugTarget);
             assertTrue(target.canDisconnect());
             assertTrue(target.canResume());
             assertFalse(target.canSuspend());

@@ -16,8 +16,8 @@ package org.key_project.sed.ui.property;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.swt.SWT;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.util.ISEDConstants;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.util.ISEConstants;
 
 
 /**
@@ -40,7 +40,7 @@ public class CallStateTabComposite extends AbstractNodeTreeTabComposite {
     */
    @Override
    protected PresentationContext createPresentationContext() {
-      return new PresentationContext(ISEDConstants.ID_CALL_STATE); // The current state is IDebugUIConstants.ID_VARIABLE_VIEW.
+      return new PresentationContext(ISEConstants.ID_CALL_STATE); // The current state is IDebugUIConstants.ID_VARIABLE_VIEW.
    }
 
    /**
@@ -55,7 +55,7 @@ public class CallStateTabComposite extends AbstractNodeTreeTabComposite {
     * {@inheritDoc}
     */
    @Override
-   protected void configurePresentationContext(PresentationContext viewerContext, ISEDDebugNode node) {
+   protected void configurePresentationContext(PresentationContext viewerContext, ISENode node) {
       // Nothing to do
    }
    

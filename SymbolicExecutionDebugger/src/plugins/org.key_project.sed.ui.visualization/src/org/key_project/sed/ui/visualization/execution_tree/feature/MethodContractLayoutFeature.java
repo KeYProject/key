@@ -16,10 +16,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
-import org.key_project.sed.core.model.ISEDMethodContract;
+import org.key_project.sed.core.model.ISEMethodContract;
 
 /**
- * Implementation of {@link ILayoutFeature} for {@link ISEDMethodContract}s.
+ * Implementation of {@link ILayoutFeature} for {@link ISEMethodContract}s.
  * @author Martin Hentschel
  */
 public class MethodContractLayoutFeature extends AbstractDebugNodeLayoutFeature {
@@ -36,6 +36,6 @@ public class MethodContractLayoutFeature extends AbstractDebugNodeLayoutFeature 
     */
    @Override
    protected boolean canLayoutBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDMethodContract;
+      return businessObject instanceof ISEMethodContract;
    }
 }

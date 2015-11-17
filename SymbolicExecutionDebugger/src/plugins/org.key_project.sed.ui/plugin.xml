@@ -71,7 +71,7 @@
                         operator="and">
                      <or>
                         <instanceof
-                              value="org.key_project.sed.core.model.ISEDDebugElement">
+                              value="org.key_project.sed.core.model.ISEDebugElement">
                         </instanceof>
                         <and>
                            <instanceof
@@ -100,7 +100,7 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="org.key_project.sed.core.model.ISEDVariable">
+                           value="org.key_project.sed.core.model.ISEVariable">
                      </instanceof>
                      <test
                            forcePluginActivation="true"
@@ -128,15 +128,15 @@
             </adapter>
          </factory>
          <factory
-               adaptableType="org.key_project.sed.core.model.ISEDVariable"
-               class="org.key_project.sed.ui.adapter.SEDVariableAdapterFactory">
+               adaptableType="org.key_project.sed.core.model.ISEVariable"
+               class="org.key_project.sed.ui.adapter.SEVariableAdapterFactory">
             <adapter
                   type="org.eclipse.debug.internal.ui.viewers.model.provisional.IElementLabelProvider">
             </adapter>
          </factory>
          <factory
-               adaptableType="org.key_project.sed.core.model.ISEDDebugTarget"
-               class="org.key_project.sed.ui.adapter.SEDDebugTargetModelProxyFactoryAdapterFactory">
+               adaptableType="org.key_project.sed.core.model.ISEDebugTarget"
+               class="org.key_project.sed.ui.adapter.SEDebugTargetModelProxyFactoryAdapterFactory">
             <adapter
                   type="org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxyFactory">
             </adapter>
@@ -227,19 +227,19 @@
           point="org.eclipse.ui.views.properties.tabbed.propertySections">
           <propertySections contributorId="org.key_project.sed.launchViewPropertyContributor">
               <propertySection tab="org.key_project.sed.ui.node.tab"           
-               class="org.key_project.sed.ui.property.SEDDebugNodePropertySection"
-               filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+               class="org.key_project.sed.ui.property.SENodePropertySection"
+               filter="org.key_project.sed.ui.property.SENodeTreeFilter"
                id="org.key_project.sed.ui.node.tab.SEDDebugNodePropertySection">
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.CallStackPropertySection"
-                    filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+                    filter="org.key_project.sed.ui.property.SENodeTreeFilter"
                     id="org.key_project.sed.ui.property.CallStackPropertySection"
                     tab="org.key_project.sed.ui.callStack.tab">
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.MethodReturnConditionsPropertySection"
-                    filter="org.key_project.sed.ui.property.SEDMethodCallTreeFilter"
+                    filter="org.key_project.sed.ui.property.SEMethodCallTreeFilter"
                     id="org.key_project.sed.ui.property.MethodReturnConditionsPropertySection"
                     tab="org.key_project.sed.ui.methodReturns.tab">
               </propertySection>
@@ -251,19 +251,19 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.AnnotationPropertySection"
-                    filter="org.key_project.sed.ui.property.SEDDebugTargetTreeFilter"
+                    filter="org.key_project.sed.ui.property.SEDebugTargetTreeFilter"
                     id="org.key_project.sed.ui.property.AnnotationPropertySection"
                     tab="org.key_project.sed.ui.annotations.tab">
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.AnnotationLinkPropertySection"
-                    filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+                    filter="org.key_project.sed.ui.property.SENodeTreeFilter"
                     id="org.key_project.sed.ui.property.AnnotationLinkPropertySection"
                     tab="org.key_project.sed.ui.annotationLinks.tab">
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.StatisticsPropertySection"
-                    filter="org.key_project.sed.ui.property.SEDDebugTargetTreeFilter"
+                    filter="org.key_project.sed.ui.property.SEDebugTargetTreeFilter"
                     id="org.key_project.sed.ui.property.StatisticsPropertySection"
                     tab="org.key_project.sed.ui.statistics.tab">
               </propertySection>
@@ -281,7 +281,7 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.ConstraintsVariablePropertySection"
-                    filter="org.key_project.sed.ui.property.SEDVariableTreeFilter"
+                    filter="org.key_project.sed.ui.property.SEVariableTreeFilter"
                     id="org.key_project.sed.ui.property.ConstraintsPropertySection"
                     tab="org.key_project.sed.ui.constraints.tab">
               </propertySection>
@@ -299,7 +299,7 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.CallStatePropertySection"
-                    filter="org.key_project.sed.ui.property.SEDBaseMethodReturnTreeFilter"
+                    filter="org.key_project.sed.ui.property.SEBaseMethodReturnTreeFilter"
                     id="org.key_project.sed.ui.property.CallStatePropertySection"
                     tab="org.key_project.sed.ui.callState.tab">
               </propertySection>
@@ -431,7 +431,7 @@
                      operator="and">
                   <or>
                      <instanceof
-                           value="org.key_project.sed.core.model.ISEDDebugElement">
+                           value="org.key_project.sed.core.model.ISEDebugElement">
                      </instanceof>
                      <and>
                         <instanceof
@@ -454,7 +454,7 @@
                      ifEmpty="false"
                      operator="and">
                   <instanceof
-                        value="org.key_project.sed.core.model.ISEDVariable">
+                        value="org.key_project.sed.core.model.ISEVariable">
                   </instanceof>
                   <test
                         forcePluginActivation="true"

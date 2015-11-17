@@ -44,6 +44,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.services.IEvaluationService;
@@ -79,13 +80,22 @@ public final class WorkbenchUtil {
     public static IPerspectiveDescriptor openPerspective(String perspectiveId) {
        IWorkbenchPage page = getActivePage();
        if (page != null) {
-          IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+          IPerspectiveDescriptor perspective = getPerspectiveDescriptor(perspectiveId);
           page.setPerspective(perspective);
           return perspective;
        }
        else {
           return null;
        }
+    }
+    
+    /**
+     * Returns the {@link IPerspectiveDescriptor} with the given ID.
+     * @param perspectiveId The perspective ID.
+     * @return The found {@link IPerspectiveDescriptor} or {@code null} if not available.
+     */
+    public static IPerspectiveDescriptor getPerspectiveDescriptor(String perspectiveId) {
+       return PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
     }
 
     /**
@@ -528,5 +538,13 @@ public final class WorkbenchUtil {
          return resource.getProject();
       }
       return null;
+   }
+
+   /**
+    * Closes the welcome view.
+    */
+   public static void closeWelcomeView() {
+      IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager();
+      introManager.closeIntro(introManager.getIntro());
    }
 }

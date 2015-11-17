@@ -17,15 +17,15 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.memory.SEDMemoryStatement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.model.memory.SEMemoryStatement;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link ICreateFeature} for {@link ISEDStatement}s.
+ * Implementation of {@link ICreateFeature} for {@link ISEStatement}s.
  * @author Martin Hentschel
  */
 public class StatementCreateFeature extends AbstractDebugNodeCreateFeature {
@@ -57,11 +57,11 @@ public class StatementCreateFeature extends AbstractDebugNodeCreateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
-                                              ISEDDebugNode parent,
-                                              ISEDThread thread,
+   protected ISENode createNewDebugNode(ISEDebugTarget target,
+                                              ISENode parent,
+                                              ISEThread thread,
                                               String name) throws DebugException {
-      SEDMemoryStatement result = new SEDMemoryStatement(target, parent, thread);
+      SEMemoryStatement result = new SEMemoryStatement(target, parent, thread);
       result.setName(name);
       return result;
    }

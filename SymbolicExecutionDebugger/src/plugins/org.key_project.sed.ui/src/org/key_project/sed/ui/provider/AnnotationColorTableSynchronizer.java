@@ -14,43 +14,43 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.services.IDisposable;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.event.ISEDAnnotationListener;
-import org.key_project.sed.core.model.event.SEDAnnotationEvent;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.event.ISEAnnotationListener;
+import org.key_project.sed.core.model.event.SEAnnotationEvent;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 
 /**
- * Shows the colors defined by {@link ISEDAnnotation} in an {@link TableViewer}.
+ * Shows the colors defined by {@link ISEAnnotation} in an {@link TableViewer}.
  * @author Martin Hentschel
  */
 public class AnnotationColorTableSynchronizer implements IDisposable {
    /**
     * The model to synchronize with.
     */
-   private final ISEDDebugTarget model;
+   private final ISEDebugTarget model;
    
    /**
     * Observes {@link #modelListener}.
     */
-   private final ISEDAnnotationListener modelListener = new ISEDAnnotationListener() {
+   private final ISEAnnotationListener modelListener = new ISEAnnotationListener() {
       @Override
-      public void annotationRegistered(SEDAnnotationEvent e) {
+      public void annotationRegistered(SEAnnotationEvent e) {
          handleAnnotationRegistered(e);
       }
 
       @Override
-      public void annotationUnregistered(SEDAnnotationEvent e) {
+      public void annotationUnregistered(SEAnnotationEvent e) {
          handleAnnotationUnregistered(e);
       }
 
       @Override
-      public void annotationMoved(SEDAnnotationEvent e) {
+      public void annotationMoved(SEAnnotationEvent e) {
       }      
    };
    
    /**
-    * Observes {@link ISEDAnnotation}s provided by {@link #model}.
+    * Observes {@link ISEAnnotation}s provided by {@link #model}.
     */
    private final PropertyChangeListener annotationListener = new PropertyChangeListener() {
       @Override
@@ -81,16 +81,16 @@ public class AnnotationColorTableSynchronizer implements IDisposable {
 
    /**
     * Constructor.
-    * @param model The {@link ISEDDebugTarget} which provides the {@link ISEDAnnotation}s.
+    * @param model The {@link ISEDebugTarget} which provides the {@link ISEAnnotation}s.
     * @param viewer The {@link TableViewer} to show colors in.
     */
-   public AnnotationColorTableSynchronizer(ISEDDebugTarget model, TableViewer viewer) {
+   public AnnotationColorTableSynchronizer(ISEDebugTarget model, TableViewer viewer) {
       Assert.isNotNull(model);
       Assert.isNotNull(viewer);
       this.model = model;
       this.model.addAnnotationListener(modelListener);
       SEDPreferenceUtil.getStore().addPropertyChangeListener(storeListener);
-      for (ISEDAnnotation annotation : model.getRegisteredAnnotations()) {
+      for (ISEAnnotation annotation : model.getRegisteredAnnotations()) {
          addListener(annotation);
       }
       this.viewer = viewer;
@@ -100,46 +100,46 @@ public class AnnotationColorTableSynchronizer implements IDisposable {
    }
 
    /**
-    * When a new {@link ISEDAnnotation} is registered.
+    * When a new {@link ISEAnnotation} is registered.
     * @param e The event.
     */
-   protected void handleAnnotationRegistered(SEDAnnotationEvent e) {
+   protected void handleAnnotationRegistered(SEAnnotationEvent e) {
       addListener(e.getAnnotation());
       updateColor(e.getAnnotation());
    }
    
    /**
-    * Adds all required listener to the {@link ISEDAnnotation}.
-    * @param annotation The {@link ISEDAnnotation} to observe.
+    * Adds all required listener to the {@link ISEAnnotation}.
+    * @param annotation The {@link ISEAnnotation} to observe.
     */
-   protected void addListener(ISEDAnnotation annotation) {
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_HIGHLIGHT_BACKGROUND, annotationListener);
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_BACKGROUND_COLOR, annotationListener);
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_HIGHLIGHT_FOREGROUND, annotationListener);
-      annotation.addPropertyChangeListener(ISEDAnnotation.PROP_FOREGROUND_COLOR, annotationListener);
+   protected void addListener(ISEAnnotation annotation) {
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_HIGHLIGHT_BACKGROUND, annotationListener);
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_BACKGROUND_COLOR, annotationListener);
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_HIGHLIGHT_FOREGROUND, annotationListener);
+      annotation.addPropertyChangeListener(ISEAnnotation.PROP_FOREGROUND_COLOR, annotationListener);
    }
 
    /**
-    * When an existing {@link ISEDAnnotation} was unregistered.
+    * When an existing {@link ISEAnnotation} was unregistered.
     * @param e The event.
     */
-   protected void handleAnnotationUnregistered(SEDAnnotationEvent e) {
+   protected void handleAnnotationUnregistered(SEAnnotationEvent e) {
       removeListener(e.getAnnotation());
    }
    
    /**
-    * Removes all listener from the {@link ISEDAnnotation}.
-    * @param annotation The {@link ISEDAnnotation} to remove listener from.
+    * Removes all listener from the {@link ISEAnnotation}.
+    * @param annotation The {@link ISEAnnotation} to remove listener from.
     */
-   protected void removeListener(ISEDAnnotation annotation) {
-      annotation.removePropertyChangeListener(ISEDAnnotation.PROP_HIGHLIGHT_BACKGROUND, annotationListener);
-      annotation.removePropertyChangeListener(ISEDAnnotation.PROP_BACKGROUND_COLOR, annotationListener);
-      annotation.removePropertyChangeListener(ISEDAnnotation.PROP_HIGHLIGHT_FOREGROUND, annotationListener);
-      annotation.removePropertyChangeListener(ISEDAnnotation.PROP_FOREGROUND_COLOR, annotationListener);
+   protected void removeListener(ISEAnnotation annotation) {
+      annotation.removePropertyChangeListener(ISEAnnotation.PROP_HIGHLIGHT_BACKGROUND, annotationListener);
+      annotation.removePropertyChangeListener(ISEAnnotation.PROP_BACKGROUND_COLOR, annotationListener);
+      annotation.removePropertyChangeListener(ISEAnnotation.PROP_HIGHLIGHT_FOREGROUND, annotationListener);
+      annotation.removePropertyChangeListener(ISEAnnotation.PROP_FOREGROUND_COLOR, annotationListener);
    }
 
    /**
-    * When {@link ISEDAnnotation#isEnabled()} has changed.
+    * When {@link ISEAnnotation#isEnabled()} has changed.
     * @param evt The event.
     */
    protected void handlePropertyChange(PropertyChangeEvent evt) {
@@ -182,8 +182,8 @@ public class AnnotationColorTableSynchronizer implements IDisposable {
     * @param item The {@link TableItem} to update its colors.
     */
    protected void updateColor(TableItem item) {
-      if (item.getData() instanceof ISEDAnnotation) {
-         ISEDAnnotation annotation = (ISEDAnnotation)item.getData();
+      if (item.getData() instanceof ISEAnnotation) {
+         ISEAnnotation annotation = (ISEAnnotation)item.getData();
          if (annotation.isHighlightBackground()) {
             item.setBackground(createColor(annotation.getBackgroundColor(), item.getDisplay()));
          }
@@ -221,7 +221,7 @@ public class AnnotationColorTableSynchronizer implements IDisposable {
    public void dispose() {
       SEDPreferenceUtil.getStore().removePropertyChangeListener(storeListener);
       model.removeAnnotationListener(modelListener);
-      for (ISEDAnnotation annotation : model.getRegisteredAnnotations()) {
+      for (ISEAnnotation annotation : model.getRegisteredAnnotations()) {
          removeListener(annotation);
       }
       for (Color color : colorMap.values()) {

@@ -13,6 +13,8 @@
 
 package org.key_project.sed.key.ui.property;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.common.ui.decorator.TruthValueEvaluationViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.java.ObjectUtil;
@@ -71,9 +73,19 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
+    * Indicates if updates are included or not.
+    */
+   public static final boolean INCLUDE_UPDATES = true;
+   
+   /**
     * The {@link TabbedPropertySheetWidgetFactory} to use.
     */
    private final TabbedPropertySheetWidgetFactory factory;
+   
+   /**
+    * An optional {@link ILayoutListener} invoked when the shown content has changed.
+    */
+   private final ILayoutListener layoutListener;
    
    /**
     * The root {@link Composite}.
@@ -90,7 +102,6 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     */
    private final List<TruthValueEvaluationViewerDecorator> decorators = new LinkedList<TruthValueEvaluationViewerDecorator>();
 
-   
    /**
     * The {@link Color} to highlight {@link TruthValue#TRUE}.
     */
@@ -107,17 +118,19 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    private final Color unknownColor;
    
    /**
-    * The currently shown {@link IKeYSEDDebugNode}.
+    * The currently shown {@link IKeYSENode}.
     */
-   private IKeYSEDDebugNode<?> currentNode;
+   private IKeYSENode<?> currentNode;
    
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
+    * @param layoutListener An optional {@link ILayoutListener} invoked when the shown content has changed.
     */
-   public AbstractTruthValueComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
+   public AbstractTruthValueComposite(Composite parent, TabbedPropertySheetWidgetFactory factory, ILayoutListener layoutListener) {
       this.factory = factory;
+      this.layoutListener = layoutListener;
       root = factory.createFlatFormComposite(parent);
       root.setLayout(new GridLayout(1, false));
       trueColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.trueRGB);
@@ -143,9 +156,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Updates the shown content.
-    * @param node The {@link IKeYSEDDebugNode} which provides the new content.
+    * @param node The {@link IKeYSENode} which provides the new content.
     */
-   public void updateContent(final IKeYSEDDebugNode<?> node) {
+   public void updateContent(final IKeYSENode<?> node) {
       if (!ObjectUtil.equals(currentNode, node)) {
          currentNode = node;
          showEvaluatingInformation();
@@ -197,9 +210,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Shows new content.
-    * @param node The {@link IKeYSEDDebugNode} which provides the new content.
+    * @param node The {@link IKeYSENode} which provides the new content.
     */
-   protected void computeAndAddNewContent(final IKeYSEDDebugNode<?> node) {
+   protected void computeAndAddNewContent(final IKeYSENode<?> node) {
       try {
          if (node != null) {
             // Get required information
@@ -209,9 +222,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Compute result
             ITreeSettings settings = node.getExecutionNode().getSettings();
             final TruthValueEvaluationResult result = TruthValueEvaluationUtil.evaluate(keyNode, 
-                                                                                      FormulaTermLabel.NAME,
-                                                                                      settings.isUseUnicode(),
-                                                                                      settings.isUsePrettyPrinting());
+                                                                                        FormulaTermLabel.NAME,
+                                                                                        settings.isUseUnicode(),
+                                                                                        settings.isUsePrettyPrinting());
             if (!root.isDisposed()) {
                root.getDisplay().syncExec(new Runnable() {
                   @Override
@@ -242,11 +255,11 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Computes the {@link Node} to show.
-    * @param node The {@link IKeYSEDDebugNode}.
+    * @param node The {@link IKeYSENode}.
     * @param executionNode The {@link IExecutionNode}.
     * @return The {@link Node} to show.
     */
-   protected Node computeNodeToShow(IKeYSEDDebugNode<?> node, IExecutionNode<?> executionNode) {
+   protected Node computeNodeToShow(IKeYSENode<?> node, IExecutionNode<?> executionNode) {
       return executionNode.getProofNode();
    }
    
@@ -266,12 +279,12 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    
    /**
     * Computes the {@link Sequent} to show.
-    * @param node The {@link IKeYSEDDebugNode}.
+    * @param node The {@link IKeYSENode}.
     * @param executionNode The {@link IExecutionNode}.
     * @param keyNode The {@link Node}.
     * @return The {@link Sequent} to show and optionally the uninterpreted predicate.
     */
-   protected abstract Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node, 
+   protected abstract Pair<Term, Term> computeTermToShow(IKeYSENode<?> node, 
                                                          IExecutionNode<?> executionNode, 
                                                          Node keyNode);
 
@@ -280,7 +293,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @param result The {@link TruthValueEvaluationResult} to consider.
     * @param succedent The {@link Term} to show as succedent.
     * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link FormulaTermLabel}.
-    * @param node The {@link IKeYSEDDebugNode} which provides the new content.
+    * @param node The {@link IKeYSENode} which provides the new content.
     */
    protected void addNewContent(TruthValueEvaluationResult result,
                                 Term succedent,
@@ -288,6 +301,23 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
                                 IExecutionNode<?> executionNode) {
       removeOldContent();
       BranchResult[] branchResults = result.getBranchResults();
+      Arrays.sort(branchResults, new Comparator<BranchResult>() { // Sort branch result to ensure that open nodes are shown first
+         @Override
+         public int compare(BranchResult o1, BranchResult o2) {
+            boolean o1closed = o1.getLeafNode().isClosed();
+            boolean o2closed = o2.getLeafNode().isClosed();
+            if (o1closed && !o2closed) {
+               return 1;
+            }
+            else if (!o1closed && o2closed) {
+               return -1;
+            }
+            else {
+               return 0;
+            }
+         }
+      });
+      Color notConsideredColor = null;
       for (BranchResult branchResult : branchResults) {
          if (shouldShowBranchResult(branchResult, uninterpretedPredicate)) {
             // Create group
@@ -298,6 +328,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Create viewer
             SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
             viewer.setEditable(false);
+            notConsideredColor = viewer.getTextWidget().getForeground();
             TruthValueEvaluationViewerDecorator viewerDecorator = new TruthValueEvaluationViewerDecorator(viewer);
             decorators.add(viewerDecorator);
             // Show term and results
@@ -310,7 +341,7 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
          }
       }
       // Add legend
-      addLegend();
+      addLegend(notConsideredColor);
       // Layout root
       updateLayout();
    }
@@ -349,17 +380,22 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
     * @return The found {@link Term} or {@code null} if not available.
     */
    protected Term findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate) {
-      if (term.op() == uninterpretedPredicate.op()) {
-         return term;
-      }
-      else if (term.op() == Junctor.AND) {
-         Term result = null;
-         int i = 0;
-         while (result == null && i < term.arity()) {
-            result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate);
-            i++;
+      if (uninterpretedPredicate != null) {
+         if (term.op() == uninterpretedPredicate.op()) {
+            return term;
          }
-         return result;
+         else if (term.op() == Junctor.AND) {
+            Term result = null;
+            int i = 0;
+            while (result == null && i < term.arity()) {
+               result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate);
+               i++;
+            }
+            return result;
+         }
+         else {
+            return null;
+         }
       }
       else {
          return null;
@@ -373,6 +409,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       root.layout();
       root.getParent().pack();
       root.getParent().layout();
+      if (layoutListener != null) {
+         layoutListener.layoutUpdated();
+      }
    }
 
    /**
@@ -448,10 +487,10 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
     * Adds the legend.
     */
-   protected void addLegend() {
+   protected void addLegend(Color notConsideredColor) {
       Composite legendComposite = factory.createFlatFormComposite(root);
       legendComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      GridLayout legendLayout = new GridLayout(4, false);
+      GridLayout legendLayout = new GridLayout(5, false);
       legendLayout.marginBottom = 0;
       legendLayout.marginHeight = 0;
       legendLayout.marginLeft = 0;
@@ -463,9 +502,19 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
       factory.createLabel(legendComposite, "Legend: ");
       Label trueLabel = factory.createLabel(legendComposite, "true");
       trueLabel.setForeground(trueColor);
+      trueLabel.setToolTipText("The term evaluates to true.");
       Label falseLabel = factory.createLabel(legendComposite, "false");
       falseLabel.setForeground(falseColor);
+      falseLabel.setToolTipText("The term evaluates to false.");
       Label unknownLabel = factory.createLabel(legendComposite, "unknown");
       unknownLabel.setForeground(unknownColor);
+      unknownLabel.setToolTipText("The term is not (yet) completely evaluated into true or false.");
+      Label notConsideredLabel = factory.createLabel(legendComposite, "not considered");
+      notConsideredLabel.setForeground(notConsideredColor);
+      notConsideredLabel.setToolTipText("The term is not part of the truth value evaluation.");
+   }
+   
+   public static interface ILayoutListener {
+      public void layoutUpdated();
    }
 }

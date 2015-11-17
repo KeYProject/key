@@ -63,7 +63,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  * ->
  * &lt;updatesToStoreInitialValues&gt;
  * &lt;modalityStart&gt;
- * exc=null;try {&lt;methodBodyExpand&gt;}catch(java.lang.Exception e) {exc = e}
+ * exc=null;try {&lt;methodBodyExpand&gt;}catch(java.lang.Throwable e) {exc = e}
  * &lt;modalityEnd&gt;
  * (exc = null & &lt;postconditions &gt; & &lt;optionalUninterpretedPredicate&gt;)
  * </code>

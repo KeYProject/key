@@ -14,7 +14,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -84,7 +84,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
                                PathReplacement... pathReplacements) throws Exception {
       IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             assertDiagram(bot, project, pathToSetFile, pathToOracleFiles, null);
          }
       };
@@ -115,7 +115,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
          // Create diagram
          ISetFileTestSteps additionalTestSteps = new ISetFileTestSteps() {
             @Override
-            public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
                try {
                   testSteps.init(bot, project, setFile, debugView, debugTree, launch, target);
                   // Select debug target
@@ -151,7 +151,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
        * @param debugView The debug view.
        * @param debugTree The debug tree.
        * @param launch The {@link ILaunch}.
-       * @param target The {@link ISEDDebugTarget}.
+       * @param target The {@link ISEDebugTarget}.
        */
       public void init(SWTWorkbenchBot bot, 
                        IProject project, 
@@ -159,7 +159,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
                        SWTBotView debugView, 
                        SWTBotTree debugTree, 
                        ILaunch launch, 
-                       ISEDDebugTarget target) throws Exception;
+                       ISEDebugTarget target) throws Exception;
       
       /**
        * Executes the test steps.
@@ -169,7 +169,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
        * @param debugView The debug view.
        * @param debugTree The debug tree.
        * @param launch The {@link ILaunch}.
-       * @param target The {@link ISEDDebugTarget}.
+       * @param target The {@link ISEDebugTarget}.
        */
       public void test(SWTWorkbenchBot bot, 
                        IProject project, 
@@ -177,7 +177,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
                        SWTBotView debugView, 
                        SWTBotTree debugTree, 
                        ILaunch launch, 
-                       ISEDDebugTarget target) throws Exception;
+                       ISEDebugTarget target) throws Exception;
    }
 
    /**
@@ -195,7 +195,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
                        SWTBotView debugView, 
                        SWTBotTree debugTree, 
                        ILaunch launch, 
-                       ISEDDebugTarget target) throws Exception {
+                       ISEDebugTarget target) throws Exception {
       }
    }
 

@@ -43,8 +43,11 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
  * @see JoinRule
  */
 public class JoinIfThenElse extends JoinProcedure {
-
     private static JoinIfThenElse INSTANCE = null;
+    
+    /** Time in milliseconds after which a simplification attempt
+     *  of a distinguishing formula times out. */
+    private static final int SIMPLIFICATION_TIMEOUT_MS = 1000;
 
     public static JoinIfThenElse instance() {
         if (INSTANCE == null) {
@@ -60,11 +63,12 @@ public class JoinIfThenElse extends JoinProcedure {
     public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
             Term v, SymbolicExecutionState state1,
             Term valueInState1, SymbolicExecutionState state2,
-            Term valueInState2, Services services) {
+            Term valueInState2, Term distinguishingFormula, Services services) {
 
         return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                 DefaultImmutableSet.<Term> nil(), createIfThenElseTerm(state1,
-                        state2, valueInState1, valueInState2, services),
+                        state2, valueInState1, valueInState2,
+                        distinguishingFormula, services),
                 DefaultImmutableSet.<Name> nil());
 
     }
@@ -86,6 +90,13 @@ public class JoinIfThenElse extends JoinProcedure {
      *            First state to evaluate.
      * @param state2
      *            Second state to evaluate.
+     * @param ifTerm
+     *            The term t1 (in the context of state1).
+     * @param elseTerm
+     *            The term t2 (in the context of state2).
+     * @param distinguishingFormula
+     *            The user-specified distinguishing formula. May be null (for
+     *            automatic generation).
      * @param services
      *            The services object.
      * @return An if then else term like
@@ -95,16 +106,26 @@ public class JoinIfThenElse extends JoinProcedure {
     public static Term createIfThenElseTerm(
             final SymbolicExecutionState state1,
             final SymbolicExecutionState state2, final Term ifTerm,
-            final Term elseTerm, final Services services) {
+            final Term elseTerm, Term distinguishingFormula,
+            final Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
-        Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd = createDistFormAndRightSidesForITEUpd(
-                state1, state2, ifTerm, elseTerm, services);
-
-        Term cond = distFormAndRightSidesForITEUpd.first;
-        Term ifForm = distFormAndRightSidesForITEUpd.second;
-        Term elseForm = distFormAndRightSidesForITEUpd.third;
+        Term cond, ifForm, elseForm;
+        
+        if (distinguishingFormula == null) {
+            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd = createDistFormAndRightSidesForITEUpd(
+                        state1, state2, ifTerm, elseTerm, services);
+    
+            cond = distFormAndRightSidesForITEUpd.first;
+            ifForm = distFormAndRightSidesForITEUpd.second;
+            elseForm = distFormAndRightSidesForITEUpd.third;
+        }
+        else {
+            cond = distinguishingFormula;
+            ifForm = ifTerm;
+            elseForm = elseTerm;
+        }
 
         // Construct the update for the symbolic state
         return tb.ife(cond, ifForm, elseForm);
@@ -235,7 +256,7 @@ public class JoinIfThenElse extends JoinProcedure {
 
         // Try an automatic simplification
         distinguishingFormula = trySimplify(services.getProof(),
-                distinguishingFormula, true);
+                distinguishingFormula, true, SIMPLIFICATION_TIMEOUT_MS);
 
         // Originally, here was a specific check of whether the equal parts
         // of the two path conditions was still included in the new path

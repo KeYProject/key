@@ -1,0 +1,266 @@
+<html>
+   <head>
+      <title>SED</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
+   </head>
+   <body>
+      <h1>SED</h1>
+      <p>
+         The <a href="http://www.key-project.org/eclipse/SED/index.html" target="_blank">Symbolic Execution Debugger (SED)</a> is a platform for interactive symbolic execution.
+         Using KeY as symbolic execution engine, sequential Java programs specified with JML can be symbolically executed.
+         In this evaluation the SED will be used to inspect proofs attempts. Interactive symbolic execution is not required.
+      </p>
+      <p>
+         The relevant knowledge for this evaluation about SED is explained in the following sections.
+         <b>Please read them carefully before you continue.</b>
+         If you are familiar with the SED, you can skip sections you know well.
+         <ul>
+            <li><a href="#screencast">1 Screencast</a></li>
+            <li>
+               <a href="#set">2 Symbolic Execution</a>
+               <ul>
+                  <li><a href="#set_mc">2.1 Symbolic Execution with Method Contracts</a></li>
+                  <li><a href="#set_li">2.2 Symbolic Execution with Loop Invariants</a></li>
+                  <li><a href="#verification">2.3 Proving by Symbolic Execution</a></li>
+               </ul>
+            </li>
+            <li>
+               <a href="#sed">3 User Interface of the Symbolic Execution Debugger (SED)</a>
+               <ul>
+                  <li><a href="#state">3.1 Inspecting a Symbolic State</a></li>
+                  <li><a href="#layout">3.2 Visualizing Memory Layouts</a></li>
+                  <li><a href="#truth">3.3 Comprehension of Truth Values of Postconditions, Preconditions and Loop Invariants</a></li>
+               </ul>
+            </li>
+            <li><a href="#best">4 Best Practices to understand a Proof Attempt using SED</a></li>
+         </ul>
+      </p>  
+      
+      <h2><a name="screencast">1 Screencast</a></h2>
+      <video width="1280" height="720" poster="SED/videos/SEDScreencast.png" controls>
+         <source src="SED/videos/SEDScreencast.mp4" type="video/mp4"></source>
+         <source src="SED/videos/SEDScreencast.ogv" type="SED/videos/ogg"></source>
+         <source src="SED/videos/SEDScreencast.webm" type="SED/videos/webm"></source>
+         <dl>
+            <a href="SED/videos/SEDScreencast.mp4">
+               <dt><img src="SED/videos/SEDScreencast.png" alt="Download Video" title="Download Video" width="1280" height="720"></dt>
+               <dd>Download Video</dt>
+            </a>
+         </dl>
+      </video>
+      
+      <h2><a name="set">2 Symbolic Execution</a></h2>
+      <p>
+         Symbolic execution allows to explore all feasible execution paths of a program at once.
+         This is achieved by using symbolic values in lieu of concrete values.
+         Whenever the knowledge about a symbolic value is not enough to follow a single execution path,
+         symbolic execution splits to cover all feasible execution paths.
+         This results in a so called <i>symbolic execution tree</i>.
+      </p> 
+      <p>
+         Consider for instance the following Java program.
+         Method <code>equals</code> checks whether the given <code>Number</code> instance has the same <code>content</code> as the current one.
+         <code>
+         <pre>
+public class Number {
+   private int content;
+
+   /*@ requires true;
+     @ ensures true;
+     @ assignable \nothing;
+     @*/
+   public boolean equals(/*@ nullable @*/ Number n) {
+      if (content == n.content) {
+         return true;
+      }
+      else {
+         return false;
+      }
+   }
+}</pre></code>
+      </p>
+      <p>
+         The resulting symbolic execution tree of method <code>equals</code> is shown in the following figure.
+         The root is a <i>start</i> node (<img src="SED/icons/thread.gif" />) representing the program fragment to execute.
+         It also restricts the initial state according to the JML specification.
+         As we are interested in method <code>equals</code>, it is called next represented by a <i>method call</i> node (<img src="SED/icons/method_call.gif" />).
+         The if statement is supposed to split execution and thus represented as <i>branch statement</i> (<img src="SED/icons/branch_statement.gif" />).
+         The conditions under which a branch is taken are shown as <i>branch condition</i> nodes (<img src="SED/icons/branch_condition.gif" />).
+         In case that <code>n</code> is <code>null</code>, the method returns with an uncaught <code>NullPointerException</code> indicated by the <i>exceptional method return</i> node (<img src="SED/icons/exceptional_method_return.gif" />).
+         Finally, this path terminates exceptionally shown by the <i>exceptional termination</i> node (<img src="SED/icons/exceptional_termination.gif" />).
+         In case that <code>n</code> is not <code>null</code>, a return statement is executed. As this statement is not supposed to split execution, a <i>statement</i> node (<img src="SED/icons/statement.gif" />) is used.
+         The <i>method return</i> nodes (<img src="SED/icons/method_return.gif" />) indicate that a called method returns. Possible return values of non void methods are shown as part of the node label.
+         Finally, a <i>termination</i> node (<img src="SED/icons/termination.gif" />) indicate that an execution path terminates normally without an uncaught exception.
+      </p>
+      <p>
+         The blue rectangles in the figure below group related nodes like an <code>if</code> statement or a method body.
+      </p>
+      <img src="SED/SED_SymbolicExecutionTree.png" />
+
+      <h3><a name="set_mc">2.1 Symbolic Execution with Method Contracts</a></h3>
+      <p>
+         A method call can be treated by inlining or by application of a method contract during symbolic execution.
+         Inlining of a method body as in the previous example is represented by a <i>method call</i> node (<img src="SED/icons/method_call.gif" />) and later after execution of the method body by a <i>method return</i> (<img src="SED/icons/method_return.gif" />) or <i>exceptional method return</i> node (<img src="SED/icons/exceptional_method_return.gif" />).
+      </p> 
+      <p>
+         The following example explains the alternative to apply a method contract instead of inlining.
+         Method <code>doubleValue</code> calls method <code>doDoubleValue</code> which should be treated during symbolic execution by applying its contract.
+         The resulting symbolic execution tree contains a <i>method contract</i> node (<img src="SED/icons/method_contract.gif" />) showing the applied contract as first order formula in KeY syntax.
+         The optional child branch conditions indicate that execution is continued in case of normal (<i>post</i>) or exceptional (<i>exceptional post</i>) termination of the called method.
+         <code>
+         <pre>
+public class IntegerUtil {
+   public static int doubleValue(int x) throws Exception {
+      return doDoubleValue(x);
+   }
+   
+   /*@ normal_behavior
+     @ requires x >= 0;
+     @ ensures \result == x + x;
+     @ also
+     @ exceptional_behavior
+     @ requires x < 0;
+     @ signals (Exception) true;
+     @*/
+   private static /*@ pure @*/ int doDoubleValue(int x) throws Exception;
+}</pre></code>
+      </p>
+      <img src="SED/SED_MC.png" />
+
+      <h3><a name="set_li">2.2 Symbolic Execution with Loop Invariants</a></h3>
+      <p>
+         A loop is always treated in this evaluation by applying the specified loop invariant.
+         Consider for instance the following example.
+         The <i>loop invariant</i> node (<img src="SED/icons/loop_invariant.gif" />) shows the specified loop invariant as first order formula in KeY syntax.
+         It also splits symbolic execution into two branches.
+         The <i>Body Preserves Invariant</i> branch represents an arbitrary loop iteration.
+         After execution of loop guard and loop body, the branch terminates indicated by the <i>loop body termination</i> node (<img src="SED/icons/loop_body_termination.gif" />).
+         The <i>Use Case</i> branch continues execution after an arbitrary number of loop iterations after the loop.
+         <code>
+         <pre>
+public class LoopExample {
+   /*@ normal_behavior
+     @ requires x >= 0;
+     @ ensures \result == 0;
+     @*/
+   public static int decrease(int x) {
+      /*@ loop_invariant x >= 0;
+        @ decreasing x;
+        @ assignable x;
+        @*/      
+      while (x > 0) {
+         x--;
+      }
+      return x;
+   }
+}</pre></code>
+      </p>
+      <img src="SED/SED_LI.png" />
+
+      <h3><a name="verification">2.3 Proving by Symbolic Execution</a></h3>
+      <p>
+         Termination (<img src="SED/icons/termination_not_verified.gif" />) and exceptional termination (<img src="SED/icons/exceptional_termination_not_verified.gif" />) nodes indicate by a red crossed icon if the postcondition (including assignable clause and uncaught exceptions) could not be proven to be correct. 
+         A method contract (<img src="SED/icons/method_contract_not_pre.gif" />) node is also marked by a red crossed icon if the precondition of the applied contract could not be proven to be correct.
+         Finally, a loop invariant (<img src="SED/icons/loop_invariant _initially_invalid.gif" />) node is crossed out if the loop invariant could not be proven to hold initially and the loop body termination (<img src="SED/icons/loop_body_termination_not_verified.gif" />) node is crossed if the loop invariant (including decreasing and assignable clause) could not be proven to be preserved.
+      </p>      
+      <p>
+         <b>A symbolically executed method is correct iff 
+            <ol>
+               <li>all execution paths end in a termination, exceptional termination or loop body termination node and</li>
+               <li>none of the nodes in the full symbolic execution tree is red crossed.</li>
+            </ol>      
+         </b>
+      </p>
+      <p>
+         If a method could not be proven correct, possible reasons are:
+         <ul>
+           <li>The analyzed source code is buggy which caused a state in which the Java program does not fulfill its specification.</li>
+           <li>
+              The strategy of KeY was stopped to early or is not powerful enough to close the proof automatically. 
+              In this case it is possible to close the proof interactively outside of SED.
+           </li>
+         </ul>
+      </p>
+
+
+      <h2><a name="sed">3 User Interface of the Symbolic Execution Debugger (SED)</a></h2>
+      <p>
+         The Symbolic Execution Debugger offers a new perspective named <i>Symbolic Debug</i> which offers everything related to symbolic execution:
+         <ul>
+            <li>The <i>Debug</i> view allows to switch between debug sessions.</li>
+            <li>View <i>Symbolic Execution Tree</i> visualizes the symbolic execution tree of the current debug session. A thumbnail for navigation purpose is available in view <i>Symbolic Execution Tree (Thumbnail)</i>.</li>
+            <li>View <i>Variables</i> shows the symbolic state of the currently selected node (before it is executed).</li>
+            <li>Additional information about the selected node or variable are shown in view <i>Properties</i>.</li>
+            <li>Views <i>Breakpoints</i> and <i>Symbolic Execution Settings</i> allows to control symbolic execution. <b>They are not needed for this evaluation as full symbolic execution trees will be offered.</b></li>
+            <li>The source code related to the selected node is also highlighted in the opened editor (here <i>Number.java</i>). All statements and code members considered during symbolic execution are also highlighted by a yellow background.</li>
+         </ul>
+      </p>
+      <img src="SED/SED.png" />
+      
+      <h3><a name="state">3.1 Inspecting a Symbolic State</a></h3>
+      <p>
+         Each node in the symbolic execution tree represents the state before a statement is executed. 
+         The state can be inspected after selection of the node of interest in view <i>Variables</i>.
+         In contrast to a concrete execution, symbolic values are shown in column <i>Value</i>.
+         Additional constraints are shown after selecting a variable in view <i>Properties</i> at tab <i>Constraints</i>.
+      </p>
+      <img src="SED/SED_Variables.png" />      
+      
+      <h3><a name="layout">3.2 Visualizing Memory Layouts</a></h3>
+      <p>
+         A symbolic execution path is representative for possibly infinite concrete executions with different memory layouts.
+         The SED allows to visualize all possible memory layouts by selecting context menu item <i>Visualize Memory Layouts</i> of a node.
+      </p>
+      <p>
+         This opens a new diagram editor in perspective <i>State Visualization</i>.
+         The rectangle with rounded corners represents the current state which points to objects on the heap (rectangles).
+         Lower compartments of objects show field variables with their symbolic values while the lower compartment of the current state shows local variables with their symbolic values.
+         The red rectangles between arrows show the name of the represented variable/location.
+      </p>
+      <p>
+         The slider in the editor allows to switch between possible memory layouts while
+         the radio buttons define if the current or the initial state before execution started is shown.
+      </p>
+      <img src="SED/SED_Layouts.png" />      
+
+      <h3><a name="truth">3.3 Comprehension of Truth Values of Postconditions, Preconditions and Loop Invariants</a></h3>
+      <p>
+         KeY tries to evaluate postconditions within a proof after symbolic execution has finished. 
+         Additionally, preconditions of applied method contracts and loop invariants are evaluated.
+         Nodes which might be marked as unverified by a red cross (see <a href="#verification">1.3 Proving by Symbolic Execution</a>) provides a tab 
+         in the <i>Properties</i> view in which the during proof computed truth values of the formula to show are highlighted. 
+         The tab is named <i>Postcondition</i> on termination and exceptional termination nodes, <i>Precondition</i> on method call nodes and <i>Loop Invariant</i> on loop invariant and loop body termination nodes.
+      </p>
+      <p>
+         In case that the proof splits in order to evaluate the formula, for each leaf (goal) is a group composite shown named after the unique ID of the leaf.
+         In the example below, the proof does not split and thus only one group named <i>Node 29</i> is available.
+         Each group shows on the left of the implication arrow <code>==></code> the split condition and on the right the to be proven formula.
+         Formulas evaluated to true are colored in green, terms evaluated to false are colored in red and terms colored in yellow are never or not completely evaluated during prove.
+         In rare cases KeY splits the proof on a term which has nothing to do with the proven formula.
+         In such a case the related part in the split condition is not colored (black).
+      </p>
+      <p>
+         <b>A leaf fulfills the formula to show, iff the left side of the implication arrow <code>==></code> evaluates to false or iff the right side evaluates to true.</b>
+         In the example below evaluates the left side to true, thus the only chance to fulfill the formula is to evaluate the right side also to true.
+         Let us inspect the terms of the conjunctions (<code>&</code>) more carefully.
+         The term <code>exc = null</code> evaluates to true which is what the specification (normal_behavior) says.
+         The terms <code>PostconditionEvaluation.x = 42</code> and <code>\forall ...</code> are not completely evaluated.
+         Additionally, the second <code>&</code> is colored in red meaning that during prove this operator was evaluated into false (even if the result of its children is not completely evaluated).
+         This means the formula can not be evaluated into true and one of the orange parts (ensures and assignable clause) must be buggy.
+         An inspection of the termination state in view <i>Variables</i> shows that the value of <code>x</code> is <code>4711</code> and not <code>42</code> as specified.
+         We found the bug.
+      </p>
+      <img src="SED/SED_Truth.png" />
+      
+      <h2><a name="best">4 Best Practices to understand a Proof Attempt using SED</a></h3>
+      <ol>
+         <li>Focus on an unverified node indicated by a red cross.</li>
+             <ol>
+                <li>Inspect the parent nodes to comprehend the followed execution path.</li>
+                <li>Comprehend the truth values of the unverified node to identify what could not be shown.</li>
+                <li>Inspect the symbolic state to identify bugs. If there is none, the proof can be closed interactively outside of SED.</li>
+             </ol>
+         </li>
+      </ol>
+   </body>
+</html>

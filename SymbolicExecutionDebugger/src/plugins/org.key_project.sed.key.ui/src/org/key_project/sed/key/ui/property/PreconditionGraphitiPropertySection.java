@@ -18,11 +18,11 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.key.core.model.KeYMethodContract;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * {@link ISection} implementation to show the properties of {@link ISENode}s.
  * @author Martin Hentschel
  */
 public class PreconditionGraphitiPropertySection extends AbstractTruthValueGraphitiPropertySection {
@@ -50,6 +50,6 @@ public class PreconditionGraphitiPropertySection extends AbstractTruthValueGraph
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new PreconditionComposite(parent, getWidgetFactory());
+      return new PreconditionComposite(parent, getWidgetFactory(), this);
    }
 }

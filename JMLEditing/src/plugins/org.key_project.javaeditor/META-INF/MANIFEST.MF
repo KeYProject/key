@@ -5,14 +5,24 @@ Bundle-SymbolicName: org.key_project.javaeditor;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.javaeditor.Activator
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.9.1",
  org.eclipse.ui,
+ org.eclipse.ui.views;bundle-version="3.7.0",
  org.eclipse.ui.editors;bundle-version="3.8.200",
  org.eclipse.jface.text;bundle-version="3.9.1",
+ org.eclipse.jdt.core;bundle-version="3.10.2",
  org.eclipse.jdt.ui;bundle-version="3.10.1",
- org.key_project.util;bundle-version="1.0.0"
+ org.key_project.util;bundle-version="1.0.0",
+ org.eclipse.core.contenttype,
+ org.eclipse.emf.ecore
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.javaeditor.extension,
+ org.key_project.javaeditor.management,
+ org.key_project.javaeditor.outline,
  org.key_project.javaeditor.preference.page,
  org.key_project.javaeditor.util
+Import-Package: org.eclipse.emf.common,
+ org.eclipse.emf.edit,
+ org.eclipse.jdt.core.manipulation

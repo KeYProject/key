@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.proof.io;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
+
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +40,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -78,6 +81,8 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.joinrule.ProgramVariablesMatchVisitor;
 
 /**
  * This class is responsible for generating a KeY proof from an intermediate
@@ -116,7 +121,7 @@ public class IntermediateProofReplayer {
 
     /** Maps join node IDs to previously seen join partners */
     private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
-
+    
     /**
      * a value == 1 means the current branch is ignored; a value > 1 means that
      * the "skipBranch - 1" parent branch of the current branch is ignored. a
@@ -238,19 +243,36 @@ public class IntermediateProofReplayer {
                         }
                         else {
                             try {
-                                JoinRuleBuiltInRuleApp joinApp = (JoinRuleBuiltInRuleApp) constructBuiltinApp(
-                                        joinAppInterm, currGoal);
+                                JoinRuleBuiltInRuleApp joinApp =
+                                        (JoinRuleBuiltInRuleApp) constructBuiltinApp(
+                                                joinAppInterm, currGoal);
                                 joinApp.setConcreteRule(JoinProcedure
                                         .getProcedureByName(joinAppInterm
                                                 .getJoinProc()));
+                                joinApp.setDistinguishingFormula(JoinRuleUtils.translateToFormula(
+                                        proof.getServices(), joinAppInterm
+                                                .getDistinguishingFormula()));
 
-                                ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = ImmutableSLList
-                                        .nil();
+                                ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
+                                        ImmutableSLList.nil();
                                 for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    final Services services = currGoal.proof().getServices();
+                                    
+                                    Triple<Term, Term, Term> ownSEState = sequentToSETriple(
+                                            currNode, joinApp.posInOccurrence(), services);
+                                    Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
+                                            partnerNodeInfo.first, partnerNodeInfo.second, services);
+                                    ProgramVariablesMatchVisitor matchVisitor = new ProgramVariablesMatchVisitor(
+                                            partnerSEState.third.javaBlock().program(), ownSEState.third.javaBlock().program(), services);
+                                    matchVisitor.start();
+                                    
+                                    assert !matchVisitor.isIncompatible() : "Cannot join incompatible program counters";
+                                    
                                     joinPartners = joinPartners
-                                            .append(new Pair<Goal, PosInOccurrence>(
+                                            .append(new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
                                                     proof.getGoal(partnerNodeInfo.first),
-                                                    partnerNodeInfo.second));
+                                                    partnerNodeInfo.second,
+                                                    matchVisitor.getMatches().getValue()));
                                 }
 
                                 joinApp.setJoinNode(currNode);

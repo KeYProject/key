@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
@@ -28,6 +29,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * {@link AbstractSourceLookupParticipant} implementation for the
@@ -35,6 +37,63 @@ import de.uka.ilkd.key.proof.JavaModel;
  * @author Martin Hentschel
  */
 public class KeYSourceLookupParticipant extends AbstractSourceLookupParticipant {
+   /**
+    * Helper class to compute the source of a custom path.
+    * @author Martin Hentschel
+    */
+   public static class SourceRequest extends PlatformObject implements ISourcePathProvider {
+      /**
+       * The {@link IDebugTarget} to use.
+       */
+      private final IDebugTarget debugTarget;
+      
+      /**
+       * The requested source path.
+       */
+      private final String sourcePath;
+
+      /**
+       * Constructor.
+       * @param debugTarget The {@link IDebugTarget} to use.
+       * @param sourcePath The requested source path.
+       */
+      public SourceRequest(IDebugTarget debugTarget, String sourcePath) {
+         assert debugTarget != null;
+         assert sourcePath != null;
+         this.debugTarget = debugTarget;
+         this.sourcePath = sourcePath;
+      }
+
+      /**
+       * Returns the {@link IDebugTarget} to use.
+       * @return The {@link IDebugTarget} to use.
+       */
+      public IDebugTarget getDebugTarget() {
+         return debugTarget;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSourcePath() {
+         return sourcePath;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+         if (ISourcePathProvider.class.equals(adapter)) {
+            return this;
+         }
+         else {
+            return super.getAdapter(adapter);
+         }
+      }
+   }
+   
    /**
     * {@inheritDoc}
     */
@@ -64,21 +123,29 @@ public class KeYSourceLookupParticipant extends AbstractSourceLookupParticipant 
     */
    protected List<File> listAllSourceLocations(IAdaptable adaptable) {
       List<File> result = new LinkedList<File>();
+      IDebugTarget target;
       if (adaptable instanceof IDebugElement) {
-         IDebugTarget target = ((IDebugElement) adaptable).getDebugTarget();
-         if (target instanceof KeYDebugTarget) {
-            KeYDebugTarget keyTarget = (KeYDebugTarget) target;
-            if (!keyTarget.getProof().isDisposed()) {
-               JavaModel javaModel = keyTarget.getProof().getServices().getJavaModel();
-               if (javaModel.getModelDir() != null) {
-                  result.add(new File(javaModel.getModelDir()));
-               }
-               if (javaModel.getClassPathEntries() != null) {
-                  result.addAll(javaModel.getClassPathEntries());
-               }
-               if (javaModel.getBootClassPath() != null) {
-                  result.add(new File(javaModel.getBootClassPath()));
-               }
+         target = ((IDebugElement) adaptable).getDebugTarget();
+      }
+      else if (adaptable instanceof SourceRequest) {
+         target = ((SourceRequest) adaptable).getDebugTarget();
+      }
+      else {
+         target = null;
+      }
+      if (target instanceof KeYDebugTarget) {
+         KeYDebugTarget keyTarget = (KeYDebugTarget) target;
+         Proof proof = keyTarget.getProof();
+         if (proof != null && !proof.isDisposed()) {
+            JavaModel javaModel = proof.getServices().getJavaModel();
+            if (javaModel.getModelDir() != null) {
+               result.add(new File(javaModel.getModelDir()));
+            }
+            if (javaModel.getClassPathEntries() != null) {
+               result.addAll(javaModel.getClassPathEntries());
+            }
+            if (javaModel.getBootClassPath() != null) {
+               result.add(new File(javaModel.getBootClassPath()));
             }
          }
       }

@@ -15,8 +15,8 @@ import org.eclipse.graphiti.util.IGradientType;
 import org.eclipse.graphiti.util.IPredefinedRenderingStyle;
 import org.eclipse.graphiti.util.PredefinedColoredAreas;
 import org.eclipse.swt.graphics.RGB;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
 
 /**
@@ -25,16 +25,16 @@ import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
  */
 public class ExecutionTreeColoredAreas extends PredefinedColoredAreas {
    /**
-    * Creates the {@link AdaptedGradientColoredAreas} for an {@link ISEDDebugNode} with the given {@link ISEDAnnotation}s.
-    * @param annotations The {@link ISEDAnnotation}s.
+    * Creates the {@link AdaptedGradientColoredAreas} for an {@link ISENode} with the given {@link ISEAnnotation}s.
+    * @param annotations The {@link ISEAnnotation}s.
     * @return The created {@link AdaptedGradientColoredAreas}.
     */
-   public static AdaptedGradientColoredAreas createExecutionTreeNodeAdaptions(ISEDAnnotation[] annotations) {
+   public static AdaptedGradientColoredAreas createExecutionTreeNodeAdaptions(ISEAnnotation[] annotations) {
       AdaptedGradientColoredAreas agca = StylesFactory.eINSTANCE.createAdaptedGradientColoredAreas();
       agca.setGradientType(VisualizationPreferences.isExecutionTreeNodeDirectionHorizontal() ? IGradientType.HORIZONTAL : IGradientType.VERTICAL);
       
-      List<ISEDAnnotation> backgroundAnnotations = new LinkedList<ISEDAnnotation>();
-      for (ISEDAnnotation annotation : annotations) {
+      List<ISEAnnotation> backgroundAnnotations = new LinkedList<ISEAnnotation>();
+      for (ISEAnnotation annotation : annotations) {
          if (annotation.isEnabled() && annotation.isHighlightBackground()) {
             backgroundAnnotations.add(annotation);
          }
@@ -64,7 +64,7 @@ public class ExecutionTreeColoredAreas extends PredefinedColoredAreas {
          secondaryColors.add(org.key_project.util.java.ColorUtil.scaleBrightness(end, 0.85f));
       }
       else {
-         for (ISEDAnnotation annotation : backgroundAnnotations) {
+         for (ISEAnnotation annotation : backgroundAnnotations) {
             RGB rgb = annotation.getBackgroundColor();
             normalColors.add(rgb);
             primaryColors.add(org.key_project.util.java.ColorUtil.scaleBrightness(rgb, 0.7f));

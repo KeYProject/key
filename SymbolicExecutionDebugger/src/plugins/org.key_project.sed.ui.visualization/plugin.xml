@@ -289,6 +289,7 @@
         <view
               id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
               minimized="false"
+              ratio="0.2"
               relationship="right"
               relative="org.eclipse.debug.ui.DebugView"
               visible="true">
@@ -425,7 +426,7 @@
                           value="org.eclipse.debug.core.model.IStackFrame">
                     </instanceof>
                     <instanceof
-                          value="org.key_project.sed.core.model.ISEDDebugNode">
+                          value="org.key_project.sed.core.model.ISENode">
                     </instanceof>
                     <test
                           forcePluginActivation="true"
@@ -445,7 +446,7 @@
                  operator="and">
               <or>
                  <instanceof
-                       value="org.key_project.sed.core.model.ISEDDebugTarget">
+                       value="org.key_project.sed.core.model.ISEDebugTarget">
                  </instanceof>
                  <and>
                     <instanceof
@@ -486,7 +487,7 @@
                     operator="and">
                  <or>
                     <instanceof
-                          value="org.key_project.sed.core.model.ISEDDebugTarget">
+                          value="org.key_project.sed.core.model.ISEDebugTarget">
                     </instanceof>
                     <and>
                        <instanceof
@@ -516,7 +517,7 @@
                              value="org.eclipse.debug.core.model.IStackFrame">
                        </instanceof>
                        <instanceof
-                             value="org.key_project.sed.core.model.ISEDDebugNode">
+                             value="org.key_project.sed.core.model.ISENode">
                        </instanceof>
                        <test
                              forcePluginActivation="true"

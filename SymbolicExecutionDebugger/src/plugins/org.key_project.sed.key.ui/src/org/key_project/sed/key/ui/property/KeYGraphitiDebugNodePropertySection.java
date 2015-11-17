@@ -24,11 +24,11 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * {@link ISection} implementation to show the properties of {@link ISENode}s.
  * @author Martin Hentschel
  */
 public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
@@ -55,20 +55,20 @@ public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
    }
    
    /**
-    * Returns the {@link ISEDDebugNode} to show.
-    * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
+    * Returns the {@link ISENode} to show.
+    * @return The {@link ISENode} to show or {@code null} if no one should be shown.
     */
-   public IKeYSEDDebugNode<?> getDebugNode() {
+   public IKeYSENode<?> getDebugNode() {
       return getDebugNode(getSelectedPictogramElement());
    }
    
    /**
-    * Returns the {@link ISEDDebugNode} to show.
+    * Returns the {@link ISENode} to show.
     * @param pe The currently selected {@link PictogramElement}.
-    * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
+    * @return The {@link ISENode} to show or {@code null} if no one should be shown.
     */
-   public IKeYSEDDebugNode<?> getDebugNode(PictogramElement pe) {
-      IKeYSEDDebugNode<?> node = null;
+   public IKeYSENode<?> getDebugNode(PictogramElement pe) {
+      IKeYSENode<?> node = null;
       if (pe != null) {
          IDiagramTypeProvider diagramProvider = getDiagramTypeProvider();
          if (diagramProvider != null) {

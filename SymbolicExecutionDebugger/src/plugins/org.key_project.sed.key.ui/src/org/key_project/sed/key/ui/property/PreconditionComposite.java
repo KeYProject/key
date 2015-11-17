@@ -15,8 +15,9 @@ package org.key_project.sed.key.ui.property;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYMethodContract;
+import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -35,16 +36,17 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
+    * @param layoutListener An optional {@link ILayoutListener} invoked when the shown content has changed.
     */
-   public PreconditionComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
-      super(parent, factory);
+   public PreconditionComposite(Composite parent, TabbedPropertySheetWidgetFactory factory, ILayoutListener layoutListener) {
+      super(parent, factory, layoutListener);
    }
    
    /**
     * {@inheritDoc}
     */
    @Override
-   protected Node computeNodeToShow(IKeYSEDDebugNode<?> node, 
+   protected Node computeNodeToShow(IKeYSENode<?> node, 
                                     IExecutionNode<?> executionNode) {
       if (node instanceof KeYMethodContract) {
          Node invariantNode = super.computeNodeToShow(node, executionNode);
@@ -61,7 +63,7 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node,
+   protected Pair<Term, Term> computeTermToShow(IKeYSENode<?> node,
                                                 IExecutionNode<?> executionNode, 
                                                 Node keyNode) {
       if (node instanceof KeYMethodContract) {
@@ -75,7 +77,9 @@ public class PreconditionComposite extends AbstractTruthValueComposite {
             int index = executionNode.getProofNode().sequent().succedent().indexOf(pio.constrainedFormula());
             term = keyNode.sequent().succedent().get(index).formula();
          }
-         term = TermBuilder.goBelowUpdates(term);
+         if (!INCLUDE_UPDATES) {
+            term = TermBuilder.goBelowUpdates(term);
+         }
          return new Pair<Term, Term>(term, null);
       }
       else {

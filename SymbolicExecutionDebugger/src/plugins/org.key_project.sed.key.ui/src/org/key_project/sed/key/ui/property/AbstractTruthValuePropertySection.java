@@ -17,25 +17,32 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.key.core.model.IKeYSENode;
+import org.key_project.sed.key.ui.property.AbstractTruthValueComposite.ILayoutListener;
 
 /**
- * Basic {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s
+ * Basic {@link ISection} implementation to show the properties of {@link ISENode}s
  * within a {@link AbstractTruthValueComposite}.
  * @author Martin Hentschel
  */
-public abstract class AbstractTruthValuePropertySection extends AbstractPropertySection {
+public abstract class AbstractTruthValuePropertySection extends AbstractPropertySection implements ILayoutListener {
    /**
     * The shown content.
     */
    private AbstractTruthValueComposite contentComposite;
    
    /**
+    * The {@link TabbedPropertySheetPage} this {@link AbstractPropertySection} is shown in.
+    */
+   private TabbedPropertySheetPage tabbedPropertySheetPage;
+   
+   /**
     * {@inheritDoc}
     */
    @Override
    public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
+      this.tabbedPropertySheetPage = tabbedPropertySheetPage;
       super.createControls(parent, tabbedPropertySheetPage);
       contentComposite = createContentComposite(parent);
    }
@@ -67,8 +74,18 @@ public abstract class AbstractTruthValuePropertySection extends AbstractProperty
    }
    
    /**
-    * Returns the {@link IKeYSEDDebugNode} to show.
-    * @return The {@link IKeYSEDDebugNode} to show or {@code null} if no one should be shown.
+    * Returns the {@link IKeYSENode} to show.
+    * @return The {@link IKeYSENode} to show or {@code null} if no one should be shown.
     */
-   protected abstract IKeYSEDDebugNode<?> getDebugNode();
+   protected abstract IKeYSENode<?> getDebugNode();
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void layoutUpdated() {
+      if (tabbedPropertySheetPage != null) {
+         tabbedPropertySheetPage.resizeScrolledComposite();
+      }
+   }
 }

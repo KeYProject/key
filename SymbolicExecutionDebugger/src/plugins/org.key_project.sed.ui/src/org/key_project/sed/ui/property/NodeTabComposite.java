@@ -24,19 +24,19 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.core.model.ISEDBaseMethodReturn;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEBaseMethodReturn;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.java.StringUtil;
 
 /**
- * This composite provides the content shown in {@link SEDDebugNodePropertySection}
+ * This composite provides the content shown in {@link SENodePropertySection}
  * and in {@code GraphitiDebugNodePropertySection}.
  * @author Martin Hentschel
  */
-public class NodeTabComposite implements ISEDDebugNodeTabContent {
+public class NodeTabComposite implements ISENodeTabContent {
    /**
     * The parent {@link Composite};
     */
@@ -71,7 +71,7 @@ public class NodeTabComposite implements ISEDDebugNodeTabContent {
     * {@inheritDoc}
     */
    @Override
-   public void updateContent(ISEDDebugNode node) {
+   public void updateContent(ISENode node) {
       String name = null;
       String type = null;
       String path = null;
@@ -83,8 +83,8 @@ public class NodeTabComposite implements ISEDDebugNodeTabContent {
             if (!node.getDebugTarget().isTerminated()) {
                path = node.getPathCondition();
             }
-            if (node instanceof ISEDBaseMethodReturn) {
-               ISEDBranchCondition returnBranchCondition = ((ISEDBaseMethodReturn) node).getMethodReturnCondition();
+            if (node instanceof ISEBaseMethodReturn) {
+               ISEBranchCondition returnBranchCondition = ((ISEBaseMethodReturn) node).getMethodReturnCondition();
                if (returnBranchCondition != null) {
                   returnCondition = returnBranchCondition.getName();
                }

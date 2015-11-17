@@ -14,6 +14,7 @@ import org.key_project.jmlediting.ui.test.hover.SWTBotJMLHoverTest;
 import org.key_project.jmlediting.ui.test.marker.SWTBotParseErrorMarkerTest;
 import org.key_project.jmlediting.ui.test.marker.SWTBotValidationErrorMarkerTest;
 import org.key_project.jmlediting.ui.test.miscellaneous.SWTBotEnableDisableTest;
+import org.key_project.jmlediting.ui.test.outline.SWTBotJMLOutlineAllTestSuite;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLColorPreferencePageTest;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLKeywordWizardTest;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLProfileWizardTest;
@@ -44,7 +45,9 @@ import org.key_project.jmlediting.ui.test.preferencepages.SWTBotProfilePropertie
    SWTBotJMLKeywordWizardTest.class,
    SWTBotJMLProfileWizardTest.class,
    SWTBotProfilePropertiesTest.class,
-   SWTBotProfilePropertiesTest2.class
+   SWTBotProfilePropertiesTest2.class,
+   // outline
+   SWTBotJMLOutlineAllTestSuite.class
 })
 public class SWTBotJMLEditingAllUITests {
 

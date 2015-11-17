@@ -14,7 +14,7 @@
 package org.key_project.sed.core.util;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 
 /**
  * Initializes the default preferences accessible via {@link SEDPreferenceUtil}.
@@ -27,7 +27,7 @@ public class SEDPreferenceUtilInitializer extends AbstractPreferenceInitializer 
    @Override
    public void initializeDefaultPreferences() {
       SEDPreferenceUtil.setDefaultShowCompactExecutionTree(true);
-      for (ISEDAnnotationType type : SEDAnnotationUtil.getAnnotationtypes()) {
+      for (ISEAnnotationType type : SEAnnotationUtil.getAnnotationtypes()) {
          SEDPreferenceUtil.setDefaultAnnotationTypeHighlightBackground(type);
          SEDPreferenceUtil.setDefaultAnnotationTypeBackgroundColor(type);
          SEDPreferenceUtil.setDefaultAnnotationTypeHighlightForeground(type);

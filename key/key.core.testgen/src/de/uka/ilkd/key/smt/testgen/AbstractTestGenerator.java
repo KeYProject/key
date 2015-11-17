@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -87,9 +88,28 @@ public abstract class AbstractTestGenerator {
              + Arrays.toString(SolverType.Z3_CE_SOLVER
                    .getSupportedVersions()));
     }
-    log
-    .writeln("Extracting test data constraints (path conditions).");
-    proofs = createProofsForTesting(settings.removeDuplicates(), settings.removePostCondition());
+    
+    if(settings.getApplySymbolicExecution()){
+        log.writeln("Applying TestGen Macro (bounded symbolic execution)...");
+        try {
+            TestGenMacro macro = new TestGenMacro();        
+            //Strategy backupStrategy = originalProof.getActiveStrategy();
+            //ProofSettings backupSettings = originalProof.getSettings();
+            
+            macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
+
+            //now restore the strategy and settings.
+            //originalProof.setActiveStrategy(backupStrategy);
+            //originalProof.getInitConfig().setSettings(backupSettings);
+            log.writeln("Finished symbolic execution.");
+        }
+        catch(Throwable ex) {
+            log.writeException(ex);
+        }        
+    }
+    
+    log.writeln("Extracting test data constraints (path conditions).");
+    proofs = createProofsForTesting(settings.removeDuplicates(), ! settings.includePostCondition());
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;
     }
@@ -97,12 +117,10 @@ public abstract class AbstractTestGenerator {
        log.writeln("Extracted " + proofs.size()
              + " test data constraints.");
     } else {
-       log
-       .writeln("No test data constraints were extracted.");
+       log.writeln("No test data constraints were extracted.");
     }
     final Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
-    log
-    .writeln("Test data generation: appling semantic blasting macro on proofs");
+    log.writeln("Test data generation: appling semantic blasting macro on proofs");
     try {
        for (final Proof proof : proofs) {
           if (stopRequest != null && stopRequest.shouldStop()) {
@@ -129,8 +147,7 @@ public abstract class AbstractTestGenerator {
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {
              Debug.out("Semantics blasting interrupted");
-             log
-             .writeln("\n Warning: semantics blasting was interrupted. "
+             log.writeln("\n Warning: semantics blasting was interrupted. "
                       + "A test case will not be generated.");
           } catch (final Exception e) {
              log.writeln(e.getLocalizedMessage());
@@ -234,10 +251,10 @@ public abstract class AbstractTestGenerator {
             Proof p = null;
             if (removeDuplicatePathConditions) {
                p = createProofForTesting_noDuplicate(oldGoalIter.next(),
-                     res);
+                     res, removePostCondition);
             } else {
                p = createProofForTesting_noDuplicate(oldGoalIter.next(),
-                     null);
+                     null, removePostCondition);
             }
             if (p != null) {
                res.add(p);
@@ -272,11 +289,12 @@ public abstract class AbstractTestGenerator {
     * proof is found in otherProofs than null will be returned instead.
     * 
     * @param node
-    * @param otherProofs
+ * @param otherProofs
+ * @param removePostCondition TODO
     * @return
     * @throws ProofInputException 
     */
-   private Proof createProofForTesting_noDuplicate(Node node, List<Proof> otherProofs) throws ProofInputException {
+   private Proof createProofForTesting_noDuplicate(Node node, List<Proof> otherProofs, boolean removePostCondition) throws ProofInputException {
       // System.out.println("Create proof for test case from Node:"+node.serialNr());
       final Proof oldProof = node.proof();
       final Sequent oldSequent = node.sequent();
@@ -285,7 +303,7 @@ public abstract class AbstractTestGenerator {
       Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
       while (it.hasNext()) {
          final SequentFormula sf = it.next();
-         // Allow modailities in the antecedent
+         // Allow updates modailities in the antecedent
          if (hasModalities(sf.formula(), false)) {
             continue;
          }
@@ -294,7 +312,7 @@ public abstract class AbstractTestGenerator {
       it = oldSequent.succedent().iterator();
       while (it.hasNext()) {
          final SequentFormula sf = it.next();
-         if (hasModalities(sf.formula(), true)) {
+         if (hasModalities(sf.formula(), removePostCondition)) {
             continue;
          }
          newSequent = newSequent.addFormula(sf, false, false).sequent();
@@ -363,9 +381,10 @@ public abstract class AbstractTestGenerator {
    protected void generateFiles(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) throws Exception {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
       tg.setLogger(log);
+            
       tg.generateJUnitTestSuite(problemSolvers);
       if (tg.isJunit()) {
-         log.writeln("Test oracle not yet implemented for JUnit.");
+         log.writeln("Compile the generated files using a Java compiler.");
       } else {
          log.writeln("Compile and run the file with openjml!");
       }

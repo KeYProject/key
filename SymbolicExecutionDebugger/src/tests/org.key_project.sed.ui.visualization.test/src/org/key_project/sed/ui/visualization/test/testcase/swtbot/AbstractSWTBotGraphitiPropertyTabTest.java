@@ -20,11 +20,11 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.SWTGefBot;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.eclipse.ui.IPageLayout;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.ui.test.testcase.swtbot.AbstractSWTBotPropertyTabTest;
 import org.key_project.sed.ui.visualization.test.Activator;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
@@ -41,8 +41,8 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected ISEDThread selectThread(SWTBotView debugView) throws Exception {
-      ISEDThread result = super.selectThread(debugView);
+   protected ISEThread selectThread(SWTBotView debugView) throws Exception {
+      ISEThread result = super.selectThread(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
       return result;
    }
@@ -51,8 +51,8 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected ISEDStatement selectStatement(SWTBotView debugView) throws Exception {
-      ISEDStatement result = super.selectStatement(debugView);
+   protected ISEStatement selectStatement(SWTBotView debugView) throws Exception {
+      ISEStatement result = super.selectStatement(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
       return result;
    }
@@ -61,8 +61,8 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugTarget selectDebugTarget(SWTBotView debugView) throws Exception {
-      ISEDDebugTarget result = super.selectDebugTarget(debugView);
+   protected ISEDebugTarget selectDebugTarget(SWTBotView debugView) throws Exception {
+      ISEDebugTarget result = super.selectDebugTarget(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
       return result;
    }
@@ -71,8 +71,8 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected ISEDMethodReturn selectMethodReturn(SWTBotView debugView) throws Exception {
-      ISEDMethodReturn result = super.selectMethodReturn(debugView);
+   protected ISEMethodReturn selectMethodReturn(SWTBotView debugView) throws Exception {
+      ISEMethodReturn result = super.selectMethodReturn(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
       return result;
    }
@@ -128,7 +128,7 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     */
    protected static interface IEditorTestSteps {
       /**
-       * Do some assertions on an {@link ISEDThread}.
+       * Do some assertions on an {@link ISEThread}.
        * @param editor The editor.
        * @param propertiesView The properties view.
        * @param tabs The properties tabs.
@@ -137,7 +137,7 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
       public void assertThread(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDStatement}.
+       * Do some assertions on an {@link ISEStatement}.
        * @param editor The editor.
        * @param propertiesView The properties view.
        * @param tabs The properties tabs.
@@ -155,7 +155,7 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
       public void assertDiagram(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on a {@link ISEDMethodCall}.
+       * Do some assertions on a {@link ISEMethodCall}.
        * @param editor The editor.
        * @param propertiesView The properties view.
        * @param tabs The properties tabs.

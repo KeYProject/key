@@ -158,9 +158,6 @@ public final class ExpressionParserUtils {
                      opElems.addAll(child.getChildren());
                   }
                }
-               else if (secondNodeType == NodeTypes.SOME) {
-                  opElems.addAll(secondNode.getChildren());
-               }
                else {
                   opElems.addAll(secondNode.getChildren());
                }

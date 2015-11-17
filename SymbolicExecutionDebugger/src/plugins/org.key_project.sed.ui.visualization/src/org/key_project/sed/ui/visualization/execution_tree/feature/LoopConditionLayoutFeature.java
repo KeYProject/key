@@ -16,10 +16,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
-import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISELoopCondition;
 
 /**
- * Implementation of {@link ILayoutFeature} for {@link ISEDLoopCondition}s.
+ * Implementation of {@link ILayoutFeature} for {@link ISELoopCondition}s.
  * @author Martin Hentschel
  */
 public class LoopConditionLayoutFeature extends AbstractDebugNodeLayoutFeature {
@@ -36,6 +36,6 @@ public class LoopConditionLayoutFeature extends AbstractDebugNodeLayoutFeature {
     */
    @Override
    protected boolean canLayoutBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDLoopCondition;
+      return businessObject instanceof ISELoopCondition;
    }
 }

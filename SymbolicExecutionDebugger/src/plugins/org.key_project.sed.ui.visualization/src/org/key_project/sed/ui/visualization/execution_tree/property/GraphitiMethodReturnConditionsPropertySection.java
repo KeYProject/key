@@ -14,13 +14,13 @@
 package org.key_project.sed.ui.visualization.execution_tree.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.ui.property.ISENodeTabContent;
 import org.key_project.sed.ui.property.MethodReturnConditionsTabComposite;
 
 /**
- * {@link ISection} implementation to show the method return conditions of an {@link ISEDMethodCall}
- * which is provided via {@link ISEDMethodCall#getMethodReturnConditions()}.
+ * {@link ISection} implementation to show the method return conditions of an {@link ISEMethodCall}
+ * which is provided via {@link ISEMethodCall#getMethodReturnConditions()}.
  * @author Martin Hentschel
  */
 public class GraphitiMethodReturnConditionsPropertySection extends AbstractGraphitiDebugNodePropertySection {
@@ -28,7 +28,7 @@ public class GraphitiMethodReturnConditionsPropertySection extends AbstractGraph
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new MethodReturnConditionsTabComposite();
    }
 }

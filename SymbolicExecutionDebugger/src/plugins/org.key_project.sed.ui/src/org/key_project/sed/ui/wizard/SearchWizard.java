@@ -12,15 +12,15 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.SearchAnnotation;
 import org.key_project.sed.core.annotation.impl.SearchAnnotationType;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.util.SEAnnotationUtil;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.wizard.page.SearchWizardPage;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -31,11 +31,11 @@ import org.key_project.util.eclipse.swt.SWTUtil;
  */
 public class SearchWizard extends Wizard {
    /**
-    * The {@link ISEDDebugTarget} to search in.
+    * The {@link ISEDebugTarget} to search in.
     */
-   private final ISEDDebugTarget target;
+   private final ISEDebugTarget target;
    
-   private final ISEDAnnotationType annotationType;
+   private final ISEAnnotationType annotationType;
    
    /**
     * The shown {@link SearchWizardPage}.
@@ -44,11 +44,11 @@ public class SearchWizard extends Wizard {
 
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} to search in.
+    * @param target The {@link ISEDebugTarget} to search in.
     */
-   public SearchWizard(ISEDDebugTarget target) {
+   public SearchWizard(ISEDebugTarget target) {
       this.target = target;
-      this.annotationType = SEDAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
+      this.annotationType = SEAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
       Assert.isNotNull(target);
       Assert.isNotNull(annotationType);
       setWindowTitle("Search");
@@ -79,12 +79,12 @@ public class SearchWizard extends Wizard {
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                try {
                   // Perform search
-                  List<ISEDAnnotationLink> links = search(annotationType, annotation, target, annotation.getSearch(), monitor);
+                  List<ISEAnnotationLink> links = search(annotationType, annotation, target, annotation.getSearch(), monitor);
                   // Add annotation and links
                   SWTUtil.checkCanceled(monitor);
                   target.registerAnnotation(annotation);
                   monitor.worked(1);
-                  for (ISEDAnnotationLink link : links) {
+                  for (ISEAnnotationLink link : links) {
                      link.getTarget().addAnnotationLink(link);
                      monitor.worked(1);
                   }
@@ -108,29 +108,29 @@ public class SearchWizard extends Wizard {
    
    /**
     * Performs the search.
-    * @param type The {@link ISEDAnnotationType} to use.
+    * @param type The {@link ISEAnnotationType} to use.
     * @param annotation The {@link SearchAnnotation} to use.
-    * @param target The {@link ISEDDebugTarget} to search in.
+    * @param target The {@link ISEDebugTarget} to search in.
     * @param search The text to search for.
     * @param monitor The {@link IProgressMonitor} to use.
-    * @return The created {@link ISEDAnnotationLink}s linking to found {@link ISEDDebugNode}.
+    * @return The created {@link ISEAnnotationLink}s linking to found {@link ISENode}.
     * @throws DebugException Occurred Exception.
     */
-   public static List<ISEDAnnotationLink> search(ISEDAnnotationType type, 
+   public static List<ISEAnnotationLink> search(ISEAnnotationType type, 
                                                  SearchAnnotation annotation,
-                                                 ISEDDebugTarget target, 
+                                                 ISEDebugTarget target, 
                                                  String search, 
                                                  IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Performing search", IProgressMonitor.UNKNOWN);
-      List<ISEDAnnotationLink> foundNodes = new LinkedList<ISEDAnnotationLink>();
-      SEDPreorderIterator iterator = new SEDPreorderIterator(target);
+      List<ISEAnnotationLink> foundNodes = new LinkedList<ISEAnnotationLink>();
+      SEPreorderIterator iterator = new SEPreorderIterator(target);
       while (iterator.hasNext()) {
          SWTUtil.checkCanceled(monitor);
-         ISEDDebugElement next = iterator.next();
-         if (next instanceof ISEDDebugNode) {
-            ISEDDebugNode node = (ISEDDebugNode)next;
+         ISEDebugElement next = iterator.next();
+         if (next instanceof ISENode) {
+            ISENode node = (ISENode)next;
             if (SearchAnnotationType.accept(node, search)) {
-               ISEDAnnotationLink link = type.createLink(annotation, node);
+               ISEAnnotationLink link = type.createLink(annotation, node);
                foundNodes.add(link);
             }
          }
@@ -141,10 +141,10 @@ public class SearchWizard extends Wizard {
    /**
     * Opens the {@link SearchWizard} in a {@link WizardDialog}.
     * @param parentShell The parent {@link Shell}.
-    * @param target The {@link ISEDDebugTarget} to search in.
+    * @param target The {@link ISEDebugTarget} to search in.
     * @return The dialog result.
     */
-   public static int openWizard(Shell parentShell, ISEDDebugTarget target) {
+   public static int openWizard(Shell parentShell, ISEDebugTarget target) {
       WizardDialog dialog = new WizardDialog(parentShell, new SearchWizard(target));
       dialog.setHelpAvailable(false);
       return dialog.open();

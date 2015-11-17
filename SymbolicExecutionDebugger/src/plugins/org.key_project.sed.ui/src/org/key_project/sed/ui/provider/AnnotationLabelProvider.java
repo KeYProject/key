@@ -6,46 +6,46 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.Image;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.event.ISEDAnnotationListener;
-import org.key_project.sed.core.model.event.SEDAnnotationEvent;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.event.ISEAnnotationListener;
+import org.key_project.sed.core.model.event.SEAnnotationEvent;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.swt.viewer.AbstractLabelProvider;
 import org.key_project.util.java.ObjectUtil;
 
 /**
  * An {@link ITableLabelProvider} which shows the registered 
- * {@link ISEDAnnotation}s of an {@link ISEDDebugTarget}. 
+ * {@link ISEAnnotation}s of an {@link ISEDebugTarget}. 
  * @author Martin Hentschel
  */
 public class AnnotationLabelProvider extends AbstractLabelProvider implements ITableLabelProvider {
    /**
-    * The observed {@link ISEDDebugTarget}.
+    * The observed {@link ISEDebugTarget}.
     */
-   private final ISEDDebugTarget target;
+   private final ISEDebugTarget target;
    
    /**
     * Listens for changes on {@link #target}.
     */
-   private final ISEDAnnotationListener targetListener = new ISEDAnnotationListener() {
+   private final ISEAnnotationListener targetListener = new ISEAnnotationListener() {
       @Override
-      public void annotationRegistered(SEDAnnotationEvent e) {
+      public void annotationRegistered(SEAnnotationEvent e) {
          handleAnnotationRegistered(e);
       }
       
       @Override
-      public void annotationUnregistered(SEDAnnotationEvent e) {
+      public void annotationUnregistered(SEAnnotationEvent e) {
          handleAnnotationUnregistered(e);
       }
 
       @Override
-      public void annotationMoved(SEDAnnotationEvent e) {
+      public void annotationMoved(SEAnnotationEvent e) {
       }
    };
    
    /**
-    * Listens for changes on {@link ISEDAnnotation}s.
+    * Listens for changes on {@link ISEAnnotation}s.
     */
    private final PropertyChangeListener annotationListener = new PropertyChangeListener() {
       @Override
@@ -56,13 +56,13 @@ public class AnnotationLabelProvider extends AbstractLabelProvider implements IT
    
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} which provides the {@link ISEDAnnotation} to observe.
+    * @param target The {@link ISEDebugTarget} which provides the {@link ISEAnnotation} to observe.
     */
-   public AnnotationLabelProvider(ISEDDebugTarget target) {
+   public AnnotationLabelProvider(ISEDebugTarget target) {
       this.target = target;
       if (target != null) {
-         ISEDAnnotation[] annotations = target.getRegisteredAnnotations();
-         for (ISEDAnnotation annotation : annotations) {
+         ISEAnnotation[] annotations = target.getRegisteredAnnotations();
+         for (ISEAnnotation annotation : annotations) {
             annotation.addPropertyChangeListener(annotationListener);
          }
          target.addAnnotationListener(targetListener);
@@ -73,7 +73,7 @@ public class AnnotationLabelProvider extends AbstractLabelProvider implements IT
     * When a new annotation is registered.
     * @param e The event.
     */
-   protected void handleAnnotationRegistered(SEDAnnotationEvent e) {
+   protected void handleAnnotationRegistered(SEAnnotationEvent e) {
       e.getAnnotation().addPropertyChangeListener(annotationListener);
    }
 
@@ -81,21 +81,21 @@ public class AnnotationLabelProvider extends AbstractLabelProvider implements IT
     * When an existing annotation is unregistered.
     * @param e The event.
     */
-   protected void handleAnnotationUnregistered(SEDAnnotationEvent e) {
+   protected void handleAnnotationUnregistered(SEAnnotationEvent e) {
       e.getAnnotation().removePropertyChangeListener(annotationListener);
    }
 
    /**
-    * When a property of an {@link ISEDAnnotation} has changed.
+    * When a property of an {@link ISEAnnotation} has changed.
     * @param evt The event.
     */
    protected void handlePropertyChange(PropertyChangeEvent evt) {
-      if (!ISEDAnnotation.PROP_ENABLED.equals(evt.getPropertyName()) &&
-          !ISEDAnnotation.PROP_TYPE.equals(evt.getPropertyName()) &&
-          !ISEDAnnotation.PROP_HIGHLIGHT_BACKGROUND.equals(evt.getPropertyName()) &&
-          !ISEDAnnotation.PROP_BACKGROUND_COLOR.equals(evt.getPropertyName()) &&
-          !ISEDAnnotation.PROP_HIGHLIGHT_FOREGROUND.equals(evt.getPropertyName()) &&
-          !ISEDAnnotation.PROP_FOREGROUND_COLOR.equals(evt.getPropertyName())) {
+      if (!ISEAnnotation.PROP_ENABLED.equals(evt.getPropertyName()) &&
+          !ISEAnnotation.PROP_TYPE.equals(evt.getPropertyName()) &&
+          !ISEAnnotation.PROP_HIGHLIGHT_BACKGROUND.equals(evt.getPropertyName()) &&
+          !ISEAnnotation.PROP_BACKGROUND_COLOR.equals(evt.getPropertyName()) &&
+          !ISEAnnotation.PROP_HIGHLIGHT_FOREGROUND.equals(evt.getPropertyName()) &&
+          !ISEAnnotation.PROP_FOREGROUND_COLOR.equals(evt.getPropertyName())) {
          fireLabelProviderChangedThreadSave(new LabelProviderChangedEvent(this, evt.getSource()));
       }
    }
@@ -114,8 +114,8 @@ public class AnnotationLabelProvider extends AbstractLabelProvider implements IT
    @Override
    public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
-         if (element instanceof ISEDAnnotation) {
-            return SEDUIUtil.getAnnotationTypeImage(((ISEDAnnotation) element).getType());
+         if (element instanceof ISEAnnotation) {
+            return SEDUIUtil.getAnnotationTypeImage(((ISEAnnotation) element).getType());
          }
          else {
             return null;
@@ -133,8 +133,8 @@ public class AnnotationLabelProvider extends AbstractLabelProvider implements IT
    public void dispose() {
       super.dispose();
       if (target != null) {
-         ISEDAnnotation[] annotations = target.getRegisteredAnnotations();
-         for (ISEDAnnotation annotation : annotations) {
+         ISEAnnotation[] annotations = target.getRegisteredAnnotations();
+         for (ISEAnnotation annotation : annotations) {
             annotation.removePropertyChangeListener(annotationListener);
          }
          target.removeAnnotationListener(targetListener);

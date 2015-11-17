@@ -16,10 +16,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
-import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEExceptionalTermination;
 
 /**
- * Implementation of {@link ILayoutFeature} for {@link ISEDExceptionalTermination}s.
+ * Implementation of {@link ILayoutFeature} for {@link ISEExceptionalTermination}s.
  * @author Martin Hentschel
  */
 public class ExceptionalTerminationLayoutFeature extends AbstractDebugNodeLayoutFeature {
@@ -36,6 +36,6 @@ public class ExceptionalTerminationLayoutFeature extends AbstractDebugNodeLayout
     */
    @Override
    protected boolean canLayoutBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDExceptionalTermination;
+      return businessObject instanceof ISEExceptionalTermination;
    }
 }

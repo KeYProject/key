@@ -27,7 +27,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotHotCodeReplaceContinueTestCase extends
@@ -37,7 +37,7 @@ public class SWTBotHotCodeReplaceContinueTestCase extends
    public void testHotCodeReplace() throws Exception{
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             IPath classPath = new Path(ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toString() + "/SWTBotHotCodeReplaceContinueTestCase_testHotCodeReplace/src/CodeReplace.java");
             IFile classFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(classPath);
             TestUtilsUtil.openEditor(classFile);

@@ -1,0 +1,42 @@
+<html>
+   <head>
+      <title>SED</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
+   </head>
+   <body>
+      <h1>SED</h1>
+      <p>
+         Please watch the introduction video (<b>no audio</b>). You can pause the video at any time to comprehend the content. 
+      </p>
+      <video width="1280" height="720" poster="SED/videos/SEDScreencast.png" controls>
+         <source src="SED/videos/SEDScreencast.mp4" type="video/mp4"></source>
+         <source src="SED/videos/SEDScreencast.ogv" type="SED/videos/ogg"></source>
+         <source src="SED/videos/SEDScreencast.webm" type="SED/videos/webm"></source>
+         <dl>
+            <a href="SED/videos/SEDScreencast.mp4">
+               <dt><img src="SED/videos/SEDScreencast.png" alt="Download Video" title="Download Video" width="1280" height="720"></dt>
+               <dd>Download Video</dt>
+            </a>
+         </dl>
+      </video>
+      
+      <h2><a name="best">Best Practices</a></h3>
+      <ol>
+         <li>Ensure that
+            <ol>
+               <li>uncaught exceptions are allowed according to the documentation.</li>
+               <li>returned values match with the documentation.</li>
+               <li>the class invariant is preserved.</li>
+               <li>all statements can be executed (reached statements during symbolic execution are highlighted in the active editor).</li>
+            </ol>
+         </li>
+         <li>If something is suspicious
+             <ol>
+                <li>inspect the parent nodes to comprehend the followed execution path.</li>
+                <li>consider the path condition of the selected node shown in view <i>Properties</i> if appropriate.</li>
+                <li>inspect the symbolic state before the statement is executed in view <i>Variables</i> if appropriate.</li>
+             </ol>
+         </li>
+      </ol>
+   </body>
+</html>

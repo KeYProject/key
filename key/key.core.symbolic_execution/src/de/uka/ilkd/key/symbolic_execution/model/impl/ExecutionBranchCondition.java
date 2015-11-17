@@ -208,7 +208,11 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             parentPath = services.getTermBuilder().tt();
          }
          // Add current branch condition to path
-         pathCondition = services.getTermBuilder().and(parentPath, getBranchCondition());
+         Term branchCondition = getBranchCondition();
+         if (branchCondition == null) {
+            return; // Proof disposed in between.
+         }
+         pathCondition = services.getTermBuilder().and(parentPath, branchCondition);
          // Simplify path condition
          if (getSettings().isSimplifyConditions()) {
             pathCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);

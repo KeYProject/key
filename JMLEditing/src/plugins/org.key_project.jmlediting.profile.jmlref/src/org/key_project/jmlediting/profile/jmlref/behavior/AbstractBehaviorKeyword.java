@@ -23,62 +23,62 @@ import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
  */
 public abstract class AbstractBehaviorKeyword implements IKeyword {
 
-   /**
-    * The keywords, which are available.
-    */
-   private Set<String> keywords;
+    /**
+     * The keywords, which are available.
+     */
+    private Set<String> keywords;
 
-   /**
-    * Creates a keyword for an behavior.
-    *
-    * @param locale
-    *           the locale for the keywords
-    * @param americanEnglishKeyword
-    *           the AE keyword
-    * @param britishEnglishKeyword
-    *           the BE keyword
-    */
-   public AbstractBehaviorKeyword(final KeywordLocale locale,
-         final String americanEnglishKeyword, final String britishEnglishKeyword) {
-      switch (locale) {
-      case AMERICAN:
-         this.keywords = Collections.singleton(americanEnglishKeyword);
-         break;
-      case BRITISH:
-         this.keywords = Collections.singleton(britishEnglishKeyword);
-         break;
-      case BOTH:
-         this.keywords = Collections.unmodifiableSet(new HashSet<String>(Arrays
-               .asList(americanEnglishKeyword, britishEnglishKeyword)));
-         break;
-      default:
-         throw new AssertionError("Illegal case statment");
-      }
-   }
+    /**
+     * Creates a keyword for an behavior.
+     *
+     * @param locale
+     *            the locale for the keywords
+     * @param americanEnglishKeyword
+     *            the AE keyword
+     * @param britishEnglishKeyword
+     *            the BE keyword
+     */
+    public AbstractBehaviorKeyword(final KeywordLocale locale,
+            final String americanEnglishKeyword,
+            final String britishEnglishKeyword) {
+        switch (locale) {
+        case AMERICAN:
+            keywords = Collections.singleton(americanEnglishKeyword);
+            break;
+        case BRITISH:
+            keywords = Collections.singleton(britishEnglishKeyword);
+            break;
+        case BOTH:
+            keywords = Collections.unmodifiableSet(new HashSet<String>(Arrays
+                    .asList(americanEnglishKeyword, britishEnglishKeyword)));
+            break;
+        default:
+            throw new AssertionError("Illegal case statment");
+        }
+    }
 
-   @Override
-   public Set<String> getKeywords() {
-      return this.keywords;
-   }
+    @Override
+    public Set<String> getKeywords() {
+        return keywords;
+    }
 
-   @Override
-   public IKeywordParser createParser() {
-      return EmptyKeywordParser.getInstance();
-   }
+    @Override
+    public IKeywordParser createParser() {
+        return EmptyKeywordParser.getInstance();
+    }
 
-   @Override
-   public IKeywordAutoProposer createAutoProposer() {
-      return null;
-   }
+    @Override
+    public IKeywordAutoProposer createAutoProposer() {
+        return null;
+    }
 
-   @Override
-   public IKeywordSort getSort() {
-      return ToplevelKeywordSort.INSTANCE;
-   }
+    @Override
+    public IKeywordSort getSort() {
+        return ToplevelKeywordSort.INSTANCE;
+    }
 
-   @Override
-   public IKeywordValidator getKeywordValidator() {
-      return null;
-   }
-
+    @Override
+    public IKeywordValidator getKeywordValidator() {
+        return null;
+    }
 }

@@ -17,9 +17,9 @@ import org.antlr.runtime.RecognitionException;
 /**
  * Reading prover input failed
  */
+@SuppressWarnings("serial")
 public class ProofInputException extends RecognitionException {
 
-   private final Throwable cause;
    private final String message;
 
    public ProofInputException(Exception e) {
@@ -32,12 +32,9 @@ public class ProofInputException extends RecognitionException {
 
    public ProofInputException(String message, Throwable cause) {
       this.message = message;
-      this.cause = cause;
-   }
-
-   @Override
-   public Throwable getCause() {
-      return cause;
+      if(cause != null) {
+    	  initCause(cause);
+      }
    }
 
    @Override

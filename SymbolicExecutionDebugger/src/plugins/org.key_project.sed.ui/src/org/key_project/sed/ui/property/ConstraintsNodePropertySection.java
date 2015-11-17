@@ -14,19 +14,19 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 
 /**
- * {@link ISection} implementation to show the constraints of an {@link ISEDDebugNode}
- * which are provided via {@link ISEDDebugNode#getConstraints()}.
+ * {@link ISection} implementation to show the constraints of an {@link ISENode}
+ * which are provided via {@link ISENode#getConstraints()}.
  * @author Martin Hentschel
  */
-public class ConstraintsNodePropertySection extends AbstractSEDDebugNodePropertySection {
+public class ConstraintsNodePropertySection extends AbstractSENodePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new ConstraintsTabComposite();
    }
 

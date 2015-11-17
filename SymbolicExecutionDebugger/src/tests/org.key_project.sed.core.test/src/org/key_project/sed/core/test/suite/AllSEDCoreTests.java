@@ -16,11 +16,11 @@ package org.key_project.sed.core.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.sed.core.test.testcase.LogUtilTest;
-import org.key_project.sed.core.test.testcase.SEDBreadthFirstIteratorTest;
-import org.key_project.sed.core.test.testcase.SEDPostorderIteratorTest;
-import org.key_project.sed.core.test.testcase.SEDPreferenceUtilInitializerTest;
-import org.key_project.sed.core.test.testcase.SEDPreferenceUtilTest;
-import org.key_project.sed.core.test.testcase.SEDPreorderIteratorTest;
+import org.key_project.sed.core.test.testcase.SEBreadthFirstIteratorTest;
+import org.key_project.sed.core.test.testcase.SEPostorderIteratorTest;
+import org.key_project.sed.core.test.testcase.SEPreferenceUtilInitializerTest;
+import org.key_project.sed.core.test.testcase.SEPreferenceUtilTest;
+import org.key_project.sed.core.test.testcase.SEPreorderIteratorTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -29,11 +29,11 @@ import org.key_project.sed.core.test.testcase.SEDPreorderIteratorTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    LogUtilTest.class,
-   SEDBreadthFirstIteratorTest.class,
-   SEDPostorderIteratorTest.class,
-   SEDPreferenceUtilInitializerTest.class,
-   SEDPreferenceUtilTest.class,
-   SEDPreorderIteratorTest.class
+   SEBreadthFirstIteratorTest.class,
+   SEPostorderIteratorTest.class,
+   SEPreferenceUtilInitializerTest.class,
+   SEPreferenceUtilTest.class,
+   SEPreorderIteratorTest.class
 })
 public class AllSEDCoreTests {
 }

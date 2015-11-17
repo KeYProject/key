@@ -32,10 +32,10 @@ import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.ui.view.SymbolicExecutionSettingsView;
@@ -72,7 +72,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
       };
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             IFolder srcFolder = project.getProject().getFolder("src");
             IFile mainFile = srcFolder.getFile("Main.java");
             IFile defaultFile = srcFolder.getFile("SameName.java");
@@ -118,9 +118,9 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             resume(bot, launchTreeItem, target);
             // Make sure that correct source resources are computed for each IStackFrame
             Iterator<IFile> expectedIter = expectedResources.iterator();
-            SEDPreorderIterator iterator = new SEDPreorderIterator(target);
+            SEPreorderIterator iterator = new SEPreorderIterator(target);
             while (iterator.hasNext()) {
-               ISEDDebugElement next = iterator.next();
+               ISEDebugElement next = iterator.next();
                if (next instanceof IStackFrame) {
                   Object source = launch.getSourceLocator().getSourceElement((IStackFrame)next);
                   IFile expected = expectedIter.next();

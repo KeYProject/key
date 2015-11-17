@@ -75,12 +75,8 @@ public class JMLTextHover implements IJavaEditorTextHover {
       return null;
    }
 
-   private CommentRange getJMLComment(final ITextViewer textViewer,
-         final int offset) {
-      final CommentLocator locator = new CommentLocator(textViewer
-            .getDocument().get());
-      final CommentRange jmlComment = locator.getJMLComment(offset);
-      return jmlComment;
+   private CommentRange getJMLComment(final ITextViewer textViewer, final int offset) {
+      return CommentLocator.getJMLComment(textViewer.getDocument(), offset);
    }
 
    /**

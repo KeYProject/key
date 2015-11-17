@@ -134,6 +134,7 @@ options {
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
          prooflabel2tag.put("joinProc", ProofElementID.JOIN_PROCEDURE);
          prooflabel2tag.put("nrJoinPartners", ProofElementID.NUMBER_JOIN_PARTNERS);
+         prooflabel2tag.put("distFormula", ProofElementID.JOIN_DIST_FORMULA);
          prooflabel2tag.put("joinNode", ProofElementID.JOIN_NODE);
          prooflabel2tag.put("joinId", ProofElementID.JOIN_ID);
          prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
@@ -685,7 +686,7 @@ options {
         Term result = problem();
         // The parser may be ok if a totally unexpected token has turned up
         // We better check that either the file has ended or a "\proof" follows.
-        if(input.LA(1) != EOF && input.LA(1) != PROOF) {
+        if(input.LA(1) != EOF && input.LA(1) != PROOF && input.LA(1) != PROOFSCRIPT) {
             throw new NoViableAltException("after problem", -1, -1, input);
         }
         return result;
@@ -1501,6 +1502,27 @@ options {
         return result;
     }
 
+    private String unescapeString(String string) {
+      char[] chars = string.toCharArray();
+      StringBuilder sb = new StringBuilder();
+      for(int i = 0; i < chars.length; i++) {
+         if(chars[i] == '\\' && i < chars.length - 1) {
+          switch(chars[++i]) {
+            case 'n': sb.append("\n"); break;
+            case 'f': sb.append("\f"); break;
+            case 'r': sb.append("\r"); break;
+            case 't': sb.append("\t"); break;
+            case 'b': sb.append("\b"); break;
+            case ':': sb.append("\\:"); break; // this is so in KeY ...
+            default: sb.append(chars[i]); break; // this more relaxed than before, \a becomes a ...
+          }
+        } else {
+          sb.append(chars[i]);
+        }
+      }
+      return sb.toString();
+    }
+
     /* ---- antlr stuff ---- (Exception handling) */
 
     @Override
@@ -1852,7 +1874,7 @@ prog_var_decls
 string_literal returns [String lit = null]
    :
      id=STRING_LITERAL {
-       lit = id.getText();
+       lit = unescapeString(id.getText());
        lit = lit.substring(1,lit.length()-1);
        stringLiteralLine = id.getLine();
      }
@@ -3094,7 +3116,8 @@ atom returns [Term _atom = null]
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
         {
-            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
+            String s = unescapeString(literal.getText());
+            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(s));
         }   
     ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().addLabel(a, labels);} } RGUILLEMETS)?
     ;
@@ -4617,7 +4640,20 @@ preferences returns [String _preferences = null]
 		(s = string_literal)?
 		RBRACE )?
 	;
-	
+
+// delivers: <Script, start line no, start column no>
+proofScript returns [ Triple<String, Integer, Integer> locatedString = null ]
+:
+    PROOFSCRIPT ps = STRING_LITERAL
+      { int line = ps.getLine();
+        // +1 for antlr starting at 0
+        // +1 for removing the leading "
+        int col = ps.getCharPositionInLine() + 2;
+        String content = ps.getText().substring(1, ps.getText().length()-1);
+        locatedString = new Triple<String, Integer, Integer>(content, line, col);
+      }
+    ;
+
 proof [IProofFileParser prl] :
         ( PROOF proofBody[prl] )?
     ;

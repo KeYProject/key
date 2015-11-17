@@ -17,11 +17,11 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
-import org.key_project.sed.core.model.ISEDVariable;
-import org.key_project.sed.core.model.impl.AbstractSEDExceptionalMethodReturn;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEVariable;
+import org.key_project.sed.core.model.impl.AbstractSEExceptionalMethodReturn;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -33,11 +33,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDExceptionalMethodReturn} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEExceptionalMethodReturn} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodReturn implements IKeYSEDDebugNode<IExecutionExceptionalMethodReturn>, IKeYBaseMethodReturn {
+public class KeYExceptionalMethodReturn extends AbstractSEExceptionalMethodReturn implements IKeYSENode<IExecutionExceptionalMethodReturn>, IKeYBaseMethodReturn {
    /**
     * The {@link IExecutionExceptionalMethodReturn} to represent by this debug node.
     */
@@ -46,7 +46,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The source name.
@@ -71,12 +71,12 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
 
    /**
     * The condition under which this method return is reached from its calling node.
     */
-   private SEDMemoryBranchCondition methodReturnCondition;
+   private SEMemoryBranchCondition methodReturnCondition;
    
    /**
     * The {@link KeYMethodCall} which is now returned.
@@ -86,7 +86,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
    
    /**
     * The contained KeY variables at the call state.
@@ -102,7 +102,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * @param executionNode The {@link IExecutionExceptionalMethodReturn} to represent by this debug node.
     */
    public KeYExceptionalMethodReturn(KeYDebugTarget target, 
-                          IKeYSEDDebugNode<?> parent, 
+                          IKeYSENode<?> parent, 
                           KeYThread thread, 
                           KeYMethodCall methodCall,
                           IExecutionExceptionalMethodReturn executionNode) throws DebugException {
@@ -136,15 +136,15 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -266,7 +266,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * {@inheritDoc}
     */
    @Override
-   public ISEDVariable[] getCallStateVariables() throws DebugException {
+   public ISEVariable[] getCallStateVariables() throws DebugException {
       synchronized (this) {
          if (callStateVariables == null) {
             callStateVariables = KeYModelUtil.createCallStateVariables(this, executionNode);
@@ -409,7 +409,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -422,12 +422,12 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition getMethodReturnCondition() throws DebugException {
+   public SEMemoryBranchCondition getMethodReturnCondition() throws DebugException {
       try {
          synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
             if (methodReturnCondition == null) {
                KeYMethodCall methodCall = getMethodCall();
-               methodReturnCondition = new SEDMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
+               methodReturnCondition = new SEMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
                methodReturnCondition.addChild(this);
                methodReturnCondition.setCallStack(KeYModelUtil.createCallStack(methodCall.getDebugTarget(), methodCall.getExecutionNode().getCallStack()));
                methodReturnCondition.setName(executionNode.getFormatedMethodReturnCondition());
@@ -446,7 +446,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 
@@ -454,11 +454,11 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
-            SEDMemoryBranchCondition returnCondition = getMethodReturnCondition();
-            SEDMemoryBranchCondition[] completedBlockConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+            SEMemoryBranchCondition returnCondition = getMethodReturnCondition();
+            SEMemoryBranchCondition[] completedBlockConditions = KeYModelUtil.createCompletedBlocksConditions(this);
             if (returnCondition != null) {
                groupStartConditions = ArrayUtil.insert(completedBlockConditions, returnCondition, 0);
                KeYModelUtil.sortyByOccurrence(this, groupStartConditions); // Sort conditions to ensure order of occurrence // TODO: To increase performance use binary insertion instead of sorting

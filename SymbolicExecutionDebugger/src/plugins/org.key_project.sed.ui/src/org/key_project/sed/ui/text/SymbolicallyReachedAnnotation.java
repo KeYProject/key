@@ -7,8 +7,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.sourcesummary.ISEDSourceRange;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.sourcesummary.ISESourceRange;
 
 /**
  * An {@link Annotation} highlighting code reached during symbolic execution.
@@ -21,9 +21,9 @@ public class SymbolicallyReachedAnnotation extends Annotation {
    public static final String TYPE = "org.key_project.sed.ui.SymbolicallyReachedAnnotation";
    
    /**
-    * The {@link ISEDDebugTarget}s with their {@link ISEDSourceRange} in which the code was reached.
+    * The {@link ISEDebugTarget}s with their {@link ISESourceRange} in which the code was reached.
     */
-   private final Map<ISEDDebugTarget, ISEDSourceRange> targetRanges = new HashMap<ISEDDebugTarget, ISEDSourceRange>();
+   private final Map<ISEDebugTarget, ISESourceRange> targetRanges = new HashMap<ISEDebugTarget, ISESourceRange>();
    
    /**
     * The {@link Position} at which this {@link SymbolicallyReachedAnnotation} is shown.
@@ -40,7 +40,7 @@ public class SymbolicallyReachedAnnotation extends Annotation {
    }
    
    /**
-    * Checks if at least one {@link ISEDDebugTarget} is available.
+    * Checks if at least one {@link ISEDebugTarget} is available.
     * @return {@code true} has targets, {@code false} has no targets.
     */
    public boolean hasTargets() {
@@ -48,41 +48,41 @@ public class SymbolicallyReachedAnnotation extends Annotation {
    }
    
    /**
-    * Checks if the given {@link ISEDDebugTarget} is contained in this annotation.
-    * @param target The {@link ISEDDebugTarget} to check.
+    * Checks if the given {@link ISEDebugTarget} is contained in this annotation.
+    * @param target The {@link ISEDebugTarget} to check.
     * @return {@code true} is contained, {@code false} is not contained.
     */
-   public boolean containsTarget(ISEDDebugTarget target) {
+   public boolean containsTarget(ISEDebugTarget target) {
       return target != null && targetRanges.containsKey(target);
    }
    
    /**
-    * Registers the given {@link ISEDDebugTarget} with the given {@link ISEDSourceRange}.
-    * @param target The {@link ISEDDebugTarget} to add.
-    * @param range The {@link ISEDSourceRange} of the given {@link ISEDDebugTarget}.
+    * Registers the given {@link ISEDebugTarget} with the given {@link ISESourceRange}.
+    * @param target The {@link ISEDebugTarget} to add.
+    * @param range The {@link ISESourceRange} of the given {@link ISEDebugTarget}.
     */
-   public void setRange(ISEDDebugTarget target, ISEDSourceRange range) {
+   public void setRange(ISEDebugTarget target, ISESourceRange range) {
       if (target != null) {
          targetRanges.put(target, range);
       }
    }
    
    /**
-    * Removes the given {@link ISEDDebugTarget}.
-    * @param target The {@link ISEDDebugTarget} to remove.
+    * Removes the given {@link ISEDebugTarget}.
+    * @param target The {@link ISEDebugTarget} to remove.
     */
-   public void removeTarget(ISEDDebugTarget target) {
+   public void removeTarget(ISEDebugTarget target) {
       if (target != null) {
          targetRanges.remove(target);
       }
    }
    
    /**
-    * Returns the {@link ISEDSourceRange} of the given {@link ISEDDebugTarget} if available.
-    * @param target The {@link ISEDDebugTarget} for which the {@link ISEDSourceRange} is requested.
-    * @return The {@link ISEDSourceRange} or {@code null} if not available.
+    * Returns the {@link ISESourceRange} of the given {@link ISEDebugTarget} if available.
+    * @param target The {@link ISEDebugTarget} for which the {@link ISESourceRange} is requested.
+    * @return The {@link ISESourceRange} or {@code null} if not available.
     */
-   public ISEDSourceRange getRange(ISEDDebugTarget target) {
+   public ISESourceRange getRange(ISEDebugTarget target) {
       return target != null ? targetRanges.get(target) : null;
    }
 
@@ -90,9 +90,9 @@ public class SymbolicallyReachedAnnotation extends Annotation {
     * Returns the specific code range to highlight.
     * @return The specific code range to highlight.
     */
-   public ISEDSourceRange[] getRanges() {
-      Collection<ISEDSourceRange> values = targetRanges.values();
-      return values.toArray(new ISEDSourceRange[values.size()]);
+   public ISESourceRange[] getRanges() {
+      Collection<ISESourceRange> values = targetRanges.values();
+      return values.toArray(new ISESourceRange[values.size()]);
    }
 
    /**

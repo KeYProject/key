@@ -9,22 +9,22 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.ui.edit.ISEAnnotationEditor;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.sed.ui.wizard.page.EditWizardPage;
 
 /**
- * This {@link Wizard} is used to edit an {@link ISEDAnnotation}.
+ * This {@link Wizard} is used to edit an {@link ISEAnnotation}.
  * @author Martin Hentschel
  */
 public class EditWizard extends Wizard {
    /**
-    * The {@link ISEDAnnotation} to edit.
+    * The {@link ISEAnnotation} to edit.
     */
-   private final ISEDAnnotation annotation;
+   private final ISEAnnotation annotation;
    
    /**
     * The used {@link EditWizardPage}.
@@ -32,16 +32,16 @@ public class EditWizard extends Wizard {
    private EditWizardPage editPage;
    
    /**
-    * The optionally used {@link ISEDAnnotationEditor}.
+    * The optionally used {@link ISEAnnotationEditor}.
     */
-   private final ISEDAnnotationEditor editor;
+   private final ISEAnnotationEditor editor;
 
    /**
     * Constructor.
-    * @param target {@link ISEDDebugTarget} in which the {@link ISEDAnnotation} is used.
-    * @param annotation The {@link ISEDAnnotation} to edit.
+    * @param target {@link ISEDebugTarget} in which the {@link ISEAnnotation} is used.
+    * @param annotation The {@link ISEAnnotation} to edit.
     */
-   public EditWizard(ISEDDebugTarget target, ISEDAnnotation annotation) {
+   public EditWizard(ISEDebugTarget target, ISEAnnotation annotation) {
       Assert.isNotNull(target);
       Assert.isNotNull(annotation);
       this.annotation = annotation;
@@ -111,13 +111,13 @@ public class EditWizard extends Wizard {
    /**
     * Opens the {@link EditWizard} in a {@link WizardDialog}.
     * @param parentShell The parent {@link Shell}.
-    * @param target {@link ISEDDebugTarget} in which the {@link ISEDAnnotation} is used.
-    * @param annotation The {@link ISEDAnnotation} to edit.
+    * @param target {@link ISEDebugTarget} in which the {@link ISEAnnotation} is used.
+    * @param annotation The {@link ISEAnnotation} to edit.
     * @return The dialog result.
     */
    public static int openWizard(Shell parentShell, 
-                                ISEDDebugTarget target,
-                                ISEDAnnotation annotation) {
+                                ISEDebugTarget target,
+                                ISEAnnotation annotation) {
       WizardDialog dialog = new WizardDialog(parentShell, new EditWizard(target, annotation));
       dialog.setHelpAvailable(false);
       return dialog.open();

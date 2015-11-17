@@ -22,11 +22,12 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import javax.swing.JTextArea;
+import javax.swing.JEditorPane;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
+import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -43,11 +44,7 @@ import de.uka.ilkd.key.util.Debug;
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
-public abstract class SequentView extends JTextArea {
-    
-    /**
-     *
-     */
+public abstract class SequentView extends JEditorPane {
     private static final long serialVersionUID = 5012937393965787981L;
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
@@ -82,6 +79,7 @@ public abstract class SequentView extends JTextArea {
     private final ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
     private SequentViewLogicPrinter printer;
+    private HTMLSyntaxHighlighter syntaxHighlighter;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
@@ -102,8 +100,14 @@ public abstract class SequentView extends JTextArea {
     private final HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight
             = new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
 
+    /** the last observed mouse position for which a highlight was created */
+    private Point lastMousePosition;
+
     SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
+        
+        setContentType("text/html");
+        syntaxHighlighter = new HTMLSyntaxHighlighter((HTMLDocument)getDocument());
 
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
@@ -132,6 +136,7 @@ public abstract class SequentView extends JTextArea {
     public final void setFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (myFont != null) {
+            putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             setFont(myFont);
         } else {
             Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
@@ -223,6 +228,30 @@ public abstract class SequentView extends JTextArea {
     }
 
     public abstract String getTitle();
+    
+    /* (non-Javadoc)
+     * @see javax.swing.JEditorPane#getText()
+     */
+    /**
+     * Returns the plain text of this sequent view.
+     */
+    @Override
+    public String getText() {
+        try {
+            return getDocument().getText(0, getDocument().getLength());
+        }
+        catch (BadLocationException e) {
+            return super.getText(); // shouldn't happen
+        }
+    }
+
+    /**
+     * Get the PosInSequent object for the last observed
+     * and highlighted mouse position.
+     */
+    public PosInSequent getLastPosInSequent() {
+        return getPosInSequent(lastMousePosition);
+    }
 
     /**
      * Get a PosInSequent object for a given coordinate of the displayed
@@ -256,6 +285,13 @@ public abstract class SequentView extends JTextArea {
     protected void setLogicPrinter(SequentViewLogicPrinter p) {
         printer = p;
     }
+    
+    /**
+     * @return The HTML syntax highlighter used for this sequent view.
+     */
+    protected HTMLSyntaxHighlighter getSyntaxHighlighter() {
+        return syntaxHighlighter;
+    }
 
     public String getHighlightedText(PosInSequent pos) {
         if (pos == null) {
@@ -263,7 +299,13 @@ public abstract class SequentView extends JTextArea {
         }
         String s = "";
         try {
-            s = getText(pos.getBounds().start(),
+            // NOTE (DS): The below addition of 1 to the beginning is a
+            // quick-and-dirty fix for the problem that the copied text
+            // was one position shifted to the left (occurred after the
+            // change to HTML documents in the JEditorPane (previous JTextArea)). If
+            // something concerning highlighting does not work in the future, here
+            // could be a starting place to find the mistake.
+            s = getText(pos.getBounds().start() + 1,
                     pos.getBounds().length());
         } catch (BadLocationException e) {
             e.printStackTrace();
@@ -295,7 +337,16 @@ public abstract class SequentView extends JTextArea {
                 = getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
         int characterIndex = viewToModel(new Point((int) p.getX() - (previousCharacterWidth / 2),
                 (int) p.getY()));
-        return characterIndex;
+        
+        // NOTE (DS): The below subtraction of 1 to the beginning is a
+        // quick-and-dirty fix for the problem that the mouse pointer
+        // has to point to the element one position left of the actual
+        // element that should be highlighted (occurred after the
+        // change to HTML documents in the JEditorPane (previous JTextArea)). If
+        // something concerning highlighting does not work in the future, here
+        // could be a starting place to find the mistake.
+        
+        return characterIndex - 1;
     }
 
     /**
@@ -357,7 +408,16 @@ public abstract class SequentView extends JTextArea {
         String seqText = getText();
         if (seqText.length() > 0) {
             int characterIndex = correctedViewToModel(p);
-            return printer.getInitialPositionTable().rangeForIndex(characterIndex);
+            
+            // NOTE (DS): The below addition of 1 to the beginning is a quick-and-dirty
+            // fix for a shift of highlighted areas to the left that occurred after the
+            // change to HTML documents in the JEditorPane (previous JTextArea). If
+            // something concerning highlighting does not work in the future, here could
+            // be a starting place to find the mistake.
+            Range result = printer.getInitialPositionTable().rangeForIndex(characterIndex);
+            result = new Range(result.start() + 1, result.end() + 1);
+            
+            return result;
         } else {
             return null;
         }
@@ -369,11 +429,16 @@ public abstract class SequentView extends JTextArea {
      * if there is no java block there.
      */
     protected synchronized Range getFirstStatementRange(Point p) {
-        String seqText = getText();
-        if (seqText.length() > 0) {
+        if (getDocument().getLength() > 0) {
             int characterIndex = correctedViewToModel(p);
-            return printer.getInitialPositionTable().
+            Range result = printer.getInitialPositionTable().
                     firstStatementRangeForIndex(characterIndex);
+            if (result == null) {
+                return null;
+            }
+            else {
+                return new Range(result.start() + 1, result.end() + 1);
+            }
         } else {
             return null;
         }
@@ -382,6 +447,7 @@ public abstract class SequentView extends JTextArea {
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
+        lastMousePosition = p;
     }
 
     @Override

@@ -15,8 +15,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLWriter;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.serialization.SEXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.page.ModelFileSaveOptionsWizardPage;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -35,9 +35,9 @@ public class SaveSetAsWizard extends BasicNewResourceWizard {
    private final IWorkbenchWindow window;
 
    /**
-    * The {@link ISEDDebugTarget}s to save.
+    * The {@link ISEDebugTarget}s to save.
     */
-   private final ISEDDebugTarget[] targets;
+   private final ISEDebugTarget[] targets;
    
    /**
     * The used {@link ContentWizardNewFileCreationPage}.
@@ -52,9 +52,9 @@ public class SaveSetAsWizard extends BasicNewResourceWizard {
    /**
     * Constructor.
     * @param window The currently active {@link IWorkbenchWindow}.
-    * @param targets The {@link ISEDDebugTarget}s to save.
+    * @param targets The {@link ISEDebugTarget}s to save.
     */
-   public SaveSetAsWizard(IWorkbenchWindow window, ISEDDebugTarget[] targets) {
+   public SaveSetAsWizard(IWorkbenchWindow window, ISEDebugTarget[] targets) {
       Assert.isNotNull(targets);
       this.window = window;
       this.targets = targets;
@@ -89,9 +89,9 @@ public class SaveSetAsWizard extends BasicNewResourceWizard {
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                try {
-                  SEDXMLWriter writer = new SEDXMLWriter();
+                  SEXMLWriter writer = new SEXMLWriter();
                   String content = writer.toXML(targets, 
-                                                SEDXMLWriter.DEFAULT_ENCODING, 
+                                                SEXMLWriter.DEFAULT_ENCODING, 
                                                 saveVariables, 
                                                 saveCallStack,
                                                 saveConstraints,
@@ -108,7 +108,7 @@ public class SaveSetAsWizard extends BasicNewResourceWizard {
          };
          getContainer().run(true, true, run);
          if (run.getResult() != null) {
-            modelPage.setInitialContents(new ByteArrayInputStream(run.getResult().getBytes(Charset.forName(SEDXMLWriter.DEFAULT_ENCODING))));
+            modelPage.setInitialContents(new ByteArrayInputStream(run.getResult().getBytes(Charset.forName(SEXMLWriter.DEFAULT_ENCODING))));
             IFile file = modelPage.createNewFile();
             if (window != null) {
                selectAndReveal(file, window);
@@ -130,12 +130,12 @@ public class SaveSetAsWizard extends BasicNewResourceWizard {
     * Opens the {@link SaveSetAsWizard} in a {@link WizardDialog}.
     * @param parentShell The parent {@link Shell}.
     * @param window The currently active {@link IWorkbenchWindow}.
-    * @param targets The {@link ISEDDebugTarget}s to save.
+    * @param targets The {@link ISEDebugTarget}s to save.
     * @return The dialog result.
     */
    public static int openWizard(Shell parentShell, 
                                 IWorkbenchWindow window,
-                                ISEDDebugTarget[] targets) {
+                                ISEDebugTarget[] targets) {
       WizardDialog dialog = new WizardDialog(parentShell, new SaveSetAsWizard(window, targets));
       return dialog.open();
    }

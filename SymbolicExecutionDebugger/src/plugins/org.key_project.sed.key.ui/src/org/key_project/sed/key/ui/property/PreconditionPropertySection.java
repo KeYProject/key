@@ -15,13 +15,13 @@ package org.key_project.sed.key.ui.property;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.key.core.model.IKeYTerminationNode;
 import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * {@link ISection} implementation to show the properties of {@link ISENode}s.
  * @author Martin Hentschel
  */
 public class PreconditionPropertySection extends AbstractTruthValuePropertySection {
@@ -48,6 +48,6 @@ public class PreconditionPropertySection extends AbstractTruthValuePropertySecti
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new PreconditionComposite(parent, getWidgetFactory());
+      return new PreconditionComposite(parent, getWidgetFactory(), this);
    }
 }

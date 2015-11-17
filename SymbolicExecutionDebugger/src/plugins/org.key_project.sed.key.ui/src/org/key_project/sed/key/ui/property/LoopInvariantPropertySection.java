@@ -15,14 +15,14 @@ package org.key_project.sed.key.ui.property;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopInvariant;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * {@link ISection} implementation to show the properties of {@link ISENode}s.
  * @author Martin Hentschel
  */
 public class LoopInvariantPropertySection extends AbstractTruthValuePropertySection {
@@ -30,19 +30,19 @@ public class LoopInvariantPropertySection extends AbstractTruthValuePropertySect
     * {@inheritDoc}
     */
    @Override
-   protected IKeYSEDDebugNode<?> getDebugNode() {
+   protected IKeYSENode<?> getDebugNode() {
       Object object = SWTUtil.getFirstElement(getSelection());
       return getDebugNode(object);
    }
    
    /**
-    * Converts the given {@link Object} into an {@link IKeYSEDDebugNode} if possible.
+    * Converts the given {@link Object} into an {@link IKeYSENode} if possible.
     * @param object The given {@link Object}.
-    * @return The {@link IKeYSEDDebugNode} or {@code null} if conversion is not possible.
+    * @return The {@link IKeYSENode} or {@code null} if conversion is not possible.
     */
-   public static IKeYSEDDebugNode<?> getDebugNode(Object object) {
+   public static IKeYSENode<?> getDebugNode(Object object) {
       return object instanceof KeYLoopInvariant || object instanceof KeYLoopBodyTermination ?
-             (IKeYSEDDebugNode<?>) object :
+             (IKeYSENode<?>) object :
              null;
    }
 
@@ -51,6 +51,6 @@ public class LoopInvariantPropertySection extends AbstractTruthValuePropertySect
     */
    @Override
    protected AbstractTruthValueComposite createContentComposite(Composite parent) {
-      return new LoopInvariantComposite(parent, getWidgetFactory());
+      return new LoopInvariantComposite(parent, getWidgetFactory(), this);
    }
 }

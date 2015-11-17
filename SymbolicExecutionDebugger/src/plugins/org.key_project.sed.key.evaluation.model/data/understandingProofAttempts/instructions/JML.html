@@ -1,0 +1,197 @@
+<html>
+   <head>
+      <title>JML</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
+   </head>
+   <body>
+      <h1>JML</h1>
+      <p>
+         The <a href="http://www.jmlspecs.org" target="_blank">Java Modeling Language (JML)</a> is a specification language used to specify the expected behavior of Java modules.
+      </p>
+      <p>
+         The relevant knowledge for this evaluation about JML is explained in the following sections.
+         <b>Please read them carefully before you continue.</b>
+         If you are familiar with JML, you can skip sections you know well.
+         <ul>
+            <li><a href="#comments">1 JML Comments</a></li>
+            <li><a href="#mc">2 Method Contracts</a></li>
+            <li><a href="#invariants">3 Class Invariants</a></li>
+            <li><a href="#loop">4 Loop Invariants</a></li>
+            <li><a href="#aliasing">5 Aliasing and Assignable</a></li>
+            <li>
+               <a href="#JMLtoJavaDL">6 From JML to Java Dynamic Logic</a>
+               <ul>
+                  <li><a href="#MethodContractsInJavaDL">6.1 Method Contracts in Java Dynamic Logic</a></li>
+                  <li><a href="#LoopInvariantsInJavaDL">6.2 Loop Invariants in Java Dynamic Logic</a></li>
+               </ul>
+            </li>
+         </ul>
+      </p>
+      
+      <h2><a name="comments">1 JML Comments</a></h2>
+      <p>
+         JML specifications are placed as special comments within the Java source code.
+         Such comments have to start with the <code><font color="#55500A">@</font></code> character.
+         JML comments used in this evaluation look as follows:
+         <code>
+         <pre>
+<font color="#55500A">/*@ ...
+  @ ... 
+  @*/</font></pre></code>
+      </p>
+
+      <h2><a name="mc">2 Method Contracts</a></h2>
+      <p>
+         A method contract specifies the expected behavior of a method in terms of pre- and postconditions.
+         Assuming that the precondition is fulfilled when the method is called, the method guarantees that the postcondition is established when it returns.
+         In JML the keywords <code><font color="#C80064"><b>normal_behavior</b></font></code> and <code><font color="#C80064"><b>exceptional_behavior</b></font></code> are used to specify that a method should terminate normally without a thrown exception or exceptionally otherwise.
+         Keyword <code><font color="#C80064"><b>requires</b></font></code> followed by a boolean expression defines a precondition while <code><font color="#C80064"><b>ensures</b></font></code> also followed by a boolean expression defines a postcondition.
+         An expression is basically a normal Java expression as used for instance in <code><font color="#7F0055"><b>if</b></font></code> statements.
+         But additionally the implication operator <code><font color="#55500A">==></font></code> and quantifiers (e.g. <code><font color="#6400C8"><b>\forall</b></font></code>) can be used.
+      </p>
+      <p>
+         The ensures clause makes a statement about the final state after method execution.
+         To express changes relative to the prestate before method invocation, the keyword <code><font color="#6400C8"><b>\old</b></font></code> can be used.
+         Keyword <code><font color="#6400C8"><b>\result</b></font></code> is used to refer to the method return value.
+      </p>
+      <p>
+         The last part of a method contract is the assignable clause.
+         It lists all locations the method is allowed to change. 
+         Keyword <code><font color="#6400C8"><b>\nothing</b></font></code> expresses that the method is not allowed to change any location.
+      </p>
+      <p>
+         Consider the following example. 
+         The method contract of <code>addCredits</code> says that the method should be called in a state in which <code><font color="#6A3E3E">credits</font></code> is greater than zero (<code><font color="#C80064"><b>requires</b></font></code>).
+         Then the method will guarantee that no exception is thrown (<code><font color="#C80064"><b>normal_behavior</b></font></code>) and that the value of <code><font color="#0000C0">acquiredCredits</font></code> is increased by <code><font color="#6A3E3E">credits</font></code> (first <code><font color="#C80064"><b>ensures</b></font></code>).
+         It also guarantees that the returned value is the new value of <code><font color="#0000C0">acquiredCredits</font></code> (second <code><font color="#C80064"><b>ensures</b></font></code>).
+         At last, the <code><font color="#C80064"><b>assignable</b></font></code> clause says that only <code><font color="#0000C0">acquiredCredits</font></code> and no other locations like <code><font color="#0000C0">firstname</font></code> or <code><font color="#0000C0">surname</font></code> are allowed to be changed by the method.
+         <code>
+         <pre>
+<font color="#7F0055"><b>public class</b></font> Student {
+   <font color="#7F0055"><b>private</b></font> <font color="#55500A">/*@</font> <font color="#C80064"><b>nullable</b></font> <font color="#55500A">@*/</font> String <font color="#0000C0">firstname</font>;
+   
+   <font color="#7F0055"><b>private</b></font> <font color="#55500A">/*@</font> <font color="#C80064"><b>non_null</b></font> <font color="#55500A">@*/</font> String <font color="#0000C0">surname</font>;
+
+   <font color="#7F0055"><b>private int</b></font> <font color="#0000C0">acquiredCredits</font> = 0;
+   
+   <font color="#55500A">/*@ <font color="#C80064"><b>normal_behavior</b></font>
+     @ <font color="#C80064"><b>requires</b></font> credits > 0;
+     @ <font color="#C80064"><b>ensures</b></font> acquiredCredits == <font color="#6400C8"><b>\old</b></font>(acquiredCredits) + credits;
+     @ <font color="#C80064"><b>ensures</b></font> <font color="#6400C8"><b>\result</b></font> == acquiredCredits;
+     @ <font color="#C80064"><b>assignable</b></font> acquiredCredits;
+     @*/</font>
+   <font color="#7F0055"><b>public int</b></font> addCredits(<font color="#7F0055"><b>int</b></font> <font color="#6A3E3E">credits</font>) {
+      <font color="#0000C0">acquiredCredits</font> += <font color="#6A3E3E">credits</font>;
+      <font color="#7F0055"><b>return</b></font> <font color="#0000C0">acquiredCredits</font>;
+   }
+}</pre></code>
+      </p>
+      <p>
+         For method parameters as well as for instance and class fields with a reference type its ability to be <code><font color="#7F0055"><b>null</b></font></code> needs to be specified.
+         Keyword <code><font color="#C80064"><b>nullable</b></font></code> allows the <code><font color="#7F0055"><b>null</b></font></code> value while <code><font color="#C80064"><b>non_null</b></font></code> forbids it.
+         In the example above, <code><font color="#0000C0">firstname</font></code> might be <code><font color="#7F0055"><b>null</b></font></code> while <code><font color="#0000C0">surname</font></code> will be never <code><font color="#7F0055"><b>null</b></font></code>.
+      </p>
+
+      <h2><a name="invariants">3 Class Invariants</a></h2>
+      <p>
+         An invariant is a property used to limit the possible state space of instances.
+         All constructors of a class have to establish the invariant while all methods have to preserve it.
+         It can only be broken temporary within a method execution.
+         Technically, an invariant can be seen as pre and postcondition added to all method contracts.
+      </p>
+      <p>
+         Let us add the following invariant to class <code>Student</code>.
+         It says that the value of <code><font color="#0000C0">acquiredCredits</font></code> is never negative.
+         <code>
+         <pre>
+<font color="#55500A">/*@ <font color="#C80064"><b>invariant</b></font> acquiredCredits >= 0;
+  @*/</font>
+<font color="#7F0055"><b>private int</b></font> <font color="#0000C0">acquiredCredits</font> = 0;</pre></code>
+      </p>
+
+      <h2><a name="loop">4 Loop Invariants</a></h2>
+      <p>
+         A loop invariant is a property which needs to hold before a loop is entered
+         and which is preserved by each loop iteration (loop guard and loop body). 
+         Thus it also holds after the loop. 
+      </p>
+      <p>
+         A loop invariant in JML consists of three parts:
+         <ul>
+            <li>Keyword <code><font color="#C80064"><b>loop_invariant</b></font></code> is used to specify a loop invariant.</li>
+            <li>Keyword <code><font color="#C80064"><b>decreasing</b></font></code> specifies a value which is always positive and strictly decreased in each loop iteration. It is used to prove termination of the loop. The decreasing clause is also named <i>variant</i>.</li>
+            <li>Keyword <code><font color="#C80064"><b>assignable</b></font></code> limits the locations may changed by the loop.</li>
+         </ul> 
+      </p>
+      <p>
+         The following example restricts with the first loop invariant the range of index variable <code><font color="#6A3E3E">i</font></code>.
+         The second loop invariant ensures that all already visited array elements are assigned with the array index.
+         Termination can be proven with help of the array length and the index variable (<code><font color="#C80064"><b>decreasing</b></font></code> term).
+         Finally, the loop can change all fields of <code><font color="#6A3E3E">array</font></code> (but not <code><font color="#6A3E3E">array</font></code> itself) and <code><font color="#6A3E3E">i</font></code>.
+         <code>
+         <pre>
+<font color="#7F0055"><b>public static void</b></font> fillArray(<font color="#7F0055"><b>int</b></font>[] <font color="#6A3E3E">array</font>) {
+   <font color="#55500A">/*@ <font color="#C80064"><b>loop_invariant</b></font> i >= 0 && i <= array.length;
+     @ <font color="#C80064"><b>loop_invariant</b></font> (<font color="#6400C8"><b>\forall</b></font> int j; j >= 0 && j < i; array[j] == j);
+     @ <font color="#C80064"><b>decreasing</b></font> array.length - i;
+     @ <font color="#C80064"><b>assignable</b></font> array[*], i;
+     @*/</font>
+   <font color="#7F0055"><b>for</b></font> (<font color="#7F0055"><b>int</b></font> <font color="#6A3E3E">i</font> = 0; <font color="#6A3E3E">i</font> &lt; <font color="#6A3E3E">array</font>.<font color="#0000C0">length</font>; <font color="#6A3E3E">i</font>++) {
+      <font color="#6A3E3E">array</font>[<font color="#6A3E3E">i</font>] = <font color="#6A3E3E">i</font>;
+   }
+}</pre></code>
+      </p>
+
+      <h2><a name="aliasing">5 Aliasing and Assignable</a></h2>
+      <p>
+         Listed instance fields in the assignable clause give the right to change its values independent from the way how the object is accessed.
+      </p>
+      <p>
+         Consider for instance the following example. The parameters <code><font color="#6A3E3E">a</font></code> and <code><font color="#6A3E3E">b</font></code> are aliased (they point to the same object)
+         as expressed by the precondition <code><font color="#55500A">a == b</font></code>. The implementation fulfills the specification, 
+         although the specification allows only to change instance field <code><font color="#0000C0">acquiredCredits</font></code> on <code><font color="#6A3E3E">b</font></code> while the implementation
+         changes it on <code><font color="#6A3E3E">a</font></code>.
+      </p>
+          <pre>
+<font color="#55500A">/*@ <font color="#C80064"><b>normal_behavior</b></font>
+  @ <font color="#C80064"><b>requires</b></font> a == b;
+  @ <font color="#C80064"><b>assignable</b></font> b.acquiredCredits;
+  @*/</font>
+<font color="#7F0055"><b>public static void</b></font> doNothing(Student <font color="#6A3E3E">a</font>, Student <font color="#6A3E3E">b</font>) {
+   <font color="#6A3E3E">a</font>.<font color="#0000C0">acquiredCredits</font> = <font color="#6A3E3E">b</font>.<font color="#0000C0">acquiredCredits</font>;
+}</pre></code>
+
+      <h2><a name="JMLtoJavaDL">6 From JML to Java Dynamic Logic</a></h2>
+      <p>
+         To verify if a Java program adheres to its JML specification, KeY translates both into a formula in <i>Java Dynamic Logic</i>.
+         Java Dynamic Logic is also used by the Symbolic Execution Debugger (SED) to present results.
+      </p>
+      <p>
+         This section gives a short introduction about how to read Java Dynamic Logic.
+      </p>
+      <p>
+         For the actual verification, KeY uses a Gentzen-style sequent calculus. 
+         The main data structure of such a calculus is a sequent like the following:
+         <pre><code><font color="#333333">
+         A, B ==> C, D
+         </font></code></pre>
+         It can be read as:
+         Assuming that all formulas on the left side (<code><font color="#333333">A</font></code> and <code><font color="#333333">B</font></code>) of the sequent arrow <code>==></code> hold, at least one formula on the right side (<code><font color="#333333">C</font></code> or <code><font color="#333333">D</font></code>) needs to hold.
+         The left side contains typically preconditions to assume while the right side contains postconditions to be proven.
+      </p>
+
+      <h3><a name="MethodContractsInJavaDL">6.1 Method Contracts in Java Dynamic Logic</a></h2>
+      <p>      
+         The following figure shows on the left the source code from Section <a href="#mc">2 Method Contracts</a> and on the right the initial sequent generated by KeY to verify the correctness of method <code>addCredits</code>.
+         Boxes are used to map the Java/JML constructs to their representation in Java Dynamic Logic. 
+      </p>      
+      <img src="JML/KeY_PO.png">
+
+      <h3><a name="LoopInvariantsInJavaDL">6.2 Loop Invariants in Java Dynamic Logic</a></h2>
+      <p>      
+         The following figure shows on the left the source code from Section <a href="#loop">4 Loop Invariants</a> and on the right the sequent generated by KeY to verify that the loop invariant is preserved by loop guard and body.
+         Boxes are used to map the Java/JML constructs to their representation in Java Dynamic Logic. 
+      </p> 
+      <img src="JML/KeY_LoopInvariant.png">
+   </body>
+</html>

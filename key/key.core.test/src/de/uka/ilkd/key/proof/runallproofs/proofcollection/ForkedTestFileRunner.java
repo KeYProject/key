@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.util.IOForwarder;
 
 /**
  * Executes KeY prover for a list of {@link TestFile}s in a separate process.
@@ -26,7 +27,9 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
  */
 public abstract class ForkedTestFileRunner implements Serializable {
 
-    private static final String FORK_TIMEOUT_KEY = "forkTimeout";
+   private static final String FORK_TIMEOUT_KEY = "forkTimeout";
+
+   private static final String FORK_DEBUG_PORT = "forkDebugPort";
 
    private static Path getLocationOfSerializedTestFiles(Path tempDirectory) {
       return Paths.get(tempDirectory.toString(), "TestFiles.serialized");
@@ -99,10 +102,29 @@ public abstract class ForkedTestFileRunner implements Serializable {
           command.add("-Xmx" + forkMemory);
       }
 
+      String debugPort = settings.get(FORK_DEBUG_PORT);
+      if(debugPort != null) {
+          String suspend = "n";
+          if(debugPort.startsWith("wait:")) {
+              debugPort = debugPort.substring(5);
+              suspend = "y";
+          }
+          int port;
+          try {
+              port = Integer.parseInt(debugPort);
+          } catch (NumberFormatException e) {
+              throw new IOException("port number must be a number");
+          }
+          command.addAll(Arrays.asList("-Xdebug", "-Xnoagent",
+                  "-Djava.compiler=NONE", "-Xrunjdwp:transport=dt_socket,server=y,suspend=" +
+                          suspend + ",address=" + port));
+      }
+
       command.add(ForkedTestFileRunner.class.getName());
       command.add(pathToTempDir.toString());
 
-      Process process = pb.inheritIO().start();
+      Process process = pb.start();
+      IOForwarder.forward(process);
       process.waitFor();
       assertEquals("Executed process terminated with non-zero exit value.",
             process.exitValue(), 0);

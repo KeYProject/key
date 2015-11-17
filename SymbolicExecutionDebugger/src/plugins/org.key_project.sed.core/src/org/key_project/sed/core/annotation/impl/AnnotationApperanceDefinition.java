@@ -1,20 +1,20 @@
 package org.key_project.sed.core.annotation.impl;
 
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationAppearance;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationAppearance;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 
 /**
- * An {@link ISEDAnnotationAppearance} which can be instantiated to define
- * the expected appearance of an {@link ISEDAnnotation}.
+ * An {@link ISEAnnotationAppearance} which can be instantiated to define
+ * the expected appearance of an {@link ISEAnnotation}.
  * @author Martin Hentschel
  */
-public class AnnotationApperanceDefinition extends AbstractSEDAnnotationAppearance {
+public class AnnotationApperanceDefinition extends AbstractSEAnnotationAppearance {
    /**
     * Constructor.
     * @param type The type of this annotation.
     */
-   public AnnotationApperanceDefinition(ISEDAnnotationType type) {
+   public AnnotationApperanceDefinition(ISEAnnotationType type) {
       super(type);
    }
 }

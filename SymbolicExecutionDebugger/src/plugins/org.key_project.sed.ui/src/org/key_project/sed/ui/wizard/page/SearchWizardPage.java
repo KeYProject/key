@@ -10,8 +10,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.ui.composite.AnnotationAppearanceComposite;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.java.StringUtil;
@@ -22,9 +22,9 @@ import org.key_project.util.java.StringUtil;
  */
 public class SearchWizardPage extends WizardPage {
    /**
-    * The {@link ISEDAnnotationType} from which the search annotation will be created.
+    * The {@link ISEAnnotationType} from which the search annotation will be created.
     */
-   private final ISEDAnnotationType annotationType;
+   private final ISEAnnotationType annotationType;
    
    /**
     * Defines the search text.
@@ -39,9 +39,9 @@ public class SearchWizardPage extends WizardPage {
    /**
     * Constructor.
     * @param pageName The name of this {@link WizardPage}.
-    * @param annotationType The {@link ISEDAnnotationType} from which the search annotation will be created.
+    * @param annotationType The {@link ISEAnnotationType} from which the search annotation will be created.
     */
-   public SearchWizardPage(String pageName, ISEDAnnotationType annotationType) {
+   public SearchWizardPage(String pageName, ISEAnnotationType annotationType) {
       super(pageName);
       this.annotationType = annotationType;
       setTitle("Search");
@@ -100,10 +100,10 @@ public class SearchWizardPage extends WizardPage {
    }
 
    /**
-    * Applies the appearance to the given {@link ISEDAnnotation}.
-    * @param annotation The {@link ISEDAnnotation} to modify.
+    * Applies the appearance to the given {@link ISEAnnotation}.
+    * @param annotation The {@link ISEAnnotation} to modify.
     */
-   public void applyAppearance(ISEDAnnotation annotation) {
+   public void applyAppearance(ISEAnnotation annotation) {
       annotationAppearanceComposite.applyChanges(annotation);
    }
 }

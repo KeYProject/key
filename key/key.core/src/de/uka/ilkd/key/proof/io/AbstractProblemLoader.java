@@ -30,6 +30,7 @@ import org.key_project.util.reflection.ClassLoaderUtil;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -49,6 +50,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -265,7 +267,7 @@ public abstract class AbstractProblemLoader {
                 
                 if (proof != null) {
                  OneStepSimplifier.refreshOSS(proof);
-                 result = replayProof(proof);
+                    result = replayProof(proof);
                 }
                                       
                 // this message is propagated to the top level in console mode
@@ -487,7 +489,31 @@ public abstract class AbstractProblemLoader {
         return proofList;
     }
 
-    protected ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
+    /**
+     * Run proof script if it is present in the input data.
+     *
+     * @return <code>true</code> iff there is a proof script to run
+     */
+    public boolean hasProofScript() {
+        if (envInput instanceof KeYUserProblemFile) {
+            KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+            return kupf.hasProofScript();
+        }
+        return false;
+    }
+
+    public Pair<String, Location> readProofScript() throws ProofInputException {
+        assert envInput instanceof KeYUserProblemFile;
+        KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+
+            Triple<String, Integer, Integer> script = kupf.readProofScript();
+        String path = kupf.getInitialFile().getAbsolutePath();
+        Location location = new Location(path, script.second, script.third);
+
+        return new Pair<String, Location>(script.first, location);
+    }
+
+    private ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
@@ -501,7 +527,7 @@ public abstract class AbstractProblemLoader {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
         ReplayResult result;
         try {
-        	if (envInput instanceof KeYUserProblemFile) {
+        	assert envInput instanceof KeYUserProblemFile;
         	    
                 parser = new IntermediatePresentationProofFileParser(proof);
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
@@ -517,7 +543,7 @@ public abstract class AbstractProblemLoader {
                 replayResult = replayer.replay();
                 
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
-        	}
+
         } catch (Exception e) {
         	if (parser == null || parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
         	        replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {

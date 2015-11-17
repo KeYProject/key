@@ -15,6 +15,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
@@ -25,7 +26,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -116,7 +119,7 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
       VisibleTermLabels visibleTermLabels = new VisibleTermLabels() {
          @Override
          public boolean contains(Name name) {
-            return true; //!ObjectUtil.equals(name, branchResult.getTermLabelName());
+            return !ObjectUtil.equals(name, branchResult.getTermLabelName());
          }
       };
       String text = showSequent(sequent, services, notationInfo, visibleTermLabels);
@@ -169,25 +172,25 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
     * @return The {@link TruthValue} of the {@link Sequent}.
     */
    protected TruthValue fillSequentRanges(Sequent sequent, 
-                                              InitialPositionTable positionTable, 
-                                              BranchResult branchResult,
-                                              int textLength,
-                                              List<StyleRange> styleRanges) {
+                                          InitialPositionTable positionTable, 
+                                          BranchResult branchResult,
+                                          int textLength,
+                                          List<StyleRange> styleRanges) {
       Map<Term, TruthValue> termValueMap = new HashMap<Term, TruthValue>();
       ImmutableList<Integer> path = ImmutableSLList.<Integer>nil().prepend(0); // Sequent arrow
       // Evaluate antecedent
       int i = 0;
       TruthValue antecedentValue = TruthValue.TRUE;
       for (SequentFormula sf : sequent.antecedent()) {
-         fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
-         antecedentValue = TruthValue.and(antecedentValue, termValueMap.get(sf.formula()));
+         TruthValue truthValue = fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
+         antecedentValue = TruthValue.and(antecedentValue, truthValue);
          i++;
       }
       // Evaluate succedent
       TruthValue succedentValue = TruthValue.FALSE;
       for (SequentFormula sf : sequent.succedent()) {
-         fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
-         succedentValue = TruthValue.or(succedentValue, termValueMap.get(sf.formula()));
+         TruthValue truthValue = fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
+         succedentValue = TruthValue.or(succedentValue, truthValue);
          i++;
       }
       // Evaluate sequent
@@ -210,45 +213,58 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
     * @param termValueMap The already computed {@link TruthValue}s.
     * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
+    * @return The {@link TruthValue} of the current {@link Term}.
     */
-   protected void fillTermRanges(Term term, 
-                                 PositionTable positionTable, 
-                                 BranchResult branchResult,
-                                 int textLength,
-                                 Map<Term, TruthValue> termValueMap,
-                                 ImmutableList<Integer> path,
-                                 List<StyleRange> styleRanges) {
-      FormulaTermLabel label = branchResult.getPredicateLabel(term);
-      if (TruthValueEvaluationUtil.isIfThenElseFormula(term)) {
-         fillIfThenElse(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, label);
+   protected TruthValue fillTermRanges(Term term, 
+                                       PositionTable positionTable, 
+                                       BranchResult branchResult,
+                                       int textLength,
+                                       Map<Term, TruthValue> termValueMap,
+                                       ImmutableList<Integer> path,
+                                       List<StyleRange> styleRanges) {
+      if (term.op() instanceof UpdateApplication) {
+         // Skip updates
+         return fillTermRanges(term.sub(1), positionTable, branchResult, textLength, termValueMap, path.append(1), styleRanges);
       }
-      else if (term.op() instanceof Junctor || term.op() == Equality.EQV) {
-         // Junctors are supported.
-         Operator operator = term.op();
-         if (operator.arity() > 2) {
-            throw new RuntimeException("Junctors with arity > 2 are not supported.");
-         }
-         else if (operator.arity() == 2) {
-            fillArity2(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator, label);
-         }
-         else if (operator.arity() == 1) {
-            fillArity1(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator, label);
-         }
-         else if (operator.arity() == 0) {
-            fillArity0(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator);
-         }
+      else if (term.op() instanceof Modality) {
+         // Skip modality
+         return fillTermRanges(term.sub(0), positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
       }
-      else if (label != null) {
-         // The BranchResult knows the result of the current Term.
-         TruthValue value = branchResult.evaluate(label);
-         if (value == null) {
-            value = TruthValue.UNKNOWN;
+      else {
+         // Highlight truth values
+         FormulaTermLabel label = branchResult.getPredicateLabel(term);
+         if (TruthValueEvaluationUtil.isIfThenElseFormula(term)) {
+            fillIfThenElse(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, label);
          }
-         Color color = getColor(value);
-         Range range = positionTable.rangeForPath(path, textLength);
-         StyleRange styleRange = new StyleRange(range.start(), range.length(), color, null);
-         termValueMap.put(term, value);
-         styleRanges.add(styleRange);
+         else if (term.op() instanceof Junctor || term.op() == Equality.EQV) {
+            // Junctors are supported.
+            Operator operator = term.op();
+            if (operator.arity() > 2) {
+               throw new RuntimeException("Junctors with arity > 2 are not supported.");
+            }
+            else if (operator.arity() == 2) {
+               fillArity2(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator, label);
+            }
+            else if (operator.arity() == 1) {
+               fillArity1(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator, label);
+            }
+            else if (operator.arity() == 0) {
+               fillArity0(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator);
+            }
+         }
+         else if (label != null) {
+            // The BranchResult knows the result of the current Term.
+            TruthValue value = branchResult.evaluate(label);
+            if (value == null) {
+               value = TruthValue.UNKNOWN;
+            }
+            Color color = getColor(value);
+            Range range = positionTable.rangeForPath(path, textLength);
+            StyleRange styleRange = new StyleRange(range.start(), range.length(), color, null);
+            termValueMap.put(term, value);
+            styleRanges.add(styleRange);
+         }
+         return termValueMap.get(term);
       }
    }
    

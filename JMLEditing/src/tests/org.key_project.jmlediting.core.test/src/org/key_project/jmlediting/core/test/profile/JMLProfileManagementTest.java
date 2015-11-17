@@ -15,6 +15,7 @@ import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.resolver.IResolver;
 
 public class JMLProfileManagementTest {
 
@@ -64,6 +65,11 @@ public class JMLProfileManagementTest {
          return new DerivedProfile<IJMLProfile>(id, name, this) {
          };
       }
+
+    @Override
+    public IResolver getResolver() {
+        return null;
+    }
 
    }
 

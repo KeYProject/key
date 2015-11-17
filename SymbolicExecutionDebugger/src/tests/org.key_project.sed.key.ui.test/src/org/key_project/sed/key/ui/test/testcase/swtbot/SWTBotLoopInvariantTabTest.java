@@ -77,25 +77,34 @@ public class SWTBotLoopInvariantTabTest extends AbstractSWTBotKeYPropertyTabTest
          public void assertLoopInvariant(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertTrue(tabs.selectTabItem("Loop Invariant"));
             TestUtilsUtil.waitForJobs();
-            assertEquals(" true\n" +
-            		       "==>\n" +
-                         "   (i >= 0)<<F(\"8.0\")>>\n" +
-            				 " & (i <= 1)<<F(\"9.0\")>>\n" +
-                         " & wellFormed(heap)<<F(\"10.0\")>>", propertiesView.bot().styledText(0).getText());
+            assertEquals(" true\n"
+                         + "==>\n"
+                         + " {_obj:=obj\n"
+                         + "  || exc:=null\n"
+                         + "  || heap:=heapAfter_doubleValue[obj.value := 2]\n"
+                         + "  || result_1:=0\n"
+                         + "  || i:=0}\n"
+                         + "   (i >= 0 & i <= 1 & wellFormed(heap))", propertiesView.bot().styledText(0).getText());
          }
 
          @Override
          public void assertLoopBodyTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertTrue(tabs.selectTabItem("Loop Invariant"));
             TestUtilsUtil.waitForJobs();
-            assertEquals(" true\n" +
-                         "==>\n" +
-                         "   (i >= 0)<<F(\"11.0\")>>\n" +
-                         " & (i <= 1)<<F(\"12.0\")>>\n" +
-                         " & (\\forall Field f;\n" +
-                         "      (\\forall java.lang.Object o;\n" +
-                         "         (o.f@heapBefore_LOOP = o.f)<<F(\"13.0\")>>)<<F(\"14.0\")>>)<<F(\"15.0\")>>\n" +
-                         " & prec(2 + i * -1, variant)<<F(\"16.0\")>>", propertiesView.bot().styledText(0).getText());
+            assertEquals(" true\n"
+                         + "==>\n"
+                         + " {_obj:=obj\n"
+                         + "  || exc:=null\n"
+                         + "  || heap:=heapAfter_doubleValue[obj.value := 2]\n"
+                         + "  || heapBefore_LOOP:=heapAfter_doubleValue[obj.value := 2]\n"
+                         + "  || variant:=2\n"
+                         + "  || i:=1}\n"
+                         + "   (  i >= 0\n"
+                         + "    & i <= 1\n"
+                         + "    & \\forall Field f;\n"
+                         + "        \\forall java.lang.Object o;\n"
+                         + "          o.f@heapBefore_LOOP = o.f\n"
+                         + "    & prec(2 + i * -1, variant))", propertiesView.bot().styledText(0).getText());
          }
       };
    }

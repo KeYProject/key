@@ -16,10 +16,12 @@ package org.key_project.util.testcase.java;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -34,6 +36,76 @@ import org.key_project.util.java.IFilterWithException;
  * @author Martin Hentschel
  */
 public class CollectionUtilTest extends TestCase {
+   /**
+    * Tests for {@link CollectionUtil#searchAll(Iterable, IFilter)}.
+    */
+   @Test
+   public void testSearchAll() {
+       // Test single existing values
+       List<String> collection = CollectionUtil.toList("A", "B", "C", "D");
+       List<String> found = CollectionUtil.searchAll(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       });
+       assertList(found, "A");
+       found = CollectionUtil.searchAll(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "B".equals(element);
+          }
+       });
+       assertList(found, "B");
+       found = CollectionUtil.searchAll(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "C".equals(element);
+          }
+       });
+       assertList(found, "C");
+       found = CollectionUtil.searchAll(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "D".equals(element);
+          }
+       });
+       assertList(found, "D");
+       // Test single not existing value
+       found = CollectionUtil.searchAll(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       });
+       assertList(found);
+       // Test null
+       found = CollectionUtil.searchAll(collection, null);
+       assertList(found);
+       found = CollectionUtil.searchAll(null, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       });
+       assertList(found);
+       // Test multible values
+       found = CollectionUtil.searchAll(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element) || "C".equals(element);
+          }
+       });
+       assertList(found, "A", "C");
+       found = CollectionUtil.searchAll(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return true;
+          }
+       });
+       assertList(found, collection.toArray(new String[collection.size()]));
+   }
+   
    /**
     * Tests {@link CollectionUtil#binaryInsert(List, Object, java.util.Comparator)}.
     */
@@ -844,8 +916,8 @@ public class CollectionUtilTest extends TestCase {
     * Test for {@link CollectionUtil#isEmpty(java.util.Collection)}
     */
    @Test
-   public void testIsEmpty() {
-      assertTrue(CollectionUtil.isEmpty(null));
+   public void testIsEmpty_Collection() {
+      assertTrue(CollectionUtil.isEmpty((Collection<?>) null));
       List<String> collection = new LinkedList<String>();
       assertTrue(CollectionUtil.isEmpty(collection));
       collection.add("A");
@@ -854,6 +926,22 @@ public class CollectionUtilTest extends TestCase {
       assertFalse(CollectionUtil.isEmpty(collection));
       collection.add("C");
       assertFalse(CollectionUtil.isEmpty(collection));
+   }
+   
+   /**
+    * Test for {@link CollectionUtil#isEmpty(java.util.Map)}
+    */
+   @Test
+   public void testIsEmpty_Map() {
+      assertTrue(CollectionUtil.isEmpty((Map<?, ?>) null));
+      Map<String, String> map = new HashMap<String, String>();
+      assertTrue(CollectionUtil.isEmpty(map));
+      map.put("A", "A");
+      assertFalse(CollectionUtil.isEmpty(map));
+      map.put("B", "B");
+      assertFalse(CollectionUtil.isEmpty(map));
+      map.put("C", "C");
+      assertFalse(CollectionUtil.isEmpty(map));
    }
    
    /**

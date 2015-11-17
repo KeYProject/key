@@ -12,9 +12,9 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
-import org.key_project.sed.core.sourcesummary.ISEDSourceRange;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.provider.SEDebugNodeContentProvider;
+import org.key_project.sed.core.sourcesummary.ISESourceRange;
 import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
@@ -54,11 +54,11 @@ public class SymbolicallyReachedJavaEditorTextHover extends AbstractAnnotationHo
          return new AnnotationInfo(annotation, position, textViewer) {
             @Override
             public ICompletionProposal[] getCompletionProposals() {
-               List<ISEDDebugNode> nodes = new LinkedList<ISEDDebugNode>();
-               for (ISEDSourceRange range : sedAnnotation.getRanges()) {
-                  for (ISEDDebugNode node : range.getDebugNodes()) {
+               List<ISENode> nodes = new LinkedList<ISENode>();
+               for (ISESourceRange range : sedAnnotation.getRanges()) {
+                  for (ISENode node : range.getDebugNodes()) {
                      try {
-                        if (SEDDebugNodeContentProvider.getDefaultInstance().isShown(node)) {
+                        if (SEDebugNodeContentProvider.getDefaultInstance().isShown(node)) {
                            nodes.add(node);
                         }
                      }
@@ -71,7 +71,7 @@ public class SymbolicallyReachedJavaEditorTextHover extends AbstractAnnotationHo
                   ICompletionProposal[] proposals = new ICompletionProposal[nodes.size() + 1];
                   proposals[0] = new AllSymbolicallyReachedCompletionProposal(shell, nodes);
                   int i = 1;
-                  for (ISEDDebugNode node : nodes) {
+                  for (ISENode node : nodes) {
                      proposals[i] = new SymbolicallyReachedCompletionProposal(shell, node);
                      i++;
                   }

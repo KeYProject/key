@@ -34,9 +34,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -710,14 +710,14 @@ public final class KeySEDUtil {
     }
 
    /**
-    * Prints the {@link ISEDDebugTarget} into the console via {@link System#out}.
-    * @param target The {@link ISEDDebugTarget} to print.
+    * Prints the {@link ISEDebugTarget} into the console via {@link System#out}.
+    * @param target The {@link ISEDebugTarget} to print.
     * @throws DebugException Occurred Exception.
     */
-   public static void printDebugTarget(ISEDDebugTarget target) throws DebugException {
+   public static void printDebugTarget(ISEDebugTarget target) throws DebugException {
       if (target != null) {
          System.out.println(target + "    (" + target.getClass() + ")");
-         for (ISEDThread thread : target.getSymbolicThreads()) {
+         for (ISEThread thread : target.getSymbolicThreads()) {
             printDebugNode(thread, 1);
          }
       }
@@ -727,12 +727,12 @@ public final class KeySEDUtil {
    }
 
    /**
-    * Prints the given {@link ISEDDebugNode} into the console via {@link System#out}.
-    * @param node The {@link ISEDDebugNode} to print.
+    * Prints the given {@link ISENode} into the console via {@link System#out}.
+    * @param node The {@link ISENode} to print.
     * @param level The level.
     * @throws DebugException Occurred Exception.
     */
-   public static void printDebugNode(ISEDDebugNode node, int level) throws DebugException {
+   public static void printDebugNode(ISENode node, int level) throws DebugException {
       // Print level
       for (int i = 0; i < level; i++) {
          System.out.print("\t");
@@ -740,7 +740,7 @@ public final class KeySEDUtil {
       // Print node and children
       if (node != null) {
          System.out.println(node);
-         for (ISEDDebugNode child : node.getChildren()) {
+         for (ISENode child : node.getChildren()) {
             printDebugNode(child, level + 1);
          }
       }
@@ -766,5 +766,87 @@ public final class KeySEDUtil {
       };
       Display.getDefault().syncExec(run);
       return run.getResult();
+   }
+   
+   /**
+    * Updates the given {@link ILaunchConfiguration}.
+    * @param config The {@link ILaunchConfiguration} to update.
+    * @param useExistingContract The new value to set.
+    * @param preconditionOrExistingContract The new value to set.
+    * @param showMethodReturnValues The new value to set.
+    * @param showVariablesOfSelectedDebugNode The new value to set.
+    * @param showKeYMainWindow The new value to set.
+    * @param mergeBranchConditions The new value to set.
+    * @param useUnicode The new value to set.
+    * @param usePrettyPrinting The new value to set.
+    * @param showSignatureOnMethodReturnNodes The new value to set.
+    * @param higlightReachedSourceCode The new value to set.
+    * @param truthValueEvaluationEnabled The new value to set.
+    * @param variablesAreComputedFromUpdates The new value to set.
+    * @return The updated {@link ILaunchConfiguration}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static ILaunchConfiguration updateLaunchConfiguration(ILaunchConfiguration config,
+                                                                Boolean useExistingContract,
+                                                                String preconditionOrExistingContract,
+                                                                Boolean showMethodReturnValues,
+                                                                Boolean showVariablesOfSelectedDebugNode,
+                                                                Boolean showKeYMainWindow,
+                                                                Boolean mergeBranchConditions,
+                                                                Boolean useUnicode,
+                                                                Boolean usePrettyPrinting,
+                                                                Boolean showSignatureOnMethodReturnNodes,
+                                                                Boolean higlightReachedSourceCode,
+                                                                Boolean truthValueEvaluationEnabled,
+                                                                Boolean variablesAreComputedFromUpdates) throws CoreException {
+      ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+      if (useExistingContract != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
+         if (preconditionOrExistingContract != null) {
+            if (useExistingContract) {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
+            }
+            else {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+            }
+         }
+      }
+      else {
+         if (preconditionOrExistingContract != null) {
+            wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+         }
+      }
+      if (showMethodReturnValues != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+      }
+      if (showVariablesOfSelectedDebugNode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+      }
+      if (showKeYMainWindow != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+      }
+      if (mergeBranchConditions != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+      }
+      if (useUnicode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
+      }
+      if (usePrettyPrinting != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
+      }
+      if (showSignatureOnMethodReturnNodes != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
+      }
+      if (higlightReachedSourceCode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
+      }
+      if (truthValueEvaluationEnabled != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
+      }
+      if (variablesAreComputedFromUpdates != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, variablesAreComputedFromUpdates);
+      }
+      config = wc.doSave();
+      return config;
    }
 }

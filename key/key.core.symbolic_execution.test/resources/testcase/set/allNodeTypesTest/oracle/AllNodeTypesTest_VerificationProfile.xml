@@ -19,14 +19,18 @@ termination: diamond" pathCondition="not(equals(obj,null))" pathConditionChanged
 variant: javaSubInt(2, i)
 mod: false" pathCondition="not(equals(obj,null))" pathConditionChanged="false" initiallyValid="true">
                                        <branchCondition name="equals(i_0,Z(0(#)))" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="true" branchCondition="equals(i_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                                          <branchCondition name="true" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                             <statement name="result_1++;" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="false">
-                                                <statement name="i++;" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="false">
-                                                   <termination name="&lt;loop body end&gt;" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
-                                                   </termination>
+                                          <loopCondition name="i==0" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="false" blockOpened="true">
+                                             <branchCondition name="true" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                                <statement name="result_1++;" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="false">
+                                                   <statement name="i++;" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="false">
+                                                      <termination name="&lt;loop body end&gt;" pathCondition="and(equals(i_0,Z(0(#))),not(equals(obj,null)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                                                      </termination>
+                                                   </statement>
                                                 </statement>
-                                             </statement>
-                                          </branchCondition>
+                                                <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
+                                             </branchCondition>
+                                             <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                          </loopCondition>
                                        </branchCondition>
                                        <branchCondition name="equals(i_0,Z(1(#)))" pathCondition="and(equals(i_0,Z(1(#))),not(equals(obj,null)))" pathConditionChanged="true" branchCondition="equals(i_0,Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                                           <statement name="result_1=doubleValue(result_1);" pathCondition="and(equals(i_0,Z(1(#))),not(equals(obj,null)))" pathConditionChanged="false">
@@ -97,7 +101,7 @@ mod: false" pathCondition="not(equals(obj,null))" pathConditionChanged="false" i
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/1/0/0/0/0/0/0"/>
 </start>

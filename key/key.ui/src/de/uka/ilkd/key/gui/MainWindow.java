@@ -87,6 +87,7 @@ import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
@@ -109,6 +110,7 @@ import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import de.uka.ilkd.key.gui.actions.TestGenerationAction;
@@ -288,6 +290,7 @@ public final class MainWindow extends JFrame  {
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         addWindowListener(exitMainAction.windowListener);
+        MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
     }
 
     public static MainWindow getInstance() {
@@ -708,6 +711,7 @@ public final class MainWindow extends JFrame  {
         
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
+        view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
         view.add(termLabelMenu);
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
 
@@ -730,8 +734,6 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        final JMenuItem macros = new ProofMacroMenu(mediator);
-        proof.add(macros);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
@@ -1575,5 +1577,15 @@ public final class MainWindow extends JFrame  {
     */
    public JToolBar getControlToolBar() {
       return controlToolBar;
+   }
+   
+   /**
+    * Defines if talcet infos are shown or not.
+    * <p>
+    * Used by the Eclipse integration.
+    * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
+    */
+   public void setShowTacletInfo(boolean show) {
+      mainWindowTabbedPane.getProofTreeView().tacletInfoToggle.setSelected(show);
    }
 }

@@ -155,7 +155,7 @@ public class TriggeredInstantiations implements TermGenerator {
     private Term instantiateTerm(final Term term, final Services services,
             SVInstantiations svInst) {
         final SyntacticalReplaceVisitor syn = new SyntacticalReplaceVisitor(
-              new TermLabelState(), null, null, svInst, null, null, services);
+              new TermLabelState(), null, null, svInst, null, null, null, services);
         term.execPostOrder(syn);
         return syn.getTerm();
     }

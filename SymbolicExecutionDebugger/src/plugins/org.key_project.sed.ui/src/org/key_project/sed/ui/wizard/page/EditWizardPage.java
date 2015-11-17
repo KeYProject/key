@@ -9,25 +9,25 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.ui.composite.AnnotationAppearanceComposite;
-import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
+import org.key_project.sed.ui.edit.ISEAnnotationEditor;
 import org.key_project.sed.ui.util.SEDImages;
 
 /**
- * This {@link WizardPage} is used to edit an {@link ISEDAnnotation}.
+ * This {@link WizardPage} is used to edit an {@link ISEAnnotation}.
  * @author Martin Hentschel
  */
 public class EditWizardPage extends WizardPage {
    /**
-    * The {@link ISEDAnnotation} to edit.
+    * The {@link ISEAnnotation} to edit.
     */
-   private final ISEDAnnotation annotation;
+   private final ISEAnnotation annotation;
    
    /**
-    * The optionally used {@link ISEDAnnotationEditor}.
+    * The optionally used {@link ISEAnnotationEditor}.
     */
-   private final ISEDAnnotationEditor editor;
+   private final ISEAnnotationEditor editor;
    
    /**
     * The used {@link AnnotationAppearanceComposite}.
@@ -37,10 +37,10 @@ public class EditWizardPage extends WizardPage {
    /**
     * Constructor.
     * @param pageName The name of this wizard page.
-    * @param editor The optionally used {@link ISEDAnnotationEditor}.
-    * @param annotation The {@link ISEDAnnotation} to edit.
+    * @param editor The optionally used {@link ISEAnnotationEditor}.
+    * @param annotation The {@link ISEAnnotation} to edit.
     */
-   public EditWizardPage(String pageName, ISEDAnnotationEditor editor, ISEDAnnotation annotation) {
+   public EditWizardPage(String pageName, ISEAnnotationEditor editor, ISEAnnotation annotation) {
       super(pageName);
       setTitle("Edit Annotation");
       setDescription("Change the details and the appearance of the annotation.");
@@ -48,7 +48,7 @@ public class EditWizardPage extends WizardPage {
       this.annotation = annotation;
       this.editor = editor;
       if (this.editor != null) {
-         this.editor.addPropertyChangeListener(ISEDAnnotationEditor.PROP_ERROR_MESSAGE, new PropertyChangeListener() {
+         this.editor.addPropertyChangeListener(ISEAnnotationEditor.PROP_ERROR_MESSAGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                updatePageCompleted();
@@ -93,7 +93,7 @@ public class EditWizardPage extends WizardPage {
    }
 
    /**
-    * Applies the changes to the {@link ISEDAnnotation}.
+    * Applies the changes to the {@link ISEAnnotation}.
     */
    public void applyChanges() {
       annotationAppearanceComposite.applyChanges(annotation);

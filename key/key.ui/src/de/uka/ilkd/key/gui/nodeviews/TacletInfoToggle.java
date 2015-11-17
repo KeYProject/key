@@ -42,7 +42,15 @@ public class TacletInfoToggle extends JCheckBox {
         setName(this.getClass().getSimpleName());
     }
 
-    public void setSequentView(SequentView sequentView) {
+   @Override
+   public void setSelected(boolean b) {
+      super.setSelected(b);
+      if (innerNodeView != null) {
+         innerNodeView.tacletInfo.setVisible(isSelected());
+      }
+   }
+
+   public void setSequentView(SequentView sequentView) {
         if (sequentView instanceof InnerNodeView) {
             innerNodeView = (InnerNodeView) sequentView;
             setVisible(true);

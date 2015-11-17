@@ -1,0 +1,100 @@
+<html>
+   <head>
+      <title>Evaluation Instructions</title>
+      <link rel="stylesheet" href="css/book.css" type="text/css">
+   </head>
+   <body>
+      <h1>Evaluation Instructions</h1>
+      <p>
+         The following sections explain the functionality of the evaluation wizard and how questions are asked.
+         <b>Please read them carefully before you continue.</b>
+         <ul>
+            <li><a href="#screencast">1 Screencast</a></li>
+            <li><a href="#target">2 Target of Questions</a></li>
+            <li><a href="#marker">3 Error Markers</a></li>
+            <li><a href="#answers">4 Question Types</a></li>
+            <li><a href="#trust">5 Trust in Correctness of a Given Answer</a></li>
+            <li><a href="#jumpTo">6 Jump to a not Completely Answered Question</a></li>
+            <li><a href="#toolbar">7 Toolbar</a></li>
+            <li><a href="#closing">8 Closing the Wizard</a></li>
+         </ul>
+      </p>
+      
+      <h2><a name="screencast">1 Screencast</a></h2>
+      <video width="1280" height="720" poster="EvaluationIntroduction/videos/EvaluationIntroduction.png" controls>
+         <source src="EvaluationIntroduction/videos/EvaluationIntroduction.mp4" type="video/mp4"></source>
+         <source src="EvaluationIntroduction/videos/EvaluationIntroduction.ogv" type="EvaluationIntroduction/videos/ogg"></source>
+         <source src="EvaluationIntroduction/videos/EvaluationIntroduction.webm" type="EvaluationIntroduction/videos/webm"></source>
+         <dl>
+            <a href="EvaluationIntroduction/videos/EvaluationIntroduction.mp4">
+               <dt><img src="EvaluationIntroduction/videos/EvaluationIntroduction.png" alt="Download Video" title="Download Video" width="1280" height="720"></dt>
+               <dd>Download Video</dt>
+            </a>
+         </dl>
+      </video>
+      
+      <h2><a name="target">2 Target of Questions</a></h2>
+      <p>
+         The evaluation wizard asks questions related to the content currently shown in Eclipse.
+         In the screenshot below questions are asked about the currently opened web browser.
+         <b>During this evaluation, questions will be asked about a proof attempt opened in KeY (external window) or the Symbolic Execution Debugger (perspective in Eclipse).</b>
+      </p>
+      <p>
+         The evaluation wizard does not block Eclipse. This means that Eclipse is fully functional and can be used without closing the evaluation wizard.
+      </p>
+      <img src="EvaluationIntroduction/Target.png" />
+      
+      <h2><a name="marker">3 Error Markers</a></h2>
+      <p>
+         An error marker is used to indicate that a question is not completely answered.
+         An error marker or its absence does not indicate whether a given answer is correct or not. 
+      </p>
+      <img src="EvaluationIntroduction/Marker.png" />
+      
+      <h2><a name="answers">4 Question Types</a></h2>
+      <p>
+         The following question types are used during this evaluation:
+         <ul>
+            <li><i>Radio Buttons</i> represent a <i>single choice question</i>. Exactly one of the possible answers is correct and should be selected.</li>
+            <li><i>Checkboxes</i> represent a <i>multiple choice question</i>. One or more of the given answers might be correct and should be selected.</li>
+         </ul>
+         By selecting an answer, related sub questions might become visible.
+      </p>
+      <img src="EvaluationIntroduction/Answers.png" />
+
+      <h2><a name="trust">5 Trust in Correctness of a Given Answer</a></h2>
+      <p>
+         The emoticons shown to the right of a question are used to collect your trust in the correctness of your given answer:
+         <ul>
+            <li>Select <img src="EvaluationIntroduction/emoticons/fantasy_dreams.png" width="16" height="16" /> if you are completely sure that your answer is right.</li>
+            <li>Select <img src="EvaluationIntroduction/emoticons/wow_dude.png" width="16" height="16" /> if you think that your answer is right as far as you understood the content.</li>
+            <li>Select <img src="EvaluationIntroduction/emoticons/omg.png" width="16" height="16" /> if you are unsure about your answer.</li>
+         </ul>
+      </p>
+      <img src="EvaluationIntroduction/Trust.png" />
+      
+      <h2><a name="jumpTo">6 Jump to a not Completely Answered Question</a></h2>
+      <p>
+         If a question is not completely answered an error message is shown in the title area.
+         You can click on the error message to make the related question visible.
+      </p>
+      <img src="EvaluationIntroduction/JumpTo.png" />
+
+      <h2><a name="toolbar">7 Toolbar</a></h2>
+      <p>
+         The toolbar of the evaluation wizard provides functionality related to the current wizard page:
+         <ol>
+            <li>If available, the first items open a previously shown introduction page (like this one) again in a separate shell.</li>
+            <li>If available, the reset item <img src="EvaluationIntroduction/icons/resetWorkbench.gif" width="16" height="16" /> restores the workbench with the target of the current questions. During this evaluation, you should click on it if you have for instance accidentally closed or modified the proof or the Java source code with JML specifications.</li>
+            <li>The pin window item <img src="EvaluationIntroduction/icons/pin_view.gif" width="16" height="16" /> defines if the evaluation wizard is shown always on top of Eclipse or not.</li>
+         </ol>
+      </p>
+      <img src="EvaluationIntroduction/Toolbar.png" />
+
+      <h2><a name="closing">8 Closing the Wizard</a></h2>
+      <p>
+         Closing the wizard does not cancel the evaluation. 
+         The evaluation can be continued at any time just by opening the wizard again (main menu item <i>Evaluation, Understanding Proof Attempts</i>).
+      </p>
+   </body>
+</html>

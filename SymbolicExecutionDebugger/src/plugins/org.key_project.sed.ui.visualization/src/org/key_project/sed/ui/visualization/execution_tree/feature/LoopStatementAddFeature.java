@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDLoopStatement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISELoopStatement;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDLoopStatement}s.
+ * Implementation of {@link IAddFeature} for {@link ISELoopStatement}s.
  * @author Martin Hentschel
  */
 public class LoopStatementAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,14 +37,14 @@ public class LoopStatementAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDLoopStatement;
+      return businessObject instanceof ISELoopStatement;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
+   protected String getImageId(ISENode node) {
       return IExecutionTreeImageConstants.IMG_LOOP_STATEMENT;
    }
 }

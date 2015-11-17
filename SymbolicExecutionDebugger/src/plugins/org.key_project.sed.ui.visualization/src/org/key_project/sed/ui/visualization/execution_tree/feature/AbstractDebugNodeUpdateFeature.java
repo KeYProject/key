@@ -41,17 +41,17 @@ import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEGroupable;
+import org.key_project.sed.core.model.ISEThread;
+import org.key_project.sed.core.util.ISEIterator;
 import org.key_project.sed.core.util.NodeUtil;
-import org.key_project.sed.core.util.SEDGroupPreorderIterator;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.util.SEGroupPreorderIterator;
+import org.key_project.sed.core.util.SEPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
@@ -63,7 +63,7 @@ import org.key_project.util.java.StringUtil;
 
 /**
  * <p>
- * Provides a basic implementation of {@link IUpdateFeature} for {@link ISEDDebugNode}s.
+ * Provides a basic implementation of {@link IUpdateFeature} for {@link ISENode}s.
  * </p>
  * </p>
  * A subtree is constructed as follows during execution of {@link #update(IUpdateContext)}
@@ -77,13 +77,13 @@ import org.key_project.util.java.StringUtil;
  *       <ol>
  *          <li>
  *             Add missing graphical representations in a tree where each branch is left centered.
- *             Result is a list of leaf nodes computed via {@link #updateChildrenLeftAligned(ISEDDebugElement, IProgressMonitor, int)}
+ *             Result is a list of leaf nodes computed via {@link #updateChildrenLeftAligned(ISEDebugElement, IProgressMonitor, int)}
  *             <ol>
  *                <li>Iterate over subtree in order.</li>
  *                <li>First branch (ends in first leaf node) is completely left centered with x = 0.</li>
  *                <li>
  *                   If a further branch is detected, the most right x of the previous 
- *                   branch is computed via {@link #findInSiblingBranch(ISEDDebugNode, boolean, boolean)}
+ *                   branch is computed via {@link #findInSiblingBranch(ISENode, boolean, boolean)}
  *                   + a given offset of two grid units.
  *                </li>
  *             </ol>
@@ -92,7 +92,7 @@ import org.key_project.util.java.StringUtil;
  *             Center whole sub tree starting from its branches leaf nodes via {@link #centerChildren(Set, IProgressMonitor)}.
  *             <ol>
  *                <li>
- *                   Iterate over all given leaf nodes. (Start with the found one via {@link #updateChildrenLeftAligned(ISEDDebugElement, IProgressMonitor, int)} and continue with nodes which children are completly centered)
+ *                   Iterate over all given leaf nodes. (Start with the found one via {@link #updateChildrenLeftAligned(ISEDebugElement, IProgressMonitor, int)} and continue with nodes which children are completly centered)
  *                </li>
  *                <li>
  *                   Go back to parents until root is reached (parent is {@code null} or multiple children are detected.
@@ -118,7 +118,7 @@ import org.key_project.util.java.StringUtil;
  *             </ol>
  *          </li>
  *          <li>
- *             Check if a adjustment of the layout is needed via {@link #adjustSubtreeIfSmaller(ISEDDebugNode, IProgressMonitor)}.
+ *             Check if a adjustment of the layout is needed via {@link #adjustSubtreeIfSmaller(ISENode, IProgressMonitor)}.
  *             <ol>
  *                <li>
  *                   Read chapter 5.2.2 of "Guided Navigation In Symbolic Execution Trees" to get the exact functionality.
@@ -126,7 +126,7 @@ import org.key_project.util.java.StringUtil;
  *             </ol>
  *          </li>
  *          <li>
- *             Adjust the rectangles of groups via {@link #adjustRects(ISEDDebugNode, IProgressMonitor)}.
+ *             Adjust the rectangles of groups via {@link #adjustRects(ISENode, IProgressMonitor)}.
  *             <ol>
  *                <li>
  *                   Read chapter 5.3.2 of "Guided Navigation In Symbolic Execution Trees" to get the exact functionality.
@@ -138,13 +138,13 @@ import org.key_project.util.java.StringUtil;
  *    <li>
  *      Move righter branches if the width of a modified branch was expanded via {@link #updateParents(PictogramElement, IProgressMonitor)}.
  *      <ol>
- *         <li>Find most left node via {@link #findMostLeftSiblingPE(ISEDDebugNode)}</li>
+ *         <li>Find most left node via {@link #findMostLeftSiblingPE(ISENode)}</li>
  *         <li>Compute distance to move as most right node of branch + offset - most left sibling</li>
- *         <li>Move all righter nodes via {@link #moveRighterNodes(ISEDDebugNode, int, IProgressMonitor)}</li>
+ *         <li>Move all righter nodes via {@link #moveRighterNodes(ISENode, int, IProgressMonitor)}</li>
  *      </ol>
  *    </li>
  *    <li>
- *       Adjust the rectangles of groups via {@link #adjustRects(ISEDDebugNode, IProgressMonitor)}.
+ *       Adjust the rectangles of groups via {@link #adjustRects(ISENode, IProgressMonitor)}.
  *    </li>
  * </ol>
  * <p>
@@ -158,15 +158,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    public static final String KEY_UPDATE_STYLE = "updateStyle";
    
    /**
-    * Key used in {@link UpdateContext#getProperty(Object)} to specify the changed {@link ISEDDebugNode}
+    * Key used in {@link UpdateContext#getProperty(Object)} to specify the changed {@link ISENode}
     * for which the style of its {@link PictogramElement} has to be updated.
-    * The value is an instance of {@link ISEDDebugNode}.
+    * The value is an instance of {@link ISENode}.
     */
    public static final String KEY_SED_NODE = "sedNode";
    
    /**
     * The maximal x coordinate which is used by the previous
-    * {@link ISEDDebugTarget} in {@link #updateChildren(PictogramElement, IProgressMonitor)}.
+    * {@link ISEDebugTarget} in {@link #updateChildren(PictogramElement, IProgressMonitor)}.
     */
    private int maxX;
    
@@ -251,7 +251,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    /**
     * Checks if the shown name in the given {@link PictogramElement}
     * is equal to the name defined by his business object 
-    * ({@link ISEDDebugNode#getName()}).
+    * ({@link ISENode#getName()}).
     * @param pictogramElement The {@link PictogramElement} to check.
     * @return {@code true} name is different and an update is required, {@code false} name is the same and no update is required.
     * @throws DebugException Occurred Exception.
@@ -269,7 +269,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Checks if all child {@link ISEDDebugNode} of the {@link ISEDDebugNode}
+    * Checks if all child {@link ISENode} of the {@link ISENode}
     * which is the business object of the given {@link PictogramElement} have
     * a graphical representation. 
     * @param pictogramElement The {@link PictogramElement} to check.
@@ -282,7 +282,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Checks if all child {@link ISEDDebugNode} of the {@link ISEDDebugNode}
+    * Checks if all child {@link ISENode} of the {@link ISENode}
     * which is the business object of the given {@link PictogramElement} have
     * a graphical representation. 
     * @param pictogramElement The {@link PictogramElement} to check.
@@ -294,8 +294,8 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                                                                               boolean groupingSupported) throws DebugException {
       Object bo = getBusinessObjectForPictogramElement(pictogramElement);
       boolean childrenHavePictogramElement = true;
-      if (bo instanceof ISEDDebugNode) {
-         ISEDDebugNode[] children = NodeUtil.getChildren((ISEDDebugNode)bo);
+      if (bo instanceof ISENode) {
+         ISENode[] children = NodeUtil.getChildren((ISENode)bo);
          int i = 0;
          while (childrenHavePictogramElement && i < children.length) {
             PictogramElement childPE = getPictogramElementForBusinessObject(children[i], groupingSupported);
@@ -343,15 +343,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    
    /**
     * Returns the name defined by the business object of the given {@link PictogramElement}
-    * which is {@link ISEDDebugNode#getName()}.
+    * which is {@link ISENode#getName()}.
     * @param pictogramElement The {@link PictogramElement} for that the business name is needed.
     * @return The name defined by the business object of the given {@link PictogramElement}.
     * @throws DebugException The business name.
     */
    protected String getBusinessName(PictogramElement pictogramElement) throws DebugException {
       Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-      if (bo instanceof ISEDDebugNode) {
-         return ((ISEDDebugNode)bo).getName();
+      if (bo instanceof ISENode) {
+         return ((ISENode)bo).getName();
       }
       else {
          return null;
@@ -359,7 +359,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Finds the {@link Text} which shows the name ({@link ISEDDebugNode#getName()}).
+    * Finds the {@link Text} which shows the name ({@link ISENode#getName()}).
     * @param pictogramElement The {@link PictogramElement} to search the {@link Text} in.
     * @return The found {@link Text} or {@code null} if no one was found.
     */
@@ -385,9 +385,9 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       Object updateStyle = context.getProperty(KEY_UPDATE_STYLE);
       if (updateStyle instanceof Boolean && ((Boolean)updateStyle).booleanValue()) {
          Object nodeProp = context.getProperty(KEY_SED_NODE);
-         ISEDDebugNode bo = nodeProp instanceof ISEDDebugNode ? (ISEDDebugNode)nodeProp : null;
+         ISENode bo = nodeProp instanceof ISENode ? (ISENode)nodeProp : null;
          if (bo == null) {
-            bo = (ISEDDebugNode)getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
+            bo = (ISENode)getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
          }
          return updateStyle(context.getPictogramElement(), bo);
       }
@@ -418,14 +418,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
                int i = 0;
                while (i < bos.length && !monitor.isCanceled()) {
-                  ISEDDebugNode node = bos[i] instanceof ISEDDebugNode ? (ISEDDebugNode) bos[i] : null;
+                  ISENode node = bos[i] instanceof ISENode ? (ISENode) bos[i] : null;
                   final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported(node);
                   if (groupingSupported) {
                      // needed for the reselect of the diagram
-                     if(node == null && bos[i] instanceof ISEDDebugTarget)
+                     if(node == null && bos[i] instanceof ISEDebugTarget)
                      {
-                        ISEDThread[] threads = ((ISEDDebugTarget) bos[i]).getSymbolicThreads();
-                        for(ISEDThread thread : threads) {
+                        ISEThread[] threads = ((ISEDebugTarget) bos[i]).getSymbolicThreads();
+                        for(ISEThread thread : threads) {
                            adjustRects(thread, groupingSupported, monitor);
                         }
                      }
@@ -489,7 +489,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Updates the children of the {@link ISEDDebugNode} represented
+    * Updates the children of the {@link ISENode} represented
     * by the given {@link PictogramElement}.
     * @param pictogramElement The {@link PictogramElement} to update.
     * @param monitor The {@link IProgressMonitor} to use.
@@ -505,19 +505,19 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
             int i = 0;
             while (i < bos.length && !monitor.isCanceled()) {
-               if (bos[i] instanceof ISEDDebugElement) {
-                  final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported((ISEDDebugElement)bos[i]);
+               if (bos[i] instanceof ISEDebugElement) {
+                  final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported((ISEDebugElement)bos[i]);
                   // Add all children left aligned
-                  Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bos[i], groupingSupported, monitor, maxX);
+                  Set<ISENode> leafs = updateChildrenLeftAligned((ISEDebugElement)bos[i], groupingSupported, monitor, maxX);
                   maxX += OFFSET;
                   monitor.worked(1);
 
                   // Center sub tree
-                  centerChildren(new HashSet<ISEDDebugNode>(leafs), groupingSupported, monitor);
+                  centerChildren(new HashSet<ISENode>(leafs), groupingSupported, monitor);
 
                   if(calledByExpand) {
                      // re-center subtrees
-                     for(ISEDDebugNode leaf : leafs) {
+                     for(ISENode leaf : leafs) {
                         PictogramElement leafPE = getPictogramElementForBusinessObject(leaf, groupingSupported);
                         if(leafPE != null) {
                            GraphicsAlgorithm leafGA = leafPE.getGraphicsAlgorithm();
@@ -537,18 +537,18 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   
                   // Check if we need a customized layout
                   // Check if we need to adjust the rects
-                  if(bos[i] instanceof ISEDDebugNode) {
-                     adjustSubtreeIfSmaller((ISEDDebugNode) bos[i], groupingSupported, monitor);
+                  if(bos[i] instanceof ISENode) {
+                     adjustSubtreeIfSmaller((ISENode) bos[i], groupingSupported, monitor);
                      if (groupingSupported) {
-                        adjustRects((ISEDDebugNode) bos[i], groupingSupported, monitor);
+                        adjustRects((ISENode) bos[i], groupingSupported, monitor);
                      }
                   }
                   // needed for the reselect of the diagram
-                  else if(bos[i] instanceof ISEDDebugTarget)
+                  else if(bos[i] instanceof ISEDebugTarget)
                   {
                      if (groupingSupported) {
-                        ISEDThread[] threads = ((ISEDDebugTarget) bos[i]).getSymbolicThreads();
-                        for(ISEDThread thread : threads) {
+                        ISEThread[] threads = ((ISEDebugTarget) bos[i]).getSymbolicThreads();
+                        for(ISEThread thread : threads) {
                            adjustRects(thread, groupingSupported, monitor);
                         }
                      }
@@ -557,7 +557,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   // Adjustment for siblings are needed
                   if(calledByExpand) {
                      // re-center subtrees
-                     for(ISEDDebugNode leaf : leafs) {
+                     for(ISENode leaf : leafs) {
                         int mostLeftSub = findInSubtree(leaf, true, true);
                         int mostRightPrev = findInSiblingBranch(leaf, true, false);
                         if(mostRightPrev > -1 && mostRightPrev + OFFSET > mostLeftSub) {
@@ -569,7 +569,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                      
                      // needed to re-adjust bigger nodes if subtree is not complete 
                      if (groupingSupported) {
-                        ISEDDebugNode mostLeftNode = findBiggestNodeInParentBranches((ISEDDebugNode) bos[i], groupingSupported);
+                        ISENode mostLeftNode = findBiggestNodeInParentBranches((ISENode) bos[i], groupingSupported);
                         adjustRects(mostLeftNode, groupingSupported, monitor);
                      }
                   }
@@ -593,18 +593,18 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param groupingSupported Is grouping supported?
     * @param monitor The {@link IProgressMonitor} to use.
     * @param initialX The initial X value which is used if no parentPE is defined.
-    * @return The found leaf {@link ISEDDebugNode}s.
+    * @return The found leaf {@link ISENode}s.
     * @throws DebugException Occurred Exception.
     */
-   protected Set<ISEDDebugNode> updateChildrenLeftAligned(ISEDDebugElement bo, 
+   protected Set<ISENode> updateChildrenLeftAligned(ISEDebugElement bo, 
                                                           boolean groupingSupported,
                                                           IProgressMonitor monitor,
                                                           int initialX) throws DebugException {
-      Set<ISEDDebugNode> leafs = new LinkedHashSet<ISEDDebugNode>();
-      ISEDIterator iter = new SEDPreorderIterator(bo);
+      Set<ISENode> leafs = new LinkedHashSet<ISENode>();
+      ISEIterator iter = new SEPreorderIterator(bo);
 
       while (iter.hasNext() && !monitor.isCanceled()) {
-         ISEDDebugElement next = iter.next();
+         ISEDebugElement next = iter.next();
          
          // Ignore the bo, because either it is ISEDDebugTarget (the very first bo)
          // which has no graphical representation or its a parentnode which
@@ -613,7 +613,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             continue;
          }
 
-         ISEDDebugNode nextNode = (ISEDDebugNode)next;
+         ISENode nextNode = (ISENode)next;
          PictogramElement nextPE = getPictogramElementForBusinessObject(next, groupingSupported);
          if (nextPE == null) {          
             createGraphicalRepresentationForNode(nextNode, groupingSupported, initialX);
@@ -643,11 +643,11 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          }
          // Handle expand (not needed for the basic add of new nodes), endnode reached         else if(!ArrayUtil.isEmpty(nextNode.getGroupStartConditions()) && !leafs.contains(nextNode)){
             // if we process the expand of a group we need to switch to the SEDGroupPreorderIterator
-            if(iter instanceof SEDPreorderIterator && NodeUtil.canBeGrouped(bo)) {
-               iter = new SEDGroupPreorderIterator((ISEDGroupable) bo, nextNode, false);
+            if(iter instanceof SEPreorderIterator && NodeUtil.canBeGrouped(bo)) {
+               iter = new SEGroupPreorderIterator((ISEGroupable) bo, nextNode, false);
             }
             
-            ISEDDebugNode parent = NodeUtil.getParent(nextNode); 
+            ISENode parent = NodeUtil.getParent(nextNode); 
             
             if(NodeUtil.canBeGrouped(parent)) {
                PictogramElement parentPE = getPictogramElementForBusinessObject(parent, 0);
@@ -669,23 +669,23 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Creates a new graphical representation for the given {@link ISEDDebugNode}.
-    * @param node The {@link ISEDDebugNode} for that a graphical representation is needed.
+    * Creates a new graphical representation for the given {@link ISENode}.
+    * @param node The {@link ISENode} for that a graphical representation is needed.
     * @param groupingSupported Is grouping supported?
     * @param initialX The initial X value which is used if no parentPE is defined.
     * @throws DebugException Occurred Exception.
     */
-   protected void createGraphicalRepresentationForNode(ISEDDebugNode node,
+   protected void createGraphicalRepresentationForNode(ISENode node,
                                                        boolean groupingSupported,
                                                        int initialX) throws DebugException { 
       AreaContext areaContext = new AreaContext();
-      ISEDDebugNode parent = NodeUtil.getParent(node);
+      ISENode parent = NodeUtil.getParent(node);
       if(parent != null)
       {
          PictogramElement pe = getPictogramElementForBusinessObject(parent, groupingSupported);
          if(pe == null) {
             // If auto-collapse is on, we need to create the BC first
-            if(parent instanceof ISEDBranchCondition) {
+            if(parent instanceof ISEBranchCondition) {
                createGraphicalRepresentationForNode(parent, groupingSupported, initialX);
                pe = getPictogramElementForBusinessObject(parent, groupingSupported);
             }
@@ -699,7 +699,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          int areaX = -1;
          int areaY = parentGA.getY() + parentGA.getHeight() + OFFSET;
          
-         ISEDDebugNode previousSibling = ArrayUtil.getPrevious(NodeUtil.getChildren(parent), node);
+         ISENode previousSibling = ArrayUtil.getPrevious(NodeUtil.getChildren(parent), node);
          
          // If we have a previous sibling, add the new node next to it
          if (previousSibling != null) {
@@ -737,18 +737,18 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception
     */
-   protected void centerChildren(final Set<ISEDDebugNode> leafs, 
+   protected void centerChildren(final Set<ISENode> leafs, 
                                  boolean groupingSupported,
                                  IProgressMonitor monitor) throws DebugException {
       // Contains all already centered nodes
-      final Set<ISEDDebugNode> doneNodes = new HashSet<ISEDDebugNode>();
+      final Set<ISENode> doneNodes = new HashSet<ISENode>();
       while (!leafs.isEmpty() && !monitor.isCanceled()) {
          // Get leaf to center which is the first one which children are already centered (all children are contained in doneNodes) or if no centering of the child is required (not part of leafs)
-         final ISEDDebugNode next = CollectionUtil.searchAndRemoveWithException(leafs, new IFilterWithException<ISEDDebugNode, DebugException>() {
+         final ISENode next = CollectionUtil.searchAndRemoveWithException(leafs, new IFilterWithException<ISENode, DebugException>() {
             @Override
-            public boolean select(ISEDDebugNode element) throws DebugException {
+            public boolean select(ISENode element) throws DebugException {
                boolean allChildrenDone = true;
-               ISEDDebugNode[] children = NodeUtil.getChildren(element);
+               ISENode[] children = NodeUtil.getChildren(element);
                int i = 0;
                while (allChildrenDone && i < children.length) {
                   if (!doneNodes.contains(children[i]) && leafs.contains(children[i])) {
@@ -771,7 +771,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          // If a parent node has more than one child it is treated as leaf node in a further iteration by adding it to leafs
          List<PictogramElement> descendantsPE = new LinkedList<PictogramElement>();
          int maxWidth = 0;
-         ISEDDebugNode current = next;
+         ISENode current = next;
          PictogramElement currentPE = nextPE;
 
          do {
@@ -802,15 +802,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   xStart = currentPE.getGraphicsAlgorithm().getX();           
             }
             
-            ISEDDebugNode child = current;
+            ISENode child = current;
             current = NodeUtil.getParent(child);
             
             if(current != null) {
-               ISEDDebugNode[] children = NodeUtil.getChildren(current);
+               ISENode[] children = NodeUtil.getChildren(current);
                
                if (children.length != 1) {
                   // Update parent only if all of his subbranches are correctly centered
-                  if(doneNodes.containsAll(new HashSet<ISEDDebugNode>(Arrays.asList(children)))){
+                  if(doneNodes.containsAll(new HashSet<ISENode>(Arrays.asList(children)))){
                      leafs.add(current);
                   }
                   current = null;
@@ -819,7 +819,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          } while (current != null && !monitor.isCanceled());
          
          boolean subtreeShiftRequired = false;
-         ISEDDebugNode[] children = NodeUtil.getChildren(next);
+         ISENode[] children = NodeUtil.getChildren(next);
          if (!ArrayUtil.isEmpty(children) && children.length > 1)
          {            
             int subTreeWidth = findInSubtree(next, false, false) - findInSubtree(next, true, false);
@@ -832,7 +832,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
 
                // Make sure that the new position is not more left than the old one
                // because this area is reserved for the previous branch and they should not overlap
-               if (xMargin + xStart < nextGA.getX() && (!isGroupStart || !((ISEDGroupable) next).isCollapsed())) {
+               if (xMargin + xStart < nextGA.getX() && (!isGroupStart || !((ISEGroupable) next).isCollapsed())) {
                   // Overlap possible, so keep old xStart
                   xMargin = 0;
                   xStart = nextGA.getX();
@@ -859,7 +859,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             int toMove = nextGA.getX() - calcXStart(children, groupingSupported) - calcXMargin(children, groupingSupported, nextGA.getWidth());
             moveSubTreeHorizontal(next, groupingSupported, toMove, false, monitor);
             
-            ISEDGroupable nextGroupStart = NodeUtil.getGroupStartNode(next);
+            ISEGroupable nextGroupStart = NodeUtil.getGroupStartNode(next);
 
             if(nextGroupStart != null) {
                resizeRectsIfNeeded(nextGroupStart, groupingSupported, monitor);
@@ -874,9 +874,9 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             int offset = nextGA.getX() - calcXStart(children, groupingSupported) - calcXMargin(children, groupingSupported, nextGA.getWidth());
             // Center children again only if offset is positive, because otherwise an overlap with the branch next to the left is possible
             if (offset > 0) {
-               SEDPreorderIterator iter = new SEDPreorderIterator(next);
+               SEPreorderIterator iter = new SEPreorderIterator(next);
                while (iter.hasNext()) {
-                  ISEDDebugElement nextChild = iter.next();
+                  ISEDebugElement nextChild = iter.next();
                   if (nextChild != next) {
                      PictogramElement nextChildPE = getPictogramElementForBusinessObject(nextChild, groupingSupported);
                      if (nextChildPE != null) {
@@ -898,14 +898,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    
    /**
     * Calculates the needed margin for the layout.
-    * @param children The {@link ISEDDebugNode}s to calculate the margin to.
+    * @param children The {@link ISENode}s to calculate the margin to.
     * @param groupingSupported Is grouping supported?
     * @param width The width of the parent node
     * @return The value of the margin.
     */
-   protected int calcXMargin(ISEDDebugNode[] children, boolean groupingSupported, int width) {
-      ISEDDebugNode firstChild = ArrayUtil.getFirst(children);
-      ISEDDebugNode lastChild = ArrayUtil.getLast(children);
+   protected int calcXMargin(ISENode[] children, boolean groupingSupported, int width) {
+      ISENode firstChild = ArrayUtil.getFirst(children);
+      ISENode lastChild = ArrayUtil.getLast(children);
       PictogramElement firstChildPE = getPictogramElementForBusinessObject(firstChild, groupingSupported);
       PictogramElement lastChildPE = getPictogramElementForBusinessObject(lastChild, groupingSupported);
       int childWidth = lastChildPE.getGraphicsAlgorithm().getX() + lastChildPE.getGraphicsAlgorithm().getWidth() -
@@ -915,11 +915,11 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    
    /**
     * Calculates the needed x start position for the layout.
-    * @param children The {@link ISEDDebugNode}s to calculate the start position to.
+    * @param children The {@link ISENode}s to calculate the start position to.
     * @param groupingSupported Is grouping supported?
     * @return The value of the start position.
     */
-   protected int calcXStart(ISEDDebugNode[] children, boolean groupingSupported) {
+   protected int calcXStart(ISENode[] children, boolean groupingSupported) {
       PictogramElement firstChildPE = getPictogramElementForBusinessObject(ArrayUtil.getFirst(children), groupingSupported);
       return firstChildPE.getGraphicsAlgorithm().getX();
    }
@@ -932,7 +932,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred exception.
     */
-   protected void adjustSubtreeIfSmaller(ISEDDebugNode node, 
+   protected void adjustSubtreeIfSmaller(ISENode node, 
                                          boolean groupingSupported, 
                                          IProgressMonitor monitor) throws DebugException {
       if(node == null) {
@@ -952,7 +952,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          // The new node/s is/are bigger than the current Branch
          if(newChildrenSubtreeWidth > biggestWidth)
          {
-            ISEDDebugNode mostLeftNode = findBiggestNodeInParentBranches(node, groupingSupported);
+            ISENode mostLeftNode = findBiggestNodeInParentBranches(node, groupingSupported);
             GraphicsAlgorithm mlnGA = getPictogramElementForBusinessObject(mostLeftNode, groupingSupported).getGraphicsAlgorithm();
             
             int mostLeftUnderBig = findInSubtree(ArrayUtil.getFirst(NodeUtil.getChildren(mostLeftNode)), true, true);
@@ -975,27 +975,27 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred exception.
     */
-   protected void adjustRects(ISEDDebugNode node, 
+   protected void adjustRects(ISENode node, 
                               boolean groupingSupported, 
                               IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Adjust rectangles", IProgressMonitor.UNKNOWN);
       
-      LinkedList<ISEDGroupable> groups = new LinkedList<ISEDGroupable>();
+      LinkedList<ISEGroupable> groups = new LinkedList<ISEGroupable>();
       
-      ISEDDebugNode startNode = NodeUtil.getGroupStartNode(node) != null ? (ISEDDebugNode) NodeUtil.getGroupStartNode(node) : node;
-      ISEDIterator iter = new SEDPreorderIterator(startNode);
+      ISENode startNode = NodeUtil.getGroupStartNode(node) != null ? (ISENode) NodeUtil.getGroupStartNode(node) : node;
+      ISEIterator iter = new SEPreorderIterator(startNode);
       while (iter.hasNext() && !monitor.isCanceled()) {
-         ISEDDebugElement next = iter.next();
+         ISEDebugElement next = iter.next();
          
-         if(next instanceof ISEDDebugNode) {            compute((ISEDDebugNode) next, groupingSupported, monitor);
+         if(next instanceof ISENode) {            compute((ISENode) next, groupingSupported, monitor);
             if(NodeUtil.canBeGrouped(next)) {
-               groups.add((ISEDGroupable) next);
+               groups.add((ISEGroupable) next);
             }
          }
          monitor.worked(1);
       }
       
-      for(ISEDGroupable group : groups) {
+      for(ISEGroupable group : groups) {
          resizeRectsIfNeeded(group, groupingSupported, monitor);
          monitor.worked(1);
       }      
@@ -1005,17 +1005,17 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    
    /**
     * Executes the adjustment of the nodes.
-    * @param node The current {@link ISEDDebugNode} to adjust.
+    * @param node The current {@link ISENode} to adjust.
     * @param groupingSupported Is grouping supported?
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   private void compute(ISEDDebugNode node, 
+   private void compute(ISENode node, 
                         boolean groupingSupported, 
                         IProgressMonitor monitor) throws DebugException {
       // Either the node or the rect if groupable
       PictogramElement pe = getPictogramElementForBusinessObject(node, 0);
-      ISEDGroupable groupStart = NodeUtil.getGroupStartNode(node);
+      ISEGroupable groupStart = NodeUtil.getGroupStartNode(node);
 //      groupStart = NodeUtil.getGroupStartNode(node) != null ? NodeUtil.getGroupStartNode(node) : (NodeUtil.canBeGrouped(node) ? (ISEDGroupable) node : null);
       
       // if the node has no graphical representation or is not in a group, return
@@ -1030,8 +1030,8 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       // We only need to adjust something if the space between the new node and his group rect is smaller than the method offset 
       if(ga.getX() < groupStartGA.getX() + METOFF)
       {
-         LinkedList<ISEDGroupable> groups = new LinkedList<ISEDGroupable>();
-         ISEDGroupable group = groupStart;
+         LinkedList<ISEGroupable> groups = new LinkedList<ISEGroupable>();
+         ISEGroupable group = groupStart;
          
          // At first we need to gather all rects we have to adjust
          while(group != null)
@@ -1050,7 +1050,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                }
             }
             
-            group = NodeUtil.getGroupStartNode((ISEDDebugNode) group);
+            group = NodeUtil.getGroupStartNode((ISENode) group);
          }
 
          // The gathered rects will be processed from outer to inner
@@ -1058,7 +1058,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             int metoffAmount = groups.size() - i;
             
             groupStart = groups.get(i);
-            ISEDGroupable outerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
+            ISEGroupable outerGroup = NodeUtil.getGroupStartNode((ISENode) groupStart);
             // if the node overlaps only the outer rect, only a 
             // shift to the right is needed
             // (if its possible that the outer rect is not the biggest width of
@@ -1108,7 +1108,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   // At first we need to gather all rects we have to adjust
                   while(group != null)
                   {
-                     ISEDGroupable outGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) group);
+                     ISEGroupable outGroup = NodeUtil.getGroupStartNode((ISENode) group);
                      
                      PictogramElement groupPE = getPictogramElementForBusinessObject(group, 0);
                      PictogramElement outGroupPE = getPictogramElementForBusinessObject(outGroup, 0);
@@ -1121,7 +1121,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                         groups2.addFirst(groupGA);
                         // We have enough space to the left
                         if(outGroupGA.getX() + METOFF < groupGA.getX()) {
-                           mostRight = findInSiblingBranch((ISEDDebugNode) group, true, false);
+                           mostRight = findInSiblingBranch((ISENode) group, true, false);
                            if(mostRight == -1 || mostRight + OFFSET <= outGroupGA.getX() + METOFF || mostRight + OFFSET < groupGA.getX()) {
                               enoughSpace = true;
                               // get the most right x where we can move to
@@ -1193,10 +1193,10 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
             int i = 0;
             while (i < bos.length && !monitor.isCanceled()) {
-               if (bos[i] instanceof ISEDDebugNode) {
-                  final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported((ISEDDebugNode)bos[i]);
-                  ISEDDebugNode node = (ISEDDebugNode)bos[i];
-                  ISEDDebugNode parent = NodeUtil.getParent(node);
+               if (bos[i] instanceof ISENode) {
+                  final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported((ISENode)bos[i]);
+                  ISENode node = (ISENode)bos[i];
+                  ISENode parent = NodeUtil.getParent(node);
                   if (parent != null) {
                      // Find most left node in righter nodes
                      int mostLeftFollowing = findInSiblingBranch(node, false, true);
@@ -1225,35 +1225,35 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Updates des height of all rects which are affected by the given {@link ISEDDebugNode}.
+    * Updates des height of all rects which are affected by the given {@link ISENode}.
     * @param node The node that updates the height.
     * @param groupingSupported Is grouping supported?
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void updateGroupRectHeights(ISEDDebugNode node, 
+   protected void updateGroupRectHeights(ISENode node, 
                                          boolean groupingSupported, 
                                          IProgressMonitor monitor) throws DebugException {
       GraphicsAlgorithm ga = getPictogramElementForBusinessObject(node, groupingSupported).getGraphicsAlgorithm();
       
-      ISEDGroupable groupStart = NodeUtil.getGroupStartNode(node);
-      boolean isGroupEnd = node.getGroupStartCondition((ISEDDebugNode) groupStart) != null;
+      ISEGroupable groupStart = NodeUtil.getGroupStartNode(node);
+      boolean isGroupEnd = node.getGroupStartCondition((ISENode) groupStart) != null;
       
       int methodMaxY = ga.getY() + ga.getHeight() + (isGroupEnd ? -ga.getHeight() / 2 : OFFSET + ga.getHeight() / 2);
 
       do
       {
          GraphicsAlgorithm rectGA = getPictogramElementForBusinessObject(groupStart, 0).getGraphicsAlgorithm();
-         ISEDBranchCondition[] bcs = groupStart.getGroupEndConditions();
+         ISEBranchCondition[] bcs = groupStart.getGroupEndConditions();
 
          // Check if an existing groupend is already placed deeper in the tree
-         for(ISEDBranchCondition bc : bcs) {
-            ISEDDebugNode groupEnd = bc.getChildren()[0];
+         for(ISEBranchCondition bc : bcs) {
+            ISENode groupEnd = bc.getChildren()[0];
             PictogramElement groupEndPE = getPictogramElementForBusinessObject(groupEnd, groupingSupported);
             if(groupEndPE != null) {
                GraphicsAlgorithm groupEndGA = groupEndPE.getGraphicsAlgorithm();
                if(groupEndGA.getY() + groupEndGA.getHeight() / 2 > methodMaxY &&
-                     groupEnd.getGroupStartCondition((ISEDDebugNode) NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart)) == null) {
+                     groupEnd.getGroupStartCondition((ISENode) NodeUtil.getGroupStartNode((ISENode) groupStart)) == null) {
                   methodMaxY = groupEndGA.getY() + groupEndGA.getHeight() / 2;
                }
             }
@@ -1265,8 +1265,8 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             rectGA.setHeight(methodMaxY - rectGA.getY());
             
             // Pushes the nodes down to the end of the rect
-            for(ISEDBranchCondition bc : bcs) {
-               ISEDDebugNode groupEnd = bc.getChildren()[0];
+            for(ISEBranchCondition bc : bcs) {
+               ISENode groupEnd = bc.getChildren()[0];
                
                if(groupEnd == node) {
                   break;
@@ -1294,22 +1294,22 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          
          methodMaxY = rectGA.getY() + rectGA.getHeight() + ga.getHeight() + OFFSET;
          
-         groupStart = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
-         isGroupEnd = node.getGroupStartCondition((ISEDDebugNode) groupStart) != null;
+         groupStart = NodeUtil.getGroupStartNode((ISENode) groupStart);
+         isGroupEnd = node.getGroupStartCondition((ISENode) groupStart) != null;
 
       } while(groupStart != null && !monitor.isCanceled());
    }
    
    /**
-    * Updates des width of all rects which are affected by the given {@link ISEDDebugNode}.
+    * Updates des width of all rects which are affected by the given {@link ISENode}.
     * @param node The node that updates the height.
     * @param groupingSupported Is grouping supported?
     * @throws DebugException Occurred Exception.
     */
-   protected void updateGroupRectWidths(ISEDDebugNode node, boolean groupingSupported) throws DebugException {
+   protected void updateGroupRectWidths(ISENode node, boolean groupingSupported) throws DebugException {
       GraphicsAlgorithm ga = getPictogramElementForBusinessObject(node, groupingSupported).getGraphicsAlgorithm();
 
-      ISEDGroupable groupStart = NodeUtil.getGroupStartNode(node);
+      ISEGroupable groupStart = NodeUtil.getGroupStartNode(node);
       
       int methodMaxX = ga.getX() + ga.getWidth() + METOFF;
       while(groupStart != null)
@@ -1322,7 +1322,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          }
 
          methodMaxX = groupStartGA.getX() + groupStartGA.getWidth() + METOFF;
-         groupStart = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
+         groupStart = NodeUtil.getGroupStartNode((ISENode) groupStart);
       }
    }
    
@@ -1332,17 +1332,17 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param groupingSupported Is grouping supported?
     * @throws DebugException
     */
-   protected void shrinkRectHeights(ISEDGroupable groupStart, boolean groupingSupported) throws DebugException {
+   protected void shrinkRectHeights(ISEGroupable groupStart, boolean groupingSupported) throws DebugException {
       GraphicsAlgorithm rectGA = null;
       do
       {
-         ISEDBranchCondition[] bcs = groupStart.getGroupEndConditions();
+         ISEBranchCondition[] bcs = groupStart.getGroupEndConditions();
          rectGA = getPictogramElementForBusinessObject(groupStart, 0).getGraphicsAlgorithm();
          
          int height = 0;
          // find the groupend with the biggest height
-         for(ISEDBranchCondition bc : bcs) {
-            ISEDDebugNode groupEnd = bc.getChildren()[0];
+         for(ISEBranchCondition bc : bcs) {
+            ISENode groupEnd = bc.getChildren()[0];
             PictogramElement groupEndPE = getPictogramElementForBusinessObject(groupEnd, groupingSupported);
                              
             if(groupEndPE != null && groupEndPE.getGraphicsAlgorithm().getHeight() > height) {
@@ -1361,26 +1361,26 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             // This loop moves all nodes between two rects upwards if the height of the inner rect
             // is less than before.
             for(int i = 0; i < bcs.length; i++) {
-               ISEDDebugNode groupEnd = bcs[i].getChildren()[0];
+               ISENode groupEnd = bcs[i].getChildren()[0];
                
                // If the groupend ends another (more outside) group too then ignore it
-               if(groupEnd.getGroupStartCondition((ISEDDebugNode) NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart)) != null) {
+               if(groupEnd.getGroupStartCondition((ISENode) NodeUtil.getGroupStartNode((ISENode) groupStart)) != null) {
                   continue;
                }
                
                PictogramElement groupEndPE = getPictogramElementForBusinessObject(groupEnd, groupingSupported);
                                 
                if(groupEndPE != null) {
-                  ISEDGroupable outerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
-                  ISEDIterator iter = outerGroup == null ? new SEDPreorderIterator(groupEnd) : new SEDGroupPreorderIterator(outerGroup, groupEnd, true);
+                  ISEGroupable outerGroup = NodeUtil.getGroupStartNode((ISENode) groupStart);
+                  ISEIterator iter = outerGroup == null ? new SEPreorderIterator(groupEnd) : new SEGroupPreorderIterator(outerGroup, groupEnd, true);
                   // Iterate over the group nodes
                   while (iter.hasNext()) {
-                     ISEDDebugElement next = iter.next();            
+                     ISEDebugElement next = iter.next();            
                      
-                     if(next instanceof ISEDDebugNode) {
-                        ISEDDebugNode nextNode = (ISEDDebugNode) next;
+                     if(next instanceof ISENode) {
+                        ISENode nextNode = (ISENode) next;
                         
-                        if(nextNode.getGroupStartCondition((ISEDDebugNode) outerGroup) != null && !nextNode.equals(groupEnd)) {
+                        if(nextNode.getGroupStartCondition((ISENode) outerGroup) != null && !nextNode.equals(groupEnd)) {
                            continue;
                         }
                         
@@ -1404,7 +1404,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                }
             }
          }
-         groupStart = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
+         groupStart = NodeUtil.getGroupStartNode((ISENode) groupStart);
       } while(groupStart != null);
    }
    
@@ -1415,7 +1415,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void resizeRectsIfNeeded(ISEDGroupable groupStart, 
+   protected void resizeRectsIfNeeded(ISEGroupable groupStart, 
                                       boolean groupingSupported, 
                                       IProgressMonitor monitor) throws DebugException {
       do
@@ -1428,27 +1428,27 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             
             int mostLeftX = findInGroup(groupStart, groupingSupported, true) - METOFF;
 
-            if(mostLeftX > rectGA.getX() && NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart) != null) {
+            if(mostLeftX > rectGA.getX() && NodeUtil.getGroupStartNode((ISENode) groupStart) != null) {
                rectGA.setX(mostLeftX);
             }
 
             rectGA.setWidth(findInGroup(groupStart, groupingSupported, false) + METOFF - rectGA.getX());
          }
 
-         groupStart = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
+         groupStart = NodeUtil.getGroupStartNode((ISENode) groupStart);
       } while(groupStart != null);
    }
    
    /**
     * Finds the biggest width of the upper part of the current branch or, if 
     * there is no upper part, the parent branch.
-    * @param start The {@link ISEDDebugNode} to start with.
+    * @param start The {@link ISENode} to start with.
     * @param groupingSupported Is grouping supported?
     * @return The width of the biggest node.
     * @throws DebugException Occurred Exception.
     */
-   protected int findBiggestWidthInPartTreeAbove(ISEDDebugNode start, boolean groupingSupported) throws DebugException {
-      ISEDDebugNode node = start;
+   protected int findBiggestWidthInPartTreeAbove(ISENode start, boolean groupingSupported) throws DebugException {
+      ISENode node = start;
       int width = -1;
       
       node = NodeUtil.getParent(node);
@@ -1470,14 +1470,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    
    /**
     * Finds and returns the biggest node in parent branches.
-    * @param start The {@link ISEDDebugNode} to start from.
+    * @param start The {@link ISENode} to start from.
     * @param groupingSupported Is grouping supported?
     * @return The biggest node.
     * @throws DebugException Occurred Exception.
     */
-   protected ISEDDebugNode findBiggestNodeInParentBranches(ISEDDebugNode start, boolean groupingSupported) throws DebugException {
-      ISEDDebugNode node = start;
-      ISEDDebugNode biggestNode = null;
+   protected ISENode findBiggestNodeInParentBranches(ISENode start, boolean groupingSupported) throws DebugException {
+      ISENode node = start;
+      ISENode biggestNode = null;
 
       while(node != null) {
          node = NodeUtil.getParent(node);
@@ -1506,20 +1506,20 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
 
    /**
-    * Iterates over the parents of the given {@link ISEDDebugNode} until
+    * Iterates over the parents of the given {@link ISENode} until
     * the beginning of the branch is reached and computes the minimal (x) or maximal 
-    * (x + width) x value of the visited {@link ISEDDebugNode}s.
-    * @param start The {@link ISEDDebugNode} to start.
+    * (x + width) x value of the visited {@link ISENode}s.
+    * @param start The {@link ISENode} to start.
     * @param groupingSupported Is grouping supported?
     * @param mostLeft The {@link Boolean} to search either the most left x value ({@code true}) or the most right ({@code false}).
-    * @return The most minmal or maximal x value of parent {@link ISEDDebugNode}s in the same branch.
+    * @return The most minmal or maximal x value of parent {@link ISENode}s in the same branch.
     * @throws DebugException Occurred Exception.
     */
-   protected int findAbove(ISEDDebugNode start, 
+   protected int findAbove(ISENode start, 
                            boolean groupingSupported, 
                            boolean mostLeft) throws DebugException {
       int mostX = -1;
-      ISEDDebugNode node = NodeUtil.getParent(start);
+      ISENode node = NodeUtil.getParent(start);
       
       while (node != null) {
          PictogramElement pe = getPictogramElementForBusinessObject(node, (isParentGroup(start, groupingSupported, node) ? 1 : 0));
@@ -1534,26 +1534,26 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Iterates over the parents of the given {@link ISEDDebugNode} until
+    * Iterates over the parents of the given {@link ISENode} until
     * there can't be more left or right nodes for this branch and computes
-    * the minimal (x) or maximal (x + width) x value of the visited {@link ISEDDebugNode}s.
-    * @param start The {@link ISEDDebugNode} to start.
+    * the minimal (x) or maximal (x + width) x value of the visited {@link ISENode}s.
+    * @param start The {@link ISENode} to start.
     * @param groupingSupported Is grouping supported?
     * @param mostLeft The {@link Boolean} to search either the most left x value ({@code true}) or the most right ({@code false}).
-    * @return The most minmal or maximal x value of parent {@link ISEDDebugNode}s in the same branch.
+    * @return The most minmal or maximal x value of parent {@link ISENode}s in the same branch.
     * @throws DebugException Occurred Exception.
     */
-   protected int findInParents(ISEDDebugNode start, 
+   protected int findInParents(ISENode start, 
                                boolean groupingSupported, 
                                boolean mostLeft) throws DebugException {
       int mostX = -1;
-      ISEDDebugNode node = start;
+      ISENode node = start;
       
       while (node != null) {
          PictogramElement pe = getPictogramElementForBusinessObject(node, (isParentGroup(start, groupingSupported, node) ? 1 : 0));
          mostX = compare(pe, mostLeft, mostX);
          // Select parent for next loop iteration
-         ISEDDebugNode child = node;
+         ISENode child = node;
          node = NodeUtil.getParent(node);
          
          if (node != null && NodeUtil.getChildren(node).length != 1
@@ -1567,22 +1567,22 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    
    /**
     * Find either the most left or most right x in the previous or following branch.
-    * @param node The {@link ISEDDebugNode} in the current branch.
+    * @param node The {@link ISENode} in the current branch.
     * @param previousBranch {@code true} if the search takes place in the previous branch, {@code false} otherwise.
     * @param mostLeft {@code true} if the most left should be searched, {@code false} otherwhise.
     * @return The most left or most right x of the previous or following branch.
     * @throws DebugException Occured Exception.
     */
-   protected int findInSiblingBranch(ISEDDebugNode node, boolean previousBranch, boolean mostLeft) throws DebugException {
+   protected int findInSiblingBranch(ISENode node, boolean previousBranch, boolean mostLeft) throws DebugException {
       do
       {
-         ISEDDebugNode parent = NodeUtil.getParent(node);
+         ISENode parent = NodeUtil.getParent(node);
          
          if(parent == null) {
             return -1;
          }
 
-         ISEDDebugNode[] children = NodeUtil.getChildren(parent);
+         ISENode[] children = NodeUtil.getChildren(parent);
          
          if(previousBranch && !ArrayUtil.isFirst(children, node)) {
             return findInSubtree(ArrayUtil.getPrevious(children, node), mostLeft, true);
@@ -1595,15 +1595,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Iterates over the most left or right children of the given {@link ISEDDebugNode}
-    * and computes the minimal (x) or maximal (x + width) x value of the visited child {@link ISEDDebugNode}s.
-    * @param start The {@link ISEDDebugNode} to start.
+    * Iterates over the most left or right children of the given {@link ISENode}
+    * and computes the minimal (x) or maximal (x + width) x value of the visited child {@link ISENode}s.
+    * @param start The {@link ISENode} to start.
     * @param mostLeft The {@link Boolean} to search either the most left x value ({@code true}) or the most right ({@code false}).
     * @param checkStartNode {@code true} if the start node should be checked too, {@code false} otherwhise.
-    * @return The most minimal or maximal x value of most left or right child {@link ISEDDebugNode}s.
+    * @return The most minimal or maximal x value of most left or right child {@link ISENode}s.
     * @throws DebugException Occurred Exception.
     */
-   protected int findInSubtree(ISEDDebugNode node, boolean mostLeft, boolean checkStartNode) throws DebugException {
+   protected int findInSubtree(ISENode node, boolean mostLeft, boolean checkStartNode) throws DebugException {
       int mostX = -1;
       if(!checkStartNode) {
          node = mostLeft ? ArrayUtil.getFirst(NodeUtil.getChildren(node)) : ArrayUtil.getLast(NodeUtil.getChildren(node));
@@ -1618,28 +1618,28 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Iterates over the most left or right children of the given {@link ISEDDebugNode} until
+    * Iterates over the most left or right children of the given {@link ISENode} until
     * the end of the group is reached and computes the minimal (x) or maximal (x + width) 
-    * x value of the visited child {@link ISEDDebugNode}s.
-    * @param groupStart The {@link ISEDGroupable} to iterate over.
+    * x value of the visited child {@link ISENode}s.
+    * @param groupStart The {@link ISEGroupable} to iterate over.
     * @param groupingSupported Is grouping supported?
     * @param mostLeft The {@link Boolean} to search either the most left x value ({@code true}) or the most right ({@code false}).
-    * @return The most minimal or maximal x value of most left or right child {@link ISEDDebugNode}s.
+    * @return The most minimal or maximal x value of most left or right child {@link ISENode}s.
     * @throws DebugException Occurred Exception.
     */
-   protected int findInGroup(ISEDGroupable groupStart, boolean groupingSupported, boolean mostLeft) throws DebugException {
+   protected int findInGroup(ISEGroupable groupStart, boolean groupingSupported, boolean mostLeft) throws DebugException {
       int mostX = -1;
-      ISEDDebugNode node = (ISEDDebugNode) groupStart;
+      ISENode node = (ISENode) groupStart;
       
       while (node != null) {
-         PictogramElement pe = NodeUtil.canBeGrouped(node) && (ISEDGroupable) node != groupStart ? getPictogramElementForBusinessObject(node, 0) : getPictogramElementForBusinessObject(node, groupingSupported);
+         PictogramElement pe = NodeUtil.canBeGrouped(node) && (ISEGroupable) node != groupStart ? getPictogramElementForBusinessObject(node, 0) : getPictogramElementForBusinessObject(node, groupingSupported);
          mostX = compare(pe, mostLeft, mostX);
          // Select child for next loop iteration
-         ISEDDebugNode parent = node;
+         ISENode parent = node;
          node = mostLeft ? ArrayUtil.getFirst(NodeUtil.getChildren(node)) : ArrayUtil.getLast(NodeUtil.getChildren(node));
          
          if(node != null && NodeUtil.getGroupStartNode(node) == null
-               || parent.getGroupStartCondition((ISEDDebugNode) groupStart) != null) {
+               || parent.getGroupStartCondition((ISENode) groupStart) != null) {
             node = null;
          }
       }
@@ -1675,19 +1675,19 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @return The highest y value of the group besides group end nodes.
     * @throws DebugException
     */
-   protected int findDeepestYInGroup(ISEDGroupable groupStart, boolean groupingSupported) throws DebugException {
+   protected int findDeepestYInGroup(ISEGroupable groupStart, boolean groupingSupported) throws DebugException {
       int deepestY = 0;
       int groupAmount = -1;
-      ISEDIterator iter = new SEDGroupPreorderIterator(groupStart);
+      ISEIterator iter = new SEGroupPreorderIterator(groupStart);
 
       while (iter.hasNext()) {
-         ISEDDebugElement next = iter.next();
-         if(next instanceof ISEDDebugNode)
+         ISEDebugElement next = iter.next();
+         if(next instanceof ISENode)
          {
-            ISEDDebugNode nextNode = (ISEDDebugNode) next;
+            ISENode nextNode = (ISENode) next;
             // Either we are outside of the Group or we have reached a groupendnode
             if(NodeUtil.getGroupStartNode(nextNode) == null
-                  || nextNode.getGroupStartCondition((ISEDDebugNode) groupStart) != null) {
+                  || nextNode.getGroupStartCondition((ISENode) groupStart) != null) {
                continue;
             }
             
@@ -1701,13 +1701,13 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                      nextNode = NodeUtil.getParent(nextNode.getInnerMostVisibleGroupStartCondition());
                   }
                   
-                  ISEDGroupable innerGroup = NodeUtil.getGroupStartNode(nextNode);
+                  ISEGroupable innerGroup = NodeUtil.getGroupStartNode(nextNode);
                   
                   groupAmount = -1;
                   // We need to compute the amount of Groups inside the startgroup
                   while(innerGroup != null && innerGroup != groupStart) {
                      groupAmount++;
-                     innerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) innerGroup);
+                     innerGroup = NodeUtil.getGroupStartNode((ISENode) innerGroup);
                   }
                }
             }
@@ -1718,25 +1718,25 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Checks if the given {@link ISEDDebugNode} potentialGroupNode contains
-    * the given {@link ISEDDebugNode} source.
+    * Checks if the given {@link ISENode} potentialGroupNode contains
+    * the given {@link ISENode} source.
     * @param source The potentially contained node.
     * @param groupingSupported Is grouping supported?
     * @param potentialGroupNode The potential node, that may contain the source node.
     * @return {@code true} if the potentialGroupNode contains the source node, {@code false} otherwhise.
     * @throws DebugException Occured Exception.
     */
-   protected boolean isParentGroup(ISEDDebugNode source, 
+   protected boolean isParentGroup(ISENode source, 
                                    boolean groupingSupported, 
-                                   ISEDDebugNode potentialGroupNode) throws DebugException {
+                                   ISENode potentialGroupNode) throws DebugException {
       if(groupingSupported && NodeUtil.canBeGrouped(potentialGroupNode)) {
-         ISEDGroupable outerGroup = NodeUtil.getGroupStartNode(source);
+         ISEGroupable outerGroup = NodeUtil.getGroupStartNode(source);
          
          while(outerGroup != null) {
-            if(outerGroup == (ISEDGroupable) potentialGroupNode) {
+            if(outerGroup == (ISEGroupable) potentialGroupNode) {
                return true;
             }
-            outerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) outerGroup);
+            outerGroup = NodeUtil.getGroupStartNode((ISENode) outerGroup);
          }
       }
       
@@ -1744,15 +1744,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Checks if the branch of the given {@link ISEDDebugNode} has either
+    * Checks if the branch of the given {@link ISENode} has either
     * a previous or a following sibling based on the given boolean value.
     * @param node The node of the branch that shoudl be checked.
     * @param previousBranch {@code true} if check for previous branch, {@code false} otherwhise.
     * @return {@code true} if there is the searched branch, {@code false} otherwhise.
     * @throws DebugException Occured Exception.
     */
-   protected boolean hasSibling(ISEDDebugNode node, boolean previousBranch) throws DebugException {
-      ISEDDebugNode parent = NodeUtil.getParent(node);
+   protected boolean hasSibling(ISENode node, boolean previousBranch) throws DebugException {
+      ISENode parent = NodeUtil.getParent(node);
       // Move to the branchsplitting.
       while(parent != null && NodeUtil.getChildren(parent).length < 2) {
          node = parent;
@@ -1770,23 +1770,23 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    
    /**
     * Returns the next child, that is bigger than the given width or null if there is none.
-    * @param node The {@link ISEDDebugNode} to start at.
+    * @param node The {@link ISENode} to start at.
     * @param groupingSupported Is grouping supported?
     * @param width The reference width.
     * @param monitor The {@link IProgressMonitor} to use.
     * @return The next bigger child or null.
     * @throws DebugException
     */
-   protected ISEDDebugNode returnBiggerChildOrNull(ISEDDebugNode node, 
+   protected ISENode returnBiggerChildOrNull(ISENode node, 
                                                    boolean groupingSupported, 
                                                    int width, 
                                                    IProgressMonitor monitor) throws DebugException {
-      ISEDIterator iter = new SEDPreorderIterator(node);
+      ISEIterator iter = new SEPreorderIterator(node);
       while (iter.hasNext()) {
-         ISEDDebugElement next = iter.next();
+         ISEDebugElement next = iter.next();
          
-         if(next instanceof ISEDDebugNode) {
-            ISEDDebugNode nextNode = (ISEDDebugNode) next;
+         if(next instanceof ISENode) {
+            ISENode nextNode = (ISENode) next;
             PictogramElement nextPE = getPictogramElementForBusinessObject(nextNode, groupingSupported);
             if(nextPE != null) {
                GraphicsAlgorithm nextGA = nextPE.getGraphicsAlgorithm();
@@ -1803,20 +1803,20 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    /**
     * Moves all nodes which x coordinates are more to the right as the 
     * given node by the given distance.
-    * @param node The {@link ISEDDebugNode} to start moving.
+    * @param node The {@link ISENode} to start moving.
     * @param groupingSupported Is grouping supported?
     * @param distance The distance to move.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void moveRighterNodes(ISEDDebugNode node, 
+   protected void moveRighterNodes(ISENode node, 
                                    boolean groupingSupported,
                                    int distance, 
                                    IProgressMonitor monitor) throws DebugException {
       if (node != null) {
-         ISEDDebugNode parent = NodeUtil.getParent(node);
+         ISENode parent = NodeUtil.getParent(node);
          while (parent != null && !monitor.isCanceled()) {
-            ISEDDebugNode[] siblings = NodeUtil.getChildren(parent);
+            ISENode[] siblings = NodeUtil.getChildren(parent);
             int index = ArrayUtil.indexOf(siblings, node);
             if (index < 0) {
                throw new DebugException(LogUtil.getLogger().createErrorStatus("Child \"" + node + "\" is not contained in parent's children \"" + Arrays.toString(siblings) + "\"."));
@@ -1842,20 +1842,20 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    /**
     * Move all nodes which x coordinates are more to the right or above
     * the given node by the given distance.
-    * @param start The {@link ISEDDebugNode} to start.
+    * @param start The {@link ISENode} to start.
     * @param groupingSupported Is grouping supported?
     * @param distance The distance to move.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void moveRightAndAbove(ISEDDebugNode start, 
+   protected void moveRightAndAbove(ISENode start, 
                                     boolean groupingSupported, 
                                     int distance, 
                                     IProgressMonitor monitor) throws DebugException {
-      ISEDDebugNode node = start;
+      ISENode node = start;
       do
       {
-         ISEDDebugNode parent = NodeUtil.getParent(node);
+         ISENode parent = NodeUtil.getParent(node);
          
          if(parent == null) {
             return;
@@ -1893,8 +1893,8 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occured Exception.
     */
-   protected void moveSmallSubtree(ISEDDebugNode node, 
-                                   ISEDDebugNode endNode, 
+   protected void moveSmallSubtree(ISENode node, 
+                                   ISENode endNode, 
                                    boolean groupingSupported,
                                    int distance, 
                                    boolean isLeft, 
@@ -1904,9 +1904,9 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       
       boolean firstBranch = true;
-      ISEDDebugNode parent = NodeUtil.getParent(node);
+      ISENode parent = NodeUtil.getParent(node);
       while (parent != null && parent != endNode && !monitor.isCanceled()) {
-         ISEDDebugNode[] siblings = NodeUtil.getChildren(parent);
+         ISENode[] siblings = NodeUtil.getChildren(parent);
          int index = ArrayUtil.indexOf(siblings, node);
          if (index < 0) {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Child \"" + node + "\" is not contained in parent's children \"" + Arrays.toString(siblings) + "\"."));
@@ -1961,30 +1961,30 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
 
    /**
-    * Moves all nodes in the sub tree starting at the given {@link ISEDDebugNode}
+    * Moves all nodes in the sub tree starting at the given {@link ISENode}
     * horizontal by the given distance.
-    * @param root The {@link ISEDDebugNode} to start moving.
+    * @param root The {@link ISENode} to start moving.
     * @param groupingSupported Is grouping supported?
     * @param distance The distance to move in x direction.
-    * @param moveRoot {@code true} if the given {@link ISEDDebugNode} shall be moved too, {@code false} otherwhise.
+    * @param moveRoot {@code true} if the given {@link ISENode} shall be moved too, {@code false} otherwhise.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception
     */
-   protected void moveSubTreeHorizontal(ISEDDebugNode root, 
+   protected void moveSubTreeHorizontal(ISENode root, 
                                         boolean groupingSupported,
                                         int distance,
                                         boolean moveRoot,
                                         IProgressMonitor monitor) throws DebugException {
-      ISEDIterator iter = new SEDPreorderIterator(root);
+      ISEIterator iter = new SEPreorderIterator(root);
       while (iter.hasNext() && !monitor.isCanceled()) {
-         ISEDDebugElement next = iter.next();
+         ISEDebugElement next = iter.next();
          
          if(next == root && !moveRoot) {
             continue;
          }
          
-         if(next instanceof ISEDDebugNode) {
-            ISEDDebugNode node = (ISEDDebugNode) next;
+         if(next instanceof ISENode) {
+            ISENode node = (ISENode) next;
             PictogramElement pe = getPictogramElementForBusinessObject(node, groupingSupported);
             if (pe != null) {
                GraphicsAlgorithm peGA = pe.getGraphicsAlgorithm();
@@ -2008,27 +2008,27 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Moves all nodes in the subtree starting at the given {@link ISEDDebugNode}
+    * Moves all nodes in the subtree starting at the given {@link ISENode}
     * vertical by the given distance.
-    * @param root The {@link ISEDDebugNode} to start moving.
+    * @param root The {@link ISENode} to start moving.
     * @param groupingSupported Is grouping supported?
     * @param distance The distance to move in x direction.
     * @parem monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception
     */
-   protected void moveSubTreeVertical(ISEDDebugNode root, 
+   protected void moveSubTreeVertical(ISENode root, 
                                       boolean groupingSupported, 
                                       int distance, 
                                       IProgressMonitor monitor) throws DebugException {
-      ISEDIterator iter = new SEDPreorderIterator(root);
+      ISEIterator iter = new SEPreorderIterator(root);
       while (iter.hasNext() && !monitor.isCanceled()) {
-         ISEDDebugElement next = iter.next();
+         ISEDebugElement next = iter.next();
          PictogramElement pe = getPictogramElementForBusinessObject(next, groupingSupported);
          if (pe != null) {
             GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
             ga.setY(ga.getY() + distance);
             
-            if(NodeUtil.canBeGrouped((ISEDDebugNode) next)) {
+            if(NodeUtil.canBeGrouped((ISENode) next)) {
                pe = getPictogramElementForBusinessObject(next, 0);
                if (pe != null) {
                   ga = pe.getGraphicsAlgorithm();
@@ -2042,15 +2042,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    /**
     * Updates the style of the given {@link PictogramElement}.
     * @param pe The {@link PictogramElement} to update.
-    * @param node The {@link ISEDDebugNode} as business object of the given {@link PictogramElement}.
+    * @param node The {@link ISENode} as business object of the given {@link PictogramElement}.
     * @return {@code true} successful, {@code false} not succesful.
     */
-   protected boolean updateStyle(PictogramElement pe, ISEDDebugNode node) {
+   protected boolean updateStyle(PictogramElement pe, ISENode node) {
       if (pe instanceof Shape) {
          Shape shape = (Shape)pe;
          if (shape.getGraphicsAlgorithm() instanceof RoundedRectangle) {
             RoundedRectangle rr = (RoundedRectangle)shape.getGraphicsAlgorithm();
-            ISEDAnnotation[] annotations = node.computeUsedAnnotations();
+            ISEAnnotation[] annotations = node.computeUsedAnnotations();
             String newStyleId = ExecutionTreeStyleUtil.computeDebugNodeStyleId(annotations);
             if (!newStyleId.equals(rr.getStyle().getId())) {
                // Replace and update style
@@ -2063,7 +2063,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          }
          else if (shape.getGraphicsAlgorithm() instanceof Text) {
             Text text = (Text)shape.getGraphicsAlgorithm();
-            ISEDAnnotation[] annotations = node.computeUsedAnnotations();
+            ISEAnnotation[] annotations = node.computeUsedAnnotations();
             String newStyleId = ExecutionTreeStyleUtil.computeDebugNodeTextStyleId(annotations);
             if (!newStyleId.equals(text.getStyle().getId())) {
                // Replace and update style

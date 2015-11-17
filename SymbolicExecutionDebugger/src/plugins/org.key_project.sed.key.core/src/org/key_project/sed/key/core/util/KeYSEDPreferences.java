@@ -14,7 +14,7 @@
 package org.key_project.sed.key.core.util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEGroupable;
 import org.key_project.sed.key.core.Activator;
 
 /**
@@ -84,7 +84,7 @@ public class KeYSEDPreferences {
    public static final String HIGHLIGHT_REACHED_SOURCE_CODE = "org.key_project.sed.key.core.preference.highlightReachedSourceCode";
 
    /**
-    * Preference key to enable or disable grouping of {@link ISEDGroupable}s.
+    * Preference key to enable or disable grouping of {@link ISEGroupable}s.
     */
    public static final String GROUPING_ENABLED = "org.key_project.sed.key.core.preference.groupingEnabled";
 

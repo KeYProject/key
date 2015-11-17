@@ -26,7 +26,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.launch.KeYLaunchConfigurationDelegate;
 import org.key_project.sed.key.core.test.Activator;
@@ -72,7 +72,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
+         ISEDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          ILaunch launch = target.getLaunch();
          assertNotNull(launch);
          // Resume
@@ -210,7 +210,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
+         ISEDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          ILaunch launch = target.getLaunch();
          assertNotNull(launch);
          // Resume

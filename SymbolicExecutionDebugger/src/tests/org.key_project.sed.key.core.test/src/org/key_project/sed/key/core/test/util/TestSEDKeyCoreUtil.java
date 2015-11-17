@@ -29,10 +29,10 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
-import org.key_project.sed.core.model.memory.SEDMemoryThread;
-import org.key_project.sed.core.model.serialization.SEDXMLReader;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.memory.SEMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEMemoryThread;
+import org.key_project.sed.core.model.serialization.SEXMLReader;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
@@ -269,17 +269,17 @@ public final class TestSEDKeyCoreUtil {
    }
 
    /**
-    * Creates an expected {@link ISEDDebugTarget} defined by the given bundle file.
+    * Creates an expected {@link ISEDebugTarget} defined by the given bundle file.
     * @param bundleId The plug-in ID which contains the expected model path.
     * @param expectedModelPathInBundle The path to the oracle file in the bundle.
-    * @return The expected {@link ISEDDebugTarget}.
+    * @return The expected {@link ISEDebugTarget}.
     * @throws IOException Occurred Exception.
     * @throws SAXException Occurred Exception.
     * @throws ParserConfigurationException Occurred Exception.
     */   
-   public static ISEDDebugTarget createExpectedModel(String bundleId, String expectedModelPathInBundle) throws ParserConfigurationException, SAXException, IOException {
-      SEDXMLReader reader = new SEDXMLReader();
-      List<ISEDDebugTarget> targets = reader.read(BundleUtil.openInputStream(bundleId, expectedModelPathInBundle));
+   public static ISEDebugTarget createExpectedModel(String bundleId, String expectedModelPathInBundle) throws ParserConfigurationException, SAXException, IOException {
+      SEXMLReader reader = new SEXMLReader();
+      List<ISEDebugTarget> targets = reader.read(BundleUtil.openInputStream(bundleId, expectedModelPathInBundle));
       TestCase.assertNotNull(targets);
       TestCase.assertEquals(1, targets.size());
       return targets.get(0);
@@ -288,16 +288,16 @@ public final class TestSEDKeyCoreUtil {
    /**
     * Creates the expected initial model that represents the state after
     * connecting to KeY with only one symbolic thread without any children.
-    * @param targetName The expected name of the {@link ISEDDebugTarget}. 
+    * @param targetName The expected name of the {@link ISEDebugTarget}. 
     * @return The created expected model.
     */
-   public static ISEDDebugTarget createExpectedInitialModel(String targetName, boolean disposed) {
+   public static ISEDebugTarget createExpectedInitialModel(String targetName, boolean disposed) {
       // Create debug target
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
+      SEMemoryDebugTarget target = new SEMemoryDebugTarget(null, false);
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
       target.setName(targetName);
       // Add thread
-      SEDMemoryThread thread = new SEDMemoryThread(target, false);
+      SEMemoryThread thread = new SEMemoryThread(target, false);
       thread.setName(IExecutionStart.DEFAULT_START_NODE_NAME);
       if (!disposed) {
          thread.setPathCondition("true");
@@ -307,37 +307,37 @@ public final class TestSEDKeyCoreUtil {
    }
    
    /**
-    * Makes sure that the given {@link ISEDDebugTarget} is
+    * Makes sure that the given {@link ISEDebugTarget} is
     * in the initial state.
-    * @param target The give {@link ISEDDebugTarget} to check.
-    * @param targetName The expected name of the {@link ISEDDebugTarget}. 
+    * @param target The give {@link ISEDebugTarget} to check.
+    * @param targetName The expected name of the {@link ISEDebugTarget}. 
     * @throws DebugException Occurred Exception.
     */
-   public static void assertDisposedInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
+   public static void assertDisposedInitialTarget(ISEDebugTarget target, String targetName) throws DebugException {
       TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, true), target, false, false, false, false);
    }
    
    /**
-    * Makes sure that the given {@link ISEDDebugTarget} is
+    * Makes sure that the given {@link ISEDebugTarget} is
     * in the initial state.
-    * @param target The give {@link ISEDDebugTarget} to check.
-    * @param targetName The expected name of the {@link ISEDDebugTarget}. 
+    * @param target The give {@link ISEDebugTarget} to check.
+    * @param targetName The expected name of the {@link ISEDebugTarget}. 
     * @throws DebugException Occurred Exception.
     */
-   public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
+   public static void assertInitialTarget(ISEDebugTarget target, String targetName) throws DebugException {
       TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, false), target, false, false, false, false);
    }
    
    /**
-    * Makes sure that the given {@link ISEDDebugTarget} contains the
+    * Makes sure that the given {@link ISEDebugTarget} contains the
     * symbolic execution tree of the statement example.
-    * @param target The give {@link ISEDDebugTarget} to check.
+    * @param target The give {@link ISEDebugTarget} to check.
     * @throws DebugException Occurred Exception.
     * @throws IOException Occurred Exception.
     * @throws SAXException Occurred Exception.
     * @throws ParserConfigurationException Occurred Exception.
     */
-   public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
+   public static void assertFlatStepsExample(ISEDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
       TestSedCoreUtil.compareDebugTarget(createExpectedModel(Activator.PLUGIN_ID, "data/statements/oracle/FlatSteps.xml"), target, false, false, false, false);
    }
    

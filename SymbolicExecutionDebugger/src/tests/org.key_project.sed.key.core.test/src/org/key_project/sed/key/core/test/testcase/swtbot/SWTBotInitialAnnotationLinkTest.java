@@ -21,32 +21,32 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.SearchAnnotation;
 import org.key_project.sed.core.annotation.impl.SearchAnnotationType;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.util.SEAnnotationUtil;
 import org.key_project.sed.key.core.model.KeYStatement;
 
 /**
- * Ensures that {@link ISEDAnnotationLink}s are automatically added to new nodes.
+ * Ensures that {@link ISEAnnotationLink}s are automatically added to new nodes.
  * @author Martin Hentschel
  */
 public class SWTBotInitialAnnotationLinkTest extends AbstractKeYDebugTargetTestCase {
    /**
-    * Ensures that initial search {@link ISEDAnnotationLink}s are added to new {@link ISEDDebugNode}s
+    * Ensures that initial search {@link ISEAnnotationLink}s are added to new {@link ISENode}s
     * (more precise: only {@link KeYStatement}s are tested).
     */
    @Test
    public void testInitialSearchAnnotations() throws Exception {
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             // Add search annotation
-            ISEDAnnotationType type = SEDAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
+            ISEAnnotationType type = SEAnnotationUtil.getAnnotationtype(SearchAnnotationType.TYPE_ID);
             SearchAnnotation annotation = (SearchAnnotation)type.createAnnotation();
             annotation.setSearch("=");
             target.registerAnnotation(annotation);
@@ -54,7 +54,7 @@ public class SWTBotInitialAnnotationLinkTest extends AbstractKeYDebugTargetTestC
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
             resume(bot, item, target);
             // Test annotation
-            ISEDAnnotationLink[] links = annotation.getLinks();
+            ISEAnnotationLink[] links = annotation.getLinks();
             assertEquals(3, links.length);
          }
       };

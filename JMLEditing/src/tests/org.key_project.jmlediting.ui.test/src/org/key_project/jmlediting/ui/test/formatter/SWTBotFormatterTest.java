@@ -49,7 +49,7 @@ public class SWTBotFormatterTest {
    @Test
    public void testJMLCommentsUnchanged() {
       final List<String> commentsBefore = this.getComments();
-      bot.menu("Source").menu("Format").click();
+      editor.contextMenu("Source").menu("Format Element").click();
       TestUtilsUtil.waitForJobs();
       final List<String> commentAfter = this.getComments();
       assertEquals("Formatter modified JML comments", commentsBefore, commentAfter);
@@ -57,9 +57,9 @@ public class SWTBotFormatterTest {
 
    @Test
    public void testJMLCommentsUnchangedFormatElement() {
-      final List<String> commentsBefore = this.getComments();
+      final List<String> commentsBefore = this.getComments();  
       editor.selectRange(18, 12, 121);
-      bot.menu("Source").menu("Format Element").click();
+      editor.contextMenu("Source").menu("Format Element").click();
       TestUtilsUtil.waitForJobs();
       final List<String> commentAfter = this.getComments();
       assertEquals("Format element modified JML comments", commentsBefore, commentAfter);

@@ -70,6 +70,11 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 "<li>Expand invariant definitions</ol>";
     }
 
+    @Override
+    public String getScriptCommandName() {
+        return "autopilot-prep";
+    }
+
     /*
      * convert a string array to a set of strings
      */

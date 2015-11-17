@@ -43,6 +43,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -356,6 +357,7 @@ public class TermLabelManager {
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
     * @param rule The {@link Rule} which is applied.
+    * @param ruleApp The {@link RuleApp} which is currently performed.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
@@ -370,6 +372,7 @@ public class TermLabelManager {
                                                              Services services,
                                                              PosInOccurrence applicationPosInOccurrence,
                                                              Rule rule,
+                                                             RuleApp ruleApp,
                                                              Goal goal,
                                                              Object hint,
                                                              Term tacletTerm,
@@ -379,7 +382,7 @@ public class TermLabelManager {
                                                              JavaBlock newTermJavaBlock,
                                                              ImmutableArray<TermLabel> newTermOriginalLabels) {
       Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
-      return instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
+      return instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
    }
 
    /**
@@ -397,6 +400,7 @@ public class TermLabelManager {
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
     * @param rule The {@link Rule} which is applied.
+    * @param ruleApp The {@link RuleApp} which is currently performed.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
@@ -412,6 +416,7 @@ public class TermLabelManager {
                                                              Term applicationTerm,
                                                              PosInOccurrence applicationPosInOccurrence,
                                                              Rule rule,
+                                                             RuleApp ruleApp,
                                                              Goal goal,
                                                              Object hint,
                                                              Term tacletTerm,
@@ -427,6 +432,7 @@ public class TermLabelManager {
                                           applicationPosInOccurrence,
                                           applicationTerm,
                                           rule,
+                                          ruleApp,
                                           goal,
                                           hint,
                                           tacletTerm,
@@ -458,6 +464,7 @@ public class TermLabelManager {
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
+    * @param ruleApp The {@link RuleApp} which is currently performed.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
@@ -473,6 +480,7 @@ public class TermLabelManager {
                                                       PosInOccurrence applicationPosInOccurrence,
                                                       Term applicationTerm,
                                                       Rule rule,
+                                                      RuleApp ruleApp,
                                                       Goal goal,
                                                       Object hint,
                                                       Term tacletTerm,
@@ -518,11 +526,11 @@ public class TermLabelManager {
       }
       // Allow rule specific updater to remove and add labels
       if (currentRuleSpecificUpdates != null) {
-         performUpdater(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, currentRuleSpecificUpdates, newLabels);
+         performUpdater(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, currentRuleSpecificUpdates, newLabels);
       }
       // Allow all rule updater to remove and add labels
       if (!allRulesUpdates.isEmpty()) {
-         performUpdater(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, allRulesUpdates, newLabels);
+         performUpdater(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, allRulesUpdates, newLabels);
       }
       // Return result
       return new ImmutableArray<TermLabel>(newLabels.toArray(new TermLabel[newLabels.size()]));
@@ -805,6 +813,7 @@ public class TermLabelManager {
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param modalityTerm The optional modality {@link Term}.
     * @param rule The {@link Rule} which is applied.
+    * @param ruleApp The {@link RuleApp} which is currently performed.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
@@ -821,6 +830,7 @@ public class TermLabelManager {
                                  Term applicationTerm,
                                  Term modalityTerm,
                                  Rule rule,
+                                 RuleApp ruleApp,
                                  Goal goal,
                                  Object hint,
                                  Term tacletTerm,
@@ -831,7 +841,7 @@ public class TermLabelManager {
                                  ImmutableList<TermLabelUpdate> updater,
                                  Set<TermLabel> newLabels) {
       for (TermLabelUpdate update : updater) {
-         update.updateLabels(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newLabels);
+         update.updateLabels(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newLabels);
       }
    }
    
@@ -1031,6 +1041,75 @@ public class TermLabelManager {
          Term root = replaceTerm(state, applicationPosInOccurrence, applicationTerm, tf, refactorings.getChildAndGrandchildRefactoringsAndParents(), services, applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
          goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
       }
+      // Do sequent refactoring if required
+      if (!refactorings.getSequentRefactorings().isEmpty()) {
+         Sequent sequent = goal.sequent();
+         refactorSemisequent(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sequent.antecedent(), true, refactorings.getSequentRefactorings());
+         refactorSemisequent(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sequent.succedent(), false, refactorings.getSequentRefactorings());
+      }
+   }
+
+   /**
+    * <p>
+    * Refactors all labels in the complete {@link Sequent}. This is the last
+    * step of each rule application. Only refactorings with scope
+    * {@link RefactoringScope#SEQUENT} are performed!
+    * </p>
+    * <p>
+    * This method delegates the request to the {@link TermLabelManager}
+    * of the given {@link Services} if possible. Otherwise no labels are returned.
+    * </p>
+    * @param state The {@link TermLabelState} of the current rule application.
+    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param rule The {@link Rule} which is applied.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
+    * @param tacletTerm The optional taclet {@link Term}.
+    */
+   public static void refactorSequent(TermLabelState state,
+                                      Services services,
+                                      PosInOccurrence applicationPosInOccurrence,
+                                      Rule rule,
+                                      Goal goal,
+                                      Object hint,
+                                      Term tacletTerm) {
+      TermLabelManager manager = getTermLabelManager(services);
+      if (manager != null) {
+         Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+         manager.refactorSequent(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
+      }
+   }
+
+   /**
+    * <p>
+    * Refactors all labels in the complete {@link Sequent}. This is the last
+    * step of each rule application. Only refactorings with scope
+    * {@link RefactoringScope#SEQUENT} are performed!
+    * </p>
+    * <p>
+    * This method delegates the request to the {@link TermLabelManager}
+    * of the given {@link Services} if possible. Otherwise no labels are returned.
+    * </p>
+    * @param state The {@link TermLabelState} of the current rule application.
+    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param rule The {@link Rule} which is applied.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
+    * @param tacletTerm The optional taclet {@link Term}.
+    */
+   public void refactorSequent(TermLabelState state,
+                               Services services,
+                               PosInOccurrence applicationPosInOccurrence,
+                               Term applicationTerm,
+                               Rule rule,
+                               Goal goal,
+                               Object hint,
+                               Term tacletTerm) {
+      // Compute active refactorings
+      RefactoringsContainer refactorings = computeRefactorings(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
       // Do sequent refactoring if required
       if (!refactorings.getSequentRefactorings().isEmpty()) {
          Sequent sequent = goal.sequent();

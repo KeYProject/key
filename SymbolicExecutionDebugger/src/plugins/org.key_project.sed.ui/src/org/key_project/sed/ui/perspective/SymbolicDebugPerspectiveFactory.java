@@ -36,7 +36,7 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
       // Get the editor area.
       String editorArea = layout.getEditorArea();
       // Put the debug view on the left.
-      IFolderLayout leftFolder = layout.createFolder("left", IPageLayout.LEFT, 0.5f, editorArea);
+      IFolderLayout leftFolder = layout.createFolder("left", IPageLayout.LEFT, 0.7f, editorArea);
       leftFolder.addView(IDebugUIConstants.ID_DEBUG_VIEW);
       // Put the properties view on bottom left.
       IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.8f, "left");

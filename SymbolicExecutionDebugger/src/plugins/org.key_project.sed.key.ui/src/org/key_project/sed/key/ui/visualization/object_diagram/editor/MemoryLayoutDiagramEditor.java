@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.ide.IDE;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.sed.key.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromMemoryLayoutCustomFeature;
 import org.key_project.sed.ui.visualization.object_diagram.editor.ObjectDiagramEditor;
@@ -173,10 +173,10 @@ public class MemoryLayoutDiagramEditor extends ReadonlyObjectDiagramEditor {
    }
    
    /**
-    * Generates an object diagram for the first layout of the given {@link IKeYSEDDebugNode}.
-    * @param node {@link IKeYSEDDebugNode} to generate layout for.
+    * Generates an object diagram for the first layout of the given {@link IKeYSENode}.
+    * @param node {@link IKeYSENode} to generate layout for.
     */
-   public void generateMemoryLayoutsDiagram(IKeYSEDDebugNode<?> node) {
+   public void generateMemoryLayoutsDiagram(IKeYSENode<?> node) {
       setLayoutControlsEnabled(false);
       SWTUtil.setText(equivalenceClassesText, null);
       if (node != null && node.getExecutionNode() != null) {

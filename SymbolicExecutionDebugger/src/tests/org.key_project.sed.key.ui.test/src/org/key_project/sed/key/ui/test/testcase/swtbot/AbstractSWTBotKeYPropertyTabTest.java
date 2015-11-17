@@ -21,18 +21,17 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDLoopBodyTermination;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDMethodContract;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISELoopBodyTermination;
+import org.key_project.sed.core.model.ISELoopInvariant;
+import org.key_project.sed.core.model.ISEMethodContract;
+import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISETermination;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
 import org.key_project.sed.key.ui.test.Activator;
-import org.key_project.sed.key.ui.test.testcase.swtbot.AbstractSWTBotKeYPropertyTabTest.ITestSteps;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -50,7 +49,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    protected void doAllNodeTypesTest(String projectName, final ITestSteps steps) throws Exception {
       IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
             resume(bot, item, target);
             // Wait until jobs are done
@@ -112,7 +111,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
-    * Selects an {@link ISEDMethodReturn}.
+    * Selects an {@link ISEMethodReturn}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
@@ -121,7 +120,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
-    * Selects an {@link ISEDMethodReturn}.
+    * Selects an {@link ISEMethodReturn}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
@@ -130,7 +129,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
-    * Selects an {@link ISEDMethodContract}.
+    * Selects an {@link ISEMethodContract}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
@@ -139,7 +138,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
-    * Selects an {@link ISEDDebugTarget}.
+    * Selects an {@link ISEDebugTarget}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
@@ -148,7 +147,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
-    * Selects an {@link ISEDThread}.
+    * Selects an {@link ISEThread}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
@@ -157,7 +156,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
-    * Selects an {@link ISEDStatement}.
+    * Selects an {@link ISEStatement}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
@@ -166,7 +165,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
-    * Selects an {@link ISEDLoopInvariant}.
+    * Selects an {@link ISELoopInvariant}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
@@ -175,16 +174,16 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
-    * Selects an {@link ISEDLoopBodyTermination}.
+    * Selects an {@link ISELoopBodyTermination}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
    protected void selectLoopBodyTermination(SWTBotView debugView) throws Exception {
-      TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 0, 4, 0, 2);
+      TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1, 0, 4, 0, 3);
    }
 
    /**
-    * Selects an {@link ISEDTermination}.
+    * Selects an {@link ISETermination}.
     * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
@@ -198,7 +197,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
     */
    protected static interface ITestSteps {
       /**
-       * Do some assertions on an {@link ISEDThread}.
+       * Do some assertions on an {@link ISEThread}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
@@ -207,7 +206,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
       public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDStatement}.
+       * Do some assertions on an {@link ISEStatement}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
@@ -216,7 +215,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
       public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDDebugTarget}.
+       * Do some assertions on an {@link ISEDebugTarget}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
@@ -225,7 +224,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
       public void assertDebugTarget(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDMethodReturn}.
+       * Do some assertions on an {@link ISEMethodReturn}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
@@ -234,7 +233,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
       public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDMethodContract}.
+       * Do some assertions on an {@link ISEMethodContract}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
@@ -243,7 +242,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
       public void assertMethodContract(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDTermination}.
+       * Do some assertions on an {@link ISETermination}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
@@ -252,7 +251,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
       public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDLoopInvariant}.
+       * Do some assertions on an {@link ISELoopInvariant}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
@@ -261,7 +260,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
       public void assertLoopInvariant(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDLoopBodyTermination}.
+       * Do some assertions on an {@link ISELoopBodyTermination}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.

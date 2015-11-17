@@ -14,19 +14,19 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 
 /**
- * {@link ISection} implementation to show the group start conditions of an {@link ISEDDebugNode}
- * which is provided via {@link ISEDDebugNode#getGroupStartConditions()}.
+ * {@link ISection} implementation to show the group start conditions of an {@link ISENode}
+ * which is provided via {@link ISENode#getGroupStartConditions()}.
  * @author Martin Hentschel
  */
-public class GroupStartConditionsPropertySection extends AbstractSEDDebugNodePropertySection {
+public class GroupStartConditionsPropertySection extends AbstractSENodePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
+   protected ISENodeTabContent createContent() {
       return new GroupStartConditionsTabComposite();
    }
 

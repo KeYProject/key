@@ -21,7 +21,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSENode;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.sed.key.ui.visualization.object_diagram.editor.MemoryLayoutDiagramEditor;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
@@ -31,7 +31,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
- * This {@link IHandler} visualizes the memory layouts of selected {@link IKeYSEDDebugNode}s.
+ * This {@link IHandler} visualizes the memory layouts of selected {@link IKeYSENode}s.
  * @author Martin Hentschel
  */
 public class VisualizeMemoryLayoutsCommand extends AbstractHandler {
@@ -45,7 +45,7 @@ public class VisualizeMemoryLayoutsCommand extends AbstractHandler {
          Object[] elements = SWTUtil.toArray(selection);
          for (Object element : elements) {
             if (canVisualize(element)) {
-               visualizeMemoryLayouts((IKeYSEDDebugNode<?>)element,
+               visualizeMemoryLayouts((IKeYSENode<?>)element,
                                       HandlerUtil.getActivePart(event).getSite().getPage());
             }
          }
@@ -64,8 +64,8 @@ public class VisualizeMemoryLayoutsCommand extends AbstractHandler {
     */
    public static boolean canVisualize(Object element) throws DebugException {
       try {
-         if (element instanceof IKeYSEDDebugNode<?>) {
-            IKeYSEDDebugNode<?> node = (IKeYSEDDebugNode<?>)element;
+         if (element instanceof IKeYSENode<?>) {
+            IKeYSENode<?> node = (IKeYSENode<?>)element;
             return !node.getExecutionNode().isDisposed() &&
                    node.getExecutionNode().getPathCondition().op() != Junctor.FALSE;
          }
@@ -79,12 +79,12 @@ public class VisualizeMemoryLayoutsCommand extends AbstractHandler {
    }
 
    /**
-    * Visualizes the memory layouts of the given {@link IKeYSEDDebugNode}.
-    * @param node The {@link IKeYSEDDebugNode} to visualize.
+    * Visualizes the memory layouts of the given {@link IKeYSENode}.
+    * @param node The {@link IKeYSENode} to visualize.
     * @param activePage The active {@link IWorkbenchPage}.
     * @throws Exception Occurred Exception.
     */
-   public static void visualizeMemoryLayouts(IKeYSEDDebugNode<?> node,
+   public static void visualizeMemoryLayouts(IKeYSENode<?> node,
                                              IWorkbenchPage activePage) throws Exception {
       // Open editor
       MemoryLayoutDiagramEditor editor = MemoryLayoutDiagramEditor.openEditor(activePage, node.getName(), node.getId() + "_layouts");

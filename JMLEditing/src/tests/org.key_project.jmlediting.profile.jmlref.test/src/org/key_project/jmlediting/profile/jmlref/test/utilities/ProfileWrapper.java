@@ -9,6 +9,6 @@ public class ProfileWrapper {
       return new JMLReferenceProfileAE();
    }
 
-   public static IJMLExpressionProfile testProfile = getReferenceProfile();
+   public final static IJMLExpressionProfile testProfile = getReferenceProfile();
 
 }

@@ -24,13 +24,13 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEDebugElement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEGroupable;
+import org.key_project.sed.core.util.ISEIterator;
 import org.key_project.sed.core.util.NodeUtil;
-import org.key_project.sed.core.util.SEDGroupPreorderIterator;
+import org.key_project.sed.core.util.SEGroupPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -82,7 +82,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       
       if(pes != null)
       {
-         ISEDGroupable groupStart = (ISEDGroupable) getBusinessObjectForPictogramElement(pes[0]);
+         ISEGroupable groupStart = (ISEGroupable) getBusinessObjectForPictogramElement(pes[0]);
          pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(groupStart);
          
          try
@@ -95,7 +95,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
             
             // if the group is expanded, collapse it
             if(!groupStart.isCollapsed()) {
-               SEDGroupPreorderIterator iter = new SEDGroupPreorderIterator(groupStart);
+               SEGroupPreorderIterator iter = new SEGroupPreorderIterator(groupStart);
                color = iter.allBranchesFinished() ? new ColorConstant(102, 180, 0) : new ColorConstant(255, 102, 0);
                
                removeChildren(groupStart);
@@ -106,9 +106,9 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
             else {
                // Remove the BranchConditions and their connections
                DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
-               ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
+               ISEBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
                
-               for(ISEDBranchCondition bc : bcs) {
+               for(ISEBranchCondition bc : bcs) {
                   PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc, true);
                   removeConnections(bcPE, drf);
                   drf.remove(new RemoveContext(bcPE));
@@ -119,8 +119,8 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                GraphicsAlgorithm rectGA = pes[0].getGraphicsAlgorithm();
                GraphicsAlgorithm nodeGA = pes[1].getGraphicsAlgorithm();
 
-               int mostLeftAbove = uf.findAbove((ISEDDebugNode) groupStart, true, true);
-               int mostLeftInSubtree = uf.findInSubtree((ISEDDebugNode) groupStart, true, true);
+               int mostLeftAbove = uf.findAbove((ISENode) groupStart, true, true);
+               int mostLeftInSubtree = uf.findInSubtree((ISENode) groupStart, true, true);
                int mostLeft = mostLeftAbove < mostLeftInSubtree ? mostLeftAbove : mostLeftInSubtree;
 
                // set groupstart node and rect like updateChildrenLeft
@@ -133,8 +133,8 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                uf.update(uc);
 
                // Add connections to the endnodes of the group
-               for(ISEDBranchCondition bc : bcs) {
-                  ISEDDebugNode groupEnd = bc.getChildren()[0];
+               for(ISEBranchCondition bc : bcs) {
+                  ISENode groupEnd = bc.getChildren()[0];
 
                   PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd, true);
                   PictogramElement parentPE = uf.getPictogramElementForBusinessObject(NodeUtil.getParent(groupEnd), true);
@@ -155,32 +155,32 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
    }
    
    /**
-    * Performs the collapse of the given {@link ISEDGroupable}.
+    * Performs the collapse of the given {@link ISEGroupable}.
     * @param groupStart The group to collapse.
     * @param uf The {@link AbstractDebugNodeUpdateFeature} to use.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   private void updateCollapse(ISEDGroupable groupStart, AbstractDebugNodeUpdateFeature uf, IProgressMonitor monitor) throws DebugException {
+   private void updateCollapse(ISEGroupable groupStart, AbstractDebugNodeUpdateFeature uf, IProgressMonitor monitor) throws DebugException {
       GraphicsAlgorithm rectGA = uf.getPictogramElementForBusinessObject(groupStart, 0).getGraphicsAlgorithm();
       GraphicsAlgorithm nodeGA = uf.getPictogramElementForBusinessObject(groupStart, true).getGraphicsAlgorithm();
       
-      ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
+      ISEBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
 
-      LinkedList<ISEDDebugNode> leafs = new LinkedList<ISEDDebugNode>();
+      LinkedList<ISENode> leafs = new LinkedList<ISENode>();
       
       nodeGA.setX(rectGA.getX());
 
       if(bcs.length > 1) {
-         int above = uf.findBiggestWidthInPartTreeAbove((ISEDDebugNode) groupStart, true);
+         int above = uf.findBiggestWidthInPartTreeAbove((ISENode) groupStart, true);
          // if there is a bigger node above our rect set the x-position to it
          if(above > rectGA.getWidth()) {
-            nodeGA.setX(uf.findAbove((ISEDDebugNode) groupStart, true, true));
+            nodeGA.setX(uf.findAbove((ISENode) groupStart, true, true));
          }
       }
       
       // Add the branchconditions to the diagram
-      for(ISEDBranchCondition bc : bcs)
+      for(ISEBranchCondition bc : bcs)
       { 
          // second parameter never used (parent always != null when collapsing)
          uf.createGraphicalRepresentationForNode(bc, true, 0);
@@ -188,7 +188,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc, true);
          GraphicsAlgorithm bcGA = bcPE.getGraphicsAlgorithm();
 
-         ISEDDebugNode groupEnd = bc.getChildren()[0];
+         ISENode groupEnd = bc.getChildren()[0];
          
          PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd, true);
          GraphicsAlgorithm groupEndGA = groupEndPE.getGraphicsAlgorithm();
@@ -212,15 +212,15 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       }
 
       uf.shrinkRectHeights(groupStart, true);
-      uf.centerChildren(new HashSet<ISEDDebugNode>(leafs), true, new SubProgressMonitor(monitor, 1));
-      uf.adjustSubtreeIfSmaller((ISEDDebugNode) groupStart, true, new SubProgressMonitor(monitor, 1));
+      uf.centerChildren(new HashSet<ISENode>(leafs), true, new SubProgressMonitor(monitor, 1));
+      uf.adjustSubtreeIfSmaller((ISENode) groupStart, true, new SubProgressMonitor(monitor, 1));
       monitor.worked(1);
 
       // if the group has only one branch we need to adjust it manually
       if(bcs.length == 1)
       {
-         ISEDDebugNode leaf = leafs.get(0);
-         ISEDDebugNode child = ArrayUtil.getFirst(NodeUtil.getChildren(leaf));
+         ISENode leaf = leafs.get(0);
+         ISENode child = ArrayUtil.getFirst(NodeUtil.getChildren(leaf));
          
          if(child != null) {
             GraphicsAlgorithm leafGA = uf.getPictogramElementForBusinessObject(leaf, true).getGraphicsAlgorithm();
@@ -245,19 +245,19 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          rectGA.setX(nodeGA.getX() - uf.METOFF);
       }
 
-      uf.adjustRects((ISEDDebugNode) groupStart, true, new SubProgressMonitor(monitor, 1));
+      uf.adjustRects((ISENode) groupStart, true, new SubProgressMonitor(monitor, 1));
       uf.updateParents(uf.getPictogramElementForBusinessObject(groupStart, true), new SubProgressMonitor(monitor, 1));
       
       /**
        * Adjust Space between the left/right side of the group
        */
-      int mostRightXInPrev = uf.findInSiblingBranch((ISEDDebugNode) groupStart, true, false);
-      int mostLeftXInSubtree = uf.findInSubtree((ISEDDebugNode) groupStart, true, true);
-      int mostLeftXAbove = uf.findAbove((ISEDDebugNode) groupStart, true, true);
+      int mostRightXInPrev = uf.findInSiblingBranch((ISENode) groupStart, true, false);
+      int mostLeftXInSubtree = uf.findInSubtree((ISENode) groupStart, true, true);
+      int mostLeftXAbove = uf.findAbove((ISENode) groupStart, true, true);
       int mostLeftX = mostLeftXAbove < mostLeftXInSubtree ? mostLeftXAbove : mostLeftXInSubtree; 
 
       int toMove = 0;
-      ISEDGroupable outerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
+      ISEGroupable outerGroup = NodeUtil.getGroupStartNode((ISENode) groupStart);
       
       if(outerGroup != null) {
          GraphicsAlgorithm outerGA = uf.getPictogramElementForBusinessObject(outerGroup, 0).getGraphicsAlgorithm();
@@ -276,8 +276,8 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       }
 
       if(toMove != 0) {
-         uf.moveRightAndAbove((ISEDDebugNode) groupStart, true, toMove, monitor);
-         uf.moveSubTreeHorizontal((ISEDDebugNode) groupStart, true, toMove, true, monitor);
+         uf.moveRightAndAbove((ISENode) groupStart, true, toMove, monitor);
+         uf.moveSubTreeHorizontal((ISENode) groupStart, true, toMove, true, monitor);
       }
       
       uf.resizeRectsIfNeeded(groupStart, true, monitor);
@@ -307,21 +307,21 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
    
    /**
     * This function removes all children and connections inside the given group (methodbody).
-    * @param ISEDGroupable groupStart The start node of the group.
+    * @param ISEGroupable groupStart The start node of the group.
     * @throws DebugException Occured Exception.
     */
-   protected void removeChildren(ISEDGroupable groupStart) throws DebugException {
+   protected void removeChildren(ISEGroupable groupStart) throws DebugException {
       DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
-      ISEDIterator iter = new SEDGroupPreorderIterator(groupStart);
+      ISEIterator iter = new SEGroupPreorderIterator(groupStart);
       while (iter.hasNext()) {
-         ISEDDebugElement next = iter.next();
+         ISEDebugElement next = iter.next();
         
-         if(next instanceof ISEDDebugNode)
+         if(next instanceof ISENode)
          {
-            ISEDDebugNode nextNode = (ISEDDebugNode) next;
+            ISENode nextNode = (ISENode) next;
             PictogramElement[] pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(nextNode);
             
-            if(pes == null || nextNode.getGroupStartCondition((ISEDDebugNode) groupStart) != null) {
+            if(pes == null || nextNode.getGroupStartCondition((ISENode) groupStart) != null) {
                 continue;
             }
             
@@ -329,7 +329,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
             removeConnections((NodeUtil.canBeGrouped(nextNode) ? pes[1] : pes[0]), drf);
             
             // If its a node of the methodbody we can remove it
-            if(nextNode != (ISEDDebugNode) groupStart) {
+            if(nextNode != (ISENode) groupStart) {
                drf.remove(new RemoveContext(pes[0]));
                
                // If the node opens an other group we need to remove the rect too 

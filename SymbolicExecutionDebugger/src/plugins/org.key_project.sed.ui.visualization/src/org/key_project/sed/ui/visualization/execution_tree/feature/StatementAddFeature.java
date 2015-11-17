@@ -15,12 +15,12 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDStatement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEStatement;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDStatement}s.
+ * Implementation of {@link IAddFeature} for {@link ISEStatement}s.
  * @author Martin Hentschel
  */
 public class StatementAddFeature extends AbstractDebugNodeAddFeature {
@@ -37,14 +37,14 @@ public class StatementAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDStatement;
+      return businessObject instanceof ISEStatement;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getImageId(ISEDDebugNode node) {
+   protected String getImageId(ISENode node) {
       return IExecutionTreeImageConstants.IMG_STATEMENT;
    }
 }

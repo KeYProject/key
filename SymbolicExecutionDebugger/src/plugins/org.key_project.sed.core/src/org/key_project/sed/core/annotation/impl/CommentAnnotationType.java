@@ -2,18 +2,18 @@ package org.key_project.sed.core.annotation.impl;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.RGB;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.annotation.ISEDAnnotationType;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
+import org.key_project.sed.core.model.ISENode;
 
 /**
- * The {@link ISEDAnnotationType} used for comments.
+ * The {@link ISEAnnotationType} used for comments.
  * @author Martin Hentschel
  * @see CommentAnnotation
  * @see CommentAnnotationLink
  */
-public class CommentAnnotationType extends AbstractSEDAnnotationType {
+public class CommentAnnotationType extends AbstractSEAnnotationType {
    /**
     * The ID of this annotation type.
     */
@@ -79,7 +79,7 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public CommentAnnotationLink createLink(ISEDAnnotation source, ISEDDebugNode target) {
+   public CommentAnnotationLink createLink(ISEAnnotation source, ISENode target) {
       return new CommentAnnotationLink(source, target);
    }
 
@@ -87,7 +87,7 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public String[] getAdditionalLinkColumns(ISEDAnnotation annotation) {
+   public String[] getAdditionalLinkColumns(ISEAnnotation annotation) {
       Assert.isTrue(annotation instanceof CommentAnnotation);
       return new String[] {((CommentAnnotation)annotation).getCommentType()};
    }
@@ -96,7 +96,7 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public String getAdditionalLinkColumnValue(int index, ISEDAnnotationLink link) {
+   public String getAdditionalLinkColumnValue(int index, ISEAnnotationLink link) {
       if (link instanceof CommentAnnotationLink) {
          if (index == 0) {
             return ((CommentAnnotationLink) link).getComment();
@@ -114,7 +114,7 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public String saveAnnotation(ISEDAnnotation annotation) {
+   public String saveAnnotation(ISEAnnotation annotation) {
       Assert.isTrue(annotation instanceof CommentAnnotation);
       return ((CommentAnnotation)annotation).getCommentType();
    }
@@ -123,7 +123,7 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public void restoreAnnotation(ISEDAnnotation annotation, String savedContent) {
+   public void restoreAnnotation(ISEAnnotation annotation, String savedContent) {
       Assert.isTrue(annotation instanceof CommentAnnotation);
       ((CommentAnnotation)annotation).setCommentType(savedContent);
    }
@@ -132,7 +132,7 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public String saveAnnotationLink(ISEDAnnotationLink link) {
+   public String saveAnnotationLink(ISEAnnotationLink link) {
       Assert.isTrue(link instanceof CommentAnnotationLink);
       return ((CommentAnnotationLink)link).getComment();
    }
@@ -141,7 +141,7 @@ public class CommentAnnotationType extends AbstractSEDAnnotationType {
     * {@inheritDoc}
     */
    @Override
-   public void restoreAnnotationLink(ISEDAnnotationLink link, String savedContent) {
+   public void restoreAnnotationLink(ISEAnnotationLink link, String savedContent) {
       Assert.isTrue(link instanceof CommentAnnotationLink);
       ((CommentAnnotationLink)link).setComment(savedContent);
    }

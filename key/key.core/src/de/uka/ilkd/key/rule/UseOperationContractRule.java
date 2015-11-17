@@ -922,7 +922,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                  postJavaBlock,
                                                  inst.progPost.sub(0),
                                                  TermLabelManager.instantiateLabels(termLabelState,
-                                                         services, ruleApp.posInOccurrence(), this,
+                                                         services, ruleApp.posInOccurrence(), this, ruleApp,
                                                          postGoal, "PostModality", null, inst.mod,
                                                          new ImmutableArray<Term>(inst.progPost.sub(0)),
                                                          null, postJavaBlock, inst.progPost.getLabels())
@@ -947,7 +947,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term originalExcPost = tb.apply(anonUpdate,
                                               tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
                                                       TermLabelManager.instantiateLabels(termLabelState, services, 
-                                                              ruleApp.posInOccurrence(), this,
+                                                              ruleApp.posInOccurrence(), this, ruleApp,
                                                               excPostGoal, "ExceptionalPostModality",
                                                               null, inst.mod,
                                                               new ImmutableArray<Term>(

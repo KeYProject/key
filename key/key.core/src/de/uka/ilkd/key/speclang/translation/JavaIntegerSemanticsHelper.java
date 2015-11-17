@@ -259,7 +259,7 @@ public class JavaIntegerSemanticsHelper {
             if (isLong(resultType))
                 div = integerLDT.getJavaDivLong();
             else if (isBigint(resultType))
-                div = integerLDT.getDiv();
+                div = integerLDT.getJDivision();
             else
                 div = integerLDT.getJavaDivInt();
 
@@ -279,7 +279,7 @@ public class JavaIntegerSemanticsHelper {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
             if (isBigint(resultType))
-                return new SLExpression(tb.func(integerLDT.getMod(), a.getTerm(), b.getTerm()), resultType);
+                return new SLExpression(tb.func(integerLDT.getJModulo(), a.getTerm(), b.getTerm()), resultType);
             else
                 return new SLExpression(tb.func(integerLDT.getJavaMod(), a.getTerm(), b.getTerm()),
                         a.getType());

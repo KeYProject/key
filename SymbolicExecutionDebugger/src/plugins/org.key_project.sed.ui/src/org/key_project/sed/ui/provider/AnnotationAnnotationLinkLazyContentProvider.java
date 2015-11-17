@@ -3,15 +3,15 @@ package org.key_project.sed.ui.provider;
 import org.eclipse.jface.viewers.ILazyContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.annotation.event.ISEDAnnotationLinkListener;
-import org.key_project.sed.core.annotation.event.SEDAnnotationLinkEvent;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.annotation.event.ISEAnnotationLinkListener;
+import org.key_project.sed.core.annotation.event.SEAnnotationLinkEvent;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * An {@link ILazyContentProvider} which shows the available 
- * {@link ISEDAnnotationLink}s of an {@link ISEDAnnotation}. 
+ * {@link ISEAnnotationLink}s of an {@link ISEAnnotation}. 
  * @author Martin Hentschel
  */
 public class AnnotationAnnotationLinkLazyContentProvider implements ILazyContentProvider {
@@ -21,21 +21,21 @@ public class AnnotationAnnotationLinkLazyContentProvider implements ILazyContent
    private TableViewer viewer;
    
    /**
-    * The currently shown and observed {@link ISEDAnnotation}.
+    * The currently shown and observed {@link ISEAnnotation}.
     */
-   private ISEDAnnotation annotation;
+   private ISEAnnotation annotation;
    
    /**
     * Listens for changes on {@link #annotation}.
     */
-   private final ISEDAnnotationLinkListener listener = new ISEDAnnotationLinkListener() {
+   private final ISEAnnotationLinkListener listener = new ISEAnnotationLinkListener() {
       @Override
-      public void annotationLinkAdded(SEDAnnotationLinkEvent e) {
+      public void annotationLinkAdded(SEAnnotationLinkEvent e) {
          handleAnnotationLinkAdded(e);
       }
       
       @Override
-      public void annotationLinkRemoved(SEDAnnotationLinkEvent e) {
+      public void annotationLinkRemoved(SEAnnotationLinkEvent e) {
          handleAnnotationLinkRemoved(e);
       }
    };
@@ -49,8 +49,8 @@ public class AnnotationAnnotationLinkLazyContentProvider implements ILazyContent
       if (this.annotation != null) {
          this.annotation.removeAnnotationLinkListener(listener);
       }
-      if (newInput instanceof ISEDAnnotation) {
-         this.annotation = (ISEDAnnotation)newInput;
+      if (newInput instanceof ISEAnnotation) {
+         this.annotation = (ISEAnnotation)newInput;
          this.annotation.addAnnotationLinkListener(listener);
          this.viewer.setItemCount(this.annotation.countLinks());
       }
@@ -72,7 +72,7 @@ public class AnnotationAnnotationLinkLazyContentProvider implements ILazyContent
     * When a new annotation link is added.
     * @param e The event.
     */
-   protected void handleAnnotationLinkAdded(SEDAnnotationLinkEvent e) {
+   protected void handleAnnotationLinkAdded(SEAnnotationLinkEvent e) {
       SWTUtil.add(viewer, e.getLink());
    }
 
@@ -80,7 +80,7 @@ public class AnnotationAnnotationLinkLazyContentProvider implements ILazyContent
     * When an existing annotation link is removed.
     * @param e The event.
     */
-   protected void handleAnnotationLinkRemoved(SEDAnnotationLinkEvent e) {
+   protected void handleAnnotationLinkRemoved(SEAnnotationLinkEvent e) {
       SWTUtil.remove(viewer, e.getLink());
    }
 

@@ -33,27 +33,27 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.provider.SEDebugNodeContentProvider;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * This composite provides the functionality to show {@link ISEDDebugNode}s
+ * This composite provides the functionality to show {@link ISENode}s
  * in a {@link TreeViewer}.
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractNodeTreeTabComposite implements ISEDDebugNodeTabContent {
+public abstract class AbstractNodeTreeTabComposite implements ISENodeTabContent {
    /**
     * Shows the name of the current node.
     */
    private Group viewerGroup;
    
    /**
-    * Shows the call stack {@link ISEDDebugNode#getCallStack()}.
+    * Shows the call stack {@link ISENode#getCallStack()}.
     */
    private TreeModelViewer viewer;
    
@@ -123,7 +123,7 @@ public abstract class AbstractNodeTreeTabComposite implements ISEDDebugNodeTabCo
       try {
          IViewPart debugView = WorkbenchUtil.findView(IDebugUIConstants.ID_DEBUG_VIEW);
          if (debugView instanceof IDebugView) {
-            List<ISEDDebugNode> selectableElemenets = computeSelectableElements(viewer.getSelection());
+            List<ISENode> selectableElemenets = computeSelectableElements(viewer.getSelection());
             if (!selectableElemenets.isEmpty()) {
                SEDUIUtil.selectInDebugView(WorkbenchUtil.getActivePart(), (IDebugView)debugView, selectableElemenets);
             }
@@ -136,17 +136,17 @@ public abstract class AbstractNodeTreeTabComposite implements ISEDDebugNodeTabCo
    }
 
    /**
-    * Returns all selected {@link ISEDDebugNode}s which are shown in the debug view.
+    * Returns all selected {@link ISENode}s which are shown in the debug view.
     * @param selection The {@link ISelection} to check.
-    * @return The found shown {@link ISEDDebugNode}s.
+    * @return The found shown {@link ISENode}s.
     * @throws DebugException Occurred Exception.
     */
-   protected List<ISEDDebugNode> computeSelectableElements(ISelection selection) throws DebugException {
-      List<ISEDDebugNode> result = new LinkedList<ISEDDebugNode>();
+   protected List<ISENode> computeSelectableElements(ISelection selection) throws DebugException {
+      List<ISENode> result = new LinkedList<ISENode>();
       for (Object element : SWTUtil.toList(selection)) {
-         if (element instanceof ISEDDebugNode) {
-            ISEDDebugNode node = (ISEDDebugNode) element;
-            if (SEDDebugNodeContentProvider.getDefaultInstance().isShown(node)) {
+         if (element instanceof ISENode) {
+            ISENode node = (ISENode) element;
+            if (SEDebugNodeContentProvider.getDefaultInstance().isShown(node)) {
                result.add(node);
             }
          }
@@ -158,7 +158,7 @@ public abstract class AbstractNodeTreeTabComposite implements ISEDDebugNodeTabCo
     * {@inheritDoc}
     */
    @Override
-   public void updateContent(ISEDDebugNode node) {
+   public void updateContent(ISENode node) {
       String nodeText = getGroupName();
       try {
          if (node != null) {
@@ -176,9 +176,9 @@ public abstract class AbstractNodeTreeTabComposite implements ISEDDebugNodeTabCo
    /**
     * Configures the {@link PresentationContext} before the input of the {@link TreeViewer} is updated.
     * @param viewerContext The {@link PresentationContext} to modify.
-    * @param node The {@link ISEDDebugNode} to set as {@link TreeViewer} input.
+    * @param node The {@link ISENode} to set as {@link TreeViewer} input.
     */
-   protected abstract void configurePresentationContext(PresentationContext viewerContext, ISEDDebugNode node);
+   protected abstract void configurePresentationContext(PresentationContext viewerContext, ISENode node);
 
    /**
     * {@inheritDoc}

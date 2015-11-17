@@ -72,10 +72,11 @@ public class SWTBotPreconditionTabTest extends AbstractSWTBotKeYPropertyTabTest 
          public void assertMethodContract(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertTrue(tabs.selectTabItem("Precondition"));
             TestUtilsUtil.waitForJobs();
-            assertEquals(" true\n" +
-            		       "==>\n" +
-            		       "   (1 >= 0)<<F(\"5.0\")>>\n" +
-            		       " & (wellFormed(heap)<<F(\"6.0\")>> & inInt(1)<<F(\"7.0\")>>)", propertiesView.bot().styledText(0).getText());
+            assertEquals(" true\n"
+                         + "==>\n"
+                         + " {_obj:=obj || exc:=null || heap:=heap[obj.value := 1]}\n"
+                         + "   {heapBefore_doubleValue:=heap}\n"
+                         + "     (1 >= 0 & (wellFormed(heap) & inInt(1)))", propertiesView.bot().styledText(0).getText());
          }
 
          @Override

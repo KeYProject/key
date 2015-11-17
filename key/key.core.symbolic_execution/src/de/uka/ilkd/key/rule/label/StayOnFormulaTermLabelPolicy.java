@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule.label;
 
+import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -50,34 +52,39 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
       if (TruthValueEvaluationUtil.isPredicate(newTermOp) || 
           TruthValueEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)) {
          assert label instanceof FormulaTermLabel;
-         FormulaTermLabel pLabel = (FormulaTermLabel) label;
-         FormulaTermLabel originalLabel = searchPredicateTermLabel(newTermOriginalLabels);
-         FormulaTermLabel mostImportantLabel = originalLabel != null ? originalLabel : pLabel;
+         FormulaTermLabel formulaLabel = (FormulaTermLabel) label;
+         FormulaTermLabel originalLabel = searchFormulaTermLabel(newTermOriginalLabels);
+         FormulaTermLabel mostImportantLabel = originalLabel != null ? originalLabel : formulaLabel;
          // May change sub ID if logical operators like junctors are used
          boolean newLabelIdRequired = false;
          Set<String> originalLabelIds = new LinkedHashSet<String>();
          if (hint instanceof TacletLabelHint) {
             TacletLabelHint tacletHint = (TacletLabelHint) hint;
+            if (isBelowIfThenElse(tacletHint.getTacletTermStack())) {
+               return null; // Do not label children of if-then-else. They are labeled when a rule rewrites them outside of the if-then-else.
+            }
             if (TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_SUCCEDENT.equals(tacletHint.getTacletOperation())) {
-               newLabelIdRequired = true;
-               originalLabelIds.add(mostImportantLabel.getId());
+               if (originalLabel == null) { // Do not give a new ID if the term has already one (see rule: impRight)
+                  newLabelIdRequired = true;
+                  originalLabelIds.add(mostImportantLabel.getId());
+               }
             }
-            boolean topLevel = isTopLevel(tacletHint, tacletTerm);
             if (tacletHint.getSequentFormula() != null) {
                if (!TruthValueEvaluationUtil.isPredicate(tacletHint.getSequentFormula())) {
                   newLabelIdRequired = true;
                }
             }
             else if (tacletHint.getTerm() != null) {
+               boolean topLevel = isTopLevel(tacletHint, tacletTerm);
                if (!topLevel && !TruthValueEvaluationUtil.isPredicate(tacletHint.getTerm())) {
                   newLabelIdRequired = true;
                }
             }
-            if (mostImportantLabel != pLabel) { // Without support of quantors '&& topLevel' can be added.
-               originalLabelIds.add(pLabel.getId());
+            if (mostImportantLabel != formulaLabel || newLabelIdRequired) { // Without support of quantors '&& topLevel' can be added.
+               originalLabelIds.add(formulaLabel.getId());
             }
          }
          // Replace label with a new one with increased sub ID.
@@ -123,11 +130,31 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
    }
 
    /**
+    * Checks if the currently treated taclet {@link Term} is a child
+    * of an if-then-else operation.
+    * @param visitStack The taclet {@link Term} stack.
+    * @return {@code true} is below if-then-else, {@code false} otherwise.
+    */
+   protected boolean isBelowIfThenElse(Deque<Term> visitStack) {
+      if (visitStack != null) {
+         return CollectionUtil.search(visitStack, new IFilter<Term>() {
+            @Override
+            public boolean select(Term element) {
+               return element.op() == IfThenElse.IF_THEN_ELSE;
+            }
+         }) != null;
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
     * Searches the {@link FormulaTermLabel} in the given {@link TermLabel}s.
     * @param labels The {@link TermLabel}s to search in.
     * @return The found {@link FormulaTermLabel} or {@code null} if not available.
     */
-   protected FormulaTermLabel searchPredicateTermLabel(ImmutableArray<TermLabel> labels) {
+   public static FormulaTermLabel searchFormulaTermLabel(ImmutableArray<TermLabel> labels) {
       TermLabel result = CollectionUtil.search(labels, new IFilter<TermLabel>() {
          @Override
          public boolean select(TermLabel element) {

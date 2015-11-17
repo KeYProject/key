@@ -15,10 +15,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEThread;
 
 /**
- * Implementation of {@link IUpdateFeature} for {@link ISEDThread}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISEThread}s.
  * @author Martin Hentschel
  */
 public class ThreadUpdateFeature extends AbstractDebugNodeUpdateFeature {
@@ -35,6 +35,6 @@ public class ThreadUpdateFeature extends AbstractDebugNodeUpdateFeature {
     */
    @Override
    protected boolean canUpdateBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDThread;
+      return businessObject instanceof ISEThread;
    }
 }

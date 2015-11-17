@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.AbstractTableViewer;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -37,6 +38,9 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -45,6 +49,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -624,5 +629,76 @@ public final class SWTUtil {
       };
       viewer.getControl().getDisplay().syncExec(run);
       return run.getResult();
+   }
+
+   /**
+    * Centers the {@link Shell} to center on the parent {@link Shell}.
+    * <p>
+    * Additionally, the location is adjusted to ensure that the full {@link Shell} to center is visible.
+    * @param parent The parent {@link Shell}.
+    * @param toCenter The {@link Shell} to center.
+    */
+   public static void centerOn(Shell parent, Shell toCenter) {
+      if (parent != null && toCenter != null) {
+         // Center location
+         Point parentLocation = parent.getLocation();
+         Point parentSize = parent.getSize();
+         Point toCenterSize = toCenter.getSize();
+         int x = parentLocation.x + (parentSize.x / 2 - toCenterSize.x / 2);
+         int y = parentLocation.y + (parentSize.y / 2 - toCenterSize.y / 2);
+         // Ensure that shell is completely visible
+         Rectangle clientArea = parent.getDisplay().getClientArea();
+         if (x < clientArea.x) {
+            x = clientArea.x;
+         }
+         if (y < clientArea.y) {
+            y = clientArea.y;
+         }
+         if (x + toCenterSize.x > clientArea.width) {
+            x = clientArea.width - toCenterSize.x;
+         }
+         if (y + toCenterSize.y > clientArea.height) {
+            y = clientArea.height - toCenterSize.y;
+         }
+         // Set shell location
+         toCenter.setLocation(x, y);
+      }
+   }
+
+   /**
+    * Opens a {@link MessageDialog}.
+    * @param parent The parent {@link Shell}.
+    * @param title The title.
+    * @param dialogTitleImage The title {@link Image}.
+    * @param message The message.
+    * @param kind The kind.
+    * @param buttons The button texts.
+    * @return The dialog result or {@code -1} if cancelled.
+    */
+   public static int openMessageDialog(Shell parent, String title, Image dialogTitleImage, String message, int kind, String[] buttons) {
+      return openMessageDialog(parent, title, dialogTitleImage, message, kind, buttons, 0, SWT.NONE);
+   }
+
+   /**
+    * Opens a {@link MessageDialog}.
+    * @param parent The parent {@link Shell}.
+    * @param title The title.
+    * @param dialogTitleImage The title {@link Image}.
+    * @param message The message.
+    * @param kind The kind.
+    * @param buttons The button texts.
+    * @param defaultButtonIndex The index of the default button.
+    * @param style The {@link Shell} style.
+    * @return The dialog result or {@code -1} if cancelled.
+    */
+   public static int openMessageDialog(Shell parent, String title, Image dialogTitleImage, String message, int kind, String[] buttons, int defaultButtonIndex, final int style) {
+      MessageDialog dialog = new MessageDialog(parent, title, dialogTitleImage, message, kind, buttons, defaultButtonIndex) {
+         @Override
+         protected int getShellStyle() {
+            int newStyle = style & SWT.SHEET;
+            return super.getShellStyle() | newStyle;
+         }
+      };
+      return dialog.open();
    }
 }

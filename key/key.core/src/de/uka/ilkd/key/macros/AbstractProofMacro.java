@@ -20,7 +20,9 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * Takes care of providing the whole ProofMacro interface by only making it
@@ -36,12 +38,6 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
  */
 public abstract class AbstractProofMacro implements ProofMacro {
 
-    /**
-     * The max number of steps to be applied.
-     * A value of -1 means no changes.
-     */
-    private int numberSteps = -1;
-    
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
             // can happen during initialisation
@@ -51,14 +47,15 @@ public abstract class AbstractProofMacro implements ProofMacro {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * By default, proof macros do not support scripts, thus <code>null</code>
+     * is returned.
+     */
     @Override
-    public void setNumberSteps(int numberSteps) {
-        this.numberSteps = numberSteps;
-    }
-
-    @Override
-    public int getNumberSteps() {
-        return this.numberSteps;
+    public String getScriptCommandName() {
+        return null;
     }
 
     @Override
@@ -75,8 +72,21 @@ public abstract class AbstractProofMacro implements ProofMacro {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }
 
-    @Override
-    public boolean isApplicableWithoutPosition() {
-        return false;
+    /**
+     * Gets the maximum number of rule applications allowed for a macro. The
+     * implementation is the maximum amount of proof steps for automatic mode.
+     *
+     * @return the maximum number of rule applications allowed for this macro
+     */
+    final protected int getMaxSteps(Proof proof) {
+        final int steps;
+        if (proof != null) {
+            steps = proof.getSettings()
+                         .getStrategySettings().getMaxSteps();
+        } else {
+            steps = ProofSettings.DEFAULT_SETTINGS
+                    .getStrategySettings().getMaxSteps();
+        }
+        return steps;
     }
 }

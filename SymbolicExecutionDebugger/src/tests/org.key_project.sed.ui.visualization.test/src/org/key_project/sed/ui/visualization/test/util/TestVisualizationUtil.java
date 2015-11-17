@@ -40,8 +40,8 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLWriter;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.serialization.SEXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
@@ -71,8 +71,8 @@ public final class TestVisualizationUtil {
       TestCase.assertNotNull(diagramFile);
       TestCase.assertNotNull(modelFile);
       // Create model file
-      SEDXMLWriter writer = new SEDXMLWriter();
-      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8", false, false, false, null);
+      SEXMLWriter writer = new SEXMLWriter();
+      String modelContent = writer.toXML(new ISEDebugTarget[0], "UTF-8", false, false, false, null);
       if (!modelFile.exists()) {
          modelFile.create(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))), true, null);
       }

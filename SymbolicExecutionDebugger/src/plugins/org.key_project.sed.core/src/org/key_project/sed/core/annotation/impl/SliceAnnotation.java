@@ -1,15 +1,15 @@
 package org.key_project.sed.core.annotation.impl;
 
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.util.SEDAnnotationUtil;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.util.SEAnnotationUtil;
 
 /**
- * The {@link ISEDAnnotation} representing a slice.
+ * The {@link ISEAnnotation} representing a slice.
  * @author Martin Hentschel
  * @see SliceAnnotationType
  */
-public class SliceAnnotation extends AbstractSEDAnnotation {
+public class SliceAnnotation extends AbstractSEAnnotation {
    /**
     * Property {@link #getSeed()}.
     */
@@ -24,7 +24,7 @@ public class SliceAnnotation extends AbstractSEDAnnotation {
     * Constructor.
     */
    public SliceAnnotation() {
-      super(SEDAnnotationUtil.getAnnotationtype(SliceAnnotationType.TYPE_ID), true);
+      super(SEAnnotationUtil.getAnnotationtype(SliceAnnotationType.TYPE_ID), true);
    }
 
    /**
@@ -49,7 +49,7 @@ public class SliceAnnotation extends AbstractSEDAnnotation {
     * {@inheritDoc}
     */
    @Override
-   public boolean canDelete(ISEDDebugTarget target) {
+   public boolean canDelete(ISEDebugTarget target) {
       return true;
    }
 

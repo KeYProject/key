@@ -3,15 +3,15 @@ package org.key_project.sed.core.annotation.impl;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISENode;
 
 /**
- * An {@link ISEDAnnotationLink} which contains the fulfilling breakpoint.
+ * An {@link ISEAnnotationLink} which contains the fulfilling breakpoint.
  * @author Martin Hentschel
  */
-public class BreakpointAnnotationLink extends AbstractSEDAnnotationLink {
+public class BreakpointAnnotationLink extends AbstractSEAnnotationLink {
    /**
     * Property {@link #getBreakpoint()}.
     */
@@ -34,10 +34,10 @@ public class BreakpointAnnotationLink extends AbstractSEDAnnotationLink {
    
    /**
     * Constructor.
-    * @param source The source {@link ISEDAnnotation}.
-    * @param target The target {@link ISEDDebugNode}.
+    * @param source The source {@link ISEAnnotation}.
+    * @param target The target {@link ISENode}.
     */
-   public BreakpointAnnotationLink(ISEDAnnotation source, ISEDDebugNode target) {
+   public BreakpointAnnotationLink(ISEAnnotation source, ISENode target) {
       super(source, target);
    }
 

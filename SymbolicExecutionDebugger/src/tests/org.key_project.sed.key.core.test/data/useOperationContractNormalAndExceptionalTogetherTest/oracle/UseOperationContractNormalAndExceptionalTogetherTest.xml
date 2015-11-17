@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_15e398ee-9620-4427-9ba5-f8290aefcc9b" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_6af0f7c1-9b61-40c3-8cc3-e6e65c4b265b" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
-         <sedMethodCall xml:id="_5c34573a-6785-4f4e-9b7a-c5df3af662a5" name="&lt;call UseOperationContractNormalAndExceptionalTogetherTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java" groupable="true">
-            <sedStatement xml:id="_9120c945-7a1d-4478-bace-603bf0c26530" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="182" charEnd="211" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
-               <sedMethodContract xml:id="_18819e07-4a20-4c64-bbe8-c39c0710d9d6" name="result_0 = magic(123) catch(exc_0)
+   <sedTarget xml:id="_db678c74-32b9-4412-bb4a-49d2efaab84d" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_42d558ac-b6a3-4820-879e-f8aad5b7c79b" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
+         <sedMethodCall xml:id="_4596a910-9200-4912-a67c-0fe96dd82f8e" name="&lt;call UseOperationContractNormalAndExceptionalTogetherTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java" groupable="true">
+            <sedStatement xml:id="_ca0dabcc-aa49-4808-a067-f29cf1da4548" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="182" charEnd="211" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
+               <sedMethodContract xml:id="_3e64f5b8-fb26-426a-8c8a-fe08e387c34b" name="result_0 = magic(123) catch(exc_0)
 pre: 123 &lt; 0 | 123 &gt;= 0
 post: (   123 &lt; 0
    -&gt;   !exc_0 = null
       &amp; java.lang.Exception::instance(exc_0) = TRUE)
 &amp; (123 &gt;= 0 -&gt; result_0 = 42 &amp; exc_0 = null)
-mod: \if (true)  \then (allLocs)  \else (allLocs)
+mod: \if (123 &lt; 0)  \then (allLocs)  \else (allLocs)
 \cap \if (123 &gt;= 0)  \then (allLocs)  \else (allLocs)
-termination: diamond" pathCondition="true" lineNumber="-1" charStart="608" charEnd="613" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedStatement xml:id="_a01e957d-1c6b-4b6f-84c1-4edfd224a85f" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="216" charEnd="250" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
-                     <sedStatement xml:id="_6797aa3c-8f5d-4945-8b95-a776c92da065" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="292" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
-                        <sedMethodReturn xml:id="_dadbd5c1-5cf1-4190-8e21-8fb768f75abf" name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java" methodReturnConditionRef="_3a781716-0be6-4593-9015-a1d62ed1a5a3">
-                           <sedTermination xml:id="_45316a24-bcfb-4ac8-966e-fb43756ed8fa" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java" verified="true">
+termination: diamond" pathCondition="true" lineNumber="-1" charStart="186" charEnd="210" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                  <sedStatement xml:id="_61775886-4b69-423d-b69f-b4362e042ce4" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="216" charEnd="250" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
+                     <sedStatement xml:id="_87ac8ec5-953e-4d91-84d7-10ad89cf2dc6" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="292" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
+                        <sedMethodReturn xml:id="_416035a5-803d-46ae-8230-9dc0ab5a3407" name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java" methodReturnConditionRef="_5d6b5772-d499-4f30-812c-f9b935f927b0">
+                           <sedTermination xml:id="_7a551910-b08f-4ee9-af69-f2ea2bae1733" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java" verified="true">
                            </sedTermination>
-                           <sedGroupEndConditionReference nodeIdRef="_3a781716-0be6-4593-9015-a1d62ed1a5a3"/>
+                           <sedGroupEndConditionReference nodeIdRef="_5d6b5772-d499-4f30-812c-f9b935f927b0"/>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedStatement>
                </sedMethodContract>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_3a781716-0be6-4593-9015-a1d62ed1a5a3" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_dadbd5c1-5cf1-4190-8e21-8fb768f75abf"/>
+            <sedMethodCallMethodReturnCondition xml:id="_5d6b5772-d499-4f30-812c-f9b935f927b0" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
+               <sedChildReference nodeIdRef="_416035a5-803d-46ae-8230-9dc0ab5a3407"/>
             </sedMethodCallMethodReturnCondition>
-            <sedGroupEndCondition xml:id="_3a781716-0be6-4593-9015-a1d62ed1a5a3" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_dadbd5c1-5cf1-4190-8e21-8fb768f75abf"/>
+            <sedGroupEndCondition xml:id="_5d6b5772-d499-4f30-812c-f9b935f927b0" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalTogetherTest\src\UseOperationContractNormalAndExceptionalTogetherTest.java">
+               <sedChildReference nodeIdRef="_416035a5-803d-46ae-8230-9dc0ab5a3407"/>
             </sedGroupEndCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_45316a24-bcfb-4ac8-966e-fb43756ed8fa"/>
+         <sedTerminationEntry nodeIdRef="_7a551910-b08f-4ee9-af69-f2ea2bae1733"/>
       </sedThread>
    </sedTarget>
 </launch>

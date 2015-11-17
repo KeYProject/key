@@ -20,11 +20,11 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDStatement;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISEStatement;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
@@ -67,22 +67,22 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
          selectMethodReturn(debugView);
          Thread.sleep(1000); // Some extra time for the Debug API to set the selection
          // Select and test debug target in once because otherwise the selection can be changed by Eclipse itself.
-         ISEDDebugTarget target = selectDebugTarget(debugView);
+         ISEDebugTarget target = selectDebugTarget(debugView);
          steps.assertDebugTarget(debugTree, propertiesView, getPropertiesTabs(propertiesView), target);
          // Select first thread
-         ISEDThread thread = selectThread(debugView);
+         ISEThread thread = selectThread(debugView);
          steps.assertThread(debugTree, propertiesView, getPropertiesTabs(propertiesView), thread);
          // Select first statement
-         ISEDStatement statement = selectStatement(debugView);
+         ISEStatement statement = selectStatement(debugView);
          steps.assertStatement(debugTree, propertiesView, getPropertiesTabs(propertiesView), statement);
          // Select debug target
          target = selectDebugTarget(debugView);
          steps.assertDebugTarget(debugTree, propertiesView, getPropertiesTabs(propertiesView), target);
          // Select method return
-         ISEDMethodReturn methodReturn = selectMethodReturn(debugView);
+         ISEMethodReturn methodReturn = selectMethodReturn(debugView);
          steps.assertMethodReturn(debugTree, propertiesView, getPropertiesTabs(propertiesView), methodReturn);
          // Select method call
-         ISEDMethodCall methodCall = selectMethodCall(debugView);
+         ISEMethodCall methodCall = selectMethodCall(debugView);
          steps.assertMethodCall(debugTree, propertiesView, getPropertiesTabs(propertiesView), methodCall);
       }
       finally {
@@ -104,63 +104,63 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
    }
 
    /**
-    * Selects an {@link ISEDMethodReturn}.
+    * Selects an {@link ISEMethodReturn}.
     * @param debugView The {@link SWTBotView} to select in.
-    * @return The selected {@link ISEDMethodReturn}.
+    * @return The selected {@link ISEMethodReturn}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDMethodReturn selectMethodReturn(SWTBotView debugView) throws Exception {
+   protected ISEMethodReturn selectMethodReturn(SWTBotView debugView) throws Exception {
       Object data = selectInDebugTree(debugView, 0, 0, 0, 5, 1, 1, 0, 0);
-      assertTrue(data instanceof ISEDMethodReturn);
-      return (ISEDMethodReturn)data;
+      assertTrue(data instanceof ISEMethodReturn);
+      return (ISEMethodReturn)data;
    }
 
    /**
-    * Selects an {@link ISEDDebugTarget}.
+    * Selects an {@link ISEDebugTarget}.
     * @param debugView The {@link SWTBotView} to select in.
-    * @return The selected {@link ISEDDebugTarget}.
+    * @return The selected {@link ISEDebugTarget}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDDebugTarget selectDebugTarget(SWTBotView debugView) throws Exception {
+   protected ISEDebugTarget selectDebugTarget(SWTBotView debugView) throws Exception {
       Object data = selectInDebugTree(debugView, 0, 0);
-      assertTrue(data instanceof ISEDDebugTarget);
-      return (ISEDDebugTarget)data;
+      assertTrue(data instanceof ISEDebugTarget);
+      return (ISEDebugTarget)data;
    }
 
    /**
-    * Selects an {@link ISEDThread}.
+    * Selects an {@link ISEThread}.
     * @param debugView The {@link SWTBotView} to select in.
-    * @return The selected {@link ISEDThread}.
+    * @return The selected {@link ISEThread}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDThread selectThread(SWTBotView debugView) throws Exception {
+   protected ISEThread selectThread(SWTBotView debugView) throws Exception {
       Object data = selectInDebugTree(debugView, 0, 0, 0);
-      assertTrue(data instanceof ISEDThread);
-      return (ISEDThread)data;
+      assertTrue(data instanceof ISEThread);
+      return (ISEThread)data;
    }
 
    /**
-    * Selects an {@link ISEDStatement}.
+    * Selects an {@link ISEStatement}.
     * @param debugView The {@link SWTBotView} to select in.
-    * @return The selected {@link ISEDStatement}.
+    * @return The selected {@link ISEStatement}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDStatement selectStatement(SWTBotView debugView) throws Exception {
+   protected ISEStatement selectStatement(SWTBotView debugView) throws Exception {
       Object data = selectInDebugTree(debugView, 0, 0, 0, 0);
-      assertTrue(data instanceof ISEDStatement);
-      return (ISEDStatement)data;
+      assertTrue(data instanceof ISEStatement);
+      return (ISEStatement)data;
    }
 
    /**
-    * Selects an {@link ISEDMethodCall}.
+    * Selects an {@link ISEMethodCall}.
     * @param debugTree The {@link SWTBotView} to select in.
-    * @return The selected {@link ISEDMethodCall}.
+    * @return The selected {@link ISEMethodCall}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDMethodCall selectMethodCall(SWTBotView debugView) throws Exception {
+   protected ISEMethodCall selectMethodCall(SWTBotView debugView) throws Exception {
       Object data = selectInDebugTree(debugView, 0, 0, 0, 5, 1, 0);
-      assertTrue(data instanceof ISEDMethodCall);
-      return (ISEDMethodCall)data;
+      assertTrue(data instanceof ISEMethodCall);
+      return (ISEMethodCall)data;
    }
    
    /**
@@ -188,49 +188,49 @@ public class AbstractSWTBotPropertyTabTest extends AbstractSetupTestCase {
       public void initializeLaunch(ILaunch launch) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDThread}.
+       * Do some assertions on an {@link ISEThread}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDThread thread) throws Exception;
+      public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEThread thread) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDStatement}.
+       * Do some assertions on an {@link ISEStatement}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDStatement statement) throws Exception;
+      public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEStatement statement) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDDebugTarget}.
+       * Do some assertions on an {@link ISEDebugTarget}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertDebugTarget(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDDebugTarget target) throws Exception;
+      public void assertDebugTarget(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDebugTarget target) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDMethodReturn}.
+       * Do some assertions on an {@link ISEMethodReturn}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodReturn methodReturn) throws Exception;
+      public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEMethodReturn methodReturn) throws Exception;
 
       /**
-       * Do some assertions on an {@link ISEDMethodCall}.
+       * Do some assertions on an {@link ISEMethodCall}.
        * @param debugTree The debug tree.
        * @param propertiesView The properties view.
        * @param tabs The properties view tabs.
        * @throws Exception Occurred Exception
        */
-      public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodCall methodCall) throws Exception;
+      public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEMethodCall methodCall) throws Exception;
    }
    
    /**

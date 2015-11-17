@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject;
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject.SaveGuarantee;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotMultilineCommentEditingTest {
 
@@ -23,6 +24,7 @@ public class SWTBotMultilineCommentEditingTest {
    @BeforeClass
    public static void initializeProject() throws CoreException,
          InterruptedException {
+      TestUtilsUtil.closeWelcomeView();
       bot = new SWTWorkbenchBot();
       testProject = JMLEditingUITestUtils.createProjectWithFile(bot,
             "MultilineCommentEditing", "test", "MultilineCommentEditingTest",

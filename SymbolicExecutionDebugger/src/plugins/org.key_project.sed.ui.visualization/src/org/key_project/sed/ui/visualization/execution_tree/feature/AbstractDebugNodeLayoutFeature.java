@@ -26,10 +26,10 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
 
 /**
- * Provides a basic implementation of {@link ILayoutFeature} for {@link ISEDDebugNode}s.
+ * Provides a basic implementation of {@link ILayoutFeature} for {@link ISENode}s.
  * @author Martin Hentschel
  */
 public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeature {
