@@ -25,6 +25,7 @@ import org.key_project.util.collection.NotUniqueException;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -63,102 +64,10 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     @Override
     protected AbstractDomainLattice getAbstractDomainForSort(final Sort s,
             final Services services) {
-        // Construct a lattice for all predicates accepting the given sort.
-        // This lattice consists of 2^n elements, where n is the number
-        // of applicable predicates.
-        // The iterator for this lattice will first return the bottom
-        // element, then all conjunctions of length n of the predicates,
-        // then all conjunctions of length n-1, and so on, until finally
-        // the top element is returned.
-
         ArrayList<AbstractionPredicate> applicablePredicates =
                 predicates.get(s);
-        int numApplPreds = applicablePredicates.size();
 
-        // We work with bit sets of length n (where n is the number of
-        // predicates). Each bit represents a predicate; when the bit is
-        // set to 1, the respective predicate should occur in the conjunction.
-
-        final ArrayList<ArrayList<ImmutableFixedLengthBitSet>> bitSetsByNumZeroes =
-                new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
-
-        // Initialize the list.
-        for (int i = 0; i < numApplPreds + 1; i++) {
-            bitSetsByNumZeroes.add(new ArrayList<ImmutableFixedLengthBitSet>());
-        }
-
-        // bitSet initially represents the number 0.
-        ImmutableFixedLengthBitSet bitSet =
-                new ImmutableFixedLengthBitSet(numApplPreds);
-
-        for (int i = 0; i < JoinRuleUtils.intPow(2, numApplPreds); i++) {
-            int numZeroes = bitSet.getNumOfZeroBits();
-            bitSetsByNumZeroes.get(numZeroes).add(bitSet);
-            bitSet = bitSet.inc();
-        }
-
-        AbstractDomainLattice result = new AbstractDomainLattice() {
-            private int nrZeroes = 0;
-            private int idx = 0;
-
-            @Override
-            public Iterator<AbstractDomainElement> iterator() {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public AbstractDomainElement join(AbstractDomainElement a,
-                    AbstractDomainElement b) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            private AbstractDomainElement elemFromPredicates(
-                    final ImmutableSet<AbstractionPredicate> predicates) {
-                return new AbstractDomainElement() {
-                    @Override
-                    public Name name() {
-                        if (predicates.size() == 0) {
-                            return new Name("BOTTOM");
-                        }
-                        
-                        StringBuilder result = new StringBuilder();
-                        for (AbstractionPredicate pred : predicates) {
-                            result
-                                .append(pred.name())
-                                .append("&");
-                        }
-                        result.deleteCharAt(result.length() - 1);
-                        
-                        return new Name(result.toString());
-                    }
-                    
-                    @Override
-                    public Term getDefiningAxiom(Term varOrConst, Services services) {
-                        TermBuilder tb = services.getTermBuilder();
-                        
-                        if (predicates.size() == 0) {
-                            return tb.ff();
-                        }
-                        
-                        Term result = null;
-                        for (AbstractionPredicate pred : predicates) {
-                            Term application = pred.apply(varOrConst);
-                            if (result == null) {
-                                result = pred.apply(application);
-                            } else {
-                                result = tb.and(result, application);
-                            }
-                        }
-                        
-                        return result;
-                    }
-                };
-            }
-        };
-
-        return result;
+        return new PredicateAbstractionLattice(applicablePredicates);
     }
 
     /**
