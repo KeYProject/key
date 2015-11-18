@@ -98,24 +98,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	};
 
 	/**
-	 * {@link IStateListener} to sync the hide intermediate proofsteps toggleState with the outline page
-	 */
-	private IStateListener stateListener = new IStateListener() {
-
-		@Override
-		public void handleStateChange(State state, Object oldValue) {
-			if ((boolean) oldValue == false
-					&& (boolean) state.getValue() == true) {
-				getTreeViewer().expandAll();
-				getTreeViewer().remove(contentProvider.getIntermediateProofsteps());
-			} else {
-				getTreeViewer().setInput(proof);
-			}
-
-		}
-	};
-
-	/**
 	 * Constructor.
 	 * 
 	 * @param proof
@@ -144,24 +126,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 			labelProvider.dispose();
 		}
 
-		getHideState().removeListener(stateListener);
-
 		super.dispose();
 	}
 	
-	/**
-	 * the toggleState indicates whether to hide or show intermediate proofsteps
-	 * @return the {@link State} for the hide intermediate proofsteps command;
-	 */
-	private State getHideState() {
-		ICommandService service = (ICommandService) getSite().getService(
-				ICommandService.class);
-		Command command = service
-				.getCommand("org.key_project.keyide.ui.commands.hideIntermediateProofsteps");
-		State state = command.getState("org.eclipse.ui.commands.toggleState");
-		return state;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -196,9 +163,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		// Update selected node
 		updateSelectedNode();
 
-		// add listener for hiding intermediate proofsteps
-		getHideState().setValue(false);
-		getHideState().addListener(stateListener);
 	}
 
 	/**

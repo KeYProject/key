@@ -18,12 +18,22 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IStateListener;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
+import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.testing.ContributionInfo;
+import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
+import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -122,13 +132,45 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 * The {@link Proof} as input of {@link #viewer}.
 	 */
 	private Proof proof;
+	
+	/**
+	 * The {@link State} which indicates hiding or showing of intermediate proofsteps
+	 */
+	private State hideState;
+	
+	/**
+	 * The {@link IStateListener} to sync the hide intermediate proofsteps toggleState with the outline page
+	 */
+	private IStateListener stateListener = new IStateListener() {
 
+		@Override
+		public void handleStateChange(State state, Object oldValue) {
+			if ((boolean) oldValue == false && (boolean) state.getValue() == true) {
+				viewer.expandAll();
+				viewer.remove(getIntermediateProofsteps());
+			} else {
+				viewer.setInput(proof);
+			}
+		}
+	};
+	
 	/**
 	 * The Constructor
 	 */
 	public LazyProofTreeContentProvider() {
+		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+	      if (service != null) {
+	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
+	         if (hideCmd != null) {
+	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
+	            if (hideState != null) {
+	               hideState.setValue(false);
+	               hideState.addListener(stateListener);
+	            }
+	         }
+	      }
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -286,6 +328,10 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			public void run() {
 				if (!viewer.getControl().isDisposed()) {
 					doHandleProofExpanded(e.getNode());
+					if((boolean) hideState.getValue() == true){
+						viewer.collapseAll();
+						viewer.remove(getIntermediateProofsteps());
+					}
 				}
 			}
 		});
@@ -495,19 +541,34 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if (proof != null) {
 			proof.removeProofTreeListener(proofTreeListener);
 		}
+		
+		if(hideState != null){
+			hideState.removeListener(stateListener);
+		}
 	}
-
+	
+	
+	public void addStateListener(){
+		if(hideState != null){
+			hideState.addListener(stateListener);
+		}
+	}
+	
+	public void removeStateListener(){
+		if(hideState != null){
+			hideState.removeListener(stateListener);
+		}
+	}
+	
 	/**
 	 * @return an array of {@link Node}s containing all intermediate proofsteps
 	 */
-	public Object[] getIntermediateProofsteps() {
+	private Object[] getIntermediateProofsteps() {
 		return getIntermediateProofsteps(proof.root()).toArray();
 	}
 
 	/**
-	 * @param node
-	 *            root {@link Node} from where to start searching for
-	 *            intermediate proofsteps
+	 * @param node - root {@link Node} from where to start searching for intermediate proofsteps
 	 * @return an {@link ArrayList<E>} containting all intermediate proofsteps
 	 */
 	private ArrayList<Node> getIntermediateProofsteps(Node node) {
