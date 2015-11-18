@@ -212,6 +212,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
                   permsFor = tb.and(permsFor, pf);
               }
           }
+          final Map<LocationVariable, LocationVariable> beforeVars =
+                  HeapContext.getBeforeAtPreVars(heaps, proofServices, "Before");
+
+          final Map<Term, Term> heapToBefore = new LinkedHashMap<Term, Term>();
+
+          for (LocationVariable heap : heaps) {
+             heapToBefore.put(tb.var(heap), tb.var(beforeVars.get(heap)));
+          }
 
           final Term pre =
                   tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
@@ -223,6 +231,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
               postTerm = tb.and(postTerm,
                       buildUninterpretedPredicate(paramVars, formalParamVars, null, getUninterpretedPredicateName(), proofServices));
           }
+
+          Term frameTerm = buildFrameClause(heaps, heapToBefore, selfVar, paramVars, proofServices);
+          Term post = tb.and(postTerm, frameTerm);
           ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
           ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository().getOperationContracts(getCalleeKeYJavaType(), pm);
           for(KeYJavaType superType : proofServices.getJavaInfo().getAllSupertypes(getCalleeKeYJavaType())) {
@@ -236,6 +247,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
               if(representsFromContract != null) break;
           }
           final Term progPost;
+          Term saveBeforeHeaps = null;
+          for (Term heap : heapToBefore.keySet()) {
+              final Term bu = tb.elementary(heapToBefore.get(heap), heap);
+              if(saveBeforeHeaps == null) {
+                  saveBeforeHeaps = bu;
+              } else {
+                  saveBeforeHeaps = tb.parallel(saveBeforeHeaps, bu);
+              }
+          }
+
           if(representsFromContract == null) {
               final Term[] updateSubs = new Term[target.arity()];
               int i = 0;
@@ -253,11 +274,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
               for(ProgramVariable paramVar : paramVars) {
                   updateSubs[i++] = tb.var(paramVar);
               }
-              progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
+              progPost = tb.apply(saveBeforeHeaps, tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post));
           } else {
               final Term body = representsFromContract;
               assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model methods are supported!";
-              progPost = tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), postTerm);
+              progPost = tb.apply(saveBeforeHeaps, tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
           }
           termPOs.add(tb.imp(pre, progPost));
       } else {
