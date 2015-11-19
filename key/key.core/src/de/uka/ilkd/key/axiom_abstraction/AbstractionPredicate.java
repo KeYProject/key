@@ -30,22 +30,12 @@ import de.uka.ilkd.key.logic.TermBuilder;
 public abstract class AbstractionPredicate implements Function<Term, Term>,
         Named {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.util.function.Function#apply(java.lang.Object)
+    /**
+     * Creates a new {@link AbstractionPredicate}. Constructor is hidden since
+     * elements fo this class should be created by the factory method
+     * {@link #create(String, Function)}.
      */
-    @Override
-    public abstract Term apply(Term t);
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return name().toString();
+    private AbstractionPredicate() {
     }
 
     /**
@@ -73,6 +63,24 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
                 return new Name(name);
             }
         };
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.util.function.Function#apply(java.lang.Object)
+     */
+    @Override
+    public abstract Term apply(Term t);
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return name().toString();
     }
 
 }
