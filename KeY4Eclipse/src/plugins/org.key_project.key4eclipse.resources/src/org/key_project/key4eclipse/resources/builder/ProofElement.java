@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.key_project.key4eclipse.resources.counterexamples.KeYProjectCounterExample;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
@@ -61,6 +62,8 @@ public class ProofElement {
    private List<IFile> usedContracts;
    private List<String> calledMethods;
    
+   private List<KeYProjectCounterExample> counterExamples;
+   
    private final SpecificationRepository specificationRepository;
    
    public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<DefaultUserInterfaceControl> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, IMarker proofMarker, List<IMarker> recursionMarker, Contract contract){
@@ -89,6 +92,8 @@ public class ProofElement {
       this.proofClosed = false;
       this.usedContracts = new LinkedList<IFile>();
       this.specificationRepository = environment.getSpecificationRepository();
+      
+      this.counterExamples = new LinkedList<KeYProjectCounterExample>();
       init();
    }
    
@@ -105,6 +110,7 @@ public class ProofElement {
             this.calledMethods = pmfr.getCalledMethods();
             this.assumptions = pmfr.getAssumptions();
             this.proofMetaReferences = pmfr.getReferences();
+            this.counterExamples = pmfr.getCounterExamples();
 
             if(!hasMarker()){
                MarkerUtil.setMarker(this);
@@ -259,5 +265,12 @@ public class ProofElement {
 
    public SpecificationRepository getSpecificationRepository() {
       return specificationRepository;
+   }
+   
+   public List<KeYProjectCounterExample> getCounterExamples(){
+       return counterExamples;
+   }
+   public void addCounterExamples(List<KeYProjectCounterExample> keYProjectCounterExamples) {
+       counterExamples.addAll(keYProjectCounterExamples);
    }
 }

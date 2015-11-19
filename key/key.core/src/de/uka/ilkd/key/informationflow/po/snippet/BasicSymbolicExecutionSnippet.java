@@ -154,7 +154,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
 
         //type of the variable for the try statement
         final KeYJavaType eType =
-            javaInfo.getTypeByClassName("java.lang.Exception");
+            javaInfo.getTypeByClassName("java.lang.Throwable");
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
 
         //create try statement

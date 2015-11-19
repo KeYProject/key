@@ -42,6 +42,7 @@ public class MarkerUtil {
    public final static String PROBLEMLOADEREXCEPTIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker";
    public final static String RECURSIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker";
    public final static String MARKER_ATTRIBUTE_OUTDATED = "org.key_project.key4eclipse.resources.ui.marker.attribute.outdated";
+   public final static String MARKER_ATTRIBUTE_COUNTER_EXAMPLES = "org.key_project.key4eclipse.resources.ui.marker.attribute.counterExamples";
    
    public final static String TYPE = "org.key_project.key4eclipse.resources.ui.marker.attribute.type";
    public final static String METHOD_NAME = "org.key_project.key4eclipse.resources.ui.marker.attribute.methodName";
@@ -82,6 +83,7 @@ public class MarkerUtil {
             marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
             marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
             marker.setAttribute(MarkerUtil.MARKER_ATTRIBUTE_OUTDATED, pe.getOutdated());
+            marker.setAttribute(MarkerUtil.MARKER_ATTRIBUTE_COUNTER_EXAMPLES, !pe.getCounterExamples().isEmpty());
             
             // Try to save method information which makes debugging a proof with SED easier.
             if (pe.getContract() != null) {

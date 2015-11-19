@@ -26,6 +26,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Path;
+import org.key_project.key4eclipse.resources.counterexamples.KeYProjectCounterExample;
+import org.key_project.key4eclipse.resources.counterexamples.TreeElement;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -43,6 +45,7 @@ public class ProofMetaFileReader {
    private final List<ProofMetaFileAssumption> assumptions = new LinkedList<ProofMetaFileAssumption>();
    private final ProofMetaReferences references = new ProofMetaReferences();
    private final List<String> calledMethods = new LinkedList<String>();
+   private final List<KeYProjectCounterExample> counterExamples = new LinkedList<KeYProjectCounterExample>();
 
    /**
     * The Constructor that automatically reads the given meta{@link IFile} and Provides the content.
@@ -255,6 +258,41 @@ public class ProofMetaFileReader {
             ProofMetaReferenceContract contract = new ProofMetaReferenceContract(kjt, getName(attributes), getRep(attributes));
             references.getPerTypeReferences(kjt).addContract(contract);
             parentStack.addFirst(ProofMetaFileWriter.TAG_CONTRACT_REFERENCE);
+         }
+         else if(ProofMetaFileWriter.TAG_COUNTER_EXAMPLES.equals(qName)){
+             Object parent = parentStack.peekFirst();
+             if (!ProofMetaFileWriter.TAG_PROOF_META_FILE.equals(parent)) {
+                 throw new SAXException(ProofMetaFileWriter.TAG_COUNTER_EXAMPLES  + " has to be a child of " + ProofMetaFileWriter.TAG_PROOF_META_FILE + ".");
+              }
+              parentStack.addFirst(ProofMetaFileWriter.TAG_COUNTER_EXAMPLES);
+         }
+         else if(ProofMetaFileWriter.TAG_COUNTER_EXAMPLE.equals(qName)){
+             Object parent = parentStack.peekFirst();
+             if (!ProofMetaFileWriter.TAG_COUNTER_EXAMPLES.equals(parent)) {
+                 throw new SAXException(ProofMetaFileWriter.TAG_COUNTER_EXAMPLE  + " has to be a child of " + ProofMetaFileWriter.TAG_COUNTER_EXAMPLES + ".");
+              }
+             String id = getCounterExampleId(attributes);
+             String name = getCounterExampleName(attributes);
+             KeYProjectCounterExample ce = new KeYProjectCounterExample(id, name);
+             counterExamples.add(ce);
+             parentStack.addFirst(ce);
+         }
+         else if(ProofMetaFileWriter.TAG_COUNTER_EXAMPLE_NODE.equals(qName)){
+             Object parent = parentStack.peekFirst();
+             if (!(parent instanceof TreeElement || parent instanceof KeYProjectCounterExample)) {
+                 throw new SAXException(ProofMetaFileWriter.TAG_COUNTER_EXAMPLE_NODE  + " has to be a child of " + ProofMetaFileWriter.TAG_COUNTER_EXAMPLE + "or " + ProofMetaFileWriter.TAG_COUNTER_EXAMPLE_NODE + ".");
+             }
+             String name = getCounterExampleNode(attributes);
+             TreeElement e = new TreeElement(name);
+             if(parent instanceof KeYProjectCounterExample) {
+                 KeYProjectCounterExample ce = (KeYProjectCounterExample) parent;
+                 ce.getModel().getTreeElements().add(e);
+             }
+             else if(parent instanceof TreeElement) {
+                 TreeElement parentTe = (TreeElement) parent;
+                 parentTe.AddChild(e);
+             }
+             parentStack.addFirst(e);
          }
          else {
             throw new SAXException("Unsupported element " + qName + ".");
@@ -470,6 +508,18 @@ public class ProofMetaFileReader {
          }
          return null;
       }
+      
+      protected String getCounterExampleId(Attributes attributes) {
+          return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_COUNTER_EXAMPLE_ID);
+       }
+      
+      protected String getCounterExampleName(Attributes attributes) {
+          return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_COUNTER_EXAMPLE_NAME);
+       }
+      
+      protected String getCounterExampleNode(Attributes attributes) {
+          return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_COUNTER_EXAMPLE_NODE_NAME);
+       }
    }
 
    /**
@@ -508,4 +558,9 @@ public class ProofMetaFileReader {
    public List<String> getCalledMethods() {
       return calledMethods;
    }
+
+
+    public List<KeYProjectCounterExample> getCounterExamples() {
+        return counterExamples;
+    }
 }
