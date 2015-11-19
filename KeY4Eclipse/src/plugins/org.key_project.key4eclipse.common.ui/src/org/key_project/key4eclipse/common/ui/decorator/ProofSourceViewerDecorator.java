@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -99,6 +100,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * The second range used to highlight the selected {@link Term}.
     */
    private StyleRange marked2;
+   /**
+    * The range used to highlight {@link Term} of Sort Update.
+    */
+   private StyleRange markedUpdate;
    
    /**
     * The {@link StyleRange} to highlight the active statement.
@@ -162,10 +167,18 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          str = "";
       }
       viewer.setDocument(new Document(str));
-      if (node != null && node.getAppliedRuleApp() != null) {
-         PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-         setGreenBackground(pio);
+      if (node != null){
+         // if view of current goal is active, highlight all updates
+         if(node.getAppliedRuleApp() == null){
+            setBlueBackground(printer.getInitialPositionTable().getUpdateRanges());
+         }
+        
+         else {
+            PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+            setGreenBackground(pio);
+         }
       }
+
    }
    
    /**
@@ -196,8 +209,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       }
       String str = computeText(sequent, printer);
       viewer.setDocument(new Document(str));
+
       return str;
    }
+   
    
    /**
     * Computes the text to show in the {@link KeYEditor}} which consists
@@ -265,9 +280,23 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
      }
       return s;
    }
-   
+   /**
+    * sets background color to light blue.
+    * @param ranges ranges in which blue color should be applied
+    * @author Anna Filighera
+    */
+   protected void setBlueBackground(Range[] ranges){
+      initializeValuesForBackground(new Color(null,167,210,210));
+      for(Range range : ranges){
+         markedUpdate.start = range.start();
+         markedUpdate.length = range.end()-range.start();
+         TextPresentation.applyTextPresentation(textPresentation, viewerText);
+         viewer.changeTextPresentation(textPresentation, true);
+      }
+      
+   }
    protected void setGreenBackground(PosInOccurrence pos){
-      initializeValuesForGreenBackground();
+      initializeValuesForBackground(new Color(null, 128, 255, 128));
       if (pos != null) {
          ImmutableList<Integer> path = printer.getInitialPositionTable().pathForPosition(pos, filter);
          Range range = printer.getInitialPositionTable().rangeForPath(path);
@@ -277,12 +306,17 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          viewer.changeTextPresentation(textPresentation, true);
       }
    }
-   
-   protected void initializeValuesForGreenBackground(){
-      marked1 = new StyleRange();
-      marked1.background=new Color(null,128,255,128);    
+
+   /**
+    * initializes a StyleRange and TextPresentation for background color.
+    * @param color Backgroundcolor
+    * @author Anna Filighera
+    */
+   protected void initializeValuesForBackground(Color color){
+      markedUpdate = new StyleRange();
+      markedUpdate.background= color;  
       textPresentation = new TextPresentation();
-      textPresentation.addStyleRange(marked1);
+      textPresentation.addStyleRange(markedUpdate);
       viewer.changeTextPresentation(textPresentation, true);
    }
 
@@ -305,6 +339,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          if (!ObjectUtil.equals(oldPos, selectedPosInSequent)) {
             // Update highlighting only on goals.
             if (node.getAppliedRuleApp() == null){
+               setBlueBackground(printer.getInitialPositionTable().getUpdateRanges());
                setBackgroundColorForHover();
             }
             // Inform listener
@@ -362,7 +397,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          marked1.start = range.start();
          marked1.length = range.length(); 
       }
-      StyleRange[] ranges = {marked1, marked2, firstStatementStyleRange};
+      StyleRange[] ranges = {marked1, marked2, firstStatementStyleRange, markedUpdate};
       textPresentation.mergeStyleRanges(ranges);
 //      textPresentation.addStyleRange(firstStatementStyleRange);
       TextPresentation.applyTextPresentation(textPresentation, viewerText);
