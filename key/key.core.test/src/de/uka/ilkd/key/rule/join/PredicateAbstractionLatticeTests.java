@@ -42,9 +42,15 @@ public class PredicateAbstractionLatticeTests extends TestCase {
         final Proof p = JoinRuleTests.loadProof("dummy.key");
         final TermBuilder tb = p.getServices().getTermBuilder();
 
-        final AbstractionPredicate gtZero = gtZero(tb);
-        final AbstractionPredicate eqZero = eqZero(tb);
-        final AbstractionPredicate ltZero = ltZero(tb);
+        final AbstractionPredicate gtZero =
+                AbstractionPredicate.create("_>0",
+                        (Term input) -> (tb.gt(input, tb.zero())));
+        final AbstractionPredicate eqZero =
+                AbstractionPredicate.create("_=0",
+                        (Term input) -> (tb.equals(input, tb.zero())));
+        final AbstractionPredicate ltZero =
+                AbstractionPredicate.create("_<0",
+                        (Term input) -> (tb.lt(input, tb.zero())));
 
         ArrayList<AbstractionPredicate> predicates =
                 new ArrayList<AbstractionPredicate>();
@@ -144,21 +150,6 @@ public class PredicateAbstractionLatticeTests extends TestCase {
 
         // This should be all.
         assertFalse(it.hasNext());
-    }
-
-    private static AbstractionPredicate gtZero(final TermBuilder tb) {
-        return AbstractionPredicate.create("_>0",
-                (Term input) -> (tb.gt(input, tb.zero())));
-    }
-
-    private static AbstractionPredicate eqZero(final TermBuilder tb) {
-        return AbstractionPredicate.create("_=0",
-                (Term input) -> (tb.equals(input, tb.zero())));
-    }
-
-    private static AbstractionPredicate ltZero(final TermBuilder tb) {
-        return AbstractionPredicate.create("_<0",
-                (Term input) -> (tb.lt(input, tb.zero())));
     }
 
 }
