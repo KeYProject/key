@@ -91,7 +91,7 @@ implements PartialComparator<AbstractDomainElement>, Iterable<AbstractDomainElem
     * Iterates through the abstract domain elements of this
     * abstract domain starting by the smallest element; if
     * an element b is returned by the iterator after an element
-    * a, the either compare(a,b) == LTE, or compare(a,b) == UNDEF
+    * a, then either compare(a,b) == LTE, or compare(a,b) == UNDEF
     * must hold (i.e., b may not be smaller than a). 
     */
    @Override

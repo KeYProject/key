@@ -15,8 +15,10 @@ package de.uka.ilkd.key.axiom_abstraction;
 
 import java.util.function.Function;
 
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction
@@ -25,5 +27,52 @@ import de.uka.ilkd.key.logic.Term;
  *
  * @author Dominic Scheurer
  */
-public interface AbstractionPredicate extends Function<Term, Term>, Named {
+public abstract class AbstractionPredicate implements Function<Term, Term>,
+        Named {
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.util.function.Function#apply(java.lang.Object)
+     */
+    @Override
+    public abstract Term apply(Term t);
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return name().toString();
+    }
+
+    /**
+     * Creates a new {@link AbstractionPredicate} with the given name and
+     * mapping. You may use nice Java 8 lambdas for the second argument!
+     *
+     * @param name
+     *            The name for the abstraction predicate, e.g. "_>0".
+     * @param mapping
+     *            The mapping from input terms of the adequate type to formulae,
+     *            e.g. "(Term input) -> (tb.gt(input, tb.zero()))" where tb is a
+     *            {@link TermBuilder}.
+     * @return
+     */
+    public static AbstractionPredicate create(final String name,
+            final Function<Term, Term> mapping) {
+        return new AbstractionPredicate() {
+            @Override
+            public Term apply(Term input) {
+                return mapping.apply(input);
+            }
+
+            @Override
+            public Name name() {
+                return new Name(name);
+            }
+        };
+    }
+
 }

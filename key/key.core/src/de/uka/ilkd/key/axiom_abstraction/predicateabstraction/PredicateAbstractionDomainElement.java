@@ -87,13 +87,17 @@ public class PredicateAbstractionDomainElement extends AbstractDomainElement {
      */
     @Override
     public Name name() {
+        if (isTopElem) {
+            return new Name("TOP");
+        }
+        
         if (predicates.size() == 0) {
             return new Name("BOTTOM");
         }
 
         StringBuilder result = new StringBuilder();
         for (AbstractionPredicate pred : predicates) {
-            result.append(pred.name()).append("&");
+            result.append("(" + pred.name() + ")").append("&");
         }
         result.deleteCharAt(result.length() - 1);
 
@@ -139,6 +143,8 @@ public class PredicateAbstractionDomainElement extends AbstractDomainElement {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof PredicateAbstractionDomainElement &&
+                (this != TOP || obj == TOP) &&
+                (this != BOTTOM || obj == BOTTOM) &&
                 this.predicates.equals(((PredicateAbstractionDomainElement)obj).predicates);
     }
 
