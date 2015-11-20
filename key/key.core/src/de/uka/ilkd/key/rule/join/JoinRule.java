@@ -201,8 +201,7 @@ public class JoinRule implements BuiltInRule {
                                     : (LocationVariable) upd.lhs();
 
                     newElementaries =
-                            newElementaries.prepend(tb.elementary(
-                                    lhs,
+                            newElementaries.prepend(tb.elementary(lhs,
                                     elementary.sub(0)));
                 }
 
@@ -262,7 +261,7 @@ public class JoinRule implements BuiltInRule {
                 new SequentFormula(succedentFormula);
         newGoal.addFormula(newSuccedent, new PosInOccurrence(newSuccedent,
                 PosInTerm.getTopLevel(), false));
-        
+
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will
         // be filled after partner node closing. The purpose of this
@@ -288,7 +287,7 @@ public class JoinRule implements BuiltInRule {
 
         return newGoals;
     }
-    
+
     /**
      * Joins two SE states (U1,C1,p) and (U2,C2,p) according to the method
      * {@link JoinRule#joinValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services)}
@@ -314,7 +313,8 @@ public class JoinRule implements BuiltInRule {
      * @return A new joined SE state (U*,C*) which is a weakening of the
      *         original states.
      */
-    @SuppressWarnings("unused") /* For deactivated equiv check */
+    @SuppressWarnings("unused")
+    /* For deactivated equiv check */
     protected Pair<SymbolicExecutionState, ImmutableSet<Name>> joinStates(
             JoinProcedure joinRule, SymbolicExecutionState state1,
             SymbolicExecutionState state2, Term programCounter,
@@ -403,7 +403,8 @@ public class JoinRule implements BuiltInRule {
 
                     Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedHeaps =
                             joinHeaps(joinRule, v, rightSide1, rightSide2,
-                                    state1, state2, distinguishingFormula, services);
+                                    state1, state2, distinguishingFormula,
+                                    services);
                     newElementaryUpdates =
                             newElementaryUpdates.prepend(tb.elementary(v,
                                     joinedHeaps.second));
@@ -416,7 +417,8 @@ public class JoinRule implements BuiltInRule {
 
                     Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedVal =
                             joinRule.joinValuesInStates(tb.var(v), state1,
-                                    rightSide1, state2, rightSide2, distinguishingFormula, services);
+                                    rightSide1, state2, rightSide2,
+                                    distinguishingFormula, services);
 
                     newNames = newNames.union(joinedVal.third);
 
@@ -488,7 +490,8 @@ public class JoinRule implements BuiltInRule {
             // Covers the case of two different symbolic heaps
             return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                     newConstraints, JoinIfThenElse.createIfThenElseTerm(state1,
-                            state2, heap1, heap2, distinguishingFormula, services), newNames);
+                            state2, heap1, heap2, distinguishingFormula,
+                            services), newNames);
         }
 
         final Function storeFunc =
@@ -535,7 +538,8 @@ public class JoinRule implements BuiltInRule {
 
                     Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinedValAndConstr =
                             joinRule.joinValuesInStates(field1, state1, value1,
-                                    state2, value2, distinguishingFormula, services);
+                                    state2, value2, distinguishingFormula,
+                                    services);
 
                     newConstraints =
                             newConstraints.union(joinedValAndConstr.first);
@@ -586,7 +590,8 @@ public class JoinRule implements BuiltInRule {
 
         return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
                 newConstraints, JoinIfThenElse.createIfThenElseTerm(state1,
-                        state2, heap1, heap2, distinguishingFormula, services), newNames);
+                        state2, heap1, heap2, distinguishingFormula, services),
+                newNames);
 
     }
 
