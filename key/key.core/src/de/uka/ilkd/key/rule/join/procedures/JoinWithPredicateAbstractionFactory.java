@@ -13,16 +13,12 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
@@ -37,7 +33,8 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
  *
  * @author Dominic Scheurer
  */
-public class JoinWithPredicateAbstractionFactory extends JoinWithPredicateAbstraction {
+public class JoinWithPredicateAbstractionFactory extends
+        JoinWithPredicateAbstraction {
 
     private static final JoinWithPredicateAbstractionFactory INSTANCE =
             new JoinWithPredicateAbstractionFactory();
@@ -94,7 +91,7 @@ public class JoinWithPredicateAbstractionFactory extends JoinWithPredicateAbstra
      * @return A complete instance of {@link JoinWithPredicateAbstraction}.
      */
     public JoinWithPredicateAbstraction instantiate(
-            HashMap<Sort, ArrayList<AbstractionPredicate>> predicates) {
+            Iterable<AbstractionPredicate> predicates) {
         return new JoinWithPredicateAbstraction(predicates);
     }
 

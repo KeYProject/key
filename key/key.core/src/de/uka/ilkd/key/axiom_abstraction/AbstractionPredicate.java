@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction
@@ -29,13 +30,19 @@ import de.uka.ilkd.key.logic.TermBuilder;
  */
 public abstract class AbstractionPredicate implements Function<Term, Term>,
         Named {
+    
+    /**
+     * The sort for the argument of this {@link AbstractionPredicate}.
+     */
+    private Sort argSort;
 
     /**
      * Creates a new {@link AbstractionPredicate}. Constructor is hidden since
      * elements fo this class should be created by the factory method
      * {@link #create(String, Function)}.
      */
-    private AbstractionPredicate() {
+    private AbstractionPredicate(Sort argSort) {
+        this.argSort = argSort;
     }
 
     /**
@@ -50,9 +57,9 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
      *            {@link TermBuilder}.
      * @return
      */
-    public static AbstractionPredicate create(final String name,
+    public static AbstractionPredicate create(final String name, final Sort argSort,
             final Function<Term, Term> mapping) {
-        return new AbstractionPredicate() {
+        return new AbstractionPredicate(argSort) {
             @Override
             public Term apply(Term input) {
                 return mapping.apply(input);
@@ -63,6 +70,13 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
                 return new Name(name);
             }
         };
+    }
+
+    /**
+     * @return The sort of this predicate's argument.
+     */
+    public Sort getArgSort() {
+        return argSort;
     }
 
     /*

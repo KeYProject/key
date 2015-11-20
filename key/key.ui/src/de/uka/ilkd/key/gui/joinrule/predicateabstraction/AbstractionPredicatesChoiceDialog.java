@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -33,6 +34,8 @@ import javafx.scene.layout.AnchorPane;
 
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
+
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -54,6 +57,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * TODO: Document.
@@ -80,6 +84,23 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     private ArrayList<AbstractionPredicate> registeredPredicates =
             new ArrayList<AbstractionPredicate>();
+
+    private HashMap<AbstractionPredicate, Sort> sortsForPredicates =
+            new HashMap<AbstractionPredicate, Sort>();
+
+    /**
+     * @return The abstraction predicates set by the user.
+     */
+    public ArrayList<AbstractionPredicate> getRegisteredPredicates() {
+        return registeredPredicates;
+    }
+
+    /**
+     * @return The mappings from abstraction predicates to input sorts.
+     */
+    public HashMap<AbstractionPredicate, Sort> getSortsForPredicates() {
+        return sortsForPredicates;
+    }
 
     /**
      * TODO: Document.
@@ -230,6 +251,27 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 }
             }
         });
+
+        ctrl.okPressedProperty().addListener(
+                (ObservableValue<? extends Boolean> observable,
+                        Boolean oldValue, Boolean newValue) -> {
+                    if (newValue) {
+                        setVisible(false);
+                        dispose();
+                    }
+                });
+
+        ctrl.cancelPressedProperty().addListener(
+                (ObservableValue<? extends Boolean> observable,
+                        Boolean oldValue, Boolean newValue) -> {
+                    if (newValue) {
+                        registeredPlaceholders = null;
+                        registeredPredicates = null;
+
+                        setVisible(false);
+                        dispose();
+                    }
+                });
     }
 
     /**
@@ -242,7 +284,13 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 .getAbbrevMap();
     }
 
-    
+    /**
+     * 
+     * TODO: Document.
+     *
+     * @param input
+     * @return
+     */
     private Pair<Sort, Name> parsePlaceholder(String input) {
         final Services services = goal.proof().getServices();
 
@@ -289,25 +337,40 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 parser.parse(new StringReader(input), Sort.FORMULA, services,
                         services.getNamespaces(), getAbbrevMap());
 
-        return AbstractionPredicate
-                .create(formula.toString(),
-                        (Term param) -> {
-                            Term result = formula;
-                            for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
-                                if (param.sort() == placeholder.first) {
-                                    LocationVariable placeholderVariable =
-                                            (LocationVariable) services
-                                                    .getNamespaces()
-                                                    .variables()
-                                                    .lookup(placeholder.second);
-                                    result =
-                                            OpReplacer.replace(
-                                                    tb.var(placeholderVariable),
-                                                    param, result, tf);
-                                }
-                            }
-                            return result;
-                        });
+        ImmutableSet<LocationVariable> containedLocVars =
+                JoinRuleUtils.getLocationVariables(formula, services);
+
+        int nrContainedPlaceholders = 0;
+        LocationVariable usedPlaceholder = null;
+        for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
+            LocationVariable placeholderVariable =
+                    (LocationVariable) services.getNamespaces().variables()
+                            .lookup(placeholder.second);
+
+            if (containedLocVars.contains(placeholderVariable)) {
+                nrContainedPlaceholders++;
+                usedPlaceholder = placeholderVariable;
+            }
+        }
+
+        if (nrContainedPlaceholders != 1) {
+            throw new RuntimeException(
+                    "An abstraction predicate must contain exactly one placeholder.");
+        }
+
+        final LocationVariable fUsedPlaceholder = usedPlaceholder;
+        final Sort fInputSort = usedPlaceholder.sort();
+
+        return AbstractionPredicate.create(formula.toString(), fInputSort, (
+                Term param) -> {
+            if (param.sort() != fInputSort) {
+                throw new IllegalArgumentException("Input must be of sort \""
+                        + fInputSort + "\", given: \"" + param.sort() + "\".");
+            }
+
+            return OpReplacer.replace(tb.var(fUsedPlaceholder), param, formula,
+                    tf);
+        });
     }
 
     // ////////////////////////////////////// //

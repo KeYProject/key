@@ -27,6 +27,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstracti
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -40,16 +41,18 @@ public class PredicateAbstractionLatticeTests extends TestCase {
     public void testCreateSignLatticeWithPredicates() {
         // Dummy proof to get a term builder.
         final Proof p = JoinRuleTests.loadProof("dummy.key");
+
+        final Sort intSort = (Sort) p.getServices().getNamespaces().sorts().lookup("int"); 
         final TermBuilder tb = p.getServices().getTermBuilder();
 
         final AbstractionPredicate gtZero =
-                AbstractionPredicate.create("_>0",
+                AbstractionPredicate.create("_>0", intSort,
                         (Term input) -> (tb.gt(input, tb.zero())));
         final AbstractionPredicate eqZero =
-                AbstractionPredicate.create("_=0",
+                AbstractionPredicate.create("_=0", intSort,
                         (Term input) -> (tb.equals(input, tb.zero())));
         final AbstractionPredicate ltZero =
-                AbstractionPredicate.create("_<0",
+                AbstractionPredicate.create("_<0", intSort,
                         (Term input) -> (tb.lt(input, tb.zero())));
 
         ArrayList<AbstractionPredicate> predicates =

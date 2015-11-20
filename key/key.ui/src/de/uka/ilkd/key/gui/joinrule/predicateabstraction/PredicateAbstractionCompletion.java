@@ -13,9 +13,13 @@
 
 package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
+import java.util.ArrayList;
+
+import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.gui.joinrule.JoinProcedureCompletion;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
 
 /**
  * Completion class for {@link JoinWithPredicateAbstraction}.
@@ -41,9 +45,28 @@ public class PredicateAbstractionCompletion extends
     @Override
     public JoinWithPredicateAbstraction complete(
             JoinWithPredicateAbstraction proc, Goal goal) {
+        AbstractionPredicatesChoiceDialog dialog =
+                new AbstractionPredicatesChoiceDialog(goal);
+
+        assert proc instanceof JoinWithPredicateAbstractionFactory :
+            "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
+
+        JoinWithPredicateAbstractionFactory procF =
+                (JoinWithPredicateAbstractionFactory) proc;
+
+        dialog.setVisible(true);
+
+        // TODO Check null (cancel button)
+        ArrayList<AbstractionPredicate> chosenPreds =
+                dialog.getRegisteredPredicates();
         
-        
-        return null;
+        // A null-pointer in the chosen predicates meands that
+        // the user has pressed the cancel button.
+        if (chosenPreds == null) {
+            return proc;
+        } else {
+            return procF.instantiate(chosenPreds);
+        }
     }
 
 }

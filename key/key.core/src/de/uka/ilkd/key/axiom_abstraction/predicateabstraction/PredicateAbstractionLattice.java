@@ -245,6 +245,14 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
             return new PredicateAbstractionDomainElement(predicatesForElem);
         }
 
+        /* (non-Javadoc)
+         * @see java.util.Iterator#remove()
+         */
+        @Override
+        public void remove() {
+            throw new RuntimeException("Method remove not implemented");
+        }
+
     }
 
 }

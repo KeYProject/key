@@ -14,7 +14,10 @@
 package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
 import java.net.URL;
+import java.util.Optional;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -22,8 +25,11 @@ import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebEngine;
@@ -60,7 +66,7 @@ public class AbstractionPredicatesJoinDialogController {
     // ///////////////////////////// //
     // //////// PROPERTIES ///////// //
     // ///////////////////////////// //
-
+    
     // Observable lists for problems. May be changed from an outside
     // controller and are watched by this class.
     ObservableList<String> placeholdersProblemsListData = FXCollections
@@ -76,6 +82,35 @@ public class AbstractionPredicatesJoinDialogController {
     // Observable list encapsulating already accepted abstraction predicates.
     private ObservableList<String> predicatesList = FXCollections
             .observableArrayList();
+
+    // Properties for pressing OK and close
+    private BooleanProperty okPressed = new SimpleBooleanProperty();
+    
+    public final boolean getOkPressed() {
+        return okPressed.get();
+    }
+    
+    public final void setOkPressed(boolean okPressed) {
+        this.okPressed.set(okPressed);
+    }
+    
+    public BooleanProperty okPressedProperty() {
+        return okPressed;
+    }
+
+    private BooleanProperty cancelPressed = new SimpleBooleanProperty();
+    
+    public final boolean getCancelPressedPressed() {
+        return cancelPressed.get();
+    }
+    
+    public final void setCancelPressed(boolean cancelPressed) {
+        this.cancelPressed.set(cancelPressed);
+    }
+    
+    public BooleanProperty cancelPressedProperty() {
+        return cancelPressed;
+    }
 
     // Property encapsulating the currently typed placeholder
     private SimpleStringProperty currentPlaceholder =
@@ -171,10 +206,12 @@ public class AbstractionPredicatesJoinDialogController {
 
     @FXML
     private void handleCancel() {
+        setCancelPressed(true);
     }
 
     @FXML
     private void handleOK() {
+        setOkPressed(true);
     }
 
     @FXML
@@ -216,7 +253,7 @@ public class AbstractionPredicatesJoinDialogController {
             else {
                 assert false : "There should not be another source than the two known list views.";
             }
-            
+
             src.setText("");
         }
     }
@@ -224,8 +261,30 @@ public class AbstractionPredicatesJoinDialogController {
     @FXML
     private void handleKeyReleasedInListview(KeyEvent e) {
         if (e.getCode().equals(KeyCode.DELETE)) {
+
             @SuppressWarnings("unchecked")
             ListView<String> lvSource = (ListView<String>) e.getSource();
+
+            if (lvSource == lvPlaceholders && lvPredicates.getItems().size() > 0) {
+                Alert delConfirmAlert = new Alert(AlertType.CONFIRMATION);
+                delConfirmAlert.setTitle("Deleting a placeholder variable");
+                delConfirmAlert
+                        .setHeaderText("You are about to delete a placeholder variable");
+                delConfirmAlert
+                        .setContentText("Deleting a placeholder that is used in an "
+                                + "abstraction predicate will cause problems whenever "
+                                + "the predicate is used. Please make sure that you "
+                                + "really do not need the placeholder.\n\n"
+                                + "Do you want to continue?");
+                delConfirmAlert.setResizable(true);
+                delConfirmAlert.getDialogPane().setPrefSize(480, 320);
+                
+                Optional<ButtonType> result = delConfirmAlert.showAndWait();
+                if (result.get() != ButtonType.OK) {
+                    return;
+                }
+            }
+            
             int idx = lvSource.getSelectionModel().getSelectedIndex();
             lvSource.getItems().remove(idx);
 

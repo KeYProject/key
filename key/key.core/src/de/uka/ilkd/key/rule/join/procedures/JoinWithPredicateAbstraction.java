@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.join.procedures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
@@ -45,17 +46,37 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      */
     protected JoinWithPredicateAbstraction() {
     }
-    
+
     /**
      * Creates a new instance of {@link JoinWithPredicateAbstraction}. This
      * JoinProcedure cannot be a Singleton since it depends on the given list of
      * predicates!
      *
-     * @param predicates The predicates for the created lattices.
+     * @param predicates
+     *            The predicates for the created lattices, sorted by sort.
      */
     public JoinWithPredicateAbstraction(
             HashMap<Sort, ArrayList<AbstractionPredicate>> predicates) {
         this.predicates = predicates;
+    }
+
+    /**
+     * Creates a new instance of {@link JoinWithPredicateAbstraction}. This
+     * JoinProcedure cannot be a Singleton since it depends on the given list of
+     * predicates!
+     *
+     * @param predicates
+     *            The predicates for the created lattices.
+     */
+    public JoinWithPredicateAbstraction(
+            Iterable<AbstractionPredicate> predicates) {
+        for (AbstractionPredicate pred : predicates) {
+            if (!this.predicates.containsKey(pred.getArgSort())) {
+                this.predicates.put(pred.getArgSort(), new ArrayList<AbstractionPredicate>());
+            }
+            
+            this.predicates.get(pred.getArgSort()).add(pred);
+        }
     }
 
     /*
@@ -96,18 +117,31 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
 
     /**
      * Adds a new predicate to the set of abstraction predicates.
-     *
-     * @param s
-     *            The sort of the input program variable for the predicate.
+     * 
      * @param predicate
-     *            The predicate itself.
+     *            The predicate.
      */
-    public void addPredicate(Sort s, AbstractionPredicate predicate) {
+    public void addPredicate(AbstractionPredicate predicate) {
+        Sort s = predicate.getArgSort();
+
         if (!predicates.containsKey(s)) {
             predicates.put(s, new ArrayList<AbstractionPredicate>());
         }
 
         predicates.get(s).add(predicate);
+    }
+
+    /**
+     * Adds a new predicate to the set of abstraction predicates.
+     * 
+     * @param predicates
+     *            The predicates to set.
+     */
+    public void addPredicates(Iterable<AbstractionPredicate> predicates) {
+        Iterator<AbstractionPredicate> it = predicates.iterator();
+        while (it.hasNext()) {
+            addPredicate(it.next());
+        }
     }
 
     @Override
