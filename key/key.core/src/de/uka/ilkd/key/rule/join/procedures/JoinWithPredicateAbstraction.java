@@ -15,23 +15,12 @@ package de.uka.ilkd.key.rule.join.procedures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
-import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.NotUniqueException;
-
-import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * Rule that joins two sequents based on a lattice of user-defined predicates.
@@ -50,6 +39,24 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      */
     private HashMap<Sort, ArrayList<AbstractionPredicate>> predicates =
             new HashMap<Sort, ArrayList<AbstractionPredicate>>();
+
+    /**
+     * Default constructor for subclasses.
+     */
+    protected JoinWithPredicateAbstraction() {
+    }
+    
+    /**
+     * Creates a new instance of {@link JoinWithPredicateAbstraction}. This
+     * JoinProcedure cannot be a Singleton since it depends on the given list of
+     * predicates!
+     *
+     * @param predicates The predicates for the created lattices.
+     */
+    public JoinWithPredicateAbstraction(
+            HashMap<Sort, ArrayList<AbstractionPredicate>> predicates) {
+        this.predicates = predicates;
+    }
 
     /*
      * (non-Javadoc)
@@ -99,25 +106,12 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
         if (!predicates.containsKey(s)) {
             predicates.put(s, new ArrayList<AbstractionPredicate>());
         }
-        
+
         predicates.get(s).add(predicate);
     }
 
     @Override
     public String toString() {
         return DISPLAY_NAME;
-    }
-
-    /**
-     * Looks up and returns the sort of the given name. May return null.
-     *
-     * @param name
-     *            The name for the sort, e.g. "int".
-     * @param services
-     *            The services object.
-     * @return The sort of the given name (may be null).
-     */
-    private Sort sortFor(String name, Services services) {
-        return (Sort) services.getNamespaces().sorts().lookup(new Name(name));
     }
 }

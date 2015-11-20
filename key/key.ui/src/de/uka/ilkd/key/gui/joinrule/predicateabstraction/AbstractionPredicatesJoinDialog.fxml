@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="450.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.gui.joinrule.predicateabstraction.AbstractionPredicatesJoinDialogController">
+   <children>
+      <BorderPane layoutX="217.0" layoutY="50.0" prefHeight="450.0" prefWidth="850.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <bottom>
+            <FlowPane alignment="CENTER" hgap="20.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+                  <Button mnemonicParsing="false" onAction="#handleOK" text="OK" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" top="10.0" />
+               </padding>
+            </FlowPane>
+         </bottom>
+         <center>
+            <SplitPane dividerPositions="0.6297169811320755" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <Accordion id="accMain" fx:id="accMain" prefHeight="402.0" prefWidth="249.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <panes>
+                            <TitledPane text="Placeholder Variables">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <BorderPane prefHeight="397.0" prefWidth="848.0">
+                                             <top>
+                                                <TextField id="txtPlaceholders" fx:id="txtPlaceholders" onKeyReleased="#handleKeyReleasedInInputTextField" promptText="Enter a new placeholder variable (e.g., &quot;int _ph1&quot;)." BorderPane.alignment="CENTER" />
+                                             </top>
+                                             <center>
+                                                <ListView id="lvPlaceholders" fx:id="lvPlaceholders" editable="true" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                             </center>
+                                          </BorderPane>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                            <TitledPane expanded="false" text="Abstraction Predicates">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <BorderPane prefHeight="397.0" prefWidth="848.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <top>
+                                                <TextField id="txtPredicates" fx:id="txtPredicates" onKeyReleased="#handleKeyReleasedInInputTextField" promptText="Enter a new predicate (e.g., &quot;_ph1 &gt; 0&quot;)." BorderPane.alignment="CENTER" />
+                                             </top>
+                                             <center>
+                                                <ListView id="lvPredicates" fx:id="lvPredicates" editable="true" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                             </center>
+                                          </BorderPane>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                          </panes>
+                        </Accordion>
+                     </children>
+                  </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <TitledPane text="Problems" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <content>
+                              <WebView fx:id="wvProblems" prefHeight="200.0" prefWidth="200.0" />
+                           </content>
+                        </TitledPane>
+                     </children>
+                  </AnchorPane>
+              </items>
+            </SplitPane>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

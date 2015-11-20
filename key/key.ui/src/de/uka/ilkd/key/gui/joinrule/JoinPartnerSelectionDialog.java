@@ -196,6 +196,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
                 }
             }
         });
+
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -396,7 +397,6 @@ public class JoinPartnerSelectionDialog extends JDialog {
     }
 
     public static void main(String[] args) {
-
         JoinPartnerSelectionDialog diag = new JoinPartnerSelectionDialog();
         diag.setVisible(true);
     }
@@ -457,10 +457,16 @@ public class JoinPartnerSelectionDialog extends JDialog {
     }
 
     /**
+     * @param <T>
      * @return The chosen join rule.
      */
-    public JoinProcedure getChosenJoinRule() {
-        return chosenRule;
+    @SuppressWarnings("unchecked")
+    public <T extends JoinProcedure> T getChosenJoinRule() {
+        JoinProcedureCompletion<T> completion =
+                (JoinProcedureCompletion<T>) JoinProcedureCompletion
+                        .getCompletionForClass(chosenRule.getClass());
+
+        return completion.complete((T) chosenRule, joinGoalPio.first);
     }
 
     /**
