@@ -60,7 +60,7 @@ public class PredicateAbstractionCompletion extends
         ArrayList<AbstractionPredicate> chosenPreds =
                 dialog.getRegisteredPredicates();
         
-        // A null-pointer in the chosen predicates meands that
+        // A null-pointer in the chosen predicates means that
         // the user has pressed the cancel button.
         if (chosenPreds == null) {
             return proc;

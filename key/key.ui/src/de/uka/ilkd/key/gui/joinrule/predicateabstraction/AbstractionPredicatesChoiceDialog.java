@@ -17,7 +17,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -33,7 +32,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 
 import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -89,7 +87,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             new HashMap<AbstractionPredicate, Sort>();
 
     /**
-     * @return The abstraction predicates set by the user.
+     * @return The abstraction predicates set by the user. Is null iff the user
+     *         pressed cancel.
      */
     public ArrayList<AbstractionPredicate> getRegisteredPredicates() {
         return registeredPredicates;
@@ -106,47 +105,36 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * TODO: Document.
      */
     private AbstractionPredicatesChoiceDialog() {
-        super(MAIN_WINDOW_INSTANCE, DIALOG_TITLE, false);
+        super(MAIN_WINDOW_INSTANCE, DIALOG_TITLE, true);
         setLocation(MAIN_WINDOW_INSTANCE.getLocation());
         setSize(INITIAL_SIZE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         final FXMLLoader loader = new FXMLLoader();
         loader.setLocation(AbstractionPredicatesChoiceDialog.class
                 .getResource("AbstractionPredicatesJoinDialog.fxml"));
 
+        final JFXPanel fxPanel = new JFXPanel();
+        add(fxPanel);
+
+        final FutureTask<AbstractionPredicatesJoinDialogController> task =
+                new FutureTask<AbstractionPredicatesJoinDialogController>(
+                        new Callable<AbstractionPredicatesJoinDialogController>() {
+                            @Override
+                            public AbstractionPredicatesJoinDialogController call()
+                                    throws Exception {
+                                Scene scene = createScene(loader);
+                                fxPanel.setScene(scene);
+                                return loader.getController();
+                            }
+                        });
+
+        Platform.runLater(task);
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    final JFXPanel fxPanel = new JFXPanel();
-                    add(fxPanel);
-
-                    final FutureTask<AbstractionPredicatesJoinDialogController> task =
-                            new FutureTask<AbstractionPredicatesJoinDialogController>(
-                                    new Callable<AbstractionPredicatesJoinDialogController>() {
-                                        @Override
-                                        public AbstractionPredicatesJoinDialogController call()
-                                                throws Exception {
-                                            Scene scene = createScene(loader);
-                                            fxPanel.setScene(scene);
-                                            return loader.getController();
-                                        }
-                                    });
-
-                    Platform.runLater(task);
-                    try {
-                        // Set the FXML controller
-                        ctrl = task.get();
-                    }
-                    catch (InterruptedException | ExecutionException e) {
-                        // This should never happen.
-                        e.printStackTrace();
-                        return;
-                    }
-                }
-            });
+            // Set the FXML controller
+            ctrl = task.get();
         }
-        catch (InvocationTargetException | InterruptedException e) {
+        catch (InterruptedException | ExecutionException e) {
             // This should never happen.
             e.printStackTrace();
             return;
@@ -388,18 +376,6 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         AbstractionPredicatesChoiceDialog dialog =
                 new AbstractionPredicatesChoiceDialog(proof.openGoals().head());
         dialog.setVisible(true);
-
-        // AbstractionPredicatesChoiceDialog dialog =
-        // new AbstractionPredicatesChoiceDialog();
-        // dialog.setVisible(true);
-        // Platform.runLater(new Runnable() {
-        //
-        // @Override
-        // public void run() {
-        // dialog.ctrl.placeholdersProblemsListData.add("Problam asdf asdfasdfasdf asdfasdf asdf");
-        // dialog.ctrl.predicateProblemsListData.add("Problam asdf asdfasdfasdf asdfasdf asdf");
-        // }
-        // });
     }
 
     /**

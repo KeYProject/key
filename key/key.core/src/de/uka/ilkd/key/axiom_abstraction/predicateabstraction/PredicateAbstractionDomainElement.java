@@ -114,20 +114,20 @@ public class PredicateAbstractionDomainElement extends AbstractDomainElement {
     @Override
     public Term getDefiningAxiom(Term varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();
-
-        if (predicates.size() == 0) {
-            return tb.ff();
-        }
         
         if (isTopElem) {
             return tb.tt();
+        }
+
+        if (predicates.size() == 0) {
+            return tb.ff();
         }
 
         Term result = null;
         for (AbstractionPredicate pred : predicates) {
             Term application = pred.apply(varOrConst);
             if (result == null) {
-                result = pred.apply(application);
+                result = application;
             }
             else {
                 result = tb.and(result, application);
