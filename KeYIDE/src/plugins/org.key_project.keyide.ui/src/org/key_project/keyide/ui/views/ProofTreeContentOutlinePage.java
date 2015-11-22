@@ -251,10 +251,11 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		for (Object unknownElement : unknownParents) {
 			Object parent = contentProvider.getParent(unknownElement);
 			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-			Assert.isTrue(viewIndex >= 0,
-					"Content provider returned wrong parents or child index computation is buggy.");
-			contentProvider.updateChildCount(parent, 0);
-			contentProvider.updateElement(parent, viewIndex);
+			if((boolean) contentProvider.getHideState().getValue() == false || node.leaf()){
+			   Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
+			   contentProvider.updateChildCount(parent, 0);
+			   contentProvider.updateElement(parent, viewIndex);
+			}
 		}
 	}
 

@@ -31,6 +31,7 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.testing.ContributionInfo;
 import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
+import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -135,6 +136,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	private State hideState;
 	
+	
+	private State symbolicState;
 	/**
 	 * The {@link IStateListener} to sync the hide intermediate proofsteps toggleState with the outline page
 	 */
@@ -147,17 +150,38 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	};
 	
 	/**
+	 * The {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page
+	 */
+	private IStateListener symbolicStateListener = new IStateListener(){
+
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         System.out.println("symbolic state changed");
+      }
+	};
+	
+	/**
 	 * The Constructor
 	 */
 	public LazyProofTreeContentProvider() {
 		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
 	      if (service != null) {
+	         
 	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
 	         if (hideCmd != null) {
 	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
 	            if (hideState != null) {
 	               hideState.setValue(false);
 	               hideState.addListener(stateListener);
+	            }
+	         }
+	         
+	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
+	         if(symbolicCmd != null){
+	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
+	            if(symbolicState != null){
+	               symbolicState.setValue(false);
+	               symbolicState.addListener(symbolicStateListener);
 	            }
 	         }
 	      }
@@ -335,7 +359,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		Object parent = getParent(node);
 		int parentChildCount = doUpdateChildCount(parent, -1);
 		int childIndex = getIndexOf(parent, node);
-		//TODO not a good solution
 		if(node.childrenCount() > 1){
 			childIndex = 0;
 		}
@@ -496,7 +519,10 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 					Node parentNode = current.parent();
 					int indexOnParent = parentNode.getChildNr(current);
 					current = parentNode.child(indexOnParent + 1);
-					index++;
+					// does not increment when the hideIntermediateProofsteps filter is active
+					if((boolean) hideState.getValue() != true){
+					   index++;
+					}
 				}
 			} else {
 				if (element == current) {
@@ -512,7 +538,13 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 						int childIndex = current.getChildNr(node);
 						if (childIndex >= 0) {
 							found = true;
-							index += childIndex + 1;
+							if((boolean) hideState.getValue() == true){ // hideIntermediateProofsteps filter is active
+							   if(element instanceof BranchFolder){
+							      index += childIndex;
+							   }
+							} else {
+							   index += childIndex + 1;
+							}
 						} else {
 							current = null; // Stop search, because element is
 											// not a child of parent
@@ -569,5 +601,13 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if(hideState != null){
 			hideState.removeListener(stateListener);
 		}
+
+		if(symbolicState != null){
+		   symbolicState.removeListener(symbolicStateListener);
+		}
+	}
+	
+	public State getHideState(){
+	   return hideState;
 	}
 }
