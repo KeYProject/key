@@ -117,6 +117,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         final JFXPanel fxPanel = new JFXPanel();
         add(fxPanel);
 
+        Platform.setImplicitExit(false);
         final FutureTask<AbstractionPredicatesJoinDialogController> task =
                 new FutureTask<AbstractionPredicatesJoinDialogController>(
                         new Callable<AbstractionPredicatesJoinDialogController>() {
