@@ -41,7 +41,8 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
  * @author Dominic Scheurer
  */
 public class PredicateAbstractionLattice extends AbstractDomainLattice {
-    private final ArrayList<AbstractionPredicate> predicates;
+    private ArrayList<AbstractionPredicate> predicates =
+            new ArrayList<AbstractionPredicate>();
 
     /**
      * Constructs a new {@link PredicateAbstractionLattice} for the given list
@@ -53,6 +54,8 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
     public PredicateAbstractionLattice(
             ArrayList<AbstractionPredicate> applicablePredicates) {
         super();
+        
+        assert predicates != null : "Do not call this constructor with a null argument.";
         this.predicates = applicablePredicates;
     }
 
@@ -95,12 +98,14 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
 
         ImmutableSet<AbstractionPredicate> preds1 = pade1.getPredicates();
         ImmutableSet<AbstractionPredicate> preds2 = pade2.getPredicates();
-        
-        ImmutableSet<AbstractionPredicate> intersection = preds1.intersect(preds2);
-        
+
+        ImmutableSet<AbstractionPredicate> intersection =
+                preds1.intersect(preds2);
+
         if (intersection.size() == 0) {
             return PredicateAbstractionDomainElement.TOP;
-        } else {
+        }
+        else {
             return new PredicateAbstractionDomainElement(intersection);
         }
     }
@@ -163,6 +168,15 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
          * bit sets for the iteration.
          */
         public PredicateLatticeIterator() {
+            // When no predicates are chosen, it happens that the predicates
+            // list is null in this inner class. This is sort of unexpected
+            // behavior, since the the predicate abstraction lattice is (and
+            // should be) never initialized with a null list. The lines below
+            // fix this issue locally.
+            if (predicates == null) {
+                predicates = new ArrayList<AbstractionPredicate>();
+            }
+
             int numApplPreds = predicates.size();
 
             // We work with bit sets of length n (where n is the number of
@@ -245,7 +259,9 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
             return new PredicateAbstractionDomainElement(predicatesForElem);
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see java.util.Iterator#remove()
          */
         @Override
