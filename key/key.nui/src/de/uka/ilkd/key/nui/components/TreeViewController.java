@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -38,7 +37,7 @@ public class TreeViewController {
 	public void displayProof(Proof p) {
 		// get the root node
 		Node pRoot = p.root();
-		
+
 		// convert proof to fxtree
 		TreeItem<String> fxRoot = new TreeItem<String>("proof tree");
 		fxRoot.setExpanded(true);
@@ -73,6 +72,9 @@ public class TreeViewController {
 				Node child = childrenIterator.next();
 				
 				String branchLabel = child.getNodeInfo().getBranchLabel();
+				if (branchLabel == null) {
+				    branchLabel = "Case " + (child.parent ().getChildNr(child) + 1);
+				}
 				TreeItem<String> branch = new TreeItem<String>(branchLabel);
 				fxParent.getChildren().add(branch);
 				
