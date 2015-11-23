@@ -22,10 +22,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction
@@ -87,9 +89,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
      * mapping. You may use nice Java 8 lambdas for the second argument!
      * <p>
      * 
-     * Note: This method should only be used for testing purposes. Predicates
-     * generated with this method cannot be saved / loaded with the proof.
-     * Please use {@link #create(Term, LocationVariable, Services)} instead.
+     * This method has been created for testing purposes; you should rather user
+     * {@link #create(Term, LocationVariable, Services)} instead.
      *
      * @param name
      *            The name for the abstraction predicate, e.g. "_>0".
@@ -101,19 +102,15 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
      *            {@link TermBuilder}.
      * @return An abstraction predicate encapsulating the given mapping.
      */
-    public static AbstractionPredicate create(final String name,
-            final Sort argSort, final Function<Term, Term> mapping) {
-        return new AbstractionPredicate(argSort) {
-            @Override
-            public Term apply(Term input) {
-                return mapping.apply(input);
-            }
+    public static AbstractionPredicate create(final Sort argSort,
+            final Function<Term, Term> mapping, Services services) {
+        LocationVariable placeholder =
+                JoinRuleUtils.getFreshLocVariableForPrefix("_ph", argSort,
+                        services);
 
-            @Override
-            public Name name() {
-                return new Name(name);
-            }
-        };
+        return create(
+                mapping.apply(services.getTermBuilder().var(placeholder)),
+                placeholder, services);
     }
 
     /**

@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -100,9 +101,9 @@ import de.uka.ilkd.key.util.SideProofUtil;
  */
 public class JoinRuleUtils {
 
-    //////////////////////////////////////////////////
-    /////////////// SIMPLE AUXILIARIES ///////////////
-    //////////////////////////////////////////////////
+    // ////////////////////////////////////////////////
+    // ///////////// SIMPLE AUXILIARIES ///////////////
+    // ////////////////////////////////////////////////
 
     /**
      * For Strings "xxx_i", this method returns "xxx". For Strings without the
@@ -135,19 +136,22 @@ public class JoinRuleUtils {
         return (int) Math.round(Math.pow(a, b));
     }
 
-    ///////////////////////////////////////////////////
-    ////////////////// GENERAL LOGIC //////////////////
-    //////////////////   (Syntax)    //////////////////
-    ///////////////////////////////////////////////////
-    
+    // /////////////////////////////////////////////////
+    // //////////////// GENERAL LOGIC //////////////////
+    // //////////////// (Syntax) //////////////////
+    // /////////////////////////////////////////////////
+
     /**
      * Translates a String into a formula or to null if not applicable.
      *
-     * @param services The services object.
-     * @param toTranslate The formula to be translated.
+     * @param services
+     *            The services object.
+     * @param toTranslate
+     *            The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
      */
-    public static Term translateToFormula(final Services services, final String toTranslate) {
+    public static Term translateToFormula(final Services services,
+            final String toTranslate) {
         try {
             final KeYParserF parser =
                     new KeYParserF(ParserMode.TERM, new KeYLexerF(
@@ -171,8 +175,9 @@ public class JoinRuleUtils {
         if (u.op() instanceof ElementaryUpdate) {
 
             ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
-            result = result.add((LocationVariable) ((ElementaryUpdate) u.op())
-                    .lhs());
+            result =
+                    result.add((LocationVariable) ((ElementaryUpdate) u.op())
+                            .lhs());
             return result;
 
         }
@@ -243,7 +248,7 @@ public class JoinRuleUtils {
 
         return result;
     }
-    
+
     /**
      * Returns all program variables in the given sequent.
      * 
@@ -260,7 +265,7 @@ public class JoinRuleUtils {
         }
 
         return result;
-    } 
+    }
 
     /**
      * Returns all program variables in the given term.
@@ -477,6 +482,35 @@ public class JoinRuleUtils {
     }
 
     /**
+     * Computes and registers a fresh location variable with the given prefix in
+     * its name of the given sort.
+     * 
+     * @param prefix
+     *            Prefix for the name of the variable.
+     * @param sort
+     *            Sort of the variable.
+     * @param services
+     *            The services object.
+     * @return A fresh location variable of the given sort with the given prefix
+     *         in its name.
+     */
+    public static LocationVariable getFreshLocVariableForPrefix(String prefix,
+            Sort sort, Services services) {
+        LocationVariable result = null;
+        String newName = "";
+
+        do {
+            newName = services.getTermBuilder().newName(prefix);
+            result =
+                    new LocationVariable(new ProgramElementName(newName), sort);
+            services.getNamespaces().variables().add(result);
+        }
+        while (newName.equals(prefix));
+
+        return result;
+    }
+
+    /**
      * Substitutes all constants in the given term by fresh variables. Multiple
      * occurrences of a constant are substituted by the same variable.
      * 
@@ -523,9 +557,10 @@ public class JoinRuleUtils {
             Function constant = (Function) term.op();
 
             if (!replMap.containsKey(constant)) {
-                LogicVariable freshVariable = getFreshVariableForPrefix(
-                        stripIndex(constant.toString()), constant.sort(),
-                        services);
+                LogicVariable freshVariable =
+                        getFreshVariableForPrefix(
+                                stripIndex(constant.toString()),
+                                constant.sort(), services);
                 replMap.put(constant, freshVariable);
             }
 
@@ -560,8 +595,8 @@ public class JoinRuleUtils {
      */
     public static Term exClosure(final Term term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized = anonymizeProgramVariables(
-                term, services);
+        Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized =
+                anonymizeProgramVariables(term, services);
 
         return tb.ex(anonymized.second, anonymized.first);
     }
@@ -578,8 +613,8 @@ public class JoinRuleUtils {
      */
     public static Term allClosure(final Term term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized = anonymizeProgramVariables(
-                term, services);
+        Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized =
+                anonymizeProgramVariables(term, services);
 
         return tb.all(anonymized.second, anonymized.first);
     }
@@ -663,8 +698,8 @@ public class JoinRuleUtils {
             branchUniqueName = base + "_" + newCounter;
         }
 
-        LocationVariable branchUniqueVar = lookupVarInNS(branchUniqueName,
-                services);
+        LocationVariable branchUniqueVar =
+                lookupVarInNS(branchUniqueName, services);
 
         return branchUniqueVar == null ? var : branchUniqueVar;
     }
@@ -733,11 +768,11 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return True iff the given formula has been successfully proven.
      */
-    public static boolean isProvable(Term toProve, Services services, int timeout) {
+    public static boolean isProvable(Term toProve, Services services,
+            int timeout) {
         return isProvable(toProve, services, false, timeout);
     }
 
@@ -750,8 +785,7 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return True iff the given formula has been successfully proven.
      */
     public static boolean isProvableWithSplitting(Term toProve,
@@ -768,11 +802,11 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return True iff the given formula has been successfully proven.
      */
-    public static boolean isProvable(Sequent toProve, Services services, int timeout) {
+    public static boolean isProvable(Sequent toProve, Services services,
+            int timeout) {
         return isProvable(toProve, services, false, timeout);
     }
 
@@ -785,8 +819,7 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return True iff the given formula has been successfully proven.
      */
     public static boolean isProvableWithSplitting(Sequent toProve,
@@ -805,8 +838,7 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * 
      * @throws RuntimeException
      *             iff proving the equivalence of term1 and term2 fails.
@@ -822,7 +854,7 @@ public class JoinRuleUtils {
     }
 
     // /////////////////////////////////////////////////
-    // //////////////   GENERAL LOGIC  /////////////////
+    // ////////////// GENERAL LOGIC /////////////////
     // ////////////// (Simplification) /////////////////
     // /////////////////////////////////////////////////
 
@@ -831,9 +863,11 @@ public class JoinRuleUtils {
      * If this attempt is successful, i.e. the number of atoms in the simplified
      * formula is lower (and, if requested, also the number of disjunctions),
      * the simplified formula is returned; otherwise, the original formula is
-     * returned.<p>
+     * returned.
+     * <p>
      * 
-     * <i>Please note that using this method can consume a great amount of time!</i>
+     * <i>Please note that using this method can consume a great amount of
+     * time!</i>
      * 
      * @param parentProof
      *            The parent {@link Proof}.
@@ -844,8 +878,7 @@ public class JoinRuleUtils {
      *            disjunctions (in addition to the number of atoms) into account
      *            when judging about the complexity of the "simplified" formula.
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return The simplified {@link Term} or the original term, if
      *         simplification was not successful.
      * 
@@ -872,10 +905,10 @@ public class JoinRuleUtils {
 
     }
 
-    ////////////////////////////////////////////////
-    //////////////// GENERAL LOGIC /////////////////
-    ////////////////  (Calculus) ///////////////////
-    ////////////////////////////////////////////////
+    // //////////////////////////////////////////////
+    // ////////////// GENERAL LOGIC /////////////////
+    // ////////////// (Calculus) ///////////////////
+    // //////////////////////////////////////////////
 
     /**
      * Deletes all formulae of the succedent / antecedent.
@@ -887,11 +920,12 @@ public class JoinRuleUtils {
      *            formulae.
      */
     public static void clearSemisequent(Goal goal, boolean antec) {
-        final Semisequent semiseq = antec ? goal.sequent().antecedent() : goal
-                .sequent().succedent();
+        final Semisequent semiseq =
+                antec ? goal.sequent().antecedent() : goal.sequent()
+                        .succedent();
         for (final SequentFormula f : semiseq) {
-            final PosInOccurrence gPio = new PosInOccurrence(f,
-                    PosInTerm.getTopLevel(), antec);
+            final PosInOccurrence gPio =
+                    new PosInOccurrence(f, PosInTerm.getTopLevel(), antec);
             goal.removeFormula(gPio);
         }
     }
@@ -921,13 +955,16 @@ public class JoinRuleUtils {
             return true;
         }
 
-        LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(node,
-                DefaultImmutableSet.<LocationVariable> nil());
+        LocVarReplBranchUniqueMap replMap =
+                new LocVarReplBranchUniqueMap(node,
+                        DefaultImmutableSet.<LocationVariable> nil());
 
-        ProgVarReplaceVisitor replVisitor1 = new ProgVarReplaceVisitor(
-                (ProgramElement) se1, replMap, services);
-        ProgVarReplaceVisitor replVisitor2 = new ProgVarReplaceVisitor(
-                (ProgramElement) se2, replMap, services);
+        ProgVarReplaceVisitor replVisitor1 =
+                new ProgVarReplaceVisitor((ProgramElement) se1, replMap,
+                        services);
+        ProgVarReplaceVisitor replVisitor2 =
+                new ProgVarReplaceVisitor((ProgramElement) se2, replMap,
+                        services);
 
         replVisitor1.start();
         replVisitor2.start();
@@ -968,23 +1005,23 @@ public class JoinRuleUtils {
      * @param services
      *            The services object.
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return A path condition that is equivalent to the disjunction of the two
      *         supplied formulae, but possibly simpler.
      */
     public static Term createSimplifiedDisjunctivePathCondition(
-            final Term cond1, final Term cond2, Services services, int simplificationTimeout) {
+            final Term cond1, final Term cond2, Services services,
+            int simplificationTimeout) {
 
         TermBuilder tb = services.getTermBuilder();
 
         ArrayList<Term> cond1ConjElems = getConjunctiveElementsFor(cond1);
         ArrayList<Term> cond2ConjElems = getConjunctiveElementsFor(cond2);
 
-        final ArrayList<Term> fCond1ConjElems = new ArrayList<Term>(
-                cond1ConjElems);
-        final ArrayList<Term> fCond2ConjElems = new ArrayList<Term>(
-                cond2ConjElems);
+        final ArrayList<Term> fCond1ConjElems =
+                new ArrayList<Term>(cond1ConjElems);
+        final ArrayList<Term> fCond2ConjElems =
+                new ArrayList<Term>(cond2ConjElems);
 
         if (cond1ConjElems.size() == cond2ConjElems.size()) {
             for (int i = 0; i < fCond1ConjElems.size(); i++) {
@@ -994,7 +1031,8 @@ public class JoinRuleUtils {
                 if (!elem1.equals(elem2)) {
                     // Try to show that the different elements can be left
                     // out in the disjunction, since they are complementary
-                    if (isProvableWithSplitting(tb.or(elem1, elem2), services, simplificationTimeout)) {
+                    if (isProvableWithSplitting(tb.or(elem1, elem2), services,
+                            simplificationTimeout)) {
                         cond1ConjElems.remove(elem1);
                         cond2ConjElems.remove(elem2);
                     }
@@ -1019,17 +1057,18 @@ public class JoinRuleUtils {
             result = result1;
         }
         else {
-            Option<Pair<Term, Term>> distinguishingAndEqual = getDistinguishingFormula(
-                    result1, result2, services);
-            
+            Option<Pair<Term, Term>> distinguishingAndEqual =
+                    getDistinguishingFormula(result1, result2, services);
+
             if (!distinguishingAndEqual.isSome()) {
-                distinguishingAndEqual = getDistinguishingFormula(
-                        result2, result1, services);
+                distinguishingAndEqual =
+                        getDistinguishingFormula(result2, result1, services);
             }
-            
+
             assert distinguishingAndEqual instanceof Option.Some : "Possibly, this join is not sound!";
-            
-            ArrayList<Term> equalConjunctiveElems = getConjunctiveElementsFor(distinguishingAndEqual.getValue().second);
+
+            ArrayList<Term> equalConjunctiveElems =
+                    getConjunctiveElementsFor(distinguishingAndEqual.getValue().second);
 
             // Apply distributivity to simplify the formula
             cond1ConjElems.removeAll(equalConjunctiveElems);
@@ -1037,16 +1076,18 @@ public class JoinRuleUtils {
 
             result1 = joinConjuctiveElements(cond1ConjElems, services);
             result2 = joinConjuctiveElements(cond2ConjElems, services);
-            Term commonElemsTerm = joinConjuctiveElements(
-                    equalConjunctiveElems, services);
+            Term commonElemsTerm =
+                    joinConjuctiveElements(equalConjunctiveElems, services);
 
             result = tb.and(tb.or(result1, result2), commonElemsTerm);
 
             // Last try: Check if the formula is equivalent to only the
             // common elements...
-            Term equivalentToCommon = tb.and(tb.imp(result, commonElemsTerm),
-                    tb.imp(commonElemsTerm, result));
-            if (isProvableWithSplitting(equivalentToCommon, services, simplificationTimeout)) {
+            Term equivalentToCommon =
+                    tb.and(tb.imp(result, commonElemsTerm),
+                            tb.imp(commonElemsTerm, result));
+            if (isProvableWithSplitting(equivalentToCommon, services,
+                    simplificationTimeout)) {
                 result = commonElemsTerm;
             }
         }
@@ -1079,8 +1120,10 @@ public class JoinRuleUtils {
 
         final TermWrapperFactory factory = new TermWrapperFactory();
 
-        final LinkedHashSet<TermWrapper> cond1ConjElems = new LinkedHashSet<JoinRuleUtils.TermWrapper>();
-        final LinkedHashSet<TermWrapper> cond2ConjElems = new LinkedHashSet<JoinRuleUtils.TermWrapper>();
+        final LinkedHashSet<TermWrapper> cond1ConjElems =
+                new LinkedHashSet<JoinRuleUtils.TermWrapper>();
+        final LinkedHashSet<TermWrapper> cond2ConjElems =
+                new LinkedHashSet<JoinRuleUtils.TermWrapper>();
 
         for (final Term term : getConjunctiveElementsFor(pathCondition1)) {
             cond1ConjElems.add(factory.wrapTerm(term));
@@ -1091,44 +1134,47 @@ public class JoinRuleUtils {
         }
 
         // The intersection of cond1ConjElems and cond2ConjElems
-        final LinkedHashSet<TermWrapper> commonElements = new LinkedHashSet<JoinRuleUtils.TermWrapper>(
-                cond1ConjElems);
+        final LinkedHashSet<TermWrapper> commonElements =
+                new LinkedHashSet<JoinRuleUtils.TermWrapper>(cond1ConjElems);
         commonElements.retainAll(cond2ConjElems);
 
         // The remaining rest
-        final LinkedHashSet<TermWrapper> distinguishingElements = new LinkedHashSet<JoinRuleUtils.TermWrapper>(
-                cond1ConjElems);
+        final LinkedHashSet<TermWrapper> distinguishingElements =
+                new LinkedHashSet<JoinRuleUtils.TermWrapper>(cond1ConjElems);
         distinguishingElements.removeAll(commonElements);
 
         if (distinguishingElements.isEmpty() && !cond1ConjElems.isEmpty()) {
             return new Option.None<Pair<Term, Term>>();
         }
 
-        return new Option.Some<Pair<Term, Term>>(
-                new Pair<Term, Term>(
-                        joinConjuctiveElements(TermWrapper.toTermList(
-                                new ArrayList<Term>(), distinguishingElements),
-                                services),
-                        joinConjuctiveElements( TermWrapper.toTermList(
-                                new ArrayList<Term>(), commonElements),
-                                services)));
+        return new Option.Some<Pair<Term, Term>>(new Pair<Term, Term>(
+                joinConjuctiveElements(TermWrapper.toTermList(
+                        new ArrayList<Term>(), distinguishingElements),
+                        services), joinConjuctiveElements(
+                        TermWrapper.toTermList(new ArrayList<Term>(),
+                                commonElements), services)));
 
     }
-    
+
     /**
      * Checks if two given path conditions are distinguishable.
      *
-     * @param pathCondition1 First path condition to check.
-     * @param pathCondition2 Second path condition to check.
-     * @param services The services object.
+     * @param pathCondition1
+     *            First path condition to check.
+     * @param pathCondition2
+     *            Second path condition to check.
+     * @param services
+     *            The services object.
      * @return True iff the two given path conditions are distinguishable.
      */
     public static boolean pathConditionsAreDistinguishable(Term pathCondition1,
             Term pathCondition2, Services services) {
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 = getDistinguishingFormula(
-                pathCondition1, pathCondition2, services);
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 = getDistinguishingFormula(
-                pathCondition2, pathCondition1, services);
+        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 =
+                getDistinguishingFormula(pathCondition1, pathCondition2,
+                        services);
+        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 =
+                getDistinguishingFormula(pathCondition2, pathCondition1,
+                        services);
 
         return distinguishingAndEqualFormula1.isSome()
                 || distinguishingAndEqualFormula2.isSome();
@@ -1150,8 +1196,9 @@ public class JoinRuleUtils {
         InitConfig initConfig = joinNodeParent.proof().getInitConfig();
 
         CloseAfterJoin closeRule = CloseAfterJoin.INSTANCE;
-        RuleApp app = closeRule.createApp(pio, joinPartner.node(),
-                joinNodeParent, joinState, joinPartnerState, pc);
+        RuleApp app =
+                closeRule.createApp(pio, joinPartner.node(), joinNodeParent,
+                        joinState, joinPartnerState, pc);
 
         // Register rule if not done yet.
         // This avoids error messages of the form
@@ -1183,8 +1230,8 @@ public class JoinRuleUtils {
     public static SymbolicExecutionState sequentToSEPair(Node node,
             PosInOccurrence pio, Services services) {
 
-        SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio,
-                services);
+        SymbolicExecutionStateWithProgCnt triple =
+                sequentToSETriple(node, pio, services);
 
         return new SymbolicExecutionState(triple.first, triple.second, node);
     }
@@ -1217,15 +1264,16 @@ public class JoinRuleUtils {
             Node node, PosInOccurrence pio, Services services) {
 
         ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
-        pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent()
-                .asList());
+        pathConditionSet =
+                pathConditionSet.prepend(node.sequent().antecedent().asList());
 
         Term selected = pio.subTerm();
 
         for (SequentFormula sf : node.sequent().succedent()) {
             if (!sf.formula().equals(selected)) {
-                pathConditionSet = pathConditionSet.prepend(new SequentFormula(
-                        services.getTermBuilder().not(sf.formula())));
+                pathConditionSet =
+                        pathConditionSet.prepend(new SequentFormula(services
+                                .getTermBuilder().not(sf.formula())));
             }
         }
 
@@ -1269,16 +1317,17 @@ public class JoinRuleUtils {
         ImmutableList<Term> elementaries = ImmutableSLList.nil();
 
         for (LocationVariable loc : getLocationVariables(term, services)) {
-            final String newName = tb
-                    .newName(stripIndex(loc.name().toString()));
-            final LogicVariable newVar = new LogicVariable(new Name(newName),
-                    loc.sort());
+            final String newName =
+                    tb.newName(stripIndex(loc.name().toString()));
+            final LogicVariable newVar =
+                    new LogicVariable(new Name(newName), loc.sort());
             services.getNamespaces().variables().add(newVar);
 
             freeVars = freeVars.add(newVar);
 
-            elementaries = elementaries.prepend(tb.elementary(tb.var(loc),
-                    tb.var(newVar)));
+            elementaries =
+                    elementaries.prepend(tb.elementary(tb.var(loc),
+                            tb.var(newVar)));
         }
 
         return new Pair<Term, ImmutableSet<QuantifiableVariable>>(tb.apply(
@@ -1320,8 +1369,9 @@ public class JoinRuleUtils {
      */
     private static ImmutableSet<LocationVariable> getProgramLocations(
             Term programCounterTerm, Services services) {
-        CollectLocationVariablesVisitor visitor = new CollectLocationVariablesVisitor(
-                programCounterTerm.javaBlock().program(), true, services);
+        CollectLocationVariablesVisitor visitor =
+                new CollectLocationVariablesVisitor(programCounterTerm
+                        .javaBlock().program(), true, services);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
 
@@ -1344,16 +1394,18 @@ public class JoinRuleUtils {
      */
     private static HashSet<LocationVariable> getProgramLocationsHashSet(
             Term programCounterTerm, Services services) {
-        final JavaProgramElement program = programCounterTerm.javaBlock().program();
-        if (program instanceof StatementBlock &&
-                (((StatementBlock) program).isEmpty() ||
-                (((StatementBlock) program).getInnerMostMethodFrame() != null &&
-                 ((StatementBlock) program).getInnerMostMethodFrame().getBody().isEmpty()))) {
+        final JavaProgramElement program =
+                programCounterTerm.javaBlock().program();
+        if (program instanceof StatementBlock
+                && (((StatementBlock) program).isEmpty() || (((StatementBlock) program)
+                        .getInnerMostMethodFrame() != null && ((StatementBlock) program)
+                        .getInnerMostMethodFrame().getBody().isEmpty()))) {
             return new HashSet<>();
         }
-        
-        CollectLocationVariablesVisitorHashSet visitor = new CollectLocationVariablesVisitorHashSet(
-                program, true, services);
+
+        CollectLocationVariablesVisitorHashSet visitor =
+                new CollectLocationVariablesVisitorHashSet(program, true,
+                        services);
 
         // Collect program variables in Java block
         visitor.start();
@@ -1402,12 +1454,13 @@ public class JoinRuleUtils {
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Term toProve,
-            Services services, boolean doSplit, String sideProofName, int timeout) {
+            Services services, boolean doSplit, String sideProofName,
+            int timeout) {
         return tryToProve(Sequent.createSequent(
-                                    // Sequent to prove
-                                    Semisequent.EMPTY_SEMISEQUENT,
-                                    new Semisequent(new SequentFormula(toProve))),
-                          services, doSplit, sideProofName, timeout);
+        // Sequent to prove
+                Semisequent.EMPTY_SEMISEQUENT, new Semisequent(
+                        new SequentFormula(toProve))), services, doSplit,
+                sideProofName, timeout);
     }
 
     /**
@@ -1426,20 +1479,20 @@ public class JoinRuleUtils {
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Sequent toProve,
-            Services services, boolean doSplit, String sideProofName, int timeout) {
-        final ProofEnvironment sideProofEnv = SideProofUtil
-                .cloneProofEnvironmentWithOwnOneStepSimplifier(
+            Services services, boolean doSplit, String sideProofName,
+            int timeout) {
+        final ProofEnvironment sideProofEnv =
+                SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
                         services.getProof(), // Parent Proof
                         new Choice[] {}); // useSimplifyTermProfile
 
         ApplyStrategyInfo proofResult = null;
         try {
-            ProofStarter proofStarter = SideProofUtil
-                    .createSideProof(
-                            sideProofEnv, // Proof environment
-                            toProve,
-                            sideProofName); // Proof name
-            
+            ProofStarter proofStarter =
+                    SideProofUtil.createSideProof(sideProofEnv, // Proof
+                                                                // environment
+                            toProve, sideProofName); // Proof name
+
             proofStarter.setTimeout(timeout * 1000000);
 
             proofResult = proofStarter.start();
@@ -1461,14 +1514,15 @@ public class JoinRuleUtils {
      * @param doSplit
      *            if true, splitting is allowed (normal mode).
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return True iff the given formula has been successfully proven.
      */
     private static boolean isProvable(Term toProve, Services services,
             boolean doSplit, int timeout) {
 
-        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check", timeout);
+        ApplyStrategyInfo proofResult =
+                tryToProve(toProve, services, doSplit, "Provability check",
+                        timeout);
         boolean result = proofResult.getProof().closed();
 
         return result;
@@ -1486,14 +1540,15 @@ public class JoinRuleUtils {
      * @param doSplit
      *            if true, splitting is allowed (normal mode).
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return True iff the given formula has been successfully proven.
      */
     private static boolean isProvable(Sequent toProve, Services services,
             boolean doSplit, int timeout) {
 
-        ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit, "Provability check", timeout);
+        ApplyStrategyInfo proofResult =
+                tryToProve(toProve, services, doSplit, "Provability check",
+                        timeout);
         boolean result = proofResult.getProof().closed();
 
         return result;
@@ -1510,8 +1565,7 @@ public class JoinRuleUtils {
      * @param term
      *            The {@link Term} to simplify.
      * @param timeout
-     *            Time in milliseconds after which the side proof
-     *            is aborted.
+     *            Time in milliseconds after which the side proof is aborted.
      * @return The simplified {@link Term}.
      * @throws ProofInputException
      *             Occurred Exception.
@@ -1523,7 +1577,8 @@ public class JoinRuleUtils {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo info = tryToProve(term, services, true, "Term simplification", timeout);
+        final ApplyStrategyInfo info =
+                tryToProve(term, services, true, "Term simplification", timeout);
 
         // The simplified formula is the conjunction of all open goals
         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
@@ -1534,8 +1589,8 @@ public class JoinRuleUtils {
         else {
             ImmutableList<Term> goalImplications = ImmutableSLList.nil();
             for (Goal goal : openGoals) {
-                Term goalImplication = sequentToFormula(goal.sequent(),
-                        services);
+                Term goalImplication =
+                        sequentToFormula(goal.sequent(), services);
                 goalImplications = goalImplications.append(goalImplication);
             }
 
@@ -1563,8 +1618,8 @@ public class JoinRuleUtils {
 
         // Shift antecedent formulae to the succedent by negation
         for (SequentFormula sf : sequent.antecedent().asList()) {
-            negAntecedentForms = negAntecedentForms
-                    .prepend(tb.not(sf.formula()));
+            negAntecedentForms =
+                    negAntecedentForms.prepend(tb.not(sf.formula()));
         }
 
         for (SequentFormula sf : sequent.succedent().asList()) {
@@ -1605,28 +1660,28 @@ public class JoinRuleUtils {
         return (LocationVariable) services.getNamespaces().programVariables()
                 .lookup(new Name(name));
     }
-    
+
     /**
-     * Creates {@link TermWrapper} objects, thereby ensuring
-     * that equal term wrappers also have equal hash codes.
+     * Creates {@link TermWrapper} objects, thereby ensuring that equal term
+     * wrappers also have equal hash codes.
      *
      * @author Dominic Scheurer
      */
     static class TermWrapperFactory {
         private ArrayList<Term> wrappedTerms = new ArrayList<Term>();
-        
+
         public TermWrapper wrapTerm(Term term) {
             for (Term existingTerm : wrappedTerms) {
                 if (existingTerm.equalsModRenaming(term)) {
                     return new TermWrapper(term, existingTerm.hashCode());
                 }
             }
-            
+
             wrappedTerms.add(term);
             return new TermWrapper(term, term.hashCode());
         }
     }
-    
+
     /**
      * Simple term wrapper for comparing terms modulo renaming.
      *
@@ -1636,32 +1691,32 @@ public class JoinRuleUtils {
     static class TermWrapper {
         private Term term;
         private int hashcode;
-        
+
         public TermWrapper(Term term, int hashcode) {
             this.term = term;
             this.hashcode = hashcode;
         }
-        
+
         public Term getTerm() {
             return term;
         }
-        
+
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof TermWrapper &&
-                    term.equalsModRenaming(((TermWrapper) obj).getTerm());
+            return obj instanceof TermWrapper
+                    && term.equalsModRenaming(((TermWrapper) obj).getTerm());
         }
-        
+
         @Override
         public int hashCode() {
             return hashcode;
         }
-        
+
         @Override
         public String toString() {
             return term.toString();
         }
-        
+
         /**
          * Adds the wrapped content of the Iterable object into the given target
          * collection.
@@ -1679,50 +1734,54 @@ public class JoinRuleUtils {
             while (it.hasNext()) {
                 target.add(it.next().getTerm());
             }
-            
+
             return target;
         }
     }
-    
+
     /**
      * A simple Scala-like option type: Either Some(value) or None.
      *
      * @author Dominic Scheurer
      *
-     * @param <T> Type for the content of the option.
+     * @param <T>
+     *            Type for the content of the option.
      */
     public static abstract class Option<T> {
         static class Some<T> extends Option<T> {
             private T value;
-            
+
             public Some(T value) {
                 this.value = value;
             }
-            
+
             public T getValue() {
                 return value;
             }
         }
-        
-        static class None<T> extends Option<T> {}
-        
+
+        static class None<T> extends Option<T> {
+        }
+
         public boolean isSome() {
             return this instanceof Some;
         }
-        
+
         /**
-         * Returns the value of this object if is a Some; otherwise,
-         * an exception is thrown.
+         * Returns the value of this object if is a Some; otherwise, an
+         * exception is thrown.
          *
          * @return The value of this object.
-         * @throws IllegalAccessError If this object is a None.
+         * @throws IllegalAccessError
+         *             If this object is a None.
          */
         public T getValue() {
             if (isSome()) {
                 return ((Some<T>) this).getValue();
             }
             else {
-                throw new IllegalAccessError("Cannot otain a value from a None object.");
+                throw new IllegalAccessError(
+                        "Cannot otain a value from a None object.");
             }
         }
     }
@@ -1765,7 +1824,8 @@ public class JoinRuleUtils {
      */
     private static class CollectLocationVariablesVisitorHashSet extends
             CreatingASTVisitor {
-        private HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
+        private HashSet<LocationVariable> variables =
+                new HashSet<LocationVariable>();
 
         public CollectLocationVariablesVisitorHashSet(ProgramElement root,
                 boolean preservesPos, Services services) {
@@ -1834,14 +1894,14 @@ public class JoinRuleUtils {
                 if (doNotRename.contains(var)) {
                     return var;
                 }
-                
+
                 if (cache.containsKey(var)) {
                     return cache.get(var);
                 }
-                
-                final ProgramVariable result = getBranchUniqueLocVar(var, node); 
+
+                final ProgramVariable result = getBranchUniqueLocVar(var, node);
                 cache.put(var, result);
-                
+
                 return result;
             }
             else {

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionLattice;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -41,19 +42,23 @@ public class PredicateAbstractionLatticeTests extends TestCase {
     public void testCreateSignLatticeWithPredicates() {
         // Dummy proof to get a term builder.
         final Proof p = JoinRuleTests.loadProof("dummy.key");
+        final Services services = p.getServices();
 
-        final Sort intSort = (Sort) p.getServices().getNamespaces().sorts().lookup("int"); 
+        final Sort intSort =
+                (Sort) p.getServices().getNamespaces().sorts().lookup("int");
         final TermBuilder tb = p.getServices().getTermBuilder();
 
         final AbstractionPredicate gtZero =
-                AbstractionPredicate.create("_>0", intSort,
-                        (Term input) -> (tb.gt(input, tb.zero())));
+                AbstractionPredicate.create(intSort,
+                        (Term input) -> (tb.gt(input, tb.zero())), services);
         final AbstractionPredicate eqZero =
-                AbstractionPredicate.create("_=0", intSort,
-                        (Term input) -> (tb.equals(input, tb.zero())));
+                AbstractionPredicate
+                        .create(intSort,
+                                (Term input) -> (tb.equals(input, tb.zero())),
+                                services);
         final AbstractionPredicate ltZero =
-                AbstractionPredicate.create("_<0", intSort,
-                        (Term input) -> (tb.lt(input, tb.zero())));
+                AbstractionPredicate.create(intSort,
+                        (Term input) -> (tb.lt(input, tb.zero())), services);
 
         ArrayList<AbstractionPredicate> predicates =
                 new ArrayList<AbstractionPredicate>();
