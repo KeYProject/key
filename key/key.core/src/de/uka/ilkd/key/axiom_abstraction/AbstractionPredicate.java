@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -91,15 +90,15 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
      * 
      * This method has been created for testing purposes; you should rather user
      * {@link #create(Term, LocationVariable, Services)} instead.
-     *
-     * @param name
-     *            The name for the abstraction predicate, e.g. "_>0".
+     * 
      * @param argSort
      *            The expected sort for the arguments of the predicate.
      * @param mapping
      *            The mapping from input terms of the adequate type to formulae,
      *            e.g. "(Term input) -> (tb.gt(input, tb.zero()))" where tb is a
      *            {@link TermBuilder}.
+     * @param services
+     *            The services object.
      * @return An abstraction predicate encapsulating the given mapping.
      */
     public static AbstractionPredicate create(final Sort argSort,
