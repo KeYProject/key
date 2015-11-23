@@ -15,11 +15,16 @@ package de.uka.ilkd.key.axiom_abstraction;
 
 import java.util.function.Function;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction
@@ -30,35 +35,73 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public abstract class AbstractionPredicate implements Function<Term, Term>,
         Named {
-    
+
     /**
      * The sort for the argument of this {@link AbstractionPredicate}.
      */
     private Sort argSort;
 
     /**
+     * The predicate term. Contains a placeholder ({@link #placeholderVariable})
+     * which is to be replaced by the concrete argument of the predicate.
+     * <p>
+     * 
+     * This field is needed to save proofs with abstraction predicates.
+     */
+    private Term predicateFormWithPlaceholder = null;
+
+    /**
+     * The placeholder variable occurring in
+     * {@link #predicateFormWithPlaceholder} which is to be replaced by the
+     * concrete argument of the predicate.
+     * <p>
+     * 
+     * This field is needed to save proofs with abstraction predicates.s
+     */
+    private LocationVariable placeholderVariable = null;
+
+    /**
      * Creates a new {@link AbstractionPredicate}. Constructor is hidden since
      * elements fo this class should be created by the factory method
      * {@link #create(String, Function)}.
+     * 
+     * @param argSort
+     *            The expected sort for the arguments of the predicate.
      */
     private AbstractionPredicate(Sort argSort) {
         this.argSort = argSort;
     }
 
     /**
+     * @return The placeholder variable and the function term that this
+     *         predicate has been constructed with.
+     */
+    public Pair<LocationVariable, Term> getPredicateFormWithPlaceholder() {
+        return new Pair<LocationVariable, Term>(placeholderVariable,
+                predicateFormWithPlaceholder);
+    }
+
+    /**
      * Creates a new {@link AbstractionPredicate} with the given name and
      * mapping. You may use nice Java 8 lambdas for the second argument!
+     * <p>
+     * 
+     * Note: This method should only be used for testing purposes. Predicates
+     * generated with this method cannot be saved / loaded with the proof.
+     * Please use {@link #create(Term, LocationVariable, Services)} instead.
      *
      * @param name
      *            The name for the abstraction predicate, e.g. "_>0".
+     * @param argSort
+     *            The expected sort for the arguments of the predicate.
      * @param mapping
      *            The mapping from input terms of the adequate type to formulae,
      *            e.g. "(Term input) -> (tb.gt(input, tb.zero()))" where tb is a
      *            {@link TermBuilder}.
-     * @return
+     * @return An abstraction predicate encapsulating the given mapping.
      */
-    public static AbstractionPredicate create(final String name, final Sort argSort,
-            final Function<Term, Term> mapping) {
+    public static AbstractionPredicate create(final String name,
+            final Sort argSort, final Function<Term, Term> mapping) {
         return new AbstractionPredicate(argSort) {
             @Override
             public Term apply(Term input) {
@@ -70,6 +113,64 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
                 return new Name(name);
             }
         };
+    }
+
+    /**
+     * Creates a new {@link AbstractionPredicate} for the given predicate. The
+     * predicate should contain the given placeholder variable, which is
+     * substituted by the argument supplied to the generated mapping.
+     * 
+     * @param predicate
+     *            The predicate formula containing the placeholder.
+     * @param placeholder
+     *            The placeholder to replace in the generated mapping.
+     * @param services
+     *            The services object.
+     * @return An abstraction predicate mapping terms to the predicate with the
+     *         placeholder substituted by the respective term.
+     */
+    public static AbstractionPredicate create(final Term predicate,
+            final LocationVariable placeholder, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final TermFactory tf = services.getTermFactory();
+        final Sort fInputSort = placeholder.sort();
+
+        AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
+            private final Name name = new Name("(" + predicate.toString()
+                    + ")[_/" + placeholder + "]");
+            private Function<Term, Term> mapping = null;
+
+            @Override
+            public Term apply(Term input) {
+                if (mapping == null) {
+                    mapping =
+                            (Term param) -> {
+                                if (param.sort() != fInputSort) {
+                                    throw new IllegalArgumentException(
+                                            "Input must be of sort \""
+                                                    + fInputSort
+                                                    + "\", given: \""
+                                                    + param.sort() + "\".");
+                                }
+
+                                return OpReplacer.replace(tb.var(placeholder),
+                                        param, predicate, tf);
+                            };
+                }
+
+                return mapping.apply(input);
+            }
+
+            @Override
+            public Name name() {
+                return name;
+            }
+        };
+        
+        result.predicateFormWithPlaceholder = predicate;
+        result.placeholderVariable = placeholder;
+        
+        return result;
     }
 
     /**

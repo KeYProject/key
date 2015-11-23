@@ -347,19 +347,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                     "An abstraction predicate must contain exactly one placeholder.");
         }
 
-        final LocationVariable fUsedPlaceholder = usedPlaceholder;
-        final Sort fInputSort = usedPlaceholder.sort();
-
-        return AbstractionPredicate.create(formula.toString(), fInputSort, (
-                Term param) -> {
-            if (param.sort() != fInputSort) {
-                throw new IllegalArgumentException("Input must be of sort \""
-                        + fInputSort + "\", given: \"" + param.sort() + "\".");
-            }
-
-            return OpReplacer.replace(tb.var(fUsedPlaceholder), param, formula,
-                    tf);
-        });
+        return AbstractionPredicate.create(formula, usedPlaceholder, services);
     }
 
     // ////////////////////////////////////// //
