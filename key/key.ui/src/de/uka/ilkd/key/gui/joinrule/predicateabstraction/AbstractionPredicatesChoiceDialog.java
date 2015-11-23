@@ -42,15 +42,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -318,8 +315,6 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private AbstractionPredicate parsePredicate(String input)
             throws ParserException {
         final Services services = goal.proof().getServices();
-        final TermBuilder tb = services.getTermBuilder();
-        final TermFactory tf = services.getTermFactory();
 
         DefaultTermParser parser = new DefaultTermParser();
         Term formula =
