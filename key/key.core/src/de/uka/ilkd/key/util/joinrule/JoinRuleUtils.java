@@ -1370,7 +1370,7 @@ public class JoinRuleUtils {
         if (registerInNamespaces
                 && services.getNamespaces().lookup(name) != null) {
             throw new NameAlreadyBoundException("The name \"" + strName
-                    + "\" is already known to the system.<br/>"
+                    + "\" is already known to the system.<br/>\n"
                     + "Plase choose a fresh one.");
         }
 

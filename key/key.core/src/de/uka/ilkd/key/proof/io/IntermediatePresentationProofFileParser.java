@@ -274,10 +274,13 @@ public class IntermediatePresentationProofFileParser implements
             ImmutableList<Pair<String, String>> currAbstractionPredicates =
                     ImmutableSLList.nil();
 
-            Pattern p =
-                    Pattern.compile("\\('(.+)', '(.+)'\\)(?:, \\('(.+)', '(.+)'\\)*)");
+            Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
             Matcher m = p.matcher(str);
-            if (m.matches()) {
+
+            boolean matched = false;
+            while (m.find()) {
+                matched = true;
+
                 for (int i = 1; i < m.groupCount(); i += 2) {
                     assert i + 1 < m.groupCount() : "Wrong format of join abstraction predicates: "
                             + "There should always be pairs of placeholders and predicate terms.";
@@ -288,12 +291,14 @@ public class IntermediatePresentationProofFileParser implements
                                             m.group(i), m.group(i + 1)));
                 }
             }
-            else {
+
+            if (!matched) {
                 errors.add(new ParserException(
                         "Wrong format of join abstraction predicates", null));
             }
 
-            ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates = currAbstractionPredicates;
+            ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates =
+                    currAbstractionPredicates;
             break;
 
         default:
