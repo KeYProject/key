@@ -16,7 +16,6 @@ package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -33,20 +32,15 @@ import javafx.scene.layout.AnchorPane;
 
 import javax.swing.JDialog;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -261,88 +255,29 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     }
 
     /**
+     * 
      * TODO: Document.
-     *
+     * 
+     * @param input
      * @return
      */
-    private static AbbrevMap getAbbrevMap() {
-        return MainWindow.getInstance().getMediator().getNotationInfo()
-                .getAbbrevMap();
+    private Pair<Sort, Name> parsePlaceholder(String input) {
+        return JoinRuleUtils
+                .parsePlaceholder(input, goal.proof().getServices());
     }
 
     /**
      * 
      * TODO: Document.
-     *
-     * @param input
-     * @return
-     */
-    private Pair<Sort, Name> parsePlaceholder(String input) {
-        final Services services = goal.proof().getServices();
-
-        String[] chunks = input.split(" ");
-        if (chunks.length != 2) {
-            throw new RuntimeException(
-                    "Expecting an input of type &lt;SORT&gt; &lt;NAME&gt;");
-        }
-
-        Sort sort = (Sort) services.getNamespaces().sorts().lookup(chunks[0]);
-
-        if (sort == null) {
-            throw new RuntimeException("Sort \"" + chunks[0]
-                    + "\" is not known");
-        }
-
-        String strName = chunks[1];
-        Name name = new Name(strName);
-
-        if (services.getNamespaces().lookup(name) != null) {
-            throw new RuntimeException("The name \"" + strName
-                    + "\" is already known to the system.<br/>"
-                    + "Plase choose a fresh one.");
-        }
-
-        return new Pair<Sort, Name>(sort, name);
-    }
-
-    /**
-     * TODO: Document.
-     *
+     * 
      * @param input
      * @return
      * @throws ParserException
      */
     private AbstractionPredicate parsePredicate(String input)
             throws ParserException {
-        final Services services = goal.proof().getServices();
-
-        DefaultTermParser parser = new DefaultTermParser();
-        Term formula =
-                parser.parse(new StringReader(input), Sort.FORMULA, services,
-                        services.getNamespaces(), getAbbrevMap());
-
-        ImmutableSet<LocationVariable> containedLocVars =
-                JoinRuleUtils.getLocationVariables(formula, services);
-
-        int nrContainedPlaceholders = 0;
-        LocationVariable usedPlaceholder = null;
-        for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
-            LocationVariable placeholderVariable =
-                    (LocationVariable) services.getNamespaces().variables()
-                            .lookup(placeholder.second);
-
-            if (containedLocVars.contains(placeholderVariable)) {
-                nrContainedPlaceholders++;
-                usedPlaceholder = placeholderVariable;
-            }
-        }
-
-        if (nrContainedPlaceholders != 1) {
-            throw new RuntimeException(
-                    "An abstraction predicate must contain exactly one placeholder.");
-        }
-
-        return AbstractionPredicate.create(formula, usedPlaceholder, services);
+        return JoinRuleUtils.parsePredicate(input, registeredPlaceholders, goal
+                .proof().getServices());
     }
 
     // ////////////////////////////////////// //

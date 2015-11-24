@@ -38,13 +38,13 @@ public interface IProofFileParser {
         BRANCH("branch"), RULE("rule"), TERM("term"), FORMULA("formula"), INSTANTIATION(
                 "inst"), ASSUMES_FORMULA_IN_SEQUENT("ifseqformula"), ASSUMES_FORMULA_DIRECT(
                 "ifdirectformula"), RULESET("heur"), BUILT_IN_RULE("builtin"), CONTRACT(
-                "contract"), ASSUMES_INST_BUILT_IN("ifInst"), JOIN_PROCEDURE(
-                "joinProc"), NUMBER_JOIN_PARTNERS("nrJoinPartners"), JOIN_NODE(
-                "joinNode"), JOIN_ID("joinId"), JOIN_DIST_FORMULA("distFormula"), USER_INTERACTION(
-                "userinteraction"), NEW_NAMES("newnames"), AUTOMODE_TIME(
-                "autoModeTime"), KeY_LOG("keyLog"), KeY_USER("keyUser"), KeY_VERSION(
-                "keyVersion"), KeY_SETTINGS("keySettings"), OPEN_GOAL(
-                "opengoal");
+                "contract"), ASSUMES_INST_BUILT_IN("ifInst"), JOIN_ABSTRACTION_PREDICATES(
+                "abstractionPredicates"), JOIN_PROCEDURE("joinProc"), NUMBER_JOIN_PARTNERS(
+                "nrJoinPartners"), JOIN_NODE("joinNode"), JOIN_ID("joinId"), JOIN_DIST_FORMULA(
+                "distFormula"), USER_INTERACTION("userinteraction"), NEW_NAMES(
+                "newnames"), AUTOMODE_TIME("autoModeTime"), KeY_LOG("keyLog"), KeY_USER(
+                "keyUser"), KeY_VERSION("keyVersion"), KeY_SETTINGS(
+                "keySettings"), OPEN_GOAL("opengoal");
 
         private String rawName;
 

@@ -413,7 +413,7 @@ public class OutputStreamProofSaver {
                                 (JoinWithPredicateAbstraction) concreteRule)
                                 .getPredicates().size() > 0) {
 
-                    tree.append(" (abstractionPredicates ");
+                    tree.append(" (abstractionPredicates \"");
                     for (Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts : predAbstrRule
                             .getPredicates().entrySet()) {
                         for (AbstractionPredicate pred : predsForSorts
@@ -422,13 +422,15 @@ public class OutputStreamProofSaver {
                                     pred.getPredicateFormWithPlaceholder();
 
                             tree.append("(")
-                                    .append("\"")
+                                    .append("'")
+                                    .append(predicateFormWithPlaceholder.first.sort())
+                                    .append(" ")
                                     .append(predicateFormWithPlaceholder.first)
-                                    .append("\"")
+                                    .append("'")
                                     .append(", ")
-                                    .append("\"")
+                                    .append("'")
                                     .append(predicateFormWithPlaceholder.second)
-                                    .append("\"")
+                                    .append("'")
                                     .append(")")
 
                                     .append(", ");
@@ -437,7 +439,7 @@ public class OutputStreamProofSaver {
                     // Delete the last ", ".
                     tree.delete(tree.length() - 2, tree.length());
                     
-                    tree.append(")");
+                    tree.append("\")");
 
                 }
             }

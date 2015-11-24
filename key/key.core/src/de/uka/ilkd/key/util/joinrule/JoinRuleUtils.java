@@ -30,6 +30,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -60,8 +61,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -134,6 +137,19 @@ public class JoinRuleUtils {
      */
     public static int intPow(int a, int b) {
         return (int) Math.round(Math.pow(a, b));
+    }
+
+    /**
+     * Creates an {@link ArrayList} containing exactly the given element.
+     * 
+     * @param elem
+     *            Element that is contained in the returned list.
+     * @return An {@link ArrayList} containing exactly the given element.
+     */
+    public static <T> ArrayList<T> singletonArrayList(T elem) {
+        ArrayList<T> result = new ArrayList<T>();
+        result.add(elem);
+        return result;
     }
 
     // /////////////////////////////////////////////////
@@ -1291,6 +1307,123 @@ public class JoinRuleUtils {
                 node); // CorrespondingNode
     }
 
+    /**
+     * Parses a declaration of the type "&lt;SORT&gt; &lt;NAME&gt;", where
+     * &lt;SORT&gt; must be a sort known to the proof and &lt;NAME&gt; must be a
+     * fresh name. This method is used, for instance, in the GUI dialog for
+     * predicate abstraction. The parsed placeholder is registered in KeY's
+     * namespaces.
+     *
+     * @param input
+     *            Input to parse.
+     * @param Services
+     *            The services object.
+     * @return A pair of parsed sort and name for the placeholder.
+     * @throws NameAlreadyBoundException
+     *             If the given placeholder is already known to the system.
+     * @throws SortNotKnownException
+     *             If the given sort is not known to the system.
+     */
+    public static Pair<Sort, Name> parsePlaceholder(String input,
+            Services services) {
+        return parsePlaceholder(input, true, services);
+    }
+
+    /**
+     * Parses a declaration of the type "&lt;SORT&gt; &lt;NAME&gt;", where
+     * &lt;SORT&gt; must be a sort known to the proof and &lt;NAME&gt; must be a
+     * fresh name. This method is used, for instance, in the GUI dialog for
+     * predicate abstraction. The parsed placeholder is registered in KeY's
+     * namespaces iff registerInNamespaces is true.
+     *
+     * @param input
+     *            Input to parse.
+     * @param registerInNamespaces
+     *            Flag to indicate whether the parsed placeholder should be
+     *            registered in the namespaces.
+     * @param Services
+     *            The services object.
+     * @return A pair of parsed sort and name for the placeholder.
+     * @throws NameAlreadyBoundException
+     *             If the given placeholder is already known to the system.
+     * @throws SortNotKnownException
+     *             If the given sort is not known to the system.
+     */
+    public static Pair<Sort, Name> parsePlaceholder(String input,
+            boolean registerInNamespaces, Services services) {
+        String[] chunks = input.split(" ");
+        if (chunks.length != 2) {
+            throw new RuntimeException(
+                    "Expecting an input of type &lt;SORT&gt; &lt;NAME&gt;");
+        }
+
+        Sort sort = (Sort) services.getNamespaces().sorts().lookup(chunks[0]);
+
+        if (sort == null) {
+            throw new SortNotKnownException("Sort \"" + chunks[0]
+                    + "\" is not known");
+        }
+
+        String strName = chunks[1];
+        Name name = new Name(strName);
+
+        if (registerInNamespaces
+                && services.getNamespaces().lookup(name) != null) {
+            throw new NameAlreadyBoundException("The name \"" + strName
+                    + "\" is already known to the system.<br/>"
+                    + "Plase choose a fresh one.");
+        }
+
+        return new Pair<Sort, Name>(sort, name);
+    }
+
+    /**
+     * Parses an abstraction predicate. The parameter input should be a textual
+     * representation of a formula containing exactly one of the also supplied
+     * placeholders (but the contained placeholder may have multiple occurrences
+     * in the formula). The result is an abstraction predicate mapping terms of
+     * the type of the placeholder to the parsed predicate with the placeholder
+     * substituted by the argument term.
+     *
+     * @param input
+     *            The predicate to parse (contains exactly one placeholder).
+     * @return The parsed {@link AbstractionPredicate}.
+     * @throws ParserException
+     *             If there is a syntax error.
+     */
+    public static AbstractionPredicate parsePredicate(String input,
+            ArrayList<Pair<Sort, Name>> registeredPlaceholders,
+            Services services) throws ParserException {
+        DefaultTermParser parser = new DefaultTermParser();
+        Term formula =
+                parser.parse(new StringReader(input), Sort.FORMULA, services,
+                        services.getNamespaces(), services.getProof()
+                                .abbreviations());
+
+        ImmutableSet<LocationVariable> containedLocVars =
+                JoinRuleUtils.getLocationVariables(formula, services);
+
+        int nrContainedPlaceholders = 0;
+        LocationVariable usedPlaceholder = null;
+        for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
+            LocationVariable placeholderVariable =
+                    (LocationVariable) services.getNamespaces().variables()
+                            .lookup(placeholder.second);
+
+            if (containedLocVars.contains(placeholderVariable)) {
+                nrContainedPlaceholders++;
+                usedPlaceholder = placeholderVariable;
+            }
+        }
+
+        if (nrContainedPlaceholders != 1) {
+            throw new RuntimeException(
+                    "An abstraction predicate must contain exactly one placeholder.");
+        }
+
+        return AbstractionPredicate.create(formula, usedPlaceholder, services);
+    }
+
     // /////////////////////////////////////////////////
     // /////////////////// PRIVATE /////////////////////
     // /////////////////////////////////////////////////
@@ -1682,6 +1815,10 @@ public class JoinRuleUtils {
         }
     }
 
+    // /////////////////////////////////////////////////
+    // /////////////////// CLASSES /////////////////////
+    // /////////////////////////////////////////////////
+
     /**
      * Simple term wrapper for comparing terms modulo renaming.
      *
@@ -1933,6 +2070,29 @@ public class JoinRuleUtils {
         public Set<java.util.Map.Entry<ProgramVariable, ProgramVariable>> entrySet() {
             return null;
         }
+    }
 
+    /**
+     * This exception is thrown by methods to indicate that a given KeY sort is
+     * not known in the current situation.
+     */
+    static class SortNotKnownException extends RuntimeException {
+        private static final long serialVersionUID = -5728194402773352846L;
+
+        public SortNotKnownException(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * This exception is thrown by methods to indicate that a name for which it
+     * is requested to register it is already known to the system.
+     */
+    static class NameAlreadyBoundException extends RuntimeException {
+        private static final long serialVersionUID = -2406984399754204833L;
+
+        public NameAlreadyBoundException(String message) {
+            super(message);
+        }
     }
 }
