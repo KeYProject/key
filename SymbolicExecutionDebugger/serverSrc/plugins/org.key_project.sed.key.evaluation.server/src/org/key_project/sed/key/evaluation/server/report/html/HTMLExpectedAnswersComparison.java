@@ -69,17 +69,20 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
                         ps = new PageStatistic(page);
                         pageMap.put(page, ps);
                      }
-                     Tool tool = entry.getValue().getTools(page).get(0);
-                     for (AbstractQuestion question : questionsWithResults) {
-                        QuestionStatistic qs = ps.getQuestionStatistic(question);
-                        QuestionInput qi = entry.getValue().getQuestionInputs(question).get(0);
-                        for (Choice choice : ((AbstractChoicesQuestion) question).getCorrectChoices()) {
-                           boolean selected = qi.isChoiceSelected(choice);
-                           ChoiceStatistic cs = qs.getChoiceStatistic(choice);
-                           for (IStatisticsFilter filter : statistics.getFilters()) {
-                              if (filter.accept(entry.getValue())) {
-                                 Statistic statistic = cs.getStatistic(filter, tool);
-                                 statistic.update(selected);
+                     List<Tool> tools = entry.getValue().getTools(page);
+                     if (!CollectionUtil.isEmpty(tools)) { // It might be empty in the reviewing code evaluation when the extend is four examples.
+                        Tool tool = tools.get(0);
+                        for (AbstractQuestion question : questionsWithResults) {
+                           QuestionStatistic qs = ps.getQuestionStatistic(question);
+                           QuestionInput qi = entry.getValue().getQuestionInputs(question).get(0);
+                           for (Choice choice : ((AbstractChoicesQuestion) question).getCorrectChoices()) {
+                              boolean selected = qi.isChoiceSelected(choice);
+                              ChoiceStatistic cs = qs.getChoiceStatistic(choice);
+                              for (IStatisticsFilter filter : statistics.getFilters()) {
+                                 if (filter.accept(entry.getValue())) {
+                                    Statistic statistic = cs.getStatistic(filter, tool);
+                                    statistic.update(selected);
+                                 }
                               }
                            }
                         }
@@ -452,7 +455,12 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
 
       public BigDecimal computePercentage(int decimalDigits) {
          BigInteger mul100 = selectedCount.multiply(BigInteger.valueOf(100));
-         return new BigDecimal(mul100).divide(new BigDecimal(maxCount), decimalDigits, RoundingMode.HALF_EVEN);
+         if (!maxCount.equals(BigInteger.ZERO)) {
+            return new BigDecimal(mul100).divide(new BigDecimal(maxCount), decimalDigits, RoundingMode.HALF_EVEN);
+         }
+         else {
+            return BigDecimal.ZERO;
+         }
       }
    }
 
@@ -468,12 +476,14 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
 
    private void dolistQuestionsWithResults(AbstractQuestion question, List<AbstractQuestion> result) {
       if (question instanceof AbstractChoicesQuestion) {
-         if (!CollectionUtil.isEmpty(((AbstractChoicesQuestion) question).getCorrectChoices())) {
-            result.add(question);
-         }
-         for (Choice choice :  ((AbstractChoicesQuestion) question).getChoices()) {
-            for (AbstractQuestion child : choice.getChildQuestions()) {
-               dolistQuestionsWithResults(child, result);
+         if (question.isEnabled()) {
+            if (!CollectionUtil.isEmpty(((AbstractChoicesQuestion) question).getCorrectChoices())) {
+               result.add(question);
+            }
+            for (Choice choice :  ((AbstractChoicesQuestion) question).getChoices()) {
+               for (AbstractQuestion child : choice.getChildQuestions()) {
+                  dolistQuestionsWithResults(child, result);
+               }
             }
          }
       }
