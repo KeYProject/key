@@ -26,8 +26,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * other types than int and boolean are unchanged if they are equal in both
  * states and set to fresh variables if they have different values.
  * 
- * TODO: Could also add a null / non-null lattice for objects.
- * 
+ * @deprecated You should use {@link JoinWithPredicateAbstraction} instead.
  * @author Dominic Scheurer
  */
 public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
@@ -42,8 +41,10 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
     }
 
     private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
      */
     @Override
@@ -54,10 +55,11 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
     @Override
     protected AbstractDomainLattice getAbstractDomainForSort(Sort s,
             Services services) {
-        final Sort intSort = (Sort) services.getNamespaces().sorts()
-                .lookup(new Name("int"));
-        final Sort booleanSort = (Sort) services.getNamespaces().sorts()
-                .lookup(new Name("boolean"));
+        final Sort intSort =
+                (Sort) services.getNamespaces().sorts().lookup(new Name("int"));
+        final Sort booleanSort =
+                (Sort) services.getNamespaces().sorts()
+                        .lookup(new Name("boolean"));
 
         if (s.equals(intSort)) {
             return SignAnalysisLattice.getInstance();

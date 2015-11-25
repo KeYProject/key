@@ -37,7 +37,7 @@ import javafx.scene.web.WebView;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * TODO: Document.
+ * The JavaFX controller for the predicates choice dialog GUI.
  *
  * @author Dominic Scheurer
  */
@@ -66,7 +66,7 @@ public class AbstractionPredicatesJoinDialogController {
     // ///////////////////////////// //
     // //////// PROPERTIES ///////// //
     // ///////////////////////////// //
-    
+
     // Observable lists for problems. May be changed from an outside
     // controller and are watched by this class.
     ObservableList<String> placeholdersProblemsListData = FXCollections
@@ -85,29 +85,29 @@ public class AbstractionPredicatesJoinDialogController {
 
     // Properties for pressing OK and close
     private BooleanProperty okPressed = new SimpleBooleanProperty();
-    
+
     public final boolean getOkPressed() {
         return okPressed.get();
     }
-    
+
     public final void setOkPressed(boolean okPressed) {
         this.okPressed.set(okPressed);
     }
-    
+
     public BooleanProperty okPressedProperty() {
         return okPressed;
     }
 
     private BooleanProperty cancelPressed = new SimpleBooleanProperty();
-    
+
     public final boolean getCancelPressedPressed() {
         return cancelPressed.get();
     }
-    
+
     public final void setCancelPressed(boolean cancelPressed) {
         this.cancelPressed.set(cancelPressed);
     }
-    
+
     public BooleanProperty cancelPressedProperty() {
         return cancelPressed;
     }
@@ -265,7 +265,8 @@ public class AbstractionPredicatesJoinDialogController {
             @SuppressWarnings("unchecked")
             ListView<String> lvSource = (ListView<String>) e.getSource();
 
-            if (lvSource == lvPlaceholders && lvPredicates.getItems().size() > 0) {
+            if (lvSource == lvPlaceholders
+                    && lvPredicates.getItems().size() > 0) {
                 Alert delConfirmAlert = new Alert(AlertType.CONFIRMATION);
                 delConfirmAlert.setTitle("Deleting a placeholder variable");
                 delConfirmAlert
@@ -278,13 +279,13 @@ public class AbstractionPredicatesJoinDialogController {
                                 + "Do you want to continue?");
                 delConfirmAlert.setResizable(true);
                 delConfirmAlert.getDialogPane().setPrefSize(480, 320);
-                
+
                 Optional<ButtonType> result = delConfirmAlert.showAndWait();
                 if (result.get() != ButtonType.OK) {
                     return;
                 }
             }
-            
+
             int idx = lvSource.getSelectionModel().getSelectedIndex();
             lvSource.getItems().remove(idx);
 

@@ -29,12 +29,6 @@ import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
 public class PredicateAbstractionCompletion extends
         JoinProcedureCompletion<JoinWithPredicateAbstraction> {
 
-    /**
-     * TODO: Document.
-     */
-    public PredicateAbstractionCompletion() {
-    }
-
     /*
      * (non-Javadoc)
      * 

@@ -134,8 +134,9 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
             private final Name name = new Name("("
-                    + LogicPrinter.quickPrintTerm(predicate, services).replace(
-                            "\n", "") + ")[_/" + placeholder + "]");
+                    + LogicPrinter.quickPrintTerm(predicate, services)
+                            .replace("\n", "") + ")[_/"
+                    + placeholder + "]");
             private Function<Term, Term> mapping = null;
 
             @Override

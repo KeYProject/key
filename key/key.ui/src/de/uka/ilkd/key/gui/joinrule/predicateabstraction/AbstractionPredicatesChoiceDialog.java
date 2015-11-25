@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
 import java.awt.Dimension;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +32,6 @@ import javafx.scene.layout.AnchorPane;
 import javax.swing.JDialog;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -42,14 +40,12 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
- * TODO: Document.
+ * A dialog for choosing abstraction predicates for joins with predicate
+ * abstraction.
  *
  * @author Dominic Scheurer
  */
@@ -93,7 +89,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     }
 
     /**
-     * TODO: Document.
+     * Constructs a new {@link AbstractionPredicatesChoiceDialog}.
      */
     private AbstractionPredicatesChoiceDialog() {
         super(MAIN_WINDOW_INSTANCE, DIALOG_TITLE, true);
@@ -148,9 +144,11 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     }
 
     /**
-     * TODO: Document.
+     * Constructs a new {@link AbstractionPredicatesChoiceDialog}. The given
+     * goal is used to get information about the proof.
      *
      * @param goal
+     *            The goal on which the join rule is applied.
      */
     public AbstractionPredicatesChoiceDialog(Goal goal) {
         this();
@@ -255,11 +253,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     }
 
     /**
-     * 
-     * TODO: Document.
+     * Parses a placeholder using
+     * {@link JoinRuleUtils#parsePlaceholder(String, Services)}.
      * 
      * @param input
-     * @return
+     *            The input to parse.
+     * @return The parsed placeholder (sort and name).
      */
     private Pair<Sort, Name> parsePlaceholder(String input) {
         return JoinRuleUtils
@@ -267,12 +266,14 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     }
 
     /**
-     * 
-     * TODO: Document.
+     * Parses an abstraction predicate using
+     * {@link JoinRuleUtils#parsePredicate(String, ArrayList, Services)}.
      * 
      * @param input
-     * @return
+     *            The input to parse.
+     * @return The parsed abstraction predicate.
      * @throws ParserException
+     *             If there is a mistake in the input.
      */
     private AbstractionPredicate parsePredicate(String input)
             throws ParserException {
@@ -284,41 +285,37 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     // //////////// TEST METHODS //////////// //
     // ////////////////////////////////////// //
 
-    /**
-     * TODO: Document.
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        Proof proof = loadProof("firstTouch/01-Agatha/project.key");
-
-        AbstractionPredicatesChoiceDialog dialog =
-                new AbstractionPredicatesChoiceDialog(proof.openGoals().head());
-        dialog.setVisible(true);
-    }
-
-    /**
-     * Loads the given proof file. Checks if the proof file exists and the proof
-     * is not null, and fails if the proof could not be loaded.
-     *
-     * @param proofFileName
-     *            The file name of the proof file to load.
-     * @return The loaded proof.
-     */
-    static Proof loadProof(String proofFileName) {
-        File proofFile = new File("examples/" + proofFileName);
-
-        try {
-            KeYEnvironment<?> environment =
-                    KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                            proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-
-            return proof;
-        }
-        catch (ProblemLoaderException e) {
-            return null;
-        }
-    }
+    // public static void main(String[] args) {
+    // Proof proof = loadProof("firstTouch/01-Agatha/project.key");
+    //
+    // AbstractionPredicatesChoiceDialog dialog =
+    // new AbstractionPredicatesChoiceDialog(proof.openGoals().head());
+    // dialog.setVisible(true);
+    // }
+    //
+    // /**
+    // * Loads the given proof file. Checks if the proof file exists and the
+    // proof
+    // * is not null, and fails if the proof could not be loaded.
+    // *
+    // * @param proofFileName
+    // * The file name of the proof file to load.
+    // * @return The loaded proof.
+    // */
+    // static Proof loadProof(String proofFileName) {
+    // File proofFile = new File("examples/" + proofFileName);
+    //
+    // try {
+    // KeYEnvironment<?> environment =
+    // KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+    // proofFile, null, null, null, true);
+    // Proof proof = environment.getLoadedProof();
+    //
+    // return proof;
+    // }
+    // catch (ProblemLoaderException e) {
+    // return null;
+    // }
+    // }
 
 }
