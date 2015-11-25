@@ -56,7 +56,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             .getInstance();
 
     /** The initial size of this dialog. */
-    private static final Dimension INITIAL_SIZE = new Dimension(850, 450);
+    private static final Dimension INITIAL_SIZE = new Dimension(850, 600);
 
     private static final String DIALOG_TITLE =
             "Choose abstraction predicates for join";
@@ -285,37 +285,39 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     // //////////// TEST METHODS //////////// //
     // ////////////////////////////////////// //
 
-    // public static void main(String[] args) {
-    // Proof proof = loadProof("firstTouch/01-Agatha/project.key");
-    //
-    // AbstractionPredicatesChoiceDialog dialog =
-    // new AbstractionPredicatesChoiceDialog(proof.openGoals().head());
-    // dialog.setVisible(true);
-    // }
-    //
-    // /**
-    // * Loads the given proof file. Checks if the proof file exists and the
-    // proof
-    // * is not null, and fails if the proof could not be loaded.
-    // *
-    // * @param proofFileName
-    // * The file name of the proof file to load.
-    // * @return The loaded proof.
-    // */
-    // static Proof loadProof(String proofFileName) {
-    // File proofFile = new File("examples/" + proofFileName);
-    //
-    // try {
-    // KeYEnvironment<?> environment =
-    // KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-    // proofFile, null, null, null, true);
-    // Proof proof = environment.getLoadedProof();
-    //
-    // return proof;
-    // }
-    // catch (ProblemLoaderException e) {
-    // return null;
-    // }
-    // }
+    public static void main(String[] args) {
+        de.uka.ilkd.key.proof.Proof proof =
+                loadProof("firstTouch/01-Agatha/project.key");
+
+        AbstractionPredicatesChoiceDialog dialog =
+                new AbstractionPredicatesChoiceDialog(proof.openGoals().head());
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Loads the given proof file. Checks if the proof file exists and the proof
+     * is not null, and fails if the proof could not be loaded.
+     *
+     * @param proofFileName
+     *            The file name of the proof file to load.
+     * @return The loaded proof.
+     */
+    static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {
+        java.io.File proofFile = new java.io.File("examples/" + proofFileName);
+
+        try {
+            de.uka.ilkd.key.control.KeYEnvironment<?> environment =
+                    de.uka.ilkd.key.control.KeYEnvironment.load(
+                            de.uka.ilkd.key.proof.init.JavaProfile
+                                    .getDefaultInstance(), proofFile, null,
+                            null, null, true);
+            de.uka.ilkd.key.proof.Proof proof = environment.getLoadedProof();
+
+            return proof;
+        }
+        catch (de.uka.ilkd.key.proof.io.ProblemLoaderException e) {
+            return null;
+        }
+    }
 
 }

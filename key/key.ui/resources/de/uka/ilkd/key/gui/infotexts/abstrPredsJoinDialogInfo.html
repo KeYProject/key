@@ -1,0 +1,19 @@
+<h4>Within this dialog, you can choose predicates used in joins by predicate abstraction.</h4>
+<p>
+	An <strong>abstraction predicate</strong> is a unary mapping from terms of suitable type to formulae.
+	You can construct such mappings here by registering <strong>placeholder variables</strong> (e.g., <code>int i</code>
+	or <code>java.lang.String s</code>) and using those in the <strong>predicate definition</strong> (e.g., <code>s = null</code>).
+	For each sort of placeholder predicates, a <strong>finite lattice</strong> for joins with abstraction is
+	constructed.
+</p>
+<p>
+	Thus, it does not make sense to register multiple placeholders of the same
+	type. Furthermore, <strong>each abstraction predicate definition must contain exactly one placeholder</strong>
+	which then also determines the type of the predicate.
+</p>
+<p>
+	From the given predicates, <strong>as many lattices as sorts of placeholders given</strong> are constructed.
+	Such a lattice consists of all possible 2^n combinations of the applicable predicates that
+	are combined using conjunction. Each lattice contains a top and bottom element. If you do
+	not enter any predicate, the default lattice with only a top and bottom element is created. 
+</p>

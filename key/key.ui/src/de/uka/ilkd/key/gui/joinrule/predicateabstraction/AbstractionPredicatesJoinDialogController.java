@@ -13,7 +13,10 @@
 
 package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -32,6 +35,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import de.uka.ilkd.key.util.Debug;
@@ -62,6 +66,12 @@ public class AbstractionPredicatesJoinDialogController {
 
     @FXML
     private WebView wvProblems;
+
+    @FXML
+    private WebView wvInfo;
+    
+    @FXML
+    private AnchorPane mainPane; 
 
     // ///////////////////////////// //
     // //////// PROPERTIES ///////// //
@@ -157,6 +167,36 @@ public class AbstractionPredicatesJoinDialogController {
         final URL bootstrapThemeCssResource =
                 getURLForResourceFile(AbstractionPredicatesChoiceDialog.class,
                         resourcePath + "css/bootstrap/bootstrap-theme.min.css");
+        final URL infoTextResource =
+                getURLForResourceFile(AbstractionPredicatesChoiceDialog.class,
+                        resourcePath
+                                + "infotexts/abstrPredsJoinDialogInfo.html");
+        
+        mainPane.prefWidthProperty().bind(wvInfo.prefWidthProperty());
+
+        {
+            final WebEngine webEngine = wvInfo.getEngine();
+            final StringBuilder sb = new StringBuilder();
+            sb.append("<html><head>");
+    
+            sb.append("<link href=\"");
+            sb.append(bootstrapCssResource);
+            sb.append("\" type=\"text/css\" rel=\"stylesheet\">");
+    
+            sb.append("<link href=\"");
+            sb.append(bootstrapThemeCssResource);
+            sb.append("\" type=\"text/css\" rel=\"stylesheet\">");
+    
+            sb.append("</head><body>");
+            try {
+                sb.append(new String(Files.readAllBytes(Paths
+                        .get(infoTextResource.getFile()))));
+            }
+            catch (IOException e) {
+            }
+            sb.append("</body></html>");
+            webEngine.loadContent(sb.toString());
+        }
 
         ListChangeListener<String> changeListener =
                 (Change<? extends String> event) -> {
