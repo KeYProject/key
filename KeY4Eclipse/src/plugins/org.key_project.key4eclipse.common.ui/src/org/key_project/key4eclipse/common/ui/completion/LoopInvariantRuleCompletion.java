@@ -274,12 +274,14 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             
             invariantT.addModifyListener(new ModifyListener(){
                public void modifyText(ModifyEvent event) {
+                  updateErrorMessage();
                   resetInvariantState();
                }
             });
             
             modifiesT.addModifyListener(new ModifyListener(){
                public void modifyText(ModifyEvent event) {
+                  updateErrorMessage();
                   resetModifiesState();
                }
             });
@@ -308,6 +310,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          
          variantsT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
+               updateErrorMessage();
                resetVariantsState();
             }
          });
@@ -316,7 +319,25 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       private void updateErrorMessage(){
+         setErrorMessage(null);
+         int i = 0;
+         for (LocationVariable heap : heaps){
+            Text wdgt = getTextField(-1, i, 0);
+            Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
+            wdgt = getTextField(-1, i, 1);
+            Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+            Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
+            if (invariantTerm == null)setErrorMessage("Error in current specification: " + heap.toString() + " / invariant");
+            if (modifiesTerm == null)setErrorMessage("Error in current specification: " + heap.toString() + " / modifies");
+            i++;
+         }
+         Term variantTerm = resetVariantsState();
+         if (variantTerm == null) setErrorMessage("Error in current specification: variant");
+         //resetStateTab();
          
+         Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
+         
+         return;
       }
       
       /**
@@ -324,6 +345,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @author Viktor Pfanschilling
        */
       private void resetStateTab(){
+         updateErrorMessage();
          TabItem[] selectedTabs = editorTab.getSelection();
          if (selectedTabs.length == 1){
             resetInvariantState();
@@ -413,7 +435,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public IBuiltInRuleApp finish() {
-         //TODO: Does any of the calls to parseInputText put unsolicited error messages?
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
          Map<LocationVariable, Term> invMap = new LinkedHashMap<LocationVariable, Term>();
          Map<LocationVariable, Term> modMap = new LinkedHashMap<LocationVariable, Term>();
