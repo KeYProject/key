@@ -41,7 +41,7 @@ public class QuestionPage extends AbstractPage implements IPageWithWorkbenchModi
    }
 
    public QuestionPage(String name, String title, String message, boolean useForm, boolean wrapLayout, boolean toolBased, boolean enabled, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
-      this(name, name, title, message, useForm, wrapLayout, toolBased, enabled, workbenchModifier, questions);
+      this(name, title, title, message, useForm, wrapLayout, toolBased, enabled, workbenchModifier, questions);
    }
 
    public QuestionPage(String name, String title, String latexTitle, String message, boolean useForm, boolean wrapLayout, boolean toolBased, boolean enabled, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
