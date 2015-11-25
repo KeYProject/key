@@ -61,7 +61,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private static final String DIALOG_TITLE =
             "Choose abstraction predicates for join";
 
-    private AbstractionPredicatesJoinDialogController ctrl = null;
+    private AbstractionPredicatesChoiceDialogController ctrl = null;
     private Goal goal = null;
 
     private ArrayList<Pair<Sort, Name>> registeredPlaceholders =
@@ -105,11 +105,11 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         add(fxPanel);
 
         Platform.setImplicitExit(false);
-        final FutureTask<AbstractionPredicatesJoinDialogController> task =
-                new FutureTask<AbstractionPredicatesJoinDialogController>(
-                        new Callable<AbstractionPredicatesJoinDialogController>() {
+        final FutureTask<AbstractionPredicatesChoiceDialogController> task =
+                new FutureTask<AbstractionPredicatesChoiceDialogController>(
+                        new Callable<AbstractionPredicatesChoiceDialogController>() {
                             @Override
-                            public AbstractionPredicatesJoinDialogController call()
+                            public AbstractionPredicatesChoiceDialogController call()
                                     throws Exception {
                                 Scene scene = createScene(loader);
                                 fxPanel.setScene(scene);

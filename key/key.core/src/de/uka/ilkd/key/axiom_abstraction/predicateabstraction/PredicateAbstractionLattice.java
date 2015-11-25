@@ -266,7 +266,7 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
          */
         @Override
         public void remove() {
-            throw new RuntimeException("Method remove not implemented");
+            throw new RuntimeException("Method \"remove\" not implemented");
         }
 
     }
