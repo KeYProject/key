@@ -2,6 +2,7 @@ package org.key_project.key4eclipse.common.ui.completion;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.jface.resource.JFaceResources;
@@ -10,9 +11,9 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -21,6 +22,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -30,13 +32,13 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
  * The {@link InteractiveRuleApplicationCompletion} to treat {@link WhileInvariantRule} in the Eclipse context.
@@ -72,7 +74,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private DefaultTermParser parser = new DefaultTermParser();
       private Services services = getGoal().proof().getServices();
       private TabFolder editorTab = null;
-      
+      LocationVariable[] heaps = null;
       
       
       /**
@@ -83,7 +85,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       public Perform(IBuiltInRuleApp app, Goal goal, boolean forced) {
          super(app, goal, forced);
-         setErrorMessage("Functionality is not available yet.");
       }
 
       /**
@@ -121,36 +122,14 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * parses input text and updates status reports accordingly
-       * @author Anna Marie Filighera
-       * @param input - text to be parsed
-       * @param sortType - Sort of input text
-       * @param status - status label to be updated
-       * @return
-       */
-      private Term parseInputText(Text input, Sort sortType, Label status){
-         Term result = null;
-         try {
-            result = parser.parse(
-               new StringReader(input.getText()), sortType,
-               services, services.getNamespaces(),
-               MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
-            status.setText("OK");
-         }  catch(Exception e){
-            status.setText(e.getMessage());
-         }
-         return result;
-      }
-
-      /**
        * {@inheritDoc}
        */
       @Override
       public void createControl(Composite root) {
          this.root = root;
          
-         FillLayout horlayout = new FillLayout(SWT.HORIZONTAL);
-         root.setLayout(horlayout);
+         //TODO: cleanup layout
+         root.setLayout(new GridLayout(2, false));
          FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
          
          //Set up right column:
@@ -164,7 +143,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          code.setBackground(root.getDisplay().getSystemColor(SWT.COLOR_WHITE));
          code.setText(getLoopText());
          
-         //Set up state view:
+         //Set up state views:
          Group invStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
          invStatusGrp.setLayout(vertlayout);
          invStatusGrp.setText("Invariant - Status:");
@@ -199,20 +178,28 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          LoopInvariant loopInv = loopApp.getInvariant();
 
          Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
-         String invariantString = "unable to load";
-         String modifiesString = "unable to load";
+         int heapCnt = services.getTypeConverter().getHeapLDT().getAllHeaps().size();
+         heaps = new LocationVariable[heapCnt];
+         String[] invariantStrings = new String[heapCnt];
+         String[] modifiesStrings = new String[heapCnt];
          String variantString = "unable to load";
+         int iter = 0;//iterator so we know where we're at.
          for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term i = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
+            heaps[iter] = heap;
+            Term invTerm = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
             Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
-
-            if (i != null) {
-               invariantString = ProofSaver.printTerm(i,  services, true).toString();
+            System.out.println("iterating. heap is " + heap.toString());
+            if (invTerm != null) {
+               invariantStrings[iter] = ProofSaver.printTerm(invTerm, services, true).toString();
             }
             
             if (modifies != null) {
-               modifiesString = ProofSaver.printTerm(modifies,  services, true).toString();
+               modifiesStrings[iter] = ProofSaver.printTerm(modifies, services, true).toString();
             }
+            System.out.println("invString = " + (invTerm == null ? "null" : ProofSaver.printTerm(invTerm,  services, true).toString()));
+            System.out.println("modString = " + (modifies == null ? "null" : ProofSaver.printTerm(modifies,  services, true).toString()));
+            //TODO: Remove printlns
+            iter++;
          }
          
          Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
@@ -221,32 +208,24 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          }
          
          //Set up initial Tab
-         addTab(invariantString, modifiesString, variantString, 0);
-         // set up store button
-         Button store = new Button(rightColumn, SWT.PUSH);
-         store.setText("Store");
-         
-         store.addSelectionListener(new SelectionAdapter(){
-            // adds new tab 
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-               //TODO
-               int currentTabID = editorTab.getSelectionIndex();
-               //assert(editorTab.getSelection().length == 1);
-               TabItem currentTab = editorTab.getSelection()[0];//Might fail if !=1 items selected.
-               Composite textCtr = (Composite) currentTab.getControl();
-               int amountTabs = editorTab.getItemCount();
-               addTab(
-                  ((Text)((Group)textCtr.getChildren()[0]).getChildren()[0]).getText(),
-                  ((Text)((Group)textCtr.getChildren()[1]).getChildren()[0]).getText(),
-                  ((Text)((Group)textCtr.getChildren()[2]).getChildren()[0]).getText(),
-                  amountTabs);
-            }
-         });
+         addTab(invariantStrings, modifiesStrings, variantString, 0);
          
          resetStateTab();
          
          //Potential expansion: Discard rule application if Completion dialog was aborted.
+      }
+      
+      private void store(){
+         int selectedSpec = editorTab.getSelectionIndex();
+         int amountTabs = editorTab.getItemCount();
+         String[] invSpecs = new String[heaps.length];
+         String[] modSpecs = new String[heaps.length];
+         String varSpec = getTextField(selectedSpec, 0, 2).getText();
+         for (int i = 0; i < heaps.length; i++) {
+            invSpecs[i] = getTextField(selectedSpec, i, 0).getText();
+            modSpecs[i] = getTextField(selectedSpec, i, 1).getText();
+         }
+         addTab(invSpecs, modSpecs, varSpec, amountTabs);
       }
       
       /**
@@ -258,54 +237,86 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @param id - id of the new tab
        * @return the generated TabItem's Composite
        */
-      private Control addTab(String invariant, String modifies, String variants, int id){
-         FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
+      private Control addTab(String[] invariants, String[] modifies, String variants, int id){
+         GridLayout vertlayout = new GridLayout();
          //add a tab item
          TabItem tab = new TabItem (editorTab, SWT.NONE);
          tab.setText("inv " + id);
          //inside, place a composite containing three groups (for pretty frames) with a Text item each.
          Composite textContainer = new Composite(editorTab, SWT.NO_BACKGROUND);
          tab.setControl(textContainer);
-         Group invariantGroup = new Group(textContainer, SWT.SHADOW_IN);
-         Text invariantT = new Text(invariantGroup, SWT.MULTI);
-         Group modifiesGroup = new Group(textContainer, SWT.SHADOW_IN);
-         Text modifiesT = new Text(modifiesGroup, SWT.MULTI);
+         //add a tab folder
+         TabFolder heapTabs = new TabFolder(textContainer, SWT.BOTTOM);
+         heapTabs.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+               resetStateTab();
+            }
+          });
+         int iter = 0;
+         for(LocationVariable heap : heaps){
+            TabItem heapTab = new TabItem(heapTabs, SWT.NONE);
+            heapTab.setText(heap.toString());
+            Composite modinvcontainer = new Composite(heapTabs, SWT.NO_BACKGROUND);
+            modinvcontainer.setLayout(vertlayout);
+            heapTab.setControl(modinvcontainer);
+            
+            //for all elems in heap, add a TabItem
+            Group invariantGroup = new Group(modinvcontainer, SWT.SHADOW_IN);
+            Text invariantT = new Text(invariantGroup, SWT.MULTI);
+            Group modifiesGroup = new Group(modinvcontainer, SWT.SHADOW_IN);
+            Text modifiesT = new Text(modifiesGroup, SWT.MULTI);
+            invariantGroup.setLayout(vertlayout);
+            modifiesGroup.setLayout(vertlayout);
+            invariantGroup.setText("invariant");
+            invariantT.setText(invariants[iter] != null ? invariants[iter] : "true");
+            modifiesGroup.setText("modifies");
+            modifiesT.setText(modifies[iter]);
+            
+            invariantT.addModifyListener(new ModifyListener(){
+               public void modifyText(ModifyEvent event) {
+                  resetInvariantState();
+               }
+            });
+            
+            modifiesT.addModifyListener(new ModifyListener(){
+               public void modifyText(ModifyEvent event) {
+                  resetModifiesState();
+               }
+            });
+            iter++;
+         }
          Group variantsGroup = new Group(textContainer, SWT.SHADOW_IN);
          Text variantsT = new Text(variantsGroup, SWT.MULTI);
          textContainer.setLayout(vertlayout);
-         invariantGroup.setLayout(vertlayout);
-         modifiesGroup.setLayout(vertlayout);
          variantsGroup.setLayout(vertlayout);
-         invariantGroup.setText("invariant");
-         invariantT.setText(invariant);
-         modifiesGroup.setText("modifies");
-         modifiesT.setText(modifies);
          variantsGroup.setText("variants");
          variantsT.setText(variants);
          
-         //add listeners.
-         invariantT.addModifyListener(new ModifyListener(){
-            public void modifyText(ModifyEvent event) {
-               Text text = (Text) event.widget;
-               resetInvariantState(text);
-            }
-         });
          
-         modifiesT.addModifyListener(new ModifyListener(){
-            public void modifyText(ModifyEvent event) {
-               Text text = (Text) event.widget;
-               resetModifiesState(text);
+         // set up store button
+         Button store = new Button(textContainer, SWT.PUSH);
+         store.setText("Store");
+
+         //add listeners.
+         store.addSelectionListener(new SelectionAdapter(){
+            // adds new tab 
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               store();
             }
          });
          
          variantsT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
-               Text text = (Text) event.widget;
-               resetVariantsState(text);
+               resetVariantsState();
             }
          });
          
          return textContainer;
+      }
+      
+      private void updateErrorMessage(){
+         
       }
       
       /**
@@ -315,10 +326,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private void resetStateTab(){
          TabItem[] selectedTabs = editorTab.getSelection();
          if (selectedTabs.length == 1){
-            Composite txtcontainer = (Composite)selectedTabs[0].getControl();
-            resetInvariantState((Text)((Group)txtcontainer.getChildren()[0]).getChildren()[0]);
-            resetModifiesState((Text)((Group)txtcontainer.getChildren()[1]).getChildren()[0]);
-            resetVariantsState((Text)((Group)txtcontainer.getChildren()[2]).getChildren()[0]);
+            resetInvariantState();
+            resetModifiesState();
+            resetVariantsState();
          }
       }
       
@@ -327,8 +337,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @author Viktor Pfanschilling
        * @param wdgt - the widget containing the user input
        */
-      private void resetInvariantState(Text wdgt){
-         parseInputText(wdgt, Sort.FORMULA, invariantStatus);
+      private Term resetInvariantState(){
+         Text wdgt = getTextField(-1, -1, 0);
+         return parseInputText(wdgt.getText(), Sort.FORMULA, invariantStatus);
       }
       
       /**
@@ -336,9 +347,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @author Viktor Pfanschilling
        * @param wdgt - the widget containing the user input
        */
-      private void resetModifiesState(Text wdgt){
+      private Term resetModifiesState(){
+         Text wdgt = getTextField(-1, -1, 1);
          Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
-         parseInputText(wdgt, modSort, modifiesStatus);
+         return parseInputText(wdgt.getText(), modSort, modifiesStatus);
       }
       
       /**
@@ -346,10 +358,54 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @author Viktor Pfanschilling
        * @param wdgt - the widget containing the user input
        */
-      private void resetVariantsState(Text wdgt){
+      private Term resetVariantsState(){
+         Text wdgt = getTextField(-1, -1, 2);
          Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
-         parseInputText(wdgt, varSort, variantStatus);
-         
+         return parseInputText(wdgt.getText(), varSort, variantStatus);
+      }
+      
+      /**
+       * parses input text and updates status reports accordingly
+       * @author Anna Marie Filighera
+       * @param input - text to be parsed
+       * @param sortType - Sort of input text
+       * @param status - status label to be updated
+       * @return
+       */
+      private Term parseInputText(String input, Sort sortType, Label status){
+         Term result = null;
+         try {
+            result = parser.parse(
+               new StringReader(input), sortType,
+               services, services.getNamespaces(),
+               MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
+            status.setText("OK");
+         }  catch(Exception e){
+            status.setText(e.getMessage());
+         }
+         return result;
+      }
+
+      /**
+       * @param specification - the big tab folder's tab in we want; -1 is current selection
+       * @param heap - the small tab folder's tab we want, or the heap index in question; -1 is current selection
+       * @param textField - 0 for invariant, 1 for modifies, 2 for variant
+       * @return the Text widget containing the specification.
+       */
+      private Text getTextField(int specification, int heap, int textField){
+         if (specification == -1) specification = editorTab.getSelectionIndex();
+         TabItem tab = editorTab.getItem(specification);
+         Composite txtcontainer = (Composite)tab.getControl();
+         if (textField == 2) {
+            Group vargrp = (Group)txtcontainer.getChildren()[1];
+            return (Text)vargrp.getChildren()[0];
+         }
+         TabFolder tfld = (TabFolder)txtcontainer.getChildren()[0];
+         if (heap == -1) heap = tfld.getSelectionIndex();
+         Composite modinvcontainer = (Composite)(tfld.getItem(heap).getControl());
+         Group modOrVarGrp = (Group)(modinvcontainer.getChildren()[textField]);
+         Text wdgt = (Text)modOrVarGrp.getChildren()[0];
+         return wdgt;
       }
 
       /**
@@ -357,8 +413,31 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public IBuiltInRuleApp finish() {
-         //TODO
-         return null;
+         //TODO: Does any of the calls to parseInputText put unsolicited error messages?
+         LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
+         Map<LocationVariable, Term> invMap = new LinkedHashMap<LocationVariable, Term>();
+         Map<LocationVariable, Term> modMap = new LinkedHashMap<LocationVariable, Term>();
+         int i = 0;
+         for (LocationVariable heap : heaps){
+            Text wdgt = getTextField(-1, i, 0);
+            //calling parseInputText here has the nasty side effect of updating the displayed error message, but we can live with that.
+            Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, invariantStatus);
+            wdgt = getTextField(-1, i, 1);
+            Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
+            Term modifiesTerm = parseInputText(wdgt.getText(), modSort, modifiesStatus);
+            invMap.put(heap, invariantTerm);
+            modMap.put(heap, modifiesTerm);
+            i++;
+         }
+         Term variantTerm = resetVariantsState();
+         resetStateTab();
+         
+         //FIXME: InfFlowSpecs are currently not implemented, thus there's little point in writing a UI for them.
+         //The InfFlowSpecs code here does not actually do anything.
+         Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
+         
+         LoopInvariant newInvariant = loopApp.getInvariant().configurate(invMap, modMap, infFlowSpecs, variantTerm);
+         return loopApp.setLoopInvariant(newInvariant);
       }
 
       /**
