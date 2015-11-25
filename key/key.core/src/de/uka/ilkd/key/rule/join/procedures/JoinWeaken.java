@@ -15,6 +15,8 @@ package de.uka.ilkd.key.rule.join.procedures;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
 
+import java.util.LinkedHashSet;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -58,7 +60,7 @@ public class JoinWeaken extends JoinProcedure {
     }
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
+    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
@@ -67,10 +69,10 @@ public class JoinWeaken extends JoinProcedure {
 
         final Function newSkolemConstant = getNewSkolemConstantForPrefix(v
                 .op().name().toString(), v.sort(), services);
-        ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
-        newNames = newNames.add(newSkolemConstant.name());
+        LinkedHashSet<Name> newNames =  new LinkedHashSet<Name>();
+        newNames.add(newSkolemConstant.name());
 
-        return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+        return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
                 DefaultImmutableSet.<Term> nil(), tb.func(newSkolemConstant),
                 newNames);
 

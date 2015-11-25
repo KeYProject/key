@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import java.util.LinkedHashSet;
+
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
@@ -65,7 +67,7 @@ public class JoinWithPredicateAbstractionFactory extends
      * de.uka.ilkd.key.java.Services)
      */
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
+    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {

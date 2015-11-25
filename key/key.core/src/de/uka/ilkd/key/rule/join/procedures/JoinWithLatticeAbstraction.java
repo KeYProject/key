@@ -15,6 +15,8 @@ package de.uka.ilkd.key.rule.join.procedures;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
 
+import java.util.LinkedHashSet;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -64,7 +66,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
     }
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>> joinValuesInStates(
+    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
@@ -90,8 +92,8 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
             Function newSkolemConst =
                     getNewSkolemConstantForPrefix(joinElem.toString(),
                             valueInState1.sort(), services);
-            ImmutableSet<Name> newNames = DefaultImmutableSet.nil();
-            newNames = newNames.add(newSkolemConst.name());
+            LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+            newNames.add(newSkolemConst.name());
 
             newConstraints =
                     newConstraints.add(joinElem.getDefiningAxiom(
@@ -108,18 +110,18 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
                                     valueInState1, valueInState2,
                                     distinguishingFormula, services)));
 
-            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+            return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
                     newConstraints, tb.func(newSkolemConst), newNames);
 
         }
         else {
 
-            return new Triple<ImmutableSet<Term>, Term, ImmutableSet<Name>>(
+            return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
                     DefaultImmutableSet.<Term> nil(),
                     JoinIfThenElse.createIfThenElseTerm(state1, state2,
                             valueInState1, valueInState2,
                             distinguishingFormula, services),
-                    DefaultImmutableSet.<Name> nil());
+                    new LinkedHashSet<Name>());
 
         }
 

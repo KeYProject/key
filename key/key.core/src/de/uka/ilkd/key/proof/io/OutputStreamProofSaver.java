@@ -423,22 +423,21 @@ public class OutputStreamProofSaver {
 
                             tree.append("(")
                                     .append("'")
-                                    .append(predicateFormWithPlaceholder.first.sort())
+                                    .append(predicateFormWithPlaceholder.first
+                                            .sort())
                                     .append(" ")
                                     .append(predicateFormWithPlaceholder.first)
-                                    .append("'")
-                                    .append(", ")
-                                    .append("'")
-                                    .append(predicateFormWithPlaceholder.second)
-                                    .append("'")
-                                    .append(")")
-
-                                    .append(", ");
+                                    .append("', '")
+                                    .append(LogicPrinter
+                                            .quickPrintTerm(
+                                                    predicateFormWithPlaceholder.second,
+                                                    proof.getServices()).replace("\n", ""))
+                                    .append("'), ");
                         }
                     }
                     // Delete the last ", ".
                     tree.delete(tree.length() - 2, tree.length());
-                    
+
                     tree.append("\")");
 
                 }
