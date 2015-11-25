@@ -103,7 +103,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * The range used to highlight {@link Term} of Sort Update.
     */
-   private StyleRange markedUpdate;
+   private StyleRange[] markedUpdates;
    
    /**
     * The {@link StyleRange} to highlight the active statement.
@@ -286,17 +286,22 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @author Anna Filighera
     */
    protected void setBlueBackground(Range[] ranges){
-      initializeValuesForBackground(new Color(null,167,210,210));
-      for(Range range : ranges){
-         markedUpdate.start = range.start();
-         markedUpdate.length = range.end()-range.start();
-         TextPresentation.applyTextPresentation(textPresentation, viewerText);
-         viewer.changeTextPresentation(textPresentation, true);
+      TextPresentation textPresentation = new TextPresentation();
+      markedUpdates = new StyleRange[ranges.length];
+      for(int i = 0; i < ranges.length; i++){
+         StyleRange markedUpdate = new StyleRange();
+         initializeValuesForBackground(new Color(null,167,210,210), markedUpdate, textPresentation);
+         markedUpdate.start = ranges[i].start();
+         markedUpdate.length = ranges[i].end()-ranges[i].start();
+         markedUpdates[i] = markedUpdate;
       }
-      
+      TextPresentation.applyTextPresentation(textPresentation, viewerText);
+      viewer.changeTextPresentation(textPresentation, true);   
    }
    protected void setGreenBackground(PosInOccurrence pos){
-      initializeValuesForBackground(new Color(null, 128, 255, 128));
+      marked1 = new StyleRange();
+      TextPresentation textPresentation = new TextPresentation();
+      initializeValuesForBackground(new Color(null, 128, 255, 128), marked1, textPresentation);
       if (pos != null) {
          ImmutableList<Integer> path = printer.getInitialPositionTable().pathForPosition(pos, filter);
          Range range = printer.getInitialPositionTable().rangeForPath(path);
@@ -308,15 +313,14 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    }
 
    /**
-    * initializes a StyleRange and TextPresentation for background color.
-    * @param color Backgroundcolor
+    * initializes Textresentation with colored StyleRange
+    * @param color - background color to be set
+    * @param mark - range which should be colored
     * @author Anna Filighera
     */
-   protected void initializeValuesForBackground(Color color){
-      markedUpdate = new StyleRange();
-      markedUpdate.background= color;  
-      textPresentation = new TextPresentation();
-      textPresentation.addStyleRange(markedUpdate);
+   protected void initializeValuesForBackground(Color color, StyleRange mark, TextPresentation textPresentation){
+      mark.background= color;  
+      textPresentation.addStyleRange(mark);
       viewer.changeTextPresentation(textPresentation, true);
    }
 
@@ -397,8 +401,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          marked1.start = range.start();
          marked1.length = range.length(); 
       }
-      StyleRange[] ranges = {marked1, marked2, firstStatementStyleRange, markedUpdate};
+      StyleRange[] ranges = {marked1, marked2, firstStatementStyleRange};
       textPresentation.mergeStyleRanges(ranges);
+      // add update marks
+      textPresentation.mergeStyleRanges(markedUpdates);
 //      textPresentation.addStyleRange(firstStatementStyleRange);
       TextPresentation.applyTextPresentation(textPresentation, viewerText);
       viewer.changeTextPresentation(textPresentation, true);

@@ -240,6 +240,10 @@
             class="org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler"
             commandId="org.key_project.keyide.ui.commands.hideIntermediateProofsteps">
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler"
+            commandId="org.key_project.keyide.ui.commands.showSymbolicExecutionTreeOnly">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -379,6 +383,11 @@
                label="Hide Intermediate Proofsteps"
                style="toggle">
          </command>
+         <command
+               commandId="org.key_project.keyide.ui.commands.showSymbolicExecutionTreeOnly"
+               label="Show Symbolic Execution Tree Only"
+               style="toggle">
+         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -460,6 +469,18 @@
                      name="persisted"
                      value="true">
                </parameter>
+            </class>
+         </state>
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Shows only the symbolic execution tree"
+            id="org.key_project.keyide.ui.commands.showSymbolicExecutionTreeOnly"
+            name="Show Symbolic Execution Tree Only">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
             </class>
          </state>
       </command>
