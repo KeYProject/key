@@ -369,7 +369,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @author Anna Marie Filighera
        * @param input - text to be parsed
        * @param sortType - Sort of input text
-       * @param status - status label to be updated
+       * @param status - status label to be updated, or null for none
        * @return
        */
       private Term parseInputText(String input, Sort sortType, Label status){
@@ -379,9 +379,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
                new StringReader(input), sortType,
                services, services.getNamespaces(),
                MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
-            status.setText("OK");
+            if (status != null) status.setText("OK");
          }  catch(Exception e){
-            status.setText(e.getMessage());
+            if (status != null) status.setText(e.getMessage());
          }
          return result;
       }
@@ -420,11 +420,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          int i = 0;
          for (LocationVariable heap : heaps){
             Text wdgt = getTextField(-1, i, 0);
-            //calling parseInputText here has the nasty side effect of updating the displayed error message, but we can live with that.
-            Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, invariantStatus);
+            Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
             wdgt = getTextField(-1, i, 1);
             Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
-            Term modifiesTerm = parseInputText(wdgt.getText(), modSort, modifiesStatus);
+            Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
             invMap.put(heap, invariantTerm);
             modMap.put(heap, modifiesTerm);
             i++;
