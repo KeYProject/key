@@ -119,6 +119,91 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
     * Value of choice defining 4 examples.
     */
    public static final String FOUR_EXAMPLES_CHOICE_VALUE = "4 Examples";
+
+   /**
+    * The name of the page with the background knowledge.
+    */
+   public static final String BACKGROUND_PAGE_NAME = "backgroundPage";
+
+   /**
+    * The name of the question defining the background knowledge with Java.
+    */
+   public static final String EXPERIENCE_WITH_JAVA_QUESTION_NAME = "experienceWithJava";
+
+   /**
+    * The name of the question defining the background knowledge with JML.
+    */
+   public static final String EXPERIENCE_WITH_JML_QUESTION_NAME = "experienceWithJML";
+
+   /**
+    * The name of the question defining the background knowledge with Symbolic Execution.
+    */
+   public static final String EXPERIENCE_WITH_SE_QUESTION_NAME = "experienceWithSymbolicExecution";
+
+   /**
+    * The name of the question defining the background knowledge with SED.
+    */
+   public static final String EXPERIENCE_WITH_SED_QUESTION_NAME = "experienceWithSED";
+
+   /**
+    * The value of no Java experience.
+    */
+   public static final String JAVA_EXPERIENCE_NON_VALUE = "None";
+
+   /**
+    * The value for less than 2 years of Java experience.
+    */
+   public static final String JAVA_EXPERIENCE_LESS_THAN_2_YEARS_VALUE = "Less than 2 years";
+
+   /**
+    * The value for more than 2 years of Java experience.
+    */
+   public static final String JAVA_EXPERIENCE_MORE_THAN_2_YEARS_VALUE = "More than 2 years";
+
+   /**
+    * The value of no JML experience.
+    */
+   public static final String JML_EXPERIENCE_NON_VALUE = "None";
+
+   /**
+    * The value for less than 2 years of JML experience.
+    */
+   public static final String JML_EXPERIENCE_LESS_THAN_2_YEARS_VALUE = "Less than 2 years";
+
+   /**
+    * The value for more than 2 years of JML experience.
+    */
+   public static final String JML_EXPERIENCE_MORE_THAN_2_YEARS_VALUE = "More than 2 years";
+
+   /**
+    * The value of no Symbolic Execution experience.
+    */
+   public static final String SE_EXPERIENCE_NON_VALUE = "None";
+
+   /**
+    * The value for less than 2 years of Symbolic Execution experience.
+    */
+   public static final String SE_EXPERIENCE_LESS_THAN_2_YEARS_VALUE = "Less than 2 years";
+
+   /**
+    * The value for more than 2 years of Symbolic Execution experience.
+    */
+   public static final String SE_EXPERIENCE_MORE_THAN_2_YEARS_VALUE = "More than 2 years";
+
+   /**
+    * The value of no SED experience.
+    */
+   public static final String SED_EXPERIENCE_NON_VALUE = "None";
+
+   /**
+    * The value for less than 1 year of SED experience.
+    */
+   public static final String SED_EXPERIENCE_LESS_THAN_1_YEAR_VALUE = "Less than 1 year";
+
+   /**
+    * The value for more than 1 year of SED experience.
+    */
+   public static final String SED_EXPERIENCE_MORE_THAN_1_YEAR_VALUE = "More than 1 year";
    
    /**
     * Forbid additional instances.
@@ -163,48 +248,48 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                               false,
                                                                               new Choice("I &accept the conditions", "yes"), 
                                                                               new Choice("I do &not accept the conditions", "no")));
-      QuestionPage backgroundPage = new QuestionPage("backgroundPage", 
+      QuestionPage backgroundPage = new QuestionPage(BACKGROUND_PAGE_NAME, 
                                                      "Background Knowledge", 
                                                      "Please fill out the form with your background knowledge.",
                                                      true,
                                                      false,
                                                      null,
-                                                     new RadioButtonsQuestion("experienceWithJava",
+                                                     new RadioButtonsQuestion(EXPERIENCE_WITH_JAVA_QUESTION_NAME,
                                                                               "Experience with Java", 
                                                                               true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with Java not defined."), 
                                                                               false,
-                                                                              new Choice("None", "None"), 
-                                                                              new Choice("< 2 years", "Less than 2 years"), 
-                                                                              new Choice(">= 2 years", "More than 2 years")),
-                                                     new RadioButtonsQuestion("experienceWithJML",
+                                                                              new Choice("None", JAVA_EXPERIENCE_NON_VALUE), 
+                                                                              new Choice("< 2 years", JAVA_EXPERIENCE_LESS_THAN_2_YEARS_VALUE), 
+                                                                              new Choice(">= 2 years", JAVA_EXPERIENCE_MORE_THAN_2_YEARS_VALUE)),
+                                                     new RadioButtonsQuestion(EXPERIENCE_WITH_JML_QUESTION_NAME,
                                                                               "Experience with JML", 
                                                                               true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with JML not defined."), 
                                                                               false,
-                                                                              new Choice("None", "None"), 
-                                                                              new Choice("< 2 years", "Less than 2 years"), 
-                                                                              new Choice(">= 2 years", "More than 2 years")),
-                                                     new RadioButtonsQuestion("experienceWithSymbolicExecution",
+                                                                              new Choice("None", JML_EXPERIENCE_NON_VALUE), 
+                                                                              new Choice("< 2 years", JML_EXPERIENCE_LESS_THAN_2_YEARS_VALUE), 
+                                                                              new Choice(">= 2 years", JML_EXPERIENCE_MORE_THAN_2_YEARS_VALUE)),
+                                                     new RadioButtonsQuestion(EXPERIENCE_WITH_SE_QUESTION_NAME,
                                                                               "Experience with symbolic execution (e.g. verification or test case generation)", 
                                                                               true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with symbolic execution not defined."), 
                                                                               false,
-                                                                              new Choice("None", "None"), 
-                                                                              new Choice("< 2 years", "Less than 2 years"), 
-                                                                              new Choice(">= 2 years", "More than 2 years")),
-                                                     new RadioButtonsQuestion("experienceWithSED",
+                                                                              new Choice("None", SE_EXPERIENCE_NON_VALUE), 
+                                                                              new Choice("< 2 years", SE_EXPERIENCE_LESS_THAN_2_YEARS_VALUE), 
+                                                                              new Choice(">= 2 years", SE_EXPERIENCE_MORE_THAN_2_YEARS_VALUE)),
+                                                     new RadioButtonsQuestion(EXPERIENCE_WITH_SED_QUESTION_NAME,
                                                                               "Experience with SED", 
                                                                               true,
                                                                               null, 
                                                                               new NotUndefinedValueValidator("Experience with SED not defined."), 
                                                                               false,
-                                                                              new Choice("None", "None"), 
-                                                                              new Choice("< 1 year", "Less than 1 year"), 
-                                                                              new Choice(">= 1 year", "More than 1 year")));
+                                                                              new Choice("None", SED_EXPERIENCE_NON_VALUE), 
+                                                                              new Choice("< 1 year", SED_EXPERIENCE_LESS_THAN_1_YEAR_VALUE), 
+                                                                              new Choice(">= 1 year", SED_EXPERIENCE_MORE_THAN_1_YEAR_VALUE)));
       QuestionPage extendPage = new QuestionPage(EXTEND_PAGE_NAME, 
                                                  "Evaluation Extent", 
                                                  "Please define the extent of the evaluation.",

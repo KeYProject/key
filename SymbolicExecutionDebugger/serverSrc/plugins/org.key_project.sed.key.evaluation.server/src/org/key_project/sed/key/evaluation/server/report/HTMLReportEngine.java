@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.key_project.sed.key.evaluation.model.definition.AbstractEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
+import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLAnswersSectionAppender;
@@ -17,6 +18,7 @@ import org.key_project.sed.key.evaluation.server.report.html.HTMLHypotheses;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLToolSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLUnderstandingProofAttemptsBalancingSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.IHTMLSectionAppender;
+import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeKnowledgeExport;
 import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsKnowledgeExport;
 import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsSummaryExport;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
@@ -87,6 +89,9 @@ public class HTMLReportEngine extends AbstractReportEngine {
          result.add(new UnderstandingProofAttemptsKnowledgeExport());
          result.add(new UnderstandingProofAttemptsSummaryExport());
          result.add(new HTMLUnderstandingProofAttemptsBalancingSectionAppender());
+      }
+      else if (evaluation instanceof ReviewingCodeEvaluation) {
+         result.add(new ReviewingCodeKnowledgeExport());
       }
       result.add(new HTMLAnswersSectionAppender());
       return result;

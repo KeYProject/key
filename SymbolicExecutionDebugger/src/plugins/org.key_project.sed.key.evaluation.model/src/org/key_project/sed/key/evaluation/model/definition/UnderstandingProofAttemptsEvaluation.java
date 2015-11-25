@@ -159,12 +159,12 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
    public static final String SED_EXPERIENCE_NON_VALUE = "None";
 
    /**
-    * The value for less than 2 years of SED experience.
+    * The value for less than 1 year of SED experience.
     */
    public static final String SED_EXPERIENCE_LESS_THAN_1_YEAR_VALUE = "Less than 1 year";
 
    /**
-    * The value for more than 2 years of SED experience.
+    * The value for more than 1 year of SED experience.
     */
    public static final String SED_EXPERIENCE_MORE_THAN_1_YEAR_VALUE = "More than 1 year";
    
