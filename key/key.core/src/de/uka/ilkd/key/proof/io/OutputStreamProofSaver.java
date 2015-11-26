@@ -439,6 +439,10 @@ public class OutputStreamProofSaver {
                     tree.delete(tree.length() - 2, tree.length());
 
                     tree.append("\")");
+                    
+                    tree.append(" (latticeType \"");
+                    predAbstrRule.getLatticeType().getName();
+                    tree.append("\")");
 
                 }
             }

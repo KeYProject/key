@@ -74,7 +74,7 @@ public class JoinRuleMenuItem extends JMenuItem {
                             try {
                                 goal.apply(completedApp);
                             }
-                            catch (Exception e) {
+                            catch (final Exception e) {
                                 signalError(e, mediator);
                             }
                             catch (final AssertionError e) {

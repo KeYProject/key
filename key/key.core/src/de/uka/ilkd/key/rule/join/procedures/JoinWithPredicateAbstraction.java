@@ -13,13 +13,16 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -42,6 +45,13 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
             new HashMap<Sort, ArrayList<AbstractionPredicate>>();
 
     /**
+     * The concrete lattice type which determines how abstract elements are
+     * generated from abstraction predicates.
+     */
+    private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
+            null;
+
+    /**
      * Default constructor for subclasses.
      */
     protected JoinWithPredicateAbstraction() {
@@ -53,30 +63,24 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      * predicates!
      *
      * @param predicates
-     *            The predicates for the created lattices, sorted by sort.
-     */
-    public JoinWithPredicateAbstraction(
-            HashMap<Sort, ArrayList<AbstractionPredicate>> predicates) {
-        this.predicates = predicates;
-    }
-
-    /**
-     * Creates a new instance of {@link JoinWithPredicateAbstraction}. This
-     * JoinProcedure cannot be a Singleton since it depends on the given list of
-     * predicates!
-     *
-     * @param predicates
      *            The predicates for the created lattices.
+     * @param latticeType
+     *            The concrete lattice type which determines how abstract
+     *            elements are generated from abstraction predicates.
      */
     public JoinWithPredicateAbstraction(
-            Iterable<AbstractionPredicate> predicates) {
+            Iterable<AbstractionPredicate> predicates,
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
-                this.predicates.put(pred.getArgSort(), new ArrayList<AbstractionPredicate>());
+                this.predicates.put(pred.getArgSort(),
+                        new ArrayList<AbstractionPredicate>());
             }
-            
+
             this.predicates.get(pred.getArgSort()).add(pred);
         }
+
+        this.latticeType = latticeType;
     }
 
     /*
@@ -95,7 +99,26 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
         ArrayList<AbstractionPredicate> applicablePredicates =
                 predicates.get(s);
 
-        return new PredicateAbstractionLattice(applicablePredicates);
+        if (applicablePredicates == null) {
+            // A returned null value indicates to
+            // JoinWithLatticeAbstraction#joinValuesInStates(...) that the
+            // fallback procedure (usually if-then-else join) should be
+            // performed instead of a join with lattices
+            return null;
+        }
+
+        try {
+            Constructor<? extends AbstractPredicateAbstractionLattice> latticeConstructor =
+                    latticeType.getConstructor(ArrayList.class);
+
+            return latticeConstructor.newInstance(applicablePredicates);
+        }
+        catch (NoSuchMethodException | SecurityException
+                | InstantiationException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException e) {
+            e.printStackTrace();
+            return new SimplePredicateAbstractionLattice(applicablePredicates);
+        }
     }
 
     /**
@@ -142,6 +165,15 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
         while (it.hasNext()) {
             addPredicate(it.next());
         }
+    }
+
+    /**
+     * TODO: Document.
+     * 
+     * @return
+     */
+    public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
+        return latticeType;
     }
 
     @Override

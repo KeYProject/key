@@ -23,8 +23,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionDomainElement;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -67,51 +67,51 @@ public class PredicateAbstractionLatticeTests extends TestCase {
         predicates.add(eqZero);
         predicates.add(ltZero);
 
-        PredicateAbstractionLattice lattice =
-                new PredicateAbstractionLattice(predicates);
+        ConjunctivePredicateAbstractionLattice lattice =
+                new ConjunctivePredicateAbstractionLattice(predicates);
 
         assertEquals(9, lattice.size());
 
         Iterator<AbstractDomainElement> it = lattice.iterator();
 
-        PredicateAbstractionDomainElement e1, e2, e3, e4, e5, e6, e7, e8, e9;
+        ConjunctivePredicateAbstractionDomainElement e1, e2, e3, e4, e5, e6, e7, e8, e9;
 
         // BOTTOM
-        assertEquals(e1 = PredicateAbstractionDomainElement.BOTTOM, it.next());
+        assertEquals(e1 = ConjunctivePredicateAbstractionDomainElement.BOTTOM, it.next());
         // <0 & =0 & >0
         assertEquals(e2 =
-                new PredicateAbstractionDomainElement(DefaultImmutableSet
+                new ConjunctivePredicateAbstractionDomainElement(DefaultImmutableSet
                         .<AbstractionPredicate> nil().add(ltZero).add(eqZero)
                         .add(gtZero)), it.next());
         // =0 & >0
         assertEquals(e3 =
-                new PredicateAbstractionDomainElement(DefaultImmutableSet
+                new ConjunctivePredicateAbstractionDomainElement(DefaultImmutableSet
                         .<AbstractionPredicate> nil().add(eqZero).add(gtZero)),
                 it.next());
         // <0 & >0
         assertEquals(e4 =
-                new PredicateAbstractionDomainElement(DefaultImmutableSet
+                new ConjunctivePredicateAbstractionDomainElement(DefaultImmutableSet
                         .<AbstractionPredicate> nil().add(ltZero).add(gtZero)),
                 it.next());
         // <0 & =0
         assertEquals(e5 =
-                new PredicateAbstractionDomainElement(DefaultImmutableSet
+                new ConjunctivePredicateAbstractionDomainElement(DefaultImmutableSet
                         .<AbstractionPredicate> nil().add(ltZero).add(eqZero)),
                 it.next());
         // >0
         assertEquals(e6 =
-                new PredicateAbstractionDomainElement(DefaultImmutableSet
+                new ConjunctivePredicateAbstractionDomainElement(DefaultImmutableSet
                         .<AbstractionPredicate> nil().add(gtZero)), it.next());
         // =0
         assertEquals(e7 =
-                new PredicateAbstractionDomainElement(DefaultImmutableSet
+                new ConjunctivePredicateAbstractionDomainElement(DefaultImmutableSet
                         .<AbstractionPredicate> nil().add(eqZero)), it.next());
         // <0
         assertEquals(e8 =
-                new PredicateAbstractionDomainElement(DefaultImmutableSet
+                new ConjunctivePredicateAbstractionDomainElement(DefaultImmutableSet
                         .<AbstractionPredicate> nil().add(ltZero)), it.next());
         // TOP
-        assertEquals(e9 = PredicateAbstractionDomainElement.TOP, it.next());
+        assertEquals(e9 = ConjunctivePredicateAbstractionDomainElement.TOP, it.next());
 
         // There should be no further elements.
         assertFalse(it.hasNext());
@@ -144,17 +144,17 @@ public class PredicateAbstractionLatticeTests extends TestCase {
         ArrayList<AbstractionPredicate> predicates =
                 new ArrayList<AbstractionPredicate>();
 
-        PredicateAbstractionLattice lattice =
-                new PredicateAbstractionLattice(predicates);
+        ConjunctivePredicateAbstractionLattice lattice =
+                new ConjunctivePredicateAbstractionLattice(predicates);
 
         assertEquals(2, lattice.size());
 
         Iterator<AbstractDomainElement> it = lattice.iterator();
 
         // BOTTOM
-        assertEquals(PredicateAbstractionDomainElement.BOTTOM, it.next());
+        assertEquals(ConjunctivePredicateAbstractionDomainElement.BOTTOM, it.next());
         // TOP
-        assertEquals(PredicateAbstractionDomainElement.TOP, it.next());
+        assertEquals(ConjunctivePredicateAbstractionDomainElement.TOP, it.next());
 
         // This should be all.
         assertFalse(it.hasNext());

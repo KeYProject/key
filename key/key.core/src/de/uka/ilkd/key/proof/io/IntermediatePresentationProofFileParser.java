@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.parser.ParserException;
@@ -106,6 +107,7 @@ public class IntermediatePresentationProofFileParser implements
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void beginExpr(ProofElementID eid, String str) {
         switch (eid) {
         case BRANCH: // branch
@@ -270,6 +272,18 @@ public class IntermediatePresentationProofFileParser implements
             ((BuiltinRuleInformation) ruleInfo).currDistFormula = str;
             break;
 
+        case JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE: // type of predicate
+                                                      // abstraction lattice
+            try {
+                ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType =
+                        (Class<? extends AbstractPredicateAbstractionLattice>) Class
+                                .forName(str);
+            }
+            catch (ClassNotFoundException e) {
+                errors.add(e);
+            }
+            break;
+
         case JOIN_ABSTRACTION_PREDICATES:
             ImmutableList<Pair<String, String>> currAbstractionPredicates =
                     ImmutableSLList.nil();
@@ -407,6 +421,7 @@ public class IntermediatePresentationProofFileParser implements
                             builtinInfo.currNrPartners,
                             builtinInfo.currNewNames,
                             builtinInfo.currDistFormula,
+                            builtinInfo.currPredAbstraLatticeType,
                             builtinInfo.currAbstractionPredicates);
         }
         else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
@@ -509,6 +524,8 @@ public class IntermediatePresentationProofFileParser implements
         protected int currCorrespondingJoinNodeId = 0;
         protected int currJoinNodeId = 0;
         protected String currDistFormula = null;
+        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
+                null;
         protected ImmutableList<Pair<String, String>> currAbstractionPredicates =
                 null;
 

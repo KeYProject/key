@@ -22,39 +22,39 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists
- * of 2^n + 1 elements, where n is the number of applicable predicates. The last
- * element is a top element which is true for all inputs.
+ * of 2^n + 1 elements, where n is the number of applicable predicates. Each
+ * element is a disjunction of the given predicates. The last element is a top
+ * element which is true for all inputs.
  * <p>
- * It may happen that certain elements of the lattice are equivalent to the
- * bottom element, since the respective combinations of predicates are
- * unsatisfiable. It should however not happen that combinations of predicates
- * are valid, that is they equal the top element. For efficiency reasons, the
- * lattice is only lazily generated on-demand by the iterator. Therefore, the
- * unsatisfiable combinations cannot be remove at generation time.
+ * It should however not happen that combinations of predicates are valid, that
+ * is they equal the top element. For efficiency reasons, the lattice is only
+ * lazily generated on-demand by the iterator. Therefore, the unsatisfiable
+ * predicates cannot be removed at generation time.
  *
  * @author Dominic Scheurer
  */
-public class PredicateAbstractionLattice extends AbstractDomainLattice {
+public class DisjunctivePredicateAbstractionLattice extends
+        AbstractPredicateAbstractionLattice {
     private ArrayList<AbstractionPredicate> predicates =
             new ArrayList<AbstractionPredicate>();
 
     /**
-     * Constructs a new {@link PredicateAbstractionLattice} for the given list
-     * of applicable predicates. The caller is responsible for making sure that
-     * no combinations of predicates are valid.
+     * Constructs a new {@link DisjunctivePredicateAbstractionLattice} for the
+     * given list of applicable predicates. The caller is responsible for making
+     * sure that no combinations of predicates are valid.
      *
      * @param applicablePredicates
+     *            The predicates to generate the lattice from.
      */
-    public PredicateAbstractionLattice(
+    public DisjunctivePredicateAbstractionLattice(
             ArrayList<AbstractionPredicate> applicablePredicates) {
         super();
-        
+
         assert predicates != null : "Do not call this constructor with a null argument.";
         this.predicates = applicablePredicates;
     }
@@ -70,44 +70,12 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
     @Override
     public AbstractDomainElement join(AbstractDomainElement a,
             AbstractDomainElement b) {
-
-        // The join result is the intersection of the respective
-        // predicates. If this is empty, then the top level element
-        // is returned.
-
-        assert a instanceof PredicateAbstractionDomainElement;
-        assert b instanceof PredicateAbstractionDomainElement;
-
-        PredicateAbstractionDomainElement pade1 =
-                (PredicateAbstractionDomainElement) a;
-        PredicateAbstractionDomainElement pade2 =
-                (PredicateAbstractionDomainElement) b;
-
-        if (pade1 == PredicateAbstractionDomainElement.TOP
-                || pade2 == PredicateAbstractionDomainElement.TOP) {
-            return PredicateAbstractionDomainElement.TOP;
-        }
-
-        if (pade1 == PredicateAbstractionDomainElement.BOTTOM) {
-            return pade2;
-        }
-
-        if (pade2 == PredicateAbstractionDomainElement.BOTTOM) {
-            return pade1;
-        }
-
-        ImmutableSet<AbstractionPredicate> preds1 = pade1.getPredicates();
-        ImmutableSet<AbstractionPredicate> preds2 = pade2.getPredicates();
-
-        ImmutableSet<AbstractionPredicate> intersection =
-                preds1.intersect(preds2);
-
-        if (intersection.size() == 0) {
-            return PredicateAbstractionDomainElement.TOP;
-        }
-        else {
-            return new PredicateAbstractionDomainElement(intersection);
-        }
+        /*
+         * The join result is a PredicateAbstractionDomainElement constructed of
+         * the union of the respective predicates.
+         */
+        return super.join(a, b, (set1, set2) -> (set1.union(set2)),
+                set -> new DisjunctivePredicateAbstractionDomainElement(set));
     }
 
     /**
@@ -136,8 +104,8 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof PredicateAbstractionLattice
-                && ((PredicateAbstractionLattice) obj).predicates
+        return obj instanceof DisjunctivePredicateAbstractionLattice
+                && ((DisjunctivePredicateAbstractionLattice) obj).predicates
                         .equals(this.predicates);
     }
 
@@ -148,26 +116,25 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
      */
     @Override
     public String toString() {
-        return "Predicate Abstraction Lattice of size " + size()
+        return "Disjunctive Predicate Abstraction Lattice of size " + size()
                 + " with predicates " + predicates.toString();
     }
 
     /**
-     * @see PredicateAbstractionLattice#iterator()
+     * @see DisjunctivePredicateAbstractionLattice#iterator()
      */
-    private class PredicateLatticeIterator implements
-            Iterator<AbstractDomainElement> {
+    private class PredicateLatticeIterator extends
+            AbstractPredicateLatticeIterator {
         private int nrZeroes = -1;
         private int idx = 0;
-
-        private final ArrayList<ArrayList<ImmutableFixedLengthBitSet>> bitSetsByNumZeroes =
-                new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
 
         /**
          * Constructs a new {@link PredicateLatticeIterator}; initializes the
          * bit sets for the iteration.
          */
         public PredicateLatticeIterator() {
+            super(predicates == null ? 0 : predicates.size());
+
             // When no predicates are chosen, it happens that the predicates
             // list is null in this inner class. This is sort of unexpected
             // behavior, since the the predicate abstraction lattice is (and
@@ -175,32 +142,6 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
             // fix this issue locally.
             if (predicates == null) {
                 predicates = new ArrayList<AbstractionPredicate>();
-            }
-
-            int numApplPreds = predicates.size();
-
-            // We work with bit sets of length n (where n is the number of
-            // predicates). Each bit represents a predicate; when the bit is
-            // set to 1, the respective predicate should occur in the
-            // conjunction.
-
-            // Initialize the list.
-            for (int i = 0; i < numApplPreds + 1; i++) {
-                bitSetsByNumZeroes
-                        .add(new ArrayList<ImmutableFixedLengthBitSet>());
-            }
-
-            // bitSet initially represents the number 0.
-            ImmutableFixedLengthBitSet bitSet =
-                    new ImmutableFixedLengthBitSet(numApplPreds);
-
-            for (int i = 0; i < JoinRuleUtils.intPow(2, numApplPreds); i++) {
-                int numZeroes = bitSet.getNumOfZeroBits();
-                bitSetsByNumZeroes.get(numZeroes).add(bitSet);
-
-                if (i < JoinRuleUtils.intPow(2, numApplPreds) - 1) {
-                    bitSet = bitSet.inc();
-                }
             }
         }
 
@@ -223,19 +164,19 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
         public AbstractDomainElement next() {
             if (nrZeroes == -1) {
                 nrZeroes++;
-                return PredicateAbstractionDomainElement.BOTTOM;
+                return DisjunctivePredicateAbstractionDomainElement.BOTTOM;
             }
 
             if (nrZeroes == predicates.size()) {
                 nrZeroes++;
-                return PredicateAbstractionDomainElement.TOP;
+                return DisjunctivePredicateAbstractionDomainElement.TOP;
             }
 
             ImmutableSet<AbstractionPredicate> predicatesForElem =
                     DefaultImmutableSet.<AbstractionPredicate> nil();
 
             ImmutableFixedLengthBitSet currBitSet =
-                    bitSetsByNumZeroes.get(nrZeroes).get(idx);
+                    getBitSetsByNumZeroes().get(nrZeroes).get(idx);
 
             for (int nonZeroPosition : currBitSet.getNonzeroPositions()) {
                 try {
@@ -248,7 +189,7 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
                 }
             }
 
-            if (bitSetsByNumZeroes.get(nrZeroes).size() - 1 > idx) {
+            if (getBitSetsByNumZeroes().get(nrZeroes).size() - 1 > idx) {
                 idx++;
             }
             else {
@@ -256,19 +197,17 @@ public class PredicateAbstractionLattice extends AbstractDomainLattice {
                 idx = 0;
             }
 
-            return new PredicateAbstractionDomainElement(predicatesForElem);
+            return new DisjunctivePredicateAbstractionDomainElement(predicatesForElem);
         }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.util.Iterator#remove()
-         */
-        @Override
-        public void remove() {
-            throw new RuntimeException("Method \"remove\" not implemented");
-        }
-
     }
 
+    @Override
+    protected AbstractPredicateAbstractionDomainElement getTopElem() {
+        return DisjunctivePredicateAbstractionDomainElement.TOP;
+    }
+
+    @Override
+    protected AbstractPredicateAbstractionDomainElement getBottomElem() {
+        return DisjunctivePredicateAbstractionDomainElement.BOTTOM;
+    }
 }

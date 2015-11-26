@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof.io.intermediate;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.util.Pair;
@@ -32,6 +33,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
     private String distinguishingFormula = null;
     private int nrPartners = 0;
     private ImmutableList<Pair<String, String>> abstractionPredicates;
+    private Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
 
     /**
      * Constructs a new join rule.
@@ -54,14 +56,24 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      *            application.
      * @param distinguishingFormula
      *            The user-supplied distinguishing formula for the join.
+     * @param predAbstrLatticeType
+     *            The type for the used predicate abstraction lattice which
+     *            determines how abstract domain elements are generated from
+     *            predicates.
      * @param abstractionPredicates
      *            The abstraction predicates, if predicate abstraction is used
      *            as a join technique.
      * @param currAbstractionPredicates
      */
-    public JoinAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
-            int id, String joinProc, int nrPartners,
-            ImmutableList<Name> newNames, String distinguishingFormula,
+    public JoinAppIntermediate(
+            String ruleName,
+            Pair<Integer, PosInTerm> pos,
+            int id,
+            String joinProc,
+            int nrPartners,
+            ImmutableList<Name> newNames,
+            String distinguishingFormula,
+            Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
             ImmutableList<Pair<String, String>> abstractionPredicates) {
         super(ruleName, pos, null, null, newNames);
 
@@ -72,6 +84,7 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
         this.nrPartners = nrPartners;
         this.distinguishingFormula = distinguishingFormula;
         this.abstractionPredicates = abstractionPredicates;
+        this.predAbstrLatticeType = predAbstrLatticeType;
     }
 
     /**
@@ -102,6 +115,14 @@ public class JoinAppIntermediate extends BuiltInAppIntermediate {
      */
     public String getDistinguishingFormula() {
         return distinguishingFormula;
+    }
+
+    /**
+     * @return The abstraction predicates, if predicate abstraction is used as a
+     *         join technique.
+     */
+    public Class<? extends AbstractPredicateAbstractionLattice> getPredAbstrLatticeType() {
+        return predAbstrLatticeType;
     }
 
     /**

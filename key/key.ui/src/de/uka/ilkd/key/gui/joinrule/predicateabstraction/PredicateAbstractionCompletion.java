@@ -59,7 +59,7 @@ public class PredicateAbstractionCompletion extends
             return proc;
         }
         else {
-            return procF.instantiate(chosenPreds);
+            return procF.instantiate(chosenPreds, dialog.getLatticeType());
         }
     }
 

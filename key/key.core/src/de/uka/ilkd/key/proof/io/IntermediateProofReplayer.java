@@ -30,6 +30,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -352,10 +354,17 @@ public class IntermediateProofReplayer {
 
                                     }
 
+                                    Class<? extends AbstractPredicateAbstractionLattice> latticeType =
+                                            joinAppInterm
+                                                    .getPredAbstrLatticeType();
+
                                     // Instantiate the join procedure
                                     joinApp.setConcreteRule(((JoinWithPredicateAbstractionFactory) joinApp
                                             .getConcreteRule())
-                                            .instantiate(predicates));
+                                            .instantiate(
+                                                    predicates,
+                                                    latticeType == null ? SimplePredicateAbstractionLattice.class
+                                                            : latticeType));
 
                                 }
 

@@ -28,41 +28,38 @@ import de.uka.ilkd.key.logic.TermBuilder;
  *
  * @author Dominic Scheurer
  */
-public class PredicateAbstractionDomainElement extends AbstractDomainElement {
-    
-    /**
-     * The bottom element of any predicate abstraction lattice.
-     */
-    public static final PredicateAbstractionDomainElement BOTTOM =
-        new PredicateAbstractionDomainElement(false);
-    
-    /**
-     * The top element of any predicate abstraction lattice.
-     */
-    public static final PredicateAbstractionDomainElement TOP =
-        new PredicateAbstractionDomainElement(true);
-    
+public abstract class AbstractPredicateAbstractionDomainElement extends
+        AbstractDomainElement {
+
     private ImmutableSet<AbstractionPredicate> predicates = null;
-    private boolean isTopElem = false;
-    
+    private boolean topElem = false;
 
     /**
-     * Constructs a new {@link PredicateAbstractionDomainElement} from a given
-     * list of abstraction predicates.
+     * Constructs a new {@link AbstractPredicateAbstractionDomainElement} from a
+     * given list of abstraction predicates.
      */
-    public PredicateAbstractionDomainElement(
+    public AbstractPredicateAbstractionDomainElement(
             final ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
     }
 
     /**
-     * Constructs a new {@link PredicateAbstractionDomainElement} that is
-     * a top element if isTopElem is set to true; otherwise, it is a bottom
+     * Constructs a new {@link AbstractPredicateAbstractionDomainElement} that
+     * is a top element if isTopElem is set to true; otherwise, it is a bottom
      * element.
      */
-    private PredicateAbstractionDomainElement(boolean isTopElem) {
-        this.predicates = DefaultImmutableSet.<AbstractionPredicate>nil();
-        this.isTopElem = isTopElem;
+    protected AbstractPredicateAbstractionDomainElement(boolean isTopElem) {
+        this.predicates = DefaultImmutableSet.<AbstractionPredicate> nil();
+        this.topElem = isTopElem;
+    }
+
+    /**
+     * TODO: Document.
+     * 
+     * @return
+     */
+    protected boolean isTopElem() {
+        return topElem;
     }
 
     /**
@@ -87,22 +84,34 @@ public class PredicateAbstractionDomainElement extends AbstractDomainElement {
      */
     @Override
     public Name name() {
-        if (isTopElem) {
+        if (topElem) {
             return new Name("TOP");
         }
-        
+
         if (predicates.size() == 0) {
             return new Name("BOTTOM");
         }
 
         StringBuilder result = new StringBuilder();
+        int i = 1;
         for (AbstractionPredicate pred : predicates) {
-            result.append("(" + pred.name() + ")").append("&");
+            result.append("(" + pred.name() + ")");
+
+            if (i++ < predicates.size()) {
+                result.append(getPredicateNameCombinationString());
+            }
         }
         result.deleteCharAt(result.length() - 1);
 
         return new Name(result.toString());
     }
+
+    /**
+     * TODO: Document.
+     * 
+     * @return
+     */
+    public abstract String getPredicateNameCombinationString();
 
     /*
      * (non-Javadoc)
@@ -114,8 +123,8 @@ public class PredicateAbstractionDomainElement extends AbstractDomainElement {
     @Override
     public Term getDefiningAxiom(Term varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();
-        
-        if (isTopElem) {
+
+        if (topElem) {
             return tb.tt();
         }
 
@@ -130,22 +139,24 @@ public class PredicateAbstractionDomainElement extends AbstractDomainElement {
                 result = application;
             }
             else {
-                result = tb.and(result, application);
+                result = combinePredicates(result, application, services);
             }
         }
 
         return result;
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof PredicateAbstractionDomainElement &&
-                (this != TOP || obj == TOP) &&
-                (this != BOTTOM || obj == BOTTOM) &&
-                this.predicates.equals(((PredicateAbstractionDomainElement)obj).predicates);
-    }
 
+    /**
+     * TODO: Document.
+     * 
+     * @param preds
+     * @param newPred
+     * @param services
+     * @return
+     */
+    protected abstract Term combinePredicates(Term preds, Term newPred,
+            Services services);
+
+    @Override
+    public abstract boolean equals(Object obj);
 }

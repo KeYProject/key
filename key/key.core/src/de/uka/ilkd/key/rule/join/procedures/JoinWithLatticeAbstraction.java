@@ -50,7 +50,9 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
      *            The sort to return the matching lattice for.
      * @param services
      *            The services object.
-     * @return The abstract domain lattice suitable for the given sort.
+     * @return The abstract domain lattice suitable for the given sort. Return
+     *         null if there is no abstract domain for that sort; in this case,
+     *         an if-then-else join will be performed.
      */
     protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s,
             Services services);

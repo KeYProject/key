@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -90,11 +91,15 @@ public class JoinWithPredicateAbstractionFactory extends
      *
      * @param predicates
      *            The predicates for the lattices to create.
+     * @param latticeType
+     *            The concrete lattice type which determines how abstract
+     *            elements are generated from abstraction predicates.
      * @return A complete instance of {@link JoinWithPredicateAbstraction}.
      */
     public JoinWithPredicateAbstraction instantiate(
-            Iterable<AbstractionPredicate> predicates) {
-        return new JoinWithPredicateAbstraction(predicates);
+            Iterable<AbstractionPredicate> predicates,
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType) {
+        return new JoinWithPredicateAbstraction(predicates, latticeType);
     }
 
     @Override

@@ -32,6 +32,8 @@ import javafx.scene.layout.AnchorPane;
 import javax.swing.JDialog;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -73,6 +75,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private HashMap<AbstractionPredicate, Sort> sortsForPredicates =
             new HashMap<AbstractionPredicate, Sort>();
 
+    private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
+            SimplePredicateAbstractionLattice.class;
+
     /**
      * @return The abstraction predicates set by the user. Is null iff the user
      *         pressed cancel.
@@ -86,6 +91,14 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     public HashMap<AbstractionPredicate, Sort> getSortsForPredicates() {
         return sortsForPredicates;
+    }
+
+    /**
+     * @return The chosen lattice type (class object for class that is an
+     *         instance of {@link AbstractPredicateAbstractionLattice}).
+     */
+    public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
+        return latticeType;
     }
 
     /**
@@ -250,6 +263,14 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                         dispose();
                     }
                 });
+
+        ctrl.latticeTypeProperty()
+                .addListener(
+                        (ObservableValue<? extends Class<? extends AbstractPredicateAbstractionLattice>> observable,
+                                Class<? extends AbstractPredicateAbstractionLattice> oldValue,
+                                Class<? extends AbstractPredicateAbstractionLattice> newValue) -> {
+                            this.latticeType = newValue;
+                        });
     }
 
     /**
