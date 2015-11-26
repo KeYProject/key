@@ -31,6 +31,10 @@ public class QuestionPage extends AbstractPage implements IPageWithWorkbenchModi
    public QuestionPage(String name, String title, String message, boolean useForm, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, AbstractQuestion... questions) {
       this(name, title, message, useForm, wrapLayout, toolBased, workbenchModifier, CollectionUtil.toList(questions));
    }
+   
+   public QuestionPage(String name, String title, String latexTitle, String message, boolean useForm, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, AbstractQuestion... questions) {
+      this(name, title, latexTitle, message, useForm, wrapLayout, toolBased, workbenchModifier, CollectionUtil.toList(questions));
+   }
 
    public QuestionPage(String name, String title, String message, boolean useForm, boolean wrapLayout, boolean toolBased, boolean enabled, IWorkbenchModifier workbenchModifier, AbstractQuestion... questions) {
       this(name, title, message, useForm, wrapLayout, toolBased, enabled, workbenchModifier, CollectionUtil.toList(questions));
@@ -38,6 +42,10 @@ public class QuestionPage extends AbstractPage implements IPageWithWorkbenchModi
 
    public QuestionPage(String name, String title, String message, boolean useForm, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
       this(name, title, message, useForm, wrapLayout, toolBased, true, workbenchModifier, questions);
+   }
+
+   public QuestionPage(String name, String title, String latexTitle, String message, boolean useForm, boolean wrapLayout, boolean toolBased, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {
+      this(name, title, latexTitle, message, useForm, wrapLayout, toolBased, true, workbenchModifier, questions);
    }
 
    public QuestionPage(String name, String title, String message, boolean useForm, boolean wrapLayout, boolean toolBased, boolean enabled, IWorkbenchModifier workbenchModifier, List<AbstractQuestion> questions) {

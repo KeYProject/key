@@ -44,6 +44,10 @@ public class CheckboxQuestion extends AbstractButtonsQuestion {
       super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, choices);
    }
 
+   public CheckboxQuestion(String name, String label, String latexLabel, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Choice... choices) {
+      super(name, label, latexLabel, description, image, vertical, defaultChoice, validator, askForTrust, choices);
+   }
+
    public CheckboxQuestion(String name, String label, String description, Image image, boolean vertical, String defaultChoice, IValueValidator validator, boolean askForTrust, Set<String> notCorrectnessRelevantChoiceValues, Choice... choices) {
       super(name, label, description, image, vertical, defaultChoice, validator, askForTrust, null, true, CollectionUtil.toList(choices), notCorrectnessRelevantChoiceValues);
    }

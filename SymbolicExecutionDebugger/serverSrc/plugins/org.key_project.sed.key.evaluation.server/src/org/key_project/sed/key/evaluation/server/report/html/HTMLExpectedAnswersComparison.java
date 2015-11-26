@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -130,17 +129,17 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
                   for (QuestionStatistic currentQs : qss) {
                      choicesCount += currentQs.getChoiceStatistics().size();
                   }
-                  sb.append("<td rowspan=\"" + choicesCount + "\" valign=\"top\">" + ps.getPage().getName() + "</td>");
+                  sb.append("<td rowspan=\"" + choicesCount + "\" valign=\"top\">" + ps.getPage().getTitle() + "</td>");
                   pagePrinted = true;
                }
                if (!questionPrinted) {
-                  sb.append("<td rowspan=\"" + css.size() + "\" valign=\"top\">" + qs.getQuestion().getName() + "</td>");
+                  sb.append("<td rowspan=\"" + css.size() + "\" valign=\"top\">" + qs.getQuestion().getLatexLabel() + "</td>");
                   questionPrinted = true;
                }
-               sb.append("<td>" + cs.getChoice().getText() + "</td>");
+               sb.append("<td>" + cs.getChoice().getLatexText() + "</td>");
                for (IStatisticsFilter filter : statistics.getFilters()) {
                   List<Tool> winningTools = cs.computeWinningTools(filter, evaluation.getTools());
-                  if (winningTools.size() == 1) {
+                  if (winningTools != null && winningTools.size() == 1) {
                      Map<Tool, BigInteger> filterMap = winningMap.get(filter);
                      if (filterMap == null) {
                         filterMap = new HashMap<Tool, BigInteger>();
@@ -157,14 +156,15 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
                   }
                   for (Tool tool : evaluation.getTools()) {
                      Statistic s = cs.getStatistic(filter, tool);
-                     if (winningTools.contains(tool)) {
+                     BigDecimal percentage = s.computePercentage();
+                     if (winningTools != null && winningTools.contains(tool)) {
                         String color = winningTools.size() == 1 ?
                                        "blue" :
                                        "#FF00FF";
-                        sb.append("<td align=\"right\"><font color=\"" + color + "\">" + s.computePercentage() + "</font></td>");
+                        sb.append("<td align=\"right\"><font color=\"" + color + "\">" + (percentage != null ? percentage : "&nbsp;") + "</font></td>");
                      }
                      else {
-                        sb.append("<td align=\"right\">" + s.computePercentage() + "</td>");
+                        sb.append("<td align=\"right\">" + (percentage != null ? percentage : "&nbsp;") + "</td>");
                      }
                   }
                }
@@ -215,12 +215,20 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
       }
       sb.append("</tr>");
       sb.append("</table>");
-      return Collections.singletonList(createLatexFile(evaluation, statistics, recordsCount, pageMap));
+      return CollectionUtil.toList(createLatexFile(evaluation, statistics, recordsCount, pageMap, false),
+                                   createLatexFile(evaluation, statistics, recordsCount, pageMap, true));
    }
    
-   private AdditionalFile createLatexFile(AbstractEvaluation evaluation, Statistics statistics, Map<IStatisticsFilter, BigInteger> recordsCount, Map<AbstractPage, PageStatistic> pageMap) {
+   private AdditionalFile createLatexFile(AbstractEvaluation evaluation, 
+                                          Statistics statistics, 
+                                          Map<IStatisticsFilter, BigInteger> recordsCount, 
+                                          Map<AbstractPage, PageStatistic> pageMap,
+                                          boolean multiPage) {
       StringBuffer latex = new StringBuffer();
       latex.append("\\begin{tabularx}{1.0\\textwidth}{lXXrrrrrrrr}" + StringUtil.NEW_LINE);
+      if (multiPage) {
+         latex.append("\\caption{Comparison of the Given Expected Answers} \\\\" + StringUtil.NEW_LINE);
+      }
       latex.append("\\toprule" + StringUtil.NEW_LINE);
       latex.append("\\multirow{3}{*}{\\rotatebox{90}{\\parbox{1.4cm}{Proof Attempt}}}&&&\\multicolumn{8}{c}{\\KeY experience}\\\\" + StringUtil.NEW_LINE);
       latex.append("&&");
@@ -236,8 +244,15 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
       }
       latex.append("\\\\" + StringUtil.NEW_LINE);
       Map<IStatisticsFilter, Map<Tool, BigInteger>> winningMap = new HashMap<IStatisticsFilter, Map<Tool, BigInteger>>();
+      boolean afterFirst = false;
       for (PageStatistic ps : pageMap.values()) {
          latex.append("\\midrule" + StringUtil.NEW_LINE);
+         if (!afterFirst) {
+            if (multiPage) {
+               latex.append("\\endhead" + StringUtil.NEW_LINE);
+            }
+            afterFirst = true;
+         }
          Collection<QuestionStatistic> qss = ps.getQuestionStatistics();
          boolean pagePrinted = false;
          for (QuestionStatistic qs : qss) {
@@ -262,7 +277,7 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
                latex.append("&" + cs.getChoice().getLatexText());
                for (IStatisticsFilter filter : statistics.getFilters()) {
                   List<Tool> winningTools = cs.computeWinningTools(filter, evaluation.getTools());
-                  if (winningTools.size() == 1) {
+                  if (winningTools != null && winningTools.size() == 1) {
                      Map<Tool, BigInteger> filterMap = winningMap.get(filter);
                      if (filterMap == null) {
                         filterMap = new HashMap<Tool, BigInteger>();
@@ -279,11 +294,12 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
                   }
                   for (Tool tool : evaluation.getTools()) {
                      Statistic s = cs.getStatistic(filter, tool);
-                     if (winningTools.size() == 1 && winningTools.contains(tool)) {
-                        latex.append("&\\textcolor{blue}{" + s.computePercentage(0) + "}");
+                     BigDecimal percentage = s.computePercentage(0);
+                     if (winningTools != null && winningTools.size() == 1 && winningTools.contains(tool)) {
+                        latex.append("&\\textcolor{blue}{" + (percentage != null ? percentage : "") + "}");
                      }
                      else {
-                        latex.append("&" + s.computePercentage(0));
+                        latex.append("&" + (percentage != null ? percentage : ""));
                      }
                   }
                }
@@ -331,8 +347,14 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
       }
       latex.append("\\\\" + StringUtil.NEW_LINE);
       latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+      if (multiPage) {
+         latex.append("\\label{tab:rcExpectedAnswerToolComparision}");
+      }
       latex.append("\\end{tabularx}" + StringUtil.NEW_LINE);
-      return new AdditionalFile("_ExpectedAnswersComparison.tex", latex.toString().getBytes(IOUtil.DEFAULT_CHARSET));
+      String fileName = multiPage ?
+                        "_ExpectedAnswersComparison_MultiPage.tex" :
+                        "_ExpectedAnswersComparison.tex";
+      return new AdditionalFile(fileName, latex.toString().getBytes(IOUtil.DEFAULT_CHARSET));
    }
    
    private static class PageStatistic {
@@ -418,12 +440,15 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
          BigDecimal winnersPercentage = null;
          for (Tool tool : tools) {
             Statistic s = getStatistic(filter, tool);
+            BigDecimal current = s.computePercentage();
+            if (current == null) {
+               return null; // No winning tool available as records for tool are missing.
+            }
             if (winnersPercentage == null) {
                winners.add(tool);
-               winnersPercentage = s.computePercentage();
+               winnersPercentage = current;
             }
             else {
-               BigDecimal current = s.computePercentage();
                if (winnersPercentage.compareTo(current) == 0) {
                   winners.add(tool);
                }
@@ -459,7 +484,7 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
             return new BigDecimal(mul100).divide(new BigDecimal(maxCount), decimalDigits, RoundingMode.HALF_EVEN);
          }
          else {
-            return BigDecimal.ZERO;
+            return null;
          }
       }
    }

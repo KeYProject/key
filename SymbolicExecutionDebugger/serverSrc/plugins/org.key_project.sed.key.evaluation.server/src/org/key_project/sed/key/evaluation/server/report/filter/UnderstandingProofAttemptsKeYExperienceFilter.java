@@ -14,7 +14,7 @@ import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
  * to filter answers by the KeY experience.
  * @author Martin Hentschel
  */
-public class UnderstandingProofAttemptsKeYExperienceFilter implements IStatisticsFilter {
+public class UnderstandingProofAttemptsKeYExperienceFilter extends AbstractStatisticsFilter {
    /**
     * The {@link Choice} with the KeY experience of interest.
     */

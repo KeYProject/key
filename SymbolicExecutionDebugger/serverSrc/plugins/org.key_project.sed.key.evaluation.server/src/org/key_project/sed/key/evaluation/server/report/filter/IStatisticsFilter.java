@@ -5,6 +5,8 @@ import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
 /**
  * An {@link IStatisticsFilter} is used to select {@link EvaluationAnswers}
  * to consider.
+ * <p>
+ * Implementations should subclass from {@link AbstractStatisticsFilter}.
  * @author Martin Hentschel
  */
 public interface IStatisticsFilter {

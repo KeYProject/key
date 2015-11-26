@@ -14,7 +14,7 @@ import org.key_project.sed.key.evaluation.server.report.EvaluationAnswers;
  * to filter answers by the Java experience.
  * @author Martin Hentschel
  */
-public class ReviewingCodeJavaExperienceFilter implements IStatisticsFilter {
+public class ReviewingCodeJavaExperienceFilter extends AbstractStatisticsFilter {
    /**
     * The {@link Choice} with the Java experience of interest.
     */
