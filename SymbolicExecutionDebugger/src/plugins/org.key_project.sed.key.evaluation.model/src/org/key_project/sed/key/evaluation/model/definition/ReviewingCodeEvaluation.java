@@ -219,10 +219,12 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       URL sedURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/SED-Screencast.html") : null;
       URL sedWizardURL = isUIAvailable() ? toLocalURL("data/reviewingCode/instructions/SED-ScreencastWizard.html") : null;
       Tool noTool = new Tool(NO_TOOL_NAME, 
+                             "DCR",
                              noToolURL, 
                              noToolWizardURL, 
                              isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.JAVA_APPLICATION_LOGO) : null);
       Tool sed = new Tool(SED_TOOL_NAME, 
+                          "\\SED",
                           sedURL, 
                           sedWizardURL, 
                           isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_LOGO) : null);

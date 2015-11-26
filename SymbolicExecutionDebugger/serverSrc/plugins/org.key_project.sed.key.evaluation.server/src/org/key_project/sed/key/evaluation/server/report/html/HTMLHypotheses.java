@@ -71,7 +71,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                alpha, 
                                "Correct Answers", 
                                sb,
-                               new String[] {firstTool.getName(), secondTool.getName()},
+                               new String[] {firstTool.getLatexName(), secondTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_CorrectAnswers",
                                additionalFiles,
                                false);
@@ -81,7 +81,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                alpha, 
                                "Correctness Score", 
                                sb,
-                               new String[] {firstTool.getName(), secondTool.getName()},
+                               new String[] {firstTool.getLatexName(), secondTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_CorrectnessScore",
                                additionalFiles,
                                false);
@@ -91,7 +91,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                alpha, 
                                "Trust Score", 
                                sb,
-                               new String[] {firstTool.getName(), secondTool.getName()},
+                               new String[] {firstTool.getLatexName(), secondTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_TrustScore",
                                additionalFiles,
                                false);
@@ -101,7 +101,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                alpha, 
                                "Partial Trust Score", 
                                sb,
-                               new String[] {firstTool.getName(), secondTool.getName()},
+                               new String[] {firstTool.getLatexName(), secondTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_PartialTrustScore",
                                additionalFiles,
                                false);
@@ -111,7 +111,7 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                alpha, 
                                "Time", 
                                sb,
-                               new String[] {secondTool.getName(), firstTool.getName()},
+                               new String[] {secondTool.getLatexName(), firstTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_Time",
                                additionalFiles,
                                true);

@@ -14,12 +14,14 @@ import org.key_project.sed.key.evaluation.model.definition.AbstractForm;
 import org.key_project.sed.key.evaluation.model.definition.Choice;
 import org.key_project.sed.key.evaluation.model.definition.QuestionPage;
 import org.key_project.sed.key.evaluation.model.definition.RadioButtonsQuestion;
+import org.key_project.sed.key.evaluation.model.definition.ReviewingCodeEvaluation;
 import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAttemptsEvaluation;
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.model.io.EvaluationInputReader;
 import org.key_project.sed.key.evaluation.server.io.FileStorage;
 import org.key_project.sed.key.evaluation.server.report.filter.AllStatisticsFilter;
 import org.key_project.sed.key.evaluation.server.report.filter.IStatisticsFilter;
+import org.key_project.sed.key.evaluation.server.report.filter.ReviewingCodeJavaExperienceFilter;
 import org.key_project.sed.key.evaluation.server.report.filter.UnderstandingProofAttemptsKeYExperienceFilter;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
 import org.key_project.util.java.ArrayUtil;
@@ -165,6 +167,17 @@ public abstract class AbstractReportEngine {
          RadioButtonsQuestion keyQuestion = (RadioButtonsQuestion) backgroundPage.getQuestion(UnderstandingProofAttemptsEvaluation.EXPERIENCE_WITH_KEY_QUESTION_NAME);
          for (Choice choice : keyQuestion.getChoices()) {
             filters.add(new UnderstandingProofAttemptsKeYExperienceFilter(choice));
+         }
+         return filters.toArray(new IStatisticsFilter[filters.size()]);
+      }
+      else if (evaluation instanceof ReviewingCodeEvaluation) {
+         List<IStatisticsFilter> filters = new LinkedList<IStatisticsFilter>();
+         filters.add(new AllStatisticsFilter());
+         AbstractForm introductionForm = evaluation.getForm(ReviewingCodeEvaluation.INTRODUCTION_FORM_NAME);
+         QuestionPage backgroundPage = (QuestionPage) introductionForm.getPage(ReviewingCodeEvaluation.BACKGROUND_PAGE_NAME);
+         RadioButtonsQuestion keyQuestion = (RadioButtonsQuestion) backgroundPage.getQuestion(ReviewingCodeEvaluation.EXPERIENCE_WITH_JAVA_QUESTION_NAME);
+         for (Choice choice : keyQuestion.getChoices()) {
+            filters.add(new ReviewingCodeJavaExperienceFilter(choice));
          }
          return filters.toArray(new IStatisticsFilter[filters.size()]);
       }
