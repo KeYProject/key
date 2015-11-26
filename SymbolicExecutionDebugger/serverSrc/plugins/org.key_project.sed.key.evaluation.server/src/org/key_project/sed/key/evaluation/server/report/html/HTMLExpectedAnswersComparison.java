@@ -133,10 +133,10 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
                   pagePrinted = true;
                }
                if (!questionPrinted) {
-                  sb.append("<td rowspan=\"" + css.size() + "\" valign=\"top\">" + qs.getQuestion().getLatexLabel() + "</td>");
+                  sb.append("<td rowspan=\"" + css.size() + "\" valign=\"top\">" + qs.getQuestion().getLabel() + "</td>");
                   questionPrinted = true;
                }
-               sb.append("<td>" + cs.getChoice().getLatexText() + "</td>");
+               sb.append("<td>" + cs.getChoice().getText() + "</td>");
                for (IStatisticsFilter filter : statistics.getFilters()) {
                   List<Tool> winningTools = cs.computeWinningTools(filter, evaluation.getTools());
                   if (winningTools != null && winningTools.size() == 1) {
