@@ -204,6 +204,21 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
     * The value for more than 1 year of SED experience.
     */
    public static final String SED_EXPERIENCE_MORE_THAN_1_YEAR_VALUE = "More than 1 year";
+
+   /**
+    * The name of the feedback section for SED.
+    */
+   public static final String SED_FEEDBACK_SECTION = "SED";
+
+   /**
+    * The name of the feedback section comparing a direct code review and SED.
+    */
+   public static final String DCR_VS_SED_FEEDBACK_SECTION = "KeYvsSED";
+
+   /**
+    * The name of the feedback section.
+    */
+   public static final String FEEDBACK_SECTION = "feedback";
    
    /**
     * Forbid additional instances.
@@ -381,6 +396,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       String setTitle = "Shown symbolic execution tree";
       RadioButtonsQuestion setQuestion = new RadioButtonsQuestion("set", 
                                                                   setTitle, 
+                                                                  "Symbolic Exec. Tree",
+                                                                  null,
                                                                   isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_RC_SET) : null,
                                                                   false,
                                                                   null, 
@@ -390,6 +407,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       String nodePropertiesTitle = "Properties of selected node";
       RadioButtonsQuestion nodePropertiesQuestion = new RadioButtonsQuestion("nodeProperties", 
                                                                              nodePropertiesTitle, 
+                                                                             "\\view{Properties} view",
+                                                                             null,
                                                                              isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_RC_NODE_PROPERTIES) : null,
                                                                              false,
                                                                              null, 
@@ -399,6 +418,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       String reachedTitle = "Highlighting of source code reached during symbolic execution";
       RadioButtonsQuestion reachedQuestion = new RadioButtonsQuestion("reachedSourceCode", 
                                                                       reachedTitle, 
+                                                                      "Reached Source Code",
+                                                                      null,
                                                                       isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_RC_REACHED) : null,
                                                                       false,
                                                                       null, 
@@ -408,13 +429,15 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
       String variablesTitle = "Shown variables of a node (view 'Variables')";
       RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
                                                                         variablesTitle, 
+                                                                        "\\view{Variables} View",
+                                                                        null,
                                                                         isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_RC_VARIABLES) : null,
                                                                         false,
                                                                         null, 
                                                                         new NotUndefinedValueValidator("Question '" + variablesTitle + "' not answered."), 
                                                                         false,
                                                                         choices);
-      SectionQuestion sedSection = new SectionQuestion("SED", "SED", false, setQuestion, nodePropertiesQuestion, reachedQuestion, variablesQuestion);
+      SectionQuestion sedSection = new SectionQuestion(SED_FEEDBACK_SECTION, "SED", false, setQuestion, nodePropertiesQuestion, reachedQuestion, variablesQuestion);
       // NO_TOOL vs SED
       String keyVsSedTitle = "I prefer to inspect source code";
       RadioButtonsQuestion keyVsSedQuestion = new RadioButtonsQuestion("toolPreference", 
@@ -428,9 +451,9 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                        new Choice("directly and using SED, depending on the source code", "DirectlyAndSEDcodeBased"),
                                                                        new Choice("directly and using SED, both are equally bad and should be improved", "DirectlyAndSEDbad"),
                                                                        new Choice("using SED", "SED"));
-      SectionQuestion keyVsSedSection = new SectionQuestion("KeYvsSED", "KeY vs SED", false, keyVsSedQuestion);
+      SectionQuestion keyVsSedSection = new SectionQuestion(DCR_VS_SED_FEEDBACK_SECTION, "Direct code review vs SED", false, keyVsSedQuestion);
       // Feedback
-      SectionQuestion feedbackSection = new SectionQuestion("feedback", 
+      SectionQuestion feedbackSection = new SectionQuestion(FEEDBACK_SECTION, 
                                                             "Feedback", 
                                                             true, 
                                                             new TextQuestion("feedback", "Feedback about the tools or the evaluation (optional)", null, null, false, 400, 200));

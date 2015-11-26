@@ -986,7 +986,7 @@ public class UnderstandingProofAttemptsEvaluation extends AbstractEvaluation {
       String variablesTitle = "Shown variables of a node (view 'Variables')";
       RadioButtonsQuestion variablesQuestion = new RadioButtonsQuestion("variables", 
                                                                         variablesTitle, 
-                                                                        "Variables View",
+                                                                        "\\view{Variables} View",
                                                                         null,
                                                                         isUIAvailable() ? EvaluationModelImages.getImage(EvaluationModelImages.SED_UP_VARIABLES) : null,
                                                                         false,
