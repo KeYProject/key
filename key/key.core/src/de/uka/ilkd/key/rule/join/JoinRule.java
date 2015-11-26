@@ -326,7 +326,7 @@ public class JoinRule implements BuiltInRule {
         final LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
 
         // Construct path condition as (optimized) disjunction
-        Term newPathCondition =
+        final Term newPathCondition =
                 createSimplifiedDisjunctivePathCondition(state1.second,
                         state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
 
@@ -340,6 +340,9 @@ public class JoinRule implements BuiltInRule {
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
 
         ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
+
+        // New constraints on introduced Skolem constants
+        Term newAdditionalConstraints = null;
 
         for (LocationVariable v : progVars) {
 
@@ -405,11 +408,18 @@ public class JoinRule implements BuiltInRule {
                             joinHeaps(joinRule, v, rightSide1, rightSide2,
                                     state1, state2, distinguishingFormula,
                                     services);
+
                     newElementaryUpdates =
                             newElementaryUpdates.prepend(tb.elementary(v,
                                     joinedHeaps.second));
-                    newPathCondition =
-                            tb.and(newPathCondition, tb.and(joinedHeaps.first));
+                    if (newAdditionalConstraints == null) {
+                        newAdditionalConstraints = tb.and(joinedHeaps.first);
+                    }
+                    else {
+                        newAdditionalConstraints =
+                                tb.and(newAdditionalConstraints,
+                                        tb.and(joinedHeaps.first));
+                    }
                     newNames.addAll(joinedHeaps.third);
 
                 }
@@ -426,8 +436,14 @@ public class JoinRule implements BuiltInRule {
                             newElementaryUpdates.prepend(tb.elementary(v,
                                     joinedVal.second));
 
-                    newPathCondition =
-                            tb.and(newPathCondition, tb.and(joinedVal.first));
+                    if (newAdditionalConstraints == null) {
+                        newAdditionalConstraints = tb.and(joinedVal.first);
+                    }
+                    else {
+                        newAdditionalConstraints =
+                                tb.and(newAdditionalConstraints,
+                                        tb.and(joinedVal.first));
+                    }
 
                 } // end else of if (v.sort().equals(heapSort))
 
@@ -438,8 +454,13 @@ public class JoinRule implements BuiltInRule {
         // Construct weakened symbolic state
         Term newSymbolicState = tb.parallel(newElementaryUpdates);
 
+        // Note: We apply the symbolic state to the new constraints to enable
+        // join techniques, in particular predicate abstraction, to make
+        // references to the values of other variables involved in the join.
         return new Pair<SymbolicExecutionState, LinkedHashSet<Name>>(
-                new SymbolicExecutionState(newSymbolicState, newPathCondition),
+                new SymbolicExecutionState(newSymbolicState, tb.and(
+                        newPathCondition,
+                        tb.apply(newSymbolicState, newAdditionalConstraints))),
                 newNames);
 
     }
