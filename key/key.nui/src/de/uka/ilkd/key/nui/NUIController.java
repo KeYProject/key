@@ -46,7 +46,7 @@ public class NUIController {
     MenuButton ButtonOpenProofsView;
     @FXML
     MenuButton ButtonTreeView;
-    
+
     @FXML
     protected void handleCloseWindow(ActionEvent e) {
         Platform.exit();
