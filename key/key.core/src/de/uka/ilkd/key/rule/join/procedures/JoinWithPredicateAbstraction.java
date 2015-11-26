@@ -168,9 +168,9 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     }
 
     /**
-     * TODO: Document.
-     * 
-     * @return
+     * @return The type of lattice, that is a subclass of
+     *         {@link AbstractPredicateAbstractionLattice} which determines how
+     *         abstract elements are constructed from abstraction predicates.
      */
     public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
         return latticeType;

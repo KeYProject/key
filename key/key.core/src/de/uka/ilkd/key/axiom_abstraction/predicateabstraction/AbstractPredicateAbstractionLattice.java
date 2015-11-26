@@ -27,21 +27,29 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
- * TODO: Document.
+ * A super class for predicates abstraction lattices. Implements basic join
+ * functionality and a template for an iterator initializing
+ * ImmutableFixedLengthBitSets.
  *
  * @author Dominic Scheurer
  */
-public abstract class AbstractPredicateAbstractionLattice
-        extends AbstractDomainLattice {
+public abstract class AbstractPredicateAbstractionLattice extends
+        AbstractDomainLattice {
 
     /**
-     * TODO: Document.
+     * Joins to abstract elements in the lattice.
      * 
      * @param a
+     *            First domain element for the join.
      * @param b
+     *            Second domain element for the join.
      * @param combiner
+     *            The combination function (e.g., "AND") for the respective
+     *            predicates of the inputs..
      * @param abstrElemConstructor
-     * @return
+     *            A function constructing abstract domain elements from
+     *            predicates.
+     * @return The joined abstract domain element.
      */
     protected AbstractPredicateAbstractionDomainElement join(
             AbstractDomainElement a,
@@ -62,9 +70,8 @@ public abstract class AbstractPredicateAbstractionLattice
         AbstractPredicateAbstractionDomainElement pade2 =
                 (AbstractPredicateAbstractionDomainElement) b;
 
-        if (pade1.isTopElem()
-                || pade2.isTopElem()) {
-            return pade1;
+        if (pade1.isTopElem() || pade2.isTopElem()) {
+            return getTopElem();
         }
 
         if (pade1 == getBottomElem()) {
@@ -88,37 +95,35 @@ public abstract class AbstractPredicateAbstractionLattice
             return abstrElemConstructor.apply(combination);
         }
     }
-    
+
     /**
-     * TODO: Document.
-     * 
-     * @return
+     * @return The top element of the lattice.
      */
     protected abstract AbstractPredicateAbstractionDomainElement getTopElem();
-    
+
     /**
-     * TODO: Document.
-     * 
-     * @return
+     * @return The bottom element of the lattice.
      */
     protected abstract AbstractPredicateAbstractionDomainElement getBottomElem();
-    
+
     /**
-     * TODO: Document.
+     * An abstract iterator which basically only sets up the bit sets
+     * used for building up complex iterators.
      *
      * @author Dominic Scheurer
      */
     protected abstract class AbstractPredicateLatticeIterator implements
             Iterator<AbstractDomainElement> {
-        
+
         private final ArrayList<ArrayList<ImmutableFixedLengthBitSet>> bitSetsByNumZeroes =
                 new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
 
         /**
-         * Constructs a new {@link AbstractPredicateLatticeIterator}; initializes the
-         * bit sets for the iteration.
+         * Constructs a new {@link AbstractPredicateLatticeIterator};
+         * initializes the bit sets for the iteration.
          * 
-         * @param numApplPreds The number of applicable predicates for the lattice.
+         * @param numApplPreds
+         *            The number of applicable predicates for the lattice.
          */
         public AbstractPredicateLatticeIterator(int numApplPreds) {
             // We work with bit sets of length n (where n is the number of
@@ -145,15 +150,13 @@ public abstract class AbstractPredicateAbstractionLattice
                 }
             }
         }
-        
+
         /**
-         * TODO: Document.
-         * @return
+         * @return The list of bit sets for all given numbers of zeroes occurrences.
          */
         public ArrayList<ArrayList<ImmutableFixedLengthBitSet>> getBitSetsByNumZeroes() {
             return bitSetsByNumZeroes;
         }
-
 
         /*
          * (non-Javadoc)

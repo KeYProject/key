@@ -54,9 +54,8 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
     }
 
     /**
-     * TODO: Document.
-     * 
-     * @return
+     * @return Whether this element is the top element of the lattice (the axiom
+     *         of which is true for every input).
      */
     protected boolean isTopElem() {
         return topElem;
@@ -107,9 +106,9 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
     }
 
     /**
-     * TODO: Document.
-     * 
-     * @return
+     * @return The String which is used for combining the names of predicates
+     *         for lattice types where multiple predicates determine an abstract
+     *         element.
      */
     public abstract String getPredicateNameCombinationString();
 
@@ -147,12 +146,15 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
     }
 
     /**
-     * TODO: Document.
+     * Combines the given predicate terms (classically using AND or OR).
      * 
      * @param preds
+     *            Term with all previous predicates.
      * @param newPred
+     *            The new predicate to combine preds with.
      * @param services
-     * @return
+     *            The services object.
+     * @return The combination of preds with newPred.
      */
     protected abstract Term combinePredicates(Term preds, Term newPred,
             Services services);

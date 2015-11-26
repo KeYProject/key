@@ -143,6 +143,8 @@ public class DisjunctivePredicateAbstractionLattice extends
             if (predicates == null) {
                 predicates = new ArrayList<AbstractionPredicate>();
             }
+            
+            nrZeroes = predicates.size();
         }
 
         /*
@@ -163,13 +165,13 @@ public class DisjunctivePredicateAbstractionLattice extends
         @Override
         public AbstractDomainElement next() {
             if (nrZeroes == -1) {
-                nrZeroes++;
-                return DisjunctivePredicateAbstractionDomainElement.BOTTOM;
+                nrZeroes--;
+                return DisjunctivePredicateAbstractionDomainElement.TOP;
             }
 
             if (nrZeroes == predicates.size()) {
-                nrZeroes++;
-                return DisjunctivePredicateAbstractionDomainElement.TOP;
+                nrZeroes--;
+                return DisjunctivePredicateAbstractionDomainElement.BOTTOM;
             }
 
             ImmutableSet<AbstractionPredicate> predicatesForElem =
@@ -193,7 +195,7 @@ public class DisjunctivePredicateAbstractionLattice extends
                 idx++;
             }
             else {
-                nrZeroes++;
+                nrZeroes--;
                 idx = 0;
             }
 
