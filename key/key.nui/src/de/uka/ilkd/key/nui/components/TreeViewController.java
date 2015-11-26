@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nui.components;
 
 import java.io.File;
+import java.util.Iterator;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
@@ -23,12 +24,9 @@ public class TreeViewController {
 	 * displays the a default proof
 	 */
 	public void initialize() {
-		System.out.println("init.\nCreate Default Proof.");
+		Proof p = loadProof("lol.proof");
 		
-		//Proof p = getDefaultProof();
-		Proof p = loadProof("key.core.test/resources/testcase/join/gcd.closed.proof");
-		System.out.println("Default proof created. Now display the proof.");
-		
+		System.out.println("Default proof loaded.");
 		displayProof(p);
 	}
 	
@@ -39,38 +37,50 @@ public class TreeViewController {
 	public void displayProof(Proof p) {
 		// get the root node
 		Node pRoot = p.root();
-		
+
 		// convert proof to fxtree
-		TreeItem<String> nodeAsTI = proofToFxTree(pRoot);
+		TreeItem<String> fxRoot = new TreeItem<String>("proof tree");
+		fxRoot.setExpanded(true);
+		addPNodeToFXNode(pRoot, fxRoot);
 		
 		// display tree
-		proofTreeView.setRoot(nodeAsTI);
+		proofTreeView.setRoot(fxRoot);
 	}
-	
+
 	/**
-	 * converts a proof to a fxtree
-	 * recursively adds children to fxtree
-	 * @param pRoot the root of the proof
-	 * @return the corresponding fxtree
+	 * converts a proof node to an fxnode recursively
+	 * and adds it to an fx fxparent
+	 * @param proofNode
+	 * @param fxParent
 	 */
-	private TreeItem<String> proofToFxTree(Node pRoot) {
-		// create a fx tree item with label
-		String label = pRoot.serialNr() + ": " + pRoot.name();
-		TreeItem<String> fxRoot = new TreeItem<String>(label);
-		fxRoot.setExpanded(true);
+	private void addPNodeToFXNode(Node proofNode, TreeItem<String> fxParent) {
+		// create an fxNode and add it to the fxparent
+		String label = proofNode.serialNr() + ": " + proofNode.name();
+		TreeItem<String> fxNode = new TreeItem<String>(label);
+		fxParent.getChildren().add(fxNode);
+		
 		
 		// add all children recursively
-		int numChildren = pRoot.childrenCount();
-		for(int i = 0; i < numChildren; i++) {
-			// convert subtree to fxtree
-			TreeItem<String> child = proofToFxTree(pRoot.child(i));
-			
-			// add subtree to root
-			fxRoot.getChildren().add(child);
-		}
+		int numChildren = proofNode.childrenCount();
 		
-		// return the fxroot
-		return fxRoot;
+		if(numChildren == 1) {
+			// add child's subtree to parent
+			addPNodeToFXNode(proofNode.child(0), fxParent);
+		} else if(numChildren > 1) {
+			// for each child create a branch node and add it to the fxparent
+			for(Iterator<Node> childrenIterator = proofNode.childrenIterator(); childrenIterator.hasNext();) {
+				Node child = childrenIterator.next();
+				
+				String branchLabel = child.getNodeInfo().getBranchLabel();
+				if (branchLabel == null) {
+				    branchLabel = "Case " + (child.parent ().getChildNr(child) + 1);
+				}
+				TreeItem<String> branch = new TreeItem<String>(branchLabel);
+				fxParent.getChildren().add(branch);
+				
+				addPNodeToFXNode(child, branch);
+			}
+		}
 	}
 	
     /**
