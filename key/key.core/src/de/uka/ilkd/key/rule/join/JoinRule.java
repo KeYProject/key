@@ -458,10 +458,10 @@ public class JoinRule implements BuiltInRule {
         // join techniques, in particular predicate abstraction, to make
         // references to the values of other variables involved in the join.
         return new Pair<SymbolicExecutionState, LinkedHashSet<Name>>(
-                new SymbolicExecutionState(newSymbolicState, tb.and(
-                        newPathCondition,
-                        newAdditionalConstraints == null ? newSymbolicState
-                                : tb.apply(newSymbolicState,
+                new SymbolicExecutionState(newSymbolicState,
+                        newAdditionalConstraints == null ? newPathCondition
+                                : tb.and(newPathCondition, tb.apply(
+                                        newSymbolicState,
                                         newAdditionalConstraints))), newNames);
 
     }
