@@ -460,8 +460,9 @@ public class JoinRule implements BuiltInRule {
         return new Pair<SymbolicExecutionState, LinkedHashSet<Name>>(
                 new SymbolicExecutionState(newSymbolicState, tb.and(
                         newPathCondition,
-                        tb.apply(newSymbolicState, newAdditionalConstraints))),
-                newNames);
+                        newAdditionalConstraints == null ? newSymbolicState
+                                : tb.apply(newSymbolicState,
+                                        newAdditionalConstraints))), newNames);
 
     }
 
