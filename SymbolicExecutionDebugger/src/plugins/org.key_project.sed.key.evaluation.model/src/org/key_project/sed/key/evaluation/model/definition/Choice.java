@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 public class Choice {
    private final String text;
@@ -95,5 +97,14 @@ public class Choice {
    
    public int countChildQuestions() {
       return childQuestions.size();
+   }
+
+   public AbstractQuestion getChildQuestion(final String name) {
+      return CollectionUtil.search(childQuestions, new IFilter<AbstractQuestion>() {
+         @Override
+         public boolean select(AbstractQuestion element) {
+            return ObjectUtil.equals(element.getName(), name);
+         }
+      });
    }
 }

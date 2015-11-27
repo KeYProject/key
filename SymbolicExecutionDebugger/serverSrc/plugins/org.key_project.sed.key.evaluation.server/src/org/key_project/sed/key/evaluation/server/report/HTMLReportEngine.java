@@ -20,6 +20,7 @@ import org.key_project.sed.key.evaluation.server.report.html.HTMLUnderstandingPr
 import org.key_project.sed.key.evaluation.server.report.html.IHTMLSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeKnowledgeExport;
 import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeSummaryExport;
+import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeHelpfulnessExport;
 import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsKnowledgeExport;
 import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsSummaryExport;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
@@ -94,6 +95,7 @@ public class HTMLReportEngine extends AbstractReportEngine {
       else if (evaluation instanceof ReviewingCodeEvaluation) {
          result.add(new ReviewingCodeKnowledgeExport());
          result.add(new ReviewingCodeSummaryExport());
+         result.add(new ReviewingCodeHelpfulnessExport());
       }
       result.add(new HTMLAnswersSectionAppender());
       return result;

@@ -219,6 +219,121 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
     * The name of the feedback section.
     */
    public static final String FEEDBACK_SECTION = "feedback";
+
+   /**
+    * The name of the question checking if the SED was considered.
+    */
+   public static final String SET_CONSIDERED_QUESTION = "setConsidered";
+
+   /**
+    * The value of the {@link #SET_CONSIDERED_QUESTION} representing choice very helpful.
+    */
+   public static final String SET_CONSIDERED_VERY_HELPFUL_VALUE = "YesVeryHelpful";
+
+   /**
+    * The value of the {@link #SET_CONSIDERED_QUESTION} representing choice helpful.
+    */
+   public static final String SET_CONSIDERED_HELPFUL_VALUE = "YesHelpful";
+
+   /**
+    * The value of the {@link #SET_CONSIDERED_QUESTION} representing choice little helpful.
+    */
+   public static final String SET_CONSIDERED_LITTLE_HELPFUL_VALUE = "YesLittleHelpful";
+
+   /**
+    * The value of the {@link #SET_CONSIDERED_QUESTION} representing choice not helpful.
+    */
+   public static final String SET_CONSIDERED_NOT_HELPFUL_VALUE = "NoNotHelpful";
+
+   /**
+    * The value of the {@link #SET_CONSIDERED_QUESTION} representing choice not considered.
+    */
+   public static final String SET_CONSIDERED_NOT_CONSIDERED_VALUE = "NotConsidered";
+
+   /**
+    * The name of the question checking if code was executed.
+    */
+   public static final String CODE_EXECUTED_QUESTION = "codeExecuted";
+
+   /**
+    * The value of the {@link #CODE_EXECUTED_QUESTION} representing choice No.
+    */
+   public static final String EXECUTED_NO_VALUE = "No";
+
+   /**
+    * The value of the {@link #CODE_EXECUTED_QUESTION} representing choice Yes.
+    */
+   public static final String EXECUTED_YES_VALUE = "Yes";
+
+   /**
+    * The name of the question checking if code execution was helpful.
+    */
+   public static final String EXECUTED_HELPFUL_QUESTION = "executionHelpful";
+
+   /**
+    * The value of the {@link #CODE_EXECUTED_QUESTION} representing choice very helpful.
+    */
+   public static final String EXECUTED_VERY_HELPFUL_VALUE = "YesVeryHelpful";
+
+   /**
+    * The value of the {@link #CODE_EXECUTED_QUESTION} representing choice helpful.
+    */
+   public static final String EXECUTED_HELPFUL_VALUE = "YesHelpful";
+
+   /**
+    * The value of the {@link #CODE_EXECUTED_QUESTION} representing choice little helpful.
+    */
+   public static final String EXECUTED_LITTLE_HELPFUL_VALUE = "YesLittleHelpful";
+
+   /**
+    * The value of the {@link #CODE_EXECUTED_QUESTION} representing choice not helpful.
+    */
+   public static final String EXECUTED_NOT_HELPFUL_VALUE = "NoNotHelpful";
+
+   /**
+    * The name of the methods tab question of {@link #EXAMPLE_1_PAGE_NAME}.
+    */
+   public static final String EXAMPLE_1_METHODS_QUESTION = "methods";
+
+   /**
+    * The name of the ObservableArray tab in {@link #EXAMPLE_1_METHODS_QUESTION}
+    */
+   public static final String OBSERVABLE_ARRAY_TAB_NAME = "ObservableArray";
+
+   /**
+    * The name of the set tab in {@link #EXAMPLE_1_METHODS_QUESTION}
+    */
+   public static final String SET_TAB_NAME = "set";
+
+   /**
+    * The name of the setArrayListeners tab in {@link #EXAMPLE_1_METHODS_QUESTION}
+    */
+   public static final String SET_AL_TAB_NAME = "setArrayListeners";
+
+   /**
+    * The name of the methods tab question of {@link #EXAMPLE_6_PAGE_NAME}.
+    */
+   public static final String EXAMPLE_6_METHODS_QUESTION = "methods";
+
+   /**
+    * The name of the Stack(int) tab in {@link #EXAMPLE_6_METHODS_QUESTION}
+    */
+   public static final String STACK_INT_TAB_NAME = "Stack_int";
+
+   /**
+    * The name of the Stack(Stack) tab in {@link #EXAMPLE_6_METHODS_QUESTION}
+    */
+   public static final String STACK_STACK_TAB_NAME = "Stack_Stack";
+
+   /**
+    * The name of the push(Object) tab in {@link #EXAMPLE_6_METHODS_QUESTION}
+    */
+   public static final String PUSH_TAB_NAME = "push(Object)";
+
+   /**
+    * The name of the pop() tab in {@link #EXAMPLE_6_METHODS_QUESTION}
+    */
+   public static final String POP_TAB_NAME = "pop()";
    
    /**
     * Forbid additional instances.
@@ -906,7 +1021,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    
    private QuestionPage createObservableArrayQuestionPage(String pageName, String title) {
-      TabbedQuestion tabbedQuestion = new TabbedQuestion("methods", 
+      TabbedQuestion tabbedQuestion = new TabbedQuestion(EXAMPLE_1_METHODS_QUESTION, 
                                                          createObservableArrayArrayTab(),
                                                          createSetTab(),
                                                          createSetArrayListenersTab());
@@ -978,7 +1093,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 35: throw new IllegalArgumentException(\"Array is null.\")", "Line 31", "Line 31", null, true),
                                                                new Choice("Line 37: this.array = array", "Line 33", "Line 33", null, true),
                                                                new Choice("Line 38: this.arrayListeners = null", "Line 34", "Line 34", null, true));
-      return new TabQuestion("ObservableArray", 
+      return new TabQuestion(OBSERVABLE_ARRAY_TAB_NAME, 
                              method, 
                              false, 
                              implementedAsDocumented,
@@ -1038,7 +1153,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 66: i++", "Line 62 increment", "Line 66: increment", null, true),
                                                                new Choice("Line 67: if (arrayListeners[i] != null)", "Line 67", "Line 63", null, true),
                                                                new Choice("Line 68: arrayListeners[i].elementChanged(e)", "Line 68", "Line 64", null, true));
-      return new TabQuestion("set", 
+      return new TabQuestion(SET_TAB_NAME, 
                              method, 
                              false, 
                              implementedAsDocumented,
@@ -1089,7 +1204,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                true,
                                                                new Choice("None of the statements can be executed", "None"),
                                                                new Choice("Line 79: this.arrayListeners = arrayListeners", "Line 79", "Line 75", null, true));
-      return new TabQuestion("setArrayListeners", 
+      return new TabQuestion(SET_AL_TAB_NAME, 
                              method, 
                              false, 
                              implementedAsDocumented,
@@ -1191,7 +1306,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
 
    private QuestionPage createStackQuestionPage(String pageName, String title) {
-      TabbedQuestion tabbedQuestion = new TabbedQuestion("methods", 
+      TabbedQuestion tabbedQuestion = new TabbedQuestion(EXAMPLE_6_METHODS_QUESTION, 
                                                          createStackIntTab(),
                                                          createStackStackTab(),
                                                          createPushTab(),
@@ -1260,7 +1375,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("None of the statements can be executed", "None"),
                                                                new Choice("Line 33: elements = new Object[maximalSize]", "Line 33", "Line 33", null, true),
                                                                new Choice("Line 34: size = 0", "Line 34", "Line 34", null, true));
-      return new TabQuestion("Stack_int", 
+      return new TabQuestion(STACK_INT_TAB_NAME, 
                              method, 
                              false, 
                              implementedAsDocumented,
@@ -1314,7 +1429,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("None of the statements can be executed", "None"),
                                                                new Choice("Line 44: this.elements = existingStack.elements", "Line 44", "Line 43", null, true),
                                                                new Choice("Line 45: this.size = existingStack.size", "Line 45", "Line 44", null, true));
-      return new TabQuestion("Stack_Stack", 
+      return new TabQuestion(STACK_STACK_TAB_NAME, 
                              method, 
                              false, 
                              implementedAsDocumented,
@@ -1373,7 +1488,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 54: if (size < elements.length)", "Line 54", "Line 53", null, true),
                                                                new Choice("Line 55: elements[size++] = e", "Line 55", "Line 54", null, true),
                                                                new Choice("Line 58: throw new IllegalStateException(\"Stack is full.\")", "Line 58", "Line 57", null, true));
-      return new TabQuestion("push(Object)", 
+      return new TabQuestion(PUSH_TAB_NAME, 
                              method, 
                              false, 
                              implementedAsDocumented,
@@ -1445,7 +1560,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                new Choice("Line 68: if (size >= 1)", "Line 68", "Line 67", null, true),
                                                                new Choice("Line 69: return elements[--size]", "Line 69", "Line 68", null, true),
                                                                new Choice("Line 72: throw new IllegalStateException(\"Stack is empty.\")", "Line 72", "Line 71", null, true));
-      return new TabQuestion("pop()", 
+      return new TabQuestion(POP_TAB_NAME, 
                              method, 
                              false, 
                              implementedAsDocumented,
@@ -1459,7 +1574,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
    
    private RadioButtonsQuestion createSEDUsedQuestion() {
       String title = "Does the symbolic execution tree help to answer the questions?";
-      return new RadioButtonsQuestion("setConsidered", 
+      return new RadioButtonsQuestion(SET_CONSIDERED_QUESTION, 
                                       title, 
                                       (String) null,
                                       true, 
@@ -1467,16 +1582,16 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                       createNotUndefinedValueValidator(title), 
                                       false,
                                       new Tool[] {getTool(SED_TOOL_NAME)},
-                                      new Choice("Yes, Very helpful", "YesVeryHelpful"), 
-                                      new Choice("Yes, Helpful", "YesHelpful"), 
-                                      new Choice("Yes, Little helpful", "YesLittleHelpful"), 
-                                      new Choice("No, Not helpful", "NoNotHelpful"),
-                                      new Choice("Not considered", "NotConsidered"));
+                                      new Choice("Yes, Very helpful", SET_CONSIDERED_VERY_HELPFUL_VALUE), 
+                                      new Choice("Yes, Helpful", SET_CONSIDERED_HELPFUL_VALUE), 
+                                      new Choice("Yes, Little helpful", SET_CONSIDERED_LITTLE_HELPFUL_VALUE), 
+                                      new Choice("No, Not helpful", SET_CONSIDERED_NOT_HELPFUL_VALUE),
+                                      new Choice("Not considered", SET_CONSIDERED_NOT_CONSIDERED_VALUE));
    }
    
    private RadioButtonsQuestion createCodeExecutedQuestion() {
       String helpfulTitle = "Does executing/debugging the source code help to answer the questions?";
-      RadioButtonsQuestion helpfulQuestion = new RadioButtonsQuestion("executionHelpful", 
+      RadioButtonsQuestion helpfulQuestion = new RadioButtonsQuestion(EXECUTED_HELPFUL_QUESTION, 
                                                                       helpfulTitle, 
                                                                       (String) null,
                                                                       true, 
@@ -1484,10 +1599,10 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                       createNotUndefinedValueValidator(helpfulTitle), 
                                                                       false,
                                                                       new Tool[] {getTool(NO_TOOL_NAME)},
-                                                                      new Choice("Yes, Very helpful", "YesVeryHelpful"), 
-                                                                      new Choice("Yes, Helpful", "YesHelpful"), 
-                                                                      new Choice("Yes, Little helpful", "YesLittleHelpful"), 
-                                                                      new Choice("No, Not helpful", "NoNotHelpful"));
+                                                                      new Choice("Yes, Very helpful", EXECUTED_VERY_HELPFUL_VALUE), 
+                                                                      new Choice("Yes, Helpful", EXECUTED_HELPFUL_VALUE), 
+                                                                      new Choice("Yes, Little helpful", EXECUTED_LITTLE_HELPFUL_VALUE), 
+                                                                      new Choice("No, Not helpful", EXECUTED_NOT_HELPFUL_VALUE));
       String writtenCodetitle = "Which code has been written?";
       TextQuestion writtenCodeQuestion = new TextQuestion("writtenCode", 
                                                           writtenCodetitle, 
@@ -1499,7 +1614,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                           400, 
                                                           200);
       String title = "Have you executed/debugged the source code to answer the questions?";
-      return new RadioButtonsQuestion("codeExecuted", 
+      return new RadioButtonsQuestion(CODE_EXECUTED_QUESTION, 
                                       title, 
                                       (String) null,
                                       true, 
@@ -1507,8 +1622,8 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                       createNotUndefinedValueValidator(title), 
                                       false,
                                       new Tool[] {getTool(NO_TOOL_NAME)},
-                                      new Choice("Yes", "Yes", helpfulQuestion, writtenCodeQuestion), 
-                                      new Choice("No", "No"));
+                                      new Choice("Yes", EXECUTED_YES_VALUE, helpfulQuestion, writtenCodeQuestion), 
+                                      new Choice("No", EXECUTED_NO_VALUE));
    }
 
    private Choice createElseRetrunedChoice(String description) {
