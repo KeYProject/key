@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.axiom_abstraction;
+package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.function.Function;
 
@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
@@ -133,10 +132,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
         final Sort fInputSort = placeholder.sort();
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
-            private final Name name = new Name("("
-                    + LogicPrinter.quickPrintTerm(predicate, services)
-                            .replace("\n", "") + ")[_/"
-                    + placeholder + "]");
+            private final Name name = new Name("abstrPred_"
+                    + predicate.op().toString());
             private Function<Term, Term> mapping = null;
 
             @Override

@@ -15,7 +15,7 @@ package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.gui.joinrule.JoinProcedureCompletion;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;

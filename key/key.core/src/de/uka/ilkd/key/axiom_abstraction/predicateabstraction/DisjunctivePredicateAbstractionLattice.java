@@ -22,7 +22,6 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**

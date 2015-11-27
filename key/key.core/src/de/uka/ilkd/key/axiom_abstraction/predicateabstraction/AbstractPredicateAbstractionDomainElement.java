@@ -17,7 +17,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -94,13 +93,12 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
         StringBuilder result = new StringBuilder();
         int i = 1;
         for (AbstractionPredicate pred : predicates) {
-            result.append("(" + pred.name() + ")");
+            result.append(pred.name());
 
             if (i++ < predicates.size()) {
                 result.append(getPredicateNameCombinationString());
             }
         }
-        result.deleteCharAt(result.length() - 1);
 
         return new Name(result.toString());
     }

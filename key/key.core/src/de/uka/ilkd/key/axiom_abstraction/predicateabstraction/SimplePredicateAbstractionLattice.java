@@ -19,7 +19,6 @@ import java.util.Iterator;
 import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.axiom_abstraction.AbstractionPredicate;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists
