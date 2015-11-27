@@ -110,6 +110,11 @@ public class ConjunctivePredicateAbstractionLattice extends
                 && ((ConjunctivePredicateAbstractionLattice) obj).predicates
                         .equals(this.predicates);
     }
+    
+    @Override
+    public int hashCode() {
+        return 31 * 1 + predicates.hashCode();
+    }
 
     /*
      * (non-Javadoc)

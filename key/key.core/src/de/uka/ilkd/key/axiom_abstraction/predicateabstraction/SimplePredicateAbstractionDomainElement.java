@@ -87,4 +87,9 @@ public class SimplePredicateAbstractionDomainElement extends
                                 .getPredicates());
     }
 
+    @Override
+    public int hashCode() {
+        return 31 * 3 + getPredicates().hashCode();
+    }
+
 }

@@ -83,4 +83,9 @@ public class DisjunctivePredicateAbstractionDomainElement extends
                                 .getPredicates());
     }
 
+    @Override
+    public int hashCode() {
+        return 31 * 2 + getPredicates().hashCode();
+    }
+
 }

@@ -125,6 +125,11 @@ public class SimplePredicateAbstractionLattice extends
                 && ((SimplePredicateAbstractionLattice) obj).predicates
                         .equals(this.predicates);
     }
+    
+    @Override
+    public int hashCode() {
+        return 31 * 3 + predicates.hashCode();
+    }
 
     /*
      * (non-Javadoc)

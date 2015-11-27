@@ -108,6 +108,11 @@ public class DisjunctivePredicateAbstractionLattice extends
                 && ((DisjunctivePredicateAbstractionLattice) obj).predicates
                         .equals(this.predicates);
     }
+    
+    @Override
+    public int hashCode() {
+        return 31 * 2 + predicates.hashCode();
+    }
 
     /*
      * (non-Javadoc)
