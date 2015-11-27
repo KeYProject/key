@@ -682,12 +682,22 @@ public class JoinPartnerSelectionDialog extends JDialog {
         // Original sequent (without highlighted text) as fallback
         String newText = sequent;
 
+        // Escape HTML characters
+        newText = LogicPrinter.escapeHTML(newText, true);
+
         if (m.find()) {
             // Assemble new text
-            String before = sequent.substring(0, m.start() - 1);
+            String before =
+                    LogicPrinter.escapeHTML(
+                            sequent.substring(0, m.start() - 1), true);
             String main =
-                    "<b>" + sequent.substring(m.start(), m.end()) + "</b>";
-            String after = sequent.substring(m.end());
+                    "<b>"
+                            + LogicPrinter
+                                    .escapeHTML(
+                                            sequent.substring(m.start(),
+                                                    m.end()), true) + "</b>";
+            String after =
+                    LogicPrinter.escapeHTML(sequent.substring(m.end()), true);
 
             newText = before + main + after;
         }
