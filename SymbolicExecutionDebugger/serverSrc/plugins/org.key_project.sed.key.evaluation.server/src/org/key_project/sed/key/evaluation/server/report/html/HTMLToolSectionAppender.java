@@ -82,7 +82,7 @@ public class HTMLToolSectionAppender implements IHTMLSectionAppender {
             sb.append("<td rowspan=\"" + (2 + formSpan + formPagesSpan) + "\" valign=\"top\"><b>");
             sb.append(form.getName());
             sb.append("</b></td>");
-            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 8 * statistics.getFilters().size())) + "\">&nbsp;</td>");
+            sb.append("<td colspan=\"" + (2 + ((evaluation.getTools().length) * 8 * statistics.getFilters().length)) + "\">&nbsp;</td>");
             sb.append("</tr>");
             for (AbstractPage page : form.getPages()) {
                int pageSpan = questionCount.get(page);

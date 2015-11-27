@@ -35,6 +35,11 @@ import org.key_project.util.java.StringUtil;
  */
 public class ReviewingCodeHelpfulnessExport implements IHTMLSectionAppender {
    /**
+    * Indicates if filter specific files should be generated or not.
+    */
+   public static final boolean CREATE_FILTER_SPECIFIC_FILES = false;
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -109,33 +114,236 @@ public class ReviewingCodeHelpfulnessExport implements IHTMLSectionAppender {
             }
          }
       }
-      // Create latex files
+      // Create filter specific latex files
       List<AdditionalFile> additionalFiles = new LinkedList<AdditionalFile>();
-      for (IStatisticsFilter filter : statistics.getFilters()) {
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_OA_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example1oa, noToolStatistics.get(filter).example1oa).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_SET_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example1set, noToolStatistics.get(filter).example1set).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_SET_AL_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example1setAL, noToolStatistics.get(filter).example1setAL).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example2, noToolStatistics.get(filter).example2).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example3, noToolStatistics.get(filter).example3).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example4, noToolStatistics.get(filter).example4).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example5, noToolStatistics.get(filter).example5).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_Si_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example6Si, noToolStatistics.get(filter).example6Si).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_SS_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example6SS, noToolStatistics.get(filter).example6SS).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_push_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example6push, noToolStatistics.get(filter).example6push).getBytes(IOUtil.DEFAULT_CHARSET)));
-         additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_pop_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
-                             createLatex(sedStatistics.get(filter).example6pop, noToolStatistics.get(filter).example6pop).getBytes(IOUtil.DEFAULT_CHARSET)));
+      if (CREATE_FILTER_SPECIFIC_FILES) {
+         for (IStatisticsFilter filter : statistics.getFilters()) {
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_OA_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example1oa, noToolStatistics.get(filter).example1oa).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_SET_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example1set, noToolStatistics.get(filter).example1set).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_SET_AL_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example1setAL, noToolStatistics.get(filter).example1setAL).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example2, noToolStatistics.get(filter).example2).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example3, noToolStatistics.get(filter).example3).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example4, noToolStatistics.get(filter).example4).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example5, noToolStatistics.get(filter).example5).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_Si_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example6Si, noToolStatistics.get(filter).example6Si).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_SS_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example6SS, noToolStatistics.get(filter).example6SS).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_push_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example6push, noToolStatistics.get(filter).example6push).getBytes(IOUtil.DEFAULT_CHARSET)));
+            additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_pop_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex", 
+                                createLatex(sedStatistics.get(filter).example6pop, noToolStatistics.get(filter).example6pop).getBytes(IOUtil.DEFAULT_CHARSET)));
+         }
       }
+      // Create filter combined latex files
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_OA.tex", 
+                          createLatex(statistics.getFilters(), listExample1oa(sedStatistics), listExample1oa(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_set.tex", 
+                          createLatex(statistics.getFilters(), listExample1set(sedStatistics), listExample1set(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_setAL.tex", 
+                         createLatex(statistics.getFilters(), listExample1setAL(sedStatistics), listExample1setAL(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME + ".tex", 
+                          createLatex(statistics.getFilters(), listExample2(sedStatistics), listExample2(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME + ".tex", 
+                          createLatex(statistics.getFilters(), listExample3(sedStatistics), listExample3(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME + ".tex", 
+                          createLatex(statistics.getFilters(), listExample4(sedStatistics), listExample4(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME + ".tex", 
+                          createLatex(statistics.getFilters(), listExample5(sedStatistics), listExample5(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_Si.tex", 
+                          createLatex(statistics.getFilters(), listExample6Si(sedStatistics), listExample6Si(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_SS.tex", 
+                          createLatex(statistics.getFilters(), listExample6SS(sedStatistics), listExample6SS(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_push.tex", 
+                          createLatex(statistics.getFilters(), listExample6push(sedStatistics), listExample6push(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_pop.tex", 
+                          createLatex(statistics.getFilters(), listExample6pop(sedStatistics), listExample6pop(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
       return additionalFiles;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample1oa(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example1oa);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample1set(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example1set);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample1setAL(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example1setAL);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample2(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example2);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample3(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example3);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample4(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example4);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample5(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example5);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample6Si(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example6Si);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample6SS(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example6SS);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample6push(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example6push);
+      }
+      return result;
+   }
+   
+   private Map<IStatisticsFilter, HelpfulnessStatistic> listExample6pop(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
+      Map<IStatisticsFilter, HelpfulnessStatistic> result = new HashMap<IStatisticsFilter, HelpfulnessStatistic>();
+      for (Entry<IStatisticsFilter, HelpfulnessToolStatistic> entry : toolStatistics.entrySet()) {
+         result.put(entry.getKey(), entry.getValue().example6pop);
+      }
+      return result;
+   }
+   
+   protected String createLatex(IStatisticsFilter[] filters, Map<IStatisticsFilter, HelpfulnessStatistic> sedMap, Map<IStatisticsFilter, HelpfulnessStatistic> noToolMap) {
+      StringBuffer latex = new StringBuffer();
+      // Header
+      latex.append("\\begin{tabular}{l");
+      for (int i = 0; i < filters.length; i++) {
+         latex.append("rr");
+      }
+      latex.append("}" + StringUtil.NEW_LINE);
+      latex.append("\\toprule" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : filters) {
+         BigInteger noMax = noToolMap.get(filter).computeMax();
+         BigInteger sedMax = sedMap.get(filter).computeMax();
+         latex.append(" & \\multicolumn{2}{c}{" + filter.getLatexName() + "~(" + noMax.add(sedMax) + ")}");
+      }
+      latex.append(" \\\\" + StringUtil.NEW_LINE);
+      for (IStatisticsFilter filter : filters) {
+         BigInteger noMax = noToolMap.get(filter).computeMax();
+         BigInteger sedMax = sedMap.get(filter).computeMax();
+         latex.append(" & \\rotatebox{90}{DCR~(" + noMax + ")}");
+         latex.append(" & \\rotatebox{90}{\\SED~(" + sedMax + ")}");
+      }
+      latex.append(" \\\\" + StringUtil.NEW_LINE);
+      latex.append("\\midrule" + StringUtil.NEW_LINE);
+      // Very
+      latex.append("Yes, Very helpful");
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeVeryPercentage(0);
+         latex.append(" & " + (noToolPercentage != null ? noToolPercentage + "~\\%" : ""));
+         BigDecimal sedPercentage = sedMap.get(filter).computeVeryPercentage(0);
+         latex.append(" & " + (sedPercentage != null ? sedPercentage + "~\\%" : ""));
+      }
+      latex.append(" \\\\" + StringUtil.NEW_LINE);
+      // Helpful
+      latex.append("Yes, Helpful");
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeHelpfulPercentage(0);
+         latex.append(" & " + (noToolPercentage != null ? noToolPercentage + "~\\%" : ""));
+         BigDecimal sedPercentage = sedMap.get(filter).computeHelpfulPercentage(0);
+         latex.append(" & " + (sedPercentage != null ? sedPercentage + "~\\%" : ""));
+      }
+      latex.append(" \\\\" + StringUtil.NEW_LINE);
+      // Little
+      latex.append("Yes, Little helpful");
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeLittlePercentage(0);
+         latex.append(" & " + (noToolPercentage != null ? noToolPercentage + "~\\%" : ""));
+         BigDecimal sedPercentage = sedMap.get(filter).computeLittlePercentage(0);
+         latex.append(" & " + (sedPercentage != null ? sedPercentage + "~\\%" : ""));
+      }
+      latex.append(" \\\\" + StringUtil.NEW_LINE);
+      // Not Helpful
+      latex.append("No, Not helpful");
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeNotHeplfulPercentage(0);
+         latex.append(" & " + (noToolPercentage != null ? noToolPercentage + "~\\%" : ""));
+         BigDecimal sedPercentage = sedMap.get(filter).computeNotHeplfulPercentage(0);
+         latex.append(" & " + (sedPercentage != null ? sedPercentage + "~\\%" : ""));
+      }
+      latex.append(" \\\\" + StringUtil.NEW_LINE);
+      // Not considered
+      latex.append("Not considered");
+      for (IStatisticsFilter filter : filters) {
+         BigDecimal noToolPercentage = noToolMap.get(filter).computeNotConsideredPercentage(0);
+         latex.append(" & " + (noToolPercentage != null ? noToolPercentage + "~\\%" : ""));
+         BigDecimal sedPercentage = sedMap.get(filter).computeNotConsideredPercentage(0);
+         latex.append(" & " + (sedPercentage != null ? sedPercentage + "~\\%" : ""));
+      }
+      latex.append(" \\\\" + StringUtil.NEW_LINE);
+      // Footer
+      latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+      latex.append("\\end{tabular}" + StringUtil.NEW_LINE);
+      return latex.toString();
+   }
+   
+   protected String createLatex(HelpfulnessStatistic sed, HelpfulnessStatistic noTool) {
+      StringBuffer latex = new StringBuffer();
+      latex.append("\\begin{tabular}{lrr}" + StringUtil.NEW_LINE);
+      latex.append("\\toprule" + StringUtil.NEW_LINE);
+      latex.append("& \\SED (\\%) & DCR (\\%) \\\\" + StringUtil.NEW_LINE);
+      latex.append("\\midrule" + StringUtil.NEW_LINE);
+      latex.append("Yes, Very helpful & " + sed.computeVeryPercentage(0) + " & " + noTool.computeVeryPercentage(0) + " \\\\" + StringUtil.NEW_LINE);
+      latex.append("Yes, Helpful & " + sed.computeHelpfulPercentage(0) + " & " + noTool.computeHelpfulPercentage(0) + " \\\\" + StringUtil.NEW_LINE);
+      latex.append("Yes, Little helpful & " + sed.computeLittlePercentage(0) + " & " + noTool.computeLittlePercentage(0) + " \\\\" + StringUtil.NEW_LINE);
+      latex.append("No, Not helpful & " + sed.computeNotHeplfulPercentage(0) + " & " + noTool.computeNotHeplfulPercentage(0) + " \\\\" + StringUtil.NEW_LINE);
+      latex.append("Not considered & " + sed.computeNotConsideredPercentage(0) + " & " + noTool.computeNotConsideredPercentage(0) + " \\\\" + StringUtil.NEW_LINE);
+      latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+      latex.append("\\end{tabular}" + StringUtil.NEW_LINE);
+      return latex.toString();
    }
    
    protected void updateStatistics(Entry<String, EvaluationAnswers> entry, 
@@ -228,22 +436,6 @@ public class ReviewingCodeHelpfulnessExport implements IHTMLSectionAppender {
             throw new IllegalStateException("Reviewing Code Evaluation has changed.");
          }
       }
-   }
-   
-   protected String createLatex(HelpfulnessStatistic sed, HelpfulnessStatistic noTool) {
-      StringBuffer latex = new StringBuffer();
-      latex.append("\\begin{tabular}{lrr}" + StringUtil.NEW_LINE);
-      latex.append("\\toprule" + StringUtil.NEW_LINE);
-      latex.append("& \\SED & DCR \\\\" + StringUtil.NEW_LINE);
-      latex.append("\\midrule" + StringUtil.NEW_LINE);
-      latex.append("Yes, Very helpful & " + sed.computeVeryPercentage(0) + " & " + noTool.computeVeryPercentage(0) + " \\\\" + StringUtil.NEW_LINE);
-      latex.append("Yes, Helpful & " + sed.computeHelpfulPercentage(0) + " & " + noTool.computeHelpfulPercentage(0) + " \\\\" + StringUtil.NEW_LINE);
-      latex.append("Yes, Little helpful & " + sed.computeLittlePercentage(0) + " & " + noTool.computeLittlePercentage(0) + " \\\\" + StringUtil.NEW_LINE);
-      latex.append("No, Not helpful & " + sed.computeNotHeplfulPercentage(0) + " & " + noTool.computeNotHeplfulPercentage(0) + " \\\\" + StringUtil.NEW_LINE);
-      latex.append("Not considered & " + sed.computeNotConsideredPercentage(0) + " & " + noTool.computeNotConsideredPercentage(0) + " \\\\" + StringUtil.NEW_LINE);
-      latex.append("\\bottomrule" + StringUtil.NEW_LINE);
-      latex.append("\\end{tabular}" + StringUtil.NEW_LINE);
-      return latex.toString();
    }
    
    private static class HelpfulnessToolStatistic {
