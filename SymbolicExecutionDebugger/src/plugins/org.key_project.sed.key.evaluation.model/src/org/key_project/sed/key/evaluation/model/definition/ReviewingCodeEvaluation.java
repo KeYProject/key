@@ -334,6 +334,11 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
     * The name of the pop() tab in {@link #EXAMPLE_6_METHODS_QUESTION}
     */
    public static final String POP_TAB_NAME = "pop()";
+
+   /**
+    * The name of the written code question.
+    */
+   public static final String WRITTEN_CODE_QUESTION = "writtenCode";
    
    /**
     * Forbid additional instances.
@@ -1604,7 +1609,7 @@ public class ReviewingCodeEvaluation extends AbstractEvaluation {
                                                                       new Choice("Yes, Little helpful", EXECUTED_LITTLE_HELPFUL_VALUE), 
                                                                       new Choice("No, Not helpful", EXECUTED_NOT_HELPFUL_VALUE));
       String writtenCodetitle = "Which code has been written?";
-      TextQuestion writtenCodeQuestion = new TextQuestion("writtenCode", 
+      TextQuestion writtenCodeQuestion = new TextQuestion(WRITTEN_CODE_QUESTION, 
                                                           writtenCodetitle, 
                                                           "(Only final code version if still available.)", 
                                                           null, 

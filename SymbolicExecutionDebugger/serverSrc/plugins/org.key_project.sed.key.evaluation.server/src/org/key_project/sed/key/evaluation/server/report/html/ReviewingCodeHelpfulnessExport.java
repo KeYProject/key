@@ -165,7 +165,88 @@ public class ReviewingCodeHelpfulnessExport implements IHTMLSectionAppender {
                           createLatex(statistics.getFilters(), listExample6push(sedStatistics), listExample6push(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
       additionalFiles.add(new AdditionalFile("_Helpfulness_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_pop.tex", 
                           createLatex(statistics.getFilters(), listExample6pop(sedStatistics), listExample6pop(noToolStatistics)).getBytes(IOUtil.DEFAULT_CHARSET)));
+      // Create code files
+      for (IStatisticsFilter filter : statistics.getFilters()) {
+         addWrittenCodeFile(noToolStatistics.get(filter).example1oa, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_OA", 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_OA_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example1set, 
+                           additionalFiles, 
+                           "rc" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_set", 
+                           "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_set_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example1setAL, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_setAL", 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_1_PAGE_NAME + "_setAL_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example2, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME, 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_2_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example3, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME, 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_3_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example4, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME, 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_4_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example5, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME, 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_5_PAGE_NAME + "_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example6Si, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_Si", 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_Si_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example6SS, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_SS", 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_SS_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example6push, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_push", 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_push_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+         addWrittenCodeFile(noToolStatistics.get(filter).example6pop, 
+                            additionalFiles, 
+                            "rc" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_pop", 
+                            "_WrittenCode_" + ReviewingCodeEvaluation.EXAMPLE_6_PAGE_NAME + "_pop_" + IOUtil.validateOSIndependentFileName(filter.getName()) + ".tex");
+      }
       return additionalFiles;
+   }
+   
+   protected void addWrittenCodeFile(HelpfulnessStatistic statistic, List<AdditionalFile> additionalFiles, String idPrefix, String fileName) {
+      if (!statistic.code.isEmpty()) {
+         additionalFiles.add(new AdditionalFile(fileName, 
+                                                createValueLatex(statistic.code, idPrefix).getBytes(IOUtil.DEFAULT_CHARSET)));
+         
+      }
+   }
+   
+   protected String createValueLatex(List<String> values, String idPrefix) {
+      StringBuffer latex = new StringBuffer();
+      latex.append("\\newcounter{" + idPrefix + "FeedbackRowcount}" + StringUtil.NEW_LINE);
+      latex.append("\\setcounter{" + idPrefix + "FeedbackRowcount}{0}" + StringUtil.NEW_LINE);
+      latex.append("\\newcommand{\\" + idPrefix + "FeedbackRowcountautorefname}{ID}" + StringUtil.NEW_LINE);
+      latex.append("\\begin{tabularx}{1.0\\textwidth}{lX}" + StringUtil.NEW_LINE);
+      latex.append("\\toprule" + StringUtil.NEW_LINE);
+      latex.append("ID & Feedback\\\\" + StringUtil.NEW_LINE);
+      latex.append("\\midrule" + StringUtil.NEW_LINE);
+      boolean afterFirst = false;
+      int i = 1;
+      for (String value : values) {
+         if (afterFirst) {
+            latex.append("\\midrule" + StringUtil.NEW_LINE);
+         }
+         else {
+            afterFirst = true;
+         }
+         latex.append(i + "\\refstepcounter{" + idPrefix + "FeedbackRowcount} & ``" + value + "''\\\\" + StringUtil.NEW_LINE);
+         i++;
+      }
+      latex.append("\\bottomrule" + StringUtil.NEW_LINE);
+      latex.append("\\end{tabularx}" + StringUtil.NEW_LINE);
+      return latex.toString();
    }
    
    private Map<IStatisticsFilter, HelpfulnessStatistic> listExample1oa(Map<IStatisticsFilter, HelpfulnessToolStatistic> toolStatistics) {
@@ -417,6 +498,15 @@ public class ReviewingCodeHelpfulnessExport implements IHTMLSectionAppender {
                   else {
                      throw new IllegalStateException("Reviewing Code Evaluation has changed, value '" + helpfulInput.getValue() + "' of '" + entry.getKey() + "' is unknown.");
                   }
+                  QuestionInput codeInput = choiceInputs[1];
+                  if (ReviewingCodeEvaluation.WRITTEN_CODE_QUESTION.equals(codeInput.getQuestion().getName())) {
+                     if (!StringUtil.isTrimmedEmpty(codeInput.getValue())) {
+                        noToolStatistics.code.add(codeInput.getValue());
+                     }
+                  }
+                  else {
+                     throw new IllegalStateException("Reviewing Code Evaluation has changed, value '" + helpfulInput.getValue() + "' of '" + entry.getKey() + "' is unknown.");
+                  }
                }
                else if (ReviewingCodeEvaluation.EXECUTED_NO_VALUE.equals(qi.getValue())) {
                   noToolStatistics.increaseNotConsidered();
@@ -458,6 +548,7 @@ public class ReviewingCodeHelpfulnessExport implements IHTMLSectionAppender {
       private BigInteger little = BigInteger.ZERO;
       private BigInteger notHelpful = BigInteger.ZERO;
       private BigInteger notConsidered = BigInteger.ZERO;
+      private List<String> code = new LinkedList<String>();
       
       public void increaseVery() {
          very = very.add(BigInteger.ONE);
