@@ -4,12 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane HBox.hgrow="always" VBox.vgrow="always" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-	<children>
-		<TextArea minHeight="0" minWidth="0" AnchorPane.bottomAnchor="0.0"
-			AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-			AnchorPane.topAnchor="0.0"
-			text="Hier koennten Goals angezeigt werden. Ziel 1, Ziel 2">
-		</TextArea>
-	</children>
-</AnchorPane>
+<TextArea xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" minHeight="0" minWidth="0"
+	AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+	AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+	text="Hier koennten Goals angezeigt werden. Ziel 1, Ziel 2">
+</TextArea>

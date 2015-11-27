@@ -22,6 +22,148 @@
 				<Menu mnemonicParsing="false" text="Edit">
 				</Menu>
 				<Menu mnemonicParsing="false" text="View">
+					<items>
+						<Menu fx:id="setViews" text="%configViews">
+							<items>
+								<MenuItem text="%proofView">
+									<graphic>
+										<MenuButton fx:id="ButtonProofView"
+											mnemonicParsing="false" text="%hide">
+											<items>
+												<MenuItem fx:id="hide" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%hide">
+													<properties componentName="proofView"
+														componentResource="proofView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toLeft" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%left">
+													<properties componentName="proofView"
+														componentResource="proofView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toMiddle" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%middle">
+													<properties componentName="proofView"
+														componentResource="proofView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toRight" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%right">
+													<properties componentName="proofView"
+														componentResource="proofView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toDown" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%down">
+													<properties componentName="proofView"
+														componentResource="proofView.fxml" />
+												</MenuItem>
+											</items>
+										</MenuButton>
+									</graphic>
+								</MenuItem>
+								<MenuItem text="%openProofsView">
+									<graphic>
+										<MenuButton fx:id="ButtonOpenProofsView"
+											mnemonicParsing="false" text="%hide">
+											<items>
+												<MenuItem fx:id="hide" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%hide">
+													<properties componentName="openProofsView"
+														componentResource="openProofsView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toLeft" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%left">
+													<properties componentName="openProofsView"
+														componentResource="openProofsView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toMiddle" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%middle">
+													<properties componentName="openProofsView"
+														componentResource="openProofsView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toRight" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%right">
+													<properties componentName="openProofsView"
+														componentResource="openProofsView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toDown" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%down">
+													<properties componentName="openProofsView"
+														componentResource="openProofsView.fxml" />
+												</MenuItem>
+											</items>
+										</MenuButton>
+									</graphic>
+								</MenuItem>
+								<MenuItem text="%goalView">
+									<graphic>
+										<MenuButton fx:id="ButtonGoalView" mnemonicParsing="false"
+											text="%hide">
+											<items>
+												<MenuItem fx:id="hide" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%hide">
+													<properties componentName="goalView"
+														componentResource="goalView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toLeft" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%left">
+													<properties componentName="goalView"
+														componentResource="goalView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toMiddle" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%middle">
+													<properties componentName="goalView"
+														componentResource="goalView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toRight" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%right">
+													<properties componentName="goalView"
+														componentResource="goalView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toDown" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%down">
+													<properties componentName="goalView"
+														componentResource="goalView.fxml" />
+												</MenuItem>
+											</items>
+										</MenuButton>
+									</graphic>
+								</MenuItem>
+								<MenuItem text="%treeView">
+									<graphic>
+										<MenuButton fx:id="ButtonTreeView" mnemonicParsing="false"
+											text="%hide">
+											<items>
+												<MenuItem fx:id="hide" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%hide">
+													<properties componentName="treeView"
+														componentResource="treeView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toLeft" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%left">
+													<properties componentName="treeView"
+														componentResource="treeView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toMiddle" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%middle">
+													<properties componentName="treeView"
+														componentResource="treeView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toRight" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%right">
+													<properties componentName="treeView"
+														componentResource="treeView.fxml" />
+												</MenuItem>
+												<MenuItem fx:id="toDown" mnemonicParsing="false"
+													onAction="#handleLoadComponent" text="%down">
+													<properties componentName="treeView"
+														componentResource="treeView.fxml" />
+												</MenuItem>
+											</items>
+										</MenuButton>
+									</graphic>
+								</MenuItem>
+							</items>
+						</Menu>
+					</items>
 				</Menu>
 				<Menu mnemonicParsing="false" text="%about">
 					<items>
@@ -70,148 +212,6 @@
 							</items>
 							<contextMenu>
 								<ContextMenu>
-									<items>
-										<Menu fx:id="setViews" text="%configViews">
-											<items>
-												<MenuItem text="%proofView">
-													<graphic>
-														<MenuButton fx:id="ButtonProofView"
-															mnemonicParsing="false" text="%hide">
-															<items>
-																<MenuItem fx:id="hide" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%hide">
-																	<properties componentName="proofView"
-																		componentResource="proofView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toLeft" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%left">
-																	<properties componentName="proofView"
-																		componentResource="proofView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toMiddle" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%middle">
-																	<properties componentName="proofView"
-																		componentResource="proofView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toRight" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%right">
-																	<properties componentName="proofView"
-																		componentResource="proofView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toDown" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%down">
-																	<properties componentName="proofView"
-																		componentResource="proofView.fxml" />
-																</MenuItem>
-															</items>
-														</MenuButton>
-													</graphic>
-												</MenuItem>
-												<MenuItem text="%openProofsView">
-													<graphic>
-														<MenuButton fx:id="ButtonOpenProofsView"
-															mnemonicParsing="false" text="%hide">
-															<items>
-																<MenuItem fx:id="hide" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%hide">
-																	<properties componentName="openProofsView"
-																		componentResource="openProofsView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toLeft" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%left">
-																	<properties componentName="openProofsView"
-																		componentResource="openProofsView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toMiddle" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%middle">
-																	<properties componentName="openProofsView"
-																		componentResource="openProofsView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toRight" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%right">
-																	<properties componentName="openProofsView"
-																		componentResource="openProofsView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toDown" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%down">
-																	<properties componentName="openProofsView"
-																		componentResource="openProofsView.fxml" />
-																</MenuItem>
-															</items>
-														</MenuButton>
-													</graphic>
-												</MenuItem>
-												<MenuItem text="%goalView">
-													<graphic>
-														<MenuButton fx:id="ButtonGoalView"
-															mnemonicParsing="false" text="%hide">
-															<items>
-																<MenuItem fx:id="hide" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%hide">
-																	<properties componentName="goalView"
-																		componentResource="goalView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toLeft" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%left">
-																	<properties componentName="goalView"
-																		componentResource="goalView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toMiddle" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%middle">
-																	<properties componentName="goalView"
-																		componentResource="goalView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toRight" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%right">
-																	<properties componentName="goalView"
-																		componentResource="goalView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toDown" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%down">
-																	<properties componentName="goalView"
-																		componentResource="goalView.fxml" />
-																</MenuItem>
-															</items>
-														</MenuButton>
-													</graphic>
-												</MenuItem>
-												<MenuItem text="%treeView">
-													<graphic>
-														<MenuButton fx:id="ButtonTreeView"
-															mnemonicParsing="false" text="%hide">
-															<items>
-																<MenuItem fx:id="hide" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%hide">
-																	<properties componentName="treeView"
-																		componentResource="treeView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toLeft" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%left">
-																	<properties componentName="treeView"
-																		componentResource="treeView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toMiddle" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%middle">
-																	<properties componentName="treeView"
-																		componentResource="treeView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toRight" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%right">
-																	<properties componentName="treeView"
-																		componentResource="treeView.fxml" />
-																</MenuItem>
-																<MenuItem fx:id="toDown" mnemonicParsing="false"
-																	onAction="#handleLoadComponent" text="%down">
-																	<properties componentName="treeView"
-																		componentResource="treeView.fxml" />
-																</MenuItem>
-															</items>
-														</MenuButton>
-													</graphic>
-												</MenuItem>
-											</items>
-										</Menu>
-									</items>
 								</ContextMenu>
 							</contextMenu>
 						</SplitPane>
