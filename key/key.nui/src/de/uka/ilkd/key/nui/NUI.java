@@ -20,7 +20,7 @@ public class NUI extends Application {
         launch(args);
     }
 
-    @Override
+    @Override 
     public void start(Stage stage) throws Exception {
         // Set default language bundle
         ResourceBundle bundle = new PropertyResourceBundle(
@@ -28,9 +28,8 @@ public class NUI extends Application {
         // Load FXML from main window
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("NUIdefault.fxml"), bundle);
-
         Parent root = loader.load();
-
+        // Load scene and set preferences
         Scene scene = new Scene(root);
         stage.setTitle("KeY");
         stage.setScene(scene);

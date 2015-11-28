@@ -26,7 +26,7 @@
 	</condition>
 
 	<target name="start" depends="compile" description="Starts KeY.">
-		<java classname="de.uka.ilkd.key.core.Main"
+		<java classname="de.uka.ilkd.key.nui.NUI"
 		      classpathref="key.nui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea -Dtaclet.match=${taclet.match} -Dtacletindex.threading.enabled=${tacletindex.threading.enabled} " />
 	</target>
 
@@ -41,8 +41,8 @@
 		<javac srcdir= "${src.dir}" 
 		       destdir="${build.dir}" 
 		       includeantruntime="false" 
-		       source="1.7" 
-		       target="1.7"
+		       source="1.8" 
+		       target="1.8"
 		       deprecation="off" 
 		       debug="on" 
 		       depend="${build.depend}" 

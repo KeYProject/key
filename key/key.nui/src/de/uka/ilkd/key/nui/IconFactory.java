@@ -1,105 +1,98 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.nui;
 
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class IconFactory {
 
 	private IconFactory() {
 	}
+	
+	private static String folderRoot = "components/images/";
+	private static Image keyHole = getImage("ekey-mono.png");
+	private static Image keyHoleClosed = getImage("keyproved.png");
+	private static Image keyFolderBlue = getImage("folder-blue.png");
+	private static Image keyFolderGray = getImage("folder-gray.png");
 
-	private static Image keyHole = getImage("images/ekey-mono.gif");
-	private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-	private static Image keyHoleClosed = getImage("images/keyproved.gif");
-	private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-	private static Image keyHoleLinked = getImage("images/keylinked.gif");
-	private static Image keyLogo = getImage("images/key-color.gif");
-	private static Image keyLogo22 = getImage("images/key22.gif");
-	private static Image keyLogoSmall = getImage("images/key-color-icon-square.png");
-
-	private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
-
-	private static Image prune = getImage("images/toolbar/pruneProof.png");
-	private static Image goalBack = getImage("images/toolbar/goalBack.png");
-	private static Image autoModeStart = getImage("images/toolbar/autoModeStart.png");
-	private static Image autoModeStop = getImage("images/toolbar/autoModeStop.png");
-	private static Image decisionProcedureConfigArrow = getImage("images/toolbar/decProcArrow.png");
-
-	private static Image junit = getImage("images/toolbar/junit_logo.png");
-	private static Image jml = getImage("images/toolbar/jml.png");
-	private static Image uml = getImage("images/toolbar/uml.png");
-
-	private static Image openKeYFile = getImage("images/toolbar/open.png");
-	private static Image openMostRecentKeYFile = getImage("images/toolbar/openMostRecent.png");
-	private static Image saveFile = getImage("images/toolbar/saveFile.png");
-	private static Image editFile = getImage("images/toolbar/edit.png");
-	private static Image abandonProof = getImage("images/toolbar/abandon.png");
-	private static Image configure = getImage("images/toolbar/config.png");
-	private static Image help = getImage("images/toolbar/help.png");
-	private static Image proofMgt = getImage("images/toolbar/mgt.png");
-	private static Image properties = getImage("images/toolbar/properties.png");
-	private static Image quit = getImage("images/toolbar/quit.png");
-	private static Image recentFiles = getImage("images/toolbar/recent.png");
-	private static Image search = getImage("images/toolbar/search.png");
-	private static Image search2 = getImage("images/toolbar/search2.png");
-	private static Image statistics = getImage("images/toolbar/statistics.png");
-	private static Image toolbox = getImage("images/toolbar/toolbox.png");
-
-	private static Image plus = getImage("images/toolbar/plus.png");
-	private static Image minus = getImage("images/toolbar/minus.png");
-	private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
-
-	private static Image next = getImage("images/toolbar/go-next.png");
-	private static Image previous = getImage("images/toolbar/go-previous.png");
-	private static Image stop = getImage("images/toolbar/stop.png");
-
-	private static Image interactiveAppLogo = getImage("images/interactiveAppLogo.png");
-
-	private static Image counterexampleImage = getImage("images/toolbar/ce.png");
-	private static Image testgenerationImage = getImage("images/toolbar/tg.png");
-
-	private static Image getImage(String string) {
-		InputStream is = IconFactory.class.getClass().getResourceAsStream("keyproved.gif");
-		InputStream is2 = IconFactory.class.getClass().getResourceAsStream("resources/images/keyproved.gif");
-
-		InputStream is3 = IconFactory.class.getClassLoader().getResourceAsStream("/keyproved.gif");
-		InputStream is4 = IconFactory.class.getClassLoader().getResourceAsStream("resources/images/keyproved.gif");
-		InputStream is5 = IconFactory.class.getClassLoader().getResourceAsStream("keyproved.gif");
-		InputStream is6 = IconFactory.class.getClassLoader().getResourceAsStream("key.nui/resources/images/keyproved.gif");
-		String url = IconFactory.class.getResource("").getPath();
-		System.out.println(IconFactory.class.getClass().toGenericString());
-		if (is == null) {
-			System.out.println("INPUTSTREAM is NULL");
-			System.exit(0);
-		}
-		Image img = new Image(is, 20, 20, true, true);
-		return img;
-//		String resourceURL = String.valueOf(IconFactory.class.getResource(string));
-//		Image img = new Image(resourceURL, true);
-//		System.out.println(resourceURL);
-//		return img;
-		//return new Image(resourceURL, 20, 20, true, true);
+	/**
+	 * Returns an Image based on the given imageFilename in the directory folderRoot
+	 * 
+	 * @param imageFilename
+	 * 				The name of the image
+	 * @return Image object of JavaFX
+	 */
+	private static Image getImage(String imageFilename) {
+		InputStream is = IconFactory.class.getResourceAsStream(folderRoot + imageFilename);
+		return new Image(is);
 	}
 
-	public static Image getKeyHoleClosed() {
-		return keyHoleClosed;
+	/**
+	 * Scales an given image to a desired size indicated by x (width) and y (height) and 
+	 * returns a ImageView with the scaled image in it. Uses the smoothing option.
+	 * 
+	 * @param image
+	 * 			The image which should be scaled
+	 * @param x
+	 * 			The desired width
+	 * @param y
+	 * 			The desired height
+	 * @return an ImageView containing the scaled Image
+	 */
+	public static ImageView scaleIcon(Image image, int x, int y) {
+		ImageView v = new ImageView(image);
+		v.setFitWidth(x);
+		v.setFitHeight(y);
+		v.setSmooth(true);
+		return v;
 	}
 
+	/**
+	 * Returns the image keyHole scaled to the given size, 
+	 * where x indicates the width and y the height.
+	 * 
+	 * @param x The desired width of the image
+	 * @param y The desired height of the image
+	 * @return an ImageView object containing the scaled image
+	 */
+	public static ImageView keyHole(int x, int y) {
+		return scaleIcon(keyHole, x, y);
+	}
+
+	/**
+	 * Returns the image keyHoleClosed scaled to the given size, 
+	 * where x indicates the width and y the height.
+	 * 
+	 * @param x The desired width of the image
+	 * @param y The desired height of the image
+	 * @return an ImageView object containing the scaled image
+	 */
+	public static ImageView keyHoleClosed(int x, int y) {
+		return scaleIcon(keyHoleClosed, x, y);
+	}
+
+	/**
+	 * Returns the image keyFolderBlue scaled to the given size, 
+	 * where x indicates the width and y the height.
+	 * 
+	 * @param x The desired width of the image
+	 * @param y The desired height of the image
+	 * @return an ImageView object containing the scaled image
+	 */
+	public static ImageView keyFolderBlue(int x, int y) {
+		return scaleIcon(keyFolderBlue, x, y);
+	}
+	
+	/**
+	 * Returns the image keyFolderGray scaled to the given size, 
+	 * where x indicates the width and y the height.
+	 * 
+	 * @param x The desired width of the image
+	 * @param y The desired height of the image
+	 * @return an ImageView object containing the scaled image
+	 */
+	public static ImageView keyFolderGray(int x, int y) {
+		return scaleIcon(keyFolderGray, x, y);
+	}
 }
-
