@@ -65,7 +65,7 @@ public class TreeViewController {
         // display tree
         proofTreeView.setRoot(fxRoot);
     }
-
+    
     /**
      * converts a proof node to an fxnode recursively and adds it to an fx
      * fxparent
@@ -77,8 +77,9 @@ public class TreeViewController {
         // create an fxNode and add it to the fxparent
         String label = proofNode.serialNr() + ": " + proofNode.name();
         TreeItem<String> fxNode = new TreeItem<String>(label);
-
-        Image img = new Image(getClass().getResourceAsStream("keyproved.gif"), 20, 20, true, true);
+        
+        //Image img = new Image(getClass().getResourceAsStream("keyproved.gif"), 20, 20, true, true);
+        Image img = IconFactory.getKeyHoleClosed();
         
         fxNode.setGraphic(new ImageView(img));
         
