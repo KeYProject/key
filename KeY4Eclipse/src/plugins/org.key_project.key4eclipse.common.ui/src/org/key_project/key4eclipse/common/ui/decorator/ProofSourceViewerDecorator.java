@@ -38,7 +38,6 @@ import org.eclipse.jface.text.JFaceTextUtil;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -125,11 +124,11 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    private StyleRange marked2;
    /**
-    * The range used to highlight {@link Term} of {@link Sort} Update.
+    * Array of {@link StyleRange} used to highlight {@link Term} of {@link Sort} Update.
     */
    private StyleRange[] markedUpdates;
    /**
-    * The range used to highlight keywords.
+    * Array of {@link StyleRange} used to highlight keywords.
     */
    private ArrayList<StyleRange> markedKeywords;
    
@@ -142,7 +141,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * The currently selected {@link PosInSequent}.
     */
    private PosInSequent selectedPosInSequent;
-   // colors and fonts used
+   
+   /**
+    * {@link Color} and {@link Font} used.
+    */
    private Color greenColor = new Color(null, 128, 255, 128);
    private Color purpleColor = new Color(null, 127, 0, 85);
    private Color blueColor = new Color(null, 0, 0, 192);
@@ -150,6 +152,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    private Color grayColor1 = new Color(null,196,205,226);
    private Color grayColor2 = new Color(null,196,205,226);
    private Color firstStatementColor = new Color(null, 167,174,192);
+   // descriptor used to ensure portability of Font (but not sure if necessary)
    private FontDescriptor descriptor = FontDescriptor.createFrom(JFaceResources.getFont(JFaceResources.TEXT_FONT)).setStyle(SWT.BOLD);
    private Font boldFont = descriptor.createFont(null);
    /**
@@ -257,9 +260,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * Sets {@link StyleRange} for keyword highlighting.
     * @param str text to be highlighted
+    * @author Anna Filighera
     */
    private void setKeywordHighlights(String str) {
-      // doesn't find keywords, that are encapsulated in text
+      // find keywords and mark them
       String[] words = str.split("[\\s(){},=.\\[\\]]" );
       int beginRange = 0;
       markedKeywords = new ArrayList<StyleRange>();
@@ -280,6 +284,20 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
             markedKeywords.add(mark);
          }
          beginRange = beginRange + words[i].length() + 1;
+      }
+      // find operators enclosed by word characters or whitespaces and mark them
+      beginRange = 0;
+      String[] operators = str.split("[\\s\\w(){}=,.\\[\\]]");
+      for(int i = 0; i<operators.length; i++){
+         if(dynamicKeywords.contains(operators[i]) || propKeywords.contains(operators[i])){
+            StyleRange mark = new StyleRange();
+            mark.font = boldFont;
+            mark.foreground = blueColor;
+            mark.start = beginRange;
+            mark.length = operators[i].length();
+            if(!(markedKeywords.contains(mark))) markedKeywords.add(mark);
+         }
+         beginRange = beginRange + operators[i].length() + 1;
       }
    }
    
@@ -515,6 +533,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * Merges all currently present highlighting {@link StyleRange}.
     * @param textPresentation {@link TextPresentation} to which {@link StyleRange} should be added.
     * @param hoverActive Indicates if hovering is active.
+    * @author Anna Filighera
     */
    private void mergeRanges(TextPresentation textPresentation, boolean hoverActive){
       ArrayList<StyleRange> allRanges = new ArrayList<StyleRange>();
@@ -626,7 +645,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    }
 
    /**
-    * Comparator to compare the beginning of StyleRanges.
+    * Comparator to compare the beginning of {@link StyleRange}.
     * @author Anna Filighera
     *
     */
