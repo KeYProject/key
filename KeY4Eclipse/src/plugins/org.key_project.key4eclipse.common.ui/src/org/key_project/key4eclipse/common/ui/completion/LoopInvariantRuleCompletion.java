@@ -13,6 +13,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -129,12 +130,17 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          this.root = root;
          
          //TODO: cleanup layout
+         //TODO: All the text/label things should be set to WRAP
          root.setLayout(new GridLayout(2, false));
+         GridData fillData = new GridData(SWT.FILL, SWT.FILL, true, true);
+         //fillData.horizontalAlignment = SWT.FILL;
+         root.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
          FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
          
          //Set up right column:
          Composite stateColumn = new Composite(root, SWT.NO_BACKGROUND);
          stateColumn.setLayout(vertlayout);
+         stateColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
          
          //Set up loop preview:
          Label code = new Label(stateColumn, SWT.BORDER);
@@ -165,13 +171,14 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //Set up right column
          Composite rightColumn = new Composite(root, SWT.NO_BACKGROUND);
          rightColumn.setLayout(vertlayout);
+         rightColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
          editorTab = new TabFolder(rightColumn, SWT.TOP);
          //this listener updates the state whenever tabs are switched.
          editorTab.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                resetStateTab();
             }
-          });
+         });
          
          //get the initial state of the text fields.
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
@@ -188,7 +195,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             heaps[iter] = heap;
             Term invTerm = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
             Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
-            System.out.println("iterating. heap is " + heap.toString());
             if (invTerm != null) {
                invariantStrings[iter] = ProofSaver.printTerm(invTerm, services, true).toString();
             }
@@ -196,9 +202,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             if (modifies != null) {
                modifiesStrings[iter] = ProofSaver.printTerm(modifies, services, true).toString();
             }
-            System.out.println("invString = " + (invTerm == null ? "null" : ProofSaver.printTerm(invTerm,  services, true).toString()));
-            System.out.println("modString = " + (modifies == null ? "null" : ProofSaver.printTerm(modifies,  services, true).toString()));
-            //TODO: Remove printlns
             iter++;
          }
          
@@ -215,6 +218,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //Potential expansion: Discard rule application if Completion dialog was aborted.
       }
       
+      /**
+       * adds a copy of the currently selected specification
+       */
       private void store(){
          int selectedSpec = editorTab.getSelectionIndex();
          int amountTabs = editorTab.getItemCount();
@@ -227,26 +233,30 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          }
          addTab(invSpecs, modSpecs, varSpec, amountTabs);
       }
-      
+
       /**
        * adds a new invariant tab to the specified TabFolder.
        * @author Viktor Pfanschilling
        * @param invariant - invariant text of the tab
        * @param modifies - modifies text of the tab
-       * @param variants - variants text of the tab
+       * @param variant - variants text of the tab
        * @param id - id of the new tab
        * @return the generated TabItem's Composite
        */
-      private Control addTab(String[] invariants, String[] modifies, String variants, int id){
+      private Control addTab(String[] invariants, String[] modifies, String variant, int id){
+         //TODO: do not add as a tab, but add another Composite. DropDown menu to switch between specifications.
          GridLayout vertlayout = new GridLayout();
+         int fontsize = editorTab.getFont().getFontData()[0].getHeight();
+         
          //add a tab item
          TabItem tab = new TabItem (editorTab, SWT.NONE);
          tab.setText("inv " + id);
          //inside, place a composite containing three groups (for pretty frames) with a Text item each.
-         Composite textContainer = new Composite(editorTab, SWT.NO_BACKGROUND);
+         Composite textContainer = new Composite(editorTab, SWT.NO_BACKGROUND | SWT.V_SCROLL);
          tab.setControl(textContainer);
          //add a tab folder
-         TabFolder heapTabs = new TabFolder(textContainer, SWT.BOTTOM);
+         TabFolder heapTabs = new TabFolder(textContainer, SWT.TOP);
+         heapTabs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
          heapTabs.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                resetStateTab();
@@ -262,15 +272,21 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             
             //for all elems in heap, add a TabItem
             Group invariantGroup = new Group(modinvcontainer, SWT.SHADOW_IN);
-            Text invariantT = new Text(invariantGroup, SWT.MULTI);
+            Text invariantT = new Text(invariantGroup, SWT.WRAP);
             Group modifiesGroup = new Group(modinvcontainer, SWT.SHADOW_IN);
-            Text modifiesT = new Text(modifiesGroup, SWT.MULTI);
+            Text modifiesT = new Text(modifiesGroup, SWT.WRAP);
             invariantGroup.setLayout(vertlayout);
-            modifiesGroup.setLayout(vertlayout);
             invariantGroup.setText("invariant");
+            invariantGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            invariantT.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            invariantT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
             invariantT.setText(invariants[iter] != null ? invariants[iter] : "true");
+            modifiesGroup.setLayout(vertlayout);
             modifiesGroup.setText("modifies");
-            modifiesT.setText(modifies[iter]);
+            modifiesGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            modifiesT.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            modifiesT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
+            modifiesT.setText(modifies[iter] != null? modifies[iter] : "allLocs");
             
             invariantT.addModifyListener(new ModifyListener(){
                public void modifyText(ModifyEvent event) {
@@ -288,11 +304,14 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             iter++;
          }
          Group variantsGroup = new Group(textContainer, SWT.SHADOW_IN);
-         Text variantsT = new Text(variantsGroup, SWT.MULTI);
+         Text variantsT = new Text(variantsGroup, SWT.WRAP);
          textContainer.setLayout(vertlayout);
          variantsGroup.setLayout(vertlayout);
          variantsGroup.setText("variants");
-         variantsT.setText(variants);
+         variantsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+         variantsT.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+         variantsT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
+         variantsT.setText(variant == null ? "" : variant);
          
          
          // set up store button
@@ -318,6 +337,12 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          return textContainer;
       }
       
+      /**
+       * resets the error message of the window. Tied to the finish button.
+       * Call every time any of the texts of the
+       * currently selected specification or the selection changes.
+       * @author Viktor Pfanschilling
+       */
       private void updateErrorMessage(){
          setErrorMessage(null);
          int i = 0;
@@ -333,10 +358,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          }
          Term variantTerm = resetVariantsState();
          if (variantTerm == null) setErrorMessage("Error in current specification: variant");
-         //resetStateTab();
-         
-         Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
-         
          return;
       }
       
@@ -435,27 +456,35 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public IBuiltInRuleApp finish() {
+         //TODO: Check for error messages, return null if there's a problem
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
          Map<LocationVariable, Term> invMap = new LinkedHashMap<LocationVariable, Term>();
          Map<LocationVariable, Term> modMap = new LinkedHashMap<LocationVariable, Term>();
          int i = 0;
+         //for every heap:
          for (LocationVariable heap : heaps){
+            //get the invariant and modify terms
             Text wdgt = getTextField(-1, i, 0);
             Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
+            if (invariantTerm == null) return null;
             wdgt = getTextField(-1, i, 1);
             Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
             Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
+            if (modifiesTerm == null) return null;
             invMap.put(heap, invariantTerm);
             modMap.put(heap, modifiesTerm);
+            if (invariantTerm == null || modifiesTerm == null)return null;
             i++;
          }
+         //get the variant
          Term variantTerm = resetVariantsState();
-         resetStateTab();
+         if (variantTerm == null) return null;
          
          //FIXME: InfFlowSpecs are currently not implemented, thus there's little point in writing a UI for them.
          //The InfFlowSpecs code here does not actually do anything.
          Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>();
          
+         //return the new Invariant
          LoopInvariant newInvariant = loopApp.getInvariant().configurate(invMap, modMap, infFlowSpecs, variantTerm);
          return loopApp.setLoopInvariant(newInvariant);
       }
@@ -465,6 +494,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public void dispose() {
+         //TODO: Is there more to do here?
          root.dispose();
       }
    }
