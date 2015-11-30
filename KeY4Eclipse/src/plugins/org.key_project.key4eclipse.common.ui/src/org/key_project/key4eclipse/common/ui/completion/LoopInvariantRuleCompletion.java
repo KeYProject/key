@@ -215,7 +215,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          
          resetStateTab();
          
-         //Potential expansion: Discard rule application if Completion dialog was aborted.
+         //TODO: Potential expansion: Discard rule application if Completion dialog was aborted.
+         //This is probably not possible from within this class
       }
       
       /**
