@@ -13,13 +13,10 @@
 
 package org.key_project.keyide.ui.providers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.IStateListener;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
@@ -137,28 +134,10 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	private State hideState;
 	
 	
+	/**
+	 * The {@link State} for the show symbolic execution tree only outline feature
+	 */
 	private State symbolicState;
-	/**
-	 * The {@link IStateListener} to sync the hide intermediate proofsteps toggleState with the outline page
-	 */
-	private IStateListener stateListener = new IStateListener() {
-
-		@Override
-		public void handleStateChange(State state, Object oldValue) {
-			viewer.refresh(proof);
-		}
-	};
-	
-	/**
-	 * The {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page
-	 */
-	private IStateListener symbolicStateListener = new IStateListener(){
-
-      @Override
-      public void handleStateChange(State state, Object oldValue) {
-         System.out.println("symbolic state changed");
-      }
-	};
 	
 	/**
 	 * The Constructor
@@ -170,19 +149,11 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
 	         if (hideCmd != null) {
 	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
-	            if (hideState != null) {
-	               hideState.setValue(false);
-	               hideState.addListener(stateListener);
-	            }
 	         }
 	         
 	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
 	         if(symbolicCmd != null){
 	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
-	            if(symbolicState != null){
-	               symbolicState.setValue(false);
-	               symbolicState.addListener(symbolicStateListener);
-	            }
 	         }
 	      }
 	}
@@ -596,14 +567,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	public void dispose() {
 		if (proof != null) {
 			proof.removeProofTreeListener(proofTreeListener);
-		}
-		
-		if(hideState != null){
-			hideState.removeListener(stateListener);
-		}
-
-		if(symbolicState != null){
-		   symbolicState.removeListener(symbolicStateListener);
 		}
 	}
 	

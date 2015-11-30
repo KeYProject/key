@@ -98,6 +98,14 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
       }
    }
    
+   
+   /**
+    * creates a viewer for the proof and checks if the hide intermediate proofsteps filter is working correctly
+    * @throws CoreException
+    * @throws InterruptedException
+    * @throws ProblemLoaderException
+    * @throws ProofInputException
+    */
    @Test
    public void testHideIntermediateProofsteps() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException{
 	// Create test project
@@ -113,8 +121,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	      FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
 	      Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
 	      assertNotNull(proof);
-	      environment.getProofControl().startAndWaitForAutoMode(proof);
-	      
+	      // create viewer to show proof in
 	      Shell shell = new Shell();
 	      try {
 	          shell.setText("OutlineContentAndLabelProviderTest");
@@ -123,37 +130,46 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	          TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 	          viewer.setUseHashlookup(true);
 	          LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
-	          // set toggle State false
+	          // deactivate hiding intermediate proofsteps
 	          lazyContentProvider.getHideState().setValue(false);
-	          
 	          viewer.setContentProvider(lazyContentProvider);
 	          viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
 	          viewer.setInput(proof);
 	          shell.setVisible(true);
 	          viewer.expandAll();
-	          
-	          // test initial toggle State
+	          // check if initial toggle State is false
 	          assertFalse((boolean) lazyContentProvider.getHideState().getValue());
-	          
-	          // test proof tree before hiding all intermediate proof steps
+	          // check if proof tree is correct before activating the filter
 	          TreeViewerIterator viewerIter = new TreeViewerIterator(viewer);
 	          NodePreorderIterator nodeIter = new NodePreorderIterator(proof.root());
 	          while(nodeIter.hasNext()){
 	             assertTree(nodeIter, viewerIter);
 	          }
 	          
-	          // toggle State for hiding all intermediate proof steps
+	          // activate hide intermediate proofsteps filter
 	          lazyContentProvider.getHideState().setValue(true);
-	          
-	         
-	          
+	          // start auto mode
+	          environment.getProofControl().startAndWaitForAutoMode(proof);
+	          viewer.setInput(proof);
 	          viewer.expandAll();
-	          TreeViewerIterator viewerIter2 = new TreeViewerIterator(viewer);
-	          NodePreorderIterator nodeIter2 = new NodePreorderIterator(proof.root());
-	          while(nodeIter2.hasNext()){
-	        	  assertHideIntermediateProofstepsTree(nodeIter2, viewerIter2);
+	          TreeViewerIterator viewerIterHide = new TreeViewerIterator(viewer);
+	          NodePreorderIterator nodeIterHide = new NodePreorderIterator(proof.root());
+	          // check if proof tree contains only branchfolders and leaves
+	          while(nodeIterHide.hasNext()){
+	        	  assertHideIntermediateProofstepsTree(nodeIterHide, viewerIterHide);
 	          }
 	          
+	          // deactivate hide intermediate proofsteps filter
+	          lazyContentProvider.getHideState().setValue(false);
+	          viewer.setInput(proof);
+	          viewer.expandAll();
+	          TreeViewerIterator viewerIterShow = new TreeViewerIterator(viewer);
+             NodePreorderIterator nodeIterShow = new NodePreorderIterator(proof.root());
+             
+             // check if the complete proof tree is shown correctly again
+             while(nodeIterShow.hasNext()){
+                assertTree(nodeIterShow, viewerIterShow);
+             }
 	       }
 	       finally {
 	          shell.setVisible(false);
@@ -185,9 +201,10 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 			   }
 		   }
 	   } else {
-		   assertFalse("The TreeViewer contains to many proof steps.",viewerIter.hasNext());
+		   assertFalse("The TreeViewer contains too many proof steps.",viewerIter.hasNext());
 	   }
    }
+   
    
    protected void assertTree(NodePreorderIterator nodeIter, TreeViewerIterator viewerIter){
       

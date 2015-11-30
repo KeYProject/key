@@ -13,10 +13,33 @@
 
 package org.key_project.key4eclipse.common.ui.decorator;
 
+import static de.uka.ilkd.key.util.UnicodeHelper.AND;
+import static de.uka.ilkd.key.util.UnicodeHelper.BOT;
+import static de.uka.ilkd.key.util.UnicodeHelper.EMPTY;
+import static de.uka.ilkd.key.util.UnicodeHelper.EQV;
+import static de.uka.ilkd.key.util.UnicodeHelper.EXISTS;
+import static de.uka.ilkd.key.util.UnicodeHelper.FORALL;
+import static de.uka.ilkd.key.util.UnicodeHelper.IMP;
+import static de.uka.ilkd.key.util.UnicodeHelper.IN;
+import static de.uka.ilkd.key.util.UnicodeHelper.NEG;
+import static de.uka.ilkd.key.util.UnicodeHelper.OR;
+import static de.uka.ilkd.key.util.UnicodeHelper.TOP;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.JFaceTextUtil;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseEvent;
@@ -49,6 +72,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The Decorator for the KeYEditor.
@@ -101,9 +125,13 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    private StyleRange marked2;
    /**
-    * The range used to highlight {@link Term} of Sort Update.
+    * The range used to highlight {@link Term} of {@link Sort} Update.
     */
    private StyleRange[] markedUpdates;
+   /**
+    * The range used to highlight keywords.
+    */
+   private ArrayList<StyleRange> markedKeywords;
    
    /**
     * The {@link StyleRange} to highlight the active statement.
@@ -114,7 +142,38 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * The currently selected {@link PosInSequent}.
     */
    private PosInSequent selectedPosInSequent;
-   
+   // colors and fonts used
+   private Color greenColor = new Color(null, 128, 255, 128);
+   private Color purpleColor = new Color(null, 127, 0, 85);
+   private Color blueColor = new Color(null, 0, 0, 192);
+   private Color lightblueColor = new Color(null,167,210,210);
+   private Color grayColor1 = new Color(null,196,205,226);
+   private Color grayColor2 = new Color(null,196,205,226);
+   private Color firstStatementColor = new Color(null, 167,174,192);
+   private FontDescriptor descriptor = FontDescriptor.createFrom(JFaceResources.getFont(JFaceResources.TEXT_FONT)).setStyle(SWT.BOLD);
+   private Font boldFont = descriptor.createFont(null);
+   /**
+    * Java keywords to be highlighted.
+    */
+   private final static List<String> javaKeywords = Arrays.asList("if", "else", "for", "do",
+      "while", "return", "break", "switch", "case", "continue", "try",
+      "catch", "finally", "assert", "null", "throw", "this", "true",
+      "false", "int", "char", "long", "short", "boolean" );
+   /**
+    *  Dynamic logic keywords to be highlighted.
+    */
+   private final static List<String> dynamicKeywords = Arrays.asList("\\forall",
+      "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum",
+      "bsum", "\\in", "exactInstance", "wellFormed", "measuredByEmpty",
+      "method-frame", "<created>", "<inv>", "\\cup",
+      ""+FORALL, ""+EXISTS, ""+IN, ""+EMPTY);
+   /**
+    * Propositional logic keywords to be highlighted.
+    */
+   private final static List<String> propKeywords = Arrays.asList( "<->", "->", "&",
+      "|", "!", "true", "false", "" + EQV, "" + IMP, "" + AND, "" + OR,
+      "" + NEG, "" + TOP, "" + BOT);
+   private String text;
    /**
     * Listens for mouse move events on {@link #viewerText}.
     */
@@ -143,6 +202,15 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       if (viewerText != null && !viewerText.isDisposed()) {
          viewerText.removeMouseMoveListener(mouseMoveListener);
       }
+      blueColor.dispose();
+      greenColor.dispose();
+      purpleColor.dispose();
+      lightblueColor.dispose();
+      grayColor1.dispose();
+      grayColor2.dispose();
+      firstStatementColor.dispose();
+      boldFont.dispose();
+     
    }
    
    /**
@@ -153,24 +221,29 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    public void showNode(Node node, NotationInfo notationInfo) {
       this.node = node;
-      String str;
       if (node != null) {
          filter = new IdentitySequentPrintFilter(node.sequent());
          printer = new LogicPrinter(new ProgramPrinter(null), 
                                     notationInfo, 
                                     node.proof().getServices());
-         str = computeText(notationInfo, node, filter, printer);
+         text = computeText(notationInfo, node, filter, printer);
       }
       else {
          filter = null;
          printer = null;
-         str = "";
+         text = "";
       }
-      viewer.setDocument(new Document(str));
+      viewer.setDocument(new Document(text));
+      // set up StyleRanges for keyword highlighting
+      setKeywordHighlights(text);
+      
       if (node != null){
          // if view of current goal is active, highlight all updates
          if(node.getAppliedRuleApp() == null){
+            // set up StyleRanges for update highlighting and merge them with keyword ranges
             setBlueBackground(printer.getInitialPositionTable().getUpdateRanges());
+            textPresentation = new TextPresentation();
+            mergeRanges(textPresentation, false);
          }
         
          else {
@@ -178,8 +251,38 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
             setGreenBackground(pio);
          }
       }
+      
 
    }
+   /**
+    * Sets {@link StyleRange} for keyword highlighting.
+    * @param str text to be highlighted
+    */
+   private void setKeywordHighlights(String str) {
+      // doesn't find keywords, that are encapsulated in text
+      String[] words = str.split("[\\s(){},=.\\[\\]]" );
+      int beginRange = 0;
+      markedKeywords = new ArrayList<StyleRange>();
+      for(int i = 0; i < words.length; i++){
+         StyleRange mark = new StyleRange();
+         if(javaKeywords.contains(words[i])){
+            mark.font = boldFont;
+            mark.foreground = purpleColor;
+            mark.start = beginRange;
+            mark.length = words[i].length();
+            markedKeywords.add(mark);
+         }
+         else if(dynamicKeywords.contains(words[i]) || propKeywords.contains(words[i])){
+            mark.font = boldFont;
+            mark.foreground = blueColor;
+            mark.start = beginRange;
+            mark.length = words[i].length();
+            markedKeywords.add(mark);
+         }
+         beginRange = beginRange + words[i].length() + 1;
+      }
+   }
+   
    
    /**
     * Shows the given {@link Term} with help of the given {@link KeYMediator}
@@ -281,47 +384,48 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       return s;
    }
    /**
-    * sets background color to light blue.
-    * @param ranges ranges in which blue color should be applied
+    * Sets up {@link StyleRange} for light blue background color.
+    * @param ranges Ranges in which blue color should be applied.
     * @author Anna Filighera
     */
    protected void setBlueBackground(Range[] ranges){
-      TextPresentation textPresentation = new TextPresentation();
       markedUpdates = new StyleRange[ranges.length];
       for(int i = 0; i < ranges.length; i++){
          StyleRange markedUpdate = new StyleRange();
-         initializeValuesForBackground(new Color(null,167,210,210), markedUpdate, textPresentation);
+         markedUpdate.background = lightblueColor;
          markedUpdate.start = ranges[i].start();
          markedUpdate.length = ranges[i].end()-ranges[i].start();
          markedUpdates[i] = markedUpdate;
-      }
-      TextPresentation.applyTextPresentation(textPresentation, viewerText);
-      viewer.changeTextPresentation(textPresentation, true);   
+      } 
    }
+   
    protected void setGreenBackground(PosInOccurrence pos){
-      marked1 = new StyleRange();
       TextPresentation textPresentation = new TextPresentation();
-      initializeValuesForBackground(new Color(null, 128, 255, 128), marked1, textPresentation);
+      marked1 = initializeValuesForBackground(greenColor, textPresentation);
       if (pos != null) {
          ImmutableList<Integer> path = printer.getInitialPositionTable().pathForPosition(pos, filter);
          Range range = printer.getInitialPositionTable().rangeForPath(path);
          marked1.start = range.start();
          marked1.length = range.end()-range.start();
+         textPresentation.mergeStyleRanges(markedKeywords.toArray(new StyleRange[markedKeywords.size()]));
+
          TextPresentation.applyTextPresentation(textPresentation, viewerText);
          viewer.changeTextPresentation(textPresentation, true);
       }
    }
 
    /**
-    * initializes Textresentation with colored StyleRange
-    * @param color - background color to be set
-    * @param mark - range which should be colored
-    * @author Anna Filighera
+    * Initializes TextPresentation with colored StyleRange.
+    * @param color Background color to be set.
+    * @param textPresentation TextPresentation to be initialized.
+    * @return mark The colored StyleRange.
+    *
     */
-   protected void initializeValuesForBackground(Color color, StyleRange mark, TextPresentation textPresentation){
+   protected StyleRange initializeValuesForBackground(Color color, TextPresentation textPresentation){
+      StyleRange mark = new StyleRange();
       mark.background= color;  
       textPresentation.addStyleRange(mark);
-      viewer.changeTextPresentation(textPresentation, true);
+      return mark;
    }
 
    /**
@@ -343,6 +447,8 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          if (!ObjectUtil.equals(oldPos, selectedPosInSequent)) {
             // Update highlighting only on goals.
             if (node.getAppliedRuleApp() == null){
+               // refresh update and keyword highlighting as range-merging messes with StyleRanges
+               setKeywordHighlights(text);
                setBlueBackground(printer.getInitialPositionTable().getUpdateRanges());
                setBackgroundColorForHover();
             }
@@ -401,22 +507,86 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          marked1.start = range.start();
          marked1.length = range.length(); 
       }
-      StyleRange[] ranges = {marked1, marked2, firstStatementStyleRange};
-      textPresentation.mergeStyleRanges(ranges);
-      // add update marks
-      textPresentation.mergeStyleRanges(markedUpdates);
-//      textPresentation.addStyleRange(firstStatementStyleRange);
-      TextPresentation.applyTextPresentation(textPresentation, viewerText);
-      viewer.changeTextPresentation(textPresentation, true);
+      // merge all StyleRanges
+      mergeRanges(textPresentation, true);
+
+   }
+   /**
+    * Merges all currently present highlighting {@link StyleRange}.
+    * @param textPresentation {@link TextPresentation} to which {@link StyleRange} should be added.
+    * @param hoverActive Indicates if hovering is active.
+    */
+   private void mergeRanges(TextPresentation textPresentation, boolean hoverActive){
+      ArrayList<StyleRange> allRanges = new ArrayList<StyleRange>();
+      ArrayList<StyleRange> backgroundMarks = new ArrayList<StyleRange>();
+      boolean overlaps = false;
+      
+      if(hoverActive) {
+         backgroundMarks.add(firstStatementStyleRange);
+         backgroundMarks.add(marked1);
+         backgroundMarks.add(marked2);
+
+         // checks for overlapping ranges and adds all conflict free update StyleRanges
+         for(StyleRange update : markedUpdates){
+            for(StyleRange hover : backgroundMarks){
+              if(update.start>=hover.start && update.start<=(hover.start+hover.length)){
+                 overlaps = true;
+                 break;
+               }
+            }
+            if(!overlaps) backgroundMarks.add(update);
+            else overlaps = false;
+         }
+      }
+      // if hovering is not active, overlapping checks are unnecessary
+      else {
+         for(StyleRange update : markedUpdates){
+            backgroundMarks.add(update);
+         }
+      }
+  
+      // handle overlapping ranges
+      for(StyleRange keywordRange: markedKeywords){
+         for(StyleRange backgroundRange: backgroundMarks){
+            // checks if keyword bounds overlap with background highlights
+            if(keywordRange.start>=backgroundRange.start && keywordRange.start<=(backgroundRange.start+backgroundRange.length)){
+               overlaps = true;
+               // adds keyword with appropriate background color to allRanges
+               StyleRange keyword = new StyleRange(keywordRange.start, keywordRange.length, keywordRange.foreground, backgroundRange.background, SWT.BOLD);
+               allRanges.add(keyword);
+               // splits background range into two new ranges, which enclose the keyword
+               if(keywordRange.start!=backgroundRange.start){
+                  StyleRange split = new StyleRange();
+                  split.background = backgroundRange.background;
+                  split.start = backgroundRange.start;
+                  split.length = keywordRange.start - split.start;
+                  backgroundMarks.add(split);
+               }
+               if(keywordRange.start!=(backgroundRange.start+backgroundRange.length)){
+                  backgroundRange.length = backgroundRange.start + backgroundRange.length - (keywordRange.start + keywordRange.length);
+                  backgroundRange.start = keywordRange.start + keywordRange.length;
+               }
+             break;
+            }    
+         }
+         if(!overlaps) allRanges.add(keywordRange);
+         else overlaps = false;
+      }
+     allRanges.addAll(backgroundMarks);
+     Collections.sort(allRanges, new RangeComparator());
+     textPresentation.mergeStyleRanges(allRanges.toArray(new StyleRange[allRanges.size()]));
+     TextPresentation.applyTextPresentation(textPresentation, viewerText);
+     viewer.changeTextPresentation(textPresentation, true);
+     
    }
    
    protected void initializeValuesForHover(){
       marked1 = new StyleRange();
-      marked1.background=new Color(null,196,205,226);
+      marked1.background= grayColor1;
       marked2 = new StyleRange();
-      marked2.background=new Color(null,196,205,226);
+      marked2.background= grayColor2;
       firstStatementStyleRange = new StyleRange();
-      firstStatementStyleRange.background = new Color(null, 167,174,192);
+      firstStatementStyleRange.background = firstStatementColor;
       textPresentation = new TextPresentation();
 //      textPresentation.addStyleRange(marked1);
 //      textPresentation.mergeStyleRange(firstStatementStyleRange);
@@ -453,5 +623,17 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    protected StyledText getViewerText() {
       return viewerText;
+   }
+
+   /**
+    * Comparator to compare the beginning of StyleRanges.
+    * @author Anna Filighera
+    *
+    */
+   public class RangeComparator implements Comparator<StyleRange> {
+   @Override
+   public int compare(StyleRange o1, StyleRange o2) {
+      return o1.start-o2.start;
+   } 
    }
 }

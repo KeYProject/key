@@ -22,18 +22,20 @@ import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
+import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
@@ -67,6 +69,10 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 	private final KeYSelectionModel selectionModel;
 	
+	private State hideState;
+	
+	private State symbolicState;
+	
 	/**
 	 * {@link KeYSelectionListener} to sync the KeYSelection with the
 	 * {@link TreeSelection}.
@@ -96,6 +102,29 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 			handleAutoModeStopped(e);
 		}
 	};
+	
+	/**
+	 * The {@link IStateListener} to sync the hide intermediate proof steps toggleState with the outline page
+	 */
+	private IStateListener hideStateListener = new IStateListener() {
+
+		@Override
+		public void handleStateChange(State state, Object oldValue) {
+			getTreeViewer().refresh(proof);
+			updateSelectedNodeThreadSafe();
+		}
+	};
+	
+	/**
+	 * The {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page
+	 */
+	private IStateListener symbolicStateListener = new IStateListener(){
+
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         System.out.println("symbolic state changed");
+      }
+	};
 
 	/**
 	 * Constructor.
@@ -110,6 +139,26 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		this.selectionModel = selectionModel;
 		selectionModel.addKeYSelectionListener(listener);
 		environment.getProofControl().addAutoModeListener(autoModeListener);
+		
+		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+	      if (service != null) {
+	         
+	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
+	         if (hideCmd != null) {
+	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
+	            if (hideState != null) {
+	               hideState.addListener(hideStateListener);
+	            }
+	         }
+	         
+	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
+	         if(symbolicCmd != null){
+	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
+	            if(symbolicState != null){
+	            	symbolicState.addListener(symbolicStateListener);
+	            }
+	         }
+	      }
 	}
 
 	/**
@@ -124,6 +173,14 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		}
 		if (labelProvider != null) {
 			labelProvider.dispose();
+		}
+		
+		if(hideState != null){
+			hideState.removeListener(hideStateListener);
+		}
+		
+		if(symbolicState != null){
+			symbolicState.removeListener(symbolicStateListener);
 		}
 
 		super.dispose();
@@ -162,7 +219,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 				getTreeViewer());
 		// Update selected node
 		updateSelectedNode();
-
 	}
 
 	/**
@@ -220,9 +276,15 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		if (mediatorNode != selectedNode) {
 			// Make sure that Node to select is loaded in lazy TreeViewer
 			makeSureElementIsLoaded(mediatorNode);
-			// Select Node in lazy TreeViewer
-			getTreeViewer().setSelection(SWTUtil.createSelection(mediatorNode),
-					true);
+			
+			Object parent = contentProvider.getParent(mediatorNode);
+			int viewIndex = contentProvider.getIndexOf(parent, mediatorNode);
+			// Select Node in lazy TreeViewer or the parent node when the node got filtered out
+			if(viewIndex >= 0){
+				getTreeViewer().setSelection(SWTUtil.createSelection(mediatorNode), true);
+			} else {
+				getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
+			}
 		}
 	}
 
@@ -251,7 +313,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		for (Object unknownElement : unknownParents) {
 			Object parent = contentProvider.getParent(unknownElement);
 			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-			if((boolean) contentProvider.getHideState().getValue() == false || node.leaf()){
+			if((boolean) contentProvider.getHideState().getValue() == false || node.leaf() || viewIndex >= 0){
 			   Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
 			   contentProvider.updateChildCount(parent, 0);
 			   contentProvider.updateElement(parent, viewIndex);
