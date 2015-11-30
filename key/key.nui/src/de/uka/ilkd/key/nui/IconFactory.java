@@ -5,6 +5,12 @@ import java.io.InputStream;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+/**
+ * Factory for creation of Icons shown in the proof tree.
+ * 
+ * @author Patrick Jattke
+ *
+ */
 public class IconFactory {
 
 	private IconFactory() {

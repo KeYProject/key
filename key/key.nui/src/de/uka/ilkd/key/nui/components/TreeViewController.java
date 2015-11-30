@@ -69,9 +69,9 @@ public class TreeViewController {
 		// determine number of children and add all children recursively
 		int numChildren = proofNode.childrenCount();
 		if (numChildren == 0) {
-			setNodeIcon(proofNode, fxNode);
+			setNodeIcon(fxNode);
 		} else if (numChildren == 1) {
-			setNodeIcon(proofNode, fxParent);
+			setNodeIcon(fxParent);
 			// add child's subtree to parent
 			addPNodeToFXNode(proofNode.child(0), fxParent);
 		} else if (numChildren > 1) {
@@ -86,7 +86,7 @@ public class TreeViewController {
 					branchLabel = "Case " + (child.parent().getChildNr(child) + 1);
 				}
 				TreeItem<String> branch = new TreeItem<String>(branchLabel);
-				setNodeIcon(child, branch);
+				setNodeIcon(branch);
 				
 				// add node to parent
 				fxParent.getChildren().add(branch);
@@ -98,14 +98,12 @@ public class TreeViewController {
 	}
 	
 	/**
-	 * Sets an Icon on a given treeItem based on the label text of the node
+	 * Sets an Icon on a given treeItem based on the treeItem's text
 	 * 
-	 * @param node
-	 * 			The node whose text should be used to determine which icon is the right one
 	 * @param treeItem
 	 * 			The tree item where the graphics should be placed on
 	 */
-	private void setNodeIcon(Node node, TreeItem<String> treeItem) {
+	private void setNodeIcon(TreeItem<String> treeItem) {
 		String lbl = treeItem.toString().toLowerCase();
 		if (lbl.contains("closed goal")) {
 			treeItem.setGraphic(IconFactory.keyHoleClosed(iconSize, iconSize));
