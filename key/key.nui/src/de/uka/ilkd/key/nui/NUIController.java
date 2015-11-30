@@ -15,11 +15,19 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Controller for the main GUI which is displayed when the program was started
+ * 
+ * @author Florian Breitfelder
+ * @author Patrick Jattke
+ *
+ */
 public class NUIController {
 
     // Stores the position of components added to the SplitPane
     private HashMap<String, Pane> posComponent = new HashMap<String, Pane>();
 
+    // Factory to create GUI components
     private ComponentFactory componentFactory = new ComponentFactory(
             "components/");
 
@@ -47,16 +55,26 @@ public class NUIController {
     @FXML
     MenuButton ButtonTreeView;
 
+    /**
+     * Handles user input if user clicks "Close" in the file menu
+     */
     @FXML
     protected void handleCloseWindow(ActionEvent e) {
         Platform.exit();
     }
 
+    /**
+     * Handles user input if user clicks "About KeY" in the file menu
+     */
     @FXML
     protected void handleAboutWindow(ActionEvent e) {
-        System.out.println("Clicked 'About'.");
+
     }
 
+    /**
+     * Handles user input if the user adds, deletes or moves GUI components by
+     * using the file menu
+     */
     @FXML
     protected void handleLoadComponent(ActionEvent e) {
 
