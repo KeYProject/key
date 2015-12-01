@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.nui;
 
 import java.util.HashMap;
-import java.util.Map;
-
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -80,47 +78,80 @@ public class NUIController {
     @FXML
     protected void handleLoadComponent(ActionEvent e) {
         RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
-        Map<Object, Object> m = clickedItem.getParentMenu().getProperties();
-        String componentName = (String) m.get("componentName");
-        String componentResource = (String) m.get("componentResource");
+        String componentName = (String) // e.g. "treeView", "proofView"
+                clickedItem.getParentMenu().getProperties().get("componentName");
   
-        // Does the component already exist? Then just change its place
+        // Does the component already exist?
+        // Then the user wants either to change change its place or to hide it
         if (posComponent.containsKey(componentName)) {
+            
             Node existingcomponent = null;
-            for(Node n : posComponent.get(componentName).getChildren()){
-                if(n.getId().equals(componentName)) existingcomponent = n; break;
+            for(Node n : posComponent.get(componentName).getChildren()) {
+                if(n.getId().equals(componentName)) {
+                    existingcomponent = n;
+                    break;
+                }
             }
+            
             switch(clickedItem.getText()) {
-            case "left":     left.getChildren().add(existingcomponent); posComponent.replace(componentName, left); break;
-            case "middle": middle.getChildren().add(existingcomponent); posComponent.replace(componentName, middle); break;
-            case "right":   right.getChildren().add(existingcomponent); posComponent.replace(componentName, right); break;
-            case "bottom":   down.getChildren().add(existingcomponent); posComponent.replace(componentName, down); break;
-            default: /* hide was chosen */ 
+            // where to does the User want to move the component?
+            // Add Component to the respective Pane
+            // (the list's observer will automatically remove it
+            //  from the Pane where it currently is listed)
+            // and update its position in the posComponent Map.
+            case "left":    
+                left.getChildren().add(existingcomponent);
+                posComponent.replace(componentName, left);
+                break;
+                
+            case "middle":
+                middle.getChildren().add(existingcomponent);
+                posComponent.replace(componentName, middle);
+                break;
+                
+            case "right":  
+                right.getChildren().add(existingcomponent);
+                posComponent.replace(componentName, right); 
+                break;
+                
+            case "bottom":  
+                down.getChildren().add(existingcomponent);
+                posComponent.replace(componentName, down);
+                break;
+                
+            default: // hide was chosen, delete component and remove it from the map
                 posComponent.get(componentName).getChildren().remove(existingcomponent);
                 posComponent.remove(componentName);
                 statustext.setText("View " + componentName + " hidden.");
             }
             
-        } else // Component did not already exist, thus it must be created
+        } else { // Component did not already exist, thus it must be created
         
-        switch(clickedItem.getText()) {
-        case "left":
-            componentFactory.createComponent(componentName, left,
-                    componentResource, posComponent);
-            break;
-        case "middle":
-            componentFactory.createComponent(componentName, middle,
-                    componentResource, posComponent);
-            break;
-        case "right":
-            componentFactory.createComponent(componentName, right,
-                    componentResource, posComponent);
-            break;
-        case "down":
-            componentFactory.createComponent(componentName, down,
-                    componentResource, posComponent);
-        default:
-            break; 
+            String componentResource = (String)
+                    clickedItem.getParentMenu()
+                               .getProperties()
+                               .get("componentResource");
+            
+            switch(clickedItem.getText()) {
+            // where to does the User want to move the component?
+            case "left":
+                componentFactory.createComponent(componentName, left,
+                        componentResource, posComponent);
+                break;
+            case "middle":
+                componentFactory.createComponent(componentName, middle,
+                        componentResource, posComponent);
+                break;
+            case "right":
+                componentFactory.createComponent(componentName, right,
+                        componentResource, posComponent);
+                break;
+            case "down":
+                componentFactory.createComponent(componentName, down,
+                        componentResource, posComponent);
+            default:
+                break; 
+            }
         }
     }
 }
