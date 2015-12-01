@@ -146,7 +146,7 @@ public class NUIController {
                 componentFactory.createComponent(componentName, right,
                         componentResource, posComponent);
                 break;
-            case "botom":
+            case "bottom":
                 componentFactory.createComponent(componentName, down,
                         componentResource, posComponent);
             default:
