@@ -110,7 +110,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 		@Override
 		public void handleStateChange(State state, Object oldValue) {
-			getTreeViewer().refresh(proof);
+			getTreeViewer().setInput(proof);
 			updateSelectedNodeThreadSafe();
 		}
 	};
