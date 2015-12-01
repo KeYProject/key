@@ -262,9 +262,9 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @param str text to be highlighted
     * @author Anna Filighera
     */
-   private void setKeywordHighlights(String str) {
+   private void setKeywordHighlights( String str) {
       // find keywords and mark them
-      String[] words = str.split("[\\s(){},=.\\[\\]]" );
+      String[] words = str.split("[\\s(){},=.\\[\\];@]" );
       int beginRange = 0;
       markedKeywords = new ArrayList<StyleRange>();
       for(int i = 0; i < words.length; i++){
