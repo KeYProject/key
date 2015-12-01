@@ -7,34 +7,50 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 
+/**
+ * Factory for creating GUI components.
+ * 
+ * @author Florian Breitfelder
+ *
+ */
 public class ComponentFactory {
 
-	private String resourceDir;
+    /**
+     * directory for fxml files
+     */
+    private String resourceDir;
 
-	public ComponentFactory(String resourceDir) {
-		this.resourceDir = resourceDir;
-	}
+    public ComponentFactory(String resourceDir) {
+        this.resourceDir = resourceDir;
+    }
 
-	public Parent createTreeView(String id, Pane pane, HashMap<String, Pane> posComponent) {
-		Parent textEditor = createComponent(id, pane, "treeView.fxml", posComponent);
-		return textEditor;
-	}
-
-	public Parent createTextEditor(String id, Pane pane, HashMap<String, Pane> posComponent) {
-		Parent textEditor = createComponent(id, pane, "textEditor.fxml", posComponent);
-		return textEditor;
-	}
-
-	public Parent createComponent(String id, Pane pane, String resource, HashMap<String, Pane> posComponent) {
-		Parent component = null;
-		try {
-			component = FXMLLoader.load(getClass().getResource(this.resourceDir + resource));
-			component.setId(id);
-			posComponent.put(id, pane);
-			pane.getChildren().add(component);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return component;
-	}
+    /**
+     * Creates a new GUI component and places it in the given pane
+     * 
+     * @param id
+     *            identifier for the new GUI component
+     * @param pane
+     *            here the new GUI component is placed
+     * @param resource
+     *            name of the fxml file for the new GUI component
+     * @param posComponent
+     *            here the position of the new GUI component is stored e. g.
+     *            left, right, etc.
+     * @return a new type Parent GUI component e. g. treeView
+     */
+    public Parent createComponent(String id, Pane pane, String resource,
+            HashMap<String, Pane> posComponent) {
+        Parent component = null;
+        try {
+            component = FXMLLoader
+                    .load(getClass().getResource(this.resourceDir + resource));
+            component.setId(id);
+            posComponent.put(id, pane);
+            pane.getChildren().add(component);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return component;
+    }
 }

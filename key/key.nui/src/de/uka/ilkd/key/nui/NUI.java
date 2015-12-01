@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
+ * Main Class for initializing the GUI
  * 
  * @author Florian Breitfelder
  *
@@ -20,7 +21,10 @@ public class NUI extends Application {
         launch(args);
     }
 
-    @Override 
+    /**
+     * When program is starting method "start" is called
+     */
+    @Override
     public void start(Stage stage) throws Exception {
         // Set default language bundle
         ResourceBundle bundle = new PropertyResourceBundle(
