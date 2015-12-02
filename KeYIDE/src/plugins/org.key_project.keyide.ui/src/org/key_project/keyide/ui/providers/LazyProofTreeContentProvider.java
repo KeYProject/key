@@ -143,19 +143,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 * The Constructor
 	 */
 	public LazyProofTreeContentProvider() {
-//		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
-//	      if (service != null) {
-//	         
-//	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
-//	         if (hideCmd != null) {
-//	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
-//	         }
-//	         
-//	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
-//	         if(symbolicCmd != null){
-//	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
-//	         }
-//	      }
 	}
 	
 	/**
