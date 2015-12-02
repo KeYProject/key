@@ -75,7 +75,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private DefaultTermParser parser = new DefaultTermParser();
       private Services services = getGoal().proof().getServices();
       private TabFolder editorTab = null;
-      LocationVariable[] heaps = null; // TODO: Always private!
+      private LocationVariable[] heaps = null;
       
       
       /**
@@ -129,6 +129,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       public void createControl(Composite root) {
          this.root = root;
          
+         //TODO: For reference tests, see DependencyContractCompletion.java
          //TODO: cleanup layout
          //TODO: All the text/label things should be set to WRAP
          root.setLayout(new GridLayout(2, false));
@@ -223,6 +224,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * adds a copy of the currently selected specification
        */
       private void store(){
+         //FIXME: doesn't *actually* store anything.
          int selectedSpec = editorTab.getSelectionIndex();
          int amountTabs = editorTab.getItemCount();
          String[] invSpecs = new String[heaps.length];
@@ -262,7 +264,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             public void widgetSelected(SelectionEvent event) {
                resetStateTab();
             }
-          });
+         });
          int iter = 0;
          for(LocationVariable heap : heaps){
             TabItem heapTab = new TabItem(heapTabs, SWT.NONE);
@@ -463,23 +465,31 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          Map<LocationVariable, Term> modMap = new LinkedHashMap<LocationVariable, Term>();
          int i = 0;
          //for every heap:
-         for (LocationVariable heap : heaps){
+         for (LocationVariable heap : heaps) {
             //get the invariant and modify terms
             Text wdgt = getTextField(-1, i, 0);
             Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
-            if (invariantTerm == null) return null;
+            if (invariantTerm == null) {
+               return null;
+            }
             wdgt = getTextField(-1, i, 1);
             Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
             Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
-            if (modifiesTerm == null) return null;
+            if (modifiesTerm == null) {
+               return null;
+            }
             invMap.put(heap, invariantTerm);
             modMap.put(heap, modifiesTerm);
-            if (invariantTerm == null || modifiesTerm == null)return null;
+            if (invariantTerm == null || modifiesTerm == null) {
+               return null;
+            }
             i++;
          }
          //get the variant
          Term variantTerm = resetVariantsState();
-         if (variantTerm == null) return null;
+         if (variantTerm == null) {
+            return null;
+         }
          
          //FIXME: InfFlowSpecs are currently not implemented, thus there's little point in writing a UI for them.
          //The InfFlowSpecs code here does not actually do anything.
