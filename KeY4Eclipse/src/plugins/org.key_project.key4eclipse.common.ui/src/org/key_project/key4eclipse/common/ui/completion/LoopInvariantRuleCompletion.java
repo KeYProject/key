@@ -75,7 +75,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private DefaultTermParser parser = new DefaultTermParser();
       private Services services = getGoal().proof().getServices();
       private TabFolder editorTab = null;
-      LocationVariable[] heaps = null;
+      LocationVariable[] heaps = null; // TODO: Always private!
       
       
       /**
@@ -215,7 +215,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          
          resetStateTab();
          
-         //Potential expansion: Discard rule application if Completion dialog was aborted.
+         //TODO: Potential expansion: Discard rule application if Completion dialog was aborted.
+         //This is probably not possible from within this class
       }
       
       /**
@@ -495,7 +496,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       @Override
       public void dispose() {
          //TODO: Is there more to do here?
-         root.dispose();
+         root.dispose(); // TODO: In theory the UI disposes contained elements automatically. What needs to be disposed manually are provider, fonts, images, colors, ... Also ensure that all added listeners are removed.
       }
    }
 }

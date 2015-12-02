@@ -153,19 +153,19 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    private Color grayColor2 = new Color(null,196,205,226);
    private Color firstStatementColor = new Color(null, 167,174,192);
    // descriptor used to ensure portability of Font (but not sure if necessary)
-   private FontDescriptor descriptor = FontDescriptor.createFrom(JFaceResources.getFont(JFaceResources.TEXT_FONT)).setStyle(SWT.BOLD);
-   private Font boldFont = descriptor.createFont(null);
+   private FontDescriptor descriptor = FontDescriptor.createFrom(JFaceResources.getFont(JFaceResources.TEXT_FONT)).setStyle(SWT.BOLD); // TODO: Use viewer.getTextWidget().getFont(), maybe it has a different font
+   private Font boldFont = descriptor.createFont(null); // TODO: Use viewer.getTextWidget().getDisplay() as parameter, there might be more then one Display.
    /**
     * Java keywords to be highlighted.
     */
-   private final static List<String> javaKeywords = Arrays.asList("if", "else", "for", "do",
+   private final static List<String> javaKeywords = Arrays.asList("if", "else", "for", "do", // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
       "while", "return", "break", "switch", "case", "continue", "try",
       "catch", "finally", "assert", "null", "throw", "this", "true",
       "false", "int", "char", "long", "short", "boolean" );
    /**
     *  Dynamic logic keywords to be highlighted.
     */
-   private final static List<String> dynamicKeywords = Arrays.asList("\\forall",
+   private final static List<String> dynamicKeywords = Arrays.asList("\\forall", // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
       "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum",
       "bsum", "\\in", "exactInstance", "wellFormed", "measuredByEmpty",
       "method-frame", "<created>", "<inv>", "\\cup",
@@ -173,7 +173,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * Propositional logic keywords to be highlighted.
     */
-   private final static List<String> propKeywords = Arrays.asList( "<->", "->", "&",
+   private final static List<String> propKeywords = Arrays.asList( "<->", "->", "&", // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
       "|", "!", "true", "false", "" + EQV, "" + IMP, "" + AND, "" + OR,
       "" + NEG, "" + TOP, "" + BOT);
    private String text;
@@ -264,7 +264,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    private void setKeywordHighlights( String str) {
       // find keywords and mark them
-      String[] words = str.split("[\\s(){},=.\\[\\];@]" );
+      String[] words = str.split("[\\s(){},=.\\[\\];@]" ); // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
       int beginRange = 0;
       markedKeywords = new ArrayList<StyleRange>();
       for(int i = 0; i < words.length; i++){
@@ -287,7 +287,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       }
       // find operators enclosed by word characters or whitespaces and mark them
       beginRange = 0;
-      String[] operators = str.split("[\\s\\w(){}=,.\\[\\]]");
+      String[] operators = str.split("[\\s\\w(){}=,.\\[\\]]"); // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
       for(int i = 0; i<operators.length; i++){
          if(dynamicKeywords.contains(operators[i]) || propKeywords.contains(operators[i])){
             StyleRange mark = new StyleRange();
