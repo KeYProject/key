@@ -69,9 +69,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 	private final KeYSelectionModel selectionModel;
 	
-	private State hideState;
+	private State hideState; // TODO: Move State to the outline and declare here only a boolean flag with getter and setter. Setter alled by outline
 	
-	private State symbolicState;
+	private State symbolicState; // TODO: Move State to the outline and declare here only a boolean flag with getter and setter. Setter alled by outline
 	
 	/**
 	 * {@link KeYSelectionListener} to sync the KeYSelection with the
