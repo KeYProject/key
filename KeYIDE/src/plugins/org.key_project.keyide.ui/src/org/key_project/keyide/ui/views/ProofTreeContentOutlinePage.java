@@ -110,6 +110,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 		@Override
 		public void handleStateChange(State state, Object oldValue) {
+			contentProvider.setHideState((boolean) state.getValue());
 			getTreeViewer().setInput(proof);
 			updateSelectedNodeThreadSafe();
 		}
@@ -122,7 +123,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
       @Override
       public void handleStateChange(State state, Object oldValue) {
-         System.out.println("symbolic state changed");
+    	  contentProvider.setSymbolicState((boolean) state.getValue());
+    	  System.out.println("symbolic state changed");
       }
 	};
 
@@ -203,6 +205,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		super.createControl(parent);
 		getTreeViewer().setUseHashlookup(true);
 		contentProvider = new LazyProofTreeContentProvider();
+		contentProvider.setHideState((boolean) hideState.getValue());
+		contentProvider.setSymbolicState((boolean) symbolicState.getValue());
 		getTreeViewer().setContentProvider(contentProvider);
 		labelProvider = new ProofTreeLabelProvider(getTreeViewer(),
 				environment.getProofControl(), proof);
@@ -313,7 +317,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		for (Object unknownElement : unknownParents) {
 			Object parent = contentProvider.getParent(unknownElement);
 			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-			if((boolean) contentProvider.getHideState().getValue() == false || node.leaf() || viewIndex >= 0){
+			if(contentProvider.getHideState() == false || node.leaf() || viewIndex >= 0){
 			   Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
 			   contentProvider.updateChildCount(parent, 0);
 			   contentProvider.updateElement(parent, viewIndex);

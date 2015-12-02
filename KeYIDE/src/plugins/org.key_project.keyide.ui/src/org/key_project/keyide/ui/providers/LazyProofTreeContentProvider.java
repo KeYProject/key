@@ -129,33 +129,33 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	private Proof proof;
 	
 	/**
-	 * The {@link State} which indicates hiding or showing of intermediate proofsteps
+	 * The boolean flag which indicates hiding or showing of intermediate proofsteps
 	 */
-	private State hideState;
+	private boolean hideState;
 	
 	
 	/**
-	 * The {@link State} for the show symbolic execution tree only outline feature
+	 * The boolean flag for the show symbolic execution tree only outline feature
 	 */
-	private State symbolicState;
+	private boolean symbolicState;
 	
 	/**
 	 * The Constructor
 	 */
 	public LazyProofTreeContentProvider() {
-		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
-	      if (service != null) {
-	         
-	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
-	         if (hideCmd != null) {
-	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
-	         }
-	         
-	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
-	         if(symbolicCmd != null){
-	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
-	         }
-	      }
+//		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+//	      if (service != null) {
+//	         
+//	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
+//	         if (hideCmd != null) {
+//	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
+//	         }
+//	         
+//	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
+//	         if(symbolicCmd != null){
+//	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
+//	         }
+//	      }
 	}
 	
 	/**
@@ -356,7 +356,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			count += 1;
 		}
 		// return the number of Nodes when the hideIntermediateProofsteps filter is active
-		if((boolean) hideState.getValue() == true){
+		if(hideState == true){
 			if(branchNode.leaf()){
 				count = 1;
 			} else {
@@ -414,7 +414,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		}
 		// element is a Node
 		if (index < childCount) {
-			if((boolean) hideState.getValue() == true){
+			if(hideState == true){
 				// gets the right node when the hideIntermediateProofsteps filter is active
 				while(node.childrenCount() == 1){
 					node = node.child(0);
@@ -470,7 +470,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			current = ((BranchFolder) parent).getChild();
 		}
 		// returns -1 for every intermediate proof step when the filter is active
-		if((boolean) hideState.getValue() == true){
+		if(hideState == true){
 			if(element instanceof Node){
 				Node node = (Node) element;
 				if(!node.leaf()){
@@ -491,7 +491,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 					int indexOnParent = parentNode.getChildNr(current);
 					current = parentNode.child(indexOnParent + 1);
 					// does not increment when the hideIntermediateProofsteps filter is active
-					if((boolean) hideState.getValue() != true){
+					if(hideState != true){
 					   index++;
 					}
 				}
@@ -509,7 +509,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 						int childIndex = current.getChildNr(node);
 						if (childIndex >= 0) {
 							found = true;
-							if((boolean) hideState.getValue() == true){ // hideIntermediateProofsteps filter is active
+							if(hideState == true){ // hideIntermediateProofsteps filter is active
 							   if(element instanceof BranchFolder){
 							      index += childIndex;
 							   }
@@ -523,7 +523,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 					} else {
 						current = current.child(0);
 						// does not increment the index when the hideIntermediateProofsteps filter is active
-						if((boolean) hideState.getValue() == false){
+						if(hideState == false){
 							index++;
 						}
 					}
@@ -570,7 +570,15 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		}
 	}
 	
-	public State getHideState(){
+	public boolean getHideState(){
 	   return hideState;
+	}
+	
+	public void setHideState(boolean state){
+		hideState = state;
+	}
+	
+	public void setSymbolicState(boolean state){
+		symbolicState = state;
 	}
 }
