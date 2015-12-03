@@ -52,8 +52,6 @@ final /*@ pure @*/ class Matrix {
     }
 
     /** matrix addition */
-    //@ requires m.size() == n.size();
-    //@ measured_by m.size();
     static Matrix plus (Matrix m, Matrix n) {
 	if (m.size()==2) {
 	    return new Matrix(m.v11+n.v11, m.v12+n.v12,
@@ -65,7 +63,6 @@ final /*@ pure @*/ class Matrix {
     }
 
     /** matrix negation */
-    //@ measured_by m.size();
     static Matrix neg (Matrix m) {
 	if (m.size()==2) {
             return new Matrix(-m.v11, -m.v12,
@@ -77,9 +74,6 @@ final /*@ pure @*/ class Matrix {
     }
 
     /** naive O(n^3) matrix multiplication */
-    //@ strictly_pure 
-    //@ requires m.size() == n.size();
-    //@ measured_by m.size();
     static Matrix mult (Matrix m, Matrix n) {
 	if (m.size()==2) {
             return new Matrix(
@@ -94,23 +88,54 @@ final /*@ pure @*/ class Matrix {
 	}
     }
 
-    /** fancy O(n^{log 7}) matrix multiplication by Strassen 
+    /** fancy O(n^{log 7}) matrix multiplication by Strassen (general case) */
     /*@ normal_behavior
       @ requires m.size() == n.size();
       @ ensures \result.equals(mult(m,n));
-      @ measured_by size();
-    static Matrix strassen (Matrix m, Matrix n) {
-        int m1 = (m.a+m.d)*(n.a+n.d);
-        int m2 = (m.c+m.d)*n.a;
-        int m3 = m.a*(n.b-n.d);
-        int m4 = m.d*(n.c-n.a);
-        int m5 = (m.a+m.b)*n.d;
-        int m6 = (m.c-m.a)*(n.a+n.b);
-        int m7 = (m.b-m.d)*(n.c+n.d);
+      @*/
+    static Matrix strassenMult (Matrix m, Matrix n) {
+	if (m.size() == 2) return strassen22(m,n);
+	else return strassen (m,n);
+    }
+
+    /** fancy O(n^{log 7}) matrix multiplication by Strassen (base case) */
+    /*@ normal_behavior
+      @ requires m.size() == 2 && n.size() == 2;
+      @ ensures \result.equals(mult(m,n));
+      @*/
+    static Matrix strassen22 (Matrix m, Matrix n) {
+        int m1 = (m.v11+m.v22)*(n.v11+n.v22);
+        int m2 = (m.v21+m.v22)*n.v11;
+        int m3 = m.v11*(n.v12-n.v22);
+        int m4 = m.v22*(n.v21-n.v11);
+        int m5 = (m.v11+m.v12)*n.v22;
+        int m6 = (m.v21-m.v11)*(n.v11+n.v12);
+        int m7 = (m.v12-m.v22)*(n.v21+n.v22);
         return new Matrix(
             m1+m4-m5+m7,  m3+m5,
             m2+m4      ,  m1-m2+m3+m6);
     }
-    */
 
+    /** fancy O(n^{log 7}) matrix multiplication by Strassen (step case) */
+    /*@ normal_behavior
+      @ requires m.size() > 2;
+      @ requires m.size() == n.size();
+      @ ensures \result.equals(mult(m,n));
+      @ measured_by m.size();
+      @*/
+    static Matrix strassen (Matrix m, Matrix n) {
+        final Matrix m1 = strassen(plus(m.a,m.d),plus(n.a,n.d));
+	final Matrix m2 = strassen(plus(m.c,m.d),n.a);
+	final Matrix m3 = strassen(m.a,plus(n.b,neg(n.d)));
+	final Matrix m4 = strassen(m.d,plus(n.c,neg(n.a)));
+	final Matrix m5 = strassen(plus(m.a,m.b),n.d);
+	final Matrix m6 = strassen(plus(m.c,neg(m.a)),plus(n.a,n.b));
+	final Matrix m7 = strassen(plus(m.b,neg(m.d)),plus(n.c,n.d));
+	final Matrix ra = plus(m1,plus(m4,plus(neg(m5),m7)));
+	final Matrix rb = plus(m3,m5);
+	final Matrix rc = plus(m2,m4);
+	final Matrix rd = plus(m1,plus(neg(m2),plus(m3,m6)));
+	return new Matrix(ra,rb,rc,rd);
+    }
 }
+
