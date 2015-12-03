@@ -7,6 +7,10 @@ import java.util.Map;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -23,6 +27,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
@@ -126,58 +131,67 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * {@inheritDoc}
        */
       @Override
-      public void createControl(Composite root) {
-         this.root = root;
+      public void createControl(Composite parent) {
+         root = new SashForm(parent, SWT.NONE);
          
          //TODO: For reference tests, see DependencyContractCompletion.java
          //TODO: cleanup layout
          //TODO: All the text/label things should be set to WRAP
-         root.setLayout(new GridLayout(2, false));
-         GridData fillData = new GridData(SWT.FILL, SWT.FILL, true, true);
          //fillData.horizontalAlignment = SWT.FILL;
-         root.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-         FillLayout vertlayout = new FillLayout(SWT.VERTICAL);
          
          //Set up right column:
-         Composite stateColumn = new Composite(root, SWT.NO_BACKGROUND);
-         stateColumn.setLayout(vertlayout);
-         stateColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+         Composite stateColumn = new Composite(root, SWT.NONE);
+         stateColumn.setLayout(new GridLayout(1, false));
+//         stateColumn.setLayoutData(new GridData(GridData.FILL_BOTH));
          
          //Set up loop preview:
-         Label code = new Label(stateColumn, SWT.BORDER);
+         Text code = new Text(stateColumn, SWT.READ_ONLY | SWT.WRAP);
+         code.setLayoutData(new GridData(GridData.FILL_BOTH));
          Font monospace = JFaceResources.getFont(JFaceResources.TEXT_FONT);
          code.setFont(monospace);
-         code.setBackground(root.getDisplay().getSystemColor(SWT.COLOR_WHITE));
          code.setText(getLoopText());
          
          //Set up state views:
-         Group invStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
-         invStatusGrp.setLayout(vertlayout);
+         Group invStatusGrp = new Group(stateColumn, SWT.NONE);
+         invStatusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
+         invStatusGrp.setLayout(new FillLayout());
          invStatusGrp.setText("Invariant - Status:");
          invariantStatus = new Label(invStatusGrp, SWT.WRAP);
          invariantStatus.setText("Ok");
 
-         Group modStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
-         modStatusGrp.setLayout(vertlayout);
+         Group modStatusGrp = new Group(stateColumn, SWT.NONE);
+         modStatusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
+         modStatusGrp.setLayout(new FillLayout());
          modStatusGrp.setText("Modifies - Status:");
          modifiesStatus = new Label(modStatusGrp, SWT.WRAP);
          modifiesStatus.setText("Ok");
 
-         Group varStatusGrp = new Group(stateColumn, SWT.SHADOW_IN);
-         varStatusGrp.setLayout(vertlayout);
+         Group varStatusGrp = new Group(stateColumn, SWT.NONE);
+         varStatusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
+         varStatusGrp.setLayout(new FillLayout());
          varStatusGrp.setText("Variant - Status:");
          variantStatus = new Label(varStatusGrp, SWT.WRAP);
          variantStatus.setText("Ok");
          
          //Set up right column
-         Composite rightColumn = new Composite(root, SWT.NO_BACKGROUND);
-         rightColumn.setLayout(vertlayout);
-         rightColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-         editorTab = new TabFolder(rightColumn, SWT.TOP);
+         Composite inputColumn = new Composite(root, SWT.NONE);
+         inputColumn.setLayout(new GridLayout(1, false));
+         editorTab = new TabFolder(inputColumn, SWT.TOP);
+         editorTab.setLayoutData(new GridData(GridData.FILL_BOTH));
          //this listener updates the state whenever tabs are switched.
          editorTab.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                resetStateTab();
+            }
+         });
+         // set up store button
+         Button store = new Button(inputColumn, SWT.PUSH);
+         store.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+         store.setText("Store");
+         store.addSelectionListener(new SelectionAdapter(){
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               store(); // add new tab 
             }
          });
          
@@ -246,20 +260,31 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @param id - id of the new tab
        * @return the generated TabItem's Composite
        */
-      private Control addTab(String[] invariants, String[] modifies, String variant, int id){
+      private Control addTab(String[] invariants, String[] modifies, String variant, int id) {
          //TODO: do not add as a tab, but add another Composite. DropDown menu to switch between specifications.
-         GridLayout vertlayout = new GridLayout();
-         int fontsize = editorTab.getFont().getFontData()[0].getHeight();
          
          //add a tab item
-         TabItem tab = new TabItem (editorTab, SWT.NONE);
+         TabItem tab = new TabItem(editorTab, SWT.NONE);
          tab.setText("inv " + id);
+         
          //inside, place a composite containing three groups (for pretty frames) with a Text item each.
-         Composite textContainer = new Composite(editorTab, SWT.NO_BACKGROUND | SWT.V_SCROLL);
-         tab.setControl(textContainer);
+         final SharedScrolledComposite scrolledComposite = new SharedScrolledComposite(editorTab, SWT.H_SCROLL | SWT.V_SCROLL) {};
+         scrolledComposite.setExpandHorizontal(true);
+         scrolledComposite.setExpandVertical(true);
+         
+         Composite textContainer = new Composite(scrolledComposite, SWT.NONE);
+         textContainer.setLayout(new GridLayout(1, false));
+         scrolledComposite.setContent(textContainer);
+         tab.setControl(scrolledComposite);
+         tab.getParent().addControlListener(new ControlAdapter() {
+            @Override
+            public void controlResized(ControlEvent e) {
+               scrolledComposite.reflow(true);
+            }
+         });
          //add a tab folder
          TabFolder heapTabs = new TabFolder(textContainer, SWT.TOP);
-         heapTabs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+         heapTabs.setLayoutData(new GridData(GridData.FILL_BOTH));
          heapTabs.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                resetStateTab();
@@ -269,25 +294,23 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          for(LocationVariable heap : heaps){
             TabItem heapTab = new TabItem(heapTabs, SWT.NONE);
             heapTab.setText(heap.toString());
-            Composite modinvcontainer = new Composite(heapTabs, SWT.NO_BACKGROUND);
-            modinvcontainer.setLayout(vertlayout);
+            Composite modinvcontainer = new Composite(heapTabs, SWT.NONE);
+            modinvcontainer.setLayout(new GridLayout(1, false));
             heapTab.setControl(modinvcontainer);
             
             //for all elems in heap, add a TabItem
-            Group invariantGroup = new Group(modinvcontainer, SWT.SHADOW_IN);
-            Text invariantT = new Text(invariantGroup, SWT.WRAP);
-            Group modifiesGroup = new Group(modinvcontainer, SWT.SHADOW_IN);
-            Text modifiesT = new Text(modifiesGroup, SWT.WRAP);
-            invariantGroup.setLayout(vertlayout);
+            Group invariantGroup = new Group(modinvcontainer, SWT.NONE);
+            Text invariantT = new Text(invariantGroup, SWT.V_SCROLL);
+            invariantGroup.setLayout(new FillLayout());
             invariantGroup.setText("invariant");
-            invariantGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-            invariantT.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            invariantGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
             invariantT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
             invariantT.setText(invariants[iter] != null ? invariants[iter] : "true");
-            modifiesGroup.setLayout(vertlayout);
+            Group modifiesGroup = new Group(modinvcontainer, SWT.NONE);
+            modifiesGroup.setLayout(new FillLayout());
             modifiesGroup.setText("modifies");
-            modifiesGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-            modifiesT.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            modifiesGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
+            Text modifiesT = new Text(modifiesGroup, SWT.V_SCROLL);
             modifiesT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
             modifiesT.setText(modifies[iter] != null? modifies[iter] : "allLocs");
             
@@ -306,29 +329,13 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             });
             iter++;
          }
-         Group variantsGroup = new Group(textContainer, SWT.SHADOW_IN);
-         Text variantsT = new Text(variantsGroup, SWT.WRAP);
-         textContainer.setLayout(vertlayout);
-         variantsGroup.setLayout(vertlayout);
+         Group variantsGroup = new Group(textContainer, SWT.NONE);
+         variantsGroup.setLayout(new FillLayout());
          variantsGroup.setText("variants");
-         variantsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-         variantsT.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+         variantsGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
+         Text variantsT = new Text(variantsGroup, SWT.V_SCROLL);
          variantsT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
          variantsT.setText(variant == null ? "" : variant);
-         
-         
-         // set up store button
-         Button store = new Button(textContainer, SWT.PUSH);
-         store.setText("Store");
-
-         //add listeners.
-         store.addSelectionListener(new SelectionAdapter(){
-            // adds new tab 
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-               store();
-            }
-         });
          
          variantsT.addModifyListener(new ModifyListener(){
             public void modifyText(ModifyEvent event) {
@@ -439,15 +446,18 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @return the Text widget containing the specification.
        */
       private Text getTextField(int specification, int heap, int textField){
-         if (specification == -1) specification = editorTab.getSelectionIndex();
+         if (specification == -1) {
+            specification = editorTab.getSelectionIndex();
+         }
          TabItem tab = editorTab.getItem(specification);
-         Composite txtcontainer = (Composite)tab.getControl();
+         ScrolledComposite scrolledComposite = (ScrolledComposite) tab.getControl();
+         Composite txtcontainer = (Composite) scrolledComposite.getContent();
          if (textField == 2) {
             Group vargrp = (Group)txtcontainer.getChildren()[1];
             return (Text)vargrp.getChildren()[0];
          }
          TabFolder tfld = (TabFolder)txtcontainer.getChildren()[0];
-         if (heap == -1) heap = tfld.getSelectionIndex();
+         if (heap == -1) heap = tfld.getSelectionIndex(); // TODO: NEVER DO; ALWAYS IN TWO LINES WITH {}!! HERE AND EVERYWHERE!
          Composite modinvcontainer = (Composite)(tfld.getItem(heap).getControl());
          Group modOrVarGrp = (Group)(modinvcontainer.getChildren()[textField]);
          Text wdgt = (Text)modOrVarGrp.getChildren()[0];
