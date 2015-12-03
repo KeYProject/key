@@ -110,7 +110,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 		@Override
 		public void handleStateChange(State state, Object oldValue) {
-			ProofTreeContentOutlinePage.this.handleStateChange(state, oldValue);
+			ProofTreeContentOutlinePage.this.handleHideStateChanged(state, oldValue);
 		}
 	};
 	
@@ -121,8 +121,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
       @Override
       public void handleStateChange(State state, Object oldValue) {
-    	  contentProvider.setSymbolicState((boolean) state.getValue());
     	  System.out.println("symbolic state changed");
+    	  ProofTreeContentOutlinePage.this.handleSymbolicStateChanged(state, oldValue);
       }
 	};
 
@@ -161,12 +161,18 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	      }
 	}
 
+	protected void handleSymbolicStateChanged(State state, Object oldValue) {
+		contentProvider.setSymbolicState((boolean) state.getValue());
+		getTreeViewer().setInput(proof);
+		//updateSelectedNodeThreadSafe();
+	}
+
 	/**
 	 * Handles a change in the state of the hideIntermediateProofsteps outline feature
 	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
 	 * @param oldValue The old value; may be anything.
 	 */
-	protected void handleStateChange(State state, Object oldValue) {
+	protected void handleHideStateChanged(State state, Object oldValue) {
 		contentProvider.setHideState((boolean) state.getValue());
 		getTreeViewer().setInput(proof);
 		updateSelectedNodeThreadSafe();
@@ -214,6 +220,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		super.createControl(parent);
 		getTreeViewer().setUseHashlookup(true);
 		contentProvider = new LazyProofTreeContentProvider();
+		// initialize boolean flags for hideIntermediateProofSteps and showSymbolicExecutionTree outline feature
 		contentProvider.setHideState((boolean) hideState.getValue());
 		contentProvider.setSymbolicState((boolean) symbolicState.getValue());
 		getTreeViewer().setContentProvider(contentProvider);

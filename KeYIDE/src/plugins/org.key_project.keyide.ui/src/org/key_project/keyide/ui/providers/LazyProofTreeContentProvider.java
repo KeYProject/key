@@ -16,24 +16,20 @@ package org.key_project.keyide.ui.providers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.testing.ContributionInfo;
-import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
-import org.key_project.keyide.ui.handlers.ShowSymbolicExecutionTreeOnlyHandler;
-
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
  * A class to provide the proofTree transformed to the KeY-Internal
@@ -139,6 +135,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	private boolean symbolicState;
 	
+	private SymbolicExecutionTreeBuilder symbolicExeTreeBuilder;
+	
 	/**
 	 * The Constructor
 	 */
@@ -158,8 +156,11 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if (newInput instanceof Proof) {
 			this.proof = (Proof) newInput;
 			proof.addProofTreeListener(proofTreeListener);
+			symbolicExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+			symbolicExeTreeBuilder.analyse();
 		} else {
 			this.proof = null;
+			this.symbolicExeTreeBuilder = null;
 		}
 	}
 
@@ -338,9 +339,20 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	protected int getBranchFolderChildCount(Node node) {
 		Node branchNode = getBranchNode(node);
 		int count = 1;
+		if(symbolicState){
+			if(symbolicExeTreeBuilder.getExecutionNode(branchNode) == null){
+				count = 0;
+			}
+		}
 		while (branchNode.childrenCount() == 1) {
 			branchNode = branchNode.child(0);
-			count += 1;
+			if(symbolicState){
+				if(symbolicExeTreeBuilder.getExecutionNode(branchNode) != null){
+					count += 1;
+				}
+			} else {
+				count += 1;
+			}
 		}
 		// return the number of Nodes when the hideIntermediateProofsteps filter is active
 		if(hideState == true){
@@ -567,5 +579,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	
 	public void setSymbolicState(boolean state){
 		symbolicState = state;
+		if(symbolicExeTreeBuilder != null && state){
+			symbolicExeTreeBuilder.analyse();
+		}
 	}
 }
