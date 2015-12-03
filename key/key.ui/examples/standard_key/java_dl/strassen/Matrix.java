@@ -11,7 +11,7 @@ final class Matrix {
     }
 
     //@ strictly_pure
-    boolean eq(Matrix o) {
+    public boolean equals(Matrix o) {
          return ( a==o.a & b==o.b
                 & c==o.c & d==o.d);
     }
@@ -26,7 +26,7 @@ final class Matrix {
 
     /** fancy O(n^{log 7}) matrix multiplication by Strassen */
     /*@ normal_behavior
-      @ ensures \result.eq(mult(m,n));
+      @ ensures \result.equals(mult(m,n));
       @*/
     static Matrix strassen (Matrix m, Matrix n) {
         int m1 = (m.a+m.d)*(n.a+n.d);
