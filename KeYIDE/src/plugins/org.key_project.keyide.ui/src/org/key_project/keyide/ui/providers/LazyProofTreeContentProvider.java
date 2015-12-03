@@ -156,8 +156,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if (newInput instanceof Proof) {
 			this.proof = (Proof) newInput;
 			proof.addProofTreeListener(proofTreeListener);
-			symbolicExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
-			symbolicExeTreeBuilder.analyse();
+//			symbolicExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+//			symbolicExeTreeBuilder.analyse();
 		} else {
 			this.proof = null;
 			this.symbolicExeTreeBuilder = null;
@@ -339,20 +339,20 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	protected int getBranchFolderChildCount(Node node) {
 		Node branchNode = getBranchNode(node);
 		int count = 1;
-		if(symbolicState){
-			if(symbolicExeTreeBuilder.getExecutionNode(branchNode) == null){
-				count = 0;
-			}
-		}
+//		if(symbolicState){
+//			if(symbolicExeTreeBuilder.getExecutionNode(branchNode) == null){
+//				count = 0;
+//			}
+//		}
 		while (branchNode.childrenCount() == 1) {
 			branchNode = branchNode.child(0);
-			if(symbolicState){
-				if(symbolicExeTreeBuilder.getExecutionNode(branchNode) != null){
-					count += 1;
-				}
-			} else {
+//			if(symbolicState){
+//				if(symbolicExeTreeBuilder.getExecutionNode(branchNode) != null){
+//					count += 1;
+//				}
+//			} else {
 				count += 1;
-			}
+//			}
 		}
 		// return the number of Nodes when the hideIntermediateProofsteps filter is active
 		if(hideState == true){
@@ -580,7 +580,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	public void setSymbolicState(boolean state){
 		symbolicState = state;
 		if(symbolicExeTreeBuilder != null && state){
-			symbolicExeTreeBuilder.analyse();
+//			symbolicExeTreeBuilder.analyse();
 		}
 	}
 }
