@@ -69,9 +69,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 	private final KeYSelectionModel selectionModel;
 	
-	private State hideState; // TODO: Move State to the outline and declare here only a boolean flag with getter and setter. Setter alled by outline
+	private State hideState;
 	
-	private State symbolicState; // TODO: Move State to the outline and declare here only a boolean flag with getter and setter. Setter alled by outline
+	private State symbolicState;
 	
 	/**
 	 * {@link KeYSelectionListener} to sync the KeYSelection with the
@@ -110,9 +110,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 		@Override
 		public void handleStateChange(State state, Object oldValue) {
-			contentProvider.setHideState((boolean) state.getValue());
-			getTreeViewer().setInput(proof);
-			updateSelectedNodeThreadSafe();
+			ProofTreeContentOutlinePage.this.handleHideStateChanged(state, oldValue);
 		}
 	};
 	
@@ -123,8 +121,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
       @Override
       public void handleStateChange(State state, Object oldValue) {
-    	  contentProvider.setSymbolicState((boolean) state.getValue());
     	  System.out.println("symbolic state changed");
+    	  ProofTreeContentOutlinePage.this.handleSymbolicStateChanged(state, oldValue);
       }
 	};
 
@@ -161,6 +159,23 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	            }
 	         }
 	      }
+	}
+
+	protected void handleSymbolicStateChanged(State state, Object oldValue) {
+		contentProvider.setSymbolicState((boolean) state.getValue());
+		getTreeViewer().setInput(proof);
+		//updateSelectedNodeThreadSafe();
+	}
+
+	/**
+	 * Handles a change in the state of the hideIntermediateProofsteps outline feature
+	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
+	 * @param oldValue The old value; may be anything.
+	 */
+	protected void handleHideStateChanged(State state, Object oldValue) {
+		contentProvider.setHideState((boolean) state.getValue());
+		getTreeViewer().setInput(proof);
+		updateSelectedNodeThreadSafe();
 	}
 
 	/**
@@ -205,6 +220,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		super.createControl(parent);
 		getTreeViewer().setUseHashlookup(true);
 		contentProvider = new LazyProofTreeContentProvider();
+		// initialize boolean flags for hideIntermediateProofSteps and showSymbolicExecutionTree outline feature
 		contentProvider.setHideState((boolean) hideState.getValue());
 		contentProvider.setSymbolicState((boolean) symbolicState.getValue());
 		getTreeViewer().setContentProvider(contentProvider);

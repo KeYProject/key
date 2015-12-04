@@ -15,6 +15,8 @@ package org.key_project.keyide.ui.test.testcase;
 
 import java.io.File;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
@@ -23,7 +25,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.RegistryToggleState;
 import org.junit.Test;
+import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
@@ -131,14 +137,14 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	          viewer.setUseHashlookup(true);
 	          LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
 	          // deactivate hiding intermediate proofsteps
-	          lazyContentProvider.getHideState().setValue(false);
+	          lazyContentProvider.setHideState(false);
 	          viewer.setContentProvider(lazyContentProvider);
 	          viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
 	          viewer.setInput(proof);
 	          shell.setVisible(true);
 	          viewer.expandAll();
 	          // check if initial toggle State is false
-	          assertFalse((boolean) lazyContentProvider.getHideState().getValue());
+	          assertFalse((boolean) lazyContentProvider.getHideState());
 	          // check if proof tree is correct before activating the filter
 	          TreeViewerIterator viewerIter = new TreeViewerIterator(viewer);
 	          NodePreorderIterator nodeIter = new NodePreorderIterator(proof.root());
@@ -146,8 +152,9 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	             assertTree(nodeIter, viewerIter);
 	          }
 	          
+	          
 	          // activate hide intermediate proofsteps filter
-	          lazyContentProvider.getHideState().setValue(true);
+	          lazyContentProvider.setHideState(true);
 	          // start auto mode
 	          environment.getProofControl().startAndWaitForAutoMode(proof);
 	          viewer.setInput(proof);
@@ -160,7 +167,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	          }
 	          
 	          // deactivate hide intermediate proofsteps filter
-	          lazyContentProvider.getHideState().setValue(false);
+	          lazyContentProvider.setHideState(false);
 	          viewer.setInput(proof);
 	          viewer.expandAll();
 	          TreeViewerIterator viewerIterShow = new TreeViewerIterator(viewer);

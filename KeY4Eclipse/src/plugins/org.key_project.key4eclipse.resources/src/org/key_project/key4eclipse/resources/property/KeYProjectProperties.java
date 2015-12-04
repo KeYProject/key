@@ -32,6 +32,7 @@ public final class KeYProjectProperties {
    public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
    public static final QualifiedName PROP_GENERATE_TEST_CASES = new QualifiedName("org.key_project.key4eclipse.resources", "generateTestCases");
+   public static final QualifiedName PROP_GENERATE_COUNTER_EXAMPLES = new QualifiedName("org.key_project.key4eclipse.resources", "counterExamples");
    public static final QualifiedName PROP_AUTO_DELETE_TEST_CASES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteTestCases");
     
    public static boolean isEnableKeYResourcesBuilds(IProject project) {
@@ -196,6 +197,31 @@ public final class KeYProjectProperties {
    public static void setGenerateTestCases(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
          project.setPersistentProperty(PROP_GENERATE_TEST_CASES, enabled + "");
+      }
+   }
+   
+   
+   public static boolean isGenerateCounterExamples(IProject project) {
+      if (project != null) {
+         String value;
+         try {
+            value = project.getPersistentProperty(PROP_GENERATE_COUNTER_EXAMPLES);
+            if(value == null){
+               return false;
+            }
+            return Boolean.parseBoolean(value);
+         }
+         catch (CoreException e) {
+            return false;
+         }
+      }
+      return false;
+   }
+   
+   
+   public static void setGenerateCounterExamples(IProject project,  boolean enabled) throws CoreException {
+      if (project != null) {
+         project.setPersistentProperty(PROP_GENERATE_COUNTER_EXAMPLES, enabled + "");
       }
    }
    

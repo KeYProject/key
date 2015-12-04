@@ -24,6 +24,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
+import org.key_project.key4eclipse.resources.counterexamples.KeYProjectCounterExample;
+import org.key_project.key4eclipse.resources.counterexamples.TreeElement;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.XMLUtil;
@@ -57,6 +59,9 @@ public class ProofMetaFileWriter {
    public static final String TAG_INLINEMETHOD_REFERENCE = "inlineMethodReference";
    public static final String TAG_CONTRACT_REFERENCES = "contractReferences";
    public static final String TAG_CONTRACT_REFERENCE = "contractReference";
+   public static final String TAG_COUNTER_EXAMPLES = "counterExamples";
+   public static final String TAG_COUNTER_EXAMPLE = "counterExample";
+   public static final String TAG_COUNTER_EXAMPLE_NODE = "counterExampleNode";
    
    
    
@@ -78,6 +83,9 @@ public class ProofMetaFileWriter {
    public static final String ATTRIBUTE_IS_FINAL = "isFinal";
    public static final String ATTRIBUTE_INITIALIZER = "initializer";
    public static final String ATTRIBUTE_REP = "rep";
+   public static final String ATTRIBUTE_COUNTER_EXAMPLE_ID = "id";
+   public static final String ATTRIBUTE_COUNTER_EXAMPLE_NAME = "name";
+   public static final String ATTRIBUTE_COUNTER_EXAMPLE_NODE_NAME = "name";
    
 
    /**
@@ -123,6 +131,7 @@ public class ProofMetaFileWriter {
       appendCalledMethods(pe, 1, sb);
       appendAssumptions(pe, 1, sb);
       appendReferences(pe.getProofMetaReferences(), 1, sb);
+      appendCounterExamples(pe.getCounterExamples(), 1, sb);
       XMLUtil.appendEndTag(0, TAG_PROOF_META_FILE, sb);
       return sb.toString();
    }
@@ -321,5 +330,33 @@ public class ProofMetaFileWriter {
          }
          XMLUtil.appendEndTag(level, TAG_CONTRACT_REFERENCES, sb);
       }
+   }
+   
+   
+   private static void appendCounterExamples(List<KeYProjectCounterExample> counterExamples, int level, StringBuffer sb){
+       if(counterExamples != null && !counterExamples.isEmpty()){
+          XMLUtil.appendStartTag(level, TAG_COUNTER_EXAMPLES, null, sb);
+          for (KeYProjectCounterExample ce : counterExamples) {
+              Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+              attributeValues.put(ATTRIBUTE_COUNTER_EXAMPLE_ID, ce.getProblemId());
+              attributeValues.put(ATTRIBUTE_COUNTER_EXAMPLE_NAME, ce.getProblemName());
+              XMLUtil.appendStartTag(level+1, TAG_COUNTER_EXAMPLE, attributeValues, sb);
+              for(TreeElement e : ce.getModel().getTreeElements()){
+                  appendCounterExampleModelNode(e, level+2, sb);
+              }
+              XMLUtil.appendEndTag(level+1, TAG_COUNTER_EXAMPLE, sb);
+          }
+          XMLUtil.appendEndTag(level, TAG_COUNTER_EXAMPLES, sb);
+       }
+   }
+   
+   private static void appendCounterExampleModelNode(TreeElement e, int level, StringBuffer sb){
+       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+       attributeValues.put(ATTRIBUTE_COUNTER_EXAMPLE_NODE_NAME, e.toString());
+       XMLUtil.appendStartTag(level, TAG_COUNTER_EXAMPLE_NODE, attributeValues, sb);
+       for (TreeElement child : e.getChildren()) {
+           appendCounterExampleModelNode(child, level+1, sb);
+       }
+       XMLUtil.appendEndTag(level, TAG_COUNTER_EXAMPLE_NODE, sb);
    }
 }
