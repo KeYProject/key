@@ -13,26 +13,15 @@
 
 package org.key_project.key4eclipse.common.ui.decorator;
 
-import static de.uka.ilkd.key.util.UnicodeHelper.AND;
-import static de.uka.ilkd.key.util.UnicodeHelper.BOT;
-import static de.uka.ilkd.key.util.UnicodeHelper.EMPTY;
-import static de.uka.ilkd.key.util.UnicodeHelper.EQV;
-import static de.uka.ilkd.key.util.UnicodeHelper.EXISTS;
-import static de.uka.ilkd.key.util.UnicodeHelper.FORALL;
-import static de.uka.ilkd.key.util.UnicodeHelper.IMP;
-import static de.uka.ilkd.key.util.UnicodeHelper.IN;
-import static de.uka.ilkd.key.util.UnicodeHelper.NEG;
-import static de.uka.ilkd.key.util.UnicodeHelper.OR;
-import static de.uka.ilkd.key.util.UnicodeHelper.TOP;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.FontDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.JFaceTextUtil;
 import org.eclipse.jface.text.TextPresentation;
@@ -47,10 +36,12 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.nodeviews.HTMLSyntaxHighlighter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -124,7 +115,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    private StyleRange marked2;
    /**
-    * Array of {@link StyleRange} used to highlight {@link Term} of {@link Sort} Update.
+    * Array of {@link StyleRange} used to highlight Updates.
     */
    private StyleRange[] markedUpdates;
    /**
@@ -143,39 +134,59 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    private PosInSequent selectedPosInSequent;
    
    /**
-    * {@link Color} and {@link Font} used.
+    * {@link Color} used for highlighting text a rule was applied to.
     */
    private Color greenColor = new Color(null, 128, 255, 128);
+   /**
+    * {@link Color} used for java keywords.
+    */
    private Color purpleColor = new Color(null, 127, 0, 85);
+   /**
+    * {@link Color} used for highlighting KeY keywords.
+    */
    private Color blueColor = new Color(null, 0, 0, 192);
+   /**
+    * {@link Color} used for highlighting updates.
+    */
    private Color lightblueColor = new Color(null,167,210,210);
+   /**
+    * {@link Color} used for highlighting hovering.
+    */
    private Color grayColor1 = new Color(null,196,205,226);
+   /**
+    * {@link Color} used for highlighting hovering.
+    */
    private Color grayColor2 = new Color(null,196,205,226);
+   /**
+    * {@link Color} used for highlighting first statement.
+    */
    private Color firstStatementColor = new Color(null, 167,174,192);
-   // descriptor used to ensure portability of Font (but not sure if necessary)
-   private FontDescriptor descriptor = FontDescriptor.createFrom(JFaceResources.getFont(JFaceResources.TEXT_FONT)).setStyle(SWT.BOLD); // TODO: Use viewer.getTextWidget().getFont(), maybe it has a different font
-   private Font boldFont = descriptor.createFont(null); // TODO: Use viewer.getTextWidget().getDisplay() as parameter, there might be more then one Display.
+   /**
+    * {@link FontDescriptor} used to describe boldFont.
+    */
+   private FontDescriptor descriptor;
+   /**
+    * {@link Font} used to mark keywords as bold.
+    */
+   private Font boldFont; 
    /**
     * Java keywords to be highlighted.
     */
-   private final static List<String> javaKeywords = Arrays.asList("if", "else", "for", "do", // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
-      "while", "return", "break", "switch", "case", "continue", "try",
-      "catch", "finally", "assert", "null", "throw", "this", "true",
-      "false", "int", "char", "long", "short", "boolean" );
+   private static final Pattern JAVA_KEYWORDS_PATTERN = Pattern.compile("" +Arrays.asList(HTMLSyntaxHighlighter.JAVA_KEYWORDS));
    /**
     *  Dynamic logic keywords to be highlighted.
     */
-   private final static List<String> dynamicKeywords = Arrays.asList("\\forall", // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
-      "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum",
-      "bsum", "\\in", "exactInstance", "wellFormed", "measuredByEmpty",
-      "method-frame", "<created>", "<inv>", "\\cup",
-      ""+FORALL, ""+EXISTS, ""+IN, ""+EMPTY);
+   private static final Pattern DYNAMIC_LOGIC_KEYWORDS_PATTERN = HTMLSyntaxHighlighter.DYNAMIC_LOGIC_KEYWORDS_PATTERN;
    /**
     * Propositional logic keywords to be highlighted.
     */
-   private final static List<String> propKeywords = Arrays.asList( "<->", "->", "&", // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
-      "|", "!", "true", "false", "" + EQV, "" + IMP, "" + AND, "" + OR,
-      "" + NEG, "" + TOP, "" + BOT);
+   private static final Pattern PROP_LOGIC_KEYWORDS_PATTERN = HTMLSyntaxHighlighter.PROP_LOGIC_KEYWORDS_PATTERN;
+   /**
+    * Propositional logic keywords to be highlighted.
+    */
+   /**
+    * Text shown.
+    */
    private String text;
    /**
     * Listens for mouse move events on {@link #viewerText}.
@@ -240,15 +251,13 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       // set up StyleRanges for keyword highlighting
       setKeywordHighlights(text);
       
-      if (node != null){
+      if (node != null) {
          // if view of current goal is active, highlight all updates
-         if(node.getAppliedRuleApp() == null){
-            // set up StyleRanges for update highlighting and merge them with keyword ranges
+         if (node.getAppliedRuleApp() == null) {
             setBlueBackground(printer.getInitialPositionTable().getUpdateRanges());
             textPresentation = new TextPresentation();
             mergeRanges(textPresentation, false);
-         }
-        
+         }   
          else {
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             setGreenBackground(pio);
@@ -257,47 +266,72 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       
 
    }
+//   private ArrayList<Range> getJavaBlockRanges(ArrayList<Range> ranges, ImmutableList<Integer> path, Term term) {
+//      if (term.javaBlock() != null) {
+//         ranges.add(printer.getInitialPositionTable().rangeForPath(path, text.length()));
+//      }
+//      else {
+//         for (int i = 0; i < term.subs().size(); i++) {
+//            if(term.sub(i).isContainsJavaBlockRecursive()) {
+//               getJavaBlockRanges(ranges, path.append(i), term.sub(i));
+//            }
+//         }
+//      }  
+//     return ranges;
+//   }
+
    /**
     * Sets {@link StyleRange} for keyword highlighting.
     * @param str text to be highlighted
     * @author Anna Filighera
     */
    private void setKeywordHighlights( String str) {
-      // find keywords and mark them
-      String[] words = str.split("[\\s(){},=.\\[\\];@]" ); // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
-      int beginRange = 0;
       markedKeywords = new ArrayList<StyleRange>();
-      for(int i = 0; i < words.length; i++){
+      descriptor = FontDescriptor.createFrom(viewer.getTextWidget().getFont()).setStyle(SWT.BOLD); 
+      boldFont = descriptor.createFont(viewer.getTextWidget().getDisplay());
+      // find keywords and mark them
+//      for (int i = 1; i <= node.sequent().size(); i++) {
+//        Term term = node.sequent().getFormulabyNr(i).formula();
+//        //System.out.println("Term " + term.toString() + " claims to contain java block: " + term.isContainsJavaBlockRecursive());
+//        if (term.isContainsJavaBlockRecursive()) {
+//         //  System.out.println("term contains java block");
+//           ImmutableList<Integer> path = ImmutableSLList.<Integer>nil().prepend(0);
+//           path.append(i);
+//           Matcher javaMatcher = JAVA_KEYWORDS_PATTERN.matcher(str);
+//           while (javaMatcher.find()) {
+//              StyleRange mark = new StyleRange();
+//              mark.font = boldFont;
+//              mark.foreground = purpleColor;
+//              mark.start = javaMatcher.start();
+//              mark.length = javaMatcher.end() - javaMatcher.start();
+//              for (Range range : getJavaBlockRanges(new ArrayList<Range>(), path.append(0), term)) {
+//                 if (mark.start >= range.start() && mark.start <= range.end()) {
+//                    markedKeywords.add(mark);
+//                 }
+//                 
+//              }
+//           }
+//           
+//           
+//        }
+//      }
+      Matcher dynamicMatcher = DYNAMIC_LOGIC_KEYWORDS_PATTERN.matcher(str);
+      while (dynamicMatcher.find()) {
          StyleRange mark = new StyleRange();
-         if(javaKeywords.contains(words[i])){
-            mark.font = boldFont;
-            mark.foreground = purpleColor;
-            mark.start = beginRange;
-            mark.length = words[i].length();
-            markedKeywords.add(mark);
-         }
-         else if(dynamicKeywords.contains(words[i]) || propKeywords.contains(words[i])){
-            mark.font = boldFont;
-            mark.foreground = blueColor;
-            mark.start = beginRange;
-            mark.length = words[i].length();
-            markedKeywords.add(mark);
-         }
-         beginRange = beginRange + words[i].length() + 1;
+         mark.font = boldFont;
+         mark.foreground = blueColor;
+         mark.start = dynamicMatcher.start();
+         mark.length = dynamicMatcher.end() - dynamicMatcher.start();
+       markedKeywords.add(mark);
       }
-      // find operators enclosed by word characters or whitespaces and mark them
-      beginRange = 0;
-      String[] operators = str.split("[\\s\\w(){}=,.\\[\\]]"); // TODO: Do not copy code, reuse KeY UI, may refactor KeY UI to make it public available.
-      for(int i = 0; i<operators.length; i++){
-         if(dynamicKeywords.contains(operators[i]) || propKeywords.contains(operators[i])){
-            StyleRange mark = new StyleRange();
-            mark.font = boldFont;
-            mark.foreground = blueColor;
-            mark.start = beginRange;
-            mark.length = operators[i].length();
-            if(!(markedKeywords.contains(mark))) markedKeywords.add(mark);
-         }
-         beginRange = beginRange + operators[i].length() + 1;
+      Matcher propMatcher = PROP_LOGIC_KEYWORDS_PATTERN.matcher(str);
+      while (propMatcher.find()) {
+         StyleRange mark = new StyleRange();
+         mark.font = boldFont;
+         mark.foreground = blueColor;
+         mark.start = propMatcher.start();
+         mark.length = propMatcher.end() - propMatcher.start();
+       markedKeywords.add(mark);
       }
    }
    
@@ -406,13 +440,13 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @param ranges Ranges in which blue color should be applied.
     * @author Anna Filighera
     */
-   protected void setBlueBackground(Range[] ranges){
+   protected void setBlueBackground(final Range[] ranges) {
       markedUpdates = new StyleRange[ranges.length];
-      for(int i = 0; i < ranges.length; i++){
+      for (int i = 0; i < ranges.length; i++) {
          StyleRange markedUpdate = new StyleRange();
          markedUpdate.background = lightblueColor;
          markedUpdate.start = ranges[i].start();
-         markedUpdate.length = ranges[i].end()-ranges[i].start();
+         markedUpdate.length = ranges[i].end() - ranges[i].start();
          markedUpdates[i] = markedUpdate;
       } 
    }

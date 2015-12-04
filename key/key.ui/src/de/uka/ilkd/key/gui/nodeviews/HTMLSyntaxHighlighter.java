@@ -67,7 +67,7 @@ public class HTMLSyntaxHighlighter {
                 }
             });
     
-    private final static Pattern PROP_LOGIC_KEYWORDS_PATTERN = Pattern
+    public final static Pattern PROP_LOGIC_KEYWORDS_PATTERN = Pattern
             .compile(concat("(", PROP_LOGIC_KEYWORDS_REGEX, ")"));
     
     private static final String PROP_LOGIC_KEYWORDS_REPLACEMENT =
@@ -91,7 +91,7 @@ public class HTMLSyntaxHighlighter {
                 }
             });
     
-    private final static Pattern DYNAMIC_LOGIC_KEYWORDS_PATTERN = Pattern
+    public final static Pattern DYNAMIC_LOGIC_KEYWORDS_PATTERN = Pattern
             .compile(concat("(", DYNAMIC_LOGIC_KEYWORDS_REGEX, ")"));
 
     private static final String DYNAMIC_LOGIC_KEYWORDS_REPLACEMENT =
@@ -101,7 +101,7 @@ public class HTMLSyntaxHighlighter {
     /////////        JAVA         /////////
     ///////////////////////////////////////
     
-    private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
+    public final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
             "while", "return", "break", "switch", "case", "continue", "try",
             "catch", "finally", "assert", "null", "throw", "this", "true",
             "false", "int", "char", "long", "short", "boolean" };
