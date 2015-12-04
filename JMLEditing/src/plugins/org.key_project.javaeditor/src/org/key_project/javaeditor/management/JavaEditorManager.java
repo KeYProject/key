@@ -66,6 +66,11 @@ import org.key_project.util.java.ObjectUtil;
 @SuppressWarnings("restriction")
 public final class JavaEditorManager {
    /**
+    * Defines if outline manipulations are performed or not.
+    */
+   public static final boolean OUTLINE_EXTENSIONS_ENABLED = false;
+   
+   /**
     * The only instance of this class.
     */
    public static final JavaEditorManager instance = new JavaEditorManager();
@@ -358,7 +363,7 @@ public final class JavaEditorManager {
     * @throws InvocationTargetException Occurred Exception.
     */
    private static void updateOutline(IPage outlinePage) throws NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-      if (outlinePage instanceof JavaOutlinePage) {
+      if (OUTLINE_EXTENSIONS_ENABLED && outlinePage instanceof JavaOutlinePage) {
          JavaOutlinePage joutline = (JavaOutlinePage) outlinePage;
          TreeViewer outlineViewer = ObjectUtil.invoke(joutline, "getOutlineViewer");
          ITreeContentProvider contentProvider = (ITreeContentProvider) outlineViewer.getContentProvider();

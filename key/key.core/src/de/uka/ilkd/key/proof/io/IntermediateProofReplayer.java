@@ -234,6 +234,16 @@ public class IntermediateProofReplayer {
                         if (partnerNodesInfo == null
                                 || partnerNodesInfo.size() < joinAppInterm
                                         .getNrPartners()) {
+                            // In case of an exception happening during the replay
+                            // process, it can happen that the queue is empty when
+                            // reaching this point. Then, we may not add the join
+                            // node to the end of the queue since this will result
+                            // in non-termination.
+                            
+                            if (queue.isEmpty()) {
+                                continue;
+                            }
+                            
                             // Wait until all partners are found: Add node
                             // at the end of the queue. NOTE: DO NOT CHANGE
                             // THIS to adding the node to the front! This will
