@@ -27,15 +27,16 @@
 						<Menu fx:id="addView" text="%configViews">
 						   <items>
 						        <fx:define>
-                            <ToggleGroup fx:id="toggleGroup1"/>  
+                            <ToggleGroup fx:id="toggleGroup1"/>
                             <ToggleGroup fx:id="toggleGroup2"/>
                             <ToggleGroup fx:id="toggleGroup3"/>
                             <ToggleGroup fx:id="toggleGroup4"/>
+														<!-- ANT DEFINE TOGGLE GROUP HERE -->
                           </fx:define>
-						      <Menu fx:id="toggleProofView" text="%proofView"> 
+						      <Menu fx:id="toggleProofView" text="%proofView">
 						        <properties componentName="proofView" componentResource="proofView.fxml"/>
-						        <items> 
-						          <RadioMenuItem text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/> 
+						        <items>
+						          <RadioMenuItem text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
 						          <RadioMenuItem text="%left"  selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
 						          <RadioMenuItem text="%middle" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
 						          <RadioMenuItem text="%right" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
@@ -44,7 +45,7 @@
 						      </Menu>
 						      <Menu fx:id="toggleOpenProofsView" text="%openProofsView">
 						      <properties componentName="openProofsView" componentResource="openProofsView.fxml"/>
-						      <items> 
+						      <items>
                             <RadioMenuItem text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup2"/>
                             <RadioMenuItem text="%left" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup2"/>
                             <RadioMenuItem text="%middle" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup2"/>
@@ -54,7 +55,7 @@
                         </Menu>
                         <Menu fx:id="toggleGoalView" text="%goalView">
                         <properties componentName="goalView" componentResource="goalView.fxml"/>
-                        <items> 
+                        <items>
                             <RadioMenuItem text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup3"/>
                             <RadioMenuItem text="%left" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup3"/>
                             <RadioMenuItem text="%middle" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup3"/>
@@ -64,7 +65,7 @@
                         </Menu>
                         <Menu fx:id="toggleTreeView" text="%treeView">
                         <properties componentName="treeView" componentResource="treeView.fxml"/>
-                        <items> 
+                        <items>
                             <RadioMenuItem text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup4"/>
                             <RadioMenuItem text="%left" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup4"/>
                             <RadioMenuItem text="%middle" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup4"/>
@@ -72,6 +73,7 @@
                             <RadioMenuItem text="%down" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup4"/>
                           </items>
                         </Menu>
+												<!-- ANT DEFINE ADD VIEW SUBMENU HERE -->
 						   </items>
 						</Menu>
 					</items>

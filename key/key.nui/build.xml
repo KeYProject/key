@@ -38,14 +38,14 @@
 
 	<target name="compile" depends="copy" description="Compile all source files into the build directory.">
 		<mkdir dir="${build.dir}"/>
-		<javac srcdir= "${src.dir}" 
-		       destdir="${build.dir}" 
-		       includeantruntime="false" 
-		       source="1.8" 
+		<javac srcdir= "${src.dir}"
+		       destdir="${build.dir}"
+		       includeantruntime="false"
+		       source="1.8"
 		       target="1.8"
-		       deprecation="off" 
-		       debug="on" 
-		       depend="${build.depend}" 
+		       deprecation="off"
+		       debug="on"
+		       depend="${build.depend}"
 		       optimize="off">
 		  <classpath refid="key.nui.class.path"/>
 		</javac>
@@ -56,9 +56,37 @@
 			<fileset dir="${basedir}/resources/"/>
 		</copy>
 	</target>
+<!-- DOES NOT WORK YET.
+	<target name="generate" description="Generate the Add-View-Menu by parsing the existing xml files in /components">
+		<var name="i" value="0"\>
+		<for param="file">
+			<path>
+				<fileset dir="${basedir}/resources/de/uka/ilkd/key/nui/resources/components" includes="*.fxml"/>
+			</path>
+			<sequential>
+				<if>
+					<not>
+						<resourcecontains resource="${basedir}/resources/de/uka/ilkd/key/nui/resources/NUIdefault.fxml"
+							                substring=""/>
+						</not>
 
+					<then>
+						<replaceregexp file="${basedir}/resources/de/uka/ilkd/key/nui/resources/NUIdefault.fxml"
+													 match="&lt;!-- ANT DEFINE TOGGLE GROUP HERE --&gt;"
+													 replace="&lt;ToggleGroup fx:id=&quot;toggleGroup${i}&quot;/&gt;&lt;!-- ANT DEFINE TOGGLE GROUP HERE --&gt;"/>
+						<replaceregexp file="${basedir}/resources/de/uka/ilkd/key/nui/resources/NUIdefault.fxml"
+													 match="&lt;!-- ANT DEFINE ADD VIEW SUBMENU HERE --&gt;"
+													 replace="&lt;Menu fx:id=&quot;toggle TODO TreeView&quot; text=&quot;% TODO treeView&quot;&gt;&lt;properties componentName=&quot;treeView&quot; componentResource=&quot;treeView.fxml&quot;/&gt;&lt;items&gt;&lt;RadioMenuItem text=&quot;%hide&quot; selected=&quot;true&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&lt;RadioMenuItem text=&quot;%left&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&lt;RadioMenuItem text=&quot;%middle&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&lt;RadioMenuItem text=&quot;%right&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&lt;RadioMenuItem text=&quot;%down&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&lt;/items&gt;&lt;/Menu&gt;&lt;!-- ANT DEFINE ADD VIEW SUBMENU HERE --&gt;"/>
+				  </then>
+				</if>
+
+				<math result="${i}" operand1="${i}" operation="+" operand2="1" datatype="int"/>
+			</sequential>
+		</for>
+	</target>
+-->
 	<target name="clean" description="Deletes all generated files and folders.">
-		<delete failonerror="false" includeemptydirs="true"> 
+		<delete failonerror="false" includeemptydirs="true">
 			<fileset dir="${build.dir}" includes="**/*" />
 			<fileset file="${dist.dir}/components/key.nui.jar" />
 		</delete>
