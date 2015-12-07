@@ -44,7 +44,7 @@ public class UnderstandingProofAttemptsSummaryExport extends AbstractSummaryExpo
       // Crate Latex file
       String keyFeatures = createFeatureLatex(keySection, statistics);
       String sedFeatures = createFeatureLatex(sedSection, statistics);
-      String keyVsSed = createQuestionLatex(keyVsSedQuestion, statistics);
+      String keyVsSed = createQuestionLatex(keyVsSedQuestion, statistics, "\\KeY experience");
       String feedback = createValueLatex(feedbackQuestion, "upa", result);
       List<AdditionalFile> additionalFiles = new LinkedList<AdditionalFile>();
       additionalFiles.add(new AdditionalFile("_KeY_Features.tex", keyFeatures.toString().getBytes(IOUtil.DEFAULT_CHARSET)));

@@ -13,14 +13,15 @@ import org.key_project.sed.key.evaluation.model.definition.UnderstandingProofAtt
 import org.key_project.sed.key.evaluation.model.input.EvaluationInput;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLAnswersSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLChoiceSectionAppender;
-import org.key_project.sed.key.evaluation.server.report.html.HTMLExpectedAnswersComparison;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLHypotheses;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLToolSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.HTMLUnderstandingProofAttemptsBalancingSectionAppender;
 import org.key_project.sed.key.evaluation.server.report.html.IHTMLSectionAppender;
+import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeExpectedAnswersComparison;
+import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeHelpfulnessExport;
 import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeKnowledgeExport;
 import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeSummaryExport;
-import org.key_project.sed.key.evaluation.server.report.html.ReviewingCodeHelpfulnessExport;
+import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsExpectedAnswersComparison;
 import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsKnowledgeExport;
 import org.key_project.sed.key.evaluation.server.report.html.UnderstandingProofAttemptsSummaryExport;
 import org.key_project.sed.key.evaluation.server.report.statiscs.Statistics;
@@ -85,17 +86,18 @@ public class HTMLReportEngine extends AbstractReportEngine {
       List<IHTMLSectionAppender> result = new LinkedList<IHTMLSectionAppender>();
       result.add(new HTMLHypotheses());
       result.add(new HTMLToolSectionAppender());
-      result.add(new HTMLExpectedAnswersComparison());
       result.add(new HTMLChoiceSectionAppender());
       if (evaluation instanceof UnderstandingProofAttemptsEvaluation) {
          result.add(new UnderstandingProofAttemptsKnowledgeExport());
          result.add(new UnderstandingProofAttemptsSummaryExport());
          result.add(new HTMLUnderstandingProofAttemptsBalancingSectionAppender());
+         result.add(new UnderstandingProofAttemptsExpectedAnswersComparison());
       }
       else if (evaluation instanceof ReviewingCodeEvaluation) {
          result.add(new ReviewingCodeKnowledgeExport());
          result.add(new ReviewingCodeSummaryExport());
          result.add(new ReviewingCodeHelpfulnessExport());
+         result.add(new ReviewingCodeExpectedAnswersComparison());
       }
       result.add(new HTMLAnswersSectionAppender());
       return result;

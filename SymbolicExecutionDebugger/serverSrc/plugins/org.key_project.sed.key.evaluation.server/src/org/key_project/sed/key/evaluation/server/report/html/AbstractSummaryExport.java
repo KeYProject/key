@@ -78,11 +78,11 @@ public abstract class AbstractSummaryExport implements IHTMLSectionAppender {
       }
    }
 
-   protected String createQuestionLatex(AbstractChoicesQuestion choiceQuestion, Statistics statistics) {
+   protected String createQuestionLatex(AbstractChoicesQuestion choiceQuestion, Statistics statistics, String experienceLabel) {
       StringBuffer latex = new StringBuffer();
       latex.append("\\begin{tabular}{lrrrr}" + StringUtil.NEW_LINE);
       latex.append("\\toprule" + StringUtil.NEW_LINE);
-      latex.append("& \\multicolumn{4}{c}{\\KeY experience}\\\\" + StringUtil.NEW_LINE);
+      latex.append("& \\multicolumn{4}{c}{" + experienceLabel + "}\\\\" + StringUtil.NEW_LINE);
       for (IStatisticsFilter filter : statistics.getFilters()) {
          latex.append("&\\rotatebox{90}{" + filter.getLatexName() + "~(\\%)}");
       }

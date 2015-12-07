@@ -32,10 +32,10 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
- * Exports the knowledge of the participants as LaTeX file.
+ * Provides the basic functionality to export the knowledge of the participants as LaTeX file.
  * @author Martin Hentschel
  */
-public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
+public abstract class AbstractExpectedAnswersComparison implements IHTMLSectionAppender {
    @Override
    public Collection<AdditionalFile> appendSection(File storageLocation, 
                                                    AbstractEvaluation evaluation, 
@@ -215,22 +215,25 @@ public class HTMLExpectedAnswersComparison implements IHTMLSectionAppender {
       }
       sb.append("</tr>");
       sb.append("</table>");
-      return CollectionUtil.toList(createLatexFile(evaluation, statistics, recordsCount, pageMap, false),
-                                   createLatexFile(evaluation, statistics, recordsCount, pageMap, true));
+      return CollectionUtil.toList(createLatexFile(evaluation, statistics, recordsCount, pageMap, false, getExperienceHeader()),
+                                   createLatexFile(evaluation, statistics, recordsCount, pageMap, true, getExperienceHeader()));
    }
+   
+   protected abstract String getExperienceHeader();
    
    private AdditionalFile createLatexFile(AbstractEvaluation evaluation, 
                                           Statistics statistics, 
                                           Map<IStatisticsFilter, BigInteger> recordsCount, 
                                           Map<AbstractPage, PageStatistic> pageMap,
-                                          boolean multiPage) {
+                                          boolean multiPage,
+                                          String experienceHeader) {
       StringBuffer latex = new StringBuffer();
       latex.append("\\begin{tabularx}{1.0\\textwidth}{lXXrrrrrrrr}" + StringUtil.NEW_LINE);
       if (multiPage) {
          latex.append("\\caption{Comparison of the Given Expected Answers} \\\\" + StringUtil.NEW_LINE);
       }
       latex.append("\\toprule" + StringUtil.NEW_LINE);
-      latex.append("\\multirow{3}{*}{\\rotatebox{90}{\\parbox{1.4cm}{Proof Attempt}}}&&&\\multicolumn{8}{c}{\\KeY experience}\\\\" + StringUtil.NEW_LINE);
+      latex.append("\\multirow{3}{*}{\\rotatebox{90}{\\parbox{1.4cm}{Proof Attempt}}}&&&\\multicolumn{8}{c}{" + experienceHeader + "}\\\\" + StringUtil.NEW_LINE);
       latex.append("&&");
       for (IStatisticsFilter filter : statistics.getFilters()) {
          latex.append("& \\multicolumn{2}{c}{" + filter.getLatexName() + " (" + recordsCount.get(filter) + ")}");
