@@ -155,6 +155,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	         if(symbolicCmd != null){
 	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
 	            if(symbolicState != null){
+	            	symbolicState.setValue(false); //TODO remove
 	            	symbolicState.addListener(symbolicStateListener);
 	            }
 	         }
@@ -164,7 +165,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	protected void handleSymbolicStateChanged(State state, Object oldValue) {
 		contentProvider.setSymbolicState((boolean) state.getValue());
 		getTreeViewer().setInput(proof);
-		//updateSelectedNodeThreadSafe();
+		updateSelectedNodeThreadSafe();
 	}
 
 	/**
@@ -333,10 +334,13 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		for (Object unknownElement : unknownParents) {
 			Object parent = contentProvider.getParent(unknownElement);
 			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-			if(contentProvider.getHideState() == false || node.leaf() || viewIndex >= 0){
+			if(contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false){
 			   Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
 			   contentProvider.updateChildCount(parent, 0);
 			   contentProvider.updateElement(parent, viewIndex);
+			} else if (viewIndex >= 0){
+				contentProvider.updateChildCount(parent, 0);
+				contentProvider.updateElement(parent, viewIndex);
 			}
 		}
 	}
