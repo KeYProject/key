@@ -69,8 +69,14 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 	private final KeYSelectionModel selectionModel;
 	
+	/**
+	 * The {@link State} which indicates hiding or showing of intermediate proofsteps
+	 */
 	private State hideState;
 	
+	/**
+	 * The {@link State} for the show symbolic execution tree only outline feature
+	 */
 	private State symbolicState;
 	
 	/**
@@ -121,7 +127,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
       @Override
       public void handleStateChange(State state, Object oldValue) {
-    	  System.out.println("symbolic state changed");
     	  ProofTreeContentOutlinePage.this.handleSymbolicStateChanged(state, oldValue);
       }
 	};

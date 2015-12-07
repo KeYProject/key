@@ -184,7 +184,12 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	       }
    }
    
-   protected void assertHideIntermediateProofstepsTree(NodePreorderIterator nodeIter, TreeViewerIterator viewerIter){
+/**
+ * Checks whether a filtered TreeViewer contains any intermediate proof steps of a proof
+ * @param nodeIter a node iterator over the proof tree
+ * @param viewerIter an iterator over the filtered tree viewer
+ */
+protected void assertHideIntermediateProofstepsTree(NodePreorderIterator nodeIter, TreeViewerIterator viewerIter){
 	   if(nodeIter.hasNext()){
 		   Node node = nodeIter.next();
 		   

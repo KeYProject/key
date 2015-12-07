@@ -129,7 +129,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 */
 	private boolean hideState;
 	
-	
 	/**
 	 * The boolean flag for the show symbolic execution tree only outline feature
 	 */
@@ -593,8 +592,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				node = node.child(0);
 			}
 			return node.childrenCount();
-		} else
+		} else {
 			return -1;
+		}
 	}
 
 	/**
