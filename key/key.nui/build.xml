@@ -27,7 +27,11 @@
 		<isset property="tacletindex.threading.enabled" />
 	</condition>
 
-	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+	     <classpath>
+	         <fileset dir="${basedir}/ant-lib/"/>
+	     </classpath>
+	</taskdef>
 
 	<target name="start" depends="compile" description="Starts KeY.">
 		<java classname="de.uka.ilkd.key.nui.NUI" classpathref="key.nui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea -Dtaclet.match=${taclet.match} -Dtacletindex.threading.enabled=${tacletindex.threading.enabled} " />
