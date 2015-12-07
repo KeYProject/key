@@ -106,103 +106,100 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
    
    
    /**
-    * creates a viewer for the proof and checks if the hide intermediate proofsteps filter is working correctly
+    * creates a viewer for the proof and checks if the hide intermediate proofsteps filter is working correctly.
     * @throws CoreException
     * @throws InterruptedException
     * @throws ProblemLoaderException
     * @throws ProofInputException
     */
    @Test
-   public void testHideIntermediateProofsteps() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException{
-	// Create test project
-	      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testHideIntermediateProofsteps_beforeAutoMode");
-	      IFolder src = project.getProject().getFolder("src");
-	      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
-	      // Get local file in operating system of folder src 
-	      File location = ResourceUtil.getLocation(src);
-	      // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-	      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
-	      IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
-	      ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
-	      FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
-	      Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
-	      assertNotNull(proof);
-	      // create viewer to show proof in
-	      Shell shell = new Shell();
-	      try {
-	          shell.setText("OutlineContentAndLabelProviderTest");
-	          shell.setSize(600, 400);
-	          shell.setLayout(new FillLayout());
-	          TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
-	          viewer.setUseHashlookup(true);
-	          LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
-	          // deactivate hiding intermediate proofsteps
-	          lazyContentProvider.setHideState(false);
-	          viewer.setContentProvider(lazyContentProvider);
-	          viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
-	          viewer.setInput(proof);
-	          shell.setVisible(true);
-	          viewer.expandAll();
-	          // check if initial toggle State is false
-	          assertFalse((boolean) lazyContentProvider.getHideState());
-	          // check if proof tree is correct before activating the filter
-	          TreeViewerIterator viewerIter = new TreeViewerIterator(viewer);
-	          NodePreorderIterator nodeIter = new NodePreorderIterator(proof.root());
-	          while(nodeIter.hasNext()){
-	             assertTree(nodeIter, viewerIter);
-	          }
+   public void testHideIntermediateProofsteps() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
+	  // Create test project
+      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testHideIntermediateProofsteps_beforeAutoMode");
+	  IFolder src = project.getProject().getFolder("src");
+	  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
+	  // Get local file in operating system of folder src 
+	  File location = ResourceUtil.getLocation(src);
+	  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
+	  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
+	  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
+	  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
+	  FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
+	  Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
+	  assertNotNull(proof);
+	  // create viewer to show proof in
+	  Shell shell = new Shell();
+	  try {
+		  shell.setText("OutlineContentAndLabelProviderTest");
+	      shell.setSize(600, 400);
+	      shell.setLayout(new FillLayout());
+	      TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
+	      viewer.setUseHashlookup(true);
+	      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
+	      // deactivate hiding intermediate proofsteps
+	      lazyContentProvider.setHideState(false);
+	      viewer.setContentProvider(lazyContentProvider);
+	      viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
+	      viewer.setInput(proof);
+	      shell.setVisible(true);
+	      viewer.expandAll();
+	      // check if initial toggle State is false
+	      assertFalse((boolean) lazyContentProvider.getHideState());
+	      // check if proof tree is correct before activating the filter
+	      TreeViewerIterator viewerIter = new TreeViewerIterator(viewer);
+	      NodePreorderIterator nodeIter = new NodePreorderIterator(proof.root());
+	      while (nodeIter.hasNext()) {
+	    	  assertTree(nodeIter, viewerIter);
+	      }
+	      // activate hide intermediate proofsteps filter
+	      lazyContentProvider.setHideState(true);
+	      // start auto mode
+	      environment.getProofControl().startAndWaitForAutoMode(proof);
+	      viewer.setInput(proof);
+	      viewer.expandAll();
+	      TreeViewerIterator viewerIterHide = new TreeViewerIterator(viewer);
+	      NodePreorderIterator nodeIterHide = new NodePreorderIterator(proof.root());
+	      // check if proof tree contains only branchfolders and leaves
+	      while (nodeIterHide.hasNext()) {
+	    	  assertHideIntermediateProofstepsTree(nodeIterHide, viewerIterHide);
+          }
 	          
-	          
-	          // activate hide intermediate proofsteps filter
-	          lazyContentProvider.setHideState(true);
-	          // start auto mode
-	          environment.getProofControl().startAndWaitForAutoMode(proof);
-	          viewer.setInput(proof);
-	          viewer.expandAll();
-	          TreeViewerIterator viewerIterHide = new TreeViewerIterator(viewer);
-	          NodePreorderIterator nodeIterHide = new NodePreorderIterator(proof.root());
-	          // check if proof tree contains only branchfolders and leaves
-	          while(nodeIterHide.hasNext()){
-	        	  assertHideIntermediateProofstepsTree(nodeIterHide, viewerIterHide);
-	          }
-	          
-	          // deactivate hide intermediate proofsteps filter
-	          lazyContentProvider.setHideState(false);
-	          viewer.setInput(proof);
-	          viewer.expandAll();
-	          TreeViewerIterator viewerIterShow = new TreeViewerIterator(viewer);
-             NodePreorderIterator nodeIterShow = new NodePreorderIterator(proof.root());
+          // deactivate hide intermediate proofsteps filter
+          lazyContentProvider.setHideState(false);
+          viewer.setInput(proof);
+          viewer.expandAll();
+          TreeViewerIterator viewerIterShow = new TreeViewerIterator(viewer);
+          NodePreorderIterator nodeIterShow = new NodePreorderIterator(proof.root());
              
-             // check if the complete proof tree is shown correctly again
-             while(nodeIterShow.hasNext()){
-                assertTree(nodeIterShow, viewerIterShow);
-             }
-	       }
-	       finally {
-	          shell.setVisible(false);
-	          shell.dispose();
-	       }
-   }
+          // check if the complete proof tree is shown correctly again
+          while (nodeIterShow.hasNext()) {
+        	  assertTree(nodeIterShow, viewerIterShow);
+          }
+		} finally {
+       		shell.setVisible(false);
+       		shell.dispose();
+		}
+   	}
    
-/**
- * Checks whether a filtered TreeViewer contains any intermediate proof steps of a proof
- * @param nodeIter a node iterator over the proof tree
- * @param viewerIter an iterator over the filtered tree viewer
- */
-protected void assertHideIntermediateProofstepsTree(NodePreorderIterator nodeIter, TreeViewerIterator viewerIter){
-	   if(nodeIter.hasNext()){
+   /**
+    * Checks whether a filtered TreeViewer contains any intermediate proof steps of a proof.
+    * @param nodeIter a node iterator over the proof tree
+    * @param viewerIter an iterator over the filtered tree viewer
+    */
+   protected void assertHideIntermediateProofstepsTree(NodePreorderIterator nodeIter, TreeViewerIterator viewerIter) {
+	   if (nodeIter.hasNext()) {
 		   Node node = nodeIter.next();
 		   
-		   if(node.leaf()){
-			   if(viewerIter.hasNext()){
+		   if (node.leaf()) {
+			   if (viewerIter.hasNext()) {
 				   assertTrue(viewerIter.next().getData().equals(node));
 			   } else {
 				   fail("There is a Goal missing in the TreeViewer.");
 			   }
-		   } else if (node.parent() != null && node.parent().childrenCount() > 1){
-			   if(viewerIter.hasNext()){
+		   } else if (node.parent() != null && node.parent().childrenCount() > 1) {
+			   if (viewerIter.hasNext()) {
 				   Object itemData = viewerIter.next().getData();
-				   if(itemData instanceof BranchFolder){
+				   if (itemData instanceof BranchFolder) {
 					   BranchFolder bf = (BranchFolder) itemData;
 					   assertTrue(bf.getChild().equals(node));
 				   } else {

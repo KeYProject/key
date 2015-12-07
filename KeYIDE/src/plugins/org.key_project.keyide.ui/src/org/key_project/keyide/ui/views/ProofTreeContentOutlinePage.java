@@ -70,12 +70,12 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	private final KeYSelectionModel selectionModel;
 	
 	/**
-	 * The {@link State} which indicates hiding or showing of intermediate proofsteps
+	 * The {@link State} which indicates hiding or showing of intermediate proofsteps.
 	 */
 	private State hideState;
 	
 	/**
-	 * The {@link State} for the show symbolic execution tree only outline feature
+	 * The {@link State} for the show symbolic execution tree only outline feature.
 	 */
 	private State symbolicState;
 	
@@ -110,7 +110,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	};
 	
 	/**
-	 * The {@link IStateListener} to sync the hide intermediate proof steps toggleState with the outline page
+	 * The {@link IStateListener} to sync the hide intermediate proof steps toggleState with the outline page.
 	 */
 	private IStateListener hideStateListener = new IStateListener() {
 
@@ -121,7 +121,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	};
 	
 	/**
-	 * The {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page
+	 * The {@link IStateListener} to sync the show symbolic execution tree only toggleState with the outline page.
 	 */
 	private IStateListener symbolicStateListener = new IStateListener(){
 
@@ -147,7 +147,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		
 		ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
 	      if (service != null) {
-	         
 	         Command hideCmd = service.getCommand(HideIntermediateProofstepsHandler.COMMAND_ID);
 	         if (hideCmd != null) {
 	            hideState = hideCmd.getState(RegistryToggleState.STATE_ID);
@@ -157,9 +156,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	         }
 	         
 	         Command symbolicCmd = service.getCommand(ShowSymbolicExecutionTreeOnlyHandler.COMMAND_ID);
-	         if(symbolicCmd != null){
+	         if (symbolicCmd != null) {
 	            symbolicState = symbolicCmd.getState(RegistryToggleState.STATE_ID);
-	            if(symbolicState != null){
+	            if (symbolicState != null) {
 	            	symbolicState.setValue(false); //TODO remove
 	            	symbolicState.addListener(symbolicStateListener);
 	            }
@@ -174,7 +173,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	}
 
 	/**
-	 * Handles a change in the state of the hideIntermediateProofsteps outline feature
+	 * Handles a change in the state of the hideIntermediateProofsteps outline feature.
 	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
 	 * @param oldValue The old value; may be anything.
 	 */
@@ -198,11 +197,11 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 			labelProvider.dispose();
 		}
 		
-		if(hideState != null){
+		if (hideState != null) {
 			hideState.removeListener(hideStateListener);
 		}
 		
-		if(symbolicState != null){
+		if (symbolicState != null) {
 			symbolicState.removeListener(symbolicStateListener);
 		}
 
@@ -306,7 +305,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 			Object parent = contentProvider.getParent(mediatorNode);
 			int viewIndex = contentProvider.getIndexOf(parent, mediatorNode);
 			// Select Node in lazy TreeViewer or the parent node when the node got filtered out
-			if(viewIndex >= 0){
+			if (viewIndex >= 0) {
 				getTreeViewer().setSelection(SWTUtil.createSelection(mediatorNode), true);
 			} else {
 				getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
@@ -339,7 +338,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		for (Object unknownElement : unknownParents) {
 			Object parent = contentProvider.getParent(unknownElement);
 			int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
-			if(contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false){
+			if (contentProvider.getHideState() == false && contentProvider.getSymbolicState() == false) {
 			   Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
 			   contentProvider.updateChildCount(parent, 0);
 			   contentProvider.updateElement(parent, viewIndex);
