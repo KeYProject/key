@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.Label;
 
 /**
  * controller for the treeView GUI element to visualize proofs
@@ -19,7 +20,7 @@ import javafx.scene.control.TreeView;
 public class TreeViewController {
 
     @FXML
-    private TreeView<String> proofTreeView;
+    private TreeView<Label> proofTreeView;
 
     // defines the width and height of an icon
     private static int iconSize = 15;
@@ -28,9 +29,13 @@ public class TreeViewController {
      * Initialization method for scene, displays the default proof
      */
     public void initialize() {
-        Proof p = loadProof("example01.proof");
-        System.out.println("Default proof loaded.");
-        displayProof(p);
+    	// add css file to view
+    	String cssPath = this.getClass().getResource("treeView.css").toExternalForm(); 
+    	proofTreeView.getStylesheets().add(cssPath);
+
+    	// load and display proof
+    	Proof p = loadProof("example02.proof");
+    	displayProof(p);
     }
 
     /**
@@ -40,16 +45,16 @@ public class TreeViewController {
      *            the proof to display
      */
     public void displayProof(Proof p) {
-        // get the root node
-        Node pRoot = p.root();
+    	// get the root node
+    	Node pRoot = p.root();
 
-        // convert proof to fxtree
-        TreeItem<String> fxRoot = new TreeItem<String>("proof tree");
-        fxRoot.setExpanded(true);
-        addPNodeToFXNode(pRoot, fxRoot);
+    	// convert proof to fxtree
+    	TreeItem<Label> fxRoot = new TreeItem<Label>(new Label("proof tree"));
+    	fxRoot.setExpanded(true);
+    	addPNodeToFXNode(pRoot, fxRoot);
 
-        // display tree
-        proofTreeView.setRoot(fxRoot);
+    	// display tree
+    	proofTreeView.setRoot(fxRoot);
     }
 
     /**
@@ -60,45 +65,46 @@ public class TreeViewController {
      * @param fxParent
      *            the node where the converted proofNode should be added to
      */
-    private void addPNodeToFXNode(Node proofNode, TreeItem<String> fxParent) {
-        // create an fxNode and add it to the fxparent
-        String nodeName = proofNode.serialNr() + ": " + proofNode.name();
-        TreeItem<String> fxNode = new TreeItem<String>(nodeName);
-        fxParent.getChildren().add(fxNode);
+    private void addPNodeToFXNode(Node proofNode, TreeItem<Label> fxParent) {
+    	// create an fxNode and add it to the fxparent
+    	String nodeName = proofNode.serialNr() + ": " + proofNode.name();
+    	TreeItem<Label> fxNode = new TreeItem<Label>(new Label(nodeName));
+    	fxParent.getChildren().add(fxNode);
 
-        // determine number of children and add all children recursively
-        int numChildren = proofNode.childrenCount();
-        if (numChildren == 0) {
-            setNodeIcon(fxNode);
-        }
-        else if (numChildren == 1) {
-            setNodeIcon(fxParent);
-            // add child's subtree to parent
-            addPNodeToFXNode(proofNode.child(0), fxParent);
-        }
-        else if (numChildren > 1) {
-            // for each child create a branch node and add it to the fxparent
-            for (Iterator<Node> childrenIterator = proofNode
-                    .childrenIterator(); childrenIterator.hasNext();) {
-                // get next child
-                Node child = childrenIterator.next();
+    	// determine number of children and add all children recursively
+    	int numChildren = proofNode.childrenCount();
+    	if (numChildren == 0) {
+    		setNodeIcon(fxNode);
+    	}
+    	else if (numChildren == 1) {
+    		setNodeIcon(fxParent);
+    		// add child's subtree to parent
+    		addPNodeToFXNode(proofNode.child(0), fxParent);
+    	}
+    	else if (numChildren > 1) {
+    		// for each child create a branch node and add it to the fxparent
+    		for (Iterator<Node> childrenIterator = proofNode
+    				.childrenIterator(); childrenIterator.hasNext();) {
+    			// get next child
+    			Node child = childrenIterator.next();
 
-                // define branch label for new node, create node and set icon
-                String branchLabel = child.getNodeInfo().getBranchLabel();
-                if (branchLabel == null) {
-                    branchLabel = "Case "
-                            + (child.parent().getChildNr(child) + 1);
-                }
-                TreeItem<String> branch = new TreeItem<String>(branchLabel);
-                setNodeIcon(branch);
+    			// define branch label for new node, create node and set icon
+    			String branchLabel = child.getNodeInfo().getBranchLabel();
+    			if (branchLabel == null) {
+    				branchLabel = "Case "
+    						+ (child.parent().getChildNr(child) + 1);
+    			}
+    			TreeItem<Label> branch = new TreeItem<Label>(new Label(branchLabel));
+    			setNodeIcon(branch);
+    			branch.getValue().getStyleClass().add("branch");
 
-                // add node to parent
-                fxParent.getChildren().add(branch);
+    			// add node to parent
+    			fxParent.getChildren().add(branch);
 
-                // call function recursively with current child
-                addPNodeToFXNode(child, branch);
-            }
-        }
+    			// call function recursively with current child
+    			addPNodeToFXNode(child, branch);
+    		}
+    	}
     }
 
     /**
@@ -107,21 +113,22 @@ public class TreeViewController {
      * @param treeItem
      *            The tree item where the graphics should be placed on
      */
-    private void setNodeIcon(TreeItem<String> treeItem) {
-        String lbl = treeItem.toString().toLowerCase();
-        if (lbl.contains("closed goal")) {
-            treeItem.setGraphic(IconFactory.keyHoleClosed(iconSize, iconSize));
-        }
-        else if (lbl.contains("open goal")) {
-            treeItem.setGraphic(IconFactory.keyHole(iconSize, iconSize));
-        }
-        else if (lbl.contains("case")) {
-            treeItem.setGraphic(IconFactory.keyFolderGray(iconSize, iconSize));
-        }
-        else if (lbl.contains("cut")) {
-            treeItem.setGraphic(IconFactory.keyFolderBlue(iconSize, iconSize));
-        }
+    private void setNodeIcon(TreeItem<Label> treeItem) {
+    	String lbl = treeItem.toString().toLowerCase();
+    	if (lbl.contains("closed goal")) {
+    		treeItem.setGraphic(IconFactory.keyHoleClosed(iconSize, iconSize));
+    	}
+    	else if (lbl.contains("open goal")) {
+    		treeItem.setGraphic(IconFactory.keyHole(iconSize, iconSize));
+    	}
+    	else if (lbl.contains("case")) {
+    		treeItem.setGraphic(IconFactory.keyFolderGray(iconSize, iconSize));
+    	}
+    	else if (lbl.contains("cut")) {
+    		treeItem.setGraphic(IconFactory.keyFolderBlue(iconSize, iconSize));
+    	}
     }
+  
 
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
