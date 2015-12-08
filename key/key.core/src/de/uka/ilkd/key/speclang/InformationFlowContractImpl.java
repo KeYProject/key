@@ -413,6 +413,16 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     @Override
+    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract, boolean addSymbolicExecutionLabel) {
+        if (addSymbolicExecutionLabel) {
+           throw new IllegalStateException("Symbolic Execution API is not supported.");
+        }
+        else {
+           return createProofObl(initConfig, contract);
+        }
+    }
+
+    @Override
     public String getDisplayName() {
         return ContractFactory.generateDisplayName(baseName, forClass, pm,
                                                    specifiedIn, id);
