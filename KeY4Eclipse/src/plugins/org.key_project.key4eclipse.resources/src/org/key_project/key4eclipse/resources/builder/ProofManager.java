@@ -711,8 +711,7 @@ public class ProofManager {
          threads = new Thread[numOfThreads];
          for (int i = 0; i < threads.length; i++) {
 
-            ProofRunnable run = new ProofRunnable(project, KeYResourcesUtil.cloneList(proofElements), proofQueue, cloneEnvironment(), properties.isGenerateTestCases(), monitor);
-            threads[i] = new Thread(run);
+            ProofRunnable run = new ProofRunnable(project, KeYResourcesUtil.cloneList(proofElements), proofQueue, cloneEnvironment(), properties.isGenerateTestCases(), properties.isGenerateCounterExamples(), monitor);            threads[i] = new Thread(run);
          }
          for(Thread thread : threads){
             thread.start();
@@ -720,7 +719,7 @@ public class ProofManager {
       }
       else{
          threads = new Thread[1];
-         ProofRunnable run = new ProofRunnable(project, proofElements,proofQueue, environment, properties.isGenerateTestCases(), monitor);
+         ProofRunnable run = new ProofRunnable(project, proofElements,proofQueue, environment, properties.isGenerateTestCases(), properties.isGenerateCounterExamples(), monitor);
          Thread thread = new Thread(run);
          threads[0] = thread;
          thread.start();

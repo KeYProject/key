@@ -42,6 +42,9 @@ public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerato
          if (AbstractTestGenerator.isSolverAvailable()) {
             resolutions.add(new GenerateTestCasesResolution(marker));
          }
+         if(marker.getAttribute(MarkerUtil.MARKER_ATTRIBUTE_COUNTER_EXAMPLES, false)){
+             resolutions.add(new ShowCounterExamplesResolution(marker));
+         }
       }
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
