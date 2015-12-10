@@ -309,7 +309,6 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
            ImmutableList<Integer> path = ImmutableSLList.<Integer>nil().prepend(0);
            Matcher javaMatcher = JAVA_KEYWORDS_PATTERN.matcher(str);
            for (Range range : getJavaBlockRanges(new ArrayList<Range>(), path.append(i - 1), term)) {
-              System.out.println("ranges with javablock " + range.toString());
               javaMatcher.region(range.start(), range.end());
               while (javaMatcher.find()) {
                  StyleRange mark = new StyleRange();
@@ -645,9 +644,6 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          }
       }
      allRanges.addAll(backgroundMarks);
-     for (StyleRange range : allRanges) {
-        System.out.println(range.toString());
-     }
      Collections.sort(allRanges, new RangeComparator());
      textPresentation.mergeStyleRanges(allRanges.toArray(new StyleRange[allRanges.size()]));
      TextPresentation.applyTextPresentation(textPresentation, viewerText);
