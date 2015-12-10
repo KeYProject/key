@@ -14,10 +14,9 @@
 package org.key_project.key4eclipse.common.ui.decorator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +46,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -62,7 +60,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The Decorator for the KeYEditor.
@@ -172,7 +169,8 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * Java keywords to be highlighted.
     */
-   private static final Pattern JAVA_KEYWORDS_PATTERN = Pattern.compile("" +Arrays.asList(HTMLSyntaxHighlighter.JAVA_KEYWORDS));
+   private static final Pattern JAVA_KEYWORDS_PATTERN = 
+         Pattern.compile(HTMLSyntaxHighlighter.concat("(", HTMLSyntaxHighlighter.JAVA_KEYWORDS_REGEX, ")"));
    /**
     *  Dynamic logic keywords to be highlighted.
     */
@@ -263,58 +261,68 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
             setGreenBackground(pio);
          }
       }
-      
-
    }
-//   private ArrayList<Range> getJavaBlockRanges(ArrayList<Range> ranges, ImmutableList<Integer> path, Term term) {
-//      if (term.javaBlock() != null) {
-//         ranges.add(printer.getInitialPositionTable().rangeForPath(path, text.length()));
-//      }
-//      else {
-//         for (int i = 0; i < term.subs().size(); i++) {
-//            if(term.sub(i).isContainsJavaBlockRecursive()) {
-//               getJavaBlockRanges(ranges, path.append(i), term.sub(i));
-//            }
-//         }
-//      }  
-//     return ranges;
-//   }
+   /**
+    * Finds {@link Range} of {@link Term} containing a JavaBlock and fills them into given ArrayList.
+    * @param ranges ArrayList to be filled.
+    * @param path Path to given {@link Term}.
+    * @param term {@link Term} to be searched for {@link Term} containing JavaBlock. 
+    * @return ArrayList containing {@link Range} of all {@link Term} containing a JavaBlock.
+    */
+   private ArrayList<Range> getJavaBlockRanges(ArrayList<Range> ranges, ImmutableList<Integer> path, Term term) {
+      if (term.javaBlock() != null && !term.javaBlock().isEmpty()) {
+         Range termRange = printer.getInitialPositionTable().rangeForPath(path, text.length());
+         // assumption: children of term always come after term 
+         int end = termRange.end();
+         // subtract ranges of all children of the Term from the range of the Term 
+         for (int i = 0; i < term.subs().size(); i++) {
+            Range subRange = printer.getInitialPositionTable().rangeForPath(path.append(i), text.length());
+            end = end - subRange.length();
+
+         }
+         Range javaRange = new Range(termRange.start(), end);
+         ranges.add(javaRange);
+      }
+      // search all children of term for other JavaBlocks
+      for (int i = 0; i < term.subs().size(); i++) {
+            if (term.sub(i).isContainsJavaBlockRecursive()) {
+               getJavaBlockRanges(ranges, path.append(i), term.sub(i));
+            }
+         }
+  
+     return ranges;
+   }
 
    /**
     * Sets {@link StyleRange} for keyword highlighting.
     * @param str text to be highlighted
     * @author Anna Filighera
     */
-   private void setKeywordHighlights( String str) {
+   private void setKeywordHighlights(String str) {
       markedKeywords = new ArrayList<StyleRange>();
       descriptor = FontDescriptor.createFrom(viewer.getTextWidget().getFont()).setStyle(SWT.BOLD); 
       boldFont = descriptor.createFont(viewer.getTextWidget().getDisplay());
-      // find keywords and mark them
-//      for (int i = 1; i <= node.sequent().size(); i++) {
-//        Term term = node.sequent().getFormulabyNr(i).formula();
-//        //System.out.println("Term " + term.toString() + " claims to contain java block: " + term.isContainsJavaBlockRecursive());
-//        if (term.isContainsJavaBlockRecursive()) {
-//         //  System.out.println("term contains java block");
-//           ImmutableList<Integer> path = ImmutableSLList.<Integer>nil().prepend(0);
-//           path.append(i);
-//           Matcher javaMatcher = JAVA_KEYWORDS_PATTERN.matcher(str);
-//           while (javaMatcher.find()) {
-//              StyleRange mark = new StyleRange();
-//              mark.font = boldFont;
-//              mark.foreground = purpleColor;
-//              mark.start = javaMatcher.start();
-//              mark.length = javaMatcher.end() - javaMatcher.start();
-//              for (Range range : getJavaBlockRanges(new ArrayList<Range>(), path.append(0), term)) {
-//                 if (mark.start >= range.start() && mark.start <= range.end()) {
-//                    markedKeywords.add(mark);
-//                 }
-//                 
-//              }
-//           }
-//           
-//           
-//        }
-//      }
+      // find java keywords and mark them
+      for (int i = 1; i <= node.sequent().size(); i++) {
+        Term term = node.sequent().getFormulabyNr(i).formula();
+        if (term.isContainsJavaBlockRecursive()) {
+           ImmutableList<Integer> path = ImmutableSLList.<Integer>nil().prepend(0);
+           Matcher javaMatcher = JAVA_KEYWORDS_PATTERN.matcher(str);
+           for (Range range : getJavaBlockRanges(new ArrayList<Range>(), path.append(i - 1), term)) {
+              System.out.println("ranges with javablock " + range.toString());
+              javaMatcher.region(range.start(), range.end());
+              while (javaMatcher.find()) {
+                 StyleRange mark = new StyleRange();
+                 mark.font = boldFont;
+                 mark.foreground = purpleColor;
+                 mark.start = javaMatcher.start();
+                 mark.length = javaMatcher.end() - javaMatcher.start();
+                 markedKeywords.add(mark);              
+              }
+           } 
+        }
+      }
+      // find KeY keywords and mark them
       Matcher dynamicMatcher = DYNAMIC_LOGIC_KEYWORDS_PATTERN.matcher(str);
       while (dynamicMatcher.find()) {
          StyleRange mark = new StyleRange();
@@ -473,9 +481,9 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @return mark The colored StyleRange.
     *
     */
-   protected StyleRange initializeValuesForBackground(Color color, TextPresentation textPresentation){
+   protected StyleRange initializeValuesForBackground(Color color, TextPresentation textPresentation) {
       StyleRange mark = new StyleRange();
-      mark.background= color;  
+      mark.background = color;  
       textPresentation.addStyleRange(mark);
       return mark;
    }
@@ -569,63 +577,77 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @param hoverActive Indicates if hovering is active.
     * @author Anna Filighera
     */
-   private void mergeRanges(TextPresentation textPresentation, boolean hoverActive){
+   private void mergeRanges(TextPresentation textPresentation, boolean hoverActive) {
       ArrayList<StyleRange> allRanges = new ArrayList<StyleRange>();
       ArrayList<StyleRange> backgroundMarks = new ArrayList<StyleRange>();
       boolean overlaps = false;
       
-      if(hoverActive) {
+      if (hoverActive) {
          backgroundMarks.add(firstStatementStyleRange);
          backgroundMarks.add(marked1);
          backgroundMarks.add(marked2);
 
          // checks for overlapping ranges and adds all conflict free update StyleRanges
-         for(StyleRange update : markedUpdates){
-            for(StyleRange hover : backgroundMarks){
-              if(update.start>=hover.start && update.start<=(hover.start+hover.length)){
+         for (StyleRange update : markedUpdates) {
+            for (StyleRange hover : backgroundMarks) {
+              if (update.start>=hover.start && update.start<=(hover.start+hover.length)) {
                  overlaps = true;
                  break;
                }
             }
-            if(!overlaps) backgroundMarks.add(update);
-            else overlaps = false;
+            if (!overlaps) {
+               backgroundMarks.add(update);
+            }
+            else {
+               overlaps = false;
+            }
          }
       }
       // if hovering is not active, overlapping checks are unnecessary
       else {
-         for(StyleRange update : markedUpdates){
+         for (StyleRange update : markedUpdates) {
             backgroundMarks.add(update);
          }
       }
   
       // handle overlapping ranges
-      for(StyleRange keywordRange: markedKeywords){
-         for(StyleRange backgroundRange: backgroundMarks){
+      for (StyleRange keywordRange: markedKeywords) {
+         for (StyleRange backgroundRange: backgroundMarks) {
             // checks if keyword bounds overlap with background highlights
-            if(keywordRange.start>=backgroundRange.start && keywordRange.start<=(backgroundRange.start+backgroundRange.length)){
+            if (keywordRange.start >= backgroundRange.start 
+                  && keywordRange.start <= (backgroundRange.start + backgroundRange.length)) {
                overlaps = true;
                // adds keyword with appropriate background color to allRanges
-               StyleRange keyword = new StyleRange(keywordRange.start, keywordRange.length, keywordRange.foreground, backgroundRange.background, SWT.BOLD);
+               StyleRange keyword = new StyleRange(keywordRange.start, keywordRange.length, 
+                     keywordRange.foreground, backgroundRange.background, SWT.BOLD);
                allRanges.add(keyword);
                // splits background range into two new ranges, which enclose the keyword
-               if(keywordRange.start!=backgroundRange.start){
+               if (keywordRange.start != backgroundRange.start) {
                   StyleRange split = new StyleRange();
                   split.background = backgroundRange.background;
                   split.start = backgroundRange.start;
                   split.length = keywordRange.start - split.start;
                   backgroundMarks.add(split);
                }
-               if(keywordRange.start!=(backgroundRange.start+backgroundRange.length)){
-                  backgroundRange.length = backgroundRange.start + backgroundRange.length - (keywordRange.start + keywordRange.length);
+               if (keywordRange.start != (backgroundRange.start + backgroundRange.length)) {
+                  backgroundRange.length = backgroundRange.start + backgroundRange.length - 
+                        (keywordRange.start + keywordRange.length);
                   backgroundRange.start = keywordRange.start + keywordRange.length;
                }
              break;
             }    
          }
-         if(!overlaps) allRanges.add(keywordRange);
-         else overlaps = false;
+         if (!overlaps) {
+            allRanges.add(keywordRange);
+         }
+         else {
+            overlaps = false;
+         }
       }
      allRanges.addAll(backgroundMarks);
+     for (StyleRange range : allRanges) {
+        System.out.println(range.toString());
+     }
      Collections.sort(allRanges, new RangeComparator());
      textPresentation.mergeStyleRanges(allRanges.toArray(new StyleRange[allRanges.size()]));
      TextPresentation.applyTextPresentation(textPresentation, viewerText);
@@ -686,7 +708,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    public class RangeComparator implements Comparator<StyleRange> {
    @Override
    public int compare(StyleRange o1, StyleRange o2) {
-      return o1.start-o2.start;
+      return o1.start - o2.start;
    } 
    }
 }
