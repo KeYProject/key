@@ -36,13 +36,6 @@ public class NUIBranchNode extends NUINode {
     public LinkedList<NUINode> getChildren() {
         return children;
     }
-
-    /**
-     * @param children the children to set
-     */
-    public void setChildren(LinkedList<NUINode> children) {
-        this.children = children;
-    }
     
     /**
      * @param children the children to set
