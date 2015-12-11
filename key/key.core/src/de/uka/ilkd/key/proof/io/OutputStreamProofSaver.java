@@ -403,7 +403,7 @@ public class OutputStreamProofSaver {
                 tree.append("\")");
 
                 tree.append(" (distFormula \"");
-                tree.append(joinApp.getDistinguishingFormula());
+                tree.append(escapeCharacters(printAnything(joinApp.getDistinguishingFormula(), proof.getServices(), false).toString()));
                 tree.append("\")");
 
                 // Predicates for joins with predicate abstraction.
