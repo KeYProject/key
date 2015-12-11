@@ -101,12 +101,12 @@ public class HTMLSyntaxHighlighter {
     /////////        JAVA         /////////
     ///////////////////////////////////////
     
-    public final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
+    private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
             "while", "return", "break", "switch", "case", "continue", "try",
             "catch", "finally", "assert", "null", "throw", "this", "true",
             "false", "int", "char", "long", "short", "boolean" };
     
-    private final static String JAVA_KEYWORDS_REGEX = concat("|",
+    public final static String JAVA_KEYWORDS_REGEX = concat("|",
             Arrays.asList(JAVA_KEYWORDS));
     
     // NOTE: \Q(...)\E escapes the String in (...)
@@ -340,7 +340,7 @@ public class HTMLSyntaxHighlighter {
      *            Strings to concatenate.
      * @return The concatenated Strings.
      */
-    private static String concat(String... strings) {
+    public static String concat(String... strings) {
         return concat("", Arrays.asList(strings), new StringTransformer() {
             @Override
             public String transform(Object input) {

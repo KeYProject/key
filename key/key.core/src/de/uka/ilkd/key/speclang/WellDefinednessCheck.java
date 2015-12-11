@@ -1209,6 +1209,16 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Override
+    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract, boolean addSymbolicExecutionLabel) {
+        if (addSymbolicExecutionLabel) {
+           throw new IllegalStateException("Symbolic Execution API is not supported.");
+        }
+        else {
+           return createProofObl(initConfig, contract);
+        }
+    }
+
+    @Override
     public final ContractPO createProofObl(InitConfig initConfig) {
         return (ContractPO)createProofObl(initConfig, this);
     }

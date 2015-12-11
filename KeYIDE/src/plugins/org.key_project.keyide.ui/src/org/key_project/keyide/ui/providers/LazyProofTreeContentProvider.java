@@ -125,16 +125,18 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	private Proof proof;
 	
 	/**
-	 * The boolean flag which indicates hiding or showing of intermediate proofsteps
+	 * The boolean flag which indicates hiding or showing of intermediate proofsteps.
 	 */
 	private boolean hideState;
 	
-	
 	/**
-	 * The boolean flag for the show symbolic execution tree only outline feature
+	 * The boolean flag for the show symbolic execution tree only outline feature.
 	 */
 	private boolean symbolicState;
 	
+	/**
+	 * The {@link SymbolicExecutionTreeBuilder} used for the showSymbolicExecutionTree outline filter.
+	 */
 	private SymbolicExecutionTreeBuilder symbolicExeTreeBuilder;
 	
 	/**
@@ -156,8 +158,23 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		if (newInput instanceof Proof) {
 			this.proof = (Proof) newInput;
 			proof.addProofTreeListener(proofTreeListener);
-//			symbolicExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
-//			symbolicExeTreeBuilder.analyse();
+			if (symbolicState) {
+				symbolicExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+				symbolicExeTreeBuilder.analyse();
+				System.out.println("analyse symExeTreeBuilder");
+				ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(symbolicExeTreeBuilder.getStartNode());
+				IExecutionNode<?>[] children = symbolicExeTreeBuilder.getStartNode().getChildren();
+				System.out.println("child count of start node: "+ children.length);
+				while(iter.hasNext()){
+					IExecutionNode<?> node = iter.next();
+					try {
+						System.out.println(node.getProofNode().serialNr()+": "+node.getProofNode().name()+" "+node.getName());
+					} catch (ProofInputException e) {
+						e.printStackTrace();
+					}
+				}
+				
+			}
 		} else {
 			this.proof = null;
 			this.symbolicExeTreeBuilder = null;
@@ -315,10 +332,13 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	 *            The expanded {@link Node}.
 	 */
 	protected void doHandleProofExpanded(Node node) {
+		if (symbolicState) {
+			symbolicExeTreeBuilder.analyse();
+		}
 		Object parent = getParent(node);
 		int parentChildCount = doUpdateChildCount(parent, -1);
 		int childIndex = getIndexOf(parent, node);
-		if(node.childrenCount() > 1){
+		if (node.childrenCount() > 1) {
 			childIndex = 0;
 		}
 		if (childIndex >= 0 && childIndex < parentChildCount) {
@@ -339,27 +359,40 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 	protected int getBranchFolderChildCount(Node node) {
 		Node branchNode = getBranchNode(node);
 		int count = 1;
-//		if(symbolicState){
-//			if(symbolicExeTreeBuilder.getExecutionNode(branchNode) == null){
-//				count = 0;
-//			}
-//		}
-		while (branchNode.childrenCount() == 1) {
-			branchNode = branchNode.child(0);
-//			if(symbolicState){
-//				if(symbolicExeTreeBuilder.getExecutionNode(branchNode) != null){
-//					count += 1;
-//				}
-//			} else {
+		
+		if (!hideState && symbolicState) {
+			// count number of nodes when the showSymbolicExecutionTree filter is active
+			IExecutionNode<?> start = symbolicExeTreeBuilder.getExecutionNode(branchNode);
+			IExecutionNode<?>[] children = {};
+			if (start != null) {
+				children = start.getChildren();
+				// count children of the symbolic execution tree
+				while (children.length == 1) {
+					start = children[0];
+					count += 1;
+					children = start.getChildren();
+				}
+				branchNode = start.getProofNode();
+			}
+			// add children count of the proof tree if the last symbolic execution node is a leaf
+			if (children.length == 0) {
+				while (branchNode.childrenCount() == 1) {
+					branchNode = branchNode.child(0);
+					count += 1;
+				}
+			}
+		} else {
+			while (branchNode.childrenCount() == 1) {
+				branchNode = branchNode.child(0);
 				count += 1;
-//			}
-		}
-		// return the number of Nodes when the hideIntermediateProofsteps filter is active
-		if(hideState == true){
-			if(branchNode.leaf()){
-				count = 1;
-			} else {
-				count = 0;
+			}
+			// return the number of nodes when the hideIntermediateProofsteps filter is active
+			if (hideState) {
+				if (branchNode.leaf()) {
+					count = 1;
+				} else {
+					count = 0;
+				}
 			}
 		}
 		return count;
@@ -413,10 +446,29 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		}
 		// element is a Node
 		if (index < childCount) {
-			if(hideState == true){
-				// gets the right node when the hideIntermediateProofsteps filter is active
-				while(node.childrenCount() == 1){
+			if (hideState) {
+				while (node.childrenCount() == 1) {
 					node = node.child(0);
+				}
+			} else if (symbolicState) {
+				IExecutionNode<?> start = symbolicExeTreeBuilder.getExecutionNode(node);
+				int count = 0;
+				// search node in symbolic execution tree when the symbolic execution tree contains the start node(parent node)
+				if (start != null) {
+					IExecutionNode<?>[] children = start.getChildren();
+					// search node in symbolic execution tree
+					while (children.length == 1 && count < index) {
+						start = children[0];
+						count += 1;
+						children = start.getChildren();
+					}
+					node = start.getProofNode();
+				}
+				
+				// search node in the proof tree when the node is not in the symbolic execution tree
+				while (node.childrenCount() == 1 && count < index) {
+					node = node.child(0);
+					count += 1;
 				}
 			} else {
 				// gets the right node when no filter is active
@@ -429,8 +481,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		// element is a BranchFolder
 		else {
 			int folderIndex = index - childCount;
-			// does the same as the code in comments beneath but also works when the hideIntermediateProofsteps filter is active
-			while(node.childrenCount() == 1){
+			// does the same as the code in comments beneath but also works when a filter is active
+			while (node.childrenCount() == 1) {
 				node = node.child(0);
 			}
 //			for (int i = 0; i < childCount - 1; i++) {
@@ -442,7 +494,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 			return branchFolder;
 		}
 	}
-
+	
 	/**
 	 * Returns the index of the given element at its given parent.
 	 * 
@@ -468,17 +520,47 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		} else if (parent instanceof BranchFolder) {
 			current = ((BranchFolder) parent).getChild();
 		}
-		// returns -1 for every intermediate proof step when the filter is active
-		if(hideState == true){
-			if(element instanceof Node){
+		
+		int index = 0;
+		if (hideState) {
+			// returns -1 for every intermediate proof step when the filter is active
+			if (element instanceof Node) {
 				Node node = (Node) element;
-				if(!node.leaf()){
+				if (!node.leaf()) {
 					return -1;
 				}
 			}
+		} else if (symbolicState) {
+			Node node = null;
+			boolean isBranchFolder = false;
+			if (element instanceof Node) {
+				node = (Node) element;
+			} else if (element instanceof BranchFolder) {
+				node = ((BranchFolder) element).getChild();
+				isBranchFolder = true;
+			}
+				IExecutionNode<?> start = symbolicExeTreeBuilder.getExecutionNode(current);
+				IExecutionNode<?>[] children = {};
+				if (start != null) {
+					children = start.getChildren();
+					while (children.length == 1 && !current.equals(node)) {
+						start = children[0];
+						index += 1;
+						children = start.getChildren();
+					}
+					current = start.getProofNode();
+				}
+				while (current.childrenCount() == 1 && !current.equals(node)) {
+					current = current.child(0);
+					index += 1;
+				}
+				if (current.equals(node)) {
+					return index;
+				} else if (!isBranchFolder) {
+					return -1;
+				}
 		}
 		// Find index of element
-		int index = 0;
 		boolean found = false;
 		while (!found && current != null) {
 			BranchFolder bf = branchFolders.get(current);
@@ -489,10 +571,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 					Node parentNode = current.parent();
 					int indexOnParent = parentNode.getChildNr(current);
 					current = parentNode.child(indexOnParent + 1);
-					// does not increment when the hideIntermediateProofsteps filter is active
-					if(hideState != true){
-					   index++;
-					}
 				}
 			} else {
 				if (element == current) {
@@ -508,8 +586,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 						int childIndex = current.getChildNr(node);
 						if (childIndex >= 0) {
 							found = true;
-							if(hideState == true){ // hideIntermediateProofsteps filter is active
-							   if(element instanceof BranchFolder){
+							if (hideState) {
+							   if (element instanceof BranchFolder) {
 							      index += childIndex;
 							   }
 							} else {
@@ -520,11 +598,10 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 											// not a child of parent
 						}
 					} else {
-						current = current.child(0);
-						// does not increment the index when the hideIntermediateProofsteps filter is active
-						if(hideState == false){
+						if (!hideState) {
 							index++;
 						}
+						current = current.child(0);
 					}
 				}
 			}
@@ -555,8 +632,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 				node = node.child(0);
 			}
 			return node.childrenCount();
-		} else
+		} else {
 			return -1;
+		}
 	}
 
 	/**
@@ -577,10 +655,11 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
 		hideState = state;
 	}
 	
+	public boolean getSymbolicState(){
+		return symbolicState;
+	}
+	
 	public void setSymbolicState(boolean state){
 		symbolicState = state;
-		if(symbolicExeTreeBuilder != null && state){
-//			symbolicExeTreeBuilder.analyse();
-		}
 	}
 }

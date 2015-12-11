@@ -156,7 +156,7 @@ public final class KeYIDEUtil {
    public static void openEditor(Contract contract, KeYEnvironment<?> environment, IMethod method)throws PartInitException{
       Assert.isNotNull(contract);
       Assert.isNotNull(environment);
-      ProofOblInput problem = contract.createProofObl(environment.getInitConfig(), contract);
+      ProofOblInput problem = contract.createProofObl(environment.getInitConfig(), contract, true);
       IStorageEditorInput input = new ProofOblInputEditorInput(problem, environment, method);
       WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);
    }
