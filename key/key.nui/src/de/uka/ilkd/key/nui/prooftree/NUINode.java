@@ -1,13 +1,12 @@
-package de.uka.ilkd.key.prooftree;
+package de.uka.ilkd.key.nui.prooftree;
 
-public abstract class Node {
-    private int id;
+public abstract class NUINode {
     private String label;
-    private boolean closed;
-    private boolean linked;
-    private boolean interactive;
-    private boolean active;
-    private boolean hasNotes;
+    private boolean closed = false;
+    private boolean linked = false;
+    private boolean interactive = false;
+    private boolean active = false;
+    private boolean hasNotes = false;
     
     /**
      * @return the closed
@@ -69,18 +68,7 @@ public abstract class Node {
     public void setHasNotes(boolean hasNotes) {
         this.hasNotes = hasNotes;
     }
-    /**
-     * @return the id
-     */
-    public int getId() {
-        return id;
-    }
-    /**
-     * @param id the id to set
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
+  
     /**
      * @return the label
      */

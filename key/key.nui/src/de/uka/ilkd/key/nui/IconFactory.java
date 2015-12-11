@@ -12,6 +12,9 @@ import javafx.scene.image.ImageView;
  *
  */
 public class IconFactory {
+    
+    // TODO: Konstante für Iconname anstelle von Methode pro Icon
+    // TODO: Größe per TreeViewController Wrapper Methode oder IconFactory instanziierbar machen
 
 	private IconFactory() {
 	}

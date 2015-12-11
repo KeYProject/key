@@ -1,53 +1,53 @@
-package de.uka.ilkd.key.prooftree;
+package de.uka.ilkd.key.nui.prooftree;
 
 import java.util.LinkedList;
 
-public class BranchNode extends Node {
+public class NUIBranchNode extends NUINode {
 
-    private de.uka.ilkd.key.proof.Node firstChild;
+    private de.uka.ilkd.key.proof.Node parent;
     
-    private LinkedList<Node> children;
+    private LinkedList<NUINode> children;
     
     /**
-     * @param firstChild
+     * @param parent
      */
-    public BranchNode(de.uka.ilkd.key.proof.Node firstChild) {
-        this.firstChild = firstChild;
-        children = new LinkedList<Node>();
+    public NUIBranchNode(de.uka.ilkd.key.proof.Node parent) {
+        this.parent = parent;
+        children = new LinkedList<NUINode>();
     }
 
     /**
      * @return the firstChild
      */
     public de.uka.ilkd.key.proof.Node getFirstChild() {
-        return firstChild;
+        return parent;
     }
 
     /**
      * @param firstChild the firstChild to set
      */
     public void setFirstChild(de.uka.ilkd.key.proof.Node firstChild) {
-        this.firstChild = firstChild;
+        this.parent = firstChild;
     }
 
     /**
      * @return the children
      */
-    public LinkedList<Node> getChildren() {
+    public LinkedList<NUINode> getChildren() {
         return children;
     }
 
     /**
      * @param children the children to set
      */
-    public void setChildren(LinkedList<Node> children) {
+    public void setChildren(LinkedList<NUINode> children) {
         this.children = children;
     }
     
     /**
      * @param children the children to set
      */
-    public void addChild(Node child) {
+    public void addChild(NUINode child) {
         this.children.addLast(child);
     }
 }

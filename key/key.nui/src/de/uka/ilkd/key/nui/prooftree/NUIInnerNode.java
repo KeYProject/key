@@ -1,13 +1,13 @@
-package de.uka.ilkd.key.prooftree;
+package de.uka.ilkd.key.nui.prooftree;
 
-public class InnerNode extends Node {
+public class NUIInnerNode extends NUINode {
 
     private de.uka.ilkd.key.proof.Node proofNode;
 
     /**
      * @param proofNode
      */
-    public InnerNode(de.uka.ilkd.key.proof.Node proofNode) {
+    public NUIInnerNode(de.uka.ilkd.key.proof.Node proofNode) {
         this.proofNode = proofNode;
     }
 

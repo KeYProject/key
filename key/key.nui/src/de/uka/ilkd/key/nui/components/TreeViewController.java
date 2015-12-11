@@ -8,9 +8,9 @@ import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.nui.prooftree.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -27,13 +27,16 @@ public class TreeViewController {
     // defines the width and height of an icon
     private static int iconSize = 15;
 
-    private Proof p;
+    // the current proof object used for the tree
+    // private Proof p;
+
+    private NUIBranchNode nuiRoot;
 
     /**
      * Initialization method for scene, displays the default proof
      */
     public void initialize() {
-        // add css file to view
+        // add CSS file to view
         String cssPath = this.getClass().getResource("treeView.css")
                 .toExternalForm();
         proofTreeView.getStylesheets().add(cssPath);
@@ -43,23 +46,29 @@ public class TreeViewController {
         displayProof(p);
     }
 
-    /**
-     * shows a proof in the treeView
-     * 
-     * @param p
-     *            the proof to display
-     */
-    public void displayProof(Proof p) {
+    public void displayProof(Proof proof) {
+        setProof(proof);
+
+        displayProof();
+    }
+
+    public void displayProof() {
+        TreeItem<Label> root = new TreeItem<Label>(
+                new Label(nuiRoot.getLabel()));
+        // TODO decoration for root node
+        addNUINodeToFXNode(nuiRoot, root);
+        proofTreeView.setRoot(root);
+    }
+
+    public void setProof(Proof p) {
         // get the root node
         Node pRoot = p.root();
 
-        // convert proof to fxtree
-        TreeItem<Label> fxRoot = new TreeItem<Label>(new Label("proof tree"));
-        fxRoot.setExpanded(true);
-        addPNodeToFXNode(pRoot, fxRoot);
-
-        // display tree
-        proofTreeView.setRoot(fxRoot);
+        // convert proof to NUITree
+        nuiRoot = new NUIBranchNode(pRoot);
+        nuiRoot.setLabel("Proof Tree");
+        nuiRoot.setClosed(pRoot.isClosed()); // TODO refactor
+        addPNodeToNUINode(pRoot, nuiRoot);
     }
 
     /**
@@ -70,21 +79,52 @@ public class TreeViewController {
      * @param fxParent
      *            the node where the converted proofNode should be added to
      */
-    private void addPNodeToFXNode(Node proofNode, TreeItem<Label> fxParent) {
-        // create an fxNode and add it to the fxparent
-        String nodeName = proofNode.serialNr() + ": " + proofNode.name();
-        TreeItem<Label> fxNode = new TreeItem<Label>(new Label(nodeName));
-        fxParent.getChildren().add(fxNode);
-
-        // determine number of children and add all children recursively
-        int numChildren = proofNode.childrenCount();
-        if (numChildren == 0) {
-            setLeafNodeDecoration(proofNode, fxNode);
+    private void addPNodeToNUINode(Node proofNode, NUIBranchNode parent) {
+        Proof p = proofNode.proof();
+        NUINode newNode;
+        // Create NUI node
+        // ----------------------------------------------------------------
+        if (proofNode.leaf()) {
+            NUILeafNode leafNode = new NUILeafNode(proofNode);
+            newNode = leafNode;
         }
-        else if (numChildren == 1) {
-            setInnerNodeDecoration(proofNode, fxNode);
-            // add child's subtree to parent
-            addPNodeToFXNode(proofNode.child(0), fxParent);
+        else {
+            NUIInnerNode innerNode = new NUIInnerNode(proofNode);
+            newNode = innerNode;
+        }
+        // Add created node to parent
+        parent.addChild(newNode);
+
+        // Set NUI fields
+        // -----------------------------------------------------------------
+        Goal g = p.getGoal(proofNode);
+        if (proofNode.leaf()) {
+            if (g != null) {
+                newNode.setLinked(g.isLinked());
+                newNode.setInteractive(!g.isAutomatic());
+                newNode.setLinked(g.isLinked());
+                newNode.setClosed(proofNode.isClosed());
+            }
+            else {
+                newNode.setClosed(true);
+            }
+        }
+        else {
+            newNode.setClosed(proofNode.isClosed());
+            newNode.setInteractive(
+                    proofNode.getNodeInfo().getInteractiveRuleApplication());
+        }
+        String nodeName = proofNode.serialNr() + ": " + proofNode.name();
+        newNode.setLabel(nodeName);
+
+        newNode.setHasNotes(proofNode.getNodeInfo().getNotes() != null);
+        newNode.setActive(proofNode.getNodeInfo().getActiveStatement() != null);
+
+        // Add children of current node proofNode to parent
+        // --------------------------------
+        int numChildren = proofNode.childrenCount();
+        if (numChildren == 1) {
+            addPNodeToNUINode(proofNode.child(0), parent);
         }
         else if (numChildren > 1) {
             // for each child create a branch node and add it to the fxparent
@@ -93,89 +133,107 @@ public class TreeViewController {
                 // get next child
                 Node child = childrenIterator.next();
 
+                // create NUIBranch and set fields
+                NUIBranchNode branchNode = new NUIBranchNode(proofNode);
+
                 // define branch label for new node, create node and set icon
                 String branchLabel = child.getNodeInfo().getBranchLabel();
                 if (branchLabel == null) {
                     branchLabel = "Case "
                             + (child.parent().getChildNr(child) + 1);
                 }
-                System.out.println(
-                        "label: " + child.getNodeInfo().getBranchLabel());
-                System.out.println("#children: " + child.childrenCount());
-                System.out.println("isClosed: " + child.isClosed());
-                System.out.println("isLeaf: " + child.leaf());
-                if (p.getGoal(child) != null) {
-                    System.out.println(
-                            "isLinked: " + p.getGoal(child).isLinked());
-                    System.out.println("isAutomatic: "
-                            + p.getGoal(child).isAutomatic() + "\n");
-                }
-                else {
-                    System.out.println("\n");
-                }
+                branchNode.setLabel(branchLabel);
 
-                TreeItem<Label> branch = new TreeItem<Label>(
-                        new Label(branchLabel));
-                setBranchNodeDecoration(child, branch);
-                branch.getValue().getStyleClass().add("branch");
+                branchNode.setClosed(child.isClosed());
 
                 // add node to parent
-                fxParent.getChildren().add(branch);
+                parent.addChild(branchNode);
 
                 // call function recursively with current child
-                addPNodeToFXNode(child, branch);
+                addPNodeToNUINode(child, branchNode);
+            }
+        }
+
+    }
+
+    // TODO rename, javadoc
+    private void addNUINodeToFXNode(NUIBranchNode branch,
+            TreeItem<Label> fxParent) {
+        for (NUINode child : branch.getChildren()) {
+            TreeItem<Label> fxNode = new TreeItem<Label>(
+                    new Label(child.getLabel()));
+            fxParent.getChildren().add(fxNode);
+
+            // set node decoration
+            if (child instanceof NUIBranchNode) {
+                fxNode.getValue().getStyleClass()
+                        .add(ProofTreeStyle.CSS_NODE_BRANCH);
+                if (child.isClosed()) {
+                    fxNode.getValue().getStyleClass()
+                            .add(ProofTreeStyle.CSS_NODE_CLOSED);
+                    fxNode.setGraphic(IconFactory
+                            .getKeyClosedInnerNode(iconSize, iconSize));
+                }
+                else {
+                    fxNode.setGraphic(IconFactory.getKeyOpenInnerNode(iconSize,
+                            iconSize));
+
+                }
+                // TODO: Implement logic for linked (non-leaf) Nodes
+                // see ProofTreeView (line 712-735)
+            }
+            else if (child instanceof NUIInnerNode) {
+                if (child.isInteractive()) {
+                    fxNode.setGraphic(IconFactory
+                            .getKeyInteractiveInnerNode(iconSize, iconSize));
+                }
+            }
+            else if (child instanceof NUILeafNode) {
+                fxNode.getValue().getStyleClass()
+                        .add(ProofTreeStyle.CSS_NODE_LEAF);
+                if (child.isClosed()) {
+                    fxNode.setGraphic(
+                            IconFactory.getKeyClosedGoal(iconSize, iconSize));
+                    fxNode.getValue().getStyleClass()
+                            .add(ProofTreeStyle.CSS_NODE_CLOSED);
+                }
+                else if (child.isLinked()) {
+                    fxNode.setGraphic(IconFactory
+                            .getKeyLinkedInnerNode(iconSize, iconSize));
+                    fxNode.getValue().getStyleClass()
+                            .add(ProofTreeStyle.CSS_NODE_LINKED);
+                }
+                else if (child.isInteractive()) {
+                    fxNode.setGraphic(IconFactory
+                            .getKeyInteractiveGoal(iconSize, iconSize));
+                    fxNode.getValue().getStyleClass()
+                            .add(ProofTreeStyle.CSS_NODE_INTERACTIVE);
+
+                }
+                else {
+                    fxNode.getValue().getStyleClass()
+                            .add(ProofTreeStyle.CSS_NODE_OPEN);
+                    fxNode.setGraphic(
+                            IconFactory.getKeyOpenGoal(iconSize, iconSize));
+                }
+            }
+
+            if (child.hasNotes()) {
+                fxNode.getValue().getStyleClass()
+                        .add(ProofTreeStyle.CSS_NODE_NOTES);
+            }
+            else if (child.isActive()) {
+                fxNode.getValue().getStyleClass()
+                        .add(ProofTreeStyle.CSS_NODE_ACTIVE);
+            }
+
+            // if branch node add children recursively
+            if (child instanceof NUIBranchNode) {
+                NUIBranchNode childBranch = (NUIBranchNode) child;
+                addNUINodeToFXNode(childBranch, fxNode);
             }
         }
     }
-
-    private void setBranchNodeDecoration(Node child, TreeItem<Label> fxBranch) {
-        if (child.isClosed()) {
-            // all goals below this node are closed
-            fxBranch.setGraphic(
-                    IconFactory.getKeyClosedInnerNode(iconSize, iconSize));
-        }
-        else {
-            fxBranch.setGraphic(
-                    IconFactory.getKeyOpenInnerNode(iconSize, iconSize));
-        }
-
-    }
-
-    /**
-	 * Sets an Icon on a given treeItem based on the information gathered from
-	 * the proofNode
-	 * 
-	 * @param proofNode
-	 *            The node item which contains the information to determine the
-	 *            right icon
-	 * @param treeItem
-	 *            The tree item where the graphics should be placed on
-	 */
-	private void setLeafNodeDecoration(Node proofNode, TreeItem<Label> treeItem) {
-
-			Goal goal = p.getGoal(proofNode);
-			if (goal == null || proofNode.isClosed()) {
-				treeItem.setGraphic(IconFactory.getKeyClosedGoal(20, 20));
-			} else {
-//				if (goal.isLinked()) {
-//					treeItem.setGraphic(IconFactory.getKeyLinkedInnerNode(20, 20));
-//				} else 
-			    if (!goal.isAutomatic()) {
-					treeItem.setGraphic(IconFactory.getKeyInteractiveGoal(20, 20));
-				} else {
-					treeItem.setGraphic(IconFactory.getKeyOpenGoal(20, 20));
-				}
-			}
-	
-		if (p.getGoal(proofNode) != null && p.getGoal(proofNode).isLinked()) {
-		    treeItem.setGraphic(IconFactory.getKeyLinkedInnerNode(iconSize, iconSize));
-		}
-	}
-	
-	   private void setInnerNodeDecoration(Node proofNode, TreeItem<Label> treeItem) {
-	       
-	   }
-
 
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
@@ -193,7 +251,6 @@ public class TreeViewController {
                     JavaProfile.getDefaultInstance(), proofFile, null, null,
                     null, true);
             Proof proof = environment.getLoadedProof();
-            this.p = proof;
             return proof;
         }
         catch (ProblemLoaderException e) {
