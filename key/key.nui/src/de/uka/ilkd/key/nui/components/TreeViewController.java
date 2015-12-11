@@ -38,7 +38,7 @@ public class TreeViewController {
 		proofTreeView.getStylesheets().add(cssPath);
 
 		// load and display proof
-		Proof p = loadProof("example02.proof");
+		Proof p = loadProof("gcd.twoJoins.proof");
 		displayProof(p);
 	}
 
@@ -94,6 +94,18 @@ public class TreeViewController {
 				if (branchLabel == null) {
 					branchLabel = "Case " + (child.parent().getChildNr(child) + 1);
 				}
+				System.out.println("label: " + branchLabel);
+				System.out.println("#children: " + child.childrenCount());
+				System.out.println("isClosed: " + child.isClosed());
+				System.out.println("isLeaf: " + child.leaf());
+				if (p.getGoal(child) != null) {
+					System.out.println("isLinked: " + p.getGoal(child).isLinked());
+					System.out.println("isAutomatic: " + p.getGoal(child).isAutomatic() + "\n");	
+				}  else {
+					System.out.println("\n");
+				}
+				
+				
 				TreeItem<Label> branch = new TreeItem<Label>(new Label(branchLabel));
 				setNodeIcon(child, branch);
 				branch.getValue().getStyleClass().add("branch");

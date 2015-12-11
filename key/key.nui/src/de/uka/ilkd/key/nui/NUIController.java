@@ -24,10 +24,14 @@ import javafx.scene.control.RadioMenuItem;
  */
 public class NUIController {
 
-    // Stores the position of components added to the SplitPane
+    /**
+     * Stores the position of components added to the SplitPane
+     */
     private HashMap<String, Pane> posComponent = new HashMap<String, Pane>();
 
-    // Factory to create GUI components
+    /**
+     * Factory to create GUI components
+     */
     private ComponentFactory componentFactory = new ComponentFactory(
             "components/");
 
@@ -55,6 +59,17 @@ public class NUIController {
     @FXML
     MenuButton ButtonTreeView;
 
+    /**
+     * Loads the default components of the GUI
+     */
+    public void initialize() {
+    	// Load default components
+    	componentFactory.createComponent("treeView", left,
+                "treeView.fxml", posComponent);
+    	componentFactory.createComponent("proofView", right,
+                "proofView.fxml", posComponent);
+    }
+    
     /**
      * Handles user input if user clicks "Close" in the file menu
      */
@@ -131,7 +146,8 @@ public class NUIController {
                     clickedItem.getParentMenu()
                                .getProperties()
                                .get("componentResource");
-            
+            System.out.println("componentName: " + componentName);
+            System.out.println("componentResource: " + componentResource);
             switch(clickedItem.getText()) {
             // where to does the User want to move the component?
             case "left":
@@ -154,4 +170,6 @@ public class NUIController {
             }
         }
     }
+    
+
 }
