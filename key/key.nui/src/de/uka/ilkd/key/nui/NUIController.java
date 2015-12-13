@@ -43,7 +43,7 @@ public class NUIController {
     @FXML
     VBox right;
     @FXML
-    HBox down;
+    HBox bottom;
     @FXML
     Parent root;
     @FXML
@@ -130,8 +130,8 @@ public class NUIController {
                 break;
                 
             case "bottom":  
-                down.getChildren().add(existingcomponent);
-                posComponent.replace(componentName, down);
+                bottom.getChildren().add(existingcomponent);
+                posComponent.replace(componentName, bottom);
                 break;
                 
             default: // hide was chosen, delete component and remove it from the map
@@ -163,7 +163,7 @@ public class NUIController {
                         componentResource, posComponent);
                 break;
             case "bottom":
-                componentFactory.createComponent(componentName, down,
+                componentFactory.createComponent(componentName, bottom,
                         componentResource, posComponent);
             default:
                 break; 
