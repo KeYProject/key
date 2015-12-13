@@ -10,7 +10,7 @@
 
 <BorderPane fx:id="root" prefHeight="600.0" prefWidth="800.0"
 	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="de.uka.ilkd.key.nui.NUIController">
+	fx:controller="de.uka.ilkd.key.nui.controller.NUIController">
 	<top>
 		<MenuBar BorderPane.alignment="CENTER">
 			<menus>
