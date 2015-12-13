@@ -185,6 +185,13 @@ public interface Contract extends SpecificationElement {
                                         Contract contract);
 
     /**
+     * Returns a proof obligation to the passed contract and initConfig.
+     */
+    public ProofOblInput createProofObl(InitConfig initConfig,
+                                        Contract contract,
+                                        boolean supportSymbolicExecutionAPI);
+
+    /**
      * Returns a contract which is identical this contract except that
      * the id is set to the new id.
      */

@@ -63,6 +63,8 @@ import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
+import org.key_project.keyide.ui.views.GoalsPage;
+import org.key_project.keyide.ui.views.IGoalsPage;
 import org.key_project.keyide.ui.views.IStrategySettingsPage;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategySettingsPage;
@@ -92,6 +94,7 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ProofUserManager;
@@ -307,6 +310,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       }
    };
    
+   
+   
    /**
     * Constructor to initialize the ContextMenu IDs
     */
@@ -400,7 +405,14 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(eclipseFile.getProject());
                List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(eclipseFile.getProject());
                List<File> includes = KeYResourceProperties.getKeYIncludes(eclipseFile.getProject());
-               this.environment = KeYEnvironment.load(file, classPaths, bootClassPath, includes, EclipseUserInterfaceCustomization.getInstance());
+               this.environment = KeYEnvironment.load(null, 
+                                                      file, 
+                                                      classPaths, 
+                                                      bootClassPath, 
+                                                      includes, 
+                                                      SymbolicExecutionTreeBuilder.createPoPropertiesToForce(),
+                                                      EclipseUserInterfaceCustomization.getInstance(),
+                                                      false);
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.currentProof = getEnvironment().getLoadedProof();
             }
@@ -465,6 +477,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       getCurrentProof().addRuleAppListener(ruleAppListener);
       sourceViewer.setEditable(false);
       setCurrentNode(getCurrentNode());
+      
    }
    
    /**
@@ -804,6 +817,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          return this;
       } else if (KeYBreakpointManager.class.equals(adapter)){
          return getBreakpointManager();
+      } else if (IGoalsPage.class.equals(adapter)) {
+         return new GoalsPage(getCurrentProof(), getEnvironment(), selectionModel);
       }
       else {
          return super.getAdapter(adapter);

@@ -481,6 +481,14 @@
                id="org.eclipse.ui.commands.toggleState">
             <class
                   class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="true">
+               </parameter>
             </class>
          </state>
       </command>
@@ -542,6 +550,13 @@
             icon="icons/debugtt_obj.gif"
             id="org.key_project.keyide.ui.view.StrategySettings"
             name="Strategy Settings"
+            restorable="true">
+      </view>
+      <view
+            category="org.key_project.keyide.ui.view.category"
+            class="org.key_project.keyide.ui.views.GoalsView"
+            id="org.key_project.keyide.ui.view.Goals"
+            name="Goals"
             restorable="true">
       </view>
    </extension>

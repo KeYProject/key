@@ -29,3 +29,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.key_project.key4eclipse.common.ui.test.suite,
  org.key_project.key4eclipse.common.ui.test.suite.swtbot
 Bundle-Vendor: KeY Project
+Import-Package: de.uka.ilkd.key.proof,
+ de.uka.ilkd.key.symbolic_execution.util,
+ org.eclipse.jface.text,
+ org.eclipse.jface.text.source,
+ org.key_project.ui.test.util
