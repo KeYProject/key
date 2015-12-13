@@ -132,11 +132,14 @@ public class RIFLTransformer {
      * @return path to the transformed directory
      */
     public static String getDefaultSavePath (String origSourcePath) {
-        origSourcePath = getBaseDirPath(origSourcePath);
-        final String[] path = origSourcePath.split(File.separator);
-        final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
-        final String result = TMP_PATH + File.separator + dirName + ".rifl";
-        return result;
+    	
+    	return origSourcePath+".rifl";
+    	
+//        origSourcePath = getBaseDirPath(origSourcePath);
+//        final String[] path = origSourcePath.split(File.separator);
+//        final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
+//        final String result = TMP_PATH + File.separator + dirName + ".rifl";       
+//        return result;
     }
 
     private static String getBaseDirPath(String origSourcePath) {
