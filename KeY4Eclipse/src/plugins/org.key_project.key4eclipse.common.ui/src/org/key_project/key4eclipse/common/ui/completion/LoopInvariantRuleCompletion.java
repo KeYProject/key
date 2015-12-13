@@ -130,6 +130,11 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          return text.trim();
       }
       
+      /**
+       * @param root The composite to which to attach the Group
+       * @param text the header text the state view should have
+       * @return the Label that is meant for the actual state message
+       */
       private Label mkStateView(Composite root, String text){
          Group statusGrp = new Group(root, SWT.NONE);
          statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -240,9 +245,13 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          switchPage(0);
          
          //FIXME: Rule will be applied even if Completion dialog was aborted.
-         //This is probably not possible from within this class
+         //This is probably not preventable from within this class
       }
       
+      /**
+       * manually switches to another specification, as if user input happened
+       * @param id the id to which to switch
+       */
       private void switchPage(int id){
          //put the page on top
          stackLayout.topControl = (Composite) specSwitchComposite.getChildren()[id];
@@ -255,7 +264,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * adds a copy of the currently selected specification
        */
       private void store(){
-         //FIXME: doesn't *actually* store anything.
+         //Just add another specification.
+         //finish() and the framework take care of putting the spec to more persistent memory.
+         //At least - as in KeY - the currently selected spec.
          int selectedSpec = getSelection();
          int amountTabs = specSwitchComposite.getChildren().length;
          String[] invSpecs = new String[heaps.length];
@@ -278,7 +289,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @param modifies - modifies text of the tab
        * @param variant - variants text of the tab
        * @param id - id of the new tab
-       * @return the generated TabItem's Composite
+       * @return the generated Composite
        */
       private Composite addTab(String[] invariants, String[] modifies, String variant, int id) {
          //add a item in the drop down
@@ -497,8 +508,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public IBuiltInRuleApp finish() {
-         //TODO: On cancel, throw exception.
-         //TODO: Also, will putting null as new Invariant make the program actually abort the rule completion?
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
          Map<LocationVariable, Term> invMap = new LinkedHashMap<LocationVariable, Term>();
          Map<LocationVariable, Term> modMap = new LinkedHashMap<LocationVariable, Term>();
