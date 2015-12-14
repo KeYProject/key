@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
  * Factory for creating GUI components.
  * 
  * @author Florian Breitfelder
+ * @author Stefan Pilot
  *
  */
 public class ComponentFactory {
@@ -49,6 +50,30 @@ public class ComponentFactory {
             component.setId(id);
             posComponent.put(id, pane);
             pane.getChildren().add(component);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return component;
+    }
+    
+    /**
+     * Returns a new GUI component. Caller is left with placing it in the
+     * correct pane.
+     * 
+     * @param id
+     *            identifier for the new GUI component
+     * @param resource
+     *            name of the fxml file for the new GUI component
+     * @return a new type Parent GUI component e. g. treeView
+     * 
+     */
+    public Parent createComponent(String id, String resource) {
+        Parent component = null;
+        try {
+            component = FXMLLoader
+                    .load(getClass().getResource(this.resourceDir + resource));
+            component.setId(id);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -99,4 +124,6 @@ public class ComponentFactory {
         }
         return treeView;
     }
+
+    
 }
