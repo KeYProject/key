@@ -89,9 +89,9 @@
 				<!-- and make the `Menu` -->
 				<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT DEFINE MENU HERE \-\-&gt;)" replace="&lt;Menu fx:id=&quot;toggle${filename}&quot; text=&quot;%${filename}&quot;&gt;&#10;&lt;properties componentName=&quot;${filename}&quot; componentResource=&quot;${filename}.fxml&quot;/&gt;&#10;&lt;items&gt;&#10;&lt;RadioMenuItem text=&quot;%hide&quot; selected=&quot;true&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem text=&quot;%left&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem text=&quot;%middle&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem text=&quot;%right&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem text=&quot;%down&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;/items&gt;&#10;&lt;/Menu&gt;&#10;\1" />
 				<!-- Increment the toggle group counter.
-   			Possible bug: If at some point there will be more than one toggle
-   			group defined in this fmxl file, it must have a number greater than
-   			the number of Views / GUI Components. -->
+   			Possible bug: If at some point there will be more than one group of 
+   			toggle groups defined in this fmxl file, each of them must have a
+   			number greater than the number of Views / GUI Components. -->
 				<math result="i" operand1="${i}" operation="+" operand2="1" datatype="int" />
 			</sequential>
 		</for>
