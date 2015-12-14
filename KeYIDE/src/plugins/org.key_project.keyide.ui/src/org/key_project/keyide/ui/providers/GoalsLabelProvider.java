@@ -8,9 +8,20 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.proof.Goal;
 
+
+/**
+ * The {@link LabelProvider} to label the list of open {@link Goal}s on
+ * the GoalsView
+ * 
+ * @author Seena Vellaramkalayil
+ *
+ */
 public class GoalsLabelProvider extends LabelProvider {
 
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public String getText(Object element) {
       if (element instanceof Goal) {
@@ -22,6 +33,9 @@ public class GoalsLabelProvider extends LabelProvider {
    }
    
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public Image getImage(Object element) {
       if (element instanceof Goal) {
