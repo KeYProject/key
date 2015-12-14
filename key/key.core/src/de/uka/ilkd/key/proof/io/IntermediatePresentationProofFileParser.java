@@ -296,7 +296,7 @@ public class IntermediatePresentationProofFileParser implements
                 matched = true;
 
                 for (int i = 1; i < m.groupCount(); i += 2) {
-                    assert i + 1 < m.groupCount() : "Wrong format of join abstraction predicates: "
+                    assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
                             + "There should always be pairs of placeholders and predicate terms.";
 
                     currAbstractionPredicates =

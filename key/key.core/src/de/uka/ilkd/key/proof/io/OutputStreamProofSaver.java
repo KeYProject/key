@@ -402,9 +402,13 @@ public class OutputStreamProofSaver {
                 tree.append(joinApp.getJoinNode().serialNr());
                 tree.append("\")");
 
-                tree.append(" (distFormula \"");
-                tree.append(escapeCharacters(printAnything(joinApp.getDistinguishingFormula(), proof.getServices(), false).toString()));
-                tree.append("\")");
+                if (joinApp.getDistinguishingFormula() != null) {
+                    tree.append(" (distFormula \"");
+                    tree.append(escapeCharacters(printAnything(
+                            joinApp.getDistinguishingFormula(),
+                            proof.getServices(), false).toString()));
+                    tree.append("\")");
+                }
 
                 // Predicates for joins with predicate abstraction.
                 JoinWithPredicateAbstraction predAbstrRule;
@@ -428,10 +432,9 @@ public class OutputStreamProofSaver {
                                     .append(" ")
                                     .append(predicateFormWithPlaceholder.first)
                                     .append("', '")
-                                    .append(LogicPrinter
-                                            .quickPrintTerm(
-                                                    predicateFormWithPlaceholder.second,
-                                                    proof.getServices()).replace("\n", ""))
+                                    .append(escapeCharacters(printAnything(
+                                                predicateFormWithPlaceholder.second,
+                                                proof.getServices(), false).toString()))
                                     .append("'), ");
                         }
                     }
