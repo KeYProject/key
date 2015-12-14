@@ -7,7 +7,7 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/key.util"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/key.util.test"/>
 	<classpathentry kind="lib" path="testfx/guava-18.0.jar"/>
-	<classpathentry kind="lib" path="testfx/testfx-core-4.0.2-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="testfx/testfx-core-4.0.2-SNAPSHOT.jar" sourcepath="testfx/testfx-core-4.0.2-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="testfx/testfx-junit-4.0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="testfx/testfx-legacy-4.0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>

@@ -28,6 +28,7 @@ public class TreeViewTest extends GuiTest {
 
     @Test
     public void testTreeNavigation() {
+        doubleClickOn("#Proof_Tree");
         for (int i = 0; i < 15; i++) {
             doubleClickOn("#" + i);
         }

@@ -27,16 +27,24 @@ public abstract class NUINode {
     private String serialNumber;
 
     /**
-     * Returns the serial number of the node.
+     * Returns the serial number of the node. </br>
+     * See {@link #setSerialNumber(String)} for more details.
      * 
      * @return serialNumber The serial number of the node.
      */
-    public String  getSerialNumber() {
+    public String getSerialNumber() {
         return serialNumber;
     }
 
     /**
      * Sets the serial number of the node.
+     * <ul>
+     * <li>If the node is an inner node or an leaf node, use
+     * node.serialNumber(), </br> see {@link de.uka.ilkd.key.proof.Node#serialNr()}</li>
+     * <li>If the node is a branch node, use node.getNodeInfo().getBranchLabel().replace(" ","_"), </br> see
+     * {@link de.uka.ilkd.key.proof.NodeInfo#getBranchLabel()}.
+     * </li>
+     * </ul>
      * 
      * @param serial
      *            The serial number to set.

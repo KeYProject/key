@@ -12,6 +12,8 @@
 		<pathelement path="${basedir}/../key.core.testgen/bin" />
 		<pathelement location="${basedir}/../key.core/lib/antlr.jar" />
 		<pathelement location="${basedir}/../key.core/lib/recoderKey.jar" />
+		<pathelement location="${basedir}/testfx/testfx-*.jar" />
+		<pathelement location="${basedir}/testfx/guava-18.0.jar" />
 	</path>
 
 	<path id="key.nui.run.class.path">
