@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.nui;
+package de.uka.ilkd.key.nui.controller;
 
 import java.util.HashMap;
+
+import de.uka.ilkd.key.nui.ComponentFactory;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToggleGroup;
 
 /**
  * Controller for the main GUI which is displayed when the program was started
@@ -32,7 +35,8 @@ public class NUIController {
     /**
      * Factory to create GUI components
      */
-    private ComponentFactory componentFactory = new ComponentFactory("components/");
+    private ComponentFactory componentFactory = new ComponentFactory(
+            "components/");
 
     // Definition of GUI fields
     @FXML
@@ -57,27 +61,27 @@ public class NUIController {
     MenuButton ButtonOpenProofsView;
     @FXML
     MenuButton ButtonTreeView;
+    @FXML
+    ToggleGroup toggleGroup0;
+    @FXML
+    ToggleGroup toggleGroup1;
+    @FXML
+    ToggleGroup toggleGroup2;
+    @FXML
+    ToggleGroup toggleGroup3;
 
     /**
      * Loads the default components of the GUI
      */
     public void initialize() {
         // Load default components
-        // componentFactory.createComponent("treeView", left, "treeView.fxml",
-        // posComponent);
-        createComponent("treeView", left, "treeView.fxml");
-
-        componentFactory.createComponent("proofView", right, "proofView.fxml", posComponent);
-    }
-
-    /**
-     * Creates a component (yay for low coupling!)
-     * TODO expand this javadoc
-     */
-    protected void createComponent(String id, Pane location, String resource) {
-        posComponent.put(id, location);
-        Parent newComponent = componentFactory.createComponent(id, resource);
-        location.getChildren().add(newComponent);
+        componentFactory.createComponent("treeView", left, "treeView.fxml",
+                posComponent);
+        componentFactory.createComponent("proofView", right, "proofView.fxml",
+                posComponent);
+        // Select appropriate menu item entries
+        toggleGroup2.selectToggle(toggleGroup2.getToggles().get(3));
+        toggleGroup3.selectToggle(toggleGroup3.getToggles().get(1));
     }
 
     /**
@@ -94,6 +98,15 @@ public class NUIController {
     @FXML
     protected void handleAboutWindow(ActionEvent e) {
 
+    }
+
+    /**
+     * Creates a component (yay for low coupling!) TODO expand this javadoc
+     */
+    protected void createComponent(String id, Pane location, String resource) {
+        posComponent.put(id, location);
+        Parent newComponent = componentFactory.createComponent(id, resource);
+        location.getChildren().add(newComponent);
     }
 
     /**
@@ -146,7 +159,8 @@ public class NUIController {
 
             default: // hide was chosen, delete component and remove it from the
                      // map
-                posComponent.get(componentName).getChildren().remove(existingcomponent);
+                posComponent.get(componentName).getChildren()
+                        .remove(existingcomponent);
                 posComponent.remove(componentName);
                 statustext.setText("View " + componentName + " hidden.");
             }
@@ -154,26 +168,30 @@ public class NUIController {
         }
         else { // Component did not already exist, thus it must be created
 
-            String componentResource = (String) clickedItem.getParentMenu().getProperties().get("componentResource");
+            String componentResource = (String) clickedItem.getParentMenu()
+                    .getProperties().get("componentResource");
             System.out.println("componentName: " + componentName);
             System.out.println("componentResource: " + componentResource);
             switch (clickedItem.getText()) {
             // where to does the User want to move the component?
             case "left":
-                componentFactory.createComponent(componentName, left, componentResource, posComponent);
+                componentFactory.createComponent(componentName, left,
+                        componentResource, posComponent);
                 break;
             case "middle":
-                componentFactory.createComponent(componentName, middle, componentResource, posComponent);
+                componentFactory.createComponent(componentName, middle,
+                        componentResource, posComponent);
                 break;
             case "right":
-                componentFactory.createComponent(componentName, right, componentResource, posComponent);
+                componentFactory.createComponent(componentName, right,
+                        componentResource, posComponent);
                 break;
             case "bottom":
-                componentFactory.createComponent(componentName, bottom, componentResource, posComponent);
+                componentFactory.createComponent(componentName, bottom,
+                        componentResource, posComponent);
             default:
                 break;
             }
         }
     }
-
 }
