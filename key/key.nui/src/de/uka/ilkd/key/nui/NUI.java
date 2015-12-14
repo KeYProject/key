@@ -26,13 +26,10 @@ public class NUI extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
-        // Set default language bundle
-        ResourceBundle bundle = new PropertyResourceBundle(
-                getClass().getResourceAsStream("bundle_en_EN.properties"));
-        // Load FXML from main window
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("NUIdefault.fxml"), bundle);
-        Parent root = loader.load();
+        ComponentFactory factory = new ComponentFactory("");
+
+        Parent root = factory.createNUISceneGraph();
+
         // Load scene and set preferences
         Scene scene = new Scene(root);
         stage.setTitle("KeY");

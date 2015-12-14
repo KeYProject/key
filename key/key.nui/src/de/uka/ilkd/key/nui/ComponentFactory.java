@@ -2,6 +2,8 @@ package de.uka.ilkd.key.nui;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -52,5 +54,49 @@ public class ComponentFactory {
             e.printStackTrace();
         }
         return component;
+    }
+
+    /**
+     * Creates and returns the JavaFX scenegraph for the application window
+     * 
+     * @return returns the JavaFX scenegraph for the application window
+     * @throws Exception
+     */
+    public Parent createNUISceneGraph() {
+        // Set default language bundle
+        ResourceBundle bundle = null;
+
+        try {
+            bundle = new PropertyResourceBundle(
+                    getClass().getResourceAsStream("bundle_en_EN.properties"));
+        }
+        catch (IOException e) {
+        }
+
+        // Load FXML from main window
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("NUIdefault.fxml"), bundle);
+
+        Parent root = null;
+
+        try {
+            root = loader.load();
+        }
+        catch (IOException e) {
+        }
+
+        return root;
+    }
+
+    public Parent createTreeView() {
+        Parent treeView = null;
+        try {
+            treeView = FXMLLoader.load(getClass().getResource(
+                    "components/treeView.fxml"));
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return treeView;
     }
 }
