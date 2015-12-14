@@ -357,10 +357,14 @@ public class OutputStreamProofSaver {
         	tree.append(" (joinId \"");
         	tree.append(joinApp.getJoinNode().serialNr());
             tree.append("\")");
-            
-            tree.append(" (distFormula \"");
-            tree.append(escapeCharacters(printAnything(joinApp.getDistinguishingFormula(), proof.getServices(), false).toString()));
-            tree.append("\")");
+
+            if (joinApp.getDistinguishingFormula() != null) {
+                tree.append(" (distFormula \"");
+                tree.append(escapeCharacters(printAnything(
+                        joinApp.getDistinguishingFormula(),
+                        proof.getServices(), false).toString()));
+                tree.append("\")");
+            }
         }
         
         if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
