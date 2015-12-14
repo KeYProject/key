@@ -552,6 +552,13 @@
             name="Strategy Settings"
             restorable="true">
       </view>
+      <view
+            category="org.key_project.keyide.ui.view.category"
+            class="org.key_project.keyide.ui.views.GoalsView"
+            id="org.key_project.keyide.ui.view.Goals"
+            name="Goals"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.help.contexts">

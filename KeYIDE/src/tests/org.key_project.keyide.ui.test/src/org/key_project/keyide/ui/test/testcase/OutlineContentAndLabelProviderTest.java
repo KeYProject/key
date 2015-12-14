@@ -181,6 +181,11 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 		}
    	}
    
+   @Test
+   public void testShowSymbolicExecutionTree() {
+	   
+   }
+   
    /**
     * Checks whether a filtered TreeViewer contains any intermediate proof steps of a proof.
     * @param nodeIter a node iterator over the proof tree

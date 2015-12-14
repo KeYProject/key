@@ -75,7 +75,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	private State hideState;
 	
 	/**
-	 * The {@link State} for the show symbolic execution tree only outline feature.
+	 * The {@link State} for the show symbolic execution tree only outline filter.
 	 */
 	private State symbolicState;
 	
@@ -116,7 +116,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
 		@Override
 		public void handleStateChange(State state, Object oldValue) {
-			ProofTreeContentOutlinePage.this.handleHideStateChanged(state, oldValue);
+			handleHideStateChanged(state, oldValue);
 		}
 	};
 	
@@ -127,7 +127,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 
       @Override
       public void handleStateChange(State state, Object oldValue) {
-    	  ProofTreeContentOutlinePage.this.handleSymbolicStateChanged(state, oldValue);
+    	  handleSymbolicStateChanged(state, oldValue);
       }
 	};
 
@@ -225,7 +225,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		super.createControl(parent);
 		getTreeViewer().setUseHashlookup(true);
 		contentProvider = new LazyProofTreeContentProvider();
-		// initialize boolean flags for hideIntermediateProofSteps and showSymbolicExecutionTree outline feature
+		// initialize boolean flags for hideIntermediateProofSteps and showSymbolicExecutionTree outline filter
 		contentProvider.setHideState((boolean) hideState.getValue());
 		contentProvider.setSymbolicState((boolean) symbolicState.getValue());
 		getTreeViewer().setContentProvider(contentProvider);

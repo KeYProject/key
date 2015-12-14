@@ -63,6 +63,8 @@ import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
+import org.key_project.keyide.ui.views.GoalsPage;
+import org.key_project.keyide.ui.views.IGoalsPage;
 import org.key_project.keyide.ui.views.IStrategySettingsPage;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategySettingsPage;
@@ -308,6 +310,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       }
    };
    
+   
+   
    /**
     * Constructor to initialize the ContextMenu IDs
     */
@@ -473,6 +477,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       getCurrentProof().addRuleAppListener(ruleAppListener);
       sourceViewer.setEditable(false);
       setCurrentNode(getCurrentNode());
+      
    }
    
    /**
@@ -812,6 +817,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          return this;
       } else if (KeYBreakpointManager.class.equals(adapter)){
          return getBreakpointManager();
+      } else if (IGoalsPage.class.equals(adapter)) {
+         return new GoalsPage(getCurrentProof(), getEnvironment(), selectionModel);
       }
       else {
          return super.getAdapter(adapter);
