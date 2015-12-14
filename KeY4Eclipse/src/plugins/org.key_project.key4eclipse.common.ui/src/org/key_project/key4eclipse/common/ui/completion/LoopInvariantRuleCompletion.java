@@ -194,6 +194,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          });
          
          specSwitchComposite = new Composite(inputColumn, SWT.NONE);
+         specSwitchComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
          stackLayout = new StackLayout();
          specSwitchComposite.setLayout(stackLayout);
          
@@ -299,6 +300,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          final SharedScrolledComposite scrolledComposite = new SharedScrolledComposite(specSwitchComposite, SWT.H_SCROLL | SWT.V_SCROLL) {};
          scrolledComposite.setExpandHorizontal(true);
          scrolledComposite.setExpandVertical(true);
+         //add layout to scrolledComposite?
          
          //... containing a composite...
          Composite textContainer = new Composite(scrolledComposite, SWT.NONE);
@@ -313,11 +315,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //... add a tab folder for heap-sensitive Invariants ...
          TabFolder heapTabs = new TabFolder(textContainer, SWT.TOP);
          heapTabs.setLayoutData(new GridData(GridData.FILL_BOTH));
-         heapTabs.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-               resetStateTab();
-            }
-         });
          int iter = 0;
          for(LocationVariable heap : heaps){
             //for all elems in heap, add a TabItem
@@ -358,6 +355,11 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             });
             iter++;
          }
+         heapTabs.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+               resetStateTab();
+            }
+         });
          Group variantsGroup = new Group(textContainer, SWT.NONE);
          variantsGroup.setLayout(new FillLayout());
          variantsGroup.setText("variants");
