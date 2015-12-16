@@ -133,7 +133,7 @@ public class RIFLTransformer {
      */
     public static String getDefaultSavePath (String origSourcePath) {
     	
-    	return origSourcePath+".rifl";
+    	return origSourcePath+"_rifl";
     	
 //        origSourcePath = getBaseDirPath(origSourcePath);
 //        final String[] path = origSourcePath.split(File.separator);

@@ -101,6 +101,7 @@ public class SpecificationInjector extends SourceVisitor {
                     sb.append(",");
                 }
                 sb.deleteCharAt(sb.length() - 1);
+                //TODO: provide support for multiple domains here! 
                 sb.append(" \\by \\itself;\n");
             }
 
