@@ -494,40 +494,19 @@ public class QuestionInput extends Bean {
    }
    
    /**
-    * Computes the achieved trust score as follows:
-    * <table border="1">
-    *    <tr><td>&nbsp;</td><td>CorrectnessScore = MaxScore</td><td>CorrectnessScore > 0</td><td>CorrectnessScore <= 0</td></tr>
-    *    <tr><td>{@link Trust#SURE}</td><td>2</td><td>1</td><td>-2</td></tr>
-    *    <tr><td>{@link Trust#EDUCATED_GUESS}</td><td>1</td><td>2</td><td>-1</td></tr>
-    *    <tr><td>{@link Trust#UNSURE}</td><td>-2</td><td>-1</td><td>1</td></tr>
-    * </table>
+    * Computes the achieved partial trust score which is
+    * {@link #computeCorrectnessScore()} * trust score.
     * @return The computed trust score or {@code null} if no result is available.
     */
-   public Integer computePartialTrustScore() {
+   public BigDecimal computePartialTrustScore() {
       if (trust != null) {
          Integer correctnessScore = computeCorrectWrongDifference();
          Boolean correct = correctnessScore != null ? correctnessScore.intValue() > 0 : null;
          Integer trustScore = doTrustScoreComputation(correct);
-         return trustScore != null ? trustScore.intValue() * correctnessScore.intValue() : null;
+         return trustScore != null ? computeCorrectnessScore().multiply(new BigDecimal(trustScore)) : null;
       }
       else {
          return null;
-      }
-   }
-
-   /**
-    * Normalizes the trust score to ensure positive values.
-    * @param trustScore The trust score to normalize.
-    * @return The normalized trust score.
-    */
-   public static int normalizeTrust(int trustScore) {
-      switch (trustScore) {
-         case -2 : return 0;
-         case -1 : return 1;
-         case  0 : return 2;
-         case  1 : return 3;
-         case  2 : return 4;
-         default : throw new IllegalArgumentException("Unsupported trust score: " + trustScore);
       }
    }
 }
