@@ -131,15 +131,14 @@ public class RIFLTransformer {
      * @param origSourcePath path to a directory or single Java file
      * @return path to the transformed directory
      */
-    public static String getDefaultSavePath (String origSourcePath) {
-    	
-    	return origSourcePath+"_rifl";
-    	
-//        origSourcePath = getBaseDirPath(origSourcePath);
-//        final String[] path = origSourcePath.split(File.separator);
-//        final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
-//        final String result = TMP_PATH + File.separator + dirName + ".rifl";       
+    public static String getDefaultSavePath (String origSourcePath) {    	
+        origSourcePath = getBaseDirPath(origSourcePath);
+        final String[] path = origSourcePath.split(File.separator);
+        final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
+        //final String result = TMP_PATH + File.separator + dirName + ".rifl";       
 //        return result;
+        System.out.println(origSourcePath + File.separator + dirName +"_rifl");
+        return origSourcePath + File.separator + dirName +"_rifl";
     }
 
     private static String getBaseDirPath(String origSourcePath) {

@@ -61,9 +61,7 @@ public interface SpecificationContainer {
     /** Return the security level of the method return, represented as a String. */
     public String returnValue(String inPackage, String inClass,
             String methodName, String[] paramTypes);
-    /** Return the domains to which given domain flows*/
-    public String flows(String domain);
+    /** Return the domains from which the given domain flows*/
+    public Set<String> flows(String domain);
 
-    
-    public Set<SpecificationEntity> domainSet(String domain);
 }

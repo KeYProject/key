@@ -14,12 +14,14 @@
 package de.uka.ilkd.key.util.rifl;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.Field;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.Parameter;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.ReturnValue;
 
 /**
  * Default implementation of {@link SpecificationContainer}.
@@ -31,10 +33,10 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 	private final Map<Field, String> field2domain = new HashMap<Field, String>();
 	private final Map<Parameter, String> param2domain = new HashMap<Parameter, String>();
 	private final Map<ReturnValue, String> return2domain = new HashMap<ReturnValue, String>();
-	private final Map<String,String> flow = new HashMap<String,String>();
+	private final Set<Entry<String,String>> flow = new LinkedHashSet<Entry<String,String>>();
 
 	public DefaultSpecificationContainer(
-			Map<SpecificationEntity, String> domainAssignments, Map<String,String> flow) {
+			Map<SpecificationEntity, String> domainAssignments, Set<Entry<String, String>> flow2) {
 		// TODO: this copying is ugly and inefficient
 		for (final Entry<SpecificationEntity, String> e : domainAssignments
 				.entrySet()) {
@@ -45,8 +47,9 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 			else if (e.getKey() instanceof ReturnValue)
 				return2domain.put((ReturnValue) e.getKey(), e.getValue());
 		}
-		for(Entry<String,String> e : flow.entrySet()){
-			flow.put(e.getKey(), e.getValue());
+		 
+		for(Entry<String,String> e : flow2){			
+			this.flow.add(e);			
 		}
 	}
 
@@ -118,34 +121,18 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 	}
 
 	@Override
-	public String flows(String domain) {
-		return flow.get(domain);
-	}
-
-	public Set<SpecificationEntity> domainSet(String domain){
-
-		Set<SpecificationEntity> result = new HashSet<SpecificationEntity>();
-
-		for(Entry<Field,String> e : field2domain.entrySet()){
+	public Set<String> flows(String domain) {
+		
+		Set<String> result = new LinkedHashSet<String>();
+		for(Entry<String,String> e : flow){
 			if(e.getValue().equals(domain)){
 				result.add(e.getKey());
 			}
 		}
-		for(Entry<Parameter,String> e : param2domain.entrySet()){
-			if(e.getValue().equals(domain)){
-				result.add(e.getKey());
-			}
-		}
-		for(Entry<ReturnValue,String> e : return2domain.entrySet()){
-			if(e.getValue().equals(domain)){
-				result.add(e.getKey());
-			}
-		}
-
+		//System.out.println("GET: "+domain+" = "+result);
 		return result;
-
-
 	}
+
 
 
 
