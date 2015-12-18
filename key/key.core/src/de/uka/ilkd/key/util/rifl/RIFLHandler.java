@@ -139,7 +139,7 @@ class RIFLHandler extends DefaultHandler {
         final Map<SpecificationEntity, String> tmp = new LinkedHashMap<SpecificationEntity, String>();
         tmp.putAll(apply(sources2categories, categories2domains));
         tmp.putAll(apply(sinks2categories, categories2domains));
-        return new DefaultSpecificationContainer(tmp);
+        return new DefaultSpecificationContainer(tmp, flow);
     }
 
     private void putField(Attributes attributes) {
@@ -174,8 +174,9 @@ class RIFLHandler extends DefaultHandler {
         final String from = attributes.getValue("from");
         final String to = attributes.getValue("to");
         assert !from.equals(to);
-        assert from.equals(DEFAULT_DOMAIN); // FIXME: For the state being
+        //assert from.equals(DEFAULT_DOMAIN); // FIXME: For the state being
         flow.put(from, to);
+        System.out.println(from+" "+to);
     }
 
     private void putDomain(Attributes attributes) {
