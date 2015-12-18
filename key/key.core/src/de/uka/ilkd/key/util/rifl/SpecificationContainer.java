@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.util.rifl;
 
+import java.util.Set;
+
 import recoder.java.declaration.FieldDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 
@@ -59,5 +61,7 @@ public interface SpecificationContainer {
     /** Return the security level of the method return, represented as a String. */
     public String returnValue(String inPackage, String inClass,
             String methodName, String[] paramTypes);
+    /** Return the domains from which the given domain flows*/
+    public Set<String> flows(String domain);
 
 }

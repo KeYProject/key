@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.util.rifl;
 
+import java.util.AbstractMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.xml.sax.Attributes;
@@ -99,8 +101,7 @@ class RIFLHandler extends DefaultHandler {
             new LinkedHashMap<Pair<String,String>, String>();
     private final Map<String, String> handles2categories = new LinkedHashMap<String, String>();
     private Set<String> domains = null;
-    private Map<String,String> flow = null;
-
+    private Set<Entry<String, String>> flow = null;
     private Map<SpecificationEntity, Pair<String,String>> tmpMap = null;
 
     private String tmpHandle = null;
@@ -139,7 +140,7 @@ class RIFLHandler extends DefaultHandler {
         final Map<SpecificationEntity, String> tmp = new LinkedHashMap<SpecificationEntity, String>();
         tmp.putAll(apply(sources2categories, categories2domains));
         tmp.putAll(apply(sinks2categories, categories2domains));
-        return new DefaultSpecificationContainer(tmp);
+        return new DefaultSpecificationContainer(tmp, flow);
     }
 
     private void putField(Attributes attributes) {
@@ -174,8 +175,10 @@ class RIFLHandler extends DefaultHandler {
         final String from = attributes.getValue("from");
         final String to = attributes.getValue("to");
         assert !from.equals(to);
-        assert from.equals(DEFAULT_DOMAIN); // FIXME: For the state being
-        flow.put(from, to);
+        //assert from.equals(DEFAULT_DOMAIN); // FIXME: For the state being
+        AbstractMap.SimpleEntry<String, String> e = new AbstractMap.SimpleEntry<String, String>(from, to); 
+        flow.add(e);
+        //System.out.println(from+" "+to);
     }
 
     private void putDomain(Attributes attributes) {
@@ -199,12 +202,22 @@ class RIFLHandler extends DefaultHandler {
     }
 
     private void checkDomainAssignmentsWithFlows() {
-        final Iterator<Pair<String,String>> it = categories2domains.keySet().iterator();
+    	// This method tried to remove flows implicitly assumed by JML,
+    	// but for more than two domains this would need a default "high domain"
+        /*final Iterator<Pair<String,String>> it = categories2domains.keySet().iterator();
         for (Pair<String,String> p = it.next(); it.hasNext(); p = it.next()) {
-            if (categories2domains.get(p).equals(flow.get(DEFAULT_DOMAIN))) {
-                it.remove();
-            }
-        }
+        	for(Entry<String,String> e : flow){
+        		if(e.getKey().equals(DEFAULT_DOMAIN) && categories2domains.containsKey(p)
+        				&& categories2domains.get(p).equals(e.getValue())){
+        			System.out.println("Remove: "+p);
+        			if (p.first.equals("h")) {
+        				throw new RuntimeException();
+        			}
+        			it.remove();
+        		}
+        	}
+            
+        }*/
     }
 
     private void checkFlows() {
@@ -306,7 +319,7 @@ class RIFLHandler extends DefaultHandler {
     }
 
     private void startFlow() {
-        flow = new LinkedHashMap<String,String>();
+        flow = new LinkedHashSet<Entry<String,String>>();
     }
 
     private void startSinks() {

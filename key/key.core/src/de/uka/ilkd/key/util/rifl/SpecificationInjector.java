@@ -15,8 +15,11 @@ package de.uka.ilkd.key.util.rifl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import recoder.abstraction.ClassType;
 import recoder.java.*;
@@ -51,10 +54,11 @@ public class SpecificationInjector extends SourceVisitor {
         private static final String JML_START = "\n"+DEFAULT_INDENTATION+"/*@ ";
 
         private final String indentation;
-        private final Map<String, List<String>> respects = new HashMap<String, List<String>>();
-
-        JMLFactory() {
+        private final Map<String, Set<String>> respects = new HashMap<String, Set<String>>();
+        private SpecificationContainer sc;
+        JMLFactory(SpecificationContainer sc) {
             indentation = DEFAULT_INDENTATION;
+            this.sc = sc;
         }
 
         JMLFactory(int indent) {
@@ -82,26 +86,56 @@ public class SpecificationInjector extends SourceVisitor {
         void addToDetermines(String name, String key) {
             put(key, name);
         }
+        
+        String getRespects(String domain){
+        	return getRespects(respects.get(domain));        	
+        }
+        
+        String getRespects(Set<String> oneRespect){
+        	String result = "";        	
+        	if(oneRespect != null && oneRespect.size() > 0){        		
+        		for (final String elem : oneRespect) {
+                    result += " "+elem+",";                    
+                }
+        		result = result.substring(0,result.length()-1);
+        	}
+        	return result;
+        	
+        }
+        
+        
 
         /** Gets a formatted JML comment. */
         String getSpecification() {
             // start JML
             final StringBuffer sb = new StringBuffer(indentation);
             sb.append(JML_START + "\n");
-
+            //System.out.println("Respects: "+respects);
             // respects clauses
-            for (final List<String> oneRespect : respects.values()) {
-                sb.append(indentation);
+            
+           
+            
+            for (final Entry<String, Set<String>> oneRespect : respects.entrySet()) {
+            	String domain = oneRespect.getKey();
+            	Set<String> flowsFromDomain = sc.flows(domain);
+            	//System.out.println("flows to "+domain+" "+flowsFromDomain);
+            	
+            	Set<String> oneRespects = new LinkedHashSet<String>();
+            	for(String flowsFrom : flowsFromDomain){
+            		oneRespects.addAll(respects.get(flowsFrom));
+            	}
+            	oneRespects.addAll(respects.get(domain));
+            	
+            	
+            	sb.append(indentation);
                 sb.append(DEFAULT_INDENTATION);
                 sb.append("@ ");
                 sb.append(DETERMINES);
-                for (final String elem : oneRespect) {
-                    sb.append(" ");
-                    sb.append(elem);
-                    sb.append(",");
-                }
-                sb.deleteCharAt(sb.length() - 1);
-                sb.append(" \\by \\itself;\n");
+                sb.append(getRespects(domain));
+                sb.append(" \\by ");
+                sb.append(getRespects(oneRespects));
+                sb.append("; //"+domain+" -> "+flowsFromDomain+"\n");
+                               
             }
 
             // close JML
@@ -114,9 +148,9 @@ public class SpecificationInjector extends SourceVisitor {
         private void put(String key, String value) {
             if (key == null)
                 return;
-            List<String> target = respects.get(key);
+            Set<String> target = respects.get(key);
             if (target == null) {
-                target = new ArrayList<String>();
+                target = new LinkedHashSet<String>();
             }
             target.add(value);
             respects.put(key, target);
@@ -187,7 +221,7 @@ public class SpecificationInjector extends SourceVisitor {
     @Override
     public void visitMethodDeclaration(MethodDeclaration md) {
         md.setProgramModelInfo(si);
-        final JMLFactory factory = new JMLFactory();
+        final JMLFactory factory = new JMLFactory(sc);
 
         // add return value
         final String returnDomain = sc.returnValue(md);
