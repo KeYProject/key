@@ -35,35 +35,32 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 	private final Map<ReturnValue, String> return2domain = new HashMap<ReturnValue, String>();
 	private final Set<Entry<String,String>> flow = new LinkedHashSet<Entry<String,String>>();
 
-	public DefaultSpecificationContainer(
-			Map<SpecificationEntity, String> domainAssignments, Set<Entry<String, String>> flow2) {
+	public DefaultSpecificationContainer(Map<SpecificationEntity, String> domainAssignments,
+	                                     Set<Entry<String, String>> flow2) {
 		// TODO: this copying is ugly and inefficient
-		for (final Entry<SpecificationEntity, String> e : domainAssignments
-				.entrySet()) {
-			if (e.getKey() instanceof Field)
+		for (final Entry<SpecificationEntity, String> e : domainAssignments.entrySet()) {
+			if (e.getKey() instanceof Field) {
 				field2domain.put((Field) e.getKey(), e.getValue());
-			else if (e.getKey() instanceof Parameter)
+			} else if (e.getKey() instanceof Parameter) {
 				param2domain.put((Parameter) e.getKey(), e.getValue());
-			else if (e.getKey() instanceof ReturnValue)
+			} else if (e.getKey() instanceof ReturnValue) {
 				return2domain.put((ReturnValue) e.getKey(), e.getValue());
+			}
 		}
-		 
-		for(Entry<String,String> e : flow2){			
-			this.flow.add(e);			
+		for(final Entry<String,String> e : flow2) {
+			this.flow.add(e);
 		}
 	}
-
-
 
 	@Override
 	public String toString() {
 		return "Fields: " + field2domain
 				+ "\nParameters: " + param2domain
-				+ "\nReturns: " + return2domain;
+				+ "\nReturns: " + return2domain
+				+ "\nFlows: " + flow;
 	}
 
-	private String[] extractParamTypes(
-			recoder.java.declaration.MethodDeclaration md) {
+	private String[] extractParamTypes(recoder.java.declaration.MethodDeclaration md) {
 		final int params = md.getParameterDeclarationCount();
 		final String[] paramTypes = new String[params];
 		for (int i = 0; i < params; i++) {
@@ -76,10 +73,8 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 
 	@Override
 	public String field(recoder.java.declaration.FieldDeclaration fd) {
-		final recoder.java.declaration.FieldSpecification fs = fd
-				.getVariables().get(0);
-		final recoder.abstraction.ClassTypeContainer ctype = fs
-				.getContainingClassType();
+		final recoder.java.declaration.FieldSpecification fs = fd.getVariables().get(0);
+		final recoder.abstraction.ClassTypeContainer ctype = fs.getContainingClassType();
 		final String inClass = ctype.getName();
 		final String inPackage = ctype.getPackage().getFullName();
 		return field(inPackage, inClass, fs.getName());
@@ -91,49 +86,42 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 	}
 
 	@Override
-	public String parameter(recoder.java.declaration.MethodDeclaration md,
-			int index) {
+	public String parameter(recoder.java.declaration.MethodDeclaration md, int index) {
 		final String[] paramTypes = extractParamTypes(md);
 		final recoder.abstraction.ClassType ctype = md.getContainingClassType();
 		return parameter(ctype.getPackage().getFullName(), ctype.getName(),
-				md.getName(), paramTypes, index);
+		                 md.getName(), paramTypes, index);
 	}
 
 	@Override
 	public String parameter(String inPackage, String inClass,
-			String methodName, String[] paramTypes, int index) {
-		return param2domain.get(new Parameter(index, methodName, paramTypes,
-				inPackage, inClass));
+			                String methodName, String[] paramTypes, int index) {
+		return param2domain.get(new Parameter(index, methodName, paramTypes, inPackage, inClass));
 	}
 
 	@Override
 	public String returnValue(recoder.java.declaration.MethodDeclaration md) {
 		final recoder.abstraction.ClassType ctype = md.getContainingClassType();
 		return returnValue(ctype.getPackage().getFullName(), ctype.getName(),
-				md.getName(), extractParamTypes(md));
+				           md.getName(), extractParamTypes(md));
 	}
 
 	@Override
 	public String returnValue(String inPackage, String inClass,
-			String methodName, String[] paramTypes) {
-		return return2domain.get(new ReturnValue(methodName, paramTypes,
-				inPackage, inClass));
+			                  String methodName, String[] paramTypes) {
+		return return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass));
 	}
 
 	@Override
 	public Set<String> flows(String domain) {
-		
 		Set<String> result = new LinkedHashSet<String>();
-		for(Entry<String,String> e : flow){
+		for (final Entry<String,String> e : flow) {
 			if(e.getValue().equals(domain)){
 				result.add(e.getKey());
 			}
 		}
-		//System.out.println("GET: "+domain+" = "+result);
+		// debug
+		// System.out.println("GET: "+domain+" = "+result);
 		return result;
 	}
-
-
-
-
 }

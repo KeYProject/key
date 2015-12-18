@@ -36,7 +36,9 @@ public interface SpecificationContainer {
      */
     public String field(FieldDeclaration fd);
 
-    /** Return the security level of the field, represented as a String. */
+    /**
+     * Return the security level of the field, represented as a String.
+     */
     public String field(String inPackage, String inClass, String name);
 
     /**
@@ -46,8 +48,7 @@ public interface SpecificationContainer {
     public String parameter(MethodDeclaration md, int index);
 
     /**
-     * Return the security level of the method parameter, represented as a
-     * String.
+     * Return the security level of the method parameter, represented as a String.
      */
     public String parameter(String inPackage, String inClass,
             String methodName, String[] paramTypes, int index);
@@ -58,10 +59,14 @@ public interface SpecificationContainer {
      */
     public String returnValue(MethodDeclaration md);
 
-    /** Return the security level of the method return, represented as a String. */
+    /**
+     * Return the security level of the method return, represented as a String.
+     */
     public String returnValue(String inPackage, String inClass,
-            String methodName, String[] paramTypes);
-    /** Return the domains from which the given domain flows*/
-    public Set<String> flows(String domain);
+                              String methodName, String[] paramTypes);
 
+    /**
+     * Return the domains from which the given domain flows
+     */
+    public Set<String> flows(String domain);
 }

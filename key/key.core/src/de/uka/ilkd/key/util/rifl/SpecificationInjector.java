@@ -13,10 +13,8 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -61,6 +59,7 @@ public class SpecificationInjector extends SourceVisitor {
             this.sc = sc;
         }
 
+        @SuppressWarnings("unused")
         JMLFactory(int indent) {
             final StringBuffer sb = new StringBuffer();
             for (int i = 0; i < indent; i++)
@@ -68,6 +67,7 @@ public class SpecificationInjector extends SourceVisitor {
             indentation = sb.toString();
         }
 
+        @SuppressWarnings("unused")
         void addResultToDetermines() {
             put(DEFAULT_KEY, RESULT);
         }
@@ -79,6 +79,7 @@ public class SpecificationInjector extends SourceVisitor {
             put(key, RESULT);
         }
 
+        @SuppressWarnings("unused")
         void addToDetermines(String name) {
             put(DEFAULT_KEY, name);
         }
@@ -86,47 +87,43 @@ public class SpecificationInjector extends SourceVisitor {
         void addToDetermines(String name, String key) {
             put(key, name);
         }
-        
-        String getRespects(String domain){
-        	return getRespects(respects.get(domain));        	
+
+        String getRespects(String domain) {
+            return getRespects(respects.get(domain));
         }
-        
-        String getRespects(Set<String> oneRespect){
-        	String result = "";        	
-        	if(oneRespect != null && oneRespect.size() > 0){        		
+
+        String getRespects(Set<String> oneRespect) {
+            String result = "";
+            if (oneRespect != null && 0 < oneRespect.size()) {
         		for (final String elem : oneRespect) {
-                    result += " "+elem+",";                    
+                    result += " "+elem+",";
                 }
         		result = result.substring(0,result.length()-1);
         	}
         	return result;
-        	
         }
-        
-        
 
         /** Gets a formatted JML comment. */
         String getSpecification() {
             // start JML
             final StringBuffer sb = new StringBuffer(indentation);
             sb.append(JML_START + "\n");
+            // debug
             //System.out.println("Respects: "+respects);
+
             // respects clauses
-            
-           
-            
             for (final Entry<String, Set<String>> oneRespect : respects.entrySet()) {
-            	String domain = oneRespect.getKey();
-            	Set<String> flowsFromDomain = sc.flows(domain);
-            	//System.out.println("flows to "+domain+" "+flowsFromDomain);
-            	
+                String domain = oneRespect.getKey();
+                Set<String> flowsFromDomain = sc.flows(domain);
+                // debug
+                // System.out.println("flows to "+domain+" "+flowsFromDomain);
+
             	Set<String> oneRespects = new LinkedHashSet<String>();
-            	for(String flowsFrom : flowsFromDomain){
-            		oneRespects.addAll(respects.get(flowsFrom));
+                for (final String flowsFrom : flowsFromDomain) {
+                    oneRespects.addAll(respects.get(flowsFrom));
             	}
             	oneRespects.addAll(respects.get(domain));
-            	
-            	
+
             	sb.append(indentation);
                 sb.append(DEFAULT_INDENTATION);
                 sb.append("@ ");
@@ -135,9 +132,7 @@ public class SpecificationInjector extends SourceVisitor {
                 sb.append(" \\by ");
                 sb.append(getRespects(oneRespects));
                 sb.append("; //"+domain+" -> "+flowsFromDomain+"\n");
-                               
             }
-
             // close JML
             sb.append(indentation);
             sb.append(DEFAULT_INDENTATION);
@@ -234,8 +229,7 @@ public class SpecificationInjector extends SourceVisitor {
             final ParameterDeclaration pd = md.getParameterDeclarationAt(i);
             // debug
             // System.out.println(".... "+ pd.getVariableSpecification().getName() +" domain: " + sc.parameter(md, i+1));
-            factory.addToDetermines(pd.getVariableSpecification().getName(),
-                    sc.parameter(md, i+1));
+            factory.addToDetermines(pd.getVariableSpecification().getName(), sc.parameter(md, i+1));
         }
 
         // add fields
@@ -253,5 +247,4 @@ public class SpecificationInjector extends SourceVisitor {
         }
         addComment(md, factory.getSpecification());
     }
-
 }

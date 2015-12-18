@@ -45,8 +45,7 @@ public abstract class SpecificationEntity {
                 return (inPackage.equals(((Field) o).inPackage)
                         && inClass.equals(((Field) o).inClass) && name
                             .equals(((Field) o).name));
-            } else
-                return false;
+            } else { return false; }
         }
 
         @Override
@@ -56,8 +55,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            return (inPackage == "" ? "" : inPackage + ".") + inClass + "#"
-                    + name;
+            return (inPackage == "" ? "" : inPackage + ".") + inClass + "#" + name;
         }
     }
 
@@ -175,8 +173,7 @@ public abstract class SpecificationEntity {
                         && inClass.equals(((ReturnValue) o).inClass)
                         && methodName.equals(((ReturnValue) o).methodName)
                         && Arrays.equals(paramTypes, ((ReturnValue) o).paramTypes));
-            } else
-                return false;
+            } else { return false; }
         }
 
         @Override
@@ -226,5 +223,4 @@ public abstract class SpecificationEntity {
     public String toString() {
         return qualifiedName();
     }
-
 }

@@ -43,9 +43,9 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class RIFLTransformer {
 
-    private static final String TMP_PATH = System.getProperty("java.io.tmpdir");
-    private static final JavaProgramFactory JPF = de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory
-            .getInstance();
+    //private static final String TMP_PATH = System.getProperty("java.io.tmpdir");
+    private static final JavaProgramFactory JPF =
+            de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
 
     private static String convertToFileURL(String filename) {
         String path = new File(filename).getAbsolutePath();
@@ -99,7 +99,6 @@ public class RIFLTransformer {
             kexh.reportException(e);
         } catch (final IOException e) {
             kexh.reportException(e);
-
         }
     }
 
@@ -135,8 +134,6 @@ public class RIFLTransformer {
         origSourcePath = getBaseDirPath(origSourcePath);
         final String[] path = origSourcePath.split(File.separator);
         final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
-        //final String result = TMP_PATH + File.separator + dirName + ".rifl";       
-//        return result;
         System.out.println(origSourcePath + File.separator + dirName +"_rifl");
         return origSourcePath + File.separator + dirName +"_rifl";
     }
@@ -237,7 +234,6 @@ public class RIFLTransformer {
         if (threadExc instanceof SAXException) throw (SAXException)threadExc;
         if (threadExc instanceof ParserException) throw (ParserException)threadExc;
 
-
         // step 2: inject specifications
         for (final CompilationUnit cu : javaCUs.keySet()) {
             final SpecificationInjector si = new SpecificationInjector(sc,JPF.getServiceConfiguration().getSourceInfo());
@@ -258,8 +254,7 @@ public class RIFLTransformer {
         if (file.exists()) {
             if (file.isDirectory() && file.canWrite()) {
                 return; // nothing to do
-            } else {
-                // bad
+            } else { // bad
                 throw new IOException("target directory "+target+" not writable");
             }
         } else { // create directory
@@ -279,11 +274,7 @@ public class RIFLTransformer {
             // System.out.println("[RIFL] Write the following contents to file:");
             // System.out.println(source);
             writer.append(source);
-        } catch (final IOException e) {
-            throw e;
-        } finally {
-            if (writer != null) writer.close();
-        }
+        } catch (final IOException e) { throw e;
+        } finally { if (writer != null) writer.close(); }
     }
-
 }
