@@ -22,6 +22,7 @@ import java.util.Set;
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Field;
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Parameter;
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.ReturnValue;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
 
 /**
  * Default implementation of {@link SpecificationContainer}.
@@ -72,44 +73,44 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 	}
 
 	@Override
-	public String field(recoder.java.declaration.FieldDeclaration fd) {
+	public String field(recoder.java.declaration.FieldDeclaration fd, Type type) {
 		final recoder.java.declaration.FieldSpecification fs = fd.getVariables().get(0);
 		final recoder.abstraction.ClassTypeContainer ctype = fs.getContainingClassType();
 		final String inClass = ctype.getName();
 		final String inPackage = ctype.getPackage().getFullName();
-		return field(inPackage, inClass, fs.getName());
+		return field(inPackage, inClass, fs.getName(), type);
 	}
 
 	@Override
-	public String field(String inPackage, String inClass, String name) {
-		return field2domain.get(new Field(name, inPackage, inClass));
+	public String field(String inPackage, String inClass, String name, Type type) {
+		return field2domain.get(new Field(name, inPackage, inClass, type));
 	}
 
 	@Override
-	public String parameter(recoder.java.declaration.MethodDeclaration md, int index) {
+	public String parameter(recoder.java.declaration.MethodDeclaration md, int index, Type type) {
 		final String[] paramTypes = extractParamTypes(md);
 		final recoder.abstraction.ClassType ctype = md.getContainingClassType();
 		return parameter(ctype.getPackage().getFullName(), ctype.getName(),
-		                 md.getName(), paramTypes, index);
+		                 md.getName(), paramTypes, index, type);
 	}
 
 	@Override
 	public String parameter(String inPackage, String inClass,
-			                String methodName, String[] paramTypes, int index) {
-		return param2domain.get(new Parameter(index, methodName, paramTypes, inPackage, inClass));
+			                String methodName, String[] paramTypes, int index, Type type) {
+		return param2domain.get(new Parameter(index, methodName, paramTypes, inPackage, inClass, type));
 	}
 
 	@Override
-	public String returnValue(recoder.java.declaration.MethodDeclaration md) {
+	public String returnValue(recoder.java.declaration.MethodDeclaration md, Type type) {
 		final recoder.abstraction.ClassType ctype = md.getContainingClassType();
 		return returnValue(ctype.getPackage().getFullName(), ctype.getName(),
-				           md.getName(), extractParamTypes(md));
+				           md.getName(), extractParamTypes(md), type);
 	}
 
 	@Override
 	public String returnValue(String inPackage, String inClass,
-			                  String methodName, String[] paramTypes) {
-		return return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass));
+			                  String methodName, String[] paramTypes, Type type) {
+		return return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass, type));
 	}
 
 	@Override

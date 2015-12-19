@@ -95,6 +95,7 @@ class RIFLHandler extends DefaultHandler {
     private Set<String> domains = new LinkedHashSet<String>();
     private Set<Entry<String, String>> flow = new LinkedHashSet<Entry<String,String>>();
     private Map<SpecificationEntity, Pair<String,String>> tmpMap = null;
+    private Type type = null;
 
     private String tmpHandle = null;
 
@@ -139,7 +140,7 @@ class RIFLHandler extends DefaultHandler {
         final String field = attributes.getValue("name");
         final String clazz = attributes.getValue("class");
         final String packg = attributes.getValue("package");
-        final SpecificationEntity se = new Field(field,packg,clazz);
+        final SpecificationEntity se = new Field(field,packg,clazz, type);
         handles2categories.put(tmpHandle, category);
         tmpMap.put(se, new Pair<String,String> (tmpHandle,category));
     }
@@ -149,7 +150,7 @@ class RIFLHandler extends DefaultHandler {
         final String clazz = attributes.getValue("class");
         final String method = attributes.getValue("method");
         final int param = Integer.parseInt(attributes.getValue("parameter"));
-        final SpecificationEntity se = new Parameter(param,method,packg,clazz);
+        final SpecificationEntity se = new Parameter(param,method,packg,clazz, type);
         handles2categories.put(tmpHandle, category);
         tmpMap.put(se, new Pair<String,String> (tmpHandle,category));
     }
@@ -158,7 +159,7 @@ class RIFLHandler extends DefaultHandler {
         final String packageName = attributes.getValue("package");
         final String className = attributes.getValue("class");
         final String methodName = attributes.getValue("method");
-        final SpecificationEntity se = new ReturnValue(methodName, packageName, className);
+        final SpecificationEntity se = new ReturnValue(methodName, packageName, className, type);
         handles2categories.put(tmpHandle, category);
         tmpMap.put(se, new Pair<String,String> (tmpHandle,category));
     }
@@ -167,7 +168,7 @@ class RIFLHandler extends DefaultHandler {
         final String from = attributes.getValue("from");
         final String to = attributes.getValue("to");
         assert !from.equals(to);
-        AbstractMap.SimpleEntry<String, String> e = new AbstractMap.SimpleEntry<String, String>(from, to); 
+        final Entry<String, String> e = new AbstractMap.SimpleEntry<String, String>(from, to);
         flow.add(e);
         // debug
         // System.out.println(from+" "+to);
@@ -317,9 +318,11 @@ class RIFLHandler extends DefaultHandler {
 
     private void startSinks() {
         tmpMap = sinks2categories;
+        type = Type.SINK;
     }
 
     private void startSources() {
         tmpMap = sources2categories;
+        type = Type.SOURCE;
     }
 }

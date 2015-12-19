@@ -130,12 +130,11 @@ public class RIFLTransformer {
      * @param origSourcePath path to a directory or single Java file
      * @return path to the transformed directory
      */
-    public static String getDefaultSavePath (String origSourcePath) {    	
+    public static String getDefaultSavePath (String origSourcePath) {
         origSourcePath = getBaseDirPath(origSourcePath);
         final String[] path = origSourcePath.split(File.separator);
         final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
-        System.out.println(origSourcePath + File.separator + dirName +"_rifl");
-        return origSourcePath + File.separator + dirName +"_rifl";
+        return origSourcePath + File.separator + dirName + "_RIFL" + File.separator;
     }
 
     private static String getBaseDirPath(String origSourcePath) {
@@ -148,7 +147,6 @@ public class RIFLTransformer {
     }
 
     private void readJava(String source) throws IOException, ParserException {
-
         final File root = new File(source);
         assert root.exists(): "source dir must exist";
         assert root.isDirectory(): "source must be directory";
@@ -160,6 +158,7 @@ public class RIFLTransformer {
         // parse
         while (walker.step()) {
             final String javaFile = walker.getCurrentName();
+            // debug
             // System.out.println("[RIFL] Read file: "+ javaFile);
             final CompilationUnit cu;
             Reader fr = null;
@@ -194,6 +193,7 @@ public class RIFLTransformer {
         // step 1a: parse RIFL file
         final Runnable r = new Runnable () {
              public void run() {
+                 // debug
                  // System.out.println("[RIFL] Start RIFL reader");
                  try {
                      sc = readRIFL(riflFilename);
@@ -202,6 +202,7 @@ public class RIFLTransformer {
                  } catch (Exception e) {
                      threadExc = e;
                  } finally {
+                     // debug
                      // System.out.println("[RIFL] Finished RIFL reader");
                  }
              }
@@ -262,7 +263,9 @@ public class RIFLTransformer {
         }
     }
 
-    /** Writes a single Java file. */
+    /**
+     * Writes a single Java file.
+     */
     private void writeJavaFile(String target, String fileName, CompilationUnit cu)
             throws IOException {
         FileWriter writer = null;
