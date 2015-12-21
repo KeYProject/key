@@ -1,3 +1,4 @@
+/** a matrix of size 2^n x 2^n */
 final /*@ pure @*/ class Matrix {
 
     // recursive case for matrices of size > 2
@@ -88,16 +89,6 @@ final /*@ pure @*/ class Matrix {
 	}
     }
 
-    /** fancy O(n^{log 7}) matrix multiplication by Strassen (general case) */
-    /*@ normal_behavior
-      @ requires m.size() == n.size();
-      @ ensures \result.equals(mult(m,n));
-      @*/
-    static Matrix strassenMult (Matrix m, Matrix n) {
-	if (m.size() == 2) return strassen22(m,n);
-	else return strassen (m,n);
-    }
-
     /** fancy O(n^{log 7}) matrix multiplication by Strassen (base case) */
     /*@ normal_behavior
       @ requires m.size() == 2 && n.size() == 2;
@@ -116,14 +107,14 @@ final /*@ pure @*/ class Matrix {
             m2+m4      ,  m1-m2+m3+m6);
     }
 
-    /** fancy O(n^{log 7}) matrix multiplication by Strassen (step case) */
+    /** fancy O(n^{log 7}) matrix multiplication by Strassen */
     /*@ normal_behavior
-      @ requires m.size() > 2;
       @ requires m.size() == n.size();
       @ ensures \result.equals(mult(m,n));
       @ measured_by m.size();
       @*/
     static Matrix strassen (Matrix m, Matrix n) {
+	if (m.size() == 2) return strassen22(m,n);
         final Matrix m1 = strassen(plus(m.a,m.d),plus(n.a,n.d));
 	final Matrix m2 = strassen(plus(m.c,m.d),n.a);
 	final Matrix m3 = strassen(m.a,plus(n.b,neg(n.d)));
