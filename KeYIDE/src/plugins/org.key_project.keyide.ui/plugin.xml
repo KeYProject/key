@@ -555,6 +555,7 @@
       <view
             category="org.key_project.keyide.ui.view.category"
             class="org.key_project.keyide.ui.views.GoalsView"
+            icon="icons/ekey-mono16.png"
             id="org.key_project.keyide.ui.view.Goals"
             name="Goals"
             restorable="true">

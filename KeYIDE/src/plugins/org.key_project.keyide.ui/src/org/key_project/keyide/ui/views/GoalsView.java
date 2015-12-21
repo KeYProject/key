@@ -25,7 +25,7 @@ public class GoalsView extends PageBookView {
    
    
    /**
-    * the id of this view
+    * The id of this view.
     */
    public static final String VIEW_ID = "org.key_project.keyide.ui.view.Goals";
    

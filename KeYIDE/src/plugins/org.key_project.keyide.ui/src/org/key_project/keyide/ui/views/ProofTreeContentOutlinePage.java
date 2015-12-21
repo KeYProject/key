@@ -310,6 +310,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 			} else {
 				getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
 			}
+		} // scroll to the selected Node
+		  else {
+		   getTreeViewer().reveal(selectedNode);
 		}
 	}
 
