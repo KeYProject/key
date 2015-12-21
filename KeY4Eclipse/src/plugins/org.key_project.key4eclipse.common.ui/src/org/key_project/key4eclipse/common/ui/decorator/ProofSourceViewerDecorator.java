@@ -38,14 +38,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
-
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.HTMLSyntaxHighlighter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -145,19 +142,19 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * {@link Color} used for highlighting updates.
     */
-   private Color lightblueColor = new Color(null,167,210,210);
+   private Color lightblueColor = new Color(null, 167, 210, 210);
    /**
     * {@link Color} used for highlighting hovering.
     */
-   private Color grayColor1 = new Color(null,196,205,226);
+   private Color grayColor1 = new Color(null, 196, 205, 226);
    /**
     * {@link Color} used for highlighting hovering.
     */
-   private Color grayColor2 = new Color(null,196,205,226);
+   private Color grayColor2 = new Color(null, 196, 205, 226);
    /**
     * {@link Color} used for highlighting first statement.
     */
-   private Color firstStatementColor = new Color(null, 167,174,192);
+   private Color firstStatementColor = new Color(null, 167, 174, 192);
    /**
     * {@link FontDescriptor} used to describe boldFont.
     */
@@ -222,14 +219,13 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       grayColor2.dispose();
       firstStatementColor.dispose();
       boldFont.dispose();
-     
    }
    
    /**
     * Shows the given {@link Node} with help of the given {@link KeYMediator}
     * in the decorated {@link ISourceViewer}.
     * @param node The {@link Node} to show.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param notationInfo The {@link NotationInfo} containing information on how to display node.
     */
    public void showNode(Node node, NotationInfo notationInfo) {
       this.node = node;
@@ -346,9 +342,9 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * Shows the given {@link Term} with help of the given {@link KeYMediator}
     * in the decorated {@link ISourceViewer}.
-    * @param term The {@link Term} to show.
+    * @param sequent The {@link Sequent} to be displayed.
     * @param services The {@link Services} to use.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param notationInfo The {@link NotationInfo} containing information on how sequent should be displayed.
     * @param visibleLabels Optional definition of visible {@link TermLabel}s.
     * @return The shown text.
     */
@@ -374,8 +370,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
 
       return str;
    }
-   
-   
+    
    /**
     * Computes the text to show in the {@link KeYEditor}} which consists
     * of the {@link Sequent} including the applied rule.
@@ -442,6 +437,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
      }
       return s;
    }
+   
    /**
     * Sets up {@link StyleRange} for light blue background color.
     * @param ranges Ranges in which blue color should be applied.
@@ -457,7 +453,11 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          markedUpdates[i] = markedUpdate;
       } 
    }
-   
+   /**
+    * Sets up {@link StyleRange} for green background color.
+    * @param pos PosInOccurrence, where green color should be applied.
+    * 
+    */
    protected void setGreenBackground(PosInOccurrence pos){
       TextPresentation textPresentation = new TextPresentation();
       marked1 = initializeValuesForBackground(greenColor, textPresentation);
@@ -477,7 +477,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * Initializes TextPresentation with colored StyleRange.
     * @param color Background color to be set.
     * @param textPresentation TextPresentation to be initialized.
-    * @return mark The colored StyleRange.
+    * @return The colored StyleRange.
     *
     */
    protected StyleRange initializeValuesForBackground(Color color, TextPresentation textPresentation) {
@@ -568,8 +568,8 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       }
       // merge all StyleRanges
       mergeRanges(textPresentation, true);
-
    }
+   
    /**
     * Merges all currently present highlighting {@link StyleRange}.
     * @param textPresentation {@link TextPresentation} to which {@link StyleRange} should be added.
@@ -609,7 +609,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          }
       }
   
-      // handle overlapping ranges
+      // handle overlapping keyword ranges
       for (StyleRange keywordRange: markedKeywords) {
          for (StyleRange backgroundRange: backgroundMarks) {
             // checks if keyword bounds overlap with background highlights
@@ -699,12 +699,11 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * Comparator to compare the beginning of {@link StyleRange}.
     * @author Anna Filighera
-    *
     */
    public class RangeComparator implements Comparator<StyleRange> {
-   @Override
-   public int compare(StyleRange o1, StyleRange o2) {
-      return o1.start - o2.start;
-   } 
+      @Override
+      public int compare(StyleRange o1, StyleRange o2) {
+         return o1.start - o2.start;
+      } 
    }
 }
