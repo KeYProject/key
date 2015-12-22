@@ -50,7 +50,7 @@ public class ProofPropertyTester extends PropertyTester {
       }
       // Test proof
       if (PROPERTY_IS_NOT_CLOSED.equals(property)) {
-         return proof != null && !proof.closed();
+         return proof != null && !proof.isDisposed() && !proof.closed();
       }
       else {
          return false;

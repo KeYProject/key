@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,6 +41,9 @@ public class Statistics {
 
     private List<Pair<String, String>> summaryList =
                     new ArrayList<Pair<String, String>>(14);
+    
+    private final HashMap<String, Integer> interactiveAppsDetails =
+            new HashMap<String, Integer>();
 
     protected Statistics(int nodes,
                        int branches,
@@ -117,6 +121,17 @@ public class Statistics {
 
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 tmpInteractive++;
+
+                final String ruleAppName =
+                        node.getAppliedRuleApp().rule().name().toString();
+
+                if (!interactiveAppsDetails.containsKey(ruleAppName)) {
+                    interactiveAppsDetails.put(ruleAppName, 1);
+                }
+                else {
+                    interactiveAppsDetails.put(ruleAppName,
+                            interactiveAppsDetails.get(ruleAppName) + 1);
+                }
             }
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
@@ -233,6 +248,10 @@ public class Statistics {
 
     public List<Pair<String, String>> getSummary() {
         return summaryList;
+    }
+    
+    public HashMap<String, Integer> getInteractiveAppsDetails() {
+        return interactiveAppsDetails;
     }
 
     @Override
