@@ -186,9 +186,16 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 		}
    	}
    
+   /**
+    * creates a viewer for the proof and checks if the show symbolic execution tree filter is working correctly.
+    * @throws CoreException
+ 	* @throws InterruptedException
+ 	* @throws ProblemLoaderException
+ 	* @throws ProofInputException
+ 	*/
    @Test
    public void testShowSymbolicExecutionTree() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
-	// Create test project
+	   // Create test project
 	      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_showSymbolicExecutionTree");
 		  IFolder src = project.getProject().getFolder("src");
 		  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
@@ -259,6 +266,11 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 			}
    }
    
+   /**
+    * checks whether a filtered TreeViewer contains the correct symbolic execution tree.
+    * @param exeNodeIter execution node iterator over the execution tree
+ 	* @param viewerIter an iterator over the filtered tree viewer
+ 	*/
    protected void assertShowSymbolicExecutionTree(ExecutionNodePreorderIterator exeNodeIter, TreeViewerIterator viewerIter) {
 	   boolean isBranchNode = false;
 	   IExecutionNode<?> exeNode = null;
