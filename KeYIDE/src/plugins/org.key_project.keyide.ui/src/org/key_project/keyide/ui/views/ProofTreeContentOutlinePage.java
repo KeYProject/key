@@ -257,7 +257,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		// (Behavior of original KeY UI and solves problem with selection
 		// synchronization with the shown TreeViewer)
 		selectionModel.removeKeYSelectionListener(listener);
-		// deactivate showSymbolicExecutionTree outline filter
+		// deactivate showSymbolicExecutionTree outline filter and remove symbolic state listener
+		symbolicState.removeListener(symbolicStateListener);
 		contentProvider.setSymbolicState(false);
 	}
 
@@ -286,6 +287,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 					});
 				}
 			}
+			// add symbolic state listener
+			symbolicState.addListener(symbolicStateListener);
 			// Make sure that correct selected node is shown
 			updateSelectedNodeThreadSafe();
 		}
