@@ -166,6 +166,11 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	      }
 	}
 
+	/**
+	 * Handles a change in the state of the showSymbolicExecutionTree outline filter.
+	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
+	 * @param oldValue The old value; may be anything.
+	 */
 	protected void handleSymbolicStateChanged(State state, Object oldValue) {
 		contentProvider.setSymbolicState((boolean) state.getValue());
 		getTreeViewer().setInput(proof);
@@ -173,7 +178,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	}
 
 	/**
-	 * Handles a change in the state of the hideIntermediateProofsteps outline feature.
+	 * Handles a change in the state of the hideIntermediateProofsteps outline filter.
 	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
 	 * @param oldValue The old value; may be anything.
 	 */
