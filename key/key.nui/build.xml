@@ -1,26 +1,29 @@
 <?xml version="1.0"?>
 <project name="key.nui" default="deploy" basedir=".">
+
+	<!-- Properties definition (global variables for paths) -->
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="build.dir" value="${basedir}/bin" />
 	<property name="dist.dir" value="${basedir}/../deployment" />
-	<property name="NUIdefault" value="${basedir}/resources/de/uka/ilkd/key/nui/NUIdefault.fxml" />
+	<!-- <property name="NUIdefault" value="${basedir}/resources/de/uka/ilkd/key/nui/NUIdefault.fxml" /> -->
+	<property name="NUIdefault" value="${build.dir}/de/uka/ilkd/key/nui/NUIdefault.fxml" />
 	<property name="components" value="${basedir}/resources/de/uka/ilkd/key/nui/components/" />
 
+	<!-- Definition of classpath -->
 	<path id="key.nui.class.path">
 		<pathelement path="${basedir}/../key.util/bin" />
 		<pathelement path="${basedir}/../key.core/bin" />
-		<pathelement path="${basedir}/../key.core.testgen/bin" />
 		<pathelement location="${basedir}/../key.core/lib/antlr.jar" />
 		<pathelement location="${basedir}/../key.core/lib/recoderKey.jar" />
-		<pathelement location="${basedir}/testfx/testfx-*.jar" />
-		<pathelement location="${basedir}/testfx/guava-18.0.jar" />
 	</path>
 
 	<path id="key.nui.run.class.path">
 		<pathelement path="${basedir}/../key.nui/bin" />
 		<path refid="key.nui.class.path" />
 	</path>
-
+	
+	<!-- Set properties ============== -->
+	<!-- Sets the property taclet.match to ${taclet.match} if it is not set yet, else it is set to 'vm' -->
 	<condition property="taclet.match" value="${taclet.match}" else="vm">
 		<isset property="taclet.match" />
 	</condition>
@@ -28,52 +31,62 @@
 	<condition property="tacletindex.threading.enabled" value="${tacletindex.threading.enabled}" else="false">
 		<isset property="tacletindex.threading.enabled" />
 	</condition>
-
+	<!-- ============================= -->
+	
+	<!-- Defines a new task -->
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
-	     <classpath>
-	         <fileset dir="${basedir}/ant-lib/"/>
-	     </classpath>
+		<classpath>
+			<fileset dir="${basedir}/ant-lib/" />
+		</classpath>
 	</taskdef>
 
+	<!-- Definition of target START -->
 	<target name="start" depends="compile" description="Starts KeY.">
-		<java classname="de.uka.ilkd.key.nui.NUI" classpathref="key.nui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea -Dtaclet.match=${taclet.match} -Dtacletindex.threading.enabled=${tacletindex.threading.enabled} " />
+		<java classname="de.uka.ilkd.key.nui.NUI" classpathref="key.nui.run.class.path" fork="true" > 
+			<jvmarg value="-Xmx2048m" />
+			<jvmarg value="-XX:MaxPermSize=256m" />
+			<jvmarg value="-ea" />
+			<jvmarg value="-Dtaclet.match=${taclet.match}" />
+			<jvmarg value="-Dtacletindex.threading.enabled=${tacletindex.threading.enabled}" />
+		</java>
 	</target>
 
+	<!-- Definition of target DEPLOY -->
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
 		<mkdir dir="${dist.dir}" />
 		<mkdir dir="${dist.dir}/components" />
 		<jar destfile="${dist.dir}/components/key.nui.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
 	</target>
 
-	<target name="compile" depends="copy" description="Compile all source files into the build directory.">
+	<!-- Definition of target COMPILE -->
+	<target name="compile" depends="generate" description="Compile all source files into the build directory.">
 		<mkdir dir="${build.dir}" />
-		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="1.8" target="1.8" deprecation="off" debug="on" depend="${build.depend}" optimize="off">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="1.8" target="1.8" 
+			deprecation="off" debug="on" depend="${build.depend}" optimize="off"> 
+			<exclude name="**/guitests/*.java" /> <!-- GUI tests are not compiled by ANT Buildfile-->
 			<classpath refid="key.nui.class.path" />
 		</javac>
 	</target>
 
-	<target name="copy" depends="generate" description="Copy all resources into the binary directory.">
-		<copy todir="${build.dir}">
+	<!-- Definition of target COPY -->
+	<target name="copy" description="Copy all resources into the binary directory.">
+		<copy todir="${build.dir}" overwrite="true">
 			<fileset dir="${basedir}/resources/" />
 		</copy>
 	</target>
 
-	
+
 	<!-- Author: Stefan Pilot <stef@n-pilot.de>
-	
-	This will remove all the menu entries defined under "Configure Views" in 
-	the ${NUIdefault} file. Then it will add new menu entries for each
-	GUI component defined as .fxml-File in the ${components} folder.
+	This will add new menu entries for each	GUI component defined as 
+	.fxml-File in the ${components} folder.
 	Possible problem: For n GUI-Components, it will use the fx:ids 
 	'toggleGroup`0`' to 'toggleGroup`n`'.
 	
 	If any questions should occur or you are editing this target,
 	please do not hesitate to write an email to the author.  
 	-->
-	<target name="generate" description="Generates the Add-View-Menu by parsing the existing fxml files in /components">
-		<!-- Clean the previously defined GUI components -->
-		<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT START DEFINING TOGGLE GROUPS HERE \-\-&gt;).*&lt;\!\-\- ANT DEFINE TOGGLE GROUP No [0-9]+ HERE \-\-&gt;" replace="\1&#10;&lt;\!\-\- ANT DEFINE TOGGLE GROUP No 0 HERE \-\-&gt;" flags="gis" byline="false" />
-		<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT START DEFINING MENUS HERE \-\-&gt;).*(&lt;\!\-\- ANT DEFINE MENU HERE --&gt;)" replace="\1&#10;\2" flags="gis" byline="false" />
+	<!-- Definition of target GENERATE -->
+	<target name="generate" depends="copy" description="Generates the Add-View-Menu by parsing the existing fxml files in /components">
 
 		<!-- Add the new GUI components -->
 		<var name="i" value="0" />
@@ -88,7 +101,7 @@
 				<basename property="filename" file="@{file}" suffix=".fxml" />
 				<!-- Define a new toggle group -->
 				<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT DEFINE TOGGLE GROUP No [0-9\.]+ HERE \-\-&gt;)" replace="&lt;ToggleGroup fx:id=&quot;toggleGroup${i}&quot;/&gt;&#10;\1" />
-				<!-- and make the `Menu` -->
+				<!-- and make the 'Menu' -->
 				<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT DEFINE MENU HERE \-\-&gt;)" replace="&lt;Menu fx:id=&quot;toggle${filename}&quot; text=&quot;%${filename}&quot;&gt;&#10;&lt;properties componentName=&quot;${filename}&quot; componentResource=&quot;${filename}.fxml&quot;/&gt;&#10;&lt;items&gt;&#10;&lt;RadioMenuItem fx:id=&quot;hideTG${i}&quot; text=&quot;%hide&quot; selected=&quot;true&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem fx:id=&quot;leftTG${i}&quot; text=&quot;%left&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem fx:id=&quot;middleTG${i}&quot; text=&quot;%middle&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem fx:id=&quot;rightTG${i}&quot; text=&quot;%right&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem fx:id=&quot;bottomTG${i}&quot; text=&quot;%bottom&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;/items&gt;&#10;&lt;/Menu&gt;&#10;\1" />
 				<!-- Increment the toggle group counter.
    			Possible bug: If at some point there will be more than one group of 
@@ -98,80 +111,8 @@
 			</sequential>
 		</for>
 	</target>
-
 	
-	<!-- Author: Stefan Pilot <stef@n-pilot.de>
-	
-   This is a much™ more efficient version of 'generate'.
-   Unfortunately, it does not work. Also, it is not commented and may be hard to
-   understand.
-   If any questions occur or you want to fix this,
-   do not hesitate to write an e-mail to the author. -->
-	<!-- 
-	<target name="generate2" description="Generate the Add-View-Menu by parsing the existing fxml files in /components">
-		<var name="numberoftogglegroups" value="0" />
-		<loadfile property="NUIdefaultfile" srcfile="${NUIdefault}" />
-		<for param="line" delimiter="${line.separator}" list="${NUIdefaultfile}">
-			<sequential>
-				<echo message="@{line}" />
-				<if>
-					<contains string="@{line}" substring="ToggleGroup fx:id=" />
-					<then>
-						<math result="numberoftogglegroups" operand1="${numberoftogglegroups}" operation="+" operand2="1" datatype="int" />
-					</then>
-				</if>
-				<propertyregex property="numberoftogglegroups" input="@{line}" regexp="&lt;\!\-\- ANT DEFINE TOGGLE GROUP No ([0-9]+) HERE - -&gt;" select="\1" override="yes" /> 
-			</sequential>
-		</for>
-		<var name="numberoffiles" value="1" />
-		<for param="file">
-			<path>
-				<fileset dir="${basedir}/resources/de/uka/ilkd/key/nui/components/" includes="*.fxml" />
-			</path>
-			<sequential>
-				<math result="numberoffiles" operand1="${numberoffiles}" operation="+" operand2="1" datatype="int" />
-			</sequential>
-		</for>
-		<echo message="Number of files= ${numberoffiles}, Number of toggle groups= ${numberoftogglegroups}" />
-		<if>
-			<not>
-				<equals arg1="${numberoffiles}" arg2="${numberoftogglegroups}" />
-			</not>
-			<then>
-				<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT START DEFINING TOGGLE GROUPS HERE \-\-&gt;).*&lt;\!\-\- ANT DEFINE TOGGLE GROUP No [0-9]+ HERE \-\-&gt;" replace="\1&#10;&lt;\!\-\- ANT DEFINE TOGGLE GROUP No 0 HERE \-\-&gt;" flags="gis" byline="false" />
-				<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT START DEFINING MENUS HERE \-\-&gt;).*(&lt;\!\-\- ANT DEFINE MENU HERE \-\-&gt;)" replace="\1&#10;\2" flags="gis" byline="false" />
-			</then>
-		</if>
-		<var name="i" unset="true" />
-		<loadfile property="NUIdefaultfile" srcfile="${NUIdefault}" />
-		<for param="line" delimiter="${line.separator}" list="${NUIdefaultfile}">
-			<sequential>
-				<propertyregex property="i" input="@{line}" regexp="&lt;\!\-\- ANT DEFINE TOGGLE GROUP No ([0-9]+) HERE \-\-&gt;" select="\1" override="yes" />
-			</sequential>
-		</for>
-		<for param="file">
-			<path>
-				<fileset dir="${basedir}/resources/de/uka/ilkd/key/nui/components/" includes="*.fxml" />
-			</path>
-			<sequential>
-				<var name="filename" unset="true" />
-				<basename property="filename" file="@{file}" suffix=".fxml" />
-				<if>
-					<not>
-						<resourcecontains resource="${NUIdefault}" substring="${filename}" />
-					</not>
-					<then>
-						<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT DEFINE TOGGLE GROUP No [0-9\.]+ HERE \-\-&gt;)" replace="&lt;ToggleGroup fx:id=&quot;toggleGroup${i}&quot;/&gt;&#10;\1" />
-						<replaceregexp file="${NUIdefault}" match="(&lt;\!\-\- ANT DEFINE MENU HERE \-\-&gt;)" replace="&lt;Menu fx:id=&quot;toggle${filename}&quot; text=&quot;%${filename}&quot;&gt;&#10;&lt;properties componentName=&quot;${filename}&quot; componentResource=&quot;${filename}.fxml&quot;/&gt;&#10;&lt;items&gt;&#10;&lt;RadioMenuItem text=&quot;%hide&quot; selected=&quot;true&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem text=&quot;%left&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem text=&quot;%middle&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem text=&quot;%right&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;RadioMenuItem text=&quot;%down&quot; selected=&quot;false&quot; onAction=&quot;#handleLoadComponent&quot; toggleGroup=&quot;$$toggleGroup${i}&quot;/&gt;&#10;&lt;/items&gt;&#10;&lt;/Menu&gt;&#10;\1" />
-					</then>
-				</if>
-				<math result="i" operand1="${i}" operation="+" operand2="1" datatype="int" />
-			</sequential>
-		</for>
-		<replaceregexp file="${basedir}/resources/de/uka/ilkd/key/nui/NUIdefault.fxml" match="(&lt;\!\-\- ANT DEFINE TOGGLE GROUP No) [0-9\.]+ (HERE \-\-&gt;)" replace="\1 ${i} \2" />
-	</target>
-	-->
-
+	<!-- Definition of target CLEAN -->
 	<target name="clean" description="Deletes all generated files and folders.">
 		<delete failonerror="false" includeemptydirs="true">
 			<fileset dir="${build.dir}" includes="**/*" />

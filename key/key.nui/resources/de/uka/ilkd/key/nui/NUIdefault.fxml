@@ -40,53 +40,9 @@ and you should under all circumstances fix it there.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 <!-- DO NOT DELETE THIS LINE --><!-- ANT START DEFINING TOGGLE GROUPS HERE -->
-<ToggleGroup fx:id="toggleGroup0"/>
-<ToggleGroup fx:id="toggleGroup1"/>
-<ToggleGroup fx:id="toggleGroup2"/>
-<ToggleGroup fx:id="toggleGroup3"/>
 <!-- ANT DEFINE TOGGLE GROUP No 0 HERE --><!-- DO NOT DELETE THIS LINE -->
 </fx:define><!-- DO NOT DELETE THIS LINE -->
 <!-- DO NOT DELETE THIS LINE --><!-- ANT START DEFINING MENUS HERE -->
-<Menu fx:id="togglegoalView" text="%goalView">
-<properties componentName="goalView" componentResource="goalView.fxml"/>
-<items>
-<RadioMenuItem fx:id="hideTG0" text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup0"/>
-<RadioMenuItem fx:id="leftTG0" text="%left" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup0"/>
-<RadioMenuItem fx:id="middleTG0" text="%middle" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup0"/>
-<RadioMenuItem fx:id="rightTG0" text="%right" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup0"/>
-<RadioMenuItem fx:id="bottomTG0" text="%bottom" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup0"/>
-</items>
-</Menu>
-<Menu fx:id="toggleopenProofsView" text="%openProofsView">
-<properties componentName="openProofsView" componentResource="openProofsView.fxml"/>
-<items>
-<RadioMenuItem fx:id="hideTG1" text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
-<RadioMenuItem fx:id="leftTG1" text="%left" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
-<RadioMenuItem fx:id="middleTG1" text="%middle" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
-<RadioMenuItem fx:id="rightTG1" text="%right" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
-<RadioMenuItem fx:id="bottomTG1" text="%bottom" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup1"/>
-</items>
-</Menu>
-<Menu fx:id="toggleproofView" text="%proofView">
-<properties componentName="proofView" componentResource="proofView.fxml"/>
-<items>
-<RadioMenuItem fx:id="hideTG2" text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup2"/>
-<RadioMenuItem fx:id="leftTG2" text="%left" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup2"/>
-<RadioMenuItem fx:id="middleTG2" text="%middle" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup2"/>
-<RadioMenuItem fx:id="rightTG2" text="%right" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup2"/>
-<RadioMenuItem fx:id="bottomTG2" text="%bottom" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup2"/>
-</items>
-</Menu>
-<Menu fx:id="toggletreeView" text="%treeView">
-<properties componentName="treeView" componentResource="treeView.fxml"/>
-<items>
-<RadioMenuItem fx:id="hideTG3" text="%hide" selected="true" onAction="#handleLoadComponent" toggleGroup="$toggleGroup3"/>
-<RadioMenuItem fx:id="leftTG3" text="%left" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup3"/>
-<RadioMenuItem fx:id="middleTG3" text="%middle" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup3"/>
-<RadioMenuItem fx:id="rightTG3" text="%right" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup3"/>
-<RadioMenuItem fx:id="bottomTG3" text="%bottom" selected="false" onAction="#handleLoadComponent" toggleGroup="$toggleGroup3"/>
-</items>
-</Menu>
 <!-- ANT DEFINE MENU HERE --><!-- DO NOT DELETE THIS LINE -->
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
