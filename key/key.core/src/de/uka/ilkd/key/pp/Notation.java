@@ -89,7 +89,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printConstant(name);
+	    sp.printConstant(t, name);
 	}
     }
 
@@ -107,7 +107,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printPrefixTerm(name, t.sub(0), ass);
+	    sp.printPrefixTerm(name, t, t.sub(0), ass);
 	}
 
     }
@@ -127,7 +127,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printInfixTerm(t.sub(0), assLeft, name, t.sub(1), assRight);
+	    sp.printInfixTerm(t.sub(0), assLeft, name, t, t.sub(1), assRight);
 	}
 
 	/**
@@ -136,7 +136,7 @@ public abstract class Notation {
          */
 	public void printContinuingBlock(Term t, LogicPrinter sp)
 		throws IOException {
-	    sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t.sub(1), assRight);
+	    sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t, t.sub(1), assRight);
 	}
 
     }

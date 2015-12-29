@@ -36,6 +36,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 public class InitialPositionTable extends PositionTable{
 
     private ImmutableList<Range> updateRanges = ImmutableSLList.<Range>nil();
+    
+    /** Ranges of keywords */
+    private ImmutableList<Range> keywordRanges = ImmutableSLList.<Range>nil();
 
     /**
      * creates a new Initial PositionTable.
@@ -147,7 +150,19 @@ public class InitialPositionTable extends PositionTable{
     public Range rangeForPath(ImmutableList<Integer> path) {
 	return rangeForPath(path,endPos[0]);
     }
-
+    /**
+     * Adds a range for a keyword to the keyword list
+     * @param r Range of keyword to be added
+     */
+    public void addKeywordRange(Range r) {
+       keywordRanges = keywordRanges.prepend(r);
+    }
+    /**
+     * @return ranges of keywords
+     */
+    public Range[] getKeywordRanges() {
+       return keywordRanges.toArray(new Range[keywordRanges.size()]);
+    }
     public void addUpdateRange(Range r) {
         updateRanges = updateRanges.prepend(r);
     }

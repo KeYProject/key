@@ -317,23 +317,12 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
            } 
         }
       }
-      // find KeY keywords and mark them
-      Matcher dynamicMatcher = DYNAMIC_LOGIC_KEYWORDS_PATTERN.matcher(str);
-      while (dynamicMatcher.find()) {
+      for(Range keyword : printer.getInitialPositionTable().getKeywordRanges()) {
          StyleRange mark = new StyleRange();
          mark.font = boldFont;
          mark.foreground = blueColor;
-         mark.start = dynamicMatcher.start();
-         mark.length = dynamicMatcher.end() - dynamicMatcher.start();
-       markedKeywords.add(mark);
-      }
-      Matcher propMatcher = PROP_LOGIC_KEYWORDS_PATTERN.matcher(str);
-      while (propMatcher.find()) {
-         StyleRange mark = new StyleRange();
-         mark.font = boldFont;
-         mark.foreground = blueColor;
-         mark.start = propMatcher.start();
-         mark.length = propMatcher.end() - propMatcher.start();
+         mark.start = keyword.start();
+         mark.length = keyword.length();
        markedKeywords.add(mark);
       }
    }
