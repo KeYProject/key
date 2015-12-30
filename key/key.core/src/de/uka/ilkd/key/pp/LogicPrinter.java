@@ -57,6 +57,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
@@ -989,15 +990,17 @@ public class LogicPrinter {
      *
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
-        Sort sort = (Sort) services.getNamespaces().sorts().lookup(new Name("Heap"));
-        Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
-        BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
-        IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
-        
-        boolean isKeyword = (t.op() == getHeapLDT().getWellFormed(sort)|| t.op() == measuredByEmpty 
-              || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
-              || t.op() == integer.getBsum() || t.op() == getHeapLDT().getCreated());
-        
+       boolean isKeyword = false;
+       if (services != null) {
+           Sort wellFormedSort = (Sort) services.getNamespaces().sorts().lookup(new Name("Heap"));
+           Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
+           BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
+           IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
+           
+           isKeyword = (t.op() == getHeapLDT().getWellFormed(wellFormedSort)|| t.op() == measuredByEmpty 
+                 || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
+                 || t.op() == integer.getBsum());
+        }
         if (notationInfo.isPrettySyntax()
                 && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT(), services)
                 && getNotationInfo().isHidePackagePrefix()) {
@@ -1017,10 +1020,24 @@ public class LogicPrinter {
         else {
             String name = t.op().name().toString();
             startTerm(t.arity());
+            boolean alreadyPrinted = false;
+            if (t.op() instanceof SortDependingFunction) {  
+               SortDependingFunction op = (SortDependingFunction) t.op();
+               if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
+                  layouter.print(op.getSortDependingOn().declarationString());
+                  layouter.print("::");
+                  markStartKeyword();
+                  layouter.print(op.getKind().toString());
+                  markEndKeyword();
+                  alreadyPrinted = true;
+               }
+            }
             if (isKeyword) {
               markStartKeyword(); 
             }
-            layouter.print(name);
+            if (!alreadyPrinted) {
+               layouter.print(name);
+            }
             if (isKeyword) {
                markEndKeyword();
             }
@@ -1245,6 +1262,10 @@ public class LogicPrinter {
                     ? HeapLDT.getClassName((Function)t.op()) + "."
                     : "";
             fieldName += HeapLDT.getPrettyFieldName(t.op());
+            boolean isKeyword = false;
+            if (services != null) {
+               isKeyword = (obs == services.getJavaInfo().getInv());
+            }
 
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
                 JavaInfo javaInfo = services.getJavaInfo();
@@ -1275,7 +1296,13 @@ public class LogicPrinter {
                 }
                 layouter.print(")").end();
             } else {
+                if (isKeyword) {
+                   markStartKeyword();
+                }
                 layouter.print(fieldName);
+                if (isKeyword) {
+                   markEndKeyword();
+                }
             }
 
             // must the heap be printed at all: no, if default heap.
@@ -1476,9 +1503,12 @@ public class LogicPrinter {
                                               Term r,int assRight)
         throws IOException
     {
-        LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
-        boolean isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP 
-              || t.op() == Equality.EQV || t.op() == loc.getUnion());
+        boolean isKeyword = false;
+        if (services != null) {
+           LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
+           isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP 
+                 || t.op() == Equality.EQV || t.op() == loc.getUnion());
+        }
         int indent = name.length()+1;
         startTerm(2);
         layouter.ind();
@@ -1752,8 +1782,11 @@ public class LogicPrinter {
     public void printConstant(Term t, String s)
         throws IOException {
         startTerm(0);
-        boolean isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE 
-              || t.op() == getHeapLDT().getCreated());
+        boolean isKeyword = false;
+        if (getHeapLDT() != null) {
+           isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE 
+                 || t.op() == getHeapLDT().getCreated());
+        }
         if (isKeyword) {
            markStartKeyword();
         }
@@ -1890,8 +1923,9 @@ public class LogicPrinter {
         mark(MarkType.MARK_MODPOSTBL);
         startTerm(phi.arity());
         layouter.print(left);
+        markStartJavaBlock();
         printJavaBlock(jb);
-
+        markEndJavaBlock();
         layouter.print(right+" ");
         if(phi.arity() == 1) {
             maybeParens(phi.sub(0),ass);
@@ -2066,6 +2100,10 @@ public class LogicPrinter {
         MARK_START_KEYWORD,
         /** Mark the end of a keyword */
         MARK_END_KEYWORD,
+        /** Mark the beginning of a java block */
+        MARK_START_JAVABLOCK,
+        /** Mark the end of a java block */
+        MARK_END_JAVABLOCK,
     }
 
     private final boolean createPositionTable = true;
@@ -2113,6 +2151,22 @@ public class LogicPrinter {
     protected void markStartKeyword() {
        if (createPositionTable) {
           mark(MarkType.MARK_START_KEYWORD);
+      }
+    }
+    /**
+     * Called before java block is printed and marks current position.
+     */
+    protected void markStartJavaBlock() {
+       if (createPositionTable) {
+          mark(MarkType.MARK_START_JAVABLOCK);
+      }
+    }
+    /**
+     * Called after java block is printed and marks current position.
+     */
+    protected void markEndJavaBlock() {
+       if (createPositionTable) {
+          mark(MarkType.MARK_END_JAVABLOCK);
       }
     }
     /**
@@ -2313,6 +2367,9 @@ public class LogicPrinter {
         
         /** Remembers the start of a keyword to create a range */
         private final Stack<Integer> keywordStarts = new Stack<Integer>();
+        
+        /** Remembers the start of a java block to create a range */
+        private final Stack<Integer> javaBlockStarts = new Stack<Integer>();
 
 
         PosTableStringBackend(int lineWidth) {
@@ -2424,7 +2481,12 @@ public class LogicPrinter {
             case MARK_END_KEYWORD:
                initPosTbl.addKeywordRange(new Range(keywordStarts.pop(), count()));
                break;
-               
+            case MARK_START_JAVABLOCK:
+               javaBlockStarts.push(count());
+               break;
+            case MARK_END_JAVABLOCK:
+               initPosTbl.addJavaBlockRange(new Range(javaBlockStarts.pop(), count()));
+               break;
 
             default:
                 System.err.println("Unexpected LogicPrinter mark: " + markType);

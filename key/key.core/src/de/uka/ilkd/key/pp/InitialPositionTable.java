@@ -39,6 +39,8 @@ public class InitialPositionTable extends PositionTable{
     
     /** Ranges of keywords */
     private ImmutableList<Range> keywordRanges = ImmutableSLList.<Range>nil();
+    /** Ranges of java blocks */
+    private ImmutableList<Range> javaBlockRanges = ImmutableSLList.<Range>nil();
 
     /**
      * creates a new Initial PositionTable.
@@ -158,10 +160,23 @@ public class InitialPositionTable extends PositionTable{
        keywordRanges = keywordRanges.prepend(r);
     }
     /**
-     * @return ranges of keywords
+     * @return ranges of keywords printed
      */
     public Range[] getKeywordRanges() {
        return keywordRanges.toArray(new Range[keywordRanges.size()]);
+    }
+    /**
+     * Adds a range for a java block to the java block list
+     * @param r Range of keyword to be added
+     */
+    public void addJavaBlockRange(Range r) {
+       javaBlockRanges = javaBlockRanges.prepend(r);
+    }
+    /**
+     * @return ranges of java blocks printed
+     */
+    public Range[] getJavaBlockRanges() {
+       return javaBlockRanges.toArray(new Range[javaBlockRanges.size()]);
     }
     public void addUpdateRange(Range r) {
         updateRanges = updateRanges.prepend(r);
