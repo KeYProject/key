@@ -4,6 +4,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -12,6 +13,7 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -23,6 +25,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
@@ -81,9 +84,38 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private DefaultTermParser parser = new DefaultTermParser();
       private Services services = getGoal().proof().getServices();
       private LocationVariable[] heaps = null;
-      private Combo specSelector = null;
       private Composite specSwitchComposite = null;
       private StackLayout stackLayout = null;
+      private Combo specSelector = null;
+      private SelectionAdapter specSelectListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e)
+         {
+            switchPage(specSelector.getSelectionIndex());
+         }
+      };
+      private Button store = null;
+      private SelectionAdapter storeListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            store(); // add new tab 
+         }
+      };
+      private Vector<TabFolder> heapTabFolders = new Vector<>();
+      private SelectionAdapter heapTabsListener = new SelectionAdapter() {
+         public void widgetSelected(SelectionEvent e) {
+            resetStateTab();
+         }
+      };
+      private Vector<Control> cListenerParents = new Vector<>();
+      private Vector<ControlListener> cListeners = new Vector<>();
+      private Vector<Text> mListenerParents = new Vector<>();
+      private ModifyListener modifyListener = new ModifyListener(){
+         public void modifyText(ModifyEvent e) {
+            updateErrorMessage();
+            resetVariantsState();
+         }
+      };
       
       
       /**
@@ -174,24 +206,19 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          final Composite inputColumn = new Composite(root, SWT.NONE);
          inputColumn.setLayout(new GridLayout(1, false));
          
-         inputColumn.addControlListener(new ControlAdapter() {
+         cListeners.add(new ControlAdapter() {
             @Override
             public void controlResized(ControlEvent e) {
                inputColumn.layout();
             }
          });
+         cListenerParents.add(inputColumn);
+         cListenerParents.lastElement().addControlListener(cListeners.lastElement());
          
          //selector drop down
          specSelector = new Combo(inputColumn, SWT.DROP_DOWN | SWT.READ_ONLY);
          specSelector.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-         specSelector.addSelectionListener(new SelectionAdapter()
-         {
-            @Override
-            public void widgetSelected(SelectionEvent arg0)
-            {
-               switchPage(specSelector.getSelectionIndex());
-            }
-         });
+         specSelector.addSelectionListener(specSelectListener);
          
          specSwitchComposite = new Composite(inputColumn, SWT.NONE);
          specSwitchComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -199,15 +226,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          specSwitchComposite.setLayout(stackLayout);
          
          // set up store button
-         Button store = new Button(inputColumn, SWT.PUSH);
+         store = new Button(inputColumn, SWT.PUSH);
          store.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
          store.setText("Store");
-         store.addSelectionListener(new SelectionAdapter(){
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-               store(); // add new tab 
-            }
-         });
+         store.addSelectionListener(storeListener);
          
          //get the initial state of the text fields.
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
@@ -306,12 +328,14 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          Composite textContainer = new Composite(scrolledComposite, SWT.NONE);
          textContainer.setLayout(new GridLayout(1, false));
          scrolledComposite.setContent(textContainer);
-         specSwitchComposite.addControlListener(new ControlAdapter() {
+         cListeners.add(new ControlAdapter() {
             @Override
             public void controlResized(ControlEvent e) {
                scrolledComposite.reflow(true);
             }
          });
+         cListenerParents.add(specSwitchComposite);
+         cListenerParents.lastElement().addControlListener(cListeners.lastElement());
          //... add a tab folder for heap-sensitive Invariants ...
          TabFolder heapTabs = new TabFolder(textContainer, SWT.TOP);
          heapTabs.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -340,26 +364,16 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             modifiesT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
             modifiesT.setText(modifies[iter] != null? modifies[iter] : "allLocs");
             
-            invariantT.addModifyListener(new ModifyListener(){
-               public void modifyText(ModifyEvent event) {
-                  updateErrorMessage();
-                  resetInvariantState();
-               }
-            });
+            mListenerParents.add(invariantT);
+            invariantT.addModifyListener(modifyListener);
             
-            modifiesT.addModifyListener(new ModifyListener(){
-               public void modifyText(ModifyEvent event) {
-                  updateErrorMessage();
-                  resetModifiesState();
-               }
-            });
+            mListenerParents.add(modifiesT);
+            modifiesT.addModifyListener(modifyListener);
+            
             iter++;
          }
-         heapTabs.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-               resetStateTab();
-            }
-         });
+         heapTabFolders.add(heapTabs);
+         heapTabs.addSelectionListener(heapTabsListener);
          Group variantsGroup = new Group(textContainer, SWT.NONE);
          variantsGroup.setLayout(new FillLayout());
          variantsGroup.setText("variants");
@@ -368,12 +382,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          variantsT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
          variantsT.setText(variant == null ? "" : variant);
          
-         variantsT.addModifyListener(new ModifyListener(){
-            public void modifyText(ModifyEvent event) {
-               updateErrorMessage();
-               resetVariantsState();
-            }
-         });
+         mListenerParents.add(variantsT);
+         variantsT.addModifyListener(modifyListener);
          
          return scrolledComposite;
       }
@@ -552,15 +562,19 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public void dispose() {
+         //remove all listeners
+         store.removeSelectionListener(storeListener);
+         specSelector.removeSelectionListener(specSelectListener);
+         for(int i = 0; i < cListenerParents.size(); i++){
+            cListenerParents.get(i).removeControlListener(cListeners.get(i));
+         }
+         for(Text p : mListenerParents){
+            p.removeModifyListener(modifyListener);
+         }
+         for(TabFolder p : heapTabFolders){
+            p.removeSelectionListener(heapTabsListener);
+         }
          root.dispose();
-         // TODO: In theory the UI disposes contained elements automatically.
-         //What needs to be disposed manually are provider, fonts, images, colors, ...
-         //Also ensure that all added listeners are removed.
-         //Remove 'global' listeners
-         //for each spec
-            //remove per-spec listeners
-            //for each heap
-               //remove per-heap listeners
       }
    }
 }
