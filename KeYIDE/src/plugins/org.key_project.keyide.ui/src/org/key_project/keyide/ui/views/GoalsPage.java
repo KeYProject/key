@@ -3,12 +3,9 @@ package org.key_project.keyide.ui.views;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.Page;
@@ -42,7 +39,7 @@ public class GoalsPage extends Page implements IGoalsPage {
  
    private Proof proof;
 
-   private TableViewer viewer;
+   private ListViewer viewer;
 
    private KeYEnvironment<?> environment;
 
@@ -307,19 +304,12 @@ public class GoalsPage extends Page implements IGoalsPage {
     */
    @Override
    public void createControl(Composite parent) {
-      this.viewer = new TableViewer(parent);
+      this.viewer = new ListViewer(parent);
       this.contentProvider = new ImmutableCollectionContentProvider();
       this.labelProvider = new GoalsLabelProvider();
       viewer.setContentProvider(contentProvider);
       viewer.setLabelProvider(labelProvider);
       viewer.setInput(proof.openGoals());
-      
-      //set header "Open Goals" on the view
-      Table table = viewer.getTable();
-      TableColumn heading = new TableColumn(table, SWT.LEFT);
-      heading.setText("Open Goals");
-      heading.setWidth(500);
-      table.setHeaderVisible(true);
 
       //allow listening to selection changes of this viewer
       getSite().setSelectionProvider(viewer);

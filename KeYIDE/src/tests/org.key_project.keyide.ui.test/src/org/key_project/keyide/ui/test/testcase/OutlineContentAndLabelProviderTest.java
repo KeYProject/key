@@ -15,8 +15,6 @@ package org.key_project.keyide.ui.test.testcase;
 
 import java.io.File;
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.State;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
@@ -24,12 +22,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.handlers.RegistryToggleState;
 import org.junit.Test;
-import org.key_project.keyide.ui.handlers.HideIntermediateProofstepsHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
@@ -51,6 +44,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
 //TODO Document class OutlineContentAndLabelProviderTest
@@ -115,7 +111,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
    @Test
    public void testHideIntermediateProofsteps() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
 	  // Create test project
-      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testHideIntermediateProofsteps_beforeAutoMode");
+      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testHideIntermediateProofsteps");
 	  IFolder src = project.getProject().getFolder("src");
 	  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
 	  // Get local file in operating system of folder src 
@@ -136,23 +132,27 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 	      TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 	      viewer.setUseHashlookup(true);
 	      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
-	      // deactivate hiding intermediate proofsteps
+	      // deactivate hiding intermediate proofsteps filter and show symbolic execution tree filter
 	      lazyContentProvider.setHideState(false);
+	      lazyContentProvider.setSymbolicState(false);
 	      viewer.setContentProvider(lazyContentProvider);
 	      viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
 	      viewer.setInput(proof);
 	      shell.setVisible(true);
 	      viewer.expandAll();
-	      // check if initial toggle State is false
-	      assertFalse((boolean) lazyContentProvider.getHideState());
+	      // check if initial toggle States are false
+	      assertFalse(lazyContentProvider.getHideState());
+	      assertFalse(lazyContentProvider.getSymbolicState());
 	      // check if proof tree is correct before activating the filter
 	      TreeViewerIterator viewerIter = new TreeViewerIterator(viewer);
 	      NodePreorderIterator nodeIter = new NodePreorderIterator(proof.root());
 	      while (nodeIter.hasNext()) {
 	    	  assertTree(nodeIter, viewerIter);
 	      }
+	      
 	      // activate hide intermediate proofsteps filter
 	      lazyContentProvider.setHideState(true);
+	      
 	      // start auto mode
 	      environment.getProofControl().startAndWaitForAutoMode(proof);
 	      viewer.setInput(proof);
@@ -170,7 +170,6 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
           viewer.expandAll();
           TreeViewerIterator viewerIterShow = new TreeViewerIterator(viewer);
           NodePreorderIterator nodeIterShow = new NodePreorderIterator(proof.root());
-             
           // check if the complete proof tree is shown correctly again
           while (nodeIterShow.hasNext()) {
         	  assertTree(nodeIterShow, viewerIterShow);
@@ -181,9 +180,216 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
 		}
    	}
    
+   /**
+    * creates a viewer for the proof and checks if the show symbolic execution tree filter is working correctly.
+    * @throws CoreException
+ 	* @throws InterruptedException
+ 	* @throws ProblemLoaderException
+ 	* @throws ProofInputException
+ 	*/
    @Test
-   public void testShowSymbolicExecutionTree() {
-	   
+   public void testShowSymbolicExecutionTree() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
+	   // Create test project
+	      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testShowSymbolicExecutionTree");
+		  IFolder src = project.getProject().getFolder("src");
+		  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
+		  // Get local file in operating system of folder src 
+		  File location = ResourceUtil.getLocation(src);
+		  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
+		  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
+		  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
+		  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
+		  FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
+		  Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc, true));
+		  assertNotNull(proof);
+		  // create viewer to show proof in
+		  Shell shell = new Shell();
+		  try {
+			  shell.setText("OutlineContentAndLabelProviderTest");
+		      shell.setSize(600, 400);
+		      shell.setLayout(new FillLayout());
+		      TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
+		      viewer.setUseHashlookup(true);
+		      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
+		      // deactivate hiding intermediate proofsteps filter and show symbolic execution tree filter
+		      lazyContentProvider.setHideState(false);
+		      lazyContentProvider.setSymbolicState(false);
+		      viewer.setContentProvider(lazyContentProvider);
+		      viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
+		      viewer.setInput(proof);
+		      shell.setVisible(true);
+		      viewer.expandAll();
+		      // check if initial toggle States are false
+		      assertFalse(lazyContentProvider.getHideState());
+		      assertFalse(lazyContentProvider.getSymbolicState());
+		      // check if proof tree is correct before activating the filter
+		      TreeViewerIterator viewerIter = new TreeViewerIterator(viewer);
+		      NodePreorderIterator nodeIter = new NodePreorderIterator(proof.root());
+		      while (nodeIter.hasNext()) {
+		    	  assertTree(nodeIter, viewerIter);
+		      }
+		      // start auto mode
+		      environment.getProofControl().startAndWaitForAutoMode(proof);
+		      
+		      // activate show symbolic execution tree filter
+		      lazyContentProvider.setSymbolicState(true);
+		      viewer.setInput(proof);
+		      viewer.expandAll();
+		      viewerIter = new TreeViewerIterator(viewer);
+		      // create symbolic execution tree iterator
+		      SymbolicExecutionTreeBuilder symExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+		      symExeTreeBuilder.analyse();
+		      ExecutionNodePreorderIterator exeNodeIter = new ExecutionNodePreorderIterator(symExeTreeBuilder.getStartNode());
+		      // check if proof tree is correct
+		      assertShowSymbolicExecutionTree(exeNodeIter, viewerIter);
+		          
+	          // deactivate show symbolic execution tree filter
+	          lazyContentProvider.setSymbolicState(false);
+	          viewer.setInput(proof);
+	          viewer.expandAll();
+	          viewerIter = new TreeViewerIterator(viewer);
+	          nodeIter = new NodePreorderIterator(proof.root());
+	          // check if the complete proof tree is shown correctly again
+	          while (nodeIter.hasNext()) {
+	        	  assertTree(nodeIter, viewerIter);
+	          }
+			} finally {
+	       		shell.setVisible(false);
+	       		shell.dispose();
+			}
+   }
+   
+   /**
+    * creates a viewer for the proof and checks if both outline filters a working correctly together.
+    * @throws CoreException
+ 	* @throws InterruptedException
+ 	* @throws ProblemLoaderException
+ 	* @throws ProofInputException
+ 	*/
+   @Test
+   public void testHideIntermediateProofstepsAndShowSymbolicExecutionTree() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
+	  // Create test project
+      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testHideIntermediateProofstepsAndShowSymbolicExecutionTree");
+	  IFolder src = project.getProject().getFolder("src");
+	  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
+	  // Get local file in operating system of folder src 
+	  File location = ResourceUtil.getLocation(src);
+	  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
+	  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
+	  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
+	  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
+	  FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
+	  Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc, true));
+	  assertNotNull(proof);
+	  // create viewer to show proof in
+	  Shell shell = new Shell();
+	  try {
+		  shell.setText("OutlineContentAndLabelProviderTest");
+	      shell.setSize(600, 400);
+	      shell.setLayout(new FillLayout());
+	      TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
+	      viewer.setUseHashlookup(true);
+	      LazyProofTreeContentProvider lazyContentProvider = new LazyProofTreeContentProvider();
+	      // deactivate hiding intermediate proofsteps filter and show symbolic execution tree filter
+	      lazyContentProvider.setHideState(false);
+	      lazyContentProvider.setSymbolicState(false);
+	      viewer.setContentProvider(lazyContentProvider);
+	      viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
+	      viewer.setInput(proof);
+	      shell.setVisible(true);
+	      viewer.expandAll();
+	      // check if initial toggle States are false
+	      assertFalse(lazyContentProvider.getHideState());
+	      assertFalse(lazyContentProvider.getSymbolicState());
+	      // check if proof tree is correct before activating the filter
+	      TreeViewerIterator viewerIter = new TreeViewerIterator(viewer);
+	      NodePreorderIterator nodeIter = new NodePreorderIterator(proof.root());
+	      while (nodeIter.hasNext()) {
+	    	  assertTree(nodeIter, viewerIter);
+	      }
+	      // start auto mode
+	      environment.getProofControl().startAndWaitForAutoMode(proof);
+	      
+	      // activate show symbolic execution tree filter
+	      lazyContentProvider.setSymbolicState(true);
+	      viewer.setInput(proof);
+	      viewer.expandAll();
+	      viewerIter = new TreeViewerIterator(viewer);
+	      // create symbolic execution tree iterator
+	      SymbolicExecutionTreeBuilder symExeTreeBuilder = new SymbolicExecutionTreeBuilder(proof, false, false, false, false, false);
+	      symExeTreeBuilder.analyse();
+	      ExecutionNodePreorderIterator exeNodeIter = new ExecutionNodePreorderIterator(symExeTreeBuilder.getStartNode());
+	      // check if proof tree is correct
+	      assertShowSymbolicExecutionTree(exeNodeIter, viewerIter);
+	      
+	      // activate hide intermediate proof steps filter
+	      lazyContentProvider.setHideState(true);
+	      viewer.setInput(proof);
+	      viewer.expandAll();
+	      viewerIter = new TreeViewerIterator(viewer);
+	      nodeIter = new NodePreorderIterator(proof.root());
+	      // check if proof tree contains only branchfolders and leafs
+	      while (nodeIter.hasNext()) {
+	    	  assertHideIntermediateProofstepsTree(nodeIter, viewerIter);
+	      }
+	      
+          // deactivate show symbolic execution tree filter and hide intermediate proof steps filter
+          lazyContentProvider.setSymbolicState(false);
+          lazyContentProvider.setHideState(false);
+          viewer.setInput(proof);
+          viewer.expandAll();
+          viewerIter = new TreeViewerIterator(viewer);
+          nodeIter = new NodePreorderIterator(proof.root());
+          // check if the complete proof tree is shown correctly again
+          while (nodeIter.hasNext()) {
+        	  assertTree(nodeIter, viewerIter);
+          }
+		} finally {
+       		shell.setVisible(false);
+       		shell.dispose();
+		}
+   }
+   
+   /**
+    * checks whether a filtered TreeViewer contains the correct symbolic execution tree.
+    * @param exeNodeIter execution node iterator over the execution tree
+ 	* @param viewerIter an iterator over the filtered tree viewer
+ 	*/
+   protected void assertShowSymbolicExecutionTree(ExecutionNodePreorderIterator exeNodeIter, TreeViewerIterator viewerIter) {
+	   boolean isBranchNode = false;
+	   IExecutionNode<?> exeNode = null;
+	   while (exeNodeIter.hasNext()) {
+		   if (!isBranchNode) {
+			   exeNode = exeNodeIter.next();
+		   }
+		   if (viewerIter.hasNext()) {
+			   Object itemData = viewerIter.next().getData();
+			   if (itemData instanceof Node) {
+				   assertTrue(itemData.equals(exeNode.getProofNode()));
+				   if (isBranchNode) {
+					   isBranchNode = false;
+				   }
+			   } else if (itemData instanceof BranchFolder) {
+				   if (isBranchNode) {
+					   exeNode = exeNodeIter.next();
+				   }
+				   BranchFolder bf = (BranchFolder) itemData;
+				   assertTrue(bf.getChild().equals(exeNode.getProofNode()));
+				   isBranchNode = true;
+			   }
+		   } else {
+			   fail("There is an execution node missing in the TreeViewer.");
+		   }
+		   if (exeNode.getChildren().length == 0) {
+			   for (int i = 0; i < exeNode.getProofNode().childrenCount(); i++) {
+				   NodePreorderIterator nodeIter = new NodePreorderIterator(exeNode.getProofNode().child(i));
+				   while (nodeIter.hasNext()) {
+					   assertTree(nodeIter, viewerIter);
+				   }
+			   }
+		   }
+	   }
+	   assertFalse("The TreeViewer contains too many proof steps.", viewerIter.hasNext());
    }
    
    /**

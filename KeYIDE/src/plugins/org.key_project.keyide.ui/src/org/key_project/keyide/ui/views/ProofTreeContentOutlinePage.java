@@ -166,6 +166,11 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	      }
 	}
 
+	/**
+	 * Handles a change in the state of the showSymbolicExecutionTree outline filter.
+	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
+	 * @param oldValue The old value; may be anything.
+	 */
 	protected void handleSymbolicStateChanged(State state, Object oldValue) {
 		contentProvider.setSymbolicState((boolean) state.getValue());
 		getTreeViewer().setInput(proof);
@@ -173,7 +178,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 	}
 
 	/**
-	 * Handles a change in the state of the hideIntermediateProofsteps outline feature.
+	 * Handles a change in the state of the hideIntermediateProofsteps outline filter.
 	 * @param state The state that has changed; never null. The value for this state has been updated to the new value.
 	 * @param oldValue The old value; may be anything.
 	 */
@@ -257,7 +262,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 		// (Behavior of original KeY UI and solves problem with selection
 		// synchronization with the shown TreeViewer)
 		selectionModel.removeKeYSelectionListener(listener);
-		// deactivate showSymbolicExecutionTree outline filter
+		// deactivate showSymbolicExecutionTree outline filter and remove symbolic state listener
+		symbolicState.removeListener(symbolicStateListener);
 		contentProvider.setSymbolicState(false);
 	}
 
@@ -286,6 +292,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 					});
 				}
 			}
+			// add symbolic state listener
+			symbolicState.addListener(symbolicStateListener);
 			// Make sure that correct selected node is shown
 			updateSelectedNodeThreadSafe();
 		}
@@ -326,6 +334,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements
 			} else {
 				getTreeViewer().setSelection(SWTUtil.createSelection(parent), true);
 			}
+		} // scroll to the selected Node
+		  else {
+		   getTreeViewer().reveal(selectedNode);
 		}
 	}
 
