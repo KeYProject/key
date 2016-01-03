@@ -8,12 +8,13 @@ package de.uka.ilkd.key.nui.prooftree;
  * <li>a NUIInnerNode {@link de.uka.ilkd.key.nui.prooftree.NUIInnerNode}</li>
  * </ul>
  * 
- * The class is used to create an intermediate representation of the proof tree
+ * The class is used to create an intermediate graphical of the proof tree
  * consisting of objects of type {@link de.uka.ilkd.key.proof.Node}. This
  * representation only consists of information relevant to create a decorated
  * tree.
  * 
- * @author Matthias Schultheis, Patrick Jattke
+ * @author Matthias Schultheis
+ * @author Patrick Jattke
  *
  */
 public abstract class NUINode {

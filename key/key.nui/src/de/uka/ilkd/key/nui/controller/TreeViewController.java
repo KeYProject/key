@@ -3,80 +3,70 @@ package de.uka.ilkd.key.nui.controller;
 import java.io.File;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.*;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
+import javafx.util.Callback;
 
 /**
  * controller for the treeView GUI element to visualize proofs
+ * @author  Patrick Jattke
+ * @author  Matthias Schultheis
+ * @version 1.1
  */
 public class TreeViewController {
 
     /**
-     * The proofTree view on the GUI.
+     * The proofTree view of the GUI.
      */
     @FXML
-    private TreeView<Label> proofTreeView;
+    private TreeView<NUINode> proofTreeView;
     
-	TreeConverter tConverter;
+    /**
+     * the visualizer for displaying a proof tree
+     */
+	ProofTreeVisualizer visualizer;
 
     /**
      * Initialization method for scene; loads the default proof
      */
     public void initialize() {
-    	// The width and height of the icons used in the proofView
-    	int iconSize = 15;
     	
-    	// Create a new tree converter instance for conversion
+    	// set cell factory for rendering cells
+    	proofTreeView.setCellFactory(new Callback<TreeView<NUINode>,TreeCell<NUINode>>(){
+            @Override
+            public TreeCell<NUINode> call(TreeView<NUINode> p) {
+                return new ProofTreeCell();
+            }
+        });
+    	
+    	// Create a new tree visualizer instance for processing the conversion
     	// de.uka.ilkd.key.proof.Node --> de.uka.ilkd.key.nui.NUI.prooftree.NUINode 
-    	// --> TreeItem<Label> (JavaFX)
-    	tConverter = new TreeConverter(proofTreeView, iconSize);
+    	// --> TreeItem<NUINode> (JavaFX)
+    	visualizer = new ProofTreeVisualizer(proofTreeView);
     	
         // add CSS file to view
         String cssPath = this.getClass()
                 .getResource("../components/treeView.css").toExternalForm();
-        tConverter.addStylesheet(cssPath);
+        visualizer.addStylesheet(cssPath);
         
-        // load and display proof
+        // load and display proof in visualizer
         Proof p = loadProof("gcd.twoJoins.proof");
         displayProof(p);
     }
 
     /**
-     * Visualizes the given proof in the treeView
+     * displays a proof in the proofTreeView
      * 
      * @param proof
-     *            The proof which should be shown into the treeView
+     *            The proof file which should be displayed
      */
-    public void displayProof(Proof proof) {
-        setProof(proof);
-        displayProof();
-    }
-
-    /**
-     * Visualizes the proof which has been set before by {@link #setProof}
-     */
-    public void displayProof() {
-        tConverter.showTree();
-    }
-
-    /**
-     * Assigns an existing proof p to the TreeView and generates an internal
-     * intermediate representation (NUITree)
-     * 
-     * @param proof
-     *            The proof file which should be assigned to the TreeView
-     */
-    public void setProof(Proof proof) {
-        // get the root node
-        Node pRoot = proof.root();
-
-        // convert proof tree to NUI Tree
-        tConverter.convertProofToNUI(pRoot);
+    private void displayProof(Proof proof) {
+    	visualizer.loadProofTree(proof);
+        visualizer.visualizeProofTree();
     }
 
     /**

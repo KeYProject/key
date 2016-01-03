@@ -3,10 +3,11 @@ package de.uka.ilkd.key.nui.prooftree;
 import java.util.LinkedList;
 
 /**
- * Represents a branch node. Is used to create a intermediate representation of
+ * Represents a branch node. Is used to create a graphical representation of
  * a proof tree consisting of {@link de.uka.ilkd.key.proof.Node} objects.
  * 
- * @author Matthias Schultheis, Patrick Jattke
+ * @author Matthias Schultheis
+ * @author Patrick Jattke
  *
  */
 public class NUIBranchNode extends NUINode {
