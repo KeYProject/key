@@ -13,144 +13,61 @@ import javafx.scene.image.ImageView;
  */
 public class IconFactory {
 
-    // TODO: Konstante fuer Iconname anstelle von Methode pro Icon
-    // TODO: Groesse per TreeViewController Wrapper Methode oder IconFactory
-    // instanziierbar machen
+	private int iconSize_x;
+	private int iconSize_y;
 
-    private IconFactory() {
-    }
+	public IconFactory(int x, int y) {
+		this.iconSize_x = x;
+		this.iconSize_y = y;
+	}
 
-    private static String folderRoot = "components/images/TreeViewController/";
+	private static String folderRoot = "components/images/TreeViewController/";
 
-    // Inner Nodes
-    private static Image keyOpenInnerNode = getImage("openNode.png");
-    private static Image keyLinkedInnerNode = getImage("linkedNode.png");
-    private static Image keyClosedInnerNode = getImage("closedNode.png");
-    private static Image keyInteractiveInnerNode = getImage(
-            "interactiveNode.png");
+	// Inner Nodes
+	public static String KEY_INNER_NODE_OPEN = "openNode.png";
+	public static String KEY_INNER_NODE_CLOSED = "closedNode.png";
+	public static String KEY_INNER_NODE_LINKED = "linkedNode.png";
+	public static String KEY_INNER_NODE_INTERACTIVE = "interactiveNode.png";
 
-    // Leafs
-    private static Image keyInteractiveGoal = getImage("interactiveGoal.png");
-    private static Image keyClosedGoal = getImage("closedGoal.png");
-    private static Image keyOpenGoal = getImage("openGoal.png");
+	// Leafs
+	public static String KEY_LEAF_NODE_INTERACTIVE = "interactiveGoal.png";
+	public static String KEY_LEAF_NODE_CLOSED = "closedGoal.png";
+	public static String KEY_LEAF_NODE_OPEN = "openGoal.png";
+	public static String KEY_LEAF_NODE_LINKED = "linkedNode.png";
 
-    /**
-     * Returns an Image based on the given imageFilename in the directory
-     * folderRoot
-     * 
-     * @param imageFilename
-     *            The name of the image
-     * @return Image object of JavaFX
-     */
-    private static Image getImage(String imageFilename) {
-        InputStream is = IconFactory.class
-                .getResourceAsStream(folderRoot + imageFilename);
-        return new Image(is);
-    }
+	/**
+	 * Returns an ImageView (scaled image) based on the given imageFilename in
+	 * the directory folderRoot
+	 * 
+	 * @param imageConstant
+	 *            The name of the image, e. g. IconFactory.KEY_INNER_NODE_OPEN
+	 * @return ImageView object of JavaFX
+	 */
+	public ImageView getImage(String imageConstant) {
+		InputStream is = IconFactory.class.getResourceAsStream(folderRoot + imageConstant);
+		Image img = new Image(is);
+		return scaleIcon(img, iconSize_x, iconSize_y);
+	}
 
-    /**
-     * Scales an given image to a desired size indicated by x (width) and y
-     * (height) and returns a ImageView with the scaled image in it. Uses the
-     * smoothing option.
-     * 
-     * @param image
-     *            The image which should be scaled
-     * @param x
-     *            The desired width
-     * @param y
-     *            The desired height
-     * @return an ImageView containing the scaled Image
-     */
-    public static ImageView scaleIcon(Image image, int x, int y) {
-        ImageView v = new ImageView(image);
-        v.setFitWidth(x);
-        v.setFitHeight(y);
-        v.setSmooth(true);
-        return v;
-    }
-
-    /**
-     * * Returns the icon scaleIcond to size (width, height) = (x, y).
-     * 
-     * @ param x the desired width of the icon @ param y the desired height of
-     * the icon
-     * 
-     * @return the scaleIcond keyOpenInnerNode
-     */
-    public static ImageView getKeyOpenInnerNode(int x, int y) {
-        return scaleIcon(keyOpenInnerNode, x, y);
-    }
-
-    /**
-     * Returns the icon scaleIcond to size (width, height) = (x, y).
-     * 
-     * @ param x the desired width of the icon @ param y the desired height of
-     * the icon
-     * 
-     * @return the scaleIcond keyLinkedInnerNode
-     */
-    public static ImageView getKeyLinkedInnerNode(int x, int y) {
-        return scaleIcon(keyLinkedInnerNode, x, y);
-    }
-
-    /**
-     * Returns the icon scaleIcond to size (width, height) = (x, y).
-     * 
-     * @ param x the desired width of the icon @ param y the desired height of
-     * the icon
-     * 
-     * @return the scaleIcond keyClosedInnerNode
-     */
-    public static ImageView getKeyClosedInnerNode(int x, int y) {
-        return scaleIcon(keyClosedInnerNode, x, y);
-    }
-
-    /**
-     * Returns the icon scaleIcond to size (width, height) = (x, y).
-     * 
-     * @ param x the desired width of the icon @ param y the desired height of
-     * the icon
-     * 
-     * @return the scaleIcond keyInteractiveInnerNode
-     */
-    public static ImageView getKeyInteractiveInnerNode(int x, int y) {
-        return scaleIcon(keyInteractiveInnerNode, x, y);
-    }
-
-    /**
-     * Returns the icon scaleIcond to size (width, height) = (x, y).
-     * 
-     * @ param x the desired width of the icon @ param y the desired height of
-     * the icon
-     * 
-     * @return the scaleIcond keyInteractiveGoal
-     */
-    public static ImageView getKeyInteractiveGoal(int x, int y) {
-        return scaleIcon(keyInteractiveGoal, x, y);
-    }
-
-    /**
-     * Returns the icon scaleIcond to size (width, height) = (x, y).
-     * 
-     * @ param x the desired width of the icon @ param y the desired height of
-     * the icon
-     * 
-     * @return the scaleIcond keyClosedGoal
-     */
-    public static ImageView getKeyClosedGoal(int x, int y) {
-        return scaleIcon(keyClosedGoal, x, y);
-    }
-
-    /**
-     * Returns the icon scaleIcond to size (width, height) = (x, y).
-     * 
-     * @ param x the desired width of the icon @ param y the desired height of
-     * the icon
-     * 
-     * @return the scaleIcond keyOpenGoal
-     */
-    public static ImageView getKeyOpenGoal(int x, int y) {
-        return scaleIcon(keyOpenGoal, x, y);
-    }
+	/**
+	 * Scales an given image to a desired size indicated by x (width) and y
+	 * (height) and returns a ImageView with the scaled image in it. Uses the
+	 * smoothing option.
+	 * 
+	 * @param image
+	 *            The image which should be scaled
+	 * @param x
+	 *            The desired width
+	 * @param y
+	 *            The desired height
+	 * @return an ImageView containing the scaled Image
+	 */
+	private ImageView scaleIcon(Image image, int x, int y) {
+		ImageView v = new ImageView(image);
+		v.setFitWidth(x);
+		v.setFitHeight(y);
+		v.setSmooth(true);
+		return v;
+	}
 
 }

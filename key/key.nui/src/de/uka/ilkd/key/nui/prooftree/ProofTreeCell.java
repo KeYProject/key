@@ -22,16 +22,28 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * space between icon and label in px
      */
     private final int ICON_SPACING = 5;
-    
+        
     /**
      * the label that will be displayed
      */
 	private Label label;
-	
+
+    /**
+     * The IconFactory used to create the required icons
+     */
+    private IconFactory icf;
+    
     /**
      * the icon that will be displayed left next to the label
      */
 	private ImageView icon;
+	
+	/**
+	 * The constructor of the ProofTreeCell
+	 */
+	public ProofTreeCell() {
+		icf = new IconFactory(ICON_SIZE, ICON_SIZE);
+	}
 	
 	/**
 	 * @param icon the icon to set
@@ -60,6 +72,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 	    label = new Label(item.getLabel()+" ");
 	    icon  = null;
         
+	    
+	    
         // set decoration (style, icon)
 		if(item instanceof NUIInnerNode)
 			decorateAsInnerNode();
@@ -91,7 +105,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 	 */
 	private void decorateAsInnerNode() {
 		if (getItem().isInteractive()) {
-			setIcon(IconFactory.getKeyInteractiveInnerNode(ICON_SIZE, ICON_SIZE));
+			setIcon(icf.getImage(IconFactory.KEY_INNER_NODE_INTERACTIVE));
 		}
 	}
 
@@ -103,10 +117,9 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 		label.getStyleClass().add(ProofTreeStyle.CSS_NODE_BRANCH);
 		if (getItem().isClosed()) {
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
-			setIcon(IconFactory.getKeyClosedInnerNode(ICON_SIZE, ICON_SIZE));
+			setIcon(icf.getImage(IconFactory.KEY_INNER_NODE_CLOSED));
 		} else {
-			setIcon(IconFactory.getKeyOpenInnerNode(ICON_SIZE, ICON_SIZE));
-
+			setIcon(icf.getImage(IconFactory.KEY_INNER_NODE_OPEN));
 		}
 		// TODO: Implement logic for linked (non-leaf) Nodes
 		// Not here but instead in the converter!!!
@@ -121,22 +134,22 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 		label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LEAF);
 		// leaf node is a closed goal
 		if (getItem().isClosed()) {
-			setIcon(IconFactory.getKeyClosedGoal(ICON_SIZE, ICON_SIZE));
+			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_CLOSED));
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
 		} 
 		// leaf node is a linked node
 		else if (getItem().isLinked()) {
-			setIcon(IconFactory.getKeyLinkedInnerNode(ICON_SIZE, ICON_SIZE));
+			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_LINKED));
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LINKED);
 		} 
 		// leaf node is an interactive node
 		else if (getItem().isInteractive()) {
-			setIcon(IconFactory.getKeyInteractiveGoal(ICON_SIZE, ICON_SIZE));
+			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_INTERACTIVE));
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_INTERACTIVE);
 		} 
 		// else: leaf node must be an open goal
 		else {
-			setIcon(IconFactory.getKeyOpenGoal(ICON_SIZE, ICON_SIZE));
+			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_OPEN));
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_OPEN);
 		}
 	}
