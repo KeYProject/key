@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
 import java.awt.Dimension;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -111,8 +112,13 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         final FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(AbstractionPredicatesChoiceDialog.class
-                .getResource("AbstractionPredicatesJoinDialog.fxml"));
+        final URL resource =
+                AbstractionPredicatesChoiceDialog.class
+                        .getResource("AbstractionPredicatesJoinDialog.fxml");
+
+        assert resource != null : "Could not find FXML file for abstraction predicates choice dialog";
+
+        loader.setLocation(resource);
 
         final JFXPanel fxPanel = new JFXPanel();
         add(fxPanel);
