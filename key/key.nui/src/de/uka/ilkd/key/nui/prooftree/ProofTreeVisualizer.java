@@ -5,6 +5,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofVisitor;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
@@ -182,6 +183,28 @@ public class ProofTreeVisualizer {
 
 		// TODO: Implement logic for linked (non-leaf) Nodes
 		// see ProofTreeView (line 712-735)
+		
+		if (!newNode.isClosed() ) {
+			class FindGoalVisitor implements ProofVisitor {
+        		private boolean isLinked = false;
+        		public boolean isLinked() {
+        			return this.isLinked;
+        		}
+        		@Override
+				public void visit(Proof proof, Node visitedNode) {
+					Goal g;
+					if ((g = proof.getGoal(visitedNode)) != null &&
+							g.isLinked()) {
+						this.isLinked = true;
+					}
+				}
+        	}
+        	FindGoalVisitor v = new FindGoalVisitor();
+        	proof.breadthFirstSearch(proofNode, v);
+        	if (v.isLinked()) {
+        		newNode.setLinked(true);
+        	}
+		}
 	}
 
 	/**

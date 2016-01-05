@@ -119,7 +119,13 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
 			setIcon(icf.getImage(IconFactory.KEY_INNER_NODE_CLOSED));
 		} else {
-			setIcon(icf.getImage(IconFactory.KEY_INNER_NODE_OPEN));
+			if (getItem().isLinked()) {
+				setIcon(icf.getImage(IconFactory.KEY_INNER_NODE_LINKED));
+			} else {
+				setIcon(icf.getImage(IconFactory.KEY_INNER_NODE_OPEN));
+			}
+			
+			
 		}
 		// TODO: Implement logic for linked (non-leaf) Nodes
 		// Not here but instead in the converter!!!
