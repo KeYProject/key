@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2016 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -36,6 +36,9 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -43,9 +46,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -71,7 +76,7 @@ public class AbstractionPredicatesChoiceDialogController {
 
     @FXML
     private ListView<String> lvPredicates;
-    
+
     @FXML
     private Label lblAvailableProgVars;
 
@@ -82,8 +87,11 @@ public class AbstractionPredicatesChoiceDialogController {
     private WebView wvInfo;
 
     @FXML
+    private TableView<AbstractionPredicateChoice> tvLatticeElemChoice;
+
+    @FXML
     private AnchorPane mainPane;
-    
+
     // ///////////////////////////// //
     // ////////// SETTERS ////////// //
     // ///////////////////////////// //
@@ -105,19 +113,25 @@ public class AbstractionPredicatesChoiceDialogController {
 
     // Observable lists for problems. May be changed from an outside
     // controller and are watched by this class.
-    ObservableList<String> placeholdersProblemsListData = FXCollections
+    final ObservableList<String> placeholdersProblemsListData = FXCollections
             .observableArrayList();
 
-    ObservableList<String> predicateProblemsListData = FXCollections
+    final ObservableList<String> predicateProblemsListData = FXCollections
             .observableArrayList();
 
     // Observable list encapsulating already accepted placeholders.
-    private ObservableList<String> placeholderList = FXCollections
+    private final ObservableList<String> placeholderList = FXCollections
             .observableArrayList();
 
     // Observable list encapsulating already accepted abstraction predicates.
-    private ObservableList<String> predicatesList = FXCollections
+    private final ObservableList<String> predicatesList = FXCollections
             .observableArrayList();
+
+    // Observable list encapsulating the abstraction predicate choices
+    // by the user. May be changed from an outside controller and is
+    // watched by this class.
+    final ObservableList<AbstractionPredicateChoice> abstrPredicateChoices =
+            FXCollections.observableArrayList();
 
     // Property for the chosen lattice type
     private ObjectProperty<Class<? extends AbstractPredicateAbstractionLattice>> latticeType =
@@ -213,8 +227,7 @@ public class AbstractionPredicatesChoiceDialogController {
                         resourcePath + "css/bootstrap/bootstrap-theme.min.css");
         final URL infoTextResource =
                 getURLForResourceFile(AbstractionPredicatesChoiceDialog.class,
-                        resourcePath
-                                + "help/abstrPredsJoinDialogInfo.html");
+                        resourcePath + "help/abstrPredsJoinDialogInfo.html");
 
         assert bootstrapCssResource != null
                 && bootstrapThemeCssResource != null
@@ -290,6 +303,33 @@ public class AbstractionPredicatesChoiceDialogController {
 
         placeholdersProblemsListData.addListener(changeListener);
         predicateProblemsListData.addListener(changeListener);
+
+        final TableColumn<AbstractionPredicateChoice, ProgramVariable> progVarCol =
+                new TableColumn<AbstractionPredicateChoice, ProgramVariable>(
+                        "Program Variable");
+
+        progVarCol.setPrefWidth(180);
+        progVarCol
+                .setCellValueFactory((
+                        CellDataFeatures<AbstractionPredicateChoice, ProgramVariable> choice) -> choice
+                        .getValue().getProgVar());
+
+        final TableColumn<AbstractionPredicateChoice, AbstractionPredicate> abstrPredCol =
+                new TableColumn<AbstractionPredicateChoice, AbstractionPredicate>(
+                        "Abstraction Predicate Choice");
+
+        abstrPredCol.prefWidthProperty().bind(
+                tvLatticeElemChoice.widthProperty().subtract(
+                        progVarCol.widthProperty()));
+        abstrPredCol
+                .setCellValueFactory((
+                        CellDataFeatures<AbstractionPredicateChoice, AbstractionPredicate> choice) -> choice
+                        .getValue().getAbstrPred());
+
+        tvLatticeElemChoice.getColumns().add(progVarCol);
+        tvLatticeElemChoice.getColumns().add(abstrPredCol);
+        
+        tvLatticeElemChoice.setItems(abstrPredicateChoices);
     }
 
     @FXML
