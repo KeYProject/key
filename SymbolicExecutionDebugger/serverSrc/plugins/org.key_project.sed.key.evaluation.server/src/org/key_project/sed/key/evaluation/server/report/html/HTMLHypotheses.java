@@ -74,7 +74,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                new String[] {firstTool.getLatexName(), secondTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_CorrectAnswers",
                                additionalFiles,
-                               false);
+                               false,
+                               0,
+                               1);
          sb.append("<br>");
          TestResultContainer correctnessScore = appendTestAndDiagrams(firstToolData.listOverallCorrectnessScoreRatios(), 
                                secondToolData.listOverallCorrectnessScoreRatios(), 
@@ -84,7 +86,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                new String[] {firstTool.getLatexName(), secondTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_CorrectnessScore",
                                additionalFiles,
-                               false);
+                               false,
+                               0,
+                               1);
          sb.append("<br>");
          TestResultContainer trustScore = appendTestAndDiagrams(firstToolData.listTrustScoreRatios(), 
                                secondToolData.listTrustScoreRatios(), 
@@ -94,7 +98,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                new String[] {firstTool.getLatexName(), secondTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_TrustScore",
                                additionalFiles,
-                               false);
+                               false,
+                               -2,
+                               2);
          sb.append("<br>");
          TestResultContainer partialTrustScore = appendTestAndDiagrams(firstToolData.listOverallPartialTrustScoreRatio(), 
                                secondToolData.listOverallPartialTrustScoreRatio(), 
@@ -104,7 +110,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                new String[] {firstTool.getLatexName(), secondTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_PartialTrustScore",
                                additionalFiles,
-                               false);
+                               false,
+                               -2,
+                               2);
          sb.append("<br>");
          TestResultContainer time = appendTestAndDiagrams(secondToolData.listTimeRatios(), 
                                firstToolData.listTimeRatios(), 
@@ -114,7 +122,9 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                new String[] {secondTool.getLatexName(), firstTool.getLatexName()},
                                IOUtil.validateOSIndependentFileName(entry.getKey().getName()) + "_Time",
                                additionalFiles,
-                               true);
+                               true,
+                               0,
+                               1);
          sb.append("<br>");
          appendDataSets(entry.getValue(), CollectionUtil.toList(firstTool, secondTool), sb);
          // Create paired ttest latex file
@@ -195,11 +205,13 @@ public class HTMLHypotheses implements IHTMLSectionAppender {
                                                        String[] toolLabels,
                                                        String boxplotFileName,
                                                        List<AdditionalFile> additionalFiles,
-                                                       boolean reverseOrder) {
+                                                       boolean reverseOrder,
+                                                       int xMin,
+                                                       int xMax) {
       // Append test
       TestResultContainer testContainer = appendTest(firstTool, secondTool, alpha, hypotheses, sb);
       // Create latex file with boxplot of data
-      String content = LatexUtil.createLatexBoxPlot(new double[][] {firstTool, secondTool}, toolLabels, null, 1.5, reverseOrder);
+      String content = LatexUtil.createLatexBoxPlot(new double[][] {firstTool, secondTool}, toolLabels, null, 1.5, reverseOrder, xMin, xMax);
       additionalFiles.add(new AdditionalFile(boxplotFileName + LatexUtil.TEX_FILE_EXTENSION_WITH_DOT, content.getBytes(IOUtil.DEFAULT_CHARSET)));
       return testContainer;
    }

@@ -29,7 +29,13 @@ public final class LatexUtil {
     * @param reverseOrder Reverse order of box plots?
     * @return The created latex document.
     */
-   public static String createLatexBoxPlot(double[][] allData, String[] yLabels, String xLabel, double k, boolean reverseOrder) {
+   public static String createLatexBoxPlot(double[][] allData, 
+                                           String[] yLabels, 
+                                           String xLabel, 
+                                           double k, 
+                                           boolean reverseOrder,
+                                           int xMin,
+                                           int xMax) {
       // Change order if reverse order is requested.
       if (reverseOrder) {
          double[][] allDataReverse = new double[allData.length][];
@@ -98,6 +104,9 @@ public final class LatexUtil {
          sb.append(yLabels[i]);
       }
       sb.append("%}," + StringUtil.NEW_LINE);
+      sb.append("%y=1cm," + StringUtil.NEW_LINE);
+      sb.append("%xmin=" + xMin + "," + StringUtil.NEW_LINE);
+      sb.append("%xmax=" + xMax + "," + StringUtil.NEW_LINE);
       sb.append("%]" + StringUtil.NEW_LINE);
       for (int i = 0; i < allData.length; i++) {
          sb.append("%\\addplot+[" + StringUtil.NEW_LINE);
@@ -135,6 +144,9 @@ public final class LatexUtil {
          sb.append(yLabels[i]);
       }
       sb.append("}," + StringUtil.NEW_LINE);
+      sb.append("y=1cm," + StringUtil.NEW_LINE);
+      sb.append("xmin=" + xMin + "," + StringUtil.NEW_LINE);
+      sb.append("xmax=" + xMax + "," + StringUtil.NEW_LINE);
       sb.append("]" + StringUtil.NEW_LINE);
       for (int i = 0; i < allData.length; i++) {
          sb.append("\\addplot+[boxplot={}] " + StringUtil.NEW_LINE);
