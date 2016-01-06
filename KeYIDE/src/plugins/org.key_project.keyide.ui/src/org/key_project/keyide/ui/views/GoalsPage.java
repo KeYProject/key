@@ -181,6 +181,7 @@ public class GoalsPage extends Page implements IGoalsPage {
    }
 
    
+  
    /**
     * Method handles selection changes on the proof.
     * @param e 
@@ -255,9 +256,9 @@ public class GoalsPage extends Page implements IGoalsPage {
    protected void updateSelectedNode() {
       Node mediatorNode = selectionModel.getSelectedNode();
       Object selectedNode = getSelectedNode(viewer.getSelection());
-      if (mediatorNode != selectedNode) {
+      if(mediatorNode != selectedNode) {
          viewer.setSelection(
-               SWTUtil.createSelection(proof.getGoal(mediatorNode)), true);
+                  SWTUtil.createSelection(proof.getGoal(mediatorNode)), true);
       }
 
    }
@@ -310,10 +311,12 @@ public class GoalsPage extends Page implements IGoalsPage {
       viewer.setContentProvider(contentProvider);
       viewer.setLabelProvider(labelProvider);
       viewer.setInput(proof.openGoals());
-
+      
       //allow listening to selection changes of this viewer
       getSite().setSelectionProvider(viewer);
       getSite().getPage().addSelectionListener(selectionListener);
+
+      updateSelectedNode();
    }
 
    /**
