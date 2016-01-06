@@ -153,7 +153,7 @@ public class InitialPositionTable extends PositionTable{
 	return rangeForPath(path,endPos[0]);
     }
     /**
-     * Adds a range for a keyword to the keyword list
+     * Adds a range for a keyword to the keyword list.
      * @param r Range of keyword to be added
      */
     public void addKeywordRange(Range r) {
@@ -166,7 +166,7 @@ public class InitialPositionTable extends PositionTable{
        return keywordRanges.toArray(new Range[keywordRanges.size()]);
     }
     /**
-     * Adds a range for a java block to the java block list
+     * Adds a range for a java block to the java block list.
      * @param r Range of keyword to be added
      */
     public void addJavaBlockRange(Range r) {

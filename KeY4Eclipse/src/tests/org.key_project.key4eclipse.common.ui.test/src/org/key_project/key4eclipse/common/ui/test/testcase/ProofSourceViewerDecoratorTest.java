@@ -1,6 +1,7 @@
 package org.key_project.key4eclipse.common.ui.test.testcase;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class ProofSourceViewerDecoratorTest {
    /**
     * {@link Color} used for highlighting updates.
     */
-   private Color lightblueColor = new Color(null,167,210,210);
+   private Color lightblueColor = new Color(null, 167, 210, 210);
    /**
     * Test for Syntaxhighlighting.
     * @throws Exception
@@ -263,9 +264,9 @@ public class ProofSourceViewerDecoratorTest {
          shouldRanges.add(keyKeywords);
          // check if StyleRanges are the same
          StyleRange[] isRanges = text.getStyleRanges();
-         assert (shouldRanges.size() == isRanges.length);
+         assertTrue ("The amount of highlights marked is not correct.", shouldRanges.size() == isRanges.length);
          for (int i = 0; i < shouldRanges.size(); i++) {
-            assert (shouldRanges.get(i).equals(isRanges[i]));
+            assertTrue ("Mark Nr. "+ i + " is not correct.", shouldRanges.get(i).equals(isRanges[i]));
          }
       
       } finally {

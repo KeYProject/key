@@ -997,7 +997,7 @@ public class LogicPrinter {
            BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
            IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
            
-           isKeyword = (t.op() == getHeapLDT().getWellFormed(wellFormedSort)|| t.op() == measuredByEmpty 
+           isKeyword = (t.op() == getHeapLDT().getWellFormed(wellFormedSort) || t.op() == measuredByEmpty 
                  || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
                  || t.op() == integer.getBsum());
         }
@@ -1113,11 +1113,11 @@ public class LogicPrinter {
             } else {
                 layouter.beginC(0);
             }
-            if(t.op() == getHeapLDT().getCreated()) {
+            if (t.op() == getHeapLDT().getCreated()) {
                markStartKeyword();
             }
             layouter.print("[" + opName + "(").beginC(0);
-            if(t.op() == getHeapLDT().getCreated()) {
+            if (t.op() == getHeapLDT().getCreated()) {
                markEndKeyword();
             }
             for(int i = 1; i < t.arity(); i++) {
@@ -1356,31 +1356,31 @@ public class LogicPrinter {
 
 
     public void printElementOf(Term t) throws IOException {
-	assert t.arity() == 3;
-	startTerm(3);
-
-	layouter.print("(").beginC(0);
-
-	markStartSub();
-	printTerm(t.sub(0));
-	markEndSub();
-
-	layouter.print(",").brk(1,0);
-
-	markStartSub();
-	printTerm(t.sub(1));
-	markEndSub();
-
-	layouter.print(")").end();
-	layouter.print(" ");
-	markStartKeyword();
-	layouter.print("\\in");
-	markEndKeyword();
-	layouter.print(" ");
-
-	markStartSub();
-	printTerm(t.sub(2));
-	markEndSub();
+   	assert t.arity() == 3;
+   	startTerm(3);
+   
+   	layouter.print("(").beginC(0);
+   
+   	markStartSub();
+   	printTerm(t.sub(0));
+   	markEndSub();
+   
+   	layouter.print(",").brk(1,0);
+   
+   	markStartSub();
+   	printTerm(t.sub(1));
+   	markEndSub();
+   
+   	layouter.print(")").end();
+   	layouter.print(" ");
+   	markStartKeyword();
+   	layouter.print("\\in");
+   	markEndKeyword();
+   	layouter.print(" ");
+   
+   	markStartSub();
+   	printTerm(t.sub(2));
+   	markEndSub();
     }
 
     public void printElementOf(Term t, String symbol) throws IOException {
@@ -1420,6 +1420,7 @@ public class LogicPrinter {
      * @param t    whole term
      * @param sub  the subterm to be printed
      * @param ass  the associativity for the subterm
+     * @throws IOException
      */
     public void printPrefixTerm(String name, Term t,
                                 Term sub,int ass)
@@ -1497,6 +1498,7 @@ public class LogicPrinter {
      * @param t    whole term
      * @param r    the right subterm
      * @param assRight associativity for right subterm
+     * @throws IOException
      * */
     public void printInfixTermContinuingBlock(Term l,int assLeft,
                                               String name, Term t,
@@ -1656,33 +1658,33 @@ public class LogicPrinter {
 
         layouter.beginC ( 0 ); 
         markStartKeyword();
-        layouter.print ( keyword );
+        layouter.print(keyword);
         markEndKeyword();
         if ( t.varsBoundHere ( 0 ).size () > 0 ) {
             layouter.print ( " " );
             printVariables ( t.varsBoundHere ( 0 ), quantifiableVariablePrintMode );
         }
 
-        layouter.print( " (" );
-        markStartSub ();
-        printTerm ( t.sub ( 0 ) );
-        markEndSub ();
-        layouter.print ( ")" );
+        layouter.print(" (");
+        markStartSub();
+        printTerm (t.sub ( 0 ));
+        markEndSub();
+        layouter.print(")");
 
         for (int i = 1; i < t.arity(); ++i) {
             layouter.brk(1, 3);
             if (i == 1) {
-                layouter.print ( " " );
+                layouter.print(" ");
                 markStartKeyword();
-                layouter.print ( "\\then" );
+                layouter.print("\\then");
                 markEndKeyword();
-                layouter.print ( " (" );
+                layouter.print(" (");
             } else {
-                layouter.print (" ");
+                layouter.print(" ");
                 markStartKeyword();
-                layouter.print ( "\\else" );
+                layouter.print("\\else");
                 markEndKeyword();
-                layouter.print (" (");
+                layouter.print(" (");
             }
             markStartSub ();
             printTerm ( t.sub ( i ) );
@@ -1778,6 +1780,7 @@ public class LogicPrinter {
      * marks it as a nullary term.
      * @param t constant as term to be printed
      * @param s name of the constant
+     * @throws IOException
      */
     public void printConstant(Term t, String s)
         throws IOException {
@@ -2096,13 +2099,13 @@ public class LogicPrinter {
         MARK_START_UPDATE,
     /** Mark the end of an update.*/
         MARK_END_UPDATE,
-        /** Mark the beginning of a keyword */
+        /** Mark the beginning of a keyword. */
         MARK_START_KEYWORD,
-        /** Mark the end of a keyword */
+        /** Mark the end of a keyword. */
         MARK_END_KEYWORD,
-        /** Mark the beginning of a java block */
+        /** Mark the beginning of a java block. */
         MARK_START_JAVABLOCK,
-        /** Mark the end of a java block */
+        /** Mark the end of a java block. */
         MARK_END_JAVABLOCK,
     }
 
@@ -2365,10 +2368,10 @@ public class LogicPrinter {
         /** Remembers the start of an update to create a range */
         private final Stack<Integer> updateStarts = new Stack<Integer>();
         
-        /** Remembers the start of a keyword to create a range */
+        /** Remembers the start of a keyword to create a range. */
         private final Stack<Integer> keywordStarts = new Stack<Integer>();
         
-        /** Remembers the start of a java block to create a range */
+        /** Remembers the start of a java block to create a range. */
         private final Stack<Integer> javaBlockStarts = new Stack<Integer>();
 
 
