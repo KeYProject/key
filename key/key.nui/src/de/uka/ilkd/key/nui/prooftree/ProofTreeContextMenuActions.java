@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.nui.prooftree;
 
+import de.uka.ilkd.key.nui.controller.NUIController;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TreeItem;
 
 /**

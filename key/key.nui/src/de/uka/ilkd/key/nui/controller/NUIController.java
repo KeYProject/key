@@ -1,11 +1,14 @@
 package de.uka.ilkd.key.nui.controller;
 
+import java.net.URL;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.nui.ComponentFactory;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
@@ -25,7 +28,7 @@ import javafx.scene.control.ToggleGroup;
  * @author Stefan Pilot
  *
  */
-public class NUIController {
+public class NUIController implements Initializable{
 
     /**
      * Stores the position of components added to the SplitPane
@@ -37,6 +40,24 @@ public class NUIController {
      */
     private ComponentFactory componentFactory = new ComponentFactory(
             "components/");
+    /**
+     * TODO
+     * 
+     */
+    public enum Place{
+        LEFT,
+        MIDDLE,
+        RIGHT,
+        BOTTOM,
+        HIDDEN
+    }
+    
+    private static NUIController instance; // TODO this is ugly
+    
+    public static NUIController getInstance() {
+        return instance; // TODO this is ugly
+    }
+
 
     // Definition of GUI fields
     @FXML
@@ -73,15 +94,16 @@ public class NUIController {
     /**
      * Loads the default components of the GUI
      */
-    public void initialize() {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         // Load default components
-        componentFactory.createComponent("treeView", left, "treeView.fxml",
-                posComponent);
-        componentFactory.createComponent("proofView", right, "proofView.fxml",
-                posComponent);
+        createComponent("treeView", left, "treeView.fxml");
+        createComponent("proofView", right, "proofView.fxml");
         // Select appropriate menu item entries
         toggleGroup2.selectToggle(toggleGroup2.getToggles().get(3));
         toggleGroup3.selectToggle(toggleGroup3.getToggles().get(1));
+        
+        instance = this; // TODO this is ugly
     }
 
     /**
@@ -118,7 +140,35 @@ public class NUIController {
         RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
         String componentName = (String) // e.g. "treeView", "proofView"
         clickedItem.getParentMenu().getProperties().get("componentName");
+        
+        Place place;
+        
+        switch (clickedItem.getText()) {
+        case "left":
+            place = Place.LEFT; break;
+        case "middle":
+            place = Place.MIDDLE; break;
+        case "right":
+            place = Place.RIGHT; break;
+        case "bottom":
+            place = Place.BOTTOM; break;
+        default: 
+            place = Place.HIDDEN; break;
+        }
 
+        String componentResource = (String) clickedItem.getParentMenu()
+                .getProperties().get("componentResource");
+        
+        createComponent(componentName, place, componentResource);
+    }
+    
+    /**
+     * TODO
+     * @param componentName
+     * @param place
+     * @param componentResource
+     */
+    public void createComponent(String componentName, Place place, String componentResource){
         // Does the component already exist?
         // Then the user wants either to change change its place or to hide it
         if (posComponent.containsKey(componentName)) {
@@ -131,28 +181,28 @@ public class NUIController {
                 }
             }
 
-            switch (clickedItem.getText()) {
+            switch (place) {
             // where to does the User want to move the component?
             // Add Component to the respective Pane
             // (the list's observer will automatically remove it
             // from the Pane where it currently is listed)
             // and update its position in the posComponent Map.
-            case "left":
+            case LEFT:
                 left.getChildren().add(existingcomponent);
                 posComponent.replace(componentName, left);
                 break;
 
-            case "middle":
+            case MIDDLE:
                 middle.getChildren().add(existingcomponent);
                 posComponent.replace(componentName, middle);
                 break;
 
-            case "right":
+            case RIGHT:
                 right.getChildren().add(existingcomponent);
                 posComponent.replace(componentName, right);
                 break;
 
-            case "bottom":
+            case BOTTOM:
                 bottom.getChildren().add(existingcomponent);
                 posComponent.replace(componentName, bottom);
                 break;
@@ -167,28 +217,19 @@ public class NUIController {
 
         }
         else { // Component did not already exist, thus it must be created
-
-            String componentResource = (String) clickedItem.getParentMenu()
-                    .getProperties().get("componentResource");
-            System.out.println("componentName: " + componentName);
-            System.out.println("componentResource: " + componentResource);
-            switch (clickedItem.getText()) {
+            switch (place) {
             // where to does the User want to move the component?
-            case "left":
-                componentFactory.createComponent(componentName, left,
-                        componentResource, posComponent);
+            case LEFT:
+                createComponent(componentName, left, componentResource);
                 break;
-            case "middle":
-                componentFactory.createComponent(componentName, middle,
-                        componentResource, posComponent);
+            case MIDDLE:
+                createComponent(componentName, middle, componentResource);
                 break;
-            case "right":
-                componentFactory.createComponent(componentName, right,
-                        componentResource, posComponent);
+            case RIGHT:
+                createComponent(componentName, right, componentResource);
                 break;
-            case "bottom":
-                componentFactory.createComponent(componentName, bottom,
-                        componentResource, posComponent);
+            case BOTTOM:
+                createComponent(componentName, bottom, componentResource);
             default:
                 break;
             }

@@ -1,12 +1,17 @@
 package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
 import javafx.util.Callback;
@@ -17,8 +22,7 @@ import javafx.util.Callback;
  * @author  Matthias Schultheis
  * @version 1.1
  */
-public class TreeViewController {
-
+public class TreeViewController implements Initializable{
     /**
      * The proofTree view of the GUI.
      */
@@ -33,13 +37,14 @@ public class TreeViewController {
     /**
      * Initialization method for scene; loads the default proof
      */
-    public void initialize() {
-    	
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+    	TreeViewController c = this;
     	// set cell factory for rendering cells
-    	proofTreeView.setCellFactory(new Callback<TreeView<NUINode>,TreeCell<NUINode>>(){
+    	proofTreeView.setCellFactory(new Callback <  TreeView<NUINode>, TreeCell<NUINode>  >(){
             @Override
             public TreeCell<NUINode> call(TreeView<NUINode> p) {
-                return new ProofTreeCell();
+                return new ProofTreeCell(c);
             }
         });
     	
@@ -56,6 +61,11 @@ public class TreeViewController {
         // load and display proof in visualizer
         Proof p = loadProof("gcd.twoJoins.proof");
         displayProof(p);
+    }
+    
+    public void handleOpenSearchView(){
+        NUIController.getInstance().createComponent(".searchView", NUIController.Place.LEFT, ".searchView.fxml");
+     // TODO this is ugly
     }
 
     /**

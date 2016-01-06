@@ -12,11 +12,11 @@ import javafx.stage.Stage;
  *
  */
 public class NUI extends Application {
-
+        
     public static void main(String[] args) {
         launch(args);
     }
-
+    
     /**
      * When program is starting method "start" is called
      */
