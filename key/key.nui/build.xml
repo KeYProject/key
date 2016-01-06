@@ -33,7 +33,7 @@
 	</condition>
 	<!-- ============================= -->
 	
-	<!-- Defines a new task -->
+	<!-- Includes ANT-CONTRIB library -->
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<fileset dir="${basedir}/ant-lib/" />
@@ -92,8 +92,11 @@
 		<var name="i" value="0" />
 		<for param="file">
 			<path>
-				<!--  For each of the .fxml-Files in the components folder -->
-				<fileset dir="${components}" includes="*.fxml" />
+				<!--  For each .fxml-File in the components folder that is not a dotfile-->
+				<fileset dir="${components}">
+				  <include name="*.fxml"/>
+				  <exclude name=".*"/>
+				</fileset>
 			</path>
 			<sequential>
 				<var name="filename" unset="true" />
