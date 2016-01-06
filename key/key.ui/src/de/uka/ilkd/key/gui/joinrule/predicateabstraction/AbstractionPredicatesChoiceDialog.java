@@ -175,6 +175,11 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         final Services services = goal.proof().getServices();
 
+        final String progVarsStr =
+                goal.getGlobalProgVars().toString().replace(",", ", ");
+        Platform.runLater(() -> ctrl.setAvailableProgVarsInfoTxt(progVarsStr
+                .substring(1, progVarsStr.length() - 1)));
+
         ctrl.currentPlaceholderProperty().addListener(
                 (ObservableValue<? extends String> observable, String oldValue,
                         String newValue) -> {

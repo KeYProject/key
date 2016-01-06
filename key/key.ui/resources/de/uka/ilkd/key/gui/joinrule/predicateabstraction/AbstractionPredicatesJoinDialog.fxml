@@ -91,6 +91,16 @@
                                              <center>
                                                 <ListView id="lvPredicates" fx:id="lvPredicates" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                                              </center>
+                                             <bottom>
+                                                <AnchorPane BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Label fx:id="lblAvailableProgVars" text="Available Program Variables: " wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                   </children>
+                                                   <BorderPane.margin>
+                                                      <Insets top="10.0" />
+                                                   </BorderPane.margin>
+                                                </AnchorPane>
+                                             </bottom>
                                           </BorderPane>
                                        </children>
                                     </AnchorPane>

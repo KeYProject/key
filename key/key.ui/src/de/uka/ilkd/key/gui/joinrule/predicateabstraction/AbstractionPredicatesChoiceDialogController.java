@@ -34,6 +34,7 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -70,6 +71,9 @@ public class AbstractionPredicatesChoiceDialogController {
 
     @FXML
     private ListView<String> lvPredicates;
+    
+    @FXML
+    private Label lblAvailableProgVars;
 
     @FXML
     private WebView wvProblems;
@@ -79,6 +83,21 @@ public class AbstractionPredicatesChoiceDialogController {
 
     @FXML
     private AnchorPane mainPane;
+    
+    // ///////////////////////////// //
+    // ////////// SETTERS ////////// //
+    // ///////////////////////////// //
+
+    /**
+     * Sets the text for the "available program variables" label.
+     * 
+     * @param progVarsStr
+     *            A string representation of the available program variables.
+     */
+    public void setAvailableProgVarsInfoTxt(String progVarsStr) {
+        lblAvailableProgVars.setText("Available Program Variables: "
+                + progVarsStr);
+    }
 
     // ///////////////////////////// //
     // //////// PROPERTIES ///////// //
