@@ -15,7 +15,7 @@ public class NUIBranchNode extends NUINode {
 	/**
 	 * The parent node of the branch node.
 	 */
-	private de.uka.ilkd.key.proof.Node parent;
+	private de.uka.ilkd.key.proof.Node proofParentNode;
 
 	/**
 	 * A list of children of the branch node.
@@ -28,8 +28,8 @@ public class NUIBranchNode extends NUINode {
 	 * @param parent
 	 *            The related parent node of the branch node.
 	 */
-	public NUIBranchNode(de.uka.ilkd.key.proof.Node parent) {
-		this.parent = parent;
+	public NUIBranchNode(de.uka.ilkd.key.proof.Node proofParentNode) {
+		this.proofParentNode = proofParentNode;
 		children = new LinkedList<NUINode>();
 	}
 
@@ -38,8 +38,8 @@ public class NUIBranchNode extends NUINode {
 	 * 
 	 * @return parent The parent node of the branch node.
 	 */
-	public de.uka.ilkd.key.proof.Node getParent() {
-		return parent;
+	public de.uka.ilkd.key.proof.Node getProofParentNode() {
+		return proofParentNode;
 	}
 
 	/**
@@ -48,8 +48,8 @@ public class NUIBranchNode extends NUINode {
 	 * @param parent
 	 *            The node to set as parent node of the branch node.
 	 */
-	public void setParent(de.uka.ilkd.key.proof.Node parent) {
-		this.parent = parent;
+	public void setProofParentNode(de.uka.ilkd.key.proof.Node parent) {
+		this.proofParentNode = parent;
 	}
 
 	/**

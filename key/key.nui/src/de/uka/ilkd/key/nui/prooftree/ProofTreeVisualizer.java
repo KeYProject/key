@@ -111,6 +111,7 @@ public class ProofTreeVisualizer {
 		}
 		// Add created node to parent
 		parent.addChild(newNode);
+		newNode.setParent(parent);
 
 		// Set NUI fields ------------------------------------------------------
 		assignNUIFields(proofNode, p, newNode);
@@ -139,6 +140,7 @@ public class ProofTreeVisualizer {
 
 				// add node to parent
 				parent.addChild(branchNode);
+				branchNode.setParent(parent);
 
 				// call function recursively with current child
 				addProofTreeToNUITree(child, branchNode);
@@ -162,10 +164,12 @@ public class ProofTreeVisualizer {
 		if (proofNode.leaf()) {
 			if (g != null) {
 				// node has a goal
-				newNode.setLinked(g.isLinked());
-				newNode.setInteractive(!g.isAutomatic());
-				newNode.setLinked(g.isLinked());
 				newNode.setClosed(proofNode.isClosed());
+				newNode.setInteractive(!g.isAutomatic());
+				
+				if(g.isLinked()) {
+					setNUINodeLinkedTrue(newNode);
+				}
 			} else {
 				// node has no open goal -> node must be closed
 				newNode.setClosed(true);
@@ -180,31 +184,19 @@ public class ProofTreeVisualizer {
 		newNode.setLabel(nodeName);
 		newNode.setHasNotes(proofNode.getNodeInfo().getNotes() != null);
 		newNode.setActive(proofNode.getNodeInfo().getActiveStatement() != null);
+	}
 
-		// TODO: Implement logic for linked (non-leaf) Nodes
-		// see ProofTreeView (line 712-735)
+	/**
+	 * sets for a node interactive = true and propagates this
+	 * information to its parents
+	 * @param newNode the node for that interactive should be set true
+	 */
+	private void setNUINodeLinkedTrue(NUINode newNode) {
+		newNode.setLinked(true);
 		
-		if (!newNode.isClosed() ) {
-			class FindGoalVisitor implements ProofVisitor {
-        		private boolean isLinked = false;
-        		public boolean isLinked() {
-        			return this.isLinked;
-        		}
-        		@Override
-				public void visit(Proof proof, Node visitedNode) {
-					Goal g;
-					if ((g = proof.getGoal(visitedNode)) != null &&
-							g.isLinked()) {
-						this.isLinked = true;
-					}
-				}
-        	}
-        	FindGoalVisitor v = new FindGoalVisitor();
-        	proof.breadthFirstSearch(proofNode, v);
-        	if (v.isLinked()) {
-        		newNode.setLinked(true);
-        	}
-		}
+		NUINode parent = newNode.getParent();
+		if(parent != null)
+			setNUINodeLinkedTrue(parent);
 	}
 
 	/**

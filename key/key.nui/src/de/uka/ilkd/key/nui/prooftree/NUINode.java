@@ -26,6 +26,7 @@ public abstract class NUINode {
     private boolean active = false;
     private boolean hasNotes = false;
     private String serialNumber;
+    private NUINode parent = null;
 
     /**
      * Returns the serial number of the node. </br>
@@ -188,4 +189,18 @@ public abstract class NUINode {
     public void setLabel(String label) {
         this.label = label;
     }
+
+	/**
+	 * @return the parent
+	 */
+	public NUINode getParent() {
+		return parent;
+	}
+
+	/**
+	 * @param parent the parent to set
+	 */
+	public void setParent(NUINode parent) {
+		this.parent = parent;
+	}
 }
