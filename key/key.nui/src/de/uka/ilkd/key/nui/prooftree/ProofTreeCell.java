@@ -38,15 +38,12 @@ public class ProofTreeCell extends TreeCell<NUINode> {
      * the icon that will be displayed left next to the label
      */
 	private ImageView icon;
-
-    private TreeViewController treeViewController;
 	
 	/**
 	 * The constructor of the ProofTreeCell
 	 */
-	public ProofTreeCell(TreeViewController treeViewController) {
+	public ProofTreeCell() {
 		icf = new IconFactory(ICON_SIZE, ICON_SIZE);
-		this.treeViewController = treeViewController;
 	}
 	
 	/**
@@ -63,7 +60,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 	protected void updateItem(NUINode item, boolean empty) {
 		super.updateItem(item, empty);
 		
-		setContextMenu(new ProofTreeContextMenu(item, getTreeItem(), treeViewController));
+		setContextMenu(new ProofTreeContextMenu(item, getTreeItem()));
 		
 		// if null node, display nothing
 		if(item == null) {

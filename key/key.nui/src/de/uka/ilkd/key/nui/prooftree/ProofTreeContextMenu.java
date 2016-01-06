@@ -30,8 +30,6 @@ public class ProofTreeContextMenu extends ContextMenu {
      */
     TreeItem<NUINode> treeItem;
 
-    TreeViewController treeViewController;
-
     /**
      * puts in the contextmenu
      * 
@@ -40,10 +38,9 @@ public class ProofTreeContextMenu extends ContextMenu {
      * @param treeItem
      *            the treeItem of node
      */
-    public ProofTreeContextMenu(NUINode node, TreeItem<NUINode> treeItem, TreeViewController treeViewController) {
+    public ProofTreeContextMenu(NUINode node, TreeItem<NUINode> treeItem) {
         this.node = node;
         this.treeItem = treeItem;
-        this.treeViewController = treeViewController;
 
         addMenuItemExpandAll();
         addMenuItemCollapseAll();
@@ -74,7 +71,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     private void addMenuItemSearch() {
         MenuItem mISearch = new MenuItem("Search...");
         this.getItems().add(mISearch);
-        mISearch.setOnAction(t -> treeViewController.handleOpenSearchView());
+        mISearch.setOnAction(t -> NUIController.getInstance().createComponent(".searchView", NUIController.Place.LEFT, ".searchView.fxml"));
     }
 
 }

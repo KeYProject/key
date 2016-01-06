@@ -33,18 +33,25 @@ public class TreeViewController implements Initializable{
      * the visualizer for displaying a proof tree
      */
 	ProofTreeVisualizer visualizer;
+	
+	/**
+	 * TODO
+	 */
+	private static TreeViewController instance;
 
     /**
      * Initialization method for scene; loads the default proof
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-    	TreeViewController c = this;
+        
+    	instance = this;
+
     	// set cell factory for rendering cells
     	proofTreeView.setCellFactory(new Callback <  TreeView<NUINode>, TreeCell<NUINode>  >(){
             @Override
             public TreeCell<NUINode> call(TreeView<NUINode> p) {
-                return new ProofTreeCell(c);
+                return new ProofTreeCell();
             }
         });
     	
@@ -101,5 +108,18 @@ public class TreeViewController implements Initializable{
             e.printStackTrace();
             return null;
         }
+    }
+    /**
+     * TODO
+     * @return
+     */
+    public static TreeViewController getInstance(){
+        return instance;
+    }
+    
+    public void search(String term){
+      //  for(){
+            
+      //  }
     }
 }
