@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,7 +25,12 @@ public class SearchViewController implements Initializable {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-       SearchTextField.requestFocus();
+       Platform.runLater(new Runnable() {
+           @Override
+           public void run() {
+               SearchTextField.requestFocus();
+           }
+       });
        SearchButton.setDisable(false);
     }
     

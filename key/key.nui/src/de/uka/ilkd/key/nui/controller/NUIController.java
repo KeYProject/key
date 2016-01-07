@@ -19,6 +19,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 /**
  * Controller for the main GUI which is displayed when the program was started
@@ -33,7 +35,7 @@ public class NUIController implements Initializable {
     /**
      * Stores the position of components added to the SplitPane
      */
-    private HashMap<String, Pane> posComponent = new HashMap<String, Pane>();
+    private HashMap<String, Place> placeComponent = new HashMap<>();
 
     /**
      * Factory to create GUI components
@@ -92,8 +94,8 @@ public class NUIController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Load default components
-        createComponent("treeView", left, "treeView.fxml");
-        createComponent("proofView", right, "proofView.fxml");
+        createComponent("treeView", Place.LEFT, "treeView.fxml");
+        createComponent("proofView", Place.RIGHT, "proofView.fxml");
         // Select appropriate menu item entries
         toggleGroup2.selectToggle(toggleGroup2.getToggles().get(3));
         toggleGroup3.selectToggle(toggleGroup3.getToggles().get(1));
@@ -153,12 +155,24 @@ public class NUIController implements Initializable {
     }
 
     /**
-     * Creates a component (yay for low coupling!) TODO expand this javadoc
+     * TODO
+     * 
+     * @param p
+     * @return
      */
-    protected void createComponent(String id, Pane location, String resource) {
-        posComponent.put(id, location);
-        Parent newComponent = componentFactory.createComponent(id, resource);
-        location.getChildren().add(newComponent);
+    protected Pane getPane(Place p) {
+        switch (p) {
+        case MIDDLE:
+            return middle;
+        case BOTTOM:
+            return bottom;
+        case LEFT:
+            return left;
+        case RIGHT:
+            return right;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -167,72 +181,69 @@ public class NUIController implements Initializable {
      * @param componentName
      * @param place
      * @param componentResource
-     * @throws IllegalArgumentException The Component componentName already exists in the Place place.
+     * @throws IllegalArgumentException
+     *             The Component componentName already exists in the Place
+     *             place.
      */
-    public void createComponent(String componentName, Place place, String componentResource) throws IllegalArgumentException {
+    public void createComponent(String componentName, Place place, String componentResource)
+            throws IllegalArgumentException {
         // Does the component already exist?
         // Then the user wants either to change change its place or to hide it
-        if (posComponent.containsKey(componentName)) {
+        if (placeComponent.containsKey(componentName)) {
 
             Node existingcomponent = null;
-            for (Node n : posComponent.get(componentName).getChildren()) {
+            for (Node n : getPane(placeComponent.get(componentName)).getChildren()) {
                 if (n.getId().equals(componentName)) {
                     existingcomponent = n;
                     break;
                 }
             }
-
-            switch (place) {
-            // where to does the User want to move the component?
             // Add Component to the respective Pane
             // (the list's observer will automatically remove it
             // from the Pane where it currently is listed)
             // and update its position in the posComponent Map.
-            case LEFT:
-                left.getChildren().add(existingcomponent);
-                posComponent.replace(componentName, left);
-                break;
-
-            case MIDDLE:
-                middle.getChildren().add(existingcomponent);
-                posComponent.replace(componentName, middle);
-                break;
-
-            case RIGHT:
-                right.getChildren().add(existingcomponent);
-                posComponent.replace(componentName, right);
-                break;
-
-            case BOTTOM:
-                bottom.getChildren().add(existingcomponent);
-                posComponent.replace(componentName, bottom);
-                break;
-
-            default: // hide was chosen, delete component and remove it from the
-                     // map
-                posComponent.get(componentName).getChildren().remove(existingcomponent);
-                posComponent.remove(componentName);
+            if (place == Place.HIDDEN) {
+                getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
+                placeComponent.remove(componentName);
                 statustext.setText("View " + componentName + " hidden.");
+            }
+            else {
+                getPane(place).getChildren().add(existingcomponent);
+                placeComponent.replace(componentName, place);
             }
 
         }
         else { // Component did not already exist, thus it must be created
-            switch (place) {
-            // where to does the User want to move the component?
-            case LEFT:
-                createComponent(componentName, left, componentResource);
-                break;
-            case MIDDLE:
-                createComponent(componentName, middle, componentResource);
-                break;
-            case RIGHT:
-                createComponent(componentName, right, componentResource);
-                break;
-            case BOTTOM:
-                createComponent(componentName, bottom, componentResource);
-            default:
-                break;
+            placeComponent.put(componentName, place);
+            Parent newComponent = componentFactory.createComponent(componentName, componentResource);
+            getPane(place).getChildren().add(newComponent);
+        }
+    }
+
+    /**
+     * TODO
+     * 
+     * @param k
+     */
+    public void handleKeyPressed(KeyEvent k) {
+        switch (k.getCode()) {
+        case ESCAPE:
+            createComponent(".searchView", Place.HIDDEN, ".searchView.fxml");
+            break;
+        case F:
+            if (k.isControlDown() && placeComponent.containsKey("treeView")) {
+                Place p = placeComponent.get("treeView");
+
+                try {
+                    createComponent(".searchView", p, ".searchView.fxml");
+                }
+                catch (IllegalArgumentException e) { // SearchView already exists
+                    // TODO move Focus to the SearchView text field
+                }
             }
+            break;
+        default:
+            break;
         }
     }
 }
