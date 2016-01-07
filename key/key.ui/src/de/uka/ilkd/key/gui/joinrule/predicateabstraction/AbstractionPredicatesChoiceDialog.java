@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -250,6 +251,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                     }
 
                     registeredPredicates.add(parsed);
+                    
+                    ctrl.availableAbstractionPreds.clear();
+                    ctrl.availableAbstractionPreds.add(Optional.empty());
+                    for (AbstractionPredicate pred : registeredPredicates) {
+                        ctrl.availableAbstractionPreds.add(Optional.of(pred));
+                    }
                 }
             }
         });
@@ -323,6 +330,11 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         AbstractionPredicatesChoiceDialog dialog =
                 new AbstractionPredicatesChoiceDialog(proof.openGoals().head());
+        
+        dialog.ctrl.abstrPredicateChoices.add(new AbstractionPredicateChoice(
+                new LocationVariable(new ProgramElementName("test"), Sort.ANY),
+                Optional.empty()));
+
         dialog.setVisible(true);
     }
 

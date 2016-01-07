@@ -24,6 +24,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ListChangeListener.Change;
@@ -40,18 +41,24 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.util.StringConverter;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * The JavaFX controller for the predicates choice dialog GUI.
@@ -85,12 +92,19 @@ public class AbstractionPredicatesChoiceDialogController {
 
     @FXML
     private WebView wvInfo;
+    
+    @FXML
+    private TitledPane tpLatticeElemChoice;
 
     @FXML
     private TableView<AbstractionPredicateChoice> tvLatticeElemChoice;
 
     @FXML
     private AnchorPane mainPane;
+    
+    // ///////////////////////////// //
+    // /////// PRIVATE FIELDS ////// //
+    // ///////////////////////////// //
 
     // ///////////////////////////// //
     // ////////// SETTERS ////////// //
@@ -128,9 +142,14 @@ public class AbstractionPredicatesChoiceDialogController {
             .observableArrayList();
 
     // Observable list encapsulating the abstraction predicate choices
-    // by the user. May be changed from an outside controller and is
-    // watched by this class.
+    // by the user. May be changed from an outside controller.
     final ObservableList<AbstractionPredicateChoice> abstrPredicateChoices =
+            FXCollections.observableArrayList();
+
+    // Observable list encapsulating the available parsed abstraction predicates
+    // for the manual choice of predicates by the user. May be changed from an
+    // outside controller.
+    final ObservableList<Optional<AbstractionPredicate>> availableAbstractionPreds =
             FXCollections.observableArrayList();
 
     // Property for the chosen lattice type
@@ -303,33 +322,14 @@ public class AbstractionPredicatesChoiceDialogController {
 
         placeholdersProblemsListData.addListener(changeListener);
         predicateProblemsListData.addListener(changeListener);
-
-        final TableColumn<AbstractionPredicateChoice, ProgramVariable> progVarCol =
-                new TableColumn<AbstractionPredicateChoice, ProgramVariable>(
-                        "Program Variable");
-
-        progVarCol.setPrefWidth(180);
-        progVarCol
-                .setCellValueFactory((
-                        CellDataFeatures<AbstractionPredicateChoice, ProgramVariable> choice) -> choice
-                        .getValue().getProgVar());
-
-        final TableColumn<AbstractionPredicateChoice, AbstractionPredicate> abstrPredCol =
-                new TableColumn<AbstractionPredicateChoice, AbstractionPredicate>(
-                        "Abstraction Predicate Choice");
-
-        abstrPredCol.prefWidthProperty().bind(
-                tvLatticeElemChoice.widthProperty().subtract(
-                        progVarCol.widthProperty()));
-        abstrPredCol
-                .setCellValueFactory((
-                        CellDataFeatures<AbstractionPredicateChoice, AbstractionPredicate> choice) -> choice
-                        .getValue().getAbstrPred());
-
-        tvLatticeElemChoice.getColumns().add(progVarCol);
-        tvLatticeElemChoice.getColumns().add(abstrPredCol);
         
-        tvLatticeElemChoice.setItems(abstrPredicateChoices);
+        tpLatticeElemChoice.expandedProperty().addListener(
+                (ObservableValue<? extends Boolean> e, Boolean oldValue,
+                        Boolean newValue) -> {
+                            if (newValue && !oldValue) {
+                                populateAbstrPredChoiceTable();
+                            }
+                });
     }
 
     @FXML
@@ -442,6 +442,95 @@ public class AbstractionPredicatesChoiceDialogController {
     @FXML
     private void disjunctivePredicatesLatticeChosen(ActionEvent e) {
         setLatticeType(DisjunctivePredicateAbstractionLattice.class);
+    }
+    
+    // ///////////////////////////// //
+    // /// OTHER PRIVATE METHODS /// //
+    // ///////////////////////////// //
+    
+    private void populateAbstrPredChoiceTable() {
+        final TableColumn<AbstractionPredicateChoice, ProgramVariable> progVarCol =
+                new TableColumn<AbstractionPredicateChoice, ProgramVariable>(
+                        "Program Variable");
+
+        progVarCol.setPrefWidth(180);
+        progVarCol.setEditable(false);
+        progVarCol
+                .setCellValueFactory((
+                        CellDataFeatures<AbstractionPredicateChoice, ProgramVariable> choice) -> choice
+                        .getValue().getProgVar());
+
+        final TableColumn<AbstractionPredicateChoice, Optional<AbstractionPredicate>> abstrPredCol =
+                new TableColumn<AbstractionPredicateChoice, Optional<AbstractionPredicate>>(
+                        "Domain Element");
+
+        abstrPredCol.prefWidthProperty().bind(
+                tvLatticeElemChoice.widthProperty().subtract(
+                        progVarCol.widthProperty().add(2)));
+        abstrPredCol.setEditable(true);
+        
+        abstrPredCol
+                .setCellValueFactory((
+                        CellDataFeatures<AbstractionPredicateChoice, Optional<AbstractionPredicate>> choice) -> choice
+                        .getValue().getAbstrPred());
+        
+        abstrPredCol.setCellFactory(ComboBoxTableCell
+                .forTableColumn(new StringConverter<Optional<AbstractionPredicate>>() {
+                    @Override
+                    public String toString(Optional<AbstractionPredicate> object) {
+                        return abstrPredToStringRepr(object);
+                    }
+
+                    @Override
+                    public Optional<AbstractionPredicate> fromString(String string) {
+                        for (Optional<AbstractionPredicate> pred : availableAbstractionPreds) {
+                            if (toString(pred).equals(string)) {
+                                return pred;
+                            }
+                        }
+                        
+                        return null;
+                    }
+                }, availableAbstractionPreds));
+
+        tvLatticeElemChoice.getColumns().clear();
+        
+        tvLatticeElemChoice.getColumns().add(progVarCol);
+        tvLatticeElemChoice.getColumns().add(abstrPredCol);
+
+        tvLatticeElemChoice.setItems(abstrPredicateChoices);
+        tvLatticeElemChoice.setPlaceholder(new Label("No content available."));
+
+        abstrPredicateChoices.addListener((
+                Change<? extends AbstractionPredicateChoice> event) -> {
+            tvLatticeElemChoice.setItems(abstrPredicateChoices);
+        });
+    }
+    
+    /**
+     * A String representation of an abstraction predicate, that is a "pair"
+     * expression of the placeholder variable and the predicate term of the form
+     * "(PROGVAR,PREDTERM)".
+     * 
+     * @param abstrPred
+     *            The abstraction predicate to convert into a String
+     *            representation.
+     * @return A String representation of the given abstraction predicate.
+     */
+    private String abstrPredToStringRepr(Optional<AbstractionPredicate> abstrPred) {
+        if (abstrPred == null) {
+            return "";
+        }
+        
+        if (!abstrPred.isPresent()) {
+            return "None.";
+        }
+        
+        Pair<LocationVariable, Term> predFormWithPh =
+                abstrPred.get().getPredicateFormWithPlaceholder();
+
+        return "(" + predFormWithPh.first.toString() + ","
+                + predFormWithPh.second.toString() + ")";
     }
 
     // ///////////////////////////// //
