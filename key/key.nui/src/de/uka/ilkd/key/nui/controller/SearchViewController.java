@@ -34,7 +34,6 @@ public class SearchViewController implements Initializable {
     
     public void handleNextButton(ActionEvent e){
         treeViewController.gotoNextSearchResult();
-        System.out.println("'>' Button was pressed");
     }
     
     public void handlePreviousButton(ActionEvent e){

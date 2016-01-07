@@ -28,7 +28,7 @@ import javafx.scene.control.ToggleGroup;
  * @author Stefan Pilot
  *
  */
-public class NUIController implements Initializable{
+public class NUIController implements Initializable {
 
     /**
      * Stores the position of components added to the SplitPane
@@ -38,26 +38,21 @@ public class NUIController implements Initializable{
     /**
      * Factory to create GUI components
      */
-    private ComponentFactory componentFactory = new ComponentFactory(
-            "components/");
+    private ComponentFactory componentFactory = new ComponentFactory("components/");
+
     /**
      * TODO
      * 
      */
-    public enum Place{
-        LEFT,
-        MIDDLE,
-        RIGHT,
-        BOTTOM,
-        HIDDEN
+    public enum Place {
+        LEFT, MIDDLE, RIGHT, BOTTOM, HIDDEN
     }
-    
+
     private static NUIController instance; // TODO this is ugly
-    
+
     public static NUIController getInstance() {
         return instance; // TODO this is ugly
     }
-
 
     // Definition of GUI fields
     @FXML
@@ -102,7 +97,7 @@ public class NUIController implements Initializable{
         // Select appropriate menu item entries
         toggleGroup2.selectToggle(toggleGroup2.getToggles().get(3));
         toggleGroup3.selectToggle(toggleGroup3.getToggles().get(1));
-        
+
         instance = this; // TODO this is ugly
     }
 
@@ -123,6 +118,41 @@ public class NUIController implements Initializable{
     }
 
     /**
+     * Handles user input if the user adds, deletes or moves GUI components by
+     * using the file menu
+     */
+    @FXML
+    protected void handleLoadComponent(ActionEvent e) {
+        RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
+        String componentName = (String) // e.g. "treeView", "proofView"
+        clickedItem.getParentMenu().getProperties().get("componentName");
+
+        Place place;
+
+        switch (clickedItem.getText()) {
+        case "left":
+            place = Place.LEFT;
+            break;
+        case "middle":
+            place = Place.MIDDLE;
+            break;
+        case "right":
+            place = Place.RIGHT;
+            break;
+        case "bottom":
+            place = Place.BOTTOM;
+            break;
+        default:
+            place = Place.HIDDEN;
+            break;
+        }
+
+        String componentResource = (String) clickedItem.getParentMenu().getProperties().get("componentResource");
+
+        createComponent(componentName, place, componentResource);
+    }
+
+    /**
      * Creates a component (yay for low coupling!) TODO expand this javadoc
      */
     protected void createComponent(String id, Pane location, String resource) {
@@ -132,43 +162,14 @@ public class NUIController implements Initializable{
     }
 
     /**
-     * Handles user input if the user adds, deletes or moves GUI components by
-     * using the file menu
-     */
-    @FXML
-    protected void handleLoadComponent(ActionEvent e) {
-        RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
-        String componentName = (String) // e.g. "treeView", "proofView"
-        clickedItem.getParentMenu().getProperties().get("componentName");
-        
-        Place place;
-        
-        switch (clickedItem.getText()) {
-        case "left":
-            place = Place.LEFT; break;
-        case "middle":
-            place = Place.MIDDLE; break;
-        case "right":
-            place = Place.RIGHT; break;
-        case "bottom":
-            place = Place.BOTTOM; break;
-        default: 
-            place = Place.HIDDEN; break;
-        }
-
-        String componentResource = (String) clickedItem.getParentMenu()
-                .getProperties().get("componentResource");
-        
-        createComponent(componentName, place, componentResource);
-    }
-    
-    /**
      * TODO
+     * 
      * @param componentName
      * @param place
      * @param componentResource
+     * @throws IllegalArgumentException The Component componentName already exists in the Place place.
      */
-    public void createComponent(String componentName, Place place, String componentResource){
+    public void createComponent(String componentName, Place place, String componentResource) throws IllegalArgumentException {
         // Does the component already exist?
         // Then the user wants either to change change its place or to hide it
         if (posComponent.containsKey(componentName)) {
@@ -209,8 +210,7 @@ public class NUIController implements Initializable{
 
             default: // hide was chosen, delete component and remove it from the
                      // map
-                posComponent.get(componentName).getChildren()
-                        .remove(existingcomponent);
+                posComponent.get(componentName).getChildren().remove(existingcomponent);
                 posComponent.remove(componentName);
                 statustext.setText("View " + componentName + " hidden.");
             }

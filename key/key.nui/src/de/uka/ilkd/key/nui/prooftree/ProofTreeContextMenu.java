@@ -71,7 +71,16 @@ public class ProofTreeContextMenu extends ContextMenu {
     private void addMenuItemSearch() {
         MenuItem mISearch = new MenuItem("Search...");
         this.getItems().add(mISearch);
-        mISearch.setOnAction(t -> NUIController.getInstance().createComponent(".searchView", NUIController.Place.LEFT, ".searchView.fxml"));
+        mISearch.setOnAction(t -> {
+            try {
+                NUIController.getInstance().createComponent(".searchView", NUIController.Place.LEFT,
+                        ".searchView.fxml");
+            }
+            catch (IllegalArgumentException e) {
+                NUIController.getInstance().createComponent(".searchView", NUIController.Place.HIDDEN,
+                        ".searchView.fxml");
+            }
+        });
     }
 
 }

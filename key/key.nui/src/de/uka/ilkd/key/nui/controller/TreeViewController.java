@@ -42,6 +42,7 @@ public class TreeViewController implements Initializable {
 
     /**
      * TODO
+     * 
      * @author Stefan Pilot
      */
     private static TreeViewController instance;
@@ -120,19 +121,10 @@ public class TreeViewController implements Initializable {
     public static TreeViewController getInstance() {
         return instance;
     }
-    
+
     /**
      * TODO
-     * @author Stefan Pilot
-     */
-    public void handleOpenSearchView() {
-        
-        NUIController.getInstance().createComponent(".searchView", NUIController.Place.LEFT, ".searchView.fxml");
-        // TODO this is ugly
-    }
-    
-    /**
-     * TODO
+     * 
      * @author Stefan Pilot
      */
     private TreeItem<NUINode> currentFoundObject;
@@ -141,68 +133,61 @@ public class TreeViewController implements Initializable {
      * TODO
      */
     private HashMap<String, TreeItem<NUINode>> searchMap;
-    
+
     private List<TreeItem<NUINode>> searchResults;
 
     /**
      * TODO
+     * 
      * @author Stefan Pilot
      * @param term
      */
     public void search(String term) {
         if (searchMap == null)
             initializeSearchMap();
-        
+
         // for(String s : searchMap.keySet()) System.out.println(s);
-        
-        if(searchResults != null){
-            for(TreeItem<NUINode> t : searchResults){
+
+        if (searchResults != null) {
+            for (TreeItem<NUINode> t : searchResults) {
                 t.getValue().setHighlighted(false);
             }
         }
-        
+
         List<TreeItem<NUINode>> searchResults = new LinkedList<>();
-        
-        for(String s : searchMap.keySet()){
-            if(s.contains(term)){
+
+        for (String s : searchMap.keySet()) {
+            if (s.contains(term)) {
                 searchResults.add(searchMap.get(s));
-                // System.out.println(s + " contains " + term + ", therefore " + searchMap.get(s) + "is put into the list");
+                // System.out.println(s + " contains " + term + ", therefore " +
+                // searchMap.get(s) + "is put into the list");
             }
         }
-        
-        for(TreeItem<NUINode> t : searchResults){
+
+        for (TreeItem<NUINode> t : searchResults) {
             t.getValue().setHighlighted(true);
         }
-        /*
-        if (searchMap.containsKey(term)) { // das muss angepasst werden, damit
-                                           // auch teil-hits gefunden werden
-            TreeItem<NUINode> foundObject = searchMap.get(term);
-            foundObject.getValue().setHighlighted(true);
-            if (currentFoundObject != null) {
-                currentFoundObject.getValue().setHighlighted(false);
-            }
-            currentFoundObject = foundObject;
-        }
-        */
     }
-    
+
     /**
      * TODO
      */
     public void gotoNextSearchResult() {
         // TODO Auto-generated method stub
-        
+
     }
+
     /**
      * TODO
      */
     public void gotoPreviousSearchResult() {
         // TODO Auto-generated method stub
-        
+
     }
 
     /**
      * TODO
+     * 
      * @author Stefan Pilot
      */
     private void initializeSearchMap() {
@@ -210,7 +195,7 @@ public class TreeViewController implements Initializable {
         List<TreeItem<NUINode>> l = treeToList(proofTreeView.getRoot());
         for (TreeItem<NUINode> t : l)
             searchMap.put(t.getValue().getLabel(), t);
-        
+
     }
 
     /**
@@ -242,7 +227,6 @@ public class TreeViewController implements Initializable {
         if (!t.getChildren().isEmpty())
             for (TreeItem<NUINode> ti : t.getChildren())
                 l.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
-            
 
         return l;
     }
