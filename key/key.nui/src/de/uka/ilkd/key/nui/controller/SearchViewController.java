@@ -27,7 +27,7 @@ public class SearchViewController implements Initializable {
     }
     
     public void handleSearchButton(ActionEvent e){
-        System.out.println(SearchTextField.getText());
+        TreeViewController.getInstance().search(SearchTextField.getText());
     }
     
     public void handleNextButton(ActionEvent e){

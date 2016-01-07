@@ -25,6 +25,7 @@ import javafx.util.Callback;
  * 
  * @author Patrick Jattke
  * @author Matthias Schultheis
+ * @author Stefan Pilot
  * @version 1.1
  */
 public class TreeViewController implements Initializable {
@@ -41,6 +42,7 @@ public class TreeViewController implements Initializable {
 
     /**
      * TODO
+     * @author Stefan Pilot
      */
     private static TreeViewController instance;
 
@@ -75,6 +77,10 @@ public class TreeViewController implements Initializable {
         displayProof(p);
     }
 
+    /**
+     * TODO
+     * @author Stefan Pilot
+     */
     public void handleOpenSearchView() {
         NUIController.getInstance().createComponent(".searchView", NUIController.Place.LEFT, ".searchView.fxml");
         // TODO this is ugly
@@ -117,6 +123,7 @@ public class TreeViewController implements Initializable {
     /**
      * TODO
      * 
+     * @author Stefan Pilot
      * @return
      */
     public static TreeViewController getInstance() {
@@ -125,6 +132,7 @@ public class TreeViewController implements Initializable {
 
     /**
      * TODO
+     * @author Stefan Pilot
      */
     private TreeItem<NUINode> currentFoundObject;
 
@@ -135,7 +143,7 @@ public class TreeViewController implements Initializable {
 
     /**
      * TODO
-     * 
+     * @author Stefan Pilot
      * @param term
      */
     public void search(String term) {
@@ -144,9 +152,9 @@ public class TreeViewController implements Initializable {
         if (searchMap.containsKey(term)) { // das muss angepasst werden, damit
                                            // auch teil-hits gefunden werden
             TreeItem<NUINode> foundObject = searchMap.get(term);
-            // found Object highlighten
+            foundObject.getValue().setHighlighted(true);
             if (currentFoundObject != null) {
-                // currentFoundObject dis-highlighten
+                currentFoundObject.getValue().setHighlighted(false);
             }
             currentFoundObject = foundObject;
         }
@@ -154,18 +162,20 @@ public class TreeViewController implements Initializable {
 
     /**
      * TODO
+     * @author Stefan Pilot
      */
     private void initializeSearchMap() {
         searchMap = new HashMap<>();
         List<TreeItem<NUINode>> l = treeToList(proofTreeView.getRoot());
-        for (TreeItem<NUINode> t : l) {
+        for (TreeItem<NUINode> t : l)
             searchMap.put(t.getValue().getLabel(), t);
-        }
+        
     }
 
     /**
      * TODO
      * 
+     * @author Stefan Pilot
      * @param t
      * @return
      */
@@ -178,6 +188,7 @@ public class TreeViewController implements Initializable {
     /**
      * TODO
      * 
+     * @author Stefan Pilot
      * @param t
      * @param l
      * @return
@@ -188,9 +199,9 @@ public class TreeViewController implements Initializable {
 
         l.add(t);
         if (!t.getChildren().isEmpty())
-            for (TreeItem<NUINode> ti : t.getChildren()) {
+            for (TreeItem<NUINode> ti : t.getChildren())
                 l.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
-            }
+            
 
         return l;
     }
