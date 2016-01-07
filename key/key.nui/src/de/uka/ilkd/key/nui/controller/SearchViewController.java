@@ -20,6 +20,8 @@ public class SearchViewController implements Initializable {
     @FXML
     Button SearchButton;
     
+    TreeViewController treeViewController = TreeViewController.getInstance();
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
        SearchTextField.requestFocus();
@@ -27,14 +29,15 @@ public class SearchViewController implements Initializable {
     }
     
     public void handleSearchButton(ActionEvent e){
-        TreeViewController.getInstance().search(SearchTextField.getText());
+        treeViewController.search(SearchTextField.getText());
     }
     
     public void handleNextButton(ActionEvent e){
+        treeViewController.gotoNextSearchResult();
         System.out.println("'>' Button was pressed");
     }
     
     public void handlePreviousButton(ActionEvent e){
-        System.out.println("'<' Button was pressed");
+        treeViewController.gotoPreviousSearchResult();
     }
 }
