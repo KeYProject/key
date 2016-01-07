@@ -5,12 +5,11 @@ import java.util.Iterator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofVisitor;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
 /**
- * This class visualizes a proof tree in a tree view
+ * This class visualizes a proof tree in a tree view.
  * @author  Patrick Jattke
  * @author  Matthias Schultheis
  * @version 1.1
@@ -18,43 +17,44 @@ import javafx.scene.control.TreeView;
 public class ProofTreeVisualizer {
 	
 	/**
-	 * the fx tree view for displaying the NUI tree
+	 * The fx tree view for displaying the NUI tree.
 	 */
 	private TreeView<NUINode> proofTreeView;
 
 	/**
-	 * the root node of the NUI tree
+	 * The root node of the NUI tree.
 	 */
 	private NUIBranchNode nuiRoot;
 
 	/**
-	 * Creates a new TreeConverter object
+	 * Creates a new TreeConverter object.
 	 * 
 	 * @param proofTreeView
 	 * 			The reference to the TreeView<NUINode> object on the GUI
 	 */
-	public ProofTreeVisualizer(TreeView<NUINode> proofTreeView) {
+	public ProofTreeVisualizer(final TreeView<NUINode> proofTreeView) {
 		this.proofTreeView = proofTreeView;
 	}
 
 	/**
-	 * Adds a CSS stylesheet given by its path to the tree
+	 * Adds a CSS stylesheet given by its path to the tree.
 	 * 
 	 * @param path
 	 * 			The path of the stylesheet to add
 	 */
-	public void addStylesheet(String path) {
+	public final void addStylesheet(final String path) {
 		proofTreeView.getStylesheets().add(path);
 	}
 
 	/**
 	 * Visualizes the loaded proof tree in the proof tree view
-	 * by creating tree items
+	 * by creating tree items.
 	 * @throws IllegalStateException in case that no proof was loaded before
 	 */
-	public void visualizeProofTree() {
-		if(nuiRoot == null)
+	public final void visualizeProofTree() {
+		if (nuiRoot == null) {
 			throw new IllegalStateException("No proof loaded.");
+		}
 		
 		// create fx root node
 		TreeItem<NUINode> rootNode = new TreeItem<NUINode>(nuiRoot);
@@ -67,17 +67,17 @@ public class ProofTreeVisualizer {
 	}
 
 	/**
-	 * loads a ProofTree given by the root node pRoot by converting
-	 * it to a NUITree which is used as an intermediate representation 
+	 * loads a proof tree by converting it to a NUITree which 
+	 * is used as an intermediate representation 
 	 * (decorated abstract tree).
 	 * 
-	 * @param pRoot
-	 * 			The root node of the ProofTree
+	 * @param p The proof tree to load
 	 */
-	public void loadProofTree(Proof p) {
+	public final void loadProofTree(final Proof p) {
 		Node pRoot = p.root();
 		
-		// Create a new branch node (as root node) and assign the appropriate label
+		// Create a new branch node (as root node) and 
+		// assign the appropriate label
 		nuiRoot = new NUIBranchNode(pRoot);
 		assignNUIFields(pRoot, pRoot.proof(), nuiRoot);
 		String label = "Proof_Tree"; //TODO
@@ -98,7 +98,8 @@ public class ProofTreeVisualizer {
 	 * @param parent {@link de.uka.ilkd.key.nui.NUI.prooftree.NUINode}
 	 *            the node where the converted proof tree should be added to
 	 */
-	private void addProofTreeToNUITree(Node proofNode, NUIBranchNode parent) {
+	private void addProofTreeToNUITree(final Node proofNode, 
+			final NUIBranchNode parent) {
 		Proof p = proofNode.proof();
 		NUINode newNode;
 		// Create NUI node -----------------------------------------------------
@@ -123,7 +124,8 @@ public class ProofTreeVisualizer {
 			addProofTreeToNUITree(proofNode.child(0), parent);
 		} else if (numChildren > 1) {
 			// for each child create a branch node and add it to parent
-			for (Iterator<Node> childrenIterator = proofNode.childrenIterator(); childrenIterator.hasNext();) {
+			for (Iterator<Node> childrenIterator = proofNode.childrenIterator();
+					childrenIterator.hasNext();) {
 				// get next child
 				Node child = childrenIterator.next();
 
@@ -159,7 +161,8 @@ public class ProofTreeVisualizer {
 	 * @param newNode
 	 *            The NUINode object where the information should be added to.
 	 */
-	private void assignNUIFields(Node proofNode, Proof proof, NUINode newNode) {
+	private void assignNUIFields(final Node proofNode, final Proof proof, 
+			final NUINode newNode) {
 		Goal g = proof.getGoal(proofNode);
 		if (proofNode.leaf()) {
 			if (g != null) {
@@ -167,7 +170,7 @@ public class ProofTreeVisualizer {
 				newNode.setClosed(proofNode.isClosed());
 				newNode.setInteractive(!g.isAutomatic());
 				
-				if(g.isLinked()) {
+				if (g.isLinked()) {
 					setNUINodeLinkedTrue(newNode);
 				}
 			} else {
@@ -177,7 +180,8 @@ public class ProofTreeVisualizer {
 		} else {
 			// node is not a leaf
 			newNode.setClosed(proofNode.isClosed());
-			newNode.setInteractive(proofNode.getNodeInfo().getInteractiveRuleApplication());
+			newNode.setInteractive(proofNode.getNodeInfo().
+					getInteractiveRuleApplication());
 		}
 		// Set parameters which exist at all nodes
 		String nodeName = proofNode.serialNr() + ": " + proofNode.name();
@@ -187,26 +191,27 @@ public class ProofTreeVisualizer {
 	}
 
 	/**
-	 * sets for a node interactive = true and propagates this
+	 * Sets for a node the field interactive = true and propagates this.
 	 * information to its parents
 	 * @param newNode the node for that interactive should be set true
 	 */
-	private void setNUINodeLinkedTrue(NUINode newNode) {
+	private void setNUINodeLinkedTrue(final NUINode newNode) {
 		newNode.setLinked(true);
 		
 		NUINode parent = newNode.getParent();
-		if(parent != null)
+		if (parent != null) {
 			setNUINodeLinkedTrue(parent);
+		}
 	}
 
 	/**
 	 * Converts the root branch of a tree from type
 	 * {@link de.uka.ilkd.key.nui.proofTree.Node}, a so called NUITree, to a
-	 * FXTree. The FXTree consists of TreeItem<NUINode> which are decorated based
-	 * on the information gathered from the NUITree.
+	 * FXTree. The FXTree consists of TreeItem<NUINode> which are decorated 
+	 * based on the information gathered from the NUITree.
 	 * 
-	 * The method creates TreeItem<NUINode> objects for each child of nuiNode and
-	 * decorates them based on the information in their respective NUINode
+	 * The method creates TreeItem<NUINode> objects for each child of nuiNode 
+	 * and decorates them based on the information in their respective NUINode
 	 * object. If any of the children is of type NUIBranchNode, the method is
 	 * called again recursively.
 	 * 
@@ -217,7 +222,8 @@ public class ProofTreeVisualizer {
 	 *            The node used to append the children
 	 * 
 	 */
-	private void convertNUITreeToFXTree(NUIBranchNode nuiNode, TreeItem<NUINode> fxTreeNode) {
+	private void convertNUITreeToFXTree(final NUIBranchNode nuiNode, 
+			final TreeItem<NUINode> fxTreeNode) {
 
 		// Assign fx:id to branch node (needed for test purposes)
 		//TODO what test?

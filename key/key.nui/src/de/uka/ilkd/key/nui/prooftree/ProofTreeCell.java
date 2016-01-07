@@ -7,42 +7,43 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 /**
- * This class is responsible for the rendering of a tree cell.
+ * This class is responsible for rendering of a tree cell.
  * @author  Matthias Schultheis
  * @version 1.0
  */
 public class ProofTreeCell extends TreeCell<NUINode> {
 	
     /**
-     * the icon size in px
+     * The icon size in px.
      */
-    private final int ICON_SIZE = 15;
+    private final int iconSize = 15;
     
     /**
-     * space between icon and label in px
+     * Space between icon and label in px.
      */
-    private final int ICON_SPACING = 5;
+    private final int iconSpacing = 5;
         
     /**
-     * the label that will be displayed
+     * The label that will be displayed.
      */
 	private Label label;
 
     /**
-     * The IconFactory used to create the required icons
+     * The IconFactory used to create the required icons.
      */
     private IconFactory icf;
     
     /**
-     * the icon that will be displayed left next to the label
+     * The icon that will be displayed left next to the label.
      */
 	private ImageView icon;
 	
 	/**
-	 * The constructor of the ProofTreeCell
+	 * The constructor of the ProofTreeCell.
 	 */
 	public ProofTreeCell() {
-		icf = new IconFactory(ICON_SIZE, ICON_SIZE);
+		super();
+		icf = new IconFactory(iconSize, iconSize);
 	}
 	
 	/**
@@ -56,17 +57,20 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void updateItem(final NUINode item, final boolean empty) {
+	protected final void updateItem(final NUINode item, final boolean empty) {
+		// remove styles from last items
+		getStyleClass().remove(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
+		
 		super.updateItem(item, empty);
 		
-		setContextMenu(new ProofTreeContextMenu(item, getTreeItem()));
-		
 		// if null node, display nothing
-		if (item == null) {
+		if (empty || item == null) {
 			setText(null);
 			setGraphic(null);
 			return;
 		}
+		
+		setContextMenu(new ProofTreeContextMenu(item, getTreeItem()));
 		
 		// reset label and icon
 	    label = new Label(item.getLabel() + " ");
@@ -89,7 +93,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 		setText(null);
 		if (icon != null) {
 		    HBox hbox = new HBox();
-		    hbox.setSpacing(ICON_SPACING);
+		    hbox.setSpacing(iconSpacing);
 		    
 		    Label iconLabel = new Label();
 		    iconLabel.setGraphic(icon);
@@ -140,8 +144,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 		if (getItem().isClosed()) {
 			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_CLOSED));
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_CLOSED);
-		} 
-		// leaf node is a linked node
+		}
 		else if (getItem().isLinked()) {
 			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_LINKED));
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LINKED);
