@@ -85,7 +85,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 			decorateAsLeafNode();
 		}
 		
-		if (item.getHighlighted()) {
+		if (item.isHighlighted()) {
 			this.getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
 		}
         

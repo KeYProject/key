@@ -150,14 +150,14 @@ public class TreeViewController implements Initializable {
 
         if (searchResults != null) {
             for (TreeItem<NUINode> t : searchResults) {
-                t.getValue().setHighlighted(false);
+                t.getValue().setHighlighting(false);
             }
         }
 
-        List<TreeItem<NUINode>> searchResults = new LinkedList<>();
+        searchResults = new LinkedList<>();
 
         for (String s : searchMap.keySet()) {
-            if (s.contains(term)) {
+            if (s.toLowerCase().contains(term.toLowerCase())) {
                 searchResults.add(searchMap.get(s));
                 // System.out.println(s + " contains " + term + ", therefore " +
                 // searchMap.get(s) + "is put into the list");
@@ -165,7 +165,7 @@ public class TreeViewController implements Initializable {
         }
 
         for (TreeItem<NUINode> t : searchResults) {
-            t.getValue().setHighlighted(true);
+            t.getValue().setHighlighting(true);
         }
     }
 

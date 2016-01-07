@@ -28,6 +28,7 @@ public abstract class NUINode {
     private String serialNumber;
     private NUINode parent = null;
     private boolean isHighlighted = false;
+    private boolean isVisible = true;
 
     /**
      * Returns the serial number of the node. </br>
@@ -205,11 +206,19 @@ public abstract class NUINode {
 		this.parent = parent;
 	}
 	
-	public void setHighlighted(boolean isHighlighted){
+	public void setHighlighting(boolean isHighlighted){
 	    this.isHighlighted = isHighlighted;
 	}
 	
-	public boolean getHighlighted(){
+	public boolean isHighlighted(){
 	    return isHighlighted;
+	}
+	
+	public void setVisibility(boolean isVisible){
+	    this.isVisible = isVisible;
+	}
+	
+	public boolean isVisible(){
+	    return isVisible;
 	}
 }
