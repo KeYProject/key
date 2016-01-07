@@ -251,12 +251,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                     }
 
                     registeredPredicates.add(parsed);
-                    
-                    ctrl.availableAbstractionPreds.clear();
-                    ctrl.availableAbstractionPreds.add(Optional.empty());
-                    for (AbstractionPredicate pred : registeredPredicates) {
-                        ctrl.availableAbstractionPreds.add(Optional.of(pred));
-                    }
+                    ctrl.availableAbstractionPreds.setAll(registeredPredicates);
                 }
             }
         });
@@ -332,8 +327,14 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 new AbstractionPredicatesChoiceDialog(proof.openGoals().head());
         
         dialog.ctrl.abstrPredicateChoices.add(new AbstractionPredicateChoice(
-                new LocationVariable(new ProgramElementName("test"), Sort.ANY),
-                Optional.empty()));
+                new LocationVariable(new ProgramElementName("test"),
+                        (Sort) proof.getServices().getNamespaces().sorts()
+                                .lookup("int")), Optional.empty()));
+        
+        dialog.ctrl.abstrPredicateChoices.add(new AbstractionPredicateChoice(
+                new LocationVariable(new ProgramElementName("test1"),
+                        (Sort) proof.getServices().getNamespaces().sorts()
+                                .lookup("boolean")), Optional.empty()));
 
         dialog.setVisible(true);
     }

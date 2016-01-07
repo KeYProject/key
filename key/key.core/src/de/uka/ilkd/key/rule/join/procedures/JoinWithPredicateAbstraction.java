@@ -94,7 +94,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     }
 
     @Override
-    protected AbstractDomainLattice getAbstractDomainForSort(final Sort s,
+    public AbstractDomainLattice getAbstractDomainForSort(final Sort s,
             final Services services) {
         ArrayList<AbstractionPredicate> applicablePredicates =
                 predicates.get(s);

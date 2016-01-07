@@ -15,9 +15,9 @@ package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
 import java.util.Optional;
 
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import javafx.beans.property.SimpleObjectProperty;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * Model class for the manual choice of an abstraction predicate by the user.
@@ -34,13 +34,13 @@ public class AbstractionPredicateChoice {
      * The chosen abstraction predicate. May be null if no choice has been done
      * for the program variable {@link #progVar}.
      */
-    private final SimpleObjectProperty<Optional<AbstractionPredicate>> abstrPred;
+    private final SimpleObjectProperty<Optional<AbstractDomainElement>> abstrPred;
 
     public AbstractionPredicateChoice(ProgramVariable progVar,
-            Optional<AbstractionPredicate> abstrPred) {
+            Optional<AbstractDomainElement> abstrPred) {
         this.progVar = new SimpleObjectProperty<ProgramVariable>(progVar);
         this.abstrPred =
-                new SimpleObjectProperty<Optional<AbstractionPredicate>>(abstrPred);
+                new SimpleObjectProperty<Optional<AbstractDomainElement>>(abstrPred);
     }
 
     public SimpleObjectProperty<ProgramVariable> getProgVar() {
@@ -51,11 +51,11 @@ public class AbstractionPredicateChoice {
         this.progVar.set(progVar);
     }
 
-    public SimpleObjectProperty<Optional<AbstractionPredicate>> getAbstrPred() {
+    public SimpleObjectProperty<Optional<AbstractDomainElement>> getAbstrPred() {
         return abstrPred;
     }
 
-    public void setAbstrPred(Optional<AbstractionPredicate> abstrPred) {
+    public void setAbstrPred(Optional<AbstractDomainElement> abstrPred) {
         this.abstrPred.set(abstrPred);
     }
 }

@@ -102,6 +102,11 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
 
         return new Name(result.toString());
     }
+    
+    @Override
+    public String toString() {
+        return name().toString();
+    }
 
     /**
      * @return The String which is used for combining the names of predicates
