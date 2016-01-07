@@ -13,7 +13,7 @@ public class NUILeafNode extends NUINode {
     /**
      * The related proof node of the leaf node.
      */
-    private de.uka.ilkd.key.proof.Node proofNode;
+    private final de.uka.ilkd.key.proof.Node proofNode;
 
     /**
      * Creates a new leaf node.
@@ -21,7 +21,8 @@ public class NUILeafNode extends NUINode {
      * @param proofNode
      * 		   The related proof node of the leaf node.
      */
-    public NUILeafNode(de.uka.ilkd.key.proof.Node proofNode) {
+    public NUILeafNode(final de.uka.ilkd.key.proof.Node proofNode) {
+    	super();
         this.proofNode = proofNode;
     }
 
@@ -31,7 +32,7 @@ public class NUILeafNode extends NUINode {
      * @return proofNode
      * 			The proof node of the leaf node.
      */
-    public de.uka.ilkd.key.proof.Node getProofNode() {
+    public final de.uka.ilkd.key.proof.Node getProofNode() {
         return proofNode;
     }
 }

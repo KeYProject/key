@@ -13,16 +13,17 @@ public class NUIInnerNode extends NUINode {
     /**
      * The related proof node of the inner node.
      */
-    private de.uka.ilkd.key.proof.Node proofNode;
+    private final de.uka.ilkd.key.proof.Node proofNode;
 
     /**
      * Creates a new inner node. 
      * 
-     * @param proofNode
+     * @param pNode
      * 			The related proof node of the inner node.
      */
-    public NUIInnerNode(de.uka.ilkd.key.proof.Node proofNode) {
-        this.proofNode = proofNode;
+    public NUIInnerNode(final de.uka.ilkd.key.proof.Node pNode) {
+    	super();
+        this.proofNode = pNode;
     }
 
     /**
@@ -31,7 +32,7 @@ public class NUIInnerNode extends NUINode {
      * @return proofNode
      * 			The proof node of the inner node.
      */
-    public de.uka.ilkd.key.proof.Node getProofNode() {
+    public final de.uka.ilkd.key.proof.Node getProofNode() {
         return proofNode;
     }
 }

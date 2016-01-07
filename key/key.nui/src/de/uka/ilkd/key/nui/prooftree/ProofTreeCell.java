@@ -16,12 +16,12 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     /**
      * The icon size in px.
      */
-    private final int iconSize = 15;
+    private static final int ICON_SIZE = 15;
     
     /**
      * Space between icon and label in px.
      */
-    private final int iconSpacing = 5;
+    private static final int ICON_SPACING = 5;
         
     /**
      * The label that will be displayed.
@@ -31,7 +31,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     /**
      * The IconFactory used to create the required icons.
      */
-    private IconFactory icf;
+    private final IconFactory icf;
     
     /**
      * The icon that will be displayed left next to the label.
@@ -43,7 +43,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 	 */
 	public ProofTreeCell() {
 		super();
-		icf = new IconFactory(iconSize, iconSize);
+		icf = new IconFactory(ICON_SIZE, ICON_SIZE);
 	}
 	
 	/**
@@ -92,8 +92,8 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 		// workaround to display an icon next to a label
 		setText(null);
 		if (icon != null) {
-		    HBox hbox = new HBox();
-		    hbox.setSpacing(iconSpacing);
+		    final HBox hbox = new HBox();
+		    hbox.setSpacing(ICON_SPACING);
 		    
 		    Label iconLabel = new Label();
 		    iconLabel.setGraphic(icon);
@@ -148,12 +148,12 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 		else if (getItem().isLinked()) {
 			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_LINKED));
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_LINKED);
-		} 
+		}
 		// leaf node is an interactive node
 		else if (getItem().isInteractive()) {
 			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_INTERACTIVE));
 			label.getStyleClass().add(ProofTreeStyle.CSS_NODE_INTERACTIVE);
-		} 
+		}
 		// else: leaf node must be an open goal
 		else {
 			setIcon(icf.getImage(IconFactory.KEY_LEAF_NODE_OPEN));
