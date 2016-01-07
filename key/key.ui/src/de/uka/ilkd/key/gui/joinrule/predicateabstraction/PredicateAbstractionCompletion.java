@@ -14,12 +14,24 @@
 package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.gui.joinrule.JoinProcedureCompletion;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
  * Completion class for {@link JoinWithPredicateAbstraction}.
@@ -38,19 +50,37 @@ public class PredicateAbstractionCompletion extends
      */
     @Override
     public JoinWithPredicateAbstraction complete(
-            JoinWithPredicateAbstraction proc, Goal goal) {
-        AbstractionPredicatesChoiceDialog dialog =
-                new AbstractionPredicatesChoiceDialog(goal);
+            JoinWithPredicateAbstraction proc,
+            Pair<Goal, PosInOccurrence> joinGoalPio,
+            Collection<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> partners) {
+        final Services services = joinGoalPio.first.proof().getServices();
 
-        assert proc instanceof JoinWithPredicateAbstractionFactory :
-            "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
+        // Compute the program variables that are different in the
+        // respective states.
 
-        JoinWithPredicateAbstractionFactory procF =
+        final ArrayList<LocationVariable> differingLocVars =
+                new ArrayList<LocationVariable>();
+
+        final SymbolicExecutionState joinState =
+                JoinRuleUtils.sequentToSEPair(joinGoalPio.first.node(),
+                        joinGoalPio.second, services);
+
+        final ImmutableList<SymbolicExecutionState> partnerStates =
+                JoinRuleUtils.sequentsToSEPairs(partners);
+        
+        differingLocVars.addAll(JoinRuleUtils.getUpdateLeftSideLocations(joinState.first));
+
+        final AbstractionPredicatesChoiceDialog dialog =
+                new AbstractionPredicatesChoiceDialog(joinGoalPio.first); // TODO supply the variables here
+
+        assert proc instanceof JoinWithPredicateAbstractionFactory : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
+
+        final JoinWithPredicateAbstractionFactory procF =
                 (JoinWithPredicateAbstractionFactory) proc;
 
         dialog.setVisible(true);
 
-        ArrayList<AbstractionPredicate> chosenPreds =
+        final ArrayList<AbstractionPredicate> chosenPreds =
                 dialog.getRegisteredPredicates();
 
         // A null-pointer in the chosen predicates means that
