@@ -28,8 +28,7 @@
 }
 
 .leaf_node.interactive_node {
-   -fx-text-fill: rgb(255, 140, 0); /* ORANGE COLOR */
-   
+   -fx-text-fill: rgb(255, 140, 0); /* ORANGE COLOR */  
 }
 
 .notes_node {
@@ -38,4 +37,8 @@
 
 .active_node  {
    -fx-background-color: rgb(230, 254, 255); /* LIGHT_BLUE_COLOR */
+}
+
+.highlighted_node {
+	-fx-background-color: rgb(253, 250, 138); /* LIGHT_YELLOW_COLOR */
 }

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.nui.prooftree;
 
 import de.uka.ilkd.key.nui.IconFactory;
-import de.uka.ilkd.key.nui.controller.TreeViewController;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeCell;
 import javafx.scene.image.ImageView;
@@ -49,7 +48,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 	/**
 	 * @param icon the icon to set
 	 */
-	private void setIcon(ImageView icon) {
+	private void setIcon(final ImageView icon) {
 		this.icon = icon;
 	}
 
@@ -57,35 +56,38 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void updateItem(NUINode item, boolean empty) {
+	protected void updateItem(final NUINode item, final boolean empty) {
 		super.updateItem(item, empty);
 		
 		setContextMenu(new ProofTreeContextMenu(item, getTreeItem()));
 		
 		// if null node, display nothing
-		if(item == null) {
+		if (item == null) {
 			setText(null);
 			setGraphic(null);
 			return;
 		}
 		
 		// reset label and icon
-	    label = new Label(item.getLabel()+" ");
+	    label = new Label(item.getLabel() + " ");
 	    icon  = null;
-        
-	    
 	    
         // set decoration (style, icon)
-		if(item instanceof NUIInnerNode)
+		if (item instanceof NUIInnerNode) {
 			decorateAsInnerNode();
-		else if(item instanceof NUIBranchNode)
+		} else if (item instanceof NUIBranchNode) {
 			decorateAsBranchNode();
-		else if(item instanceof NUILeafNode)
+		} else if (item instanceof NUILeafNode) {
 			decorateAsLeafNode();
+		}
+		
+		if (item.getHighlighted()) {
+			this.getStyleClass().add(ProofTreeStyle.CSS_NODE_HIGHLIGHTED);
+		}
         
 		// workaround to display an icon next to a label
 		setText(null);
-		if(icon != null) {
+		if (icon != null) {
 		    HBox hbox = new HBox();
 		    hbox.setSpacing(ICON_SPACING);
 		    

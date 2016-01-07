@@ -19,6 +19,6 @@ public final class ProofTreeStyle {
     public static String CSS_NODE_INTERACTIVE  = "interactive_node";
     public static String CSS_NODE_NOTES  = "notes_node";
     public static String CSS_NODE_ACTIVE  = "active_node";
-
+    public static String CSS_NODE_HIGHLIGHTED  = "highlighted_node";
     
 }
