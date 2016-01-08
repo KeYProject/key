@@ -41,7 +41,8 @@ public class TreeViewController implements Initializable {
     ProofTreeVisualizer visualizer;
 
     /**
-     * TODO
+     * stores reference to 'this' for singleton purpose TODO this is bad
+     * practice
      * 
      * @author Stefan Pilot
      */
@@ -53,7 +54,7 @@ public class TreeViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        instance = this;
+        instance = this; // TODO this is bad practice
 
         // set cell factory for rendering cells
         proofTreeView.setCellFactory(new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
@@ -113,7 +114,7 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * TODO
+     * returns reference to 'this' for singleton purpose
      * 
      * @author Stefan Pilot
      * @return
@@ -123,54 +124,45 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * TODO
-     * 
-     * @author Stefan Pilot
-     */
-    private TreeItem<NUINode> currentFoundObject;
-
-    /**
-     * TODO
+     * stores all the Labels in the tree and their respective TreeItems must be
+     * initialized with initializeSearchMap()
      */
     private HashMap<String, TreeItem<NUINode>> searchMap;
 
+    /**
+     * After a call to search(String term), this stores all the TreeItems found
+     * by that search. At every point in time, All of these TreeItems are
+     * currently highlighted.
+     */
     private List<TreeItem<NUINode>> searchResults;
 
     /**
-     * TODO
+     * This will highlight all the TreeItems for which <tt>.contains(term)</tt>
+     * is <tt>true</tt>. The search is not case sensitive.
      * 
-     * @author Stefan Pilot
      * @param term
+     *            The String to search for
      */
     public void search(String term) {
         if (searchMap == null)
             initializeSearchMap();
 
-        // for(String s : searchMap.keySet()) System.out.println(s);
-
-        if (searchResults != null) {
-            for (TreeItem<NUINode> t : searchResults) {
+        if (searchResults != null)
+            for (TreeItem<NUINode> t : searchResults)
                 t.getValue().setHighlighting(false);
-            }
-        }
 
         searchResults = new LinkedList<>();
 
-        for (String s : searchMap.keySet()) {
-            if (s.toLowerCase().contains(term.toLowerCase())) {
+        for (String s : searchMap.keySet())
+            if (s.toLowerCase().contains(term.toLowerCase()))
                 searchResults.add(searchMap.get(s));
-                // System.out.println(s + " contains " + term + ", therefore " +
-                // searchMap.get(s) + "is put into the list");
-            }
-        }
 
-        for (TreeItem<NUINode> t : searchResults) {
+        for (TreeItem<NUINode> t : searchResults)
             t.getValue().setHighlighting(true);
-        }
     }
 
     /**
-     * TODO
+     * TODO someday this will move the focus to the next found item
      */
     public void gotoNextSearchResult() {
         // TODO Auto-generated method stub
@@ -178,7 +170,7 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * TODO
+     * TODO someday this will move the focus to the previous found item
      */
     public void gotoPreviousSearchResult() {
         // TODO Auto-generated method stub
@@ -186,9 +178,8 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * TODO
-     * 
-     * @author Stefan Pilot
+     * This will recusively parse the proof tree and store all elements in the
+     * <tt>searchMap</tt>
      */
     private void initializeSearchMap() {
         searchMap = new HashMap<>();
@@ -199,11 +190,13 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * TODO
+     * Parses a Tree, beginning at <b>t</b>, and puts every TreeItem into a
+     * List. This should rarely be called directly.
      * 
-     * @author Stefan Pilot
      * @param t
-     * @return
+     *            Where to start parsing the tree
+     * @return A List containing all TreeItems who are children of <b>t</b> or
+     *         of its children
      */
     private List<TreeItem<NUINode>> treeToList(TreeItem<NUINode> t) {
         if (t == null)
@@ -212,22 +205,25 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * TODO
+     * Parses a Tree, beginning at <b>t</b>, and adds to list every TreeItem
+     * that is a child of <b>root</b> or of its children <b>l</b>. This should
+     * rarely be called directly.
      * 
-     * @author Stefan Pilot
-     * @param t
-     * @param l
-     * @return
+     * @param root
+     *            Where to start parsing
+     * @param list
+     *            Where all the TreeItems are added to
+     * @return <b>list</b>, but with all the TreeItems appended to it
      */
-    private List<TreeItem<NUINode>> treeToList(TreeItem<NUINode> t, List<TreeItem<NUINode>> l) {
-        if (t == null || l == null)
+    private List<TreeItem<NUINode>> treeToList(TreeItem<NUINode> root, List<TreeItem<NUINode>> list) {
+        if (root == null || list == null)
             throw new IllegalArgumentException();
 
-        l.add(t);
-        if (!t.getChildren().isEmpty())
-            for (TreeItem<NUINode> ti : t.getChildren())
-                l.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
+        list.add(root);
+        if (!root.getChildren().isEmpty())
+            for (TreeItem<NUINode> ti : root.getChildren())
+                list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
 
-        return l;
+        return list;
     }
 }
