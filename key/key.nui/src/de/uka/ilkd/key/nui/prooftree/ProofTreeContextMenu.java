@@ -53,7 +53,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     private void addMenuItemExpandAll() {
         MenuItem miExpandAll = new MenuItem("Expand All"); // TODO
         getItems().add(miExpandAll);
-        miExpandAll.setOnAction(t -> ProofTreeContextMenuActions.expandAll(treeItem));
+        miExpandAll.setOnAction(t -> ProofTreeActions.expandAll(treeItem));
     }
 
     /**
@@ -62,7 +62,7 @@ public class ProofTreeContextMenu extends ContextMenu {
     private void addMenuItemCollapseAll() {
         MenuItem miCollapseAll = new MenuItem("Collapse All"); // TODO
         getItems().add(miCollapseAll);
-        miCollapseAll.setOnAction(t -> ProofTreeContextMenuActions.collapseAll(treeItem));
+        miCollapseAll.setOnAction(t -> ProofTreeActions.collapseAll(treeItem));
     }
 
     /**
