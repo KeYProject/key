@@ -2,10 +2,12 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.prooftree.*;
@@ -159,13 +161,67 @@ public class TreeViewController implements Initializable {
 
         for (TreeItem<NUINode> t : searchResults)
             t.getValue().setHighlighting(true);
+        
+        gotoNextSearchResult();
     }
 
     /**
      * TODO someday this will move the focus to the next found item
      */
     public void gotoNextSearchResult() {
-        // TODO Auto-generated method stub
+
+    	// check if match list is empty
+    	if(searchResults.isEmpty())
+    		return;
+
+    	// the current selected index
+    	int idxSelected = proofTreeView.getSelectionModel().getSelectedIndex();
+
+    	// get next higher index and its tree node
+    	//TODO can be very much improved using your grips
+    	// store list of indices of matches
+    	List<Integer> idxOfMatches = new LinkedList<Integer>();
+    	for(TreeItem<NUINode> i : searchResults) {
+    		int idx = proofTreeView.getRow(i);
+    		idxOfMatches.add(idx);
+    		System.out.print(idx+" ");
+    	}
+    	System.out.println();
+
+    	// select the next largest match index.
+    	// if there is no, choose match with smallest index.
+    	int nextLargerIdx;
+    	List<Integer> listLargerThanSelected = idxOfMatches.stream().filter(s -> s > idxSelected).collect(Collectors.toList());
+    	if(!listLargerThanSelected.isEmpty()) {
+    		//TODO Can be done very much smarter i guess
+    		nextLargerIdx = listLargerThanSelected.stream().min(Comparator.comparingInt(i -> i)).get();
+    	} else {
+    		//TODO not the smartest way...
+    		nextLargerIdx = idxOfMatches.stream().min(Comparator.comparingInt(i -> i)).get();
+    	}
+
+    	//TODO this is very inefficient
+    	// Problem is that you can't get the TreeItem by index by 
+    	// proofTreeView.getTreeItem(row) if parents of the treeItem
+    	// are collapsed
+    	int idxInList = idxOfMatches.indexOf(nextLargerIdx);
+    	TreeItem<NUINode> nextLargerTI = searchResults.get(idxInList);
+
+    	// expand all parents so we can reach the treeItem
+    	//TODO this is also not very smartly done and coudl be refactored
+    	// in a recurive method. However, if you change the lines before
+    	// this could be superfluous.
+    	TreeItem<NUINode> parent = nextLargerTI;
+    	while(parent.getParent() != null) {
+    		parent = parent.getParent();
+    		parent.setExpanded(true);
+    	}
+
+    	// scrolling and selecting
+    	proofTreeView.scrollTo(nextLargerIdx);
+    	proofTreeView.getSelectionModel().select(nextLargerIdx);
+
+    	System.out.println("Currently Selected: " + idxSelected + ", Next Match at "+ nextLargerIdx);
 
     }
 
