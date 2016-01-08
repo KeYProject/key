@@ -121,7 +121,7 @@ public class TreeViewController implements Initializable {
      * @author Stefan Pilot
      * @return
      */
-    public static TreeViewController getInstance() {
+    static TreeViewController getInstance() {
         return instance;
     }
 
@@ -182,7 +182,7 @@ public class TreeViewController implements Initializable {
     	// get next higher index and its tree node
     	//TODO can be very much improved using your grips
     	// store list of indices of matches
-    	List<Integer> idxOfMatches = new LinkedList<Integer>();
+    	List<Integer> idxOfMatches = new LinkedList<>();
     	for(TreeItem<NUINode> i : searchResults) {
     		int idx = proofTreeView.getRow(i);
     		idxOfMatches.add(idx);
@@ -236,7 +236,7 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * This will recusively parse the proof tree and store all elements in the
+     * This will recursively parse the proof tree and store all elements in the
      * <tt>searchMap</tt>
      */
     private void initializeSearchMap() {
