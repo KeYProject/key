@@ -234,7 +234,7 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * This will recusively parse the proof tree and store all elements in the
+     * This will recursively parse the proof tree and store all elements in the
      * <tt>searchMap</tt>
      */
     private void initializeSearchMap() {
