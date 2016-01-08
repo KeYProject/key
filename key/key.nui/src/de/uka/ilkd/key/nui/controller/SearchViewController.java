@@ -35,8 +35,6 @@ public class SearchViewController implements Initializable {
                 SearchTextField.requestFocus();
             }
         });
-        SearchButton.setDisable(false);
-
         SearchTextField.textProperty()
                 .addListener(new ChangeListener<String>() {
                     @Override
@@ -44,8 +42,13 @@ public class SearchViewController implements Initializable {
                             ObservableValue<? extends String> observable,
                             String oldValue, String newValue) {
                         SearchButton.setDisable(newValue.isEmpty());
+                        if(newValue.isEmpty()){
+                            NextButton.setDisable(true);
+                            PreviousButton.setDisable(true);
+                        }
                     }
                 });
+        SearchButton.setDisable(true);
 
         instance = this;
     }

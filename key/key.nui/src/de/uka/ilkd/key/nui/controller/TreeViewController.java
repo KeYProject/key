@@ -59,12 +59,13 @@ public class TreeViewController implements Initializable {
         instance = this; // TODO this is bad practice
 
         // set cell factory for rendering cells
-        proofTreeView.setCellFactory(new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
-            @Override
-            public TreeCell<NUINode> call(TreeView<NUINode> p) {
-                return new ProofTreeCell();
-            }
-        });
+        proofTreeView.setCellFactory(
+                new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
+                    @Override
+                    public TreeCell<NUINode> call(TreeView<NUINode> p) {
+                        return new ProofTreeCell();
+                    }
+                });
 
         // Create a new tree visualizer instance for processing the conversion
         // de.uka.ilkd.key.proof.Node -->
@@ -73,7 +74,8 @@ public class TreeViewController implements Initializable {
         visualizer = new ProofTreeVisualizer(proofTreeView);
 
         // add CSS file to view
-        String cssPath = this.getClass().getResource("../components/treeView.css").toExternalForm();
+        String cssPath = this.getClass()
+                .getResource("../components/treeView.css").toExternalForm();
         visualizer.addStylesheet(cssPath);
 
         // load and display proof in visualizer
@@ -104,7 +106,8 @@ public class TreeViewController implements Initializable {
         String examplesRoot = "resources//de/uka//ilkd//key//examples//";
         File proofFile = new File(examplesRoot + proofFileName);
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
+            KeYEnvironment<?> environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFile, null, null,
                     null, true);
             Proof proof = environment.getLoadedProof();
             return proof;
@@ -116,10 +119,10 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * returns reference to 'this' for singleton purpose
+     * returns reference to 'this' TODO remove this singleton, it is bad
+     * practice
      * 
      * @author Stefan Pilot
-     * @return
      */
     static TreeViewController getInstance() {
         return instance;
@@ -145,7 +148,7 @@ public class TreeViewController implements Initializable {
      * @param term
      *            The String to search for
      */
-    public void search(String term) {
+    public boolean search(String term) {
         if (searchMap == null)
             initializeSearchMap();
 
@@ -159,12 +162,16 @@ public class TreeViewController implements Initializable {
             if (s.toLowerCase().contains(term.toLowerCase()))
                 searchResults.add(searchMap.get(s));
 
-        for (TreeItem<NUINode> t : searchResults) {
-        	t.getValue().setHighlighting(true);
-        	ProofTreeActions.refeshTreeItem(t);
+        if (!searchResults.isEmpty()) {
+            for (TreeItem<NUINode> t : searchResults) {
+                t.getValue().setHighlighting(true);
+                ProofTreeActions.refeshTreeItem(t);
+            }
+            gotoNextSearchResult();
+            return true;
         }
-        
-        gotoNextSearchResult();
+        else
+            return false;
     }
 
     /**
@@ -172,58 +179,63 @@ public class TreeViewController implements Initializable {
      */
     public void gotoNextSearchResult() {
 
-    	// check if match list is empty
-    	if(searchResults.isEmpty())
-    		return;
+        // check if match list is empty
+        if (searchResults.isEmpty())
+            return;
 
-    	// the current selected index
-    	int idxSelected = proofTreeView.getSelectionModel().getSelectedIndex();
+        // the current selected index
+        int idxSelected = proofTreeView.getSelectionModel().getSelectedIndex();
 
-    	// get next higher index and its tree node
-    	//TODO can be very much improved using your grips
-    	// store list of indices of matches
-    	List<Integer> idxOfMatches = new LinkedList<>();
-    	for(TreeItem<NUINode> i : searchResults) {
-    		int idx = proofTreeView.getRow(i);
-    		idxOfMatches.add(idx);
-    		System.out.print(idx+" ");
-    	}
-    	System.out.println();
+        // get next higher index and its tree node
+        // TODO can be very much improved using your grips
+        // store list of indices of matches
+        List<Integer> idxOfMatches = new LinkedList<>();
+        for (TreeItem<NUINode> i : searchResults) {
+            int idx = proofTreeView.getRow(i);
+            idxOfMatches.add(idx);
+            System.out.print(idx + " ");
+        }
+        System.out.println();
 
-    	// select the next largest match index.
-    	// if there is no, choose match with smallest index.
-    	int nextLargerIdx;
-    	List<Integer> listLargerThanSelected = idxOfMatches.stream().filter(s -> s > idxSelected).collect(Collectors.toList());
-    	if(!listLargerThanSelected.isEmpty()) {
-    		//TODO Can be done very much smarter i guess
-    		nextLargerIdx = listLargerThanSelected.stream().min(Comparator.comparingInt(i -> i)).get();
-    	} else {
-    		//TODO not the smartest way...
-    		nextLargerIdx = idxOfMatches.stream().min(Comparator.comparingInt(i -> i)).get();
-    	}
+        // select the next largest match index.
+        // if there is no, choose match with smallest index.
+        int nextLargerIdx;
+        List<Integer> listLargerThanSelected = idxOfMatches.stream()
+                .filter(s -> s > idxSelected).collect(Collectors.toList());
+        if (!listLargerThanSelected.isEmpty()) {
+            // TODO Can be done very much smarter i guess
+            nextLargerIdx = listLargerThanSelected.stream()
+                    .min(Comparator.comparingInt(i -> i)).get();
+        }
+        else {
+            // TODO not the smartest way...
+            nextLargerIdx = idxOfMatches.stream()
+                    .min(Comparator.comparingInt(i -> i)).get();
+        }
 
-    	//TODO this is very inefficient
-    	// Problem is that you can't get the TreeItem by index by 
-    	// proofTreeView.getTreeItem(row) if parents of the treeItem
-    	// are collapsed
-    	int idxInList = idxOfMatches.indexOf(nextLargerIdx);
-    	TreeItem<NUINode> nextLargerTI = searchResults.get(idxInList);
+        // TODO this is very inefficient
+        // Problem is that you can't get the TreeItem by index by
+        // proofTreeView.getTreeItem(row) if parents of the treeItem
+        // are collapsed
+        int idxInList = idxOfMatches.indexOf(nextLargerIdx);
+        TreeItem<NUINode> nextLargerTI = searchResults.get(idxInList);
 
-    	// expand all parents so we can reach the treeItem
-    	//TODO this is also not very smartly done and coudl be refactored
-    	// in a recurive method. However, if you change the lines before
-    	// this could be superfluous.
-    	TreeItem<NUINode> parent = nextLargerTI;
-    	while(parent.getParent() != null) {
-    		parent = parent.getParent();
-    		parent.setExpanded(true);
-    	}
+        // expand all parents so we can reach the treeItem
+        // TODO this is also not very smartly done and coudl be refactored
+        // in a recurive method. However, if you change the lines before
+        // this could be superfluous.
+        TreeItem<NUINode> parent = nextLargerTI;
+        while (parent.getParent() != null) {
+            parent = parent.getParent();
+            parent.setExpanded(true);
+        }
 
-    	// scrolling and selecting
-    	proofTreeView.scrollTo(nextLargerIdx);
-    	proofTreeView.getSelectionModel().select(nextLargerIdx);
+        // scrolling and selecting
+        proofTreeView.scrollTo(nextLargerIdx);
+        proofTreeView.getSelectionModel().select(nextLargerIdx);
 
-    	System.out.println("Currently Selected: " + idxSelected + ", Next Match at "+ nextLargerIdx);
+        System.out.println("Currently Selected: " + idxSelected
+                + ", Next Match at " + nextLargerIdx);
 
     }
 
@@ -273,14 +285,16 @@ public class TreeViewController implements Initializable {
      *            Where all the TreeItems are added to
      * @return <b>list</b>, but with all the TreeItems appended to it
      */
-    private List<TreeItem<NUINode>> treeToList(TreeItem<NUINode> root, List<TreeItem<NUINode>> list) {
+    private List<TreeItem<NUINode>> treeToList(TreeItem<NUINode> root,
+            List<TreeItem<NUINode>> list) {
         if (root == null || list == null)
             throw new IllegalArgumentException();
 
         list.add(root);
         if (!root.getChildren().isEmpty())
             for (TreeItem<NUINode> ti : root.getChildren())
-                list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
+                list.addAll(
+                        treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
 
         return list;
     }

@@ -19,7 +19,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 /**
@@ -157,10 +156,9 @@ public class NUIController implements Initializable {
     }
 
     /**
-     * TODO
-     * 
-     * @param p
-     * @return
+     * @param p a {@link Place}
+     * @return the respective Pane
+     * @throws IllegalArgumentException p == HIDDEN
      */
     protected Pane getPane(Place p) {
         switch (p) {
@@ -190,7 +188,7 @@ public class NUIController implements Initializable {
     public void createComponent(String componentName, Place place,
             String componentResource) throws IllegalArgumentException {
         // Does the component already exist?
-        // Then the user wants either to change change its place or to hide it
+        // Then the user wants either to change its place or to hide it
         if (placeComponent.containsKey(componentName)) {
 
             Node existingcomponent = null;
