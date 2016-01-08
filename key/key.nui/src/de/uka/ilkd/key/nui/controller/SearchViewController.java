@@ -27,6 +27,8 @@ public class SearchViewController implements Initializable {
 
     private static SearchViewController instance;
 
+    private boolean thereCurrentlyIsAnOpenSearch = false;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(new Runnable() {
@@ -42,7 +44,8 @@ public class SearchViewController implements Initializable {
                             ObservableValue<? extends String> observable,
                             String oldValue, String newValue) {
                         SearchButton.setDisable(newValue.isEmpty());
-                        if(newValue.isEmpty()){
+                        thereCurrentlyIsAnOpenSearch = false;
+                        if (newValue.isEmpty()) {
                             NextButton.setDisable(true);
                             PreviousButton.setDisable(true);
                         }
@@ -54,8 +57,12 @@ public class SearchViewController implements Initializable {
     }
 
     public void handleSearchButton(ActionEvent e) {
-        if (!SearchButton.isDisable())
-            treeViewController.search(SearchTextField.getText());
+        if (!SearchButton.isDisable()
+                && treeViewController.search(SearchTextField.getText())) {
+            NextButton.setDisable(false);
+            PreviousButton.setDisable(false);
+            thereCurrentlyIsAnOpenSearch = true;
+        }
     }
 
     public void handleNextButton(ActionEvent e) {
@@ -71,5 +78,12 @@ public class SearchViewController implements Initializable {
      */
     static SearchViewController getInstance() {
         return instance;
+    }
+
+    public void handleEnterKey(ActionEvent e) {
+        if (thereCurrentlyIsAnOpenSearch)
+            handleNextButton(e);
+        else
+            handleSearchButton(e);
     }
 }
