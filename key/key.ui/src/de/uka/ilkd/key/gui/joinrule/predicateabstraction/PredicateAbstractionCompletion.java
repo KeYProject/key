@@ -16,6 +16,8 @@ package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -58,20 +60,46 @@ public class PredicateAbstractionCompletion extends
         // Compute the program variables that are different in the
         // respective states.
 
-        final ArrayList<LocationVariable> differingLocVars =
-                new ArrayList<LocationVariable>();
-
         final SymbolicExecutionState joinState =
                 JoinRuleUtils.sequentToSEPair(joinGoalPio.first.node(),
                         joinGoalPio.second, services);
 
         final ImmutableList<SymbolicExecutionState> partnerStates =
                 JoinRuleUtils.sequentsToSEPairs(partners);
-        
-        differingLocVars.addAll(JoinRuleUtils.getUpdateLeftSideLocations(joinState.first));
+
+        final ArrayList<LocationVariable> differingLocVars =
+                new ArrayList<LocationVariable>();
+
+        JoinRuleUtils
+                .getUpdateLeftSideLocations(joinState.first)
+                .forEach(
+                        v -> {
+                            // The meaning of the following statement corresponds to
+                            // partnerStates.fold("right value for v differs", false)
+                            final boolean isDifferent = StreamSupport
+                                    .stream(partnerStates.spliterator(), false)
+                                    .collect(
+                                            Collectors
+                                                    .reducing(
+                                                            false,
+                                                            partner -> !JoinRuleUtils
+                                                                    .getUpdateRightSideFor(
+                                                                            partner.getSymbolicState(),
+                                                                            v)
+                                                                    .equals(JoinRuleUtils
+                                                                            .getUpdateRightSideFor(
+                                                                                    joinState
+                                                                                            .getSymbolicState(),
+                                                                                    v)),
+                                                            (b1, b2) -> (b1 || b2)));
+                            
+                            if (isDifferent) {
+                                differingLocVars.add(v);
+                            }
+                        });
 
         final AbstractionPredicatesChoiceDialog dialog =
-                new AbstractionPredicatesChoiceDialog(joinGoalPio.first); // TODO supply the variables here
+                new AbstractionPredicatesChoiceDialog(joinGoalPio.first, differingLocVars);
 
         assert proc instanceof JoinWithPredicateAbstractionFactory : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
 
@@ -79,9 +107,11 @@ public class PredicateAbstractionCompletion extends
                 (JoinWithPredicateAbstractionFactory) proc;
 
         dialog.setVisible(true);
+        
+        final AbstractionPredicatesChoiceDialog.Result userInput = dialog.getResult();
 
         final ArrayList<AbstractionPredicate> chosenPreds =
-                dialog.getRegisteredPredicates();
+                userInput.getRegisteredPredicates();
 
         // A null-pointer in the chosen predicates means that
         // the user has pressed the cancel button.
@@ -89,7 +119,7 @@ public class PredicateAbstractionCompletion extends
             return proc;
         }
         else {
-            return procF.instantiate(chosenPreds, dialog.getLatticeType());
+            return procF.instantiate(chosenPreds, userInput.getLatticeType(), userInput.getAbstractDomElemUserChoices());
         }
     }
 

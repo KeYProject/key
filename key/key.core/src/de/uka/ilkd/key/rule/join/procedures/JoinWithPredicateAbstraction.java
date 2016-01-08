@@ -20,10 +20,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -50,6 +52,11 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      */
     private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
             null;
+    
+    /**
+     * Manually chosen lattice elements for program variables.
+     */
+    private HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> userChoices = null;
 
     /**
      * Default constructor for subclasses.
@@ -70,7 +77,8 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      */
     public JoinWithPredicateAbstraction(
             Iterable<AbstractionPredicate> predicates,
-            Class<? extends AbstractPredicateAbstractionLattice> latticeType) {
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+            HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
                 this.predicates.put(pred.getArgSort(),
@@ -81,6 +89,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
         }
 
         this.latticeType = latticeType;
+        this.userChoices = userChoices;
     }
 
     /*
@@ -174,6 +183,13 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      */
     public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
         return latticeType;
+    }
+
+    /**
+     * @return Manually chosen lattice elements for program variables.
+     */
+    public HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> getUserChoices() {
+        return userChoices;
     }
 
     @Override

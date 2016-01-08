@@ -18,7 +18,6 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantFo
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -26,7 +25,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
@@ -50,8 +48,10 @@ public class JoinWeaken extends JoinProcedure {
     }
 
     private static final String DISPLAY_NAME = "JoinByFullAnonymization";
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see de.uka.ilkd.key.rule.join.JoinProcedure#complete()
      */
     @Override
@@ -60,21 +60,21 @@ public class JoinWeaken extends JoinProcedure {
     }
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
+    public ValuesJoinResult joinValuesInStates(Term v,
+            SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
-        final Function newSkolemConstant = getNewSkolemConstantForPrefix(v
-                .op().name().toString(), v.sort(), services);
-        LinkedHashSet<Name> newNames =  new LinkedHashSet<Name>();
+        final Function newSkolemConstant =
+                getNewSkolemConstantForPrefix(v.op().name().toString(),
+                        v.sort(), services);
+        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         newNames.add(newSkolemConstant.name());
 
-        return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
-                DefaultImmutableSet.<Term> nil(), tb.func(newSkolemConstant),
-                newNames);
+        return new ValuesJoinResult(DefaultImmutableSet.<Term> nil(),
+                tb.func(newSkolemConstant), newNames, new LinkedHashSet<Term>());
 
     }
 

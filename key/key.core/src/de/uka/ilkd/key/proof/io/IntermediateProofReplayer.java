@@ -29,6 +29,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
@@ -358,13 +359,15 @@ public class IntermediateProofReplayer {
                                             joinAppInterm
                                                     .getPredAbstrLatticeType();
 
+                                    // TODO (DS): Add HashMap with user choices.
                                     // Instantiate the join procedure
                                     joinApp.setConcreteRule(((JoinWithPredicateAbstractionFactory) joinApp
                                             .getConcreteRule())
                                             .instantiate(
                                                     predicates,
                                                     latticeType == null ? SimplePredicateAbstractionLattice.class
-                                                            : latticeType));
+                                                            : latticeType,
+                                                    new HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement>()));
 
                                 }
 

@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.join;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
-
 import java.util.HashMap;
 
 import org.key_project.util.collection.ImmutableList;

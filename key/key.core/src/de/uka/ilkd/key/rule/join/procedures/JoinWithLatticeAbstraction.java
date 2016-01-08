@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.join.procedures;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -22,14 +23,15 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
@@ -57,6 +59,12 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
     protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s,
             Services services);
 
+    /**
+     * @return Manually chosen lattice elements for program variables. Returns
+     *         an empty map if none given.
+     */
+    protected abstract HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> getUserChoices();
+
     /*
      * (non-Javadoc)
      * 
@@ -67,9 +75,12 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
         return true;
     }
 
+    // TODO (DS): Consider manual user choices; return additional formulae to be
+    // proven.
+
     @Override
-    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
+    public ValuesJoinResult joinValuesInStates(Term v,
+            SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
 
@@ -90,6 +101,10 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
 
             AbstractDomainElement joinElem =
                     lattice.join(abstrElem1, abstrElem2);
+
+            // TODO: Incorporate manual user choices with corresponding side
+            // contitions
+            LinkedHashSet<Term> sideConditions = new LinkedHashSet<Term>();
 
             Function newSkolemConst =
                     getNewSkolemConstantForPrefix(joinElem.toString(),
@@ -112,18 +127,17 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
                                     valueInState1, valueInState2,
                                     distinguishingFormula, services)));
 
-            return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
-                    newConstraints, tb.func(newSkolemConst), newNames);
+            return new ValuesJoinResult(newConstraints,
+                    tb.func(newSkolemConst), newNames, sideConditions);
 
         }
         else {
 
-            return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
-                    DefaultImmutableSet.<Term> nil(),
+            return new ValuesJoinResult(DefaultImmutableSet.<Term> nil(),
                     JoinIfThenElse.createIfThenElseTerm(state1, state2,
                             valueInState1, valueInState2,
                             distinguishingFormula, services),
-                    new LinkedHashSet<Name>());
+                    new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
 
         }
 

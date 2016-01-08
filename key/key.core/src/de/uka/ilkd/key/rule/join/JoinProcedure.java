@@ -27,7 +27,6 @@ import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
@@ -84,11 +83,9 @@ public abstract class JoinProcedure {
      *            automatic generation).
      * @param services
      *            The services object.
-     * @return A joined value for valueInState1 and valueInState2, that is a
-     *         triple consisting of new constraints, the actual value and new
-     *         names introduced.
+     * @return The join result.
      */
-    public abstract Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
+    public abstract ValuesJoinResult joinValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services);
@@ -136,6 +133,43 @@ public abstract class JoinProcedure {
      */
     public static ImmutableList<JoinProcedure> getJoinProcedures() {
         return CONCRETE_RULES;
+    }
+    
+    /**
+     * Encapsulates the result of a join of values.
+     *
+     * @author Dominic Scheurer
+     */
+    public static class ValuesJoinResult {
+        private ImmutableSet<Term> newConstraints;
+        private Term joinVal;
+        private LinkedHashSet<Name> newNames;
+        private LinkedHashSet<Term> sideConditions;
+        
+        public ValuesJoinResult(ImmutableSet<Term> newConstraints,
+                Term joinVal, LinkedHashSet<Name> newNames,
+                LinkedHashSet<Term> sideConditions) {
+            this.newConstraints = newConstraints;
+            this.joinVal = joinVal;
+            this.newNames = newNames;
+            this.sideConditions = sideConditions;
+        }
+
+        public ImmutableSet<Term> getNewConstraints() {
+            return newConstraints;
+        }
+
+        public Term getJoinVal() {
+            return joinVal;
+        }
+
+        public LinkedHashSet<Name> getNewNames() {
+            return newNames;
+        }
+
+        public LinkedHashSet<Term> getSideConditions() {
+            return sideConditions;
+        }
     }
 
 }

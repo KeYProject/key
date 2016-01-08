@@ -21,7 +21,6 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.trySimplify;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -32,7 +31,6 @@ import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils.Option;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
@@ -75,16 +73,16 @@ public class JoinIfThenElse extends JoinProcedure {
     }
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
+    public ValuesJoinResult joinValuesInStates(
             Term v, SymbolicExecutionState state1,
             Term valueInState1, SymbolicExecutionState state2,
             Term valueInState2, Term distinguishingFormula, Services services) {
 
-        return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
+        return new ValuesJoinResult(
                 DefaultImmutableSet.<Term> nil(), createIfThenElseTerm(state1,
                         state2, valueInState1, valueInState2,
                         distinguishingFormula, services),
-                new LinkedHashSet<Name>());
+                new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
 
     }
     @Override
