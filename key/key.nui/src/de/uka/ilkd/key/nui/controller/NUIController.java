@@ -40,7 +40,8 @@ public class NUIController implements Initializable {
     /**
      * Factory to create GUI components
      */
-    private ComponentFactory componentFactory = new ComponentFactory("components/");
+    private ComponentFactory componentFactory = new ComponentFactory(
+            "components/");
 
     /**
      * TODO
@@ -149,7 +150,8 @@ public class NUIController implements Initializable {
             break;
         }
 
-        String componentResource = (String) clickedItem.getParentMenu().getProperties().get("componentResource");
+        String componentResource = (String) clickedItem.getParentMenu()
+                .getProperties().get("componentResource");
 
         createComponent(componentName, place, componentResource);
     }
@@ -185,14 +187,15 @@ public class NUIController implements Initializable {
      *             The Component componentName already exists in the Place
      *             place.
      */
-    public void createComponent(String componentName, Place place, String componentResource)
-            throws IllegalArgumentException {
+    public void createComponent(String componentName, Place place,
+            String componentResource) throws IllegalArgumentException {
         // Does the component already exist?
         // Then the user wants either to change change its place or to hide it
         if (placeComponent.containsKey(componentName)) {
 
             Node existingcomponent = null;
-            for (Node n : getPane(placeComponent.get(componentName)).getChildren()) {
+            for (Node n : getPane(placeComponent.get(componentName))
+                    .getChildren()) {
                 if (n.getId().equals(componentName)) {
                     existingcomponent = n;
                     break;
@@ -203,7 +206,8 @@ public class NUIController implements Initializable {
             // from the Pane where it currently is listed)
             // and update its position in the posComponent Map.
             if (place == Place.HIDDEN) {
-                getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
+                getPane(placeComponent.get(componentName)).getChildren()
+                        .remove(existingcomponent);
                 placeComponent.remove(componentName);
                 statustext.setText("View " + componentName + " hidden.");
             }
@@ -215,7 +219,8 @@ public class NUIController implements Initializable {
         }
         else { // Component did not already exist, thus it must be created
             placeComponent.put(componentName, place);
-            Parent newComponent = componentFactory.createComponent(componentName, componentResource);
+            Parent newComponent = componentFactory
+                    .createComponent(componentName, componentResource);
             getPane(place).getChildren().add(newComponent);
         }
     }
@@ -237,8 +242,10 @@ public class NUIController implements Initializable {
                 try {
                     createComponent(".searchView", p, ".searchView.fxml");
                 }
-                catch (IllegalArgumentException e) { // SearchView already exists
-                    // TODO move Focus to the SearchView text field
+                catch (IllegalArgumentException e) {
+                    // SearchView already exists
+                    SearchViewController.getInstance().SearchTextField.requestFocus();
+                    // TODO this is the ugliest solution possible
                 }
             }
             break;

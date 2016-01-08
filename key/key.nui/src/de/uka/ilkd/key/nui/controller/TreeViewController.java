@@ -121,7 +121,7 @@ public class TreeViewController implements Initializable {
      * @author Stefan Pilot
      * @return
      */
-    public static TreeViewController getInstance() {
+    static TreeViewController getInstance() {
         return instance;
     }
 
