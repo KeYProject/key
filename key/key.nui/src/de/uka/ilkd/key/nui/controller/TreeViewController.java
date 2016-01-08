@@ -180,7 +180,7 @@ public class TreeViewController implements Initializable {
     	// get next higher index and its tree node
     	//TODO can be very much improved using your grips
     	// store list of indices of matches
-    	List<Integer> idxOfMatches = new LinkedList<Integer>();
+    	List<Integer> idxOfMatches = new LinkedList<>();
     	for(TreeItem<NUINode> i : searchResults) {
     		int idx = proofTreeView.getRow(i);
     		idxOfMatches.add(idx);
