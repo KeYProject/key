@@ -18,12 +18,40 @@ public final class ProofTreeActions {
 	
 	/**
 	 * expands an item and all of its children
+	 * @param rootTreeItem the item for applying the action to
+	 */
+	public static void expandAll(TreeItem<NUINode> rootTreeItem) {
+		rootTreeItem.setExpanded(true);
+		for(TreeItem<NUINode> child : rootTreeItem.getChildren()) {
+			expandAll(child);
+		}
+	}
+	
+	
+	/**
+	 * expands an item and all of its children
 	 * @param treeItem the item for applying the action to
 	 */
-	public static void expandAll(TreeItem<NUINode> treeItem) {
+	public static void expandBelow(TreeItem<NUINode> treeItem) {
 		treeItem.setExpanded(true);
 		for(TreeItem<NUINode> child : treeItem.getChildren()) {
 			expandAll(child);
+		}
+		
+		TreeItem<NUINode> nextSibling = treeItem.nextSibling();
+		if(nextSibling != null) {
+			expandBelow(nextSibling);
+		}
+	}
+	
+	/**
+	 * collapses an item and all of its children
+	 * @param rootTreeItem the item for applying the action to
+	 */
+	public static void collapseAll(TreeItem<NUINode> rootTreeItem) {
+		rootTreeItem.setExpanded(false);
+		for(TreeItem<NUINode> child : rootTreeItem.getChildren()) {
+			collapseAll(child);
 		}
 	}
 	
@@ -31,10 +59,15 @@ public final class ProofTreeActions {
 	 * collapses an item and all of its children
 	 * @param treeItem the item for applying the action to
 	 */
-	public static void collapseAll(TreeItem<NUINode> treeItem) {
+	public static void collapseBelow(TreeItem<NUINode> treeItem) {
 		treeItem.setExpanded(false);
 		for(TreeItem<NUINode> child : treeItem.getChildren()) {
 			collapseAll(child);
+		}
+		
+		TreeItem<NUINode> nextSibling = treeItem.nextSibling();
+		if(nextSibling != null) {
+			collapseBelow(nextSibling);
 		}
 	}
 	

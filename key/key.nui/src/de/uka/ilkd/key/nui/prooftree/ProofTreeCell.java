@@ -70,7 +70,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 			return;
 		}
 		
-		setContextMenu(new ProofTreeContextMenu(item, getTreeItem()));
+		setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView()));
 		
 		// reset label and icon
 	    label = new Label(item.getLabel() + " ");

@@ -34,10 +34,15 @@ public class IconFactory {
 	public static String KEY_INNER_NODE_INTERACTIVE = "interactiveNode.png";
 
 	// Leafs
-	public static String KEY_LEAF_NODE_INTERACTIVE = "interactiveGoal.png";
+	public static final String KEY_LEAF_NODE_INTERACTIVE = "interactiveGoal.png";
 	public static String KEY_LEAF_NODE_CLOSED = "closedGoal.png";
 	public static String KEY_LEAF_NODE_OPEN = "openGoal.png";
-	public static String KEY_LEAF_NODE_LINKED = "linkedNode.png";	
+	public static String KEY_LEAF_NODE_LINKED = "linkedNode.png";
+	
+	// Context Menu
+	public static final String EXPAND = "expand.png";
+	public static final String COLLAPSE = "collapse.png";
+	public static final String SEARCH = "search.png";
 
 	/**
 	 * Returns an ImageView (scaled image) based on the given imageFilename in
