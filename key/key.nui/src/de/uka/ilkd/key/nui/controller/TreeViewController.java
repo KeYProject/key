@@ -159,8 +159,10 @@ public class TreeViewController implements Initializable {
             if (s.toLowerCase().contains(term.toLowerCase()))
                 searchResults.add(searchMap.get(s));
 
-        for (TreeItem<NUINode> t : searchResults)
-            t.getValue().setHighlighting(true);
+        for (TreeItem<NUINode> t : searchResults) {
+        	t.getValue().setHighlighting(true);
+        	ProofTreeActions.refeshTreeItem(t);
+        }
         
         gotoNextSearchResult();
     }
