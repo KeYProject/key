@@ -11,5 +11,11 @@
 	<classpathentry kind="lib" path="testfx/testfx-junit-4.0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="testfx/testfx-legacy-4.0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/annotations-3.0.1u2.jar"/>
+	<classpathentry kind="lib" path="lib/guava-19.0-rc2.jar"/>
+	<classpathentry kind="lib" path="lib/javassist-3.20.0-GA.jar"/>
+	<classpathentry kind="lib" path="lib/jcip-annotations-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jsr305-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/reflections-0.9.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
