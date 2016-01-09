@@ -18,6 +18,7 @@ import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -57,21 +58,56 @@ public class TreeViewController implements Initializable {
     private static TreeViewController instance;
 
     /**
-     * Initialization method for scene; loads the default proof
+     * Initialization method for scene; loads the default proof.
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public final void initialize(final URL location, final ResourceBundle resources) {
 
         instance = this; // TODO this is bad practice
+        Platform.runLater(new Runnable() {
 
-        // set cell factory for rendering cells
-        proofTreeView.setCellFactory(
-                new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
+            @Override
+            public void run() {
+                NUIController.getInstance().registerKeyListener(KeyCode.F,
+                        new KeyCode[] { KeyCode.CONTROL }, new EventHandler<KeyEvent>() {
                     @Override
-                    public TreeCell<NUINode> call(TreeView<NUINode> p) {
-                        return new ProofTreeCell();
+                    public void handle(final KeyEvent e) {
+                        if (NUIController.getInstance().getPlaceComponent()
+                                .containsKey("treeView")) {
+                            Place p = NUIController.getInstance().getPlaceComponent()
+                                    .get("treeView");
+                            try {
+                                NUIController.getInstance().createOrMoveOrHideComponent(
+                                        ".searchView", p, ".searchView.fxml");
+                            }
+                            catch (IllegalArgumentException ex) {
+                                // SearchView already exists
+                                SearchViewController.getInstance().SearchTextField.requestFocus();
+                            }
+                        }
                     }
                 });
+
+                NUIController.getInstance().registerKeyListener(KeyCode.ESCAPE, null,
+                        new EventHandler<KeyEvent>() {
+                    @Override
+                    public void handle(final KeyEvent e) {
+                        NUIController.getInstance().createOrMoveOrHideComponent(".searchView",
+                                Place.HIDDEN, ".searchView.fxml");
+                    }
+                });
+
+            }
+
+        });
+
+        // set cell factory for rendering cells
+        proofTreeView.setCellFactory(new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
+            @Override
+            public TreeCell<NUINode> call(final TreeView<NUINode> p) {
+                return new ProofTreeCell();
+            }
+        });
 
         // Create a new tree visualizer instance for processing the conversion
         // de.uka.ilkd.key.proof.Node -->

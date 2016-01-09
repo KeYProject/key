@@ -244,31 +244,72 @@ public class NUIController implements Initializable {
     }
 
     /**
+     * TODO 
+     */
+    private Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
+
+    /**
+     * TODO
+     * 
+     * @throws IllegalArgumentException
+     *             -- that key is already in use or modifiers does not entirely
+     *             consist of modifiers
+     */
+    public void registerKeyListener(KeyCode k, KeyCode[] modifiers, EventHandler<KeyEvent> e)
+            throws IllegalArgumentException {
+
+        if (modifiers != null)
+            for (KeyCode c : modifiers) {
+                // blame Java for the fact that I cannot make the compiler do
+                // this check
+                if (!c.isModifierKey())
+                    throw new IllegalArgumentException(
+                            "You submitted an illegal modifiers list for the key " + k);
+            }
+        if (keyEventHandlers.containsKey(k))
+            throw new IllegalArgumentException(
+                    "The key you submitted (" + k + ") was already in use.");
+
+        keyEventHandlers.put(k, new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(e,
+                (modifiers == null) ? new KeyCode[0] : modifiers));
+    }
+
+    /**
      * TODO
      * 
      * @param k
      */
     public void handleKeyPressed(KeyEvent k) {
-        switch (k.getCode()) {
-        case ESCAPE:
-            createOrMoveOrHideComponent(".searchView", Place.HIDDEN, ".searchView.fxml");
-            break;
-        case F:
-            if (k.isControlDown() && placeComponent.containsKey("treeView")) {
-                Place p = placeComponent.get("treeView");
 
-                try {
-                    createOrMoveOrHideComponent(".searchView", p, ".searchView.fxml");
-                }
-                catch (IllegalArgumentException ex) {
-                    // SearchView already exists
-                    SearchViewController.getInstance().SearchTextField.requestFocus();
-                    // TODO this is the ugliest solution possible
+        // Registered Key Handlers
+        SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]> e = keyEventHandlers
+                .get(k.getCode());
+
+        if (e != null) {
+            for (KeyCode keyCode : e.getValue()) {
+                switch (keyCode) {
+                case ALT:
+                    if (!k.isAltDown())
+                        return;
+                    break;
+                case CONTROL:
+                    if (!k.isControlDown())
+                        return;
+                    break;
+                case META:
+                    if (!k.isMetaDown())
+                        return;
+                    break;
+                case SHIFT:
+                    if (!k.isShiftDown())
+                        return;
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                            "You submitted an illegal modifiers list for the key " + k.getCode());
                 }
             }
-            break;
-        default:
-            break;
+            e.getKey().handle(k);
         }
     }
 }
