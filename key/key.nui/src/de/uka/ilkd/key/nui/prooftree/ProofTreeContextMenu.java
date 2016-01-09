@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nui.prooftree;
 
 import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.controller.NUIController;
+import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -126,8 +127,9 @@ public class ProofTreeContextMenu extends ContextMenu {
     	this.getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
     	mISearch.setOnAction(t -> {
+    	    Place p = NUIController.getInstance().getPlaceComponent().get("treeView");
     		try {
-    			NUIController.getInstance().createComponent(".searchView", NUIController.Place.LEFT,
+    			NUIController.getInstance().createComponent(".searchView", p,
     					".searchView.fxml");
     		} catch (IllegalArgumentException e) {
     			NUIController.getInstance().createComponent(".searchView", 

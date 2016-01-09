@@ -1,12 +1,14 @@
 package de.uka.ilkd.key.nui.controller;
 
 import java.net.URL;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
-
 import de.uka.ilkd.key.nui.ComponentFactory;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -19,6 +21,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 /**
@@ -39,8 +42,7 @@ public class NUIController implements Initializable {
     /**
      * Factory to create GUI components
      */
-    private ComponentFactory componentFactory = new ComponentFactory(
-            "components/");
+    private ComponentFactory componentFactory = new ComponentFactory("components/");
 
     /**
      * TODO
@@ -49,11 +51,25 @@ public class NUIController implements Initializable {
     public enum Place {
         LEFT, MIDDLE, RIGHT, BOTTOM, HIDDEN
     }
-
+    
+    /**
+     * TODO
+     */
     private static NUIController instance; // TODO this is ugly
-
+    
+    /**
+     * TODO
+     * @return
+     */
     public static NUIController getInstance() {
         return instance; // TODO this is ugly
+    }
+
+    /**
+     * @return the placeComponent
+     */
+    public HashMap<String, Place> getPlaceComponent() {
+        return placeComponent;
     }
 
     // Definition of GUI fields
@@ -149,16 +165,18 @@ public class NUIController implements Initializable {
             break;
         }
 
-        String componentResource = (String) clickedItem.getParentMenu()
-                .getProperties().get("componentResource");
+        String componentResource = (String) clickedItem.getParentMenu().getProperties()
+                .get("componentResource");
 
         createComponent(componentName, place, componentResource);
     }
 
     /**
-     * @param p a {@link Place}
+     * @param p
+     *            a {@link Place}
      * @return the respective Pane
-     * @throws IllegalArgumentException p == HIDDEN
+     * @throws IllegalArgumentException
+     *             p == HIDDEN
      */
     protected Pane getPane(Place p) {
         switch (p) {
@@ -185,15 +203,14 @@ public class NUIController implements Initializable {
      *             The Component componentName already exists in the Place
      *             place.
      */
-    public void createComponent(String componentName, Place place,
-            String componentResource) throws IllegalArgumentException {
+    public void createComponent(String componentName, Place place, String componentResource)
+            throws IllegalArgumentException {
         // Does the component already exist?
         // Then the user wants either to change its place or to hide it
         if (placeComponent.containsKey(componentName)) {
 
             Node existingcomponent = null;
-            for (Node n : getPane(placeComponent.get(componentName))
-                    .getChildren()) {
+            for (Node n : getPane(placeComponent.get(componentName)).getChildren()) {
                 if (n.getId().equals(componentName)) {
                     existingcomponent = n;
                     break;
@@ -204,8 +221,7 @@ public class NUIController implements Initializable {
             // from the Pane where it currently is listed)
             // and update its position in the posComponent Map.
             if (place == Place.HIDDEN) {
-                getPane(placeComponent.get(componentName)).getChildren()
-                        .remove(existingcomponent);
+                getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
                 placeComponent.remove(componentName);
                 statustext.setText("View " + componentName + " hidden.");
             }
@@ -240,7 +256,7 @@ public class NUIController implements Initializable {
                 try {
                     createComponent(".searchView", p, ".searchView.fxml");
                 }
-                catch (IllegalArgumentException e) {
+                catch (IllegalArgumentException ex) {
                     // SearchView already exists
                     SearchViewController.getInstance().SearchTextField.requestFocus();
                     // TODO this is the ugliest solution possible
