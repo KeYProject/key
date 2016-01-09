@@ -51,14 +51,15 @@ public class NUIController implements Initializable {
     public enum Place {
         LEFT, MIDDLE, RIGHT, BOTTOM, HIDDEN
     }
-    
+
     /**
      * TODO
      */
     private static NUIController instance; // TODO this is ugly
-    
+
     /**
      * TODO
+     * 
      * @return
      */
     public static NUIController getInstance() {
@@ -110,8 +111,8 @@ public class NUIController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Load default components
-        createComponent("treeView", Place.LEFT, "treeView.fxml");
-        createComponent("proofView", Place.RIGHT, "proofView.fxml");
+        createOrMoveOrHideComponent("treeView", Place.LEFT, "treeView.fxml");
+        createOrMoveOrHideComponent("proofView", Place.RIGHT, "proofView.fxml");
         // Select appropriate menu item entries
         toggleGroup2.selectToggle(toggleGroup2.getToggles().get(3));
         toggleGroup3.selectToggle(toggleGroup3.getToggles().get(1));
@@ -168,7 +169,7 @@ public class NUIController implements Initializable {
         String componentResource = (String) clickedItem.getParentMenu().getProperties()
                 .get("componentResource");
 
-        createComponent(componentName, place, componentResource);
+        createOrMoveOrHideComponent(componentName, place, componentResource);
     }
 
     /**
@@ -178,7 +179,7 @@ public class NUIController implements Initializable {
      * @throws IllegalArgumentException
      *             p == HIDDEN
      */
-    protected Pane getPane(Place p) {
+    protected Pane getPane(Place p) throws IllegalArgumentException {
         switch (p) {
         case MIDDLE:
             return middle;
@@ -196,17 +197,17 @@ public class NUIController implements Initializable {
     /**
      * TODO
      * 
-     * @param componentName
-     * @param place
+     * @param componentName – the Component to create / relocate / hide
+     * @param place – the place where
      * @param componentResource
      * @throws IllegalArgumentException
      *             The Component componentName already exists in the Place
      *             place.
      */
-    public void createComponent(String componentName, Place place, String componentResource)
+    public void createOrMoveOrHideComponent(String componentName, Place place, String componentResource)
             throws IllegalArgumentException {
         // Does the component already exist?
-        // Then the user wants either to change its place or to hide it
+        // Then the user wants to either change its place or to hide it
         if (placeComponent.containsKey(componentName)) {
 
             Node existingcomponent = null;
@@ -231,11 +232,14 @@ public class NUIController implements Initializable {
             }
 
         }
-        else { // Component did not already exist, thus it must be created
-            placeComponent.put(componentName, place);
-            Parent newComponent = componentFactory
-                    .createComponent(componentName, componentResource);
-            getPane(place).getChildren().add(newComponent);
+        else {
+            if (place != Place.HIDDEN) {// Component did not already exist, thus
+                                        // it must be created
+                placeComponent.put(componentName, place);
+                Parent newComponent = componentFactory.createComponent(componentName,
+                        componentResource);
+                getPane(place).getChildren().add(newComponent);
+            }
         }
     }
 
@@ -247,14 +251,14 @@ public class NUIController implements Initializable {
     public void handleKeyPressed(KeyEvent k) {
         switch (k.getCode()) {
         case ESCAPE:
-            createComponent(".searchView", Place.HIDDEN, ".searchView.fxml");
+            createOrMoveOrHideComponent(".searchView", Place.HIDDEN, ".searchView.fxml");
             break;
         case F:
             if (k.isControlDown() && placeComponent.containsKey("treeView")) {
                 Place p = placeComponent.get("treeView");
 
                 try {
-                    createComponent(".searchView", p, ".searchView.fxml");
+                    createOrMoveOrHideComponent(".searchView", p, ".searchView.fxml");
                 }
                 catch (IllegalArgumentException ex) {
                     // SearchView already exists
