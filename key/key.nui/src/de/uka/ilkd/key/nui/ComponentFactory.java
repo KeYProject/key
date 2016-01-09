@@ -51,6 +51,7 @@ public class ComponentFactory {
 
     /**
      * Creates and returns the JavaFX scenegraph for the application window
+     * TODO this tends to return null sometimes. But when exactly?
      * 
      * @return returns the JavaFX scenegraph for the application window
      * @throws Exception
