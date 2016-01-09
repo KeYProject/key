@@ -69,7 +69,7 @@ public class NUIController implements Initializable {
     /**
      * @return the placeComponent
      */
-    public HashMap<String, Place> getPlaceComponent() {
+    public final HashMap<String, Place> getPlaceComponent() {
         return placeComponent;
     }
 
@@ -109,7 +109,7 @@ public class NUIController implements Initializable {
      * Loads the default components of the GUI
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(final URL location, final ResourceBundle resources) {
         // Load default components
         createOrMoveOrHideComponent("treeView", Place.LEFT, "treeView.fxml");
         createOrMoveOrHideComponent("proofView", Place.RIGHT, "proofView.fxml");
@@ -124,7 +124,7 @@ public class NUIController implements Initializable {
      * Handles user input if user clicks "Close" in the file menu
      */
     @FXML
-    protected void handleCloseWindow(ActionEvent e) {
+    protected void handleCloseWindow(final ActionEvent e) {
         Platform.exit();
     }
 
@@ -132,7 +132,7 @@ public class NUIController implements Initializable {
      * Handles user input if user clicks "About KeY" in the file menu
      */
     @FXML
-    protected void handleAboutWindow(ActionEvent e) {
+    protected void handleAboutWindow(final ActionEvent e) {
 
     }
 
@@ -141,7 +141,7 @@ public class NUIController implements Initializable {
      * using the file menu
      */
     @FXML
-    protected void handleLoadComponent(ActionEvent e) {
+    protected void handleLoadComponent(final ActionEvent e) {
         RadioMenuItem clickedItem = (RadioMenuItem) e.getSource();
         String componentName = (String) // e.g. "treeView", "proofView"
         clickedItem.getParentMenu().getProperties().get("componentName");
@@ -179,7 +179,7 @@ public class NUIController implements Initializable {
      * @throws IllegalArgumentException
      *             p == HIDDEN
      */
-    protected Pane getPane(Place p) throws IllegalArgumentException {
+    protected Pane getPane(final Place p) throws IllegalArgumentException {
         switch (p) {
         case MIDDLE:
             return middle;
@@ -197,15 +197,17 @@ public class NUIController implements Initializable {
     /**
      * TODO
      * 
-     * @param componentName – the Component to create / relocate / hide
-     * @param place – the place where
+     * @param componentName
+     *            – the Component to create / relocate / hide
+     * @param place
+     *            – the place where
      * @param componentResource
      * @throws IllegalArgumentException
      *             The Component componentName already exists in the Place
      *             place.
      */
-    public void createOrMoveOrHideComponent(String componentName, Place place, String componentResource)
-            throws IllegalArgumentException {
+    public void createOrMoveOrHideComponent(final String componentName, final Place place,
+            final String componentResource) throws IllegalArgumentException {
         // Does the component already exist?
         // Then the user wants to either change its place or to hide it
         if (placeComponent.containsKey(componentName)) {
@@ -233,8 +235,8 @@ public class NUIController implements Initializable {
 
         }
         else {
-            if (place != Place.HIDDEN) {// Component did not already exist, thus
-                                        // it must be created
+            if (place != Place.HIDDEN) {
+                // Component did not already exist, thus it must be created
                 placeComponent.put(componentName, place);
                 Parent newComponent = componentFactory.createComponent(componentName,
                         componentResource);
@@ -244,7 +246,7 @@ public class NUIController implements Initializable {
     }
 
     /**
-     * TODO 
+     * TODO
      */
     private Map<KeyCode, SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>> keyEventHandlers = new HashMap<>();
 
@@ -258,7 +260,7 @@ public class NUIController implements Initializable {
     public void registerKeyListener(KeyCode k, KeyCode[] modifiers, EventHandler<KeyEvent> e)
             throws IllegalArgumentException {
 
-        if (modifiers != null)
+        if (modifiers != null) {
             for (KeyCode c : modifiers) {
                 // blame Java for the fact that I cannot make the compiler do
                 // this check
@@ -266,9 +268,11 @@ public class NUIController implements Initializable {
                     throw new IllegalArgumentException(
                             "You submitted an illegal modifiers list for the key " + k);
             }
-        if (keyEventHandlers.containsKey(k))
+        }
+        if (keyEventHandlers.containsKey(k)) {
             throw new IllegalArgumentException(
                     "The key you submitted (" + k + ") was already in use.");
+        }
 
         keyEventHandlers.put(k, new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(e,
                 (modifiers == null) ? new KeyCode[0] : modifiers));
@@ -279,7 +283,7 @@ public class NUIController implements Initializable {
      * 
      * @param k
      */
-    public void handleKeyPressed(KeyEvent k) {
+    public final void handleKeyPressed(final KeyEvent k) {
 
         // Registered Key Handlers
         SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]> e = keyEventHandlers
@@ -289,20 +293,24 @@ public class NUIController implements Initializable {
             for (KeyCode keyCode : e.getValue()) {
                 switch (keyCode) {
                 case ALT:
-                    if (!k.isAltDown())
+                    if (!k.isAltDown()) {
                         return;
+                    }
                     break;
                 case CONTROL:
-                    if (!k.isControlDown())
+                    if (!k.isControlDown()) {
                         return;
+                    }
                     break;
                 case META:
-                    if (!k.isMetaDown())
+                    if (!k.isMetaDown()) {
                         return;
+                    }
                     break;
                 case SHIFT:
-                    if (!k.isShiftDown())
+                    if (!k.isShiftDown()) {
                         return;
+                    }
                     break;
                 default:
                     throw new IllegalArgumentException(
