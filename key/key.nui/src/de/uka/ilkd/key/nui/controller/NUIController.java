@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.nui.controller;
 
+import java.io.File;
 import java.net.URL;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -19,6 +21,8 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
@@ -38,12 +42,7 @@ public class NUIController implements Initializable {
      * Stores the position of components added to the SplitPane
      */
     private HashMap<String, Place> placeComponent = new HashMap<>();
-
-    /**
-     * Factory to create GUI components
-     */
-    private ComponentFactory componentFactory = new ComponentFactory("components/");
-
+    
     /**
      * TODO
      * 
@@ -238,8 +237,7 @@ public class NUIController implements Initializable {
             if (place != Place.HIDDEN) {
                 // Component did not already exist, thus it must be created
                 placeComponent.put(componentName, place);
-                Parent newComponent = componentFactory.createComponent(componentName,
-                        componentResource);
+                Parent newComponent = ComponentFactory.getInstance().createComponent(componentName, componentResource);
                 getPane(place).getChildren().add(newComponent);
             }
         }

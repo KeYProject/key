@@ -50,22 +50,13 @@ public class TreeViewController implements Initializable {
     private ProofTreeVisualizer visualizer;
 
     /**
-     * Stores reference to 'this' for singleton purpose. TODO this is bad
-     * practice
-     * 
-     * @author Stefan Pilot
-     */
-    private static TreeViewController instance;
-
-    /**
      * Initialization method for scene; loads the default proof.
      */
     @Override
     public final void initialize(final URL location, final ResourceBundle resources) {
 
-        instance = this; // TODO this is bad practice
+        // Register KeyEvent
         Platform.runLater(new Runnable() {
-
             @Override
             public void run() {
                 NUIController.getInstance().registerKeyListener(KeyCode.F,
@@ -98,7 +89,6 @@ public class TreeViewController implements Initializable {
                 });
 
             }
-
         });
 
         // set cell factory for rendering cells
@@ -156,17 +146,6 @@ public class TreeViewController implements Initializable {
             e.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * Returns reference to 'this'. TODO remove this singleton, it is bad
-     * practice
-     * 
-     * @return Reference to 'this'
-     * @author Stefan Pilot
-     */
-    static TreeViewController getInstance() {
-        return instance;
     }
 
     /**

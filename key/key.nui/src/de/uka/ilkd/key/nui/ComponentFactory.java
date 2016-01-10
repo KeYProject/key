@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.nui;
 
 import java.io.IOException;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
@@ -19,11 +22,62 @@ public class ComponentFactory {
     /**
      * directory for fxml files
      */
-    private String resourceDir;
+    private static String resourceDir;
 
-    public ComponentFactory(String resourceDir) {
-        this.resourceDir = resourceDir;
+    private static ComponentFactory instance;
+
+    public static ComponentFactory getInstance() {
+        if (instance == null) {
+            instance = new ComponentFactory();
+            return instance;
+        }
+        else {
+            return instance;
+        }
     }
+
+    private ComponentFactory() {
+        
+    }
+
+    /**
+     * 
+     * @author Stefan Pilot
+     *
+     */
+    private class ComponentMapEntry {
+        /**
+         * 
+         */
+        private SimpleImmutableEntry<FXMLLoader, Parent> e;
+
+        /**
+         * 
+         * @param l
+         * @param p
+         */
+        public ComponentMapEntry(FXMLLoader l, Parent p) {
+            e = new SimpleImmutableEntry<>(l, p);
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public <T> T getController() {
+            return e.getKey().getController();
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public Parent getComponent() {
+            return e.getValue();
+        }
+    }
+
+    private Map<String, ComponentMapEntry> componentMap = new HashMap<>();
 
     /**
      * Returns a new GUI component. Caller is left with placing it in the
@@ -39,9 +93,10 @@ public class ComponentFactory {
     public Parent createComponent(String id, String resource) {
         Parent component = null;
         try {
-            component = FXMLLoader
-                    .load(getClass().getResource(this.resourceDir + resource));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(this.resourceDir + resource));
+            component = loader.load();
             component.setId(id);
+            componentMap.put(id, new ComponentMapEntry(loader, component));
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -50,8 +105,49 @@ public class ComponentFactory {
     }
 
     /**
-     * Creates and returns the JavaFX scenegraph for the application window
-     * TODO this tends to return null sometimes. But when exactly?
+     * 
+     * @param id
+     */
+    public void deleteComponent(String id) {
+        componentMap.remove(id);
+    }
+
+    /**
+     * 
+     * @param id
+     */
+    public boolean hasComponent(String id) {
+        return componentMap.containsKey(id);
+    }
+
+    /**
+     * 
+     * @param id
+     * @return
+     */
+    public Parent getComponent(String id) {
+        return componentMap.get(id).getComponent();
+    }
+
+    /**
+     * Returns a controller for a given component specified by ID.<br/>
+     * 
+     * @param id
+     *            the Components ID
+     * 
+     * @return the Controller, or <t> null </t>, if a component with this ID is
+     *         not currently stored
+     */
+    public <T> T getController(String id) {
+        if (hasComponent(id)) {
+            return componentMap.get(id).getController();
+        }
+        return null;
+    }
+
+    /**
+     * Creates and returns the JavaFX scenegraph for the application window TODO
+     * this tends to return null sometimes. But when exactly?
      * 
      * @return returns the JavaFX scenegraph for the application window
      * @throws Exception
@@ -69,8 +165,7 @@ public class ComponentFactory {
         }
 
         // Load FXML from main window
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("NUIdefault.fxml"), bundle);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("NUIdefault.fxml"), bundle);
 
         Parent root = null;
 
@@ -84,17 +179,7 @@ public class ComponentFactory {
         return root;
     }
 
-    public Parent createTreeView() {
-        Parent treeView = null;
-        try {
-            treeView = FXMLLoader.load(getClass().getResource(
-                    "components/treeView.fxml"));
-        }
-        catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-        return treeView;
+    public static void setInstance(String resourceDir) {
+        ComponentFactory.resourceDir = resourceDir;
     }
-
-    
 }

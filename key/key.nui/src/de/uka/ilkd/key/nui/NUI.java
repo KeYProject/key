@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nui;
 
+import java.util.Arrays;
+
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -22,9 +24,8 @@ public class NUI extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
-        ComponentFactory factory = new ComponentFactory("");
-
-        Parent root = factory.createNUISceneGraph();
+        ComponentFactory.setInstance("components/");
+        Parent root = ComponentFactory.getInstance().createNUISceneGraph();
 
         // Load scene and set preferences
         Scene scene = new Scene(root);

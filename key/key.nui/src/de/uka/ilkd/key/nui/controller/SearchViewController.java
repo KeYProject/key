@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nui.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import de.uka.ilkd.key.nui.ComponentFactory;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -23,7 +24,7 @@ public class SearchViewController implements Initializable {
     @FXML
     Button SearchButton;
 
-    TreeViewController treeViewController = TreeViewController.getInstance();
+    TreeViewController treeViewController = ComponentFactory.getInstance().getController("treeView");
 
     private static SearchViewController instance;
 
