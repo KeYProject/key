@@ -37,16 +37,38 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 public class GoalsPage extends Page implements IGoalsPage {
 
  
+   /**
+    * the currently loaded proof.
+    */
    private Proof proof;
 
+   /**
+    * the viewer of this page.
+    */
    private ListViewer viewer;
 
+   
+   /**
+    * the environment of the proof.
+    */
    private KeYEnvironment<?> environment;
 
+   
+   /**
+    * the selection model.
+    */
    private KeYSelectionModel selectionModel;
 
+   
+   /**
+    * the content provider for the viewer.
+    */
    private ImmutableCollectionContentProvider contentProvider;
 
+   
+   /**
+    * the label provider for the viewer.
+    */
    private LabelProvider labelProvider;
 
    /**
@@ -266,7 +288,7 @@ public class GoalsPage extends Page implements IGoalsPage {
    
    /**
     * Method returns the selected {@link Node}.
-    * @param selection
+    * @param selection the current seletion
     * @return The selected {@link Node} or {@code null} if no {@link Node} is selected.
     */
    protected Node getSelectedNode(ISelection selection) {
