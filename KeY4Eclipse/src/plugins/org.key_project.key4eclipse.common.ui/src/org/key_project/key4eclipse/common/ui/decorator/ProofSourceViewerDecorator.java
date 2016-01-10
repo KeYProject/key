@@ -156,29 +156,11 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    private Color firstStatementColor = new Color(null, 167, 174, 192);
    /**
-    * {@link FontDescriptor} used to describe boldFont.
-    */
-   private FontDescriptor descriptor;
-   /**
-    * {@link Font} used to mark keywords as bold.
-    */
-   private Font boldFont; 
-   /**
     * Java keywords to be highlighted.
     */
    private static final Pattern JAVA_KEYWORDS_PATTERN = 
          Pattern.compile(HTMLSyntaxHighlighter.concat("(", HTMLSyntaxHighlighter.JAVA_KEYWORDS_REGEX, ")"));
-   /**
-    *  Dynamic logic keywords to be highlighted.
-    */
-   private static final Pattern DYNAMIC_LOGIC_KEYWORDS_PATTERN = HTMLSyntaxHighlighter.DYNAMIC_LOGIC_KEYWORDS_PATTERN;
-   /**
-    * Propositional logic keywords to be highlighted.
-    */
-   private static final Pattern PROP_LOGIC_KEYWORDS_PATTERN = HTMLSyntaxHighlighter.PROP_LOGIC_KEYWORDS_PATTERN;
-   /**
-    * Propositional logic keywords to be highlighted.
-    */
+
    /**
     * Text shown.
     */
@@ -218,7 +200,6 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       grayColor1.dispose();
       grayColor2.dispose();
       firstStatementColor.dispose();
-      boldFont.dispose();
    }
    
    /**
@@ -258,36 +239,6 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          }
       }
    }
-   /**
-    * Finds {@link Range} of {@link Term} containing a JavaBlock and fills them into given ArrayList.
-    * @param ranges ArrayList to be filled.
-    * @param path Path to given {@link Term}.
-    * @param term {@link Term} to be searched for {@link Term} containing JavaBlock. 
-    * @return ArrayList containing {@link Range} of all {@link Term} containing a JavaBlock.
-    */
-   private ArrayList<Range> getJavaBlockRanges(ArrayList<Range> ranges, ImmutableList<Integer> path, Term term) {
-      if (term.javaBlock() != null && !term.javaBlock().isEmpty()) {
-         Range termRange = printer.getInitialPositionTable().rangeForPath(path, text.length());
-         // assumption: children of term always come after term 
-         int end = termRange.end();
-         // subtract ranges of all children of the Term from the range of the Term 
-         for (int i = 0; i < term.subs().size(); i++) {
-            Range subRange = printer.getInitialPositionTable().rangeForPath(path.append(i), text.length());
-            end = end - subRange.length();
-
-         }
-         Range javaRange = new Range(termRange.start(), end);
-         ranges.add(javaRange);
-      }
-      // search all children of term for other JavaBlocks
-      for (int i = 0; i < term.subs().size(); i++) {
-            if (term.sub(i).isContainsJavaBlockRecursive()) {
-               getJavaBlockRanges(ranges, path.append(i), term.sub(i));
-            }
-         }
-  
-     return ranges;
-   }
 
    /**
     * Sets {@link StyleRange} for keyword highlighting.
@@ -296,45 +247,27 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    private void setKeywordHighlights(String str) {
       markedKeywords = new ArrayList<StyleRange>();
-      descriptor = FontDescriptor.createFrom(viewer.getTextWidget().getFont()).setStyle(SWT.BOLD); 
-      boldFont = descriptor.createFont(viewer.getTextWidget().getDisplay());
-      // find java keywords and mark them
-      for (int i = 1; i <= node.sequent().size(); i++) {
-        Term term = node.sequent().getFormulabyNr(i).formula();
-        if (term.isContainsJavaBlockRecursive()) {
-           ImmutableList<Integer> path = ImmutableSLList.<Integer>nil().prepend(0);
-           Matcher javaMatcher = JAVA_KEYWORDS_PATTERN.matcher(str);
-           for (Range range : getJavaBlockRanges(new ArrayList<Range>(), path.append(i - 1), term)) {
-              javaMatcher.region(range.start(), range.end());
-              while (javaMatcher.find()) {
-                 StyleRange mark = new StyleRange();
-                 mark.font = boldFont;
-                 mark.foreground = purpleColor;
-                 mark.start = javaMatcher.start();
-                 mark.length = javaMatcher.end() - javaMatcher.start();
-                 markedKeywords.add(mark);              
-              }
-           } 
-        }
+      // mark java keywords in a java block
+      Matcher javaMatcher = JAVA_KEYWORDS_PATTERN.matcher(str);
+      for (Range range : printer.getInitialPositionTable().getJavaBlockRanges()) {
+         javaMatcher.region(range.start(), range.end());
+         while (javaMatcher.find()) {
+            StyleRange mark = new StyleRange();
+            mark.fontStyle = SWT.BOLD;
+            mark.foreground = purpleColor;
+            mark.start = javaMatcher.start();
+            mark.length = javaMatcher.end() - javaMatcher.start();
+            markedKeywords.add(mark); 
+         }
       }
-      // find KeY keywords and mark them
-      Matcher dynamicMatcher = DYNAMIC_LOGIC_KEYWORDS_PATTERN.matcher(str);
-      while (dynamicMatcher.find()) {
+      // mark KeY keywords 
+      for (Range keyword : printer.getInitialPositionTable().getKeywordRanges()) {
          StyleRange mark = new StyleRange();
-         mark.font = boldFont;
+         mark.fontStyle = SWT.BOLD;
          mark.foreground = blueColor;
-         mark.start = dynamicMatcher.start();
-         mark.length = dynamicMatcher.end() - dynamicMatcher.start();
-       markedKeywords.add(mark);
-      }
-      Matcher propMatcher = PROP_LOGIC_KEYWORDS_PATTERN.matcher(str);
-      while (propMatcher.find()) {
-         StyleRange mark = new StyleRange();
-         mark.font = boldFont;
-         mark.foreground = blueColor;
-         mark.start = propMatcher.start();
-         mark.length = propMatcher.end() - propMatcher.start();
-       markedKeywords.add(mark);
+         mark.start = keyword.start();
+         mark.length = keyword.length();
+         markedKeywords.add(mark);
       }
    }
    

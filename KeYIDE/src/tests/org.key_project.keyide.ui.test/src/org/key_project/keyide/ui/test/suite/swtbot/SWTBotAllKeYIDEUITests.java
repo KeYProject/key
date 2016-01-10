@@ -16,6 +16,7 @@ package org.key_project.keyide.ui.test.suite.swtbot;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotAutoModeHandlerTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotGoalsViewPageTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEPreferencePageTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotManualRuleApplicationTest;
@@ -40,6 +41,7 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTermPropertySectionT
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    SWTBotAutoModeHandlerTest.class,
+   SWTBotGoalsViewPageTest.class,
    SWTBotKeYIDEMethodStarterTest.class,
    SWTBotKeYIDEPreferencePageTest.class,
    SWTBotManualRuleApplicationTest.class,

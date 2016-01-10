@@ -80,7 +80,7 @@ public class HTMLSyntaxHighlighter {
     private final static String[] DYNAMIC_LOGIC_KEYWORDS = { "\\forall",
             "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum",
             "bsum", "\\in", "exactInstance", "wellFormed", "measuredByEmpty",
-            "method-frame", "<created>", "<inv>", "\\cup",
+            "<created>", "<inv>", "\\cup",
             ""+FORALL, ""+EXISTS, ""+IN, ""+EMPTY};
     
     private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
@@ -104,7 +104,7 @@ public class HTMLSyntaxHighlighter {
     private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
             "while", "return", "break", "switch", "case", "continue", "try",
             "catch", "finally", "assert", "null", "throw", "this", "true",
-            "false", "int", "char", "long", "short", "boolean" };
+            "false", "int", "char", "long", "short", "method-frame", "boolean" };
     
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
             Arrays.asList(JAVA_KEYWORDS));

@@ -30,17 +30,23 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -51,6 +57,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
@@ -983,6 +990,17 @@ public class LogicPrinter {
      *
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
+       boolean isKeyword = false;
+       if (services != null) {
+           Sort wellFormedSort = (Sort) services.getNamespaces().sorts().lookup(new Name("Heap"));
+           Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
+           BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
+           IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
+           
+           isKeyword = (t.op() == getHeapLDT().getWellFormed(wellFormedSort) || t.op() == measuredByEmpty 
+                 || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
+                 || t.op() == integer.getBsum());
+        }
         if (notationInfo.isPrettySyntax()
                 && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT(), services)
                 && getNotationInfo().isHidePackagePrefix()) {
@@ -991,12 +1009,38 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             int index = name.lastIndexOf(".");
             String prettyFieldName = name.substring(index+1);
+            if (isKeyword) {
+               markStartKeyword(); 
+             }
             layouter.print(prettyFieldName);
+            if (isKeyword) {
+               markEndKeyword();
+            }
         }
         else {
             String name = t.op().name().toString();
             startTerm(t.arity());
-            layouter.print(name);
+            boolean alreadyPrinted = false;
+            if (t.op() instanceof SortDependingFunction) {  
+               SortDependingFunction op = (SortDependingFunction) t.op();
+               if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
+                  layouter.print(op.getSortDependingOn().declarationString());
+                  layouter.print("::");
+                  markStartKeyword();
+                  layouter.print(op.getKind().toString());
+                  markEndKeyword();
+                  alreadyPrinted = true;
+               }
+            }
+            if (isKeyword) {
+              markStartKeyword(); 
+            }
+            if (!alreadyPrinted) {
+               layouter.print(name);
+            }
+            if (isKeyword) {
+               markEndKeyword();
+            }
             if(!t.boundVars().isEmpty()) {
         	layouter.print("{").beginC(0);
         	printVariables(t.boundVars(), quantifiableVariablePrintMode);
@@ -1055,7 +1099,6 @@ public class LogicPrinter {
 
         if(notationInfo.isPrettySyntax() && heapLDT != null) {
             startTerm(t.arity());
-
             final Term heapTerm = t.sub(0);
             final String opName = t.op().name().toString();
 
@@ -1070,9 +1113,13 @@ public class LogicPrinter {
             } else {
                 layouter.beginC(0);
             }
-
+            if (t.op() == getHeapLDT().getCreated()) {
+               markStartKeyword();
+            }
             layouter.print("[" + opName + "(").beginC(0);
-
+            if (t.op() == getHeapLDT().getCreated()) {
+               markEndKeyword();
+            }
             for(int i = 1; i < t.arity(); i++) {
                 // do not print anon_heap if parsability is not required
                 if (getNotationInfo().isHidePackagePrefix() && "anon".equals(opName) && i == 2) {
@@ -1215,6 +1262,10 @@ public class LogicPrinter {
                     ? HeapLDT.getClassName((Function)t.op()) + "."
                     : "";
             fieldName += HeapLDT.getPrettyFieldName(t.op());
+            boolean isKeyword = false;
+            if (services != null) {
+               isKeyword = (obs == services.getJavaInfo().getInv());
+            }
 
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
                 JavaInfo javaInfo = services.getJavaInfo();
@@ -1245,7 +1296,13 @@ public class LogicPrinter {
                 }
                 layouter.print(")").end();
             } else {
+                if (isKeyword) {
+                   markStartKeyword();
+                }
                 layouter.print(fieldName);
+                if (isKeyword) {
+                   markEndKeyword();
+                }
             }
 
             // must the heap be printed at all: no, if default heap.
@@ -1299,27 +1356,31 @@ public class LogicPrinter {
 
 
     public void printElementOf(Term t) throws IOException {
-	assert t.arity() == 3;
-	startTerm(3);
-
-	layouter.print("(").beginC(0);
-
-	markStartSub();
-	printTerm(t.sub(0));
-	markEndSub();
-
-	layouter.print(",").brk(1,0);
-
-	markStartSub();
-	printTerm(t.sub(1));
-	markEndSub();
-
-	layouter.print(")").end();
-	layouter.print(" \\in ");
-
-	markStartSub();
-	printTerm(t.sub(2));
-	markEndSub();
+   	assert t.arity() == 3;
+   	startTerm(3);
+   
+   	layouter.print("(").beginC(0);
+   
+   	markStartSub();
+   	printTerm(t.sub(0));
+   	markEndSub();
+   
+   	layouter.print(",").brk(1,0);
+   
+   	markStartSub();
+   	printTerm(t.sub(1));
+   	markEndSub();
+   
+   	layouter.print(")").end();
+   	layouter.print(" ");
+   	markStartKeyword();
+   	layouter.print("\\in");
+   	markEndKeyword();
+   	layouter.print(" ");
+   
+   	markStartSub();
+   	printTerm(t.sub(2));
+   	markEndSub();
     }
 
     public void printElementOf(Term t, String symbol) throws IOException {
@@ -1356,16 +1417,24 @@ public class LogicPrinter {
      * <code>!a</code>.  No line breaks are possible.
      *
      * @param name the prefix operator
-     * @param t    the subterm to be printed
+     * @param t    whole term
+     * @param sub  the subterm to be printed
      * @param ass  the associativity for the subterm
+     * @throws IOException
      */
-    public void printPrefixTerm(String name,
-                                Term t,int ass)
+    public void printPrefixTerm(String name, Term t,
+                                Term sub,int ass)
         throws IOException
     {
         startTerm(1);
+        if (t.op() == Junctor.NOT) {
+           markStartKeyword();
+        }
         layouter.print(name);
-        maybeParens(t, ass);
+        if (t.op() == Junctor.NOT) {
+           markEndKeyword();
+        }
+        maybeParens(sub, ass);
     }
 
 
@@ -1401,18 +1470,19 @@ public class LogicPrinter {
      * @param l    the left subterm
      * @param assLeft associativity for left subterm
      * @param name the infix operator
+     * @param t    whole term
      * @param r    the right subterm
      * @param assRight associativity for right subterm
      */
     public void printInfixTerm(Term l,int assLeft,
-                               String name,
+                               String name, Term t,
                                Term r,int assRight)
         throws IOException
     {
         int indent = name.length()+1;
         layouter.beginC(indent);
         printInfixTermContinuingBlock(l,assLeft,
-                                      name,
+                                      name, t,
                                       r,assRight);
         layouter.end();
     }
@@ -1425,19 +1495,35 @@ public class LogicPrinter {
      * @param l    the left subterm
      * @param assLeft associativity for left subterm
      * @param name the infix operator
+     * @param t    whole term
      * @param r    the right subterm
      * @param assRight associativity for right subterm
+     * @throws IOException
      * */
     public void printInfixTermContinuingBlock(Term l,int assLeft,
-                                              String name,
+                                              String name, Term t,
                                               Term r,int assRight)
         throws IOException
     {
+        boolean isKeyword = false;
+        if (services != null) {
+           LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
+           isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP 
+                 || t.op() == Equality.EQV || t.op() == loc.getUnion());
+        }
         int indent = name.length()+1;
         startTerm(2);
         layouter.ind();
         maybeParens(l, assLeft);
-        layouter.brk(1,-indent).print(name).ind(1,0);
+        layouter.brk(1,-indent);
+        if (isKeyword) {
+           markStartKeyword();
+        }
+        layouter.print(name);
+        if (isKeyword) {
+           markEndKeyword();
+        }
+        layouter.ind(1,0);
         maybeParens(r, assRight);
     }
 
@@ -1570,27 +1656,35 @@ public class LogicPrinter {
     public void printIfThenElseTerm(Term t, String keyword) throws IOException {
         startTerm(t.arity());
 
-        layouter.beginC ( 0 );
-
-        layouter.print ( keyword );
-
+        layouter.beginC ( 0 ); 
+        markStartKeyword();
+        layouter.print(keyword);
+        markEndKeyword();
         if ( t.varsBoundHere ( 0 ).size () > 0 ) {
             layouter.print ( " " );
             printVariables ( t.varsBoundHere ( 0 ), quantifiableVariablePrintMode );
         }
 
-        layouter.print( " (" );
-        markStartSub ();
-        printTerm ( t.sub ( 0 ) );
-        markEndSub ();
-        layouter.print ( ")" );
+        layouter.print(" (");
+        markStartSub();
+        printTerm (t.sub ( 0 ));
+        markEndSub();
+        layouter.print(")");
 
         for (int i = 1; i < t.arity(); ++i) {
             layouter.brk(1, 3);
             if (i == 1) {
-                layouter.print ( " \\then (" );
+                layouter.print(" ");
+                markStartKeyword();
+                layouter.print("\\then");
+                markEndKeyword();
+                layouter.print(" (");
             } else {
-                layouter.print ( " \\else (" );
+                layouter.print(" ");
+                markStartKeyword();
+                layouter.print("\\else");
+                markEndKeyword();
+                layouter.print(" (");
             }
             markStartSub ();
             printTerm ( t.sub ( i ) );
@@ -1660,7 +1754,10 @@ public class LogicPrinter {
                                     int ass)
         throws IOException {
         layouter.beginC(2);
-        layouter.print(name).print(" ");
+        markStartKeyword();
+        layouter.print(name);
+        markEndKeyword();
+        layouter.print(" ");
         printVariables(vars, quantifiableVariablePrintMode);
         layouter.brk();
         startTerm(1);
@@ -1676,12 +1773,32 @@ public class LogicPrinter {
      */
     public void printConstant(String s)
         throws IOException {
-
         startTerm(0);
         layouter.print(s);
     }
-
-
+    /** Print a constant.  This just prints the string <code>s</code> and
+     * marks it as a nullary term.
+     * @param t constant as term to be printed
+     * @param s name of the constant
+     * @throws IOException
+     */
+    public void printConstant(Term t, String s)
+        throws IOException {
+        startTerm(0);
+        boolean isKeyword = false;
+        if (getHeapLDT() != null) {
+           isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE 
+                 || t.op() == getHeapLDT().getCreated());
+        }
+        if (isKeyword) {
+           markStartKeyword();
+        }
+        layouter.print(s);
+        if (isKeyword) {
+           markEndKeyword();
+        }
+    }
+ 
     /**
      * Print a Java block.  This is formatted using the ProgramPrinter
      * given to the constructor.  The result is indented according to
@@ -1809,8 +1926,9 @@ public class LogicPrinter {
         mark(MarkType.MARK_MODPOSTBL);
         startTerm(phi.arity());
         layouter.print(left);
+        markStartJavaBlock();
         printJavaBlock(jb);
-
+        markEndJavaBlock();
         layouter.print(right+" ");
         if(phi.arity() == 1) {
             maybeParens(phi.sub(0),ass);
@@ -1981,6 +2099,14 @@ public class LogicPrinter {
         MARK_START_UPDATE,
     /** Mark the end of an update.*/
         MARK_END_UPDATE,
+        /** Mark the beginning of a keyword. */
+        MARK_START_KEYWORD,
+        /** Mark the end of a keyword. */
+        MARK_END_KEYWORD,
+        /** Mark the beginning of a java block. */
+        MARK_START_JAVABLOCK,
+        /** Mark the end of a java block. */
+        MARK_END_JAVABLOCK,
     }
 
     private final boolean createPositionTable = true;
@@ -2022,7 +2148,38 @@ public class LogicPrinter {
             mark(MarkType.MARK_END_SUB);
         }
     }
-
+    /**
+     * Called before keyword is printed and marks current position.
+     */
+    protected void markStartKeyword() {
+       if (createPositionTable) {
+          mark(MarkType.MARK_START_KEYWORD);
+      }
+    }
+    /**
+     * Called before java block is printed and marks current position.
+     */
+    protected void markStartJavaBlock() {
+       if (createPositionTable) {
+          mark(MarkType.MARK_START_JAVABLOCK);
+      }
+    }
+    /**
+     * Called after java block is printed and marks current position.
+     */
+    protected void markEndJavaBlock() {
+       if (createPositionTable) {
+          mark(MarkType.MARK_END_JAVABLOCK);
+      }
+    }
+    /**
+     * Called after keyword is printed and marks current position.
+     */
+    protected void markEndKeyword() {
+       if (createPositionTable) {
+          mark(MarkType.MARK_END_KEYWORD);
+      }
+    }
     /**
      * Start a term with subterms.  The backend will set the current
      * posTbl to a newly created position table with the given number
@@ -2210,6 +2367,12 @@ public class LogicPrinter {
 
         /** Remembers the start of an update to create a range */
         private final Stack<Integer> updateStarts = new Stack<Integer>();
+        
+        /** Remembers the start of a keyword to create a range. */
+        private final Stack<Integer> keywordStarts = new Stack<Integer>();
+        
+        /** Remembers the start of a java block to create a range. */
+        private final Stack<Integer> javaBlockStarts = new Stack<Integer>();
 
 
         PosTableStringBackend(int lineWidth) {
@@ -2315,6 +2478,18 @@ public class LogicPrinter {
         	int updateStart = updateStarts.pop();
                 initPosTbl.addUpdateRange(new Range(updateStart, count()));
                 break;
+            case MARK_START_KEYWORD:
+               keywordStarts.push(count());
+               break;
+            case MARK_END_KEYWORD:
+               initPosTbl.addKeywordRange(new Range(keywordStarts.pop(), count()));
+               break;
+            case MARK_START_JAVABLOCK:
+               javaBlockStarts.push(count());
+               break;
+            case MARK_END_JAVABLOCK:
+               initPosTbl.addJavaBlockRange(new Range(javaBlockStarts.pop(), count()));
+               break;
 
             default:
                 System.err.println("Unexpected LogicPrinter mark: " + markType);

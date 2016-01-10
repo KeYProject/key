@@ -34,5 +34,6 @@ Export-Package: org.key_project.keyide.ui.editor,
  org.key_project.keyide.ui.property,
  org.key_project.keyide.ui.providers,
  org.key_project.keyide.ui.starter,
- org.key_project.keyide.ui.util
+ org.key_project.keyide.ui.util,
+ org.key_project.keyide.ui.views
 Import-Package: org.eclipse.jdt.internal.debug.core.breakpoints
