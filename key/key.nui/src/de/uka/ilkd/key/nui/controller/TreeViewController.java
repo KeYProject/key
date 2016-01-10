@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeActions;
@@ -108,10 +109,10 @@ public class TreeViewController implements Initializable {
         // add CSS file to view
         String cssPath = this.getClass().getResource("../components/treeView.css").toExternalForm();
         visualizer.addStylesheet(cssPath);
-
-        // load and display proof in visualizer
-        Proof p = loadProof("gcd.twoJoins.proof");
-        displayProof(p);
+        
+        if(NUI.initialProofFile != null){
+            loadAndDisplayProof(NUI.initialProofFile);
+        }
     }
 
     /**
@@ -124,6 +125,14 @@ public class TreeViewController implements Initializable {
         visualizer.loadProofTree(proof);
         visualizer.visualizeProofTree();
     }
+    
+    /**
+     * 
+     * @param file
+     */
+    public final void loadAndDisplayProof(File file) {
+      displayProof(loadProof(file));
+    }
 
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
@@ -133,9 +142,20 @@ public class TreeViewController implements Initializable {
      *            The file name of the proof file to load.
      * @return The loaded proof.
      */
-    private Proof loadProof(final String proofFileName) {
-        String examplesRoot = "resources//de/uka//ilkd//key//examples//";
-        File proofFile = new File(examplesRoot + proofFileName);
+    public void loadExampleProof() {
+        File proofFile = new File("resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
+        loadAndDisplayProof(proofFile);
+    }
+    
+    /**
+     * Loads the given proof file. Checks if the proof file exists and the proof
+     * is not null, and fails if the proof could not be loaded.
+     *
+     * @param proofFileName
+     *            The file name of the proof file to load.
+     * @return The loaded proof.
+     */
+    private Proof loadProof(final File proofFile) {
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                     proofFile, null, null, null, true);

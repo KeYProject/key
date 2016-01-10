@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nui;
 
+import java.io.File;
 import java.util.Arrays;
 
 import javafx.application.Application;
@@ -14,8 +15,12 @@ import javafx.stage.Stage;
  *
  */
 public class NUI extends Application {
-        
+    
+    public static File initialProofFile;
+    
     public static void main(String[] args) {
+        if(args.length != 0)
+            initialProofFile = new File(System.getProperty("user.dir") + args[0]);
         launch(args);
     }
     

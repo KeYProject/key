@@ -112,6 +112,13 @@ public class NUIController implements Initializable {
         // Load default components
         createOrMoveOrHideComponent("treeView", Place.LEFT, "treeView.fxml");
         createOrMoveOrHideComponent("proofView", Place.RIGHT, "proofView.fxml");
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                TreeViewController t = ComponentFactory.getInstance().getController("treeView");
+                t.loadExampleProof();
+            }
+        });
         // Select appropriate menu item entries
         toggleGroup2.selectToggle(toggleGroup2.getToggles().get(3));
         toggleGroup3.selectToggle(toggleGroup3.getToggles().get(1));
@@ -126,7 +133,23 @@ public class NUIController implements Initializable {
     protected void handleCloseWindow(final ActionEvent e) {
         Platform.exit();
     }
-
+    /**
+     * 
+     * @param e
+     */
+    @FXML
+    public final void handleOpenProof(ActionEvent e){
+        if(!ComponentFactory.getInstance().hasComponent("treeView")){
+            statustext.setText("TreeView not found, opening a tree is not possible");
+        } else {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
+            fileChooser.setSelectedExtensionFilter(new ExtensionFilter("test", Arrays.asList(new String[]{"proof"})));
+            File file = fileChooser.showOpenDialog(contextMenu);
+            TreeViewController t = ComponentFactory.getInstance().getController("treeView");
+            t.loadAndDisplayProof(file);
+        }
+    }
     /**
      * Handles user input if user clicks "About KeY" in the file menu
      */
@@ -203,14 +226,13 @@ public class NUIController implements Initializable {
      * @param componentResource
      * @throws IllegalArgumentException
      *             The Component componentName already exists in the Place
-     *             place.
+     *             place. 
      */
     public void createOrMoveOrHideComponent(final String componentName, final Place place,
             final String componentResource) throws IllegalArgumentException {
         // Does the component already exist?
         // Then the user wants to either change its place or to hide it
         if (placeComponent.containsKey(componentName)) {
-
             Node existingcomponent = null;
             for (Node n : getPane(placeComponent.get(componentName)).getChildren()) {
                 if (n.getId().equals(componentName)) {
