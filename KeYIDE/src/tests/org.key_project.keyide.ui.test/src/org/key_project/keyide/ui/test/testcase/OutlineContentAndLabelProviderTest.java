@@ -60,12 +60,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
     */
    @Test
    public void testInitialStructure() throws Exception {
-      // Create test project
-      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testInitialStructure");
-      IFolder src = project.getProject().getFolder("src");
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
-      // Get local file in operating system of folder src 
-      File location = ResourceUtil.getLocation(src);
+      File location = getFile("OutlineContentAndLabelProviderTest_testInitialStructure", "src", "data/paycard");
       // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
       KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
       IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
@@ -110,12 +105,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
     */
    @Test
    public void testHideIntermediateProofsteps() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
-	  // Create test project
-      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testHideIntermediateProofsteps");
-	  IFolder src = project.getProject().getFolder("src");
-	  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
-	  // Get local file in operating system of folder src 
-	  File location = ResourceUtil.getLocation(src);
+	  File location = getFile("OutlineContentAndLabelProviderTest_testHideIntermediateProofsteps", "src", "data/paycard");
 	  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
 	  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
 	  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
@@ -189,12 +179,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
  	*/
    @Test
    public void testShowSymbolicExecutionTree() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
-	   // Create test project
-	      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testShowSymbolicExecutionTree");
-		  IFolder src = project.getProject().getFolder("src");
-		  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
-		  // Get local file in operating system of folder src 
-		  File location = ResourceUtil.getLocation(src);
+		  File location = getFile("OutlineContentAndLabelProviderTest_testShowSymbolicExecutionTree", "src", "data/paycard");
 		  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
 		  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
 		  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
@@ -268,12 +253,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
  	*/
    @Test
    public void testHideIntermediateProofstepsAndShowSymbolicExecutionTree() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
-	  // Create test project
-      IJavaProject project = TestUtilsUtil.createJavaProject("OutlineContentAndLabelProviderTest_testHideIntermediateProofstepsAndShowSymbolicExecutionTree");
-	  IFolder src = project.getProject().getFolder("src");
-	  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
-	  // Get local file in operating system of folder src 
-	  File location = ResourceUtil.getLocation(src);
+	  File location = getFile("OutlineContentAndLabelProviderTest_testHideIntermediateProofstepsAndShowSymbolicExecutionTree", "src", "data/paycard");
 	  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
 	  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
 	  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
@@ -474,5 +454,24 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
          }
       }
       else assertFalse(viewerIter.hasNext());
+   }
+   
+   /**
+    * Creates a test project and returns the local file of the folder with the given folder name.
+    * @param projectName the name of the test project.
+ 	* @param folderName the name of the folder.
+ 	* @param pathInBundle the path in the bundle.
+ 	* @return the file of the folder with the given folder name
+ 	* @throws CoreException
+ 	* @throws InterruptedException
+ 	*/
+   private File getFile(String projectName, String folderName, String pathInBundle) throws CoreException, InterruptedException {
+	   // Create test project
+      IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+	  IFolder src = project.getProject().getFolder(folderName);
+	  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, src);
+	  // Get file of folder src 
+	  File location = ResourceUtil.getLocation(src);
+	  return location;
    }
 }
