@@ -100,7 +100,8 @@ public class ProofTreeContextMenu extends ContextMenu {
         final MenuItem miExpandAll = new MenuItem("Expand All"); //TODO
         miExpandAll.setGraphic(icf.getImage(IconFactory.EXPAND));
         getItems().add(miExpandAll);
-        miExpandAll.setOnAction(t -> ProofTreeActions.expandAll(treeView.getRoot()));
+        miExpandAll.setOnAction(t -> ProofTreeActions.expandAll(
+                treeView.getRoot()));
     }
     
     /**
@@ -119,7 +120,8 @@ public class ProofTreeContextMenu extends ContextMenu {
         final MenuItem miCollapseAll = new MenuItem("Collapse All"); // TODO
         miCollapseAll.setGraphic(icf.getImage(IconFactory.COLLAPSE));
         getItems().add(miCollapseAll);
-        miCollapseAll.setOnAction(t -> ProofTreeActions.collapseAll(treeView.getRoot()));
+        miCollapseAll.setOnAction(t -> ProofTreeActions.collapseAll(
+                treeView.getRoot()));
     }
 
     /**
@@ -139,13 +141,15 @@ public class ProofTreeContextMenu extends ContextMenu {
     	this.getItems().add(mISearch);
     	mISearch.setGraphic(icf.getImage(IconFactory.SEARCH));
     	mISearch.setOnAction(t -> {
-    	    Place p = NUIController.getInstance().getPlaceComponent().get("treeView");
+    	    Place p = NUIController.getInstance().getPlaceComponent().
+    	            get("treeView");
     		try {
-    			NUIController.getInstance().createOrMoveOrHideComponent(".searchView", p,
-    					".searchView.fxml");
+    			NUIController.getInstance().createOrMoveOrHideComponent(
+    			        ".searchView", p, ".searchView.fxml");
     		} catch (IllegalArgumentException e) {
-    			NUIController.getInstance().createOrMoveOrHideComponent(".searchView", 
-    					NUIController.Place.HIDDEN,	".searchView.fxml");
+    			NUIController.getInstance().createOrMoveOrHideComponent(
+    			        ".searchView", NUIController.Place.HIDDEN, 
+    			        ".searchView.fxml");
     		}
     	});
     }

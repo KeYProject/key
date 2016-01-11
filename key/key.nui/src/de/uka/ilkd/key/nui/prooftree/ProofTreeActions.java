@@ -17,56 +17,56 @@ public final class ProofTreeActions {
 	}
 	
 	/**
-	 * expands an item and all of its children
+	 * Expands an item and all of its children.
 	 * @param rootTreeItem the item for applying the action to
 	 */
-	public static void expandAll(TreeItem<NUINode> rootTreeItem) {
+	public static void expandAll(final TreeItem<NUINode> rootTreeItem) {
 		rootTreeItem.setExpanded(true);
-		for(TreeItem<NUINode> child : rootTreeItem.getChildren()) {
+		for (TreeItem<NUINode> child : rootTreeItem.getChildren()) {
 			expandAll(child);
 		}
 	}
 	
 	
 	/**
-	 * expands an item and all of its children
+	 * Expands an item and all of its children.
 	 * @param treeItem the item for applying the action to
 	 */
-	public static void expandBelow(TreeItem<NUINode> treeItem) {
+	public static void expandBelow(final TreeItem<NUINode> treeItem) {
 		treeItem.setExpanded(true);
-		for(TreeItem<NUINode> child : treeItem.getChildren()) {
+		for (final TreeItem<NUINode> child : treeItem.getChildren()) {
 			expandAll(child);
 		}
 		
 		TreeItem<NUINode> nextSibling = treeItem.nextSibling();
-		if(nextSibling != null) {
+		if (nextSibling != null) {
 			expandBelow(nextSibling);
 		}
 	}
 	
 	/**
-	 * collapses an item and all of its children
+	 * Collapses an item and all of its children.
 	 * @param rootTreeItem the item for applying the action to
 	 */
-	public static void collapseAll(TreeItem<NUINode> rootTreeItem) {
+	public static void collapseAll(final TreeItem<NUINode> rootTreeItem) {
 		rootTreeItem.setExpanded(false);
-		for(TreeItem<NUINode> child : rootTreeItem.getChildren()) {
+		for (final TreeItem<NUINode> child : rootTreeItem.getChildren()) {
 			collapseAll(child);
 		}
 	}
 	
 	/**
-	 * collapses an item and all of its children
+	 * Collapses an item and all of its children.
 	 * @param treeItem the item for applying the action to
 	 */
-	public static void collapseBelow(TreeItem<NUINode> treeItem) {
+	public static void collapseBelow(final TreeItem<NUINode> treeItem) {
 		treeItem.setExpanded(false);
-		for(TreeItem<NUINode> child : treeItem.getChildren()) {
+		for (final TreeItem<NUINode> child : treeItem.getChildren()) {
 			collapseAll(child);
 		}
 		
 		TreeItem<NUINode> nextSibling = treeItem.nextSibling();
-		if(nextSibling != null) {
+		if (nextSibling != null) {
 			collapseBelow(nextSibling);
 		}
 	}
