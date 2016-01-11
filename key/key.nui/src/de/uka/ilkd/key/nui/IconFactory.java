@@ -14,35 +14,53 @@ import javafx.scene.image.ImageView;
  */
 public class IconFactory {
 
-	private int iconSize_x;
-	private int iconSize_y;
+	/**
+	 * The width of produced icons in pixels.
+	 */
+	private final int iconSizeX;
+	
+	/**
+	 * The height of produced icons in pixels.
+	 */
+	private final int iconSizeY;
 
-	public IconFactory(int x, int y) {
-		this.iconSize_x = x;
-		this.iconSize_y = y;
-	}
-
+	/**
+	 * TODO
+	 * the relative path to the root folder where icons can be found.
+	 */
 	private static String folderRoot = "components/images/TreeViewController/";
 	
-	// Hashmap to store loaded icons
-	private HashMap<String, ImageView> icons = new HashMap<String, ImageView>();
+	/**
+	 * An Hashmap for storing loaded icons.
+	 */
+	private HashMap<String, Image> icons = new HashMap<String, Image>();
 
 	// Inner Nodes
-	public static String KEY_BRANCH_NODE_OPEN = "openBranch.png";
-	public static String KEY_BRANCH_NODE_CLOSED = "closedBranch.png";
-	public static String KEY_BRANCH_NODE_LINKED = "linkedBranch.png";
-	public static String KEY_INNER_NODE_INTERACTIVE = "interactiveNode.png";
+	public final static String KEY_BRANCH_NODE_OPEN = "openBranch.png";
+	public final static String KEY_BRANCH_NODE_CLOSED = "closedBranch.png";
+	public final static String KEY_BRANCH_NODE_LINKED = "linkedBranch.png";
+	public final static String KEY_INNER_NODE_INTERACTIVE = "interactiveNode.png";
 
 	// Leafs
-	public static final String KEY_LEAF_NODE_INTERACTIVE = "interactiveGoal.png";
-	public static String KEY_LEAF_NODE_CLOSED = "closedGoal.png";
-	public static String KEY_LEAF_NODE_OPEN = "openGoal.png";
-	public static String KEY_LEAF_NODE_LINKED = "linkedNode.png";
+	public final static String KEY_LEAF_NODE_INTERACTIVE = "interactiveGoal.png";
+	public final static String KEY_LEAF_NODE_CLOSED = "closedGoal.png";
+	public final static String KEY_LEAF_NODE_OPEN = "openGoal.png";
+	public final static String KEY_LEAF_NODE_LINKED = "linkedNode.png";
 	
 	// Context Menu
-	public static final String EXPAND = "expand.png";
-	public static final String COLLAPSE = "collapse.png";
-	public static final String SEARCH = "search.png";
+	public final static String EXPAND = "expand.png";
+	public final static String COLLAPSE = "collapse.png";
+	public final static String SEARCH = "search.png";
+	
+	/**
+	 * The constructor.
+	 * @param x the width of icons in pixels.
+	 * @param y the height of icons in pixels.
+	 */
+	public IconFactory(final int x, final int y) {
+		this.iconSizeX = x;
+		this.iconSizeY = y;
+	}
 
 	/**
 	 * Returns an ImageView (scaled image) based on the given imageFilename in
@@ -53,16 +71,17 @@ public class IconFactory {
 	 *            The name of the image, e. g. IconFactory.KEY_INNER_NODE_OPEN
 	 * @return ImageView object of JavaFX
 	 */
-	public ImageView getImage(String imageConstant) {
-		if(icons.containsKey(imageConstant)) {
-			return icons.get(imageConstant);
+	public final ImageView getImage(final String imageConstant) {
+		Image img;
+		if (icons.containsKey(imageConstant)) {
+			img = icons.get(imageConstant);
 		} else {
-			InputStream is = IconFactory.class.getResourceAsStream(folderRoot + imageConstant);
-			Image img = new Image(is);
-			ImageView imgView = scaleIcon(img, iconSize_x, iconSize_y);
-			icons.put(imageConstant, imgView);
-			return imgView;
+			final InputStream istream = IconFactory.class.getResourceAsStream(folderRoot
+					+ imageConstant);
+			img = new Image(istream);
+			icons.put(imageConstant, img);
 		}
+		return scaleIcon(img, iconSizeX, iconSizeY);
 	}
 
 	/**
@@ -78,8 +97,8 @@ public class IconFactory {
 	 *            The desired height
 	 * @return an ImageView containing the scaled Image
 	 */
-	private ImageView scaleIcon(Image image, int x, int y) {
-		ImageView v = new ImageView(image);
+	private ImageView scaleIcon(final Image image, final int x, final int y) {
+		final ImageView v = new ImageView(image);
 		v.setFitWidth(x);
 		v.setFitHeight(y);
 		v.setSmooth(true);

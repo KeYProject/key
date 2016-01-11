@@ -21,7 +21,8 @@ public class ProofTreeContextMenu extends ContextMenu {
     /**
      * The tree node the context menu is for.
      */
-    private final NUINode node;
+    @SuppressWarnings("unused")
+	private final NUINode node;
 
     /**
      * The treeItem of node.
@@ -34,34 +35,47 @@ public class ProofTreeContextMenu extends ContextMenu {
     private final TreeView<NUINode> treeView;
     
     /**
-     * The icon size in px.
-     */
-    private static final int ICON_SIZE = 15;
-    
-    /**
      * The IconFactory used to create the required icons.
      */
     private final IconFactory icf;
 
     /**
-     * Puts in the contextmenu.
-     * 
+     * The constructor.
      * @param treeItem
      *            the treeItem of node
      * @param treeView
      *            the treeview that treeItem is in
+     * @param icf
+     * 	          an icon factory for creating icons
      */
     public ProofTreeContextMenu(final TreeItem<NUINode> treeItem, 
-    		final TreeView<NUINode> treeView) {
+    		final TreeView<NUINode> treeView, final IconFactory icf) {
     	super();
     	
     	this.treeItem = treeItem;
         this.node = treeItem.getValue();
         this.treeView = treeView;
         
-        icf = new IconFactory(ICON_SIZE, ICON_SIZE);
-
-        //TODO has to be done only when menu is displayed
+        this.icf = icf;
+        
+        // Add dummy so that the context menu can be displayed.
+        // It is put in in the method "show".
+        addSeparator();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * This method is called to show the contextmenu.
+     * Displays and fills the context menu.
+     */
+	@Override
+    public final void show() {
+    	super.show();
+    	
+    	// clear current entries
+    	getItems().clear();
+    	
+    	// add appropriate entries
         addMenuItemExpandAll();
         addMenuItemExpandBelow();
         addMenuItemCollapseAll();
@@ -71,8 +85,6 @@ public class ProofTreeContextMenu extends ContextMenu {
         
         addMenuItemSearch();
     }
-    
-    
     
     /**
      * Adds a separator to the context menu.
@@ -85,7 +97,7 @@ public class ProofTreeContextMenu extends ContextMenu {
      * Adds the entry ExpandAll to the context menu.
      */
     private void addMenuItemExpandAll() {
-        final MenuItem miExpandAll = new MenuItem("Expand All"); // TODO
+        final MenuItem miExpandAll = new MenuItem("Expand All"); //TODO
         miExpandAll.setGraphic(icf.getImage(IconFactory.EXPAND));
         getItems().add(miExpandAll);
         miExpandAll.setOnAction(t -> ProofTreeActions.expandAll(treeView.getRoot()));
@@ -95,7 +107,7 @@ public class ProofTreeContextMenu extends ContextMenu {
      * Adds the entry ExpandAll to the context menu.
      */
     private void addMenuItemExpandBelow() {
-        final MenuItem miExpand = new MenuItem("Expand Below"); // TODO
+        final MenuItem miExpand = new MenuItem("Expand Below"); //TODO
         getItems().add(miExpand);
         miExpand.setOnAction(t -> ProofTreeActions.expandBelow(treeItem));
     }

@@ -2,21 +2,17 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.net.URL;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.ComponentFactory;
+import de.uka.ilkd.key.nui.IconFactory;
 import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
-import de.uka.ilkd.key.nui.prooftree.ProofTreeActions;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeCell;
 import de.uka.ilkd.key.nui.prooftree.ProofTreeVisualizer;
 import de.uka.ilkd.key.proof.Proof;
@@ -52,6 +48,18 @@ public class TreeViewController implements Initializable {
      * The visualizer for displaying a proof tree.
      */
     private ProofTreeVisualizer visualizer;
+    
+    /**
+     * The IconFactory used to create icons for the proof tree nodes.
+     */
+    private final IconFactory icf;
+    
+    /**
+     * The constructor.
+     */
+    public TreeViewController() {
+        icf = new IconFactory(ProofTreeCell.ICON_SIZE, ProofTreeCell.ICON_SIZE);
+    }
 
     /**
      * Initialization method for scene; loads the default proof.
@@ -100,7 +108,7 @@ public class TreeViewController implements Initializable {
         proofTreeView.setCellFactory(new Callback<TreeView<NUINode>, TreeCell<NUINode>>() {
             @Override
             public TreeCell<NUINode> call(final TreeView<NUINode> p) {
-                return new ProofTreeCell();
+                return new ProofTreeCell(icf);
             }
         });
 
