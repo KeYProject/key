@@ -112,8 +112,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       private Vector<Text> mListenerParents = new Vector<>();
       private ModifyListener modifyListener = new ModifyListener(){
          public void modifyText(ModifyEvent e) {
-            updateErrorMessage();
-            resetVariantsState();
+            resetStateTab();
          }
       };
       
@@ -315,6 +314,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @return the generated Composite
        */
       private Composite addTab(String[] invariants, String[] modifies, String variant, int id) {
+         //TODO: One of these listeners is probably broken: Editing the texts doesn't immediately change the error messages.
+         
          //add a item in the drop down
          specSelector.add("inv " + id);
          
