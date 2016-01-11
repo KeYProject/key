@@ -16,22 +16,22 @@ public class ProofTreeCell extends TreeCell<NUINode> {
     /**
      * The icon size in px.
      */
-    private static final int ICON_SIZE = 15;
+    public static final int ICON_SIZE = 15;
     
     /**
      * Space between icon and label in px.
      */
-    private static final int ICON_SPACING = 5;
+    public static final int ICON_SPACING = 5;
+    
+    /**
+     * The IconFactory used to create the required icons.
+     */
+    private final IconFactory icf;
         
     /**
      * The label that will be displayed.
      */
 	private Label label;
-
-    /**
-     * The IconFactory used to create the required icons.
-     */
-    private final IconFactory icf;
     
     /**
      * The icon that will be displayed left next to the label.
@@ -40,10 +40,13 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 	
 	/**
 	 * The constructor of the ProofTreeCell.
+	 * 
+	 * @param icf the icon factory used to display node icons
 	 */
-	public ProofTreeCell() {
+	public ProofTreeCell(final IconFactory icf) {
 		super();
-		icf = new IconFactory(ICON_SIZE, ICON_SIZE);
+		
+		this.icf = icf;
 	}
 	
 	/**
@@ -70,7 +73,7 @@ public class ProofTreeCell extends TreeCell<NUINode> {
 			return;
 		}
 		
-		setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView()));
+		setContextMenu(new ProofTreeContextMenu(getTreeItem(), getTreeView(), icf));
 		
 		// reset label and icon
 	    label = new Label(item.getLabel() + " ");

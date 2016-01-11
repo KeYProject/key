@@ -12,6 +12,7 @@ tags
 *.tar
 .*.swp
 *.class
+*.pmd
 
 smt-solvers
 *.toc
