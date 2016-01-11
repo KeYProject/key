@@ -158,7 +158,8 @@ public class DisjunctivePredicateAbstractionLattice extends
          */
         @Override
         public boolean hasNext() {
-            return nrZeroes < predicates.size() + 1;
+//            return nrZeroes < predicates.size() + 1;
+            return nrZeroes > -2;
         }
 
         /*

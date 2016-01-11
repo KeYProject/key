@@ -26,6 +26,7 @@ import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSEPair;
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
@@ -64,7 +65,6 @@ import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.ProgramVariablesMatchVisitor;
@@ -221,12 +221,14 @@ public class JoinRule implements BuiltInRule {
                 new SymbolicExecutionState(thisSEState.first,
                         thisSEState.second, newGoal.node());
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
 
         for (SymbolicExecutionState state : joinPartnerStates) {
-            Pair<SymbolicExecutionState, LinkedHashSet<Name>> joinResult =
+            Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> joinResult =
                     joinStates(joinRule, joinedState, state, thisSEState.third,
                             joinRuleApp.getDistinguishingFormula(), services);
             newNames.addAll(joinResult.second);
+            sideConditionsToProve.addAll(joinResult.third);
 
             joinedState = joinResult.first;
             joinedState.setCorrespondingNode(newGoal.node());
@@ -237,9 +239,10 @@ public class JoinRule implements BuiltInRule {
         // NOTE (DS): The following simplification has been commented
         // out since it was usually not successful and consumed an
         // inadequate amount of time.
+
         // final Term previousResultPathCondition = resultPathCondition;
-        // resultPathCondition = trySimplify(services.getProof(),
-        // resultPathCondition, true);
+        // resultPathCondition =
+        // trySimplify(services.getProof(), resultPathCondition, true);
 
         // Delete previous sequents
         clearSemisequent(newGoal, true);
@@ -286,7 +289,37 @@ public class JoinRule implements BuiltInRule {
             services.addNameProposal(newName);
         }
 
-        return newGoals;
+        // Add new goals for side conditions that have to be proven
+        if (sideConditionsToProve.size() > 0) {
+            final ImmutableList<Goal> sideConditionsGoals =
+                    goal.split(sideConditionsToProve.size() + 1);
+            
+            final Iterator<Term> sideCondIt = sideConditionsToProve.iterator();
+            final Iterator<Goal> goalIt = sideConditionsGoals.iterator();
+            
+            int i = 0;
+            while (goalIt.hasNext()) {
+                if (i >= sideConditionsGoals.size() - 1) {
+                    break;
+                }
+                
+                final Goal sideConditionGoal = goalIt.next();
+                clearSemisequent(sideConditionGoal, true);
+                clearSemisequent(sideConditionGoal, false);
+                final Term sideCondition = sideCondIt.next();
+
+                sideConditionGoal.addFormula(
+                        new SequentFormula(sideCondition),
+                        new PosInOccurrence(newSuccedent, PosInTerm
+                                .getTopLevel(), false));
+                
+                i++;
+            }
+            
+            return sideConditionsGoals;
+        } else {
+            return newGoals;   
+        }
     }
 
     /**
@@ -316,7 +349,7 @@ public class JoinRule implements BuiltInRule {
      */
     @SuppressWarnings("unused")
     /* For deactivated equiv check */
-    protected Pair<SymbolicExecutionState, LinkedHashSet<Name>> joinStates(
+    protected Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> joinStates(
             JoinProcedure joinRule, SymbolicExecutionState state1,
             SymbolicExecutionState state2, Term programCounter,
             Term distinguishingFormula, Services services) {
@@ -325,6 +358,11 @@ public class JoinRule implements BuiltInRule {
 
         // Newly introduced names
         final LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+
+        // Side conditions remaining to be proven, e.g. after predicate
+        // abstraction.
+        final LinkedHashSet<Term> sideConditionsToProve =
+                new LinkedHashSet<Term>();
 
         // Construct path condition as (optimized) disjunction
         final Term newPathCondition =
@@ -398,7 +436,7 @@ public class JoinRule implements BuiltInRule {
             }
             else {
 
-                // Apply if-then-else construction: Different values
+                // Apply join procedure: Different values
 
                 Sort heapSort =
                         (Sort) services.getNamespaces().sorts().lookup("Heap");
@@ -422,7 +460,10 @@ public class JoinRule implements BuiltInRule {
                                 tb.and(newAdditionalConstraints,
                                         tb.and(joinedHeaps.getNewConstraints()));
                     }
+
                     newNames.addAll(joinedHeaps.getNewNames());
+                    sideConditionsToProve.addAll(joinedHeaps
+                            .getSideConditions());
 
                 }
                 else {
@@ -433,6 +474,7 @@ public class JoinRule implements BuiltInRule {
                                     distinguishingFormula, services);
 
                     newNames.addAll(joinedVal.getNewNames());
+                    sideConditionsToProve.addAll(joinedVal.getSideConditions());
 
                     newElementaryUpdates =
                             newElementaryUpdates.prepend(tb.elementary(v,
@@ -460,12 +502,13 @@ public class JoinRule implements BuiltInRule {
         // Note: We apply the symbolic state to the new constraints to enable
         // join techniques, in particular predicate abstraction, to make
         // references to the values of other variables involved in the join.
-        return new Pair<SymbolicExecutionState, LinkedHashSet<Name>>(
+        return new Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>>(
                 new SymbolicExecutionState(newSymbolicState,
                         newAdditionalConstraints == null ? newPathCondition
                                 : tb.and(newPathCondition, tb.apply(
                                         newSymbolicState,
-                                        newAdditionalConstraints))), newNames);
+                                        newAdditionalConstraints))), newNames,
+                sideConditionsToProve);
 
     }
 
@@ -503,13 +546,13 @@ public class JoinRule implements BuiltInRule {
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
 
-        final LinkedHashSet<Term> emptySideConditions =
+        final LinkedHashSet<Term> sideConditionsToProve =
                 new LinkedHashSet<Term>();
 
         if (heap1.equals(heap2)) {
             // Keep equal heaps
             return new ValuesJoinResult(newConstraints, heap1, newNames,
-                    emptySideConditions);
+                    sideConditionsToProve);
         }
 
         if (!(heap1.op() instanceof Function)
@@ -518,7 +561,7 @@ public class JoinRule implements BuiltInRule {
             return new ValuesJoinResult(newConstraints,
                     JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1,
                             heap2, distinguishingFormula, services), newNames,
-                    emptySideConditions);
+                    sideConditionsToProve);
         }
 
         final Function storeFunc =
@@ -554,6 +597,7 @@ public class JoinRule implements BuiltInRule {
                 newConstraints =
                         newConstraints.union(joinedSubHeap.getNewConstraints());
                 newNames.addAll(joinedSubHeap.getNewNames());
+                sideConditionsToProve.addAll(joinedSubHeap.getSideConditions());
 
                 Term joinedVal = null;
 
@@ -573,6 +617,8 @@ public class JoinRule implements BuiltInRule {
                             newConstraints.union(joinedValAndConstr
                                     .getNewConstraints());
                     newNames.addAll(joinedValAndConstr.getNewNames());
+                    sideConditionsToProve.addAll(joinedValAndConstr
+                            .getSideConditions());
                     joinedVal = joinedValAndConstr.getJoinVal();
 
                 }
@@ -580,7 +626,7 @@ public class JoinRule implements BuiltInRule {
                 return new ValuesJoinResult(newConstraints, tb.func(
                         (Function) heap1.op(), joinedSubHeap.getJoinVal(),
                         heap1.sub(1), field1, joinedVal), newNames,
-                        emptySideConditions);
+                        sideConditionsToProve);
 
             } // end if (pointer1.equals(pointer2) && field1.equals(field2))
 
@@ -606,10 +652,11 @@ public class JoinRule implements BuiltInRule {
                 newConstraints =
                         newConstraints.union(joinedSubHeap.getNewConstraints());
                 newNames.addAll(joinedSubHeap.getNewNames());
+                sideConditionsToProve.addAll(joinedSubHeap.getSideConditions());
 
                 return new ValuesJoinResult(newConstraints, tb.func(
                         (Function) heap1.op(), joinedSubHeap.getJoinVal(),
-                        pointer1), newNames, emptySideConditions);
+                        pointer1), newNames, sideConditionsToProve);
             }
 
             // "else" case is fallback at end of method:
@@ -621,7 +668,7 @@ public class JoinRule implements BuiltInRule {
         return new ValuesJoinResult(newConstraints,
                 JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1,
                         heap2, distinguishingFormula, services), newNames,
-                emptySideConditions);
+                sideConditionsToProve);
 
     }
 

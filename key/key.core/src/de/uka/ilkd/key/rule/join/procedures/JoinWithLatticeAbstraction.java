@@ -75,9 +75,6 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
         return true;
     }
 
-    // TODO (DS): Consider manual user choices; return additional formulae to be
-    // proven.
-
     @Override
     public ValuesJoinResult joinValuesInStates(Term v,
             SymbolicExecutionState state1, Term valueInState1,
@@ -93,18 +90,26 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
 
         if (lattice != null) {
 
-            // Join with abstract domain lattice.
-            AbstractDomainElement abstrElem1 =
-                    lattice.abstractFrom(state1, valueInState1, services);
-            AbstractDomainElement abstrElem2 =
-                    lattice.abstractFrom(state2, valueInState2, services);
-
-            AbstractDomainElement joinElem =
-                    lattice.join(abstrElem1, abstrElem2);
-
-            // TODO: Incorporate manual user choices with corresponding side
-            // contitions
+            AbstractDomainElement joinElem = null;
             LinkedHashSet<Term> sideConditions = new LinkedHashSet<Term>();
+            
+            assert v.op() instanceof ProgramVariable;
+
+            if (getUserChoices().containsKey((ProgramVariable) v.op())) {
+                joinElem = getUserChoices().get((ProgramVariable) v.op());
+                sideConditions
+                        .add(AbstractDomainLattice.getSideConditionForAxiom(
+                                state1, v, joinElem, services));
+            }
+            else {
+                // Join with abstract domain lattice.
+                AbstractDomainElement abstrElem1 =
+                        lattice.abstractFrom(state1, valueInState1, services);
+                AbstractDomainElement abstrElem2 =
+                        lattice.abstractFrom(state2, valueInState2, services);
+
+                joinElem = lattice.join(abstrElem1, abstrElem2);
+            }
 
             Function newSkolemConst =
                     getNewSkolemConstantForPrefix(joinElem.toString(),
