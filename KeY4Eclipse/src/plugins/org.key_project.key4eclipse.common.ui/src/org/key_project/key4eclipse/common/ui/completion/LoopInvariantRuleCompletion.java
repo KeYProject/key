@@ -183,8 +183,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       public void createControl(Composite parent) {
          root = new SashForm(parent, SWT.NONE);
          
-         //TODO: Make tests. For reference tests, see DependencyContractCompletion.java
-         
          //Set up right column:
          Composite stateColumn = new Composite(root, SWT.NONE);
          stateColumn.setLayout(new GridLayout(1, false));
@@ -314,8 +312,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @return the generated Composite
        */
       private Composite addTab(String[] invariants, String[] modifies, String variant, int id) {
-         //TODO: One of these listeners is probably broken: Editing the texts doesn't immediately change the error messages.
-         
          //add a item in the drop down
          specSelector.add("inv " + id);
          
