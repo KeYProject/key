@@ -78,7 +78,7 @@ public final class ProofTreeActions {
 	 * such that the treeCell is rendered again.
 	 * @param treeItem the treeItem to refresh
 	 */
-	public static void refeshTreeItem(final TreeItem<NUINode> treeItem) {
+	public static void refreshTreeItem(final TreeItem<NUINode> treeItem) {
 		int index = treeItem.getParent().getChildren().indexOf(treeItem);
 		treeItem.getParent().getChildren().set(index, treeItem);
 	}

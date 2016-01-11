@@ -2,14 +2,17 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.net.URL;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.nui.ComponentFactory;
 import de.uka.ilkd.key.nui.NUI;
 import de.uka.ilkd.key.nui.controller.NUIController.Place;
 import de.uka.ilkd.key.nui.prooftree.NUINode;
@@ -74,7 +77,8 @@ public class TreeViewController implements Initializable {
                             }
                             catch (IllegalArgumentException ex) {
                                 // SearchView already exists
-                                SearchViewController.getInstance().SearchTextField.requestFocus();
+                                SearchViewController c = ComponentFactory.getInstance().getController("searchView");
+                                c.performFocusRequest();
                             }
                         }
                     }
@@ -109,8 +113,8 @@ public class TreeViewController implements Initializable {
         // add CSS file to view
         String cssPath = this.getClass().getResource("../components/treeView.css").toExternalForm();
         visualizer.addStylesheet(cssPath);
-        
-        if(NUI.initialProofFile != null){
+
+        if (NUI.initialProofFile != null) {
             loadAndDisplayProof(NUI.initialProofFile);
         }
     }
@@ -125,13 +129,14 @@ public class TreeViewController implements Initializable {
         visualizer.loadProofTree(proof);
         visualizer.visualizeProofTree();
     }
-    
+
     /**
      * 
      * @param file
      */
     public final void loadAndDisplayProof(File file) {
-      displayProof(loadProof(file));
+        displayProof(loadProof(file));
+        searchMap = null;
     }
 
     /**
@@ -142,11 +147,12 @@ public class TreeViewController implements Initializable {
      *            The file name of the proof file to load.
      * @return The loaded proof.
      */
-    public void loadExampleProof() {
+    public final void loadExampleProof() {
         File proofFile = new File("resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
         loadAndDisplayProof(proofFile);
+        searchMap = null;
     }
-    
+
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
@@ -169,181 +175,64 @@ public class TreeViewController implements Initializable {
     }
 
     /**
-     * Stores all the Labels in the tree and their respective TreeItems. Must be
-     * initialized with initializeSearchMap()
+     * Stores all the Labels in the tree and their respective TreeItems.
      */
     private HashMap<String, TreeItem<NUINode>> searchMap;
 
-    /**
-     * After a call to search(String term), this stores all the TreeItems found
-     * by that search. At every point in time, All of these TreeItems are
-     * currently highlighted.
-     */
-    private List<TreeItem<NUINode>> searchResults;
+    public final int getCurrentlySelectedItemsIndex() {
+        return proofTreeView.getSelectionModel().getSelectedIndex();
+    }
 
-    /**
-     * This will highlight all the TreeItems for which <tt>.contains(term)</tt>
-     * is <tt>true</tt>. The search is not case sensitive.
-     * 
-     * @param term
-     *            The String to search for
-     * @return whether the search found something
-     */
-    public final boolean search(final String term) {
-        if (searchMap == null) {
-            initializeSearchMap();
-        }
-
-        if (searchResults != null) {
-            for (TreeItem<NUINode> t : searchResults) {
-                t.getValue().setHighlighting(false);
-            }
-        }
-
-        searchResults = new LinkedList<>();
-
-        for (String s : searchMap.keySet()) {
-            if (s.toLowerCase().contains(term.toLowerCase())) {
-                searchResults.add(searchMap.get(s));
-            }
-        }
-
-        if (!searchResults.isEmpty()) {
-            for (TreeItem<NUINode> t : searchResults) {
-                t.getValue().setHighlighting(true);
-                ProofTreeActions.refeshTreeItem(t);
-            }
-            gotoNextSearchResult();
-            return true;
-        }
-        else {
-            return false;
-        }
+    public final int getTreeItemsRow(TreeItem<NUINode> t) {
+        return proofTreeView.getRow(t);
     }
 
     /**
-     * TODO someday this will move the focus to the next found item.
+     * 
+     * @return
      */
-    public final void gotoNextSearchResult() {
+    public final Map<String, TreeItem<NUINode>> getSearchMap() {
 
-        // check if match list is empty
-        if (searchResults.isEmpty()) {
-            return;
+        class TreeToListHelper {
+            /**
+             * Parses a Tree, beginning at <b>t</b>, and adds to list every
+             * TreeItem that is a child of <b>root</b> or of its children
+             * <b>l</b>.
+             * 
+             * @param root
+             *            Where to start parsing
+             * @param list
+             *            Where all the TreeItems are added to
+             * @return <b>list</b>, but with all the TreeItems appended to it
+             */
+            private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
+                    final List<TreeItem<NUINode>> list) {
+                if (root == null || list == null) {
+                    throw new IllegalArgumentException();
+                }
+                list.add(root);
+                if (!root.getChildren().isEmpty()) {
+                    for (TreeItem<NUINode> ti : root.getChildren()) {
+                        list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
+                    }
+                }
+                return list;
+            }
         }
 
-        // the current selected index
-        int idxSelected = proofTreeView.getSelectionModel().getSelectedIndex();
-
-        // get next higher index and its tree node
-        // TODO can be very much improved using your grips
-        // store list of indices of matches
-        List<Integer> idxOfMatches = new LinkedList<>();
-        for (TreeItem<NUINode> i : searchResults) {
-            int idx = proofTreeView.getRow(i);
-            idxOfMatches.add(idx);
-            System.out.print(idx + " ");
+        if (searchMap == null) {
+            searchMap = new HashMap<>();
+            List<TreeItem<NUINode>> l = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
+                    new LinkedList<TreeItem<NUINode>>());
+            for (TreeItem<NUINode> t : l) {
+                searchMap.put(t.getValue().getLabel(), t);
+            }
         }
-        System.out.println();
+        return searchMap;
+    }
 
-        // select the next largest match index.
-        // if there is no, choose match with smallest index.
-        int nextLargerIdx;
-        List<Integer> listLargerThanSelected = idxOfMatches.stream().filter(s -> s > idxSelected)
-                .collect(Collectors.toList());
-        if (!listLargerThanSelected.isEmpty()) {
-            // TODO Can be done very much smarter i guess
-            nextLargerIdx = listLargerThanSelected.stream().min(Comparator.comparingInt(i -> i))
-                    .get();
-        }
-        else {
-            // TODO not the smartest way...
-            nextLargerIdx = idxOfMatches.stream().min(Comparator.comparingInt(i -> i)).get();
-        }
-
-        // TODO this is very inefficient
-        // Problem is that you can't get the TreeItem by index by
-        // proofTreeView.getTreeItem(row) if parents of the treeItem
-        // are collapsed
-        int idxInList = idxOfMatches.indexOf(nextLargerIdx);
-        TreeItem<NUINode> nextLargerTI = searchResults.get(idxInList);
-
-        // expand all parents so we can reach the treeItem
-        // TODO this is also not very smartly done and could be refactored
-        // in a recursive method. However, if you change the lines before
-        // this could be superfluous.
-        TreeItem<NUINode> parent = nextLargerTI;
-        while (parent.getParent() != null) {
-            parent = parent.getParent();
-            parent.setExpanded(true);
-        }
-
-        // scrolling and selecting
+    public void scrollToAndSelect(int nextLargerIdx) {
         proofTreeView.scrollTo(nextLargerIdx);
         proofTreeView.getSelectionModel().select(nextLargerIdx);
-
-        System.out
-                .println("Currently Selected: " + idxSelected + ", Next Match at " + nextLargerIdx);
-
-    }
-
-    /**
-     * TODO someday this will move the focus to the previous found item.
-     */
-    public void gotoPreviousSearchResult() {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * This will recursively parse the proof tree and store all elements in the
-     * <tt>searchMap</tt>.
-     */
-    private void initializeSearchMap() {
-        searchMap = new HashMap<>();
-        List<TreeItem<NUINode>> l = treeToList(proofTreeView.getRoot());
-        for (TreeItem<NUINode> t : l) {
-            searchMap.put(t.getValue().getLabel(), t);
-        }
-    }
-
-    /**
-     * Parses a Tree, beginning at <b>t</b>, and puts every TreeItem into a
-     * List. This should rarely be called directly.
-     * 
-     * @param t
-     *            Where to start parsing the tree
-     * @return A List containing all TreeItems who are children of <b>t</b> or
-     *         of its children
-     */
-    private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> t) {
-        if (t == null) {
-            throw new IllegalArgumentException();
-        }
-        return treeToList(t, new LinkedList<TreeItem<NUINode>>());
-    }
-
-    /**
-     * Parses a Tree, beginning at <b>t</b>, and adds to list every TreeItem
-     * that is a child of <b>root</b> or of its children <b>l</b>. This should
-     * rarely be called directly.
-     * 
-     * @param root
-     *            Where to start parsing
-     * @param list
-     *            Where all the TreeItems are added to
-     * @return <b>list</b>, but with all the TreeItems appended to it
-     */
-    private List<TreeItem<NUINode>> treeToList(final TreeItem<NUINode> root,
-            final List<TreeItem<NUINode>> list) {
-        if (root == null || list == null) {
-            throw new IllegalArgumentException();
-        }
-        list.add(root);
-        if (!root.getChildren().isEmpty()) {
-            for (TreeItem<NUINode> ti : root.getChildren()) {
-                list.addAll(treeToList(ti, new LinkedList<TreeItem<NUINode>>()));
-            }
-        }
-        return list;
     }
 }
