@@ -130,7 +130,7 @@ public class LoopInvariantRuleCompletionTest extends TestCase {
          point = new Point(point.x - 1, point.y);
          
          TestUtilsUtil.setCursorLocation(styledText, point.x, point.y);
-         TestUtilsUtil.clickContextMenu(styledText, point.x, point.y, "gibberish");
+         TestUtilsUtil.clickContextMenu(styledText, point.x, point.y, "Loop Invariant");
          SWTBotShell shell = bot.activeShell();
          
          dialogShell = shell;
