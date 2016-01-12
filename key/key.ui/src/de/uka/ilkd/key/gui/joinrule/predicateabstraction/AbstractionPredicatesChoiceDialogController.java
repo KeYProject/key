@@ -615,11 +615,10 @@ public class AbstractionPredicatesChoiceDialogController {
     // ///////////////////////////// //
 
     /**
-     * TODO: Document.
+     * A table cell displaying a combo box for available abstract domain
+     * elements.
      *
      * @author Dominic Scheurer
-     * @param <S>
-     * @param <T>
      */
     class CustomComboBoxTableCell
             extends
