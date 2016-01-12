@@ -161,15 +161,17 @@ public class JoinRule implements BuiltInRule {
 
         // At the moment, the join rule is always applied interactively
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-        
+
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
         final int numSideConditionsToProve =
                 joinRuleApp.getConcreteRule().getUserChoices().size()
                         * (joinRuleApp.getJoinPartners().size() + 1);
 
+        // New goals are reversed to make sure that they are displayed in the
+        // order expected by the user.
         final ImmutableList<Goal> newGoals =
-                goal.split(1 + numSideConditionsToProve);
+                goal.split(1 + numSideConditionsToProve).reverse();
         final Goal newGoal = newGoals.head();
 
         final TermBuilder tb = services.getTermBuilder();
@@ -304,8 +306,14 @@ public class JoinRule implements BuiltInRule {
             for (Goal sideConditionGoal : newGoals) {
                 if (i == 0) {
                     i++;
+
+                    sideConditionGoal.node().getNodeInfo()
+                            .setBranchLabel("Join Result");
                     continue;
                 }
+
+                sideConditionGoal.node().getNodeInfo()
+                        .setBranchLabel("Join is valid (" + i + ")");
 
                 clearSemisequent(sideConditionGoal, true);
                 clearSemisequent(sideConditionGoal, false);
@@ -319,7 +327,7 @@ public class JoinRule implements BuiltInRule {
                 i++;
             }
         }
-        
+
         return newGoals;
     }
 

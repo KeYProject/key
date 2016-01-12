@@ -209,12 +209,12 @@ public class DisjunctivePredicateAbstractionLattice extends
     }
 
     @Override
-    protected AbstractPredicateAbstractionDomainElement getTopElem() {
+    protected PredicateAbstractionAbstractDomainElement getTopElem() {
         return DisjunctivePredicateAbstractionDomainElement.TOP;
     }
 
     @Override
-    protected AbstractPredicateAbstractionDomainElement getBottomElem() {
+    protected PredicateAbstractionAbstractDomainElement getBottomElem() {
         return DisjunctivePredicateAbstractionDomainElement.BOTTOM;
     }
 }

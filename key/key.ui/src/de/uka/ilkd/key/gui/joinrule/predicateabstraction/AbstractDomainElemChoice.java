@@ -16,7 +16,7 @@ package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 import java.util.Optional;
 
 import javafx.beans.property.SimpleObjectProperty;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionAbstractDomainElement;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -35,13 +35,13 @@ public class AbstractDomainElemChoice {
      * The chosen abstract domain element. May be null if no choice has been
      * done for the program variable {@link #progVar}.
      */
-    private final SimpleObjectProperty<Optional<AbstractPredicateAbstractionDomainElement>> abstrDomElem;
+    private final SimpleObjectProperty<Optional<PredicateAbstractionAbstractDomainElement>> abstrDomElem;
 
     public AbstractDomainElemChoice(ProgramVariable progVar,
-            Optional<AbstractPredicateAbstractionDomainElement> abstrDomElem) {
+            Optional<PredicateAbstractionAbstractDomainElement> abstrDomElem) {
         this.progVar = new SimpleObjectProperty<ProgramVariable>(progVar);
         this.abstrDomElem =
-                new SimpleObjectProperty<Optional<AbstractPredicateAbstractionDomainElement>>(
+                new SimpleObjectProperty<Optional<PredicateAbstractionAbstractDomainElement>>(
                         abstrDomElem);
     }
 
@@ -53,12 +53,12 @@ public class AbstractDomainElemChoice {
         this.progVar.set(progVar);
     }
 
-    public SimpleObjectProperty<Optional<AbstractPredicateAbstractionDomainElement>> getAbstrDomElem() {
+    public SimpleObjectProperty<Optional<PredicateAbstractionAbstractDomainElement>> getAbstrDomElem() {
         return abstrDomElem;
     }
 
     public void setAbstrDomElem(
-            Optional<AbstractPredicateAbstractionDomainElement> abstrDomElem) {
+            Optional<PredicateAbstractionAbstractDomainElement> abstrDomElem) {
         this.abstrDomElem.set(abstrDomElem);
     }
 

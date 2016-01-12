@@ -142,12 +142,12 @@ public class SimplePredicateAbstractionLattice extends
     }
 
     @Override
-    protected AbstractPredicateAbstractionDomainElement getTopElem() {
+    protected PredicateAbstractionAbstractDomainElement getTopElem() {
         return SimplePredicateAbstractionDomainElement.TOP;
     }
 
     @Override
-    protected AbstractPredicateAbstractionDomainElement getBottomElem() {
+    protected PredicateAbstractionAbstractDomainElement getBottomElem() {
         return SimplePredicateAbstractionDomainElement.BOTTOM;
     }
 }

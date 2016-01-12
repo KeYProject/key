@@ -209,12 +209,12 @@ public class ConjunctivePredicateAbstractionLattice extends
     }
 
     @Override
-    protected AbstractPredicateAbstractionDomainElement getTopElem() {
+    protected PredicateAbstractionAbstractDomainElement getTopElem() {
         return ConjunctivePredicateAbstractionDomainElement.TOP;
     }
 
     @Override
-    protected AbstractPredicateAbstractionDomainElement getBottomElem() {
+    protected PredicateAbstractionAbstractDomainElement getBottomElem() {
         return ConjunctivePredicateAbstractionDomainElement.BOTTOM;
     }
 }

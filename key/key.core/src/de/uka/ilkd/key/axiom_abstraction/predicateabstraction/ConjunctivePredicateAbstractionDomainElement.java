@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.Term;
  * @author Dominic Scheurer
  */
 public class ConjunctivePredicateAbstractionDomainElement extends
-        AbstractPredicateAbstractionDomainElement {
+        PredicateAbstractionAbstractDomainElement {
 
     /**
      * The bottom element of any predicate abstraction lattice.

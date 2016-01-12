@@ -27,27 +27,27 @@ import de.uka.ilkd.key.logic.TermBuilder;
  *
  * @author Dominic Scheurer
  */
-public abstract class AbstractPredicateAbstractionDomainElement extends
+public abstract class PredicateAbstractionAbstractDomainElement extends
         AbstractDomainElement {
 
     private ImmutableSet<AbstractionPredicate> predicates = null;
     private boolean topElem = false;
 
     /**
-     * Constructs a new {@link AbstractPredicateAbstractionDomainElement} from a
+     * Constructs a new {@link PredicateAbstractionAbstractDomainElement} from a
      * given list of abstraction predicates.
      */
-    public AbstractPredicateAbstractionDomainElement(
+    public PredicateAbstractionAbstractDomainElement(
             final ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
     }
 
     /**
-     * Constructs a new {@link AbstractPredicateAbstractionDomainElement} that
+     * Constructs a new {@link PredicateAbstractionAbstractDomainElement} that
      * is a top element if isTopElem is set to true; otherwise, it is a bottom
      * element.
      */
-    protected AbstractPredicateAbstractionDomainElement(boolean isTopElem) {
+    protected PredicateAbstractionAbstractDomainElement(boolean isTopElem) {
         this.predicates = DefaultImmutableSet.<AbstractionPredicate> nil();
         this.topElem = isTopElem;
     }
