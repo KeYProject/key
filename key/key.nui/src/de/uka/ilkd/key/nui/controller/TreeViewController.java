@@ -48,12 +48,12 @@ public class TreeViewController implements Initializable {
      * The visualizer for displaying a proof tree.
      */
     private ProofTreeVisualizer visualizer;
-    
+
     /**
      * The IconFactory used to create icons for the proof tree nodes.
      */
     private final IconFactory icf;
-    
+
     /**
      * The constructor.
      */
@@ -85,7 +85,8 @@ public class TreeViewController implements Initializable {
                             }
                             catch (IllegalArgumentException ex) {
                                 // SearchView already exists
-                                SearchViewController c = ComponentFactory.getInstance().getController("searchView");
+                                SearchViewController c = ComponentFactory.getInstance()
+                                        .getController("searchView");
                                 c.performFocusRequest();
                             }
                         }
@@ -240,7 +241,8 @@ public class TreeViewController implements Initializable {
     }
 
     public void scrollToAndSelect(int nextLargerIdx) {
-        proofTreeView.scrollTo(nextLargerIdx);
+        // TODO this is a workaround as I was not able to make this thing scroll to middle
+        proofTreeView.scrollTo((nextLargerIdx < 5) ? nextLargerIdx : (nextLargerIdx - 5));
         proofTreeView.getSelectionModel().select(nextLargerIdx);
     }
 }
