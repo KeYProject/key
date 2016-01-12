@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -254,14 +255,10 @@ public class IntermediateProofReplayer {
                                 || partnerNodesInfo.size() < joinAppInterm
                                         .getNrPartners()) {
                             // In case of an exception happening during the
-                            // replay
-                            // process, it can happen that the queue is empty
-                            // when
-                            // reaching this point. Then, we may not add the
-                            // join
-                            // node to the end of the queue since this will
-                            // result
-                            // in non-termination.
+                            // replay process, it can happen that the queue is
+                            // empty when reaching this point. Then, we may not
+                            // add the join node to the end of the queue since
+                            // this will result in non-termination.
 
                             if (queue.isEmpty()) {
                                 continue;
@@ -279,144 +276,17 @@ public class IntermediateProofReplayer {
                                 final Services services = proof.getServices();
 
                                 JoinRuleBuiltInRuleApp joinApp =
-                                        (JoinRuleBuiltInRuleApp) constructBuiltinApp(
-                                                joinAppInterm, currGoal);
-                                joinApp.setConcreteRule(JoinProcedure
-                                        .getProcedureByName(joinAppInterm
-                                                .getJoinProc()));
-                                joinApp.setDistinguishingFormula(JoinRuleUtils
-                                        .translateToFormula(
-                                                services,
-                                                joinAppInterm
-                                                        .getDistinguishingFormula()));
-
-                                // Predicate abstraction join rule
-                                if (joinApp.getConcreteRule() instanceof JoinWithPredicateAbstractionFactory) {
-                                    final ArrayList<AbstractionPredicate> predicates =
-                                            new ArrayList<AbstractionPredicate>();
-
-                                    // It may happen that the abstraction
-                                    // predicates are null -- in this case,
-                                    // it is the expected behavior to create
-                                    // a default lattice with top and bottom
-                                    // elements only, which is accomplished by
-                                    // just supplying an empty list of
-                                    // predicates to the join procedure.
-                                    if (joinAppInterm
-                                            .getAbstractionPredicates() != null) {
-
-                                        for (Pair<String, String> rawPred : joinAppInterm
-                                                .getAbstractionPredicates()) {
-
-                                            // Parse the placeholder
-                                            Pair<Sort, Name> ph = null;
-                                            try {
-                                                ph =
-                                                        JoinRuleUtils
-                                                                .parsePlaceholder(
-                                                                        rawPred.first,
-                                                                        false,
-                                                                        services);
-                                            }
-                                            catch (RuntimeException e) {
-                                                errors.add(e);
-                                                continue;
-                                            }
-
-                                            // Add placeholder to namespaces, if
-                                            // necessary
-                                            if (services.getNamespaces()
-                                                    .variables()
-                                                    .lookup(ph.second) == null) {
-                                                services.getNamespaces()
-                                                        .variables()
-                                                        .add(new LocationVariable(
-                                                                new ProgramElementName(
-                                                                        ph.second
-                                                                                .toString()),
-                                                                ph.first));
-                                            }
-
-                                            // Parse the predicate
-                                            try {
-                                                predicates
-                                                        .add(JoinRuleUtils
-                                                                .parsePredicate(
-                                                                        rawPred.second,
-                                                                        JoinRuleUtils
-                                                                                .singletonArrayList(ph),
-                                                                        services));
-                                            }
-                                            catch (ParserException e) {
-                                                errors.add(e);
-                                                continue;
-                                            }
-                                        }
-
-                                    }
-
-                                    Class<? extends AbstractPredicateAbstractionLattice> latticeType =
-                                            joinAppInterm
-                                                    .getPredAbstrLatticeType();
-
-                                    // TODO (DS): Add HashMap with user choices.
-                                    // Instantiate the join procedure
-                                    joinApp.setConcreteRule(((JoinWithPredicateAbstractionFactory) joinApp
-                                            .getConcreteRule())
-                                            .instantiate(
-                                                    predicates,
-                                                    latticeType == null ? SimplePredicateAbstractionLattice.class
-                                                            : latticeType,
-                                                    new HashMap<ProgramVariable, AbstractDomainElement>()));
-
-                                }
-
-                                ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
-                                        ImmutableSLList.nil();
-                                for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
-
-                                    Triple<Term, Term, Term> ownSEState =
-                                            sequentToSETriple(currNode,
-                                                    joinApp.posInOccurrence(),
-                                                    services);
-                                    Triple<Term, Term, Term> partnerSEState =
-                                            sequentToSETriple(
-                                                    partnerNodeInfo.first,
-                                                    partnerNodeInfo.second,
-                                                    services);
-                                    ProgramVariablesMatchVisitor matchVisitor =
-                                            new ProgramVariablesMatchVisitor(
-                                                    partnerSEState.third
-                                                            .javaBlock()
-                                                            .program(),
-                                                    ownSEState.third
-                                                            .javaBlock()
-                                                            .program(),
-                                                    services);
-                                    matchVisitor.start();
-
-                                    assert !matchVisitor.isIncompatible() : "Cannot join incompatible program counters";
-
-                                    joinPartners =
-                                            joinPartners
-                                                    .append(new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
-                                                            proof.getGoal(partnerNodeInfo.first),
-                                                            partnerNodeInfo.second,
-                                                            matchVisitor
-                                                                    .getMatches()
-                                                                    .getValue()));
-                                }
-
-                                joinApp.setJoinNode(currNode);
-                                joinApp.setJoinPartners(joinPartners);
+                                        instantiateJoinApp(joinAppInterm,
+                                                currNode, partnerNodesInfo,
+                                                services);
 
                                 assert joinApp.complete() : "Join app should be automatically completed in replay";
 
                                 currGoal.apply(joinApp);
 
                                 // Join node has exactly one child in a closed
-                                // proof, and
-                                // zero or one children in an open proof.
+                                // proof, and zero or one children in an open
+                                // proof.
                                 if (currInterm.getChildren().size() > 0) {
                                     queue.addFirst(new Pair<Node, NodeIntermediate>(
                                             currNode.childrenIterator().next(),
@@ -830,6 +700,141 @@ public class IntermediateProofReplayer {
         ourApp = ruleApps.iterator().next();
         builtinIfInsts = null;
         return ourApp;
+    }
+    
+
+
+    /**
+     * Instantiates a Join Rule application.
+     * 
+     * @param joinAppInterm
+     *            Intermediate join app.
+     * @param services
+     *            The services object.
+     * @param currNode
+     *            The current proof node.
+     * @param partnerNodesInfo
+     *            Information about join partner nodes.
+     * @param currNode
+     * @param partnerNodesInfo
+     * @return The instantiated Join Rule application.
+     * @throws SkipSMTRuleException
+     *             If the proof has been loaded, but the SMT solvers have not
+     *             been run.
+     * @throws BuiltInConstructionException
+     *             In case of an error during construction of the builtin rule
+     *             app.
+     */
+    private JoinRuleBuiltInRuleApp instantiateJoinApp(
+            final JoinAppIntermediate joinAppInterm,
+            final Node currNode,
+            final Set<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo,
+            final Services services) throws SkipSMTRuleException,
+            BuiltInConstructionException {
+        final JoinRuleBuiltInRuleApp joinApp =
+                (JoinRuleBuiltInRuleApp) constructBuiltinApp(joinAppInterm,
+                        currGoal);
+        joinApp.setConcreteRule(JoinProcedure.getProcedureByName(joinAppInterm
+                .getJoinProc()));
+        joinApp.setDistinguishingFormula(JoinRuleUtils.translateToFormula(
+                services, joinAppInterm.getDistinguishingFormula()));
+
+        // Predicate abstraction join rule
+        if (joinApp.getConcreteRule() instanceof JoinWithPredicateAbstractionFactory) {
+            final ArrayList<AbstractionPredicate> predicates =
+                    new ArrayList<AbstractionPredicate>();
+
+            // It may happen that the abstraction predicates are null -- in this
+            // case, it is the expected behavior to create a default lattice
+            // with top and bottom elements only, which is accomplished by just
+            // supplying an empty list of predicates to the join procedure.
+            if (joinAppInterm.getAbstractionPredicates() != null) {
+
+                for (Pair<String, String> rawPred : joinAppInterm
+                        .getAbstractionPredicates()) {
+
+                    // Parse the placeholder
+                    Pair<Sort, Name> ph = null;
+                    try {
+                        ph =
+                                JoinRuleUtils.parsePlaceholder(rawPred.first,
+                                        false, services);
+                    }
+                    catch (RuntimeException e) {
+                        errors.add(e);
+                        continue;
+                    }
+
+                    // Add placeholder to namespaces, if necessary
+                    if (services.getNamespaces().variables().lookup(ph.second) == null) {
+                        services.getNamespaces()
+                                .variables()
+                                .add(new LocationVariable(
+                                        new ProgramElementName(ph.second
+                                                .toString()), ph.first));
+                    }
+
+                    // Parse the predicate
+                    try {
+                        predicates
+                                .add(JoinRuleUtils.parsePredicate(
+                                        rawPred.second,
+                                        JoinRuleUtils.singletonArrayList(ph),
+                                        services));
+                    }
+                    catch (ParserException e) {
+                        errors.add(e);
+                        continue;
+                    }
+                }
+
+            }
+
+            final Class<? extends AbstractPredicateAbstractionLattice> latticeType =
+                    joinAppInterm.getPredAbstrLatticeType();
+
+            // TODO (DS): Add HashMap with user choices.
+            // Instantiate the join procedure
+            joinApp.setConcreteRule(((JoinWithPredicateAbstractionFactory) joinApp
+                    .getConcreteRule())
+                    .instantiate(
+                            predicates,
+                            latticeType == null ? SimplePredicateAbstractionLattice.class
+                                    : latticeType,
+                            new HashMap<ProgramVariable, AbstractDomainElement>()));
+
+        }
+
+        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners =
+                ImmutableSLList.nil();
+        for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+
+            final Triple<Term, Term, Term> ownSEState =
+                    sequentToSETriple(currNode, joinApp.posInOccurrence(),
+                            services);
+            final Triple<Term, Term, Term> partnerSEState =
+                    sequentToSETriple(partnerNodeInfo.first,
+                            partnerNodeInfo.second, services);
+            final ProgramVariablesMatchVisitor matchVisitor =
+                    new ProgramVariablesMatchVisitor(partnerSEState.third
+                            .javaBlock().program(), ownSEState.third
+                            .javaBlock().program(), services);
+            matchVisitor.start();
+
+            assert !matchVisitor.isIncompatible() : "Cannot join incompatible program counters";
+
+            joinPartners =
+                    joinPartners
+                            .append(new Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>(
+                                    proof.getGoal(partnerNodeInfo.first),
+                                    partnerNodeInfo.second, matchVisitor
+                                            .getMatches().getValue()));
+        }
+
+        joinApp.setJoinNode(currNode);
+        joinApp.setJoinPartners(joinPartners);
+
+        return joinApp;
     }
 
     // ######## Below: Methods previously listed in DefaultProofFileParser
