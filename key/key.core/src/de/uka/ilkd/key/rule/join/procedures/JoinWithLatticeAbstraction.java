@@ -15,7 +15,6 @@ package de.uka.ilkd.key.rule.join.procedures;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
 
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -23,7 +22,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -59,12 +57,6 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
     protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s,
             Services services);
 
-    /**
-     * @return Manually chosen lattice elements for program variables. Returns
-     *         an empty map if none given.
-     */
-    protected abstract HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> getUserChoices();
-
     /*
      * (non-Javadoc)
      * 
@@ -92,14 +84,18 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
 
             AbstractDomainElement joinElem = null;
             LinkedHashSet<Term> sideConditions = new LinkedHashSet<Term>();
-            
+
             assert v.op() instanceof ProgramVariable;
 
             if (getUserChoices().containsKey((ProgramVariable) v.op())) {
                 joinElem = getUserChoices().get((ProgramVariable) v.op());
+
                 sideConditions
                         .add(AbstractDomainLattice.getSideConditionForAxiom(
                                 state1, v, joinElem, services));
+                sideConditions
+                        .add(AbstractDomainLattice.getSideConditionForAxiom(
+                                state2, v, joinElem, services));
             }
             else {
                 // Join with abstract domain lattice.

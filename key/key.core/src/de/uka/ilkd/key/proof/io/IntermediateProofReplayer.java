@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
@@ -367,7 +367,7 @@ public class IntermediateProofReplayer {
                                                     predicates,
                                                     latticeType == null ? SimplePredicateAbstractionLattice.class
                                                             : latticeType,
-                                                    new HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement>()));
+                                                    new HashMap<ProgramVariable, AbstractDomainElement>()));
 
                                 }
 

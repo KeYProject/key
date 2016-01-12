@@ -15,7 +15,7 @@ package de.uka.ilkd.key.rule.join.procedures;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Services;
@@ -97,7 +97,7 @@ public class JoinWithPredicateAbstractionFactory extends
     public JoinWithPredicateAbstraction instantiate(
             Iterable<AbstractionPredicate> predicates,
             Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-            HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> userChoices) {
+            HashMap<ProgramVariable, AbstractDomainElement> userChoices) {
         return new JoinWithPredicateAbstraction(predicates, latticeType, userChoices);
     }
 

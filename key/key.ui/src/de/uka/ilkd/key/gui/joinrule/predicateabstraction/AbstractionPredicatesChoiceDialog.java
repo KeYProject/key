@@ -34,7 +34,7 @@ import javafx.scene.layout.AnchorPane;
 
 import javax.swing.JDialog;
 
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
@@ -332,8 +332,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     class Result {
         private ArrayList<AbstractionPredicate> registeredPredicates;
         private Class<? extends AbstractPredicateAbstractionLattice> latticeType;
-        private HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> abstractDomElemUserChoices =
-                new HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement>();
+        private HashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
+                new HashMap<ProgramVariable, AbstractDomainElement>();
 
         public Result(
                 ArrayList<AbstractionPredicate> registeredPredicates,
@@ -369,7 +369,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         /**
          * @return Manually chosen lattice elements for program variables.
          */
-        public HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> getAbstractDomElemUserChoices() {
+        public HashMap<ProgramVariable, AbstractDomainElement> getAbstractDomElemUserChoices() {
             return abstractDomElemUserChoices;
         }
     }

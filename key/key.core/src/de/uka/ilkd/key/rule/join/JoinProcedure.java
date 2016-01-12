@@ -13,15 +13,18 @@
 
 package de.uka.ilkd.key.rule.join;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
@@ -107,6 +110,11 @@ public abstract class JoinProcedure {
      *         methods.
      */
     public abstract boolean requiresDistinguishablePathConditions();
+
+    /**
+     * @return Manually chosen lattice elements for program variables.
+     */
+    public abstract HashMap<ProgramVariable, AbstractDomainElement> getUserChoices();
 
     /**
      * Returns the join procedure for the given name.

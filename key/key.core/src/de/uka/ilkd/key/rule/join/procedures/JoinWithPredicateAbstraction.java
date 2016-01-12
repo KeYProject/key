@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
@@ -56,7 +56,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     /**
      * Manually chosen lattice elements for program variables.
      */
-    private HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> userChoices = null;
+    private HashMap<ProgramVariable, AbstractDomainElement> userChoices = null;
 
     /**
      * Default constructor for subclasses.
@@ -78,7 +78,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     public JoinWithPredicateAbstraction(
             Iterable<AbstractionPredicate> predicates,
             Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-            HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> userChoices) {
+            HashMap<ProgramVariable, AbstractDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
                 this.predicates.put(pred.getArgSort(),
@@ -188,7 +188,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     /**
      * @return Manually chosen lattice elements for program variables.
      */
-    public HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement> getUserChoices() {
+    public HashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
         return userChoices;
     }
 

@@ -161,8 +161,15 @@ public class JoinRule implements BuiltInRule {
 
         // At the moment, the join rule is always applied interactively
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
+        
+        // The number of goals needed for side conditions related to
+        // manually chosen lattice elements.
+        final int numSideConditionsToProve =
+                joinRuleApp.getConcreteRule().getUserChoices().size()
+                        * (joinRuleApp.getJoinPartners().size() + 1);
 
-        final ImmutableList<Goal> newGoals = goal.split(1);
+        final ImmutableList<Goal> newGoals =
+                goal.split(1 + numSideConditionsToProve);
         final Goal newGoal = newGoals.head();
 
         final TermBuilder tb = services.getTermBuilder();
@@ -291,19 +298,15 @@ public class JoinRule implements BuiltInRule {
 
         // Add new goals for side conditions that have to be proven
         if (sideConditionsToProve.size() > 0) {
-            final ImmutableList<Goal> sideConditionsGoals =
-                    goal.split(sideConditionsToProve.size() + 1);
-            
             final Iterator<Term> sideCondIt = sideConditionsToProve.iterator();
-            final Iterator<Goal> goalIt = sideConditionsGoals.iterator();
-            
+
             int i = 0;
-            while (goalIt.hasNext()) {
-                if (i >= sideConditionsGoals.size() - 1) {
-                    break;
+            for (Goal sideConditionGoal : newGoals) {
+                if (i == 0) {
+                    i++;
+                    continue;
                 }
-                
-                final Goal sideConditionGoal = goalIt.next();
+
                 clearSemisequent(sideConditionGoal, true);
                 clearSemisequent(sideConditionGoal, false);
                 final Term sideCondition = sideCondIt.next();
@@ -312,14 +315,12 @@ public class JoinRule implements BuiltInRule {
                         new SequentFormula(sideCondition),
                         new PosInOccurrence(newSuccedent, PosInTerm
                                 .getTopLevel(), false));
-                
+
                 i++;
             }
-            
-            return sideConditionsGoals;
-        } else {
-            return newGoals;   
         }
+        
+        return newGoals;
     }
 
     /**

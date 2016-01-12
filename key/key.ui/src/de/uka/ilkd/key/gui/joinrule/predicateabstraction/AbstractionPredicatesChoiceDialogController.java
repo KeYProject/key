@@ -646,7 +646,7 @@ public class AbstractionPredicatesChoiceDialogController {
                     new JoinWithPredicateAbstraction(
                             availableAbstractionPreds,
                             latticeType.get(),
-                            new HashMap<ProgramVariable, AbstractPredicateAbstractionDomainElement>())
+                            new HashMap<ProgramVariable, AbstractDomainElement>())
                             .getAbstractDomainForSort(s, MainWindow
                                     .getInstance().getMediator().getServices());
 
