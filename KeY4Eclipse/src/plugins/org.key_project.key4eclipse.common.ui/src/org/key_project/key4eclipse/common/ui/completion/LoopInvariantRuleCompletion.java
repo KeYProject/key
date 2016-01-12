@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -46,7 +45,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -144,7 +142,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * extracts loop from app
+       * extracts loop from app.
        * @author Anna Marie Filighera
        * @return complete loop as String
        */
@@ -166,8 +164,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @param text the header text the state view should have
        * @return the Label that is meant for the actual state message
        */
-      private Label mkStateView(Composite root, String text){
-         Group statusGrp = new Group(root, SWT.NONE);
+      private Label mkStateView(Composite parent, String text) {
+         Group statusGrp = new Group(parent, SWT.NONE);
          statusGrp.setLayoutData(new GridData(GridData.FILL_BOTH));
          statusGrp.setLayout(new FillLayout());
          statusGrp.setText(text);
@@ -232,14 +230,14 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          LoopInvariantBuiltInRuleApp loopApp = ((LoopInvariantBuiltInRuleApp) getApp()).tryToInstantiate(getGoal());
          LoopInvariant loopInv = loopApp.getInvariant();
 
-         Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
+         Map<LocationVariable, Term> atPres = loopInv.getInternalAtPres();
          int heapCnt = services.getTypeConverter().getHeapLDT().getAllHeaps().size();
          heaps = new LocationVariable[heapCnt];
          String[] invariantStrings = new String[heapCnt];
          String[] modifiesStrings = new String[heapCnt];
          String variantString = "unable to load";
-         int iter = 0;//iterator so we know where we're at.
-         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+         int iter = 0; //iterator so we know where we're at.
+         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             heaps[iter] = heap;
             Term invTerm = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
             Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
@@ -269,10 +267,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * manually switches to another specification, as if user input happened
+       * manually switches to another specification, as if user input happened.
        * @param id the id to which to switch
        */
-      private void switchPage(int id){
+      private void switchPage(int id) {
          //put the page on top
          stackLayout.topControl = (Composite) specSwitchComposite.getChildren()[id];
          specSwitchComposite.layout();
@@ -281,9 +279,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * adds a copy of the currently selected specification
+       * adds a copy of the currently selected specification.
        */
-      private void store(){
+      private void store() {
          //Just add another specification.
          //finish() and the framework take care of putting the spec to more persistent memory.
          //At least - as in KeY - the currently selected spec.
@@ -305,8 +303,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       /**
        * adds a new invariant tab to the specified TabFolder.
        * @author Viktor Pfanschilling
-       * @param invariant - invariant text of the tab
-       * @param modifies - modifies text of the tab
+       * @param invariants - invariant texts of the tab
+       * @param modifies - modifies texts of the tab
        * @param variant - variants text of the tab
        * @param id - id of the new tab
        * @return the generated Composite
@@ -316,7 +314,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          specSelector.add("inv " + id);
          
          //create a scrolledComposite...
-         final SharedScrolledComposite scrolledComposite = new SharedScrolledComposite(specSwitchComposite, SWT.H_SCROLL | SWT.V_SCROLL) {};
+         final SharedScrolledComposite scrolledComposite = new SharedScrolledComposite(specSwitchComposite, SWT.H_SCROLL | SWT.V_SCROLL) { };
          scrolledComposite.setExpandHorizontal(true);
          scrolledComposite.setExpandVertical(true);
          //add layout to scrolledComposite?
@@ -337,7 +335,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          TabFolder heapTabs = new TabFolder(textContainer, SWT.TOP);
          heapTabs.setLayoutData(new GridData(GridData.FILL_BOTH));
          int iter = 0;
-         for(LocationVariable heap : heaps){
+         for (LocationVariable heap : heaps) {
             //for all elems in heap, add a TabItem
             TabItem heapTab = new TabItem(heapTabs, SWT.NONE);
             heapTab.setText(heap.toString());
@@ -391,17 +389,21 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * currently selected specification or the selection changes.
        * @author Viktor Pfanschilling
        */
-      private void updateErrorMessage(){
+      private void updateErrorMessage() {
          setErrorMessage(null);
          int i = 0;
-         for (LocationVariable heap : heaps){
+         for (LocationVariable heap : heaps) {
             Text wdgt = getTextField(-1, i, 0);
             Term invariantTerm = parseInputText(wdgt.getText(), Sort.FORMULA, null);
             wdgt = getTextField(-1, i, 1);
             Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
             Term modifiesTerm = parseInputText(wdgt.getText(), modSort, null);
-            if (invariantTerm == null)setErrorMessage("Error in current specification: " + heap.toString() + " / invariant");
-            if (modifiesTerm == null)setErrorMessage("Error in current specification: " + heap.toString() + " / modifies");
+            if (invariantTerm == null) {
+               setErrorMessage("Error in current specification: " + heap.toString() + " / invariant");
+            }
+            if (modifiesTerm == null) {
+               setErrorMessage("Error in current specification: " + heap.toString() + " / modifies");
+            }
             i++;
          }
          Term variantTerm = resetVariantsState();
@@ -423,7 +425,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * resets the state text for the user-specified invariant
+       * resets the state text for the user-specified invariant.
        * @author Viktor Pfanschilling
        * @param wdgt - the widget containing the user input
        */
@@ -433,7 +435,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * resets the state text for the user-specified modifies field
+       * resets the state text for the user-specified modifies field.
        * @author Viktor Pfanschilling
        * @param wdgt - the widget containing the user input
        */
@@ -444,7 +446,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * resets the state text for the user-specified variants
+       * resets the state text for the user-specified variants.
        * @author Viktor Pfanschilling
        * @param wdgt - the widget containing the user input
        */
@@ -455,7 +457,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * parses input text and updates status reports accordingly
+       * parses input text and updates status reports accordingly.
        * @author Anna Marie Filighera
        * @param input - text to be parsed
        * @param sortType - Sort of input text
@@ -472,7 +474,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             if (status != null) {
                status.setText("OK");
             }
-         }  catch(Exception e){
+         }  catch(Exception e) {
             if (status != null) {
                status.setText(e.getMessage());
             }
@@ -480,7 +482,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          return result;
       }
       
-      private int getSelection(){
+      private int getSelection() {
          return specSelector.getSelectionIndex();
       }
 
@@ -499,16 +501,16 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          ScrolledComposite scrolledComposite = (ScrolledComposite) specSwitchComposite.getChildren()[specification];
          Composite txtcontainer = (Composite) scrolledComposite.getContent();
          if (textField == 2) {
-            Group vargrp = (Group)txtcontainer.getChildren()[1];
-            return (Text)vargrp.getChildren()[0];
+            Group vargrp = (Group) txtcontainer.getChildren()[1];
+            return (Text) vargrp.getChildren()[0];
          }
          TabFolder tfld = (TabFolder)txtcontainer.getChildren()[0];
-         if (heap == -1){
+         if (heap == -1) {
             heap = tfld.getSelectionIndex();
          }
-         Composite modinvcontainer = (Composite)(tfld.getItem(heap).getControl());
-         Group modOrVarGrp = (Group)(modinvcontainer.getChildren()[textField]);
-         Text wdgt = (Text)modOrVarGrp.getChildren()[0];
+         Composite modinvcontainer = (Composite) (tfld.getItem(heap).getControl());
+         Group modOrVarGrp = (Group) (modinvcontainer.getChildren()[textField]);
+         Text wdgt = (Text) modOrVarGrp.getChildren()[0];
          return wdgt;
       }
 
@@ -562,13 +564,13 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          //remove all listeners
          store.removeSelectionListener(storeListener);
          specSelector.removeSelectionListener(specSelectListener);
-         for(int i = 0; i < cListenerParents.size(); i++){
+         for (int i = 0; i < cListenerParents.size(); i++) {
             cListenerParents.get(i).removeControlListener(cListeners.get(i));
          }
-         for(Text p : mListenerParents){
+         for (Text p : mListenerParents) {
             p.removeModifyListener(modifyListener);
          }
-         for(TabFolder p : heapTabFolders){
+         for (TabFolder p : heapTabFolders) {
             p.removeSelectionListener(heapTabsListener);
          }
          root.dispose();

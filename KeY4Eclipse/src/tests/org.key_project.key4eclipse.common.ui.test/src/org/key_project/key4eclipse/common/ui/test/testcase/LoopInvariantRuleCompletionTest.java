@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -17,6 +18,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.test.Activator;
 import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
+import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -26,6 +28,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -33,99 +36,169 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Viktor Pfanschilling
  *
  */
-public class LoopInvariantRuleCompletionTest extends TestCase{
-   SWTWorkbenchBot bot = null;
-   SWTBotShell dialogShell = null;
-   SWTBotEditor editor = null;
-   
-   //TODO: Automate pop up dialogs that appear
-   //TODO: Cleanup.
+public class LoopInvariantRuleCompletionTest extends TestCase {
+   private SWTWorkbenchBot bot = null;
+   private SWTBotShell dialogShell = null;
+   private SWTBotEditor editor = null;
+   private SWTBotPerspective previousperspective = null;
+   private String prevProofStarter = null;
+   private boolean prevDontAsk = false;
+   private Proof proof = null;
+   private KeYEnvironment<DefaultUserInterfaceControl> environment = null;
    
    /**
-    * Tests whether the finish button is inactive at the right times
+    * Tests whether the finish button is inactive at the right times.
     * @throws Exception 
     */
    @Test
-   public void testFinishButtonInactive() throws Exception {
-      setupTest("MyClass.proof");
-      openLIDialog();
-      dialogShell.bot().text("self.array.*").setText("There is no way *this* is a valid specification.");
-      assertFalse(dialogShell.bot().button("Finish").isEnabled());
-      dialogShell.bot().button("Cancel").click();
-      dialogShell = null;
+   public final void testFinishButtonInactive() throws Exception {
+      try {
+         setupTest("MyClass.proof");
+         openLIDialog();
+         dialogShell.bot().text("self.array.*").setText("There is no way *this* is a valid specification.");
+         assertFalse(dialogShell.bot().button("Finish").isEnabled());
+         dialogShell.bot().button("Cancel").click();
+         dialogShell = null;
+      } finally {
+         
+      }
    }
    
    /**
-    * Tests whether the finish button is active at the right times
+    * Tests whether the finish button is active at the right times.
+    * @throws Exception
     */
    @Test
-   public void testFinishButtonActive() throws Exception {
-      setupTest("LoopInvariantExample.proof");
-      openLIDialog();
-      //Thread.sleep(100000);
-      assertTrue(dialogShell.bot().button("Finish").isEnabled());
-      dialogShell.bot().button("Cancel").click();
-      dialogShell = null;
+   public final void testFinishButtonActive() throws Exception {
+      try {
+         setupTest("LoopInvariantExample.proof");
+         openLIDialog();
+         assertTrue(dialogShell.bot().button("Finish").isEnabled());
+         dialogShell.bot().button("Cancel").click();
+         dialogShell = null;
+      } finally {
+         
+      }
    }
    
    /**
-    * Tests whether completing the dialog applies the invariant
+    * Tests whether completing the dialog applies the invariant.
     */
    @Test
-   public void testCompleteApplication() throws Exception {
-      setupTest("LoopInvariantExample.proof");
-      openLIDialog();
-      dialogShell.bot().button("Finish").click();
-      dialogShell = null;
-      final SWTBotStyledText styledText = editor.bot().styledText();
-      assertTrue(styledText.getText().contains("i >= 0 & i <= _array.length"));
-      assertFalse(styledText.getText().contains("bogus, this isn't actually in the text."));
+   public final void testCompleteApplication() throws Exception {
+      try {
+         setupTest("LoopInvariantExample.proof");
+         openLIDialog();
+         dialogShell.bot().button("Finish").click();
+         dialogShell = null;
+         final SWTBotStyledText styledText = editor.bot().styledText();
+         assertTrue(styledText.getText().contains("i >= 0 & i <= _array.length"));
+         assertFalse(styledText.getText().contains("bogus, this isn't actually in the text."));
+      } finally {
+         restore();
+      }
    }
    
    /**
-    * Tests whether re-opening the dialog restores the specification
+    * Tests whether re-opening the dialog restores the specification.
     * Currently disabled until I figure out how to prune the proof.
     */
-   private void notActuallyATestRestore() throws Exception {
-      setupTest("LoopInvariantExample.proof");
-      openLIDialog();
-      dialogShell.bot().text("i >= 0 & i <= _array.length").setText("i > -1 & i <= _array.length");
-      dialogShell.bot().button("Finish").click();
-      dialogShell = null;
-      prune(0);
-      openLIDialog();
-      assertNotNull(dialogShell.bot().text("i > -1 & i <= _array.length"));
-      dialogShell.bot().button("Finish").click();
-      dialogShell = null;
+   @Test
+   public void testRestore() throws Exception {
+      try {
+         setupTest("LoopInvariantExample.proof");
+         Node n = proof.root();
+         //Not sure if this results in the right node.
+         //If not, clickContextMenu will raise a WidgetNotFound Exception.
+         while(!n.child(0).leaf()){
+            n = n.child(0);
+         }
+         
+         //Open Dialog, apply modified Invariant
+         openLIDialog();
+         dialogShell.bot().text("i >= 0 & i <= _array.length").setText("i > -1 & i <= _array.length");
+         dialogShell.bot().button("Finish").click();
+         dialogShell = null;
+         
+         //prune away the change.
+         //"n, true" results in Exceptions, "n, false" results in no change being detected.
+         proof.pruneProof(n, false);
+         
+         editor.setFocus();
+         final SWTBotStyledText styledText = editor.bot().styledText();
+         Point point = TestUtilsUtil.selectText(styledText, "{");
+         point = new Point(point.x - 1, point.y);
+         
+         TestUtilsUtil.setCursorLocation(styledText, point.x, point.y);
+         TestUtilsUtil.clickContextMenu(styledText, point.x, point.y, "gibberish");
+         SWTBotShell shell = bot.activeShell();
+         
+         dialogShell = shell;
+         
+         assertNotNull(dialogShell.bot().text("i > -1 & i <= _array.length"));
+         dialogShell.bot().button("Finish").click();
+         dialogShell = null;
+      } finally {
+         restore();
+      }
    }
    
    /**
-    * Tests whether additional heaps are displayed in the dialog
+    * Tests whether additional heaps are displayed in the dialog.
     */
    @Test
    public void testAdditionalHeaps() throws Exception {
-      setupTest("MyClass.proof");
-      openLIDialog();
-      assertNotNull(dialogShell.bot().tabItem("permissions").activate());
-      assertNotNull(dialogShell.bot().text("false"));
-      dialogShell.bot().button("Cancel").click();
-      dialogShell = null;
+      try {
+         setupTest("MyClass.proof");
+         openLIDialog();
+         assertNotNull(dialogShell.bot().tabItem("permissions").activate());
+         assertNotNull(dialogShell.bot().text("false"));
+         dialogShell.bot().button("Cancel").click();
+         dialogShell = null;
+      } finally {
+         
+      }
    }
    
    /**
-    * sets up a test environment
+    * restores the initial conditions.
+    */
+   private void restore() {
+      if(dialogShell != null) {
+         dialogShell.close();
+         dialogShell = null;
+      }
+      editor.close();
+      previousperspective.activate();
+      StarterPreferenceUtil.setDontAskForProofStarter(prevDontAsk);
+      StarterPreferenceUtil.setSelectedProofStarterID(prevProofStarter);
+      proof.dispose();
+      environment.dispose();
+   }
+   
+   /**
+    * sets up a test environment.
+    * @param filename The filename of the .proof file
     * @throws Exception
     */
-   private void setupTest(String filename) throws Exception{
+   private void setupTest(String filename) throws Exception {
       // Close welcome view if available
       bot = new SWTWorkbenchBot();
       TestUtilsUtil.closeWelcomeView(bot);
+      
+      //Don't show the dialogs inquiring about starters and perspectives.
+      previousperspective = bot.activePerspective();
+      bot.perspectiveByLabel("KeY").activate();
+      prevProofStarter = StarterPreferenceUtil.getSelectedProofStarterID();
+      StarterPreferenceUtil.setSelectedProofStarterID("org.key_project.keyide.ui.starter.KeYIDEProofStarter");
+      prevDontAsk = StarterPreferenceUtil.isDontAskForProofStarter();
+      StarterPreferenceUtil.setDontAskForProofStarter(true);
+      
       // Create test project
       IJavaProject project = TestUtilsUtil.createJavaProject("LoopInvariantRuleCompletionTest");
       IFolder src = project.getProject().getFolder("src");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/loopInvariantExample", src);
       
-      final Proof proof;
       editor = null;
       // Get local file in operating system of folder src 
       File location = ResourceUtil.getLocation(src);
@@ -134,9 +207,9 @@ public class LoopInvariantRuleCompletionTest extends TestCase{
       assertEquals(filesInLoc.length, 1);
       File proofFolder = filesInLoc[0];
       
+      
       // Load source code in KeY and get contract to proof which is the first contract of LogRecord#getBalance().
-      final KeYEnvironment<DefaultUserInterfaceControl>  environment =
-            KeYEnvironment.load(new File(proofFolder, filename), null, null, null, EclipseUserInterfaceCustomization.getInstance());
+      environment = KeYEnvironment.load(new File(proofFolder, filename), null, null, null, EclipseUserInterfaceCustomization.getInstance());
       
       proof = environment.getLoadedProof();
       assertNotNull(proof);
@@ -148,13 +221,12 @@ public class LoopInvariantRuleCompletionTest extends TestCase{
                SWTBotShell s = bot.activeShell();
                assertNotNull(s);
                StarterUtil.openProofStarter(s.widget, proof, environment, null, true, true, true, true);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                setException(e);
             }
          }
       };
-
+      
       Display.getDefault().syncExec(run);
       if (run.getException() != null) {
          throw run.getException();
@@ -162,34 +234,19 @@ public class LoopInvariantRuleCompletionTest extends TestCase{
       editor = bot.activeEditor();
       assertNotNull(editor);
       
-      AbstractSWTBot<?> eclEditor = bot.activeShell();
-      assertNotNull(eclEditor);
    }
    
-   private void openLIDialog(){
-
+   private void openLIDialog() {
       //click context menu / text we're looking for: The first { should be the start of the update.
       final SWTBotStyledText styledText = editor.bot().styledText();
       Point point = TestUtilsUtil.selectText(styledText, "{");
-      point = new Point(point.x-1, point.y);
+      point = new Point(point.x - 1, point.y);
       
       TestUtilsUtil.setCursorLocation(styledText, point.x, point.y);
       TestUtilsUtil.clickContextMenu(styledText, point.x, point.y, "Loop Invariant");
       SWTBotShell shell = bot.activeShell();
       
       dialogShell = shell;
-   }
-   
-   private void prune(int node){
-      SWTBotView view = null;
-      for(SWTBotView viewIt : bot.views()){
-         System.out.println("View title = " + viewIt.getTitle());
-         if (viewIt.getTitle().equals("Outline")) {
-            System.out.println("This is a match");
-            view = viewIt;
-         }
-      }
-      assertNotNull(view);
-      view.bot().tree().getTreeItem("22:Loop Invariant").contextMenu("Prune Proof").click();
+      
    }
 }
