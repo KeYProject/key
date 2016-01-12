@@ -75,40 +75,96 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
     */
    public static class Perform extends AbstractInteractiveRuleApplicationCompletionPerform {
       
+      /**
+       * The Composite in the wizard this dialog is attached to.
+       */
       private Composite root = null;
+      /**
+       * Displays the status of the invariant specification the user is looking at.
+       */
       private Label invariantStatus = null;
+      /**
+       * Displays the status of the modifies specification the user is looking at.
+       */
       private Label modifiesStatus = null;
+      /**
+       * Displays the status of the variant specification the user is looking at.
+       */
       private Label variantStatus = null;
-      private DefaultTermParser parser = new DefaultTermParser();
+      /**
+       * The services in use.
+       */
       private Services services = getGoal().proof().getServices();
+      /**
+       * The heaps this object is dealing with.
+       */
       private LocationVariable[] heaps = null;
+      /**
+       * The specSwitchComposite, alternatively displaying widgets for one of the specifications.
+       */
       private Composite specSwitchComposite = null;
+      /**
+       * The layout of specSwitchComposite. onTopControl sets the currently visible specification
+       */
       private StackLayout stackLayout = null;
+      /**
+       * The Combo box that contains references to all the alternative specifications.
+       */
       private Combo specSelector = null;
+      /**
+       * The Store Button.
+       */
+      private Button store = null;
+      
+      
+      /////////////// The listeners and attachment points for Listeners are just stored here for cleanup ///////////////
+      
+      /**
+       * The listener that causes specification selections.
+       */
       private SelectionAdapter specSelectListener = new SelectionAdapter() {
          @Override
-         public void widgetSelected(SelectionEvent e)
-         {
+         public void widgetSelected(SelectionEvent e) {
             switchPage(specSelector.getSelectionIndex());
          }
       };
-      private Button store = null;
+      /**
+       * The listener that handles store events.
+       */
       private SelectionAdapter storeListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             store(); // add new tab 
          }
       };
+      /**
+       * the TabFolders that contain the specification for one heap.
+       */
       private Vector<TabFolder> heapTabFolders = new Vector<>();
+      /**
+       * The listeners for the heapTabFolders, handling the update of the error panel.
+       */
       private SelectionAdapter heapTabsListener = new SelectionAdapter() {
          public void widgetSelected(SelectionEvent e) {
             resetStateTab();
          }
       };
+      /**
+       * List of Control Elements that have had Control Listeners attached.
+       */
       private Vector<Control> cListenerParents = new Vector<>();
+      /**
+       * List of listeners, corresponding to cListenerParents.
+       */
       private Vector<ControlListener> cListeners = new Vector<>();
+      /**
+       * Vector of elements a modifyListener has been attached to.
+       */
       private Vector<Text> mListenerParents = new Vector<>();
-      private ModifyListener modifyListener = new ModifyListener(){
+      /**
+       * Listener to be called when input text is modified.
+       */
+      private ModifyListener modifyListener = new ModifyListener() {
          public void modifyText(ModifyEvent e) {
             resetStateTab();
          }
@@ -160,7 +216,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       }
       
       /**
-       * @param root The composite to which to attach the Group
+       * @param parent The composite to which to attach the Group
        * @param text the header text the state view should have
        * @return the Label that is meant for the actual state message
        */
@@ -350,14 +406,20 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             invariantGroup.setText("invariant");
             invariantGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
             invariantT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
-            invariantT.setText(invariants[iter] != null ? invariants[iter] : "true");
+            if (invariants[iter] == null) {
+               invariants[iter] = "true";
+            }
+            invariantT.setText(invariants[iter]);
             Group modifiesGroup = new Group(modinvcontainer, SWT.NONE);
             modifiesGroup.setLayout(new FillLayout());
             modifiesGroup.setText("modifies");
             modifiesGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
             Text modifiesT = new Text(modifiesGroup, SWT.V_SCROLL | SWT.WRAP);
             modifiesT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
-            modifiesT.setText(modifies[iter] != null? modifies[iter] : "allLocs");
+            if (modifies[iter] == null) {
+               modifies[iter] = "allLocs";
+            }
+            modifiesT.setText(modifies[iter]);
             
             mListenerParents.add(invariantT);
             invariantT.addModifyListener(modifyListener);
@@ -375,7 +437,10 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          variantsGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
          Text variantsT = new Text(variantsGroup, SWT.V_SCROLL | SWT.WRAP);
          variantsT.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
-         variantsT.setText(variant == null ? "" : variant);
+         if (variant == null) {
+            variant = "";
+         }
+         variantsT.setText(variant);
          
          mListenerParents.add(variantsT);
          variantsT.addModifyListener(modifyListener);
@@ -417,7 +482,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * resets the state text for all three input fields.
        * @author Viktor Pfanschilling
        */
-      private void resetStateTab(){
+      private void resetStateTab() {
          updateErrorMessage();
          resetInvariantState();
          resetModifiesState();
@@ -427,9 +492,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       /**
        * resets the state text for the user-specified invariant.
        * @author Viktor Pfanschilling
-       * @param wdgt - the widget containing the user input
+       * @return the invariant term
        */
-      private Term resetInvariantState(){
+      private Term resetInvariantState() {
          Text wdgt = getTextField(-1, -1, 0);
          return parseInputText(wdgt.getText(), Sort.FORMULA, invariantStatus);
       }
@@ -437,9 +502,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       /**
        * resets the state text for the user-specified modifies field.
        * @author Viktor Pfanschilling
-       * @param wdgt - the widget containing the user input
+       * @return the modifies term
        */
-      private Term resetModifiesState(){
+      private Term resetModifiesState() {
          Text wdgt = getTextField(-1, -1, 1);
          Sort modSort = services.getTypeConverter().getLocSetLDT().targetSort();
          return parseInputText(wdgt.getText(), modSort, modifiesStatus);
@@ -448,9 +513,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       /**
        * resets the state text for the user-specified variants.
        * @author Viktor Pfanschilling
-       * @param wdgt - the widget containing the user input
+       * @return the variant term
        */
-      private Term resetVariantsState(){
+      private Term resetVariantsState() {
          Text wdgt = getTextField(-1, -1, 2);
          Sort varSort = services.getTypeConverter().getIntegerLDT().targetSort();
          return parseInputText(wdgt.getText(), varSort, variantStatus);
@@ -462,19 +527,20 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @param input - text to be parsed
        * @param sortType - Sort of input text
        * @param status - status label to be updated, or null for none
-       * @return
+       * @return the Term parsed from the input, given the specification
        */
-      private Term parseInputText(String input, Sort sortType, Label status){
+      private Term parseInputText(String input, Sort sortType, Label status) {
          Term result = null;
          try {
-            result = parser.parse(
+            DefaultTermParser parser = new DefaultTermParser();
+            result = parser .parse(
                new StringReader(input), sortType,
                services, services.getNamespaces(),
                MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
             if (status != null) {
                status.setText("OK");
             }
-         }  catch(Exception e) {
+         }  catch (Exception e) {
             if (status != null) {
                status.setText(e.getMessage());
             }
@@ -482,6 +548,9 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
          return result;
       }
       
+      /**
+       * @return the ID of the currently selected specification
+       */
       private int getSelection() {
          return specSelector.getSelectionIndex();
       }
@@ -492,7 +561,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        * @param textField - 0 for invariant, 1 for modifies, 2 for variant
        * @return the Text widget containing the specification.
        */
-      private Text getTextField(int specification, int heap, int textField){
+      private Text getTextField(int specification, int heap, int textField) {
          if (specification == -1) {
             specification = getSelection();
          }
@@ -504,7 +573,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
             Group vargrp = (Group) txtcontainer.getChildren()[1];
             return (Text) vargrp.getChildren()[0];
          }
-         TabFolder tfld = (TabFolder)txtcontainer.getChildren()[0];
+         TabFolder tfld = (TabFolder) txtcontainer.getChildren()[0];
          if (heap == -1) {
             heap = tfld.getSelectionIndex();
          }
