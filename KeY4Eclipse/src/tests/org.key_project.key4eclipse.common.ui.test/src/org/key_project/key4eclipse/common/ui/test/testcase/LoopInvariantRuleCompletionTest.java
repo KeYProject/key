@@ -60,7 +60,7 @@ public class LoopInvariantRuleCompletionTest extends TestCase {
          dialogShell.bot().button("Cancel").click();
          dialogShell = null;
       } finally {
-         
+         restore();
       }
    }
    
@@ -77,7 +77,7 @@ public class LoopInvariantRuleCompletionTest extends TestCase {
          dialogShell.bot().button("Cancel").click();
          dialogShell = null;
       } finally {
-         
+         restore();
       }
    }
    
@@ -156,7 +156,7 @@ public class LoopInvariantRuleCompletionTest extends TestCase {
          dialogShell.bot().button("Cancel").click();
          dialogShell = null;
       } finally {
-         
+         restore();
       }
    }
    
@@ -168,12 +168,19 @@ public class LoopInvariantRuleCompletionTest extends TestCase {
          dialogShell.close();
          dialogShell = null;
       }
-      editor.close();
       previousperspective.activate();
       StarterPreferenceUtil.setDontAskForProofStarter(prevDontAsk);
       StarterPreferenceUtil.setSelectedProofStarterID(prevProofStarter);
-      proof.dispose();
-      environment.dispose();
+      bot.closeAllEditors();
+      if (editor != null) {
+         editor.close();
+      }
+      if (proof != null && !proof.isDisposed()) {
+         proof.dispose();
+      }
+      if (environment != null) {
+         environment.dispose();
+      }
    }
    
    /**
