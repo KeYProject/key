@@ -53,11 +53,11 @@ import javafx.scene.web.WebView;
 import javafx.util.StringConverter;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionAbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionAbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
@@ -247,6 +247,7 @@ public class AbstractionPredicatesChoiceDialogController {
     @FXML
     private void initialize() {
         accMain.setExpandedPane(accMain.getPanes().get(0));
+
         final String resourcePath = "/de/uka/ilkd/key/gui/";
         final URL bootstrapCssResource =
                 getURLForResourceFile(AbstractionPredicatesChoiceDialog.class,
