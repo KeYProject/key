@@ -60,10 +60,12 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredica
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
@@ -543,13 +545,7 @@ public class AbstractionPredicatesChoiceDialogController {
                 predElem.getPredicates().iterator();
 
         while (it.hasNext()) {
-            AbstractionPredicate next = it.next();
-
-            final Pair<LocationVariable, Term> predFormWithPh =
-                    next.getPredicateFormWithPlaceholder();
-
-            sb.append("(" + predFormWithPh.first.toString() + ","
-                    + predFormWithPh.second.toString() + ")");
+            sb.append(abstrPredToString(it.next()));
 
             if (it.hasNext()) {
                 sb.append(predElem.getPredicateNameCombinationString());
@@ -557,6 +553,26 @@ public class AbstractionPredicatesChoiceDialogController {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Returns a String representation of an abstraction predicate.
+     * 
+     * @param pred
+     *            Predicate to compute a String representation for.
+     * @return A String representation of an abstraction predicate.
+     */
+    private String abstrPredToString(AbstractionPredicate pred) {
+        final Services services =
+                MainWindow.getInstance().getMediator().getServices();
+        final Pair<LocationVariable, Term> predFormWithPh =
+                pred.getPredicateFormWithPlaceholder();
+
+        return "("
+                + predFormWithPh.first.toString()
+                + ","
+                + OutputStreamProofSaver.printAnything(predFormWithPh.second,
+                        services) + ")";
     }
 
     // ///////////////////////////// //

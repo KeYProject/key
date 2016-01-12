@@ -194,4 +194,17 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
         return name().toString();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AbstractionPredicate)) {
+            return false;
+        }
+
+        final AbstractionPredicate otherPred = (AbstractionPredicate) obj;
+
+        return otherPred.placeholderVariable.equals(placeholderVariable)
+                && otherPred.predicateFormWithPlaceholder
+                        .equals(predicateFormWithPlaceholder);
+    }
+
 }

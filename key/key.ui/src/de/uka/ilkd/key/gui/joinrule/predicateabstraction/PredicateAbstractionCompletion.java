@@ -72,34 +72,36 @@ public class PredicateAbstractionCompletion extends
 
         JoinRuleUtils
                 .getUpdateLeftSideLocations(joinState.first)
-                .forEach(
-                        v -> {
-                            // The meaning of the following statement corresponds to
-                            // partnerStates.fold("right value for v differs", false)
-                            final boolean isDifferent = StreamSupport
-                                    .stream(partnerStates.spliterator(), false)
-                                    .collect(
-                                            Collectors
-                                                    .reducing(
-                                                            false,
-                                                            partner -> !JoinRuleUtils
-                                                                    .getUpdateRightSideFor(
-                                                                            partner.getSymbolicState(),
-                                                                            v)
-                                                                    .equals(JoinRuleUtils
-                                                                            .getUpdateRightSideFor(
-                                                                                    joinState
-                                                                                            .getSymbolicState(),
-                                                                                    v)),
-                                                            (b1, b2) -> (b1 || b2)));
-                            
-                            if (isDifferent) {
-                                differingLocVars.add(v);
-                            }
-                        });
+                .forEach(v -> {
+                    // The meaning of the following statement corresponds to
+                    // partnerStates.fold("right value for v differs", false)
+                        final boolean isDifferent =
+                                StreamSupport
+                                        .stream(partnerStates.spliterator(),
+                                                false)
+                                        .collect(
+                                                Collectors
+                                                        .reducing(
+                                                                false,
+                                                                partner -> !JoinRuleUtils
+                                                                        .getUpdateRightSideFor(
+                                                                                partner.getSymbolicState(),
+                                                                                v)
+                                                                        .equals(JoinRuleUtils
+                                                                                .getUpdateRightSideFor(
+                                                                                        joinState
+                                                                                                .getSymbolicState(),
+                                                                                        v)),
+                                                                (b1, b2) -> (b1 || b2)));
+
+                        if (isDifferent) {
+                            differingLocVars.add(v);
+                        }
+                    });
 
         final AbstractionPredicatesChoiceDialog dialog =
-                new AbstractionPredicatesChoiceDialog(joinGoalPio.first, differingLocVars);
+                new AbstractionPredicatesChoiceDialog(joinGoalPio.first,
+                        differingLocVars);
 
         assert proc instanceof JoinWithPredicateAbstractionFactory : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
 
@@ -107,8 +109,9 @@ public class PredicateAbstractionCompletion extends
                 (JoinWithPredicateAbstractionFactory) proc;
 
         dialog.setVisible(true);
-        
-        final AbstractionPredicatesChoiceDialog.Result userInput = dialog.getResult();
+
+        final AbstractionPredicatesChoiceDialog.Result userInput =
+                dialog.getResult();
 
         final ArrayList<AbstractionPredicate> chosenPreds =
                 userInput.getRegisteredPredicates();
@@ -119,7 +122,8 @@ public class PredicateAbstractionCompletion extends
             return proc;
         }
         else {
-            return procF.instantiate(chosenPreds, userInput.getLatticeType(), userInput.getAbstractDomElemUserChoices());
+            return procF.instantiate(chosenPreds, userInput.getLatticeType(),
+                    userInput.getAbstractDomElemUserChoices());
         }
     }
 

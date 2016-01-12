@@ -171,7 +171,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param goal
      *            The goal on which the join rule is applied.
      * @param differingLocVars
-     *            TODO
+     *            Location variables the values of which differ in the join
+     *            partner states.
      */
     public AbstractionPredicatesChoiceDialog(Goal goal,
             List<LocationVariable> differingLocVars) {
@@ -206,9 +207,14 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 (ObservableValue<? extends String> observable, String oldValue,
                         String newValue) -> {
                     try {
-                        parsePredicate(newValue);
+                        AbstractionPredicate pred = parsePredicate(newValue);
 
                         ctrl.predicateProblemsListData.clear();
+
+                        if (registeredPredicates.contains(pred)) {
+                            ctrl.predicateProblemsListData
+                                    .add("Predicate is already registered");
+                        }
                     }
                     catch (Exception e) {
                         ctrl.predicateProblemsListData.clear();
