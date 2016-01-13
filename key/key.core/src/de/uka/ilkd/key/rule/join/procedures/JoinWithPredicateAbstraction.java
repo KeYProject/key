@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -53,11 +54,12 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      */
     private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
             null;
-    
+
     /**
      * Manually chosen lattice elements for program variables.
      */
-    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices = null;
+    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices =
+            null;
 
     /**
      * Default constructor for subclasses.
@@ -106,8 +108,27 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     @Override
     public AbstractDomainLattice getAbstractDomainForSort(final Sort s,
             final Services services) {
-        ArrayList<AbstractionPredicate> applicablePredicates =
-                predicates.get(s);
+        return instantiateAbstractDomain(s, predicates.get(s), latticeType, services);
+    }
+
+    /**
+     * Instantiates the abstract domain lattice for the given sort or null if
+     * there has no lattice been specified for that sort.
+     * 
+     * @param s
+     *            {@link Sort} of for elements in the lattice.
+     * @param predicates
+     *            {@link AbstractionPredicate}s for all sorts.
+     * @param latticeType
+     *            Type of {@link AbstractPredicateAbstractionLattice}.
+     * @param services
+     *            The {@link Services} object.
+     * @return The corresponding {@link AbstractDomainLattice}.
+     */
+    public static AbstractDomainLattice instantiateAbstractDomain(final Sort s,
+            final List<AbstractionPredicate> applicablePredicates,
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+            final Services services) {
 
         if (applicablePredicates == null) {
             // A returned null value indicates to

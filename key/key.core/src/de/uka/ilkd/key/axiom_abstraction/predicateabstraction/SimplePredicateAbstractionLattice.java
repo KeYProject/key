@@ -15,6 +15,7 @@ package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 
@@ -32,7 +33,7 @@ public class SimplePredicateAbstractionLattice extends
         AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "<<<<<<N/A>>>>>>";
     
-    private ArrayList<AbstractionPredicate> predicates =
+    private List<AbstractionPredicate> predicates =
             new ArrayList<AbstractionPredicate>();
 
     /**
@@ -44,7 +45,7 @@ public class SimplePredicateAbstractionLattice extends
      *            The predicates to generate the lattice from.
      */
     public SimplePredicateAbstractionLattice(
-            ArrayList<AbstractionPredicate> applicablePredicates) {
+            List<AbstractionPredicate> applicablePredicates) {
         super();
 
         assert predicates != null : "Do not call this constructor with a null argument.";

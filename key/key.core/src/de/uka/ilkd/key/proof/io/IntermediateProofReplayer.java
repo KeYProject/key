@@ -25,6 +25,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -38,14 +42,13 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbs
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -79,6 +82,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
@@ -702,8 +706,6 @@ public class IntermediateProofReplayer {
         builtinIfInsts = null;
         return ourApp;
     }
-    
-
 
     /**
      * Instantiates a Join Rule application.
@@ -742,7 +744,7 @@ public class IntermediateProofReplayer {
 
         // Predicate abstraction join rule
         if (joinApp.getConcreteRule() instanceof JoinWithPredicateAbstractionFactory) {
-            final ArrayList<AbstractionPredicate> predicates =
+            List<AbstractionPredicate> predicates =
                     new ArrayList<AbstractionPredicate>();
 
             // It may happen that the abstraction predicates are null -- in this
@@ -750,43 +752,14 @@ public class IntermediateProofReplayer {
             // with top and bottom elements only, which is accomplished by just
             // supplying an empty list of predicates to the join procedure.
             if (joinAppInterm.getAbstractionPredicates() != null) {
-
-                for (Pair<String, String> rawPred : joinAppInterm
-                        .getAbstractionPredicates()) {
-
-                    // Parse the placeholder
-                    Pair<Sort, Name> ph = null;
-                    try {
-                        ph =
-                                JoinRuleUtils.parsePlaceholder(rawPred.first,
-                                        false, services);
-                    }
-                    catch (RuntimeException e) {
-                        errors.add(e);
-                        continue;
-                    }
-
-                    // Add placeholder to namespaces, if necessary
-                    if (services.getNamespaces().variables().lookup(ph.second) == null) {
-                        services.getNamespaces()
-                                .variables()
-                                .add(new LocationVariable(
-                                        new ProgramElementName(ph.second
-                                                .toString()), ph.first));
-                    }
-
-                    // Parse the predicate
-                    try {
-                        predicates
-                                .add(JoinRuleUtils.parsePredicate(
-                                        rawPred.second,
-                                        JoinRuleUtils.singletonArrayList(ph),
-                                        services));
-                    }
-                    catch (ParserException e) {
-                        errors.add(e);
-                        continue;
-                    }
+                try {
+                    predicates =
+                            AbstractionPredicate.fromString(
+                                    joinAppInterm.getAbstractionPredicates(),
+                                    services);
+                }
+                catch (ParserException e) {
+                    errors.add(e);
                 }
 
             }
@@ -794,15 +767,71 @@ public class IntermediateProofReplayer {
             final Class<? extends AbstractPredicateAbstractionLattice> latticeType =
                     joinAppInterm.getPredAbstrLatticeType();
 
-            // TODO (DS): Add HashMap with user choices.
+            LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices =
+                    new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
+
+            if (joinAppInterm.getUserChoices() != null) {
+                final Pattern p = Pattern.compile("\\('(.+?)', `(.+?)`\\)");
+                final Matcher m = p.matcher(joinAppInterm.getUserChoices());
+
+                boolean matched = false;
+                while (m.find()) {
+                    matched = true;
+
+                    for (int i = 1; i < m.groupCount(); i += 2) {
+                        assert i + 1 <= m.groupCount() : "Wrong format of join user choices: "
+                                + "There should always be pairs of program variables "
+                                + "and abstract domain elements.";
+
+                        final String progVarStr = m.group(i);
+                        final String abstrElemStr = m.group(i + 1);
+
+                        // Parse the program variable
+                        final Pair<Sort, Name> ph =
+                                JoinRuleUtils.parsePlaceholder(progVarStr,
+                                        false, services);
+
+                        final List<AbstractionPredicate> applicablePredicates =
+                                StreamSupport
+                                        .stream(predicates.spliterator(), false)
+                                        .filter(pred -> pred.getArgSort()
+                                                .equals(ph.first))
+                                        .collect(Collectors.toList());
+
+                        // Parse the abstract domain element
+                        final AbstractDomainElement elem =
+                                JoinWithPredicateAbstraction
+                                        .instantiateAbstractDomain(ph.first,
+                                                applicablePredicates,
+                                                latticeType, services)
+                                        .fromString(abstrElemStr, services);
+
+                        final Named pv =
+                                services.getNamespaces().programVariables()
+                                        .lookup(ph.second);
+
+                        assert pv != null
+                                && pv instanceof ProgramVariable
+                                && ((ProgramVariable) pv).sort().equals(
+                                        ph.first) : "Program variable involved in join is not known to the system";
+
+                        userChoices.put((ProgramVariable) pv, elem);
+                    }
+                }
+
+                if (!matched) {
+                    errors.add(new ParserException(
+                            "Wrong format of join user choices.", null));
+                }
+            }
+
             // Instantiate the join procedure
             joinApp.setConcreteRule(((JoinWithPredicateAbstractionFactory) joinApp
                     .getConcreteRule())
                     .instantiate(
                             predicates,
                             latticeType == null ? SimplePredicateAbstractionLattice.class
-                                    : latticeType,
-                            new LinkedHashMap<ProgramVariable, AbstractDomainElement>()));
+                                    : latticeType, userChoices));
 
         }
 
