@@ -289,13 +289,11 @@ public class IntermediateProofReplayer {
 
                                 currGoal.apply(joinApp);
 
-                                // Join node has exactly one child in a closed
-                                // proof, and zero or one children in an open
-                                // proof.
-                                if (currInterm.getChildren().size() > 0) {
+                                final Iterator<Node> childrenIterator = currNode.childrenIterator();
+                                for (NodeIntermediate child : currInterm.getChildren()) {
                                     queue.addFirst(new Pair<Node, NodeIntermediate>(
-                                            currNode.childrenIterator().next(),
-                                            currInterm.getChildren().get(0)));
+                                            childrenIterator.next(),
+                                            child));
                                 }
 
                                 // Now add children of partner nodes

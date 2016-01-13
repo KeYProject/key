@@ -393,22 +393,22 @@ public class OutputStreamProofSaver {
                         (JoinRuleBuiltInRuleApp) appliedRuleApp;
                 JoinProcedure concreteRule = joinApp.getConcreteRule();
 
-                tree.append(" (").append(ProofElementID.JOIN_PROCEDURE)
+                tree.append(" (").append(ProofElementID.JOIN_PROCEDURE.getRawName())
                         .append(" \"");
                 tree.append(concreteRule.toString());
                 tree.append("\")");
 
-                tree.append(" (").append(ProofElementID.NUMBER_JOIN_PARTNERS)
+                tree.append(" (").append(ProofElementID.NUMBER_JOIN_PARTNERS.getRawName())
                         .append(" \"");
                 tree.append(joinApp.getJoinPartners().size());
                 tree.append("\")");
 
-                tree.append(" (").append(ProofElementID.JOIN_ID).append(" \"");
+                tree.append(" (").append(ProofElementID.JOIN_ID.getRawName()).append(" \"");
                 tree.append(joinApp.getJoinNode().serialNr());
                 tree.append("\")");
 
                 if (joinApp.getDistinguishingFormula() != null) {
-                    tree.append(" (").append(ProofElementID.JOIN_DIST_FORMULA)
+                    tree.append(" (").append(ProofElementID.JOIN_DIST_FORMULA.getRawName())
                             .append(" \"");
                     tree.append(escapeCharacters(printAnything(
                             joinApp.getDistinguishingFormula(),
@@ -424,7 +424,7 @@ public class OutputStreamProofSaver {
                                 .getPredicates().size() > 0) {
 
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_ABSTRACTION_PREDICATES)
+                            .append(ProofElementID.JOIN_ABSTRACTION_PREDICATES.getRawName())
                             .append(" \"");
                     for (Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts : predAbstrRule
                             .getPredicates().entrySet()) {
@@ -441,7 +441,7 @@ public class OutputStreamProofSaver {
                     tree.append("\")");
 
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE)
+                            .append(ProofElementID.JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE.getRawName())
                             .append(" \"");
                     tree.append(predAbstrRule.getLatticeType().getName());
                     tree.append("\")");
@@ -452,7 +452,7 @@ public class OutputStreamProofSaver {
                         ((JoinWithLatticeAbstraction) concreteRule)
                                 .getUserChoices();
                 if (!userChoices.isEmpty()) {
-                    tree.append(" (").append(ProofElementID.JOIN_USER_CHOICES)
+                    tree.append(" (").append(ProofElementID.JOIN_USER_CHOICES.getRawName())
                             .append(" \"");
                     for (final ProgramVariable v : userChoices.keySet()) {
                         final AbstractDomainElement elem = userChoices.get(v);
@@ -479,7 +479,7 @@ public class OutputStreamProofSaver {
                 // TODO (DS): There may be problems here if the join node is
                 // pruned away. Need to test some cases and either check for
                 // null pointers at this place or find a better solution.
-                tree.append(" (").append(ProofElementID.JOIN_NODE)
+                tree.append(" (").append(ProofElementID.JOIN_NODE.getRawName())
                         .append(" \"");
                 tree.append(closeApp.getCorrespondingJoinNode().parent()
                         .serialNr());

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -41,7 +42,7 @@ public class DisjunctivePredicateAbstractionLattice extends
         AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "_OR_";
     
-    private ArrayList<AbstractionPredicate> predicates =
+    private List<AbstractionPredicate> predicates =
             new ArrayList<AbstractionPredicate>();
 
     /**
@@ -53,7 +54,7 @@ public class DisjunctivePredicateAbstractionLattice extends
      *            The predicates to generate the lattice from.
      */
     public DisjunctivePredicateAbstractionLattice(
-            ArrayList<AbstractionPredicate> applicablePredicates) {
+            List<AbstractionPredicate> applicablePredicates) {
         super();
 
         assert predicates != null : "Do not call this constructor with a null argument.";

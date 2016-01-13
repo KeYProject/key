@@ -140,7 +140,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
 
         try {
             Constructor<? extends AbstractPredicateAbstractionLattice> latticeConstructor =
-                    latticeType.getConstructor(ArrayList.class);
+                    latticeType.getConstructor(List.class);
 
             return latticeConstructor.newInstance(applicablePredicates);
         }
