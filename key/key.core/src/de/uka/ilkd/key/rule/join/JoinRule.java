@@ -167,7 +167,7 @@ public class JoinRule implements BuiltInRule {
         final int numSideConditionsToProve =
                 joinRuleApp.getConcreteRule() instanceof JoinWithLatticeAbstraction ? ((JoinWithLatticeAbstraction) joinRuleApp
                         .getConcreteRule()).getUserChoices().size()
-                        * (joinRuleApp.getJoinPartners().size() + 1) : 1;
+                        * (joinRuleApp.getJoinPartners().size() + 1) : 0;
 
         // New goals are reversed to make sure that they are displayed in the
         // order expected by the user.

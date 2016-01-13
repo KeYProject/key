@@ -88,7 +88,7 @@ public class JoinRuleTests extends TestCase {
 
         assertTrue(proof.closed());
         assertEquals("There should be two join applications in the proof.",
-                proof.getStatistics().joinRuleApps, 2);
+                2, proof.getStatistics().joinRuleApps);
     }
 
     /**
