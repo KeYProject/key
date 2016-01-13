@@ -60,13 +60,8 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
     */
    @Test
    public void testInitialStructure() throws Exception {
-      File location = getFile("OutlineContentAndLabelProviderTest_testInitialStructure", "src", "data/paycard");
-      // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
-      IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
-      ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
-      FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
-      Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
+	  KeYEnvironment<DefaultUserInterfaceControl> environment = getEnvironment("OutlineContentAndLabelProviderTest_testInitialStructure", "src", "data/paycard");
+      Proof proof = getProof(environment, "PayCard", "isValid");
       assertNotNull(proof);
       // Close proof automatically
       environment.getProofControl().startAndWaitForAutoMode(proof);
@@ -105,13 +100,8 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
     */
    @Test
    public void testHideIntermediateProofsteps() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
-	  File location = getFile("OutlineContentAndLabelProviderTest_testHideIntermediateProofsteps", "src", "data/paycard");
-	  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-	  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
-	  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
-	  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
-	  FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
-	  Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
+	  KeYEnvironment<DefaultUserInterfaceControl> environment = getEnvironment("OutlineContentAndLabelProviderTest_testHideIntermediateProofsteps", "src", "data/paycard");
+	  Proof proof = getProof(environment, "PayCard", "isValid");
 	  assertNotNull(proof);
 	  // create viewer to show proof in
 	  Shell shell = new Shell();
@@ -179,13 +169,8 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
  	*/
    @Test
    public void testShowSymbolicExecutionTree() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
-		  File location = getFile("OutlineContentAndLabelProviderTest_testShowSymbolicExecutionTree", "src", "data/paycard");
-		  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-		  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
-		  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
-		  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
-		  FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
-		  Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc, true));
+	   	  KeYEnvironment<DefaultUserInterfaceControl> environment = getEnvironment("OutlineContentAndLabelProviderTest_testShowSymbolicExecutionTree", "src", "data/paycard");
+		  Proof proof = getProof(environment, "PayCard", "isValid");
 		  assertNotNull(proof);
 		  // create viewer to show proof in
 		  Shell shell = new Shell();
@@ -253,13 +238,8 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
  	*/
    @Test
    public void testHideIntermediateProofstepsAndShowSymbolicExecutionTree() throws CoreException, InterruptedException, ProblemLoaderException, ProofInputException {
-	  File location = getFile("OutlineContentAndLabelProviderTest_testHideIntermediateProofstepsAndShowSymbolicExecutionTree", "src", "data/paycard");
-	  // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-	  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
-	  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
-	  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
-	  FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
-	  Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc, true));
+	  KeYEnvironment<DefaultUserInterfaceControl> environment = getEnvironment("OutlineContentAndLabelProviderTest_testHideIntermediateProofstepsAndShowSymbolicExecutionTree", "src", "data/paycard");
+	  Proof proof = getProof(environment, "PayCard", "isValid");
 	  assertNotNull(proof);
 	  // create viewer to show proof in
 	  Shell shell = new Shell();
@@ -457,21 +437,40 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
    }
    
    /**
-    * Creates a test project and returns the local file of the folder with the given folder name.
+    * Creates a test project and returns the KeYEnvironment.
     * @param projectName the name of the test project.
  	* @param folderName the name of the folder.
  	* @param pathInBundle the path in the bundle.
- 	* @return the file of the folder with the given folder name
+ 	* @return the file KeYEnvironment.
  	* @throws CoreException
  	* @throws InterruptedException
+ * @throws ProblemLoaderException 
  	*/
-   private File getFile(String projectName, String folderName, String pathInBundle) throws CoreException, InterruptedException {
-	   // Create test project
+   private KeYEnvironment<DefaultUserInterfaceControl> getEnvironment(String projectName, String folderName, String pathInBundle) throws CoreException, InterruptedException, ProblemLoaderException {
+	  // Create test project
       IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
 	  IFolder src = project.getProject().getFolder(folderName);
 	  BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, src);
 	  // Get file of folder src 
 	  File location = ResourceUtil.getLocation(src);
-	  return location;
+	  KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null, null);
+	  return environment;
+   }
+   
+   /**
+    * Load source code in KeY and return the proof.
+    * @param environment The KeYEnvironment.
+ 	* @param containerTypeName The name of the type which contains the method.
+ 	* @param methodFullName The method name to search.
+ 	* @return The proof.
+ 	* @throws ProofInputException
+ 	*/
+   private Proof getProof(KeYEnvironment<DefaultUserInterfaceControl> environment, String containerTypeName, String methodFullName) throws ProofInputException {
+	  // Load source code in KeY and get contract to proof
+	  IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
+	  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
+	  FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
+	  Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc, true));
+	  return proof;
    }
 }
