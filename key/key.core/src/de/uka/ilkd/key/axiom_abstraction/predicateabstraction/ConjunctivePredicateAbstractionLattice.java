@@ -41,6 +41,8 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
  */
 public class ConjunctivePredicateAbstractionLattice extends
         AbstractPredicateAbstractionLattice {
+    public static final String PREDICATE_NAME_CONBINATION_STRING = "_AND_";
+
     private ArrayList<AbstractionPredicate> predicates =
             new ArrayList<AbstractionPredicate>();
 
@@ -109,7 +111,7 @@ public class ConjunctivePredicateAbstractionLattice extends
                 && ((ConjunctivePredicateAbstractionLattice) obj).predicates
                         .equals(this.predicates);
     }
-    
+
     @Override
     public int hashCode() {
         return 31 * 1 + predicates.hashCode();
@@ -209,12 +211,17 @@ public class ConjunctivePredicateAbstractionLattice extends
     }
 
     @Override
-    protected PredicateAbstractionAbstractDomainElement getTopElem() {
+    protected AbstractPredicateAbstractionDomainElement getTopElem() {
         return ConjunctivePredicateAbstractionDomainElement.TOP;
     }
 
     @Override
-    protected PredicateAbstractionAbstractDomainElement getBottomElem() {
+    protected AbstractPredicateAbstractionDomainElement getBottomElem() {
         return ConjunctivePredicateAbstractionDomainElement.BOTTOM;
+    }
+
+    @Override
+    public String getPredicateNameCombinationString() {
+        return PREDICATE_NAME_CONBINATION_STRING;
     }
 }

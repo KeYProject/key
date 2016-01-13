@@ -165,8 +165,9 @@ public class JoinRule implements BuiltInRule {
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
         final int numSideConditionsToProve =
-                joinRuleApp.getConcreteRule().getUserChoices().size()
-                        * (joinRuleApp.getJoinPartners().size() + 1);
+                joinRuleApp.getConcreteRule() instanceof JoinWithLatticeAbstraction ? ((JoinWithLatticeAbstraction) joinRuleApp
+                        .getConcreteRule()).getUserChoices().size()
+                        * (joinRuleApp.getJoinPartners().size() + 1) : 1;
 
         // New goals are reversed to make sure that they are displayed in the
         // order expected by the user.

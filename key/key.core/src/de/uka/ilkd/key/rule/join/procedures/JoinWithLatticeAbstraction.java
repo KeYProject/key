@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.join.procedures;
 
 import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.getNewSkolemConstantForPrefix;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -56,6 +57,11 @@ public abstract class JoinWithLatticeAbstraction extends JoinProcedure {
      */
     protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s,
             Services services);
+
+    /**
+     * @return Manually chosen lattice elements for program variables.
+     */
+    public abstract HashMap<ProgramVariable, AbstractDomainElement> getUserChoices();
 
     /*
      * (non-Javadoc)

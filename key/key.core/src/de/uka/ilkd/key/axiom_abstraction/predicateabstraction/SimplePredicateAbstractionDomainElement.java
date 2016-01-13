@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.Term;
  * @author Dominic Scheurer
  */
 public class SimplePredicateAbstractionDomainElement extends
-        PredicateAbstractionAbstractDomainElement {
+        AbstractPredicateAbstractionDomainElement {
 
     /**
      * The bottom element of any predicate abstraction lattice.
@@ -66,9 +66,7 @@ public class SimplePredicateAbstractionDomainElement extends
 
     @Override
     public String getPredicateNameCombinationString() {
-        throw new RuntimeException(
-                "In the simple predicate abstraction lattice, "
-                + "elements should not be combined.");
+        return SimplePredicateAbstractionLattice.PREDICATE_NAME_CONBINATION_STRING;
     }
 
     /*

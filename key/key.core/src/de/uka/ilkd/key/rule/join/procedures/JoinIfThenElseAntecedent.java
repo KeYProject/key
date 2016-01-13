@@ -167,9 +167,4 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
     public String toString() {
         return DISPLAY_NAME;
     }
-
-    @Override
-    public HashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
-        return new HashMap<ProgramVariable, AbstractDomainElement>();
-    }
 }

@@ -48,4 +48,9 @@ public class Bottom extends SignAnalysisDomainElem {
       return axiom;
    }
 
+   @Override
+   public String toParseableString(Services services) {
+       return toString();
+   }
+
 }

@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.Term;
  * @author Dominic Scheurer
  */
 public class DisjunctivePredicateAbstractionDomainElement extends
-        PredicateAbstractionAbstractDomainElement {
+        AbstractPredicateAbstractionDomainElement {
 
     /**
      * The bottom element of any predicate abstraction lattice.
@@ -64,7 +64,7 @@ public class DisjunctivePredicateAbstractionDomainElement extends
 
     @Override
     public String getPredicateNameCombinationString() {
-        return "_OR_";
+        return DisjunctivePredicateAbstractionLattice.PREDICATE_NAME_CONBINATION_STRING;
     }
 
     /*

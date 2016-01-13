@@ -132,4 +132,32 @@ public abstract class AbstractDomainLattice implements
     @Override
     public abstract Iterator<AbstractDomainElement> iterator();
 
+    /**
+     * Constructs an Abstract Domain Element from the given String
+     * representation. It should always hold that, for an
+     * {@link AbstractDomainElement} e, that
+     * {@code fromString(e.toParseableString(),
+     * services).equals(e)}.
+     * 
+     * @param s
+     *            String to parse.
+     * @param services
+     *            The services object.
+     * @return The corresponding {@link AbstractDomainElement}.
+     * @throws RuntimeException
+     *             if s cannot be parsed.
+     */
+    public AbstractDomainElement fromString(String s, Services services) {
+        final Iterator<AbstractDomainElement> it = iterator();
+        while (it.hasNext()) {
+            final AbstractDomainElement elem = it.next();
+            if (elem.toParseableString(services).equals(s)) {
+                return elem;
+            }
+        }
+
+        throw new RuntimeException(
+                "No element is represented by the given String '" + s + "'.");
+    }
+
 }

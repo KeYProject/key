@@ -66,6 +66,7 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
@@ -422,32 +423,24 @@ public class OutputStreamProofSaver {
                             .getPredicates().entrySet()) {
                         for (AbstractionPredicate pred : predsForSorts
                                 .getValue()) {
-                            Pair<LocationVariable, Term> predicateFormWithPlaceholder =
-                                    pred.getPredicateFormWithPlaceholder();
-
-                            tree.append("(")
-                                    .append("'")
-                                    .append(predicateFormWithPlaceholder.first
-                                            .sort())
-                                    .append(" ")
-                                    .append(predicateFormWithPlaceholder.first)
-                                    .append("', '")
-                                    .append(escapeCharacters(printAnything(
-                                                predicateFormWithPlaceholder.second,
-                                                proof.getServices(), false).toString()))
-                                    .append("'), ");
+                            tree.append(
+                                    pred.toParseableString(proof.getServices()))
+                                    .append(",");
                         }
                     }
                     // Delete the last ", ".
                     tree.delete(tree.length() - 2, tree.length());
 
                     tree.append("\")");
-                    
+
                     tree.append(" (latticeType \"");
                     tree.append(predAbstrRule.getLatticeType().getName());
                     tree.append("\")");
 
                 }
+
+                // ((JoinWithLatticeAbstraction) concreteRule).g
+                // TODO (DS) continue here
             }
 
             if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {

@@ -50,24 +50,24 @@ public abstract class AbstractPredicateAbstractionLattice extends
      *            predicates.
      * @return The joined abstract domain element.
      */
-    protected PredicateAbstractionAbstractDomainElement join(
+    protected AbstractPredicateAbstractionDomainElement join(
             AbstractDomainElement a,
             AbstractDomainElement b,
             BiFunction<ImmutableSet<AbstractionPredicate>, ImmutableSet<AbstractionPredicate>, ImmutableSet<AbstractionPredicate>> combiner,
-            Function<ImmutableSet<AbstractionPredicate>, PredicateAbstractionAbstractDomainElement> abstrElemConstructor) {
+            Function<ImmutableSet<AbstractionPredicate>, AbstractPredicateAbstractionDomainElement> abstrElemConstructor) {
 
         // The join result is result of the application of the combination
         // function on the respective predicates. If this is empty, then
         // the top level element is returned (NOTE: Could also add a default
         // argument as parameter, but was not needed at the moment).
 
-        assert a instanceof PredicateAbstractionAbstractDomainElement;
-        assert b instanceof PredicateAbstractionAbstractDomainElement;
+        assert a instanceof AbstractPredicateAbstractionDomainElement;
+        assert b instanceof AbstractPredicateAbstractionDomainElement;
 
-        PredicateAbstractionAbstractDomainElement pade1 =
-                (PredicateAbstractionAbstractDomainElement) a;
-        PredicateAbstractionAbstractDomainElement pade2 =
-                (PredicateAbstractionAbstractDomainElement) b;
+        AbstractPredicateAbstractionDomainElement pade1 =
+                (AbstractPredicateAbstractionDomainElement) a;
+        AbstractPredicateAbstractionDomainElement pade2 =
+                (AbstractPredicateAbstractionDomainElement) b;
 
         if (pade1.isTopElem() || pade2.isTopElem()) {
             return getTopElem();
@@ -98,16 +98,23 @@ public abstract class AbstractPredicateAbstractionLattice extends
     /**
      * @return The top element of the lattice.
      */
-    protected abstract PredicateAbstractionAbstractDomainElement getTopElem();
+    protected abstract AbstractPredicateAbstractionDomainElement getTopElem();
 
     /**
      * @return The bottom element of the lattice.
      */
-    protected abstract PredicateAbstractionAbstractDomainElement getBottomElem();
+    protected abstract AbstractPredicateAbstractionDomainElement getBottomElem();
 
     /**
-     * An abstract iterator which basically only sets up the bit sets
-     * used for building up complex iterators.
+     * @return The String which is used for combining the names of predicates
+     *         for lattice types where multiple predicates determine an abstract
+     *         element.
+     */
+    public abstract String getPredicateNameCombinationString();
+
+    /**
+     * An abstract iterator which basically only sets up the bit sets used for
+     * building up complex iterators.
      *
      * @author Dominic Scheurer
      */
@@ -151,7 +158,8 @@ public abstract class AbstractPredicateAbstractionLattice extends
         }
 
         /**
-         * @return The list of bit sets for all given numbers of zeroes occurrences.
+         * @return The list of bit sets for all given numbers of zeroes
+         *         occurrences.
          */
         public ArrayList<ArrayList<ImmutableFixedLengthBitSet>> getBitSetsByNumZeroes() {
             return bitSetsByNumZeroes;

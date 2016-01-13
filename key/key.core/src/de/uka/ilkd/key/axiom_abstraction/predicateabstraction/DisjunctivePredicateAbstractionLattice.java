@@ -39,6 +39,8 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
  */
 public class DisjunctivePredicateAbstractionLattice extends
         AbstractPredicateAbstractionLattice {
+    public static final String PREDICATE_NAME_CONBINATION_STRING = "_OR_";
+    
     private ArrayList<AbstractionPredicate> predicates =
             new ArrayList<AbstractionPredicate>();
 
@@ -158,7 +160,6 @@ public class DisjunctivePredicateAbstractionLattice extends
          */
         @Override
         public boolean hasNext() {
-//            return nrZeroes < predicates.size() + 1;
             return nrZeroes > -2;
         }
 
@@ -209,12 +210,17 @@ public class DisjunctivePredicateAbstractionLattice extends
     }
 
     @Override
-    protected PredicateAbstractionAbstractDomainElement getTopElem() {
+    protected AbstractPredicateAbstractionDomainElement getTopElem() {
         return DisjunctivePredicateAbstractionDomainElement.TOP;
     }
 
     @Override
-    protected PredicateAbstractionAbstractDomainElement getBottomElem() {
+    protected AbstractPredicateAbstractionDomainElement getBottomElem() {
         return DisjunctivePredicateAbstractionDomainElement.BOTTOM;
+    }
+
+    @Override
+    public String getPredicateNameCombinationString() {
+        return PREDICATE_NAME_CONBINATION_STRING;
     }
 }

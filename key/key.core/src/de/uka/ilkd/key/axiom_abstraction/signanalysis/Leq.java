@@ -32,4 +32,9 @@ public class Leq extends SignAnalysisDomainElem {
       return services.getTermBuilder().leq(varOrConst, tb.zero());
    }
 
+   @Override
+   public String toParseableString(Services services) {
+       return toString();
+   }
+
 }

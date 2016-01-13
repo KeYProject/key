@@ -30,6 +30,8 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
  */
 public class SimplePredicateAbstractionLattice extends
         AbstractPredicateAbstractionLattice {
+    public static final String PREDICATE_NAME_CONBINATION_STRING = "<<<<<<N/A>>>>>>";
+    
     private ArrayList<AbstractionPredicate> predicates =
             new ArrayList<AbstractionPredicate>();
 
@@ -142,12 +144,17 @@ public class SimplePredicateAbstractionLattice extends
     }
 
     @Override
-    protected PredicateAbstractionAbstractDomainElement getTopElem() {
+    protected AbstractPredicateAbstractionDomainElement getTopElem() {
         return SimplePredicateAbstractionDomainElement.TOP;
     }
 
     @Override
-    protected PredicateAbstractionAbstractDomainElement getBottomElem() {
+    protected AbstractPredicateAbstractionDomainElement getBottomElem() {
         return SimplePredicateAbstractionDomainElement.BOTTOM;
+    }
+
+    @Override
+    public String getPredicateNameCombinationString() {
+        return PREDICATE_NAME_CONBINATION_STRING;
     }
 }
