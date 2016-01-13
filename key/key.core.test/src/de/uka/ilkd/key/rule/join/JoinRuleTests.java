@@ -75,6 +75,20 @@ public class JoinRuleTests extends TestCase {
     }
 
     /**
+     * Simple regression test case loading an existing closed proof (standard
+     * Gcd example) including two joins with predicate abstraction (with lattice
+     * elements manually chosen by the user) and trying to replay it.
+     *
+     * @throws ProblemLoaderException
+     *             If the proof could not be loaded.
+     */
+    @Test
+    public void testLoadGcdProofWithPredAbstrAndUserChoices() {
+        Proof proof = loadProof("gcd.closed.predicateAbstractionWithUserChoices.proof");
+        assertTrue(proof.closed());
+    }
+
+    /**
      * Runs the FullAutoPilotWithJMLSpecJoinsProofMacro on the problem with join
      * blocks specified in JML, following by an automatic strategy finish. At
      * the end, there should be two join applications, and the proof should be
@@ -87,8 +101,8 @@ public class JoinRuleTests extends TestCase {
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
-        assertEquals("There should be two join applications in the proof.",
-                2, proof.getStatistics().joinRuleApps);
+        assertEquals("There should be two join applications in the proof.", 2,
+                proof.getStatistics().joinRuleApps);
     }
 
     /**
