@@ -13,13 +13,19 @@
 
 package de.uka.ilkd.key.gui.joinrule;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.function.Function;
 
 import de.uka.ilkd.key.gui.joinrule.predicateabstraction.PredicateAbstractionCompletion;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * A completion class for join procedures. Certain procedures, such as
@@ -47,7 +53,10 @@ public abstract class JoinProcedureCompletion<C extends JoinProcedure> {
             final Function<T, T> completion) {
         return new JoinProcedureCompletion<T>() {
             @Override
-            public T complete(T proc, Goal goal) {
+            public T complete(
+                    T proc,
+                    Pair<Goal, PosInOccurrence> joinGoalPio,
+                    Collection<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> partners) {
                 return completion.apply(proc);
             }
         };
@@ -59,9 +68,16 @@ public abstract class JoinProcedureCompletion<C extends JoinProcedure> {
      *
      * @param proc
      *            {@link JoinProcedure} to complete.
+     * @param joinGoalPio
+     *            TODO
+     * @param partners
+     *            TODO
      * @return The completed {@link JoinProcedure}.
      */
-    public abstract C complete(final C proc, final Goal goal);
+    public abstract C complete(
+            final C proc,
+            final Pair<Goal, PosInOccurrence> joinGoalPio,
+            final Collection<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> partners);
 
     /**
      * Returns the completion for the given join procedure class.

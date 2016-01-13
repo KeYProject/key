@@ -14,12 +14,26 @@
 package de.uka.ilkd.key.gui.joinrule.predicateabstraction;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.gui.joinrule.JoinProcedureCompletion;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
  * Completion class for {@link JoinWithPredicateAbstraction}.
@@ -38,20 +52,69 @@ public class PredicateAbstractionCompletion extends
      */
     @Override
     public JoinWithPredicateAbstraction complete(
-            JoinWithPredicateAbstraction proc, Goal goal) {
-        AbstractionPredicatesChoiceDialog dialog =
-                new AbstractionPredicatesChoiceDialog(goal);
+            JoinWithPredicateAbstraction proc,
+            Pair<Goal, PosInOccurrence> joinGoalPio,
+            Collection<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> partners) {
+        final Services services = joinGoalPio.first.proof().getServices();
 
-        assert proc instanceof JoinWithPredicateAbstractionFactory :
-            "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
+        // Compute the program variables that are different in the
+        // respective states.
 
-        JoinWithPredicateAbstractionFactory procF =
+        final SymbolicExecutionState joinState =
+                JoinRuleUtils.sequentToSEPair(joinGoalPio.first.node(),
+                        joinGoalPio.second, services);
+
+        final ImmutableList<SymbolicExecutionState> partnerStates =
+                JoinRuleUtils.sequentsToSEPairs(partners);
+
+        final ArrayList<LocationVariable> differingLocVars =
+                new ArrayList<LocationVariable>();
+
+        JoinRuleUtils
+                .getUpdateLeftSideLocations(joinState.first)
+                .forEach(v -> {
+                    // The meaning of the following statement corresponds to
+                    // partnerStates.fold("right value for v differs", false)
+                        final boolean isDifferent =
+                                StreamSupport
+                                        .stream(partnerStates.spliterator(),
+                                                false)
+                                        .collect(
+                                                Collectors
+                                                        .reducing(
+                                                                false,
+                                                                partner -> !JoinRuleUtils
+                                                                        .getUpdateRightSideFor(
+                                                                                partner.getSymbolicState(),
+                                                                                v)
+                                                                        .equals(JoinRuleUtils
+                                                                                .getUpdateRightSideFor(
+                                                                                        joinState
+                                                                                                .getSymbolicState(),
+                                                                                        v)),
+                                                                (b1, b2) -> (b1 || b2)));
+
+                        if (isDifferent) {
+                            differingLocVars.add(v);
+                        }
+                    });
+
+        final AbstractionPredicatesChoiceDialog dialog =
+                new AbstractionPredicatesChoiceDialog(joinGoalPio.first,
+                        differingLocVars);
+
+        assert proc instanceof JoinWithPredicateAbstractionFactory : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
+
+        final JoinWithPredicateAbstractionFactory procF =
                 (JoinWithPredicateAbstractionFactory) proc;
 
         dialog.setVisible(true);
 
-        ArrayList<AbstractionPredicate> chosenPreds =
-                dialog.getRegisteredPredicates();
+        final AbstractionPredicatesChoiceDialog.Result userInput =
+                dialog.getResult();
+
+        final ArrayList<AbstractionPredicate> chosenPreds =
+                userInput.getRegisteredPredicates();
 
         // A null-pointer in the chosen predicates means that
         // the user has pressed the cancel button.
@@ -59,7 +122,8 @@ public class PredicateAbstractionCompletion extends
             return proc;
         }
         else {
-            return procF.instantiate(chosenPreds, dialog.getLatticeType());
+            return procF.instantiate(chosenPreds, userInput.getLatticeType(),
+                    userInput.getAbstractDomElemUserChoices());
         }
     }
 

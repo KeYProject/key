@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.proof.io;
 
+import static de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -26,6 +28,7 @@ import java.util.Vector;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
@@ -38,7 +41,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -66,13 +69,13 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.rule.join.CloseAfterJoinRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Saves a proof to a given {@link OutputStream}.
@@ -319,7 +322,7 @@ public class OutputStreamProofSaver {
         }
         return " (newnames \"" + s.substring(1) + "\")";
     }
-
+    
     private void printSingleNode(Node node, String prefix, StringBuffer tree) {
 
         RuleApp appliedRuleApp = node.getAppliedRuleApp();
@@ -390,20 +393,23 @@ public class OutputStreamProofSaver {
                         (JoinRuleBuiltInRuleApp) appliedRuleApp;
                 JoinProcedure concreteRule = joinApp.getConcreteRule();
 
-                tree.append(" (joinProc \"");
+                tree.append(" (").append(ProofElementID.JOIN_PROCEDURE.getRawName())
+                        .append(" \"");
                 tree.append(concreteRule.toString());
                 tree.append("\")");
 
-                tree.append(" (nrJoinPartners \"");
+                tree.append(" (").append(ProofElementID.NUMBER_JOIN_PARTNERS.getRawName())
+                        .append(" \"");
                 tree.append(joinApp.getJoinPartners().size());
                 tree.append("\")");
 
-                tree.append(" (joinId \"");
+                tree.append(" (").append(ProofElementID.JOIN_ID.getRawName()).append(" \"");
                 tree.append(joinApp.getJoinNode().serialNr());
                 tree.append("\")");
 
                 if (joinApp.getDistinguishingFormula() != null) {
-                    tree.append(" (distFormula \"");
+                    tree.append(" (").append(ProofElementID.JOIN_DIST_FORMULA.getRawName())
+                            .append(" \"");
                     tree.append(escapeCharacters(printAnything(
                             joinApp.getDistinguishingFormula(),
                             proof.getServices(), false).toString()));
@@ -417,37 +423,53 @@ public class OutputStreamProofSaver {
                                 (JoinWithPredicateAbstraction) concreteRule)
                                 .getPredicates().size() > 0) {
 
-                    tree.append(" (abstractionPredicates \"");
+                    tree.append(" (")
+                            .append(ProofElementID.JOIN_ABSTRACTION_PREDICATES.getRawName())
+                            .append(" \"");
                     for (Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts : predAbstrRule
                             .getPredicates().entrySet()) {
                         for (AbstractionPredicate pred : predsForSorts
                                 .getValue()) {
-                            Pair<LocationVariable, Term> predicateFormWithPlaceholder =
-                                    pred.getPredicateFormWithPlaceholder();
-
-                            tree.append("(")
-                                    .append("'")
-                                    .append(predicateFormWithPlaceholder.first
-                                            .sort())
-                                    .append(" ")
-                                    .append(predicateFormWithPlaceholder.first)
-                                    .append("', '")
-                                    .append(escapeCharacters(printAnything(
-                                                predicateFormWithPlaceholder.second,
-                                                proof.getServices(), false).toString()))
-                                    .append("'), ");
+                            tree.append(
+                                    pred.toParseableString(proof.getServices()))
+                                    .append(", ");
                         }
                     }
                     // Delete the last ", ".
                     tree.delete(tree.length() - 2, tree.length());
 
                     tree.append("\")");
-                    
-                    tree.append(" (latticeType \"");
+
+                    tree.append(" (")
+                            .append(ProofElementID.JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE.getRawName())
+                            .append(" \"");
                     tree.append(predAbstrRule.getLatticeType().getName());
                     tree.append("\")");
 
                 }
+
+                final Map<ProgramVariable, AbstractDomainElement> userChoices =
+                        ((JoinWithLatticeAbstraction) concreteRule)
+                                .getUserChoices();
+                if (!userChoices.isEmpty()) {
+                    tree.append(" (").append(ProofElementID.JOIN_USER_CHOICES.getRawName())
+                            .append(" \"");
+                    for (final ProgramVariable v : userChoices.keySet()) {
+                        final AbstractDomainElement elem = userChoices.get(v);
+                        tree.append("('")
+                                .append(v.sort().toString())
+                                .append(" ")
+                                .append(v.toString())
+                                .append("', `")
+                                .append(elem.toParseableString(proof
+                                        .getServices())).append("`), ");
+                    }
+                    // Delete the last ", ".
+                    tree.delete(tree.length() - 2, tree.length());
+
+                    tree.append("\")");
+                }
+
             }
 
             if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
@@ -457,7 +479,8 @@ public class OutputStreamProofSaver {
                 // TODO (DS): There may be problems here if the join node is
                 // pruned away. Need to test some cases and either check for
                 // null pointers at this place or find a better solution.
-                tree.append(" (joinNode \"");
+                tree.append(" (").append(ProofElementID.JOIN_NODE.getRawName())
+                        .append(" \"");
                 tree.append(closeApp.getCorrespondingJoinNode().parent()
                         .serialNr());
                 tree.append("\")");

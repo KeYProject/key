@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.join;
 
-import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.sequentToSETriple;
-
 import java.util.HashMap;
 
 import org.key_project.util.collection.ImmutableList;
@@ -118,17 +116,7 @@ public class JoinRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     public void setJoinPartners(ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners) {
         this.joinPartners = joinPartners;
-        
-        joinPartnerStates = ImmutableSLList.nil();
-        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> joinPartner : joinPartners) {
-            final Services services = joinPartner.first.proof().getServices();
-            
-            Triple<Term, Term, Term> partnerSEState =
-                  sequentToSETriple(joinPartner.first.node(), joinPartner.second, services);
-            
-            joinPartnerStates = joinPartnerStates.prepend(
-                  new SymbolicExecutionState(partnerSEState.first, partnerSEState.second, joinPartner.first.node()));
-         }
+        joinPartnerStates = JoinRuleUtils.sequentsToSEPairs(joinPartners);
     }
 
     public JoinProcedure getConcreteRule() {

@@ -13,17 +13,26 @@
 
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.naming.NameAlreadyBoundException;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
@@ -192,6 +201,101 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
     @Override
     public String toString() {
         return name().toString();
+    }
+
+    /**
+     * Returns a parseable String representation of this abstraction predicate
+     * of the form "('[[TYPE]] [[PLACEHOLDER]]', '[[PREDICATE]]')".
+     * 
+     * @param services
+     *            The services object.
+     * @return A parseable String representation of this predicate.
+     */
+    public String toParseableString(final Services services) {
+        StringBuilder sb = new StringBuilder();
+        Pair<LocationVariable, Term> predicateFormWithPlaceholder =
+                getPredicateFormWithPlaceholder();
+
+        sb.append("(")
+                .append("'")
+                .append(predicateFormWithPlaceholder.first.sort())
+                .append(" ")
+                .append(predicateFormWithPlaceholder.first)
+                .append("', '")
+                .append(OutputStreamProofSaver
+                        .escapeCharacters(OutputStreamProofSaver.printAnything(
+                                predicateFormWithPlaceholder.second, services,
+                                false).toString())).append("')");
+
+        return sb.toString();
+    }
+
+    /**
+     * TODO: Document.
+     * 
+     * @param s
+     * @param services
+     * @return
+     * @throws ParserException If there is a syntax error.
+     * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
+     * @throws SortNotKnownException If the given sort is not known to the system.
+     */
+    public static List<AbstractionPredicate> fromString(final String s,
+            final Services services) throws ParserException {
+        final ArrayList<AbstractionPredicate> result =
+                new ArrayList<AbstractionPredicate>();
+
+        Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
+        Matcher m = p.matcher(s);
+
+        boolean matched = false;
+        while (m.find()) {
+            matched = true;
+
+            for (int i = 1; i < m.groupCount(); i += 2) {
+                assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
+                        + "There should always be pairs of placeholders and predicate terms.";
+
+                final String phStr = m.group(i);
+                final String predStr = m.group(i + 1);
+
+                // Parse the placeholder
+                Pair<Sort, Name> ph = null;
+                ph = JoinRuleUtils.parsePlaceholder(phStr, false, services);
+
+                // Add placeholder to namespaces, if necessary
+                if (services.getNamespaces().variables().lookup(ph.second) == null) {
+                    services.getNamespaces()
+                            .variables()
+                            .add(new LocationVariable(new ProgramElementName(
+                                    ph.second.toString()), ph.first));
+                }
+
+                // Parse the predicate
+                result.add(JoinRuleUtils.parsePredicate(predStr,
+                        JoinRuleUtils.singletonArrayList(ph), services));
+            }
+        }
+
+        if (!matched) {
+            throw new ParserException(
+                    "Wrong format of join abstraction predicates", null);
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AbstractionPredicate)) {
+            return false;
+        }
+
+        final AbstractionPredicate otherPred = (AbstractionPredicate) obj;
+
+        return otherPred.placeholderVariable.equals(placeholderVariable)
+                && otherPred.predicateFormWithPlaceholder
+                        .equals(predicateFormWithPlaceholder);
     }
 
 }

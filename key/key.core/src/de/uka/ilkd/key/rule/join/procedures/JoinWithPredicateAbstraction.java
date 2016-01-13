@@ -18,12 +18,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -52,6 +56,12 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
             null;
 
     /**
+     * Manually chosen lattice elements for program variables.
+     */
+    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices =
+            null;
+
+    /**
      * Default constructor for subclasses.
      */
     protected JoinWithPredicateAbstraction() {
@@ -70,7 +80,8 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      */
     public JoinWithPredicateAbstraction(
             Iterable<AbstractionPredicate> predicates,
-            Class<? extends AbstractPredicateAbstractionLattice> latticeType) {
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+            LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
                 this.predicates.put(pred.getArgSort(),
@@ -81,6 +92,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
         }
 
         this.latticeType = latticeType;
+        this.userChoices = userChoices;
     }
 
     /*
@@ -94,10 +106,29 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     }
 
     @Override
-    protected AbstractDomainLattice getAbstractDomainForSort(final Sort s,
+    public AbstractDomainLattice getAbstractDomainForSort(final Sort s,
             final Services services) {
-        ArrayList<AbstractionPredicate> applicablePredicates =
-                predicates.get(s);
+        return instantiateAbstractDomain(s, predicates.get(s), latticeType, services);
+    }
+
+    /**
+     * Instantiates the abstract domain lattice for the given sort or null if
+     * there has no lattice been specified for that sort.
+     * 
+     * @param s
+     *            {@link Sort} of for elements in the lattice.
+     * @param predicates
+     *            {@link AbstractionPredicate}s for all sorts.
+     * @param latticeType
+     *            Type of {@link AbstractPredicateAbstractionLattice}.
+     * @param services
+     *            The {@link Services} object.
+     * @return The corresponding {@link AbstractDomainLattice}.
+     */
+    public static AbstractDomainLattice instantiateAbstractDomain(final Sort s,
+            final List<AbstractionPredicate> applicablePredicates,
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+            final Services services) {
 
         if (applicablePredicates == null) {
             // A returned null value indicates to
@@ -109,7 +140,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
 
         try {
             Constructor<? extends AbstractPredicateAbstractionLattice> latticeConstructor =
-                    latticeType.getConstructor(ArrayList.class);
+                    latticeType.getConstructor(List.class);
 
             return latticeConstructor.newInstance(applicablePredicates);
         }
@@ -174,6 +205,13 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      */
     public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
         return latticeType;
+    }
+
+    /**
+     * @return Manually chosen lattice elements for program variables.
+     */
+    public LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
+        return userChoices;
     }
 
     @Override

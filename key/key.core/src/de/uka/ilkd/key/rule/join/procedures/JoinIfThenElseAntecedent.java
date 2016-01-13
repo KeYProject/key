@@ -13,20 +13,22 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
@@ -66,8 +68,8 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
     }
 
     @Override
-    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
+    public ValuesJoinResult joinValuesInStates(Term v,
+            SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
 
@@ -85,8 +87,8 @@ public class JoinIfThenElseAntecedent extends JoinProcedure {
                         tb.func(newSkolemConst), valueInState1, valueInState2,
                         state1, state2, distinguishingFormula, services));
 
-        return new Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>>(
-                newConstraints, tb.func(newSkolemConst), newNames);
+        return new ValuesJoinResult(newConstraints, tb.func(newSkolemConst),
+                newNames, new LinkedHashSet<Term>());
 
     }
 

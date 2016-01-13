@@ -466,7 +466,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
                 (JoinProcedureCompletion<T>) JoinProcedureCompletion
                         .getCompletionForClass(chosenRule.getClass());
 
-        return completion.complete((T) chosenRule, joinGoalPio.first);
+        return completion.complete((T) chosenRule, joinGoalPio, chosenGoals);
     }
 
     /**

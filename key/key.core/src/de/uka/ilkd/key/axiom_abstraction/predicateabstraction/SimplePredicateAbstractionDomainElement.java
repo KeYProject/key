@@ -66,9 +66,7 @@ public class SimplePredicateAbstractionDomainElement extends
 
     @Override
     public String getPredicateNameCombinationString() {
-        throw new RuntimeException(
-                "In the simple predicate abstraction lattice, "
-                + "elements should not be combined.");
+        return SimplePredicateAbstractionLattice.PREDICATE_NAME_CONBINATION_STRING;
     }
 
     /*

@@ -78,6 +78,7 @@ import de.uka.ilkd.key.rule.join.CloseAfterJoin;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * This class encapsulates static methods used in the JoinRule implementation.
@@ -1305,6 +1306,36 @@ public class JoinRuleUtils {
                 joinListToAndTerm(pathConditionSet, services), // Path Condition
                 programCounter, // Program Counter and Post Condition
                 node); // CorrespondingNode
+    }
+
+    /**
+     * Convenience method for converting a whole list of goal-pio combinations
+     * to symbolic execution states; relies on
+     * {@link #sequentToSETriple(Node, PosInOccurrence, Services)}.
+     *
+     * @param sequentInfos
+     *            Goals and PosInOccurrences specifying join partners and the
+     *            positions of the program counter-post condition formulae in
+     *            the goals.
+     * @return A list of symbolic execution states.
+     */
+    public static ImmutableList<SymbolicExecutionState> sequentsToSEPairs(
+            Iterable<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> sequentInfos) {
+        ImmutableList<SymbolicExecutionState> result = ImmutableSLList.nil();
+        for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> sequentInfo : sequentInfos) {
+            final Services services = sequentInfo.first.proof().getServices();
+
+            Triple<Term, Term, Term> partnerSEState =
+                    sequentToSETriple(sequentInfo.first.node(),
+                            sequentInfo.second, services);
+
+            result =
+                    result.prepend(new SymbolicExecutionState(
+                            partnerSEState.first, partnerSEState.second,
+                            sequentInfo.first.node()));
+        }
+
+        return result;
     }
 
     /**

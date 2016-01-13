@@ -13,17 +13,15 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 
-import org.key_project.util.collection.ImmutableSet;
-
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
@@ -68,7 +66,7 @@ public class JoinWithPredicateAbstractionFactory extends
      * de.uka.ilkd.key.java.Services)
      */
     @Override
-    public Triple<ImmutableSet<Term>, Term, LinkedHashSet<Name>> joinValuesInStates(
+    public ValuesJoinResult joinValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
@@ -98,8 +96,9 @@ public class JoinWithPredicateAbstractionFactory extends
      */
     public JoinWithPredicateAbstraction instantiate(
             Iterable<AbstractionPredicate> predicates,
-            Class<? extends AbstractPredicateAbstractionLattice> latticeType) {
-        return new JoinWithPredicateAbstraction(predicates, latticeType);
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+            LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices) {
+        return new JoinWithPredicateAbstraction(predicates, latticeType, userChoices);
     }
 
     @Override

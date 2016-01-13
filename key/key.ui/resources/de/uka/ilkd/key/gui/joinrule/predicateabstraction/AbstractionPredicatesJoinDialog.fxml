@@ -70,7 +70,7 @@
                                                    </font></TextField>
                                              </top>
                                              <center>
-                                                <ListView id="lvPlaceholders" fx:id="lvPlaceholders" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                <ListView id="lvPlaceholders" fx:id="lvPlaceholders" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" style="-fx-font: 13px Monospaced;" BorderPane.alignment="CENTER" />
                                              </center>
                                           </BorderPane>
                                        </children>
@@ -89,7 +89,7 @@
                                                    </font></TextField>
                                              </top>
                                              <center>
-                                                <ListView id="lvPredicates" fx:id="lvPredicates" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                <ListView id="lvPredicates" fx:id="lvPredicates" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" style="-fx-font: 13px Monospaced;" BorderPane.alignment="CENTER" />
                                              </center>
                                              <bottom>
                                                 <AnchorPane BorderPane.alignment="CENTER">
@@ -106,6 +106,15 @@
                                     </AnchorPane>
                               </content>
                             </TitledPane>
+                              <TitledPane fx:id="tpLatticeElemChoice" animated="false" text="(4) Choice of abstraction predicates [opt]">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TableView fx:id="tvLatticeElemChoice" editable="true" prefHeight="270.0" prefWidth="528.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
                           </panes>
                         </Accordion>
                      </children>

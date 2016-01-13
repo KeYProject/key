@@ -64,7 +64,7 @@ public class DisjunctivePredicateAbstractionDomainElement extends
 
     @Override
     public String getPredicateNameCombinationString() {
-        return "_OR_";
+        return DisjunctivePredicateAbstractionLattice.PREDICATE_NAME_CONBINATION_STRING;
     }
 
     /*

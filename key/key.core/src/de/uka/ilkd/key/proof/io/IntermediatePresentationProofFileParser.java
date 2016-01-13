@@ -17,8 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -26,7 +24,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
@@ -285,34 +282,11 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case JOIN_ABSTRACTION_PREDICATES:
-            ImmutableList<Pair<String, String>> currAbstractionPredicates =
-                    ImmutableSLList.nil();
+            ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates = str;
+            break;
 
-            Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
-            Matcher m = p.matcher(str);
-
-            boolean matched = false;
-            while (m.find()) {
-                matched = true;
-
-                for (int i = 1; i < m.groupCount(); i += 2) {
-                    assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
-                            + "There should always be pairs of placeholders and predicate terms.";
-
-                    currAbstractionPredicates =
-                            currAbstractionPredicates
-                                    .append(new Pair<String, String>(
-                                            m.group(i), m.group(i + 1)));
-                }
-            }
-
-            if (!matched) {
-                errors.add(new ParserException(
-                        "Wrong format of join abstraction predicates", null));
-            }
-
-            ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates =
-                    currAbstractionPredicates;
+        case JOIN_USER_CHOICES:
+            ((BuiltinRuleInformation) ruleInfo).currUserChoices = str;
             break;
 
         default:
@@ -422,7 +396,8 @@ public class IntermediatePresentationProofFileParser implements
                             builtinInfo.currNewNames,
                             builtinInfo.currDistFormula,
                             builtinInfo.currPredAbstraLatticeType,
-                            builtinInfo.currAbstractionPredicates);
+                            builtinInfo.currAbstractionPredicates,
+                            builtinInfo.currUserChoices);
         }
         else if (builtinInfo.currRuleName.equals("CloseAfterJoin")) {
             result =
@@ -526,8 +501,8 @@ public class IntermediatePresentationProofFileParser implements
         protected String currDistFormula = null;
         protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
                 null;
-        protected ImmutableList<Pair<String, String>> currAbstractionPredicates =
-                null;
+        protected String currAbstractionPredicates = null;
+        public String currUserChoices = null;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);

@@ -17,7 +17,9 @@ import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -32,6 +34,7 @@ import javafx.scene.layout.AnchorPane;
 
 import javax.swing.JDialog;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
@@ -40,6 +43,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
@@ -73,9 +77,6 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private ArrayList<AbstractionPredicate> registeredPredicates =
             new ArrayList<AbstractionPredicate>();
 
-    private HashMap<AbstractionPredicate, Sort> sortsForPredicates =
-            new HashMap<AbstractionPredicate, Sort>();
-
     private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
             SimplePredicateAbstractionLattice.class;
 
@@ -83,23 +84,24 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return The abstraction predicates set by the user. Is null iff the user
      *         pressed cancel.
      */
-    public ArrayList<AbstractionPredicate> getRegisteredPredicates() {
+    private ArrayList<AbstractionPredicate> getRegisteredPredicates() {
         return registeredPredicates;
-    }
-
-    /**
-     * @return The mappings from abstraction predicates to input sorts.
-     */
-    public HashMap<AbstractionPredicate, Sort> getSortsForPredicates() {
-        return sortsForPredicates;
     }
 
     /**
      * @return The chosen lattice type (class object for class that is an
      *         instance of {@link AbstractPredicateAbstractionLattice}).
      */
-    public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
+    private Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
         return latticeType;
+    }
+
+    /**
+     * @return The resulting input supplied by the user.
+     */
+    public Result getResult() {
+        return new Result(getRegisteredPredicates(), getLatticeType(),
+                ctrl.abstrPredicateChoices);
     }
 
     /**
@@ -168,8 +170,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      *
      * @param goal
      *            The goal on which the join rule is applied.
+     * @param differingLocVars
+     *            Location variables the values of which differ in the join
+     *            partner states.
      */
-    public AbstractionPredicatesChoiceDialog(Goal goal) {
+    public AbstractionPredicatesChoiceDialog(Goal goal,
+            List<LocationVariable> differingLocVars) {
         this();
         this.goal = goal;
 
@@ -201,9 +207,14 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 (ObservableValue<? extends String> observable, String oldValue,
                         String newValue) -> {
                     try {
-                        parsePredicate(newValue);
+                        AbstractionPredicate pred = parsePredicate(newValue);
 
                         ctrl.predicateProblemsListData.clear();
+
+                        if (registeredPredicates.contains(pred)) {
+                            ctrl.predicateProblemsListData
+                                    .add("Predicate is already registered");
+                        }
                     }
                     catch (Exception e) {
                         ctrl.predicateProblemsListData.clear();
@@ -250,6 +261,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                     }
 
                     registeredPredicates.add(parsed);
+                    ctrl.availableAbstractionPreds.setAll(registeredPredicates);
                 }
             }
         });
@@ -282,6 +294,11 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                                 Class<? extends AbstractPredicateAbstractionLattice> newValue) -> {
                             this.latticeType = newValue;
                         });
+
+        differingLocVars.forEach(v -> {
+            ctrl.abstrPredicateChoices.add(new AbstractDomainElemChoice(v,
+                    Optional.empty()));
+        });
     }
 
     /**
@@ -313,16 +330,77 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 .proof().getServices());
     }
 
+    /**
+     * Encapsulates the results supplied by the user.
+     *
+     * @author Dominic Scheurer
+     */
+    class Result {
+        private ArrayList<AbstractionPredicate> registeredPredicates;
+        private Class<? extends AbstractPredicateAbstractionLattice> latticeType;
+        private LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
+                new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
+
+        public Result(
+                ArrayList<AbstractionPredicate> registeredPredicates,
+                Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+                List<AbstractDomainElemChoice> userChoices) {
+            this.registeredPredicates = registeredPredicates;
+            this.latticeType = latticeType;
+
+            userChoices.forEach(choice -> {
+                if (choice.isChoiceMade()) {
+                    abstractDomElemUserChoices.put(choice.getProgVar().get(),
+                            choice.getAbstrDomElem().get().get());
+                }
+            });
+        }
+
+        /**
+         * @return The abstraction predicates set by the user. Is null iff the
+         *         user pressed cancel.
+         */
+        public ArrayList<AbstractionPredicate> getRegisteredPredicates() {
+            return registeredPredicates;
+        }
+
+        /**
+         * @return The chosen lattice type (class object for class that is an
+         *         instance of {@link AbstractPredicateAbstractionLattice}).
+         */
+        public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
+            return latticeType;
+        }
+
+        /**
+         * @return Manually chosen lattice elements for program variables.
+         */
+        public LinkedHashMap<ProgramVariable, AbstractDomainElement> getAbstractDomElemUserChoices() {
+            return abstractDomElemUserChoices;
+        }
+    }
+
     // ////////////////////////////////////// //
     // //////////// TEST METHODS //////////// //
     // ////////////////////////////////////// //
 
     public static void main(String[] args) {
-        de.uka.ilkd.key.proof.Proof proof =
+        final de.uka.ilkd.key.proof.Proof proof =
                 loadProof("firstTouch/01-Agatha/project.key");
 
-        AbstractionPredicatesChoiceDialog dialog =
-                new AbstractionPredicatesChoiceDialog(proof.openGoals().head());
+        final ArrayList<LocationVariable> differingLocVars =
+                new ArrayList<LocationVariable>();
+        differingLocVars.add(new LocationVariable(
+                new ProgramElementName("test"), (Sort) proof.getServices()
+                        .getNamespaces().sorts().lookup("int")));
+        differingLocVars.add(new LocationVariable(new ProgramElementName(
+                "test1"), (Sort) proof.getServices().getNamespaces().sorts()
+                .lookup("boolean")));
+
+        final AbstractionPredicatesChoiceDialog dialog =
+                new AbstractionPredicatesChoiceDialog(proof.openGoals().head(),
+                        differingLocVars);
+
         dialog.setVisible(true);
     }
 

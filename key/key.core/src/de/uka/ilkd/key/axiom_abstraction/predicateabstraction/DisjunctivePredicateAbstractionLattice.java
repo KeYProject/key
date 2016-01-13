@@ -15,6 +15,7 @@ package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -39,7 +40,9 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
  */
 public class DisjunctivePredicateAbstractionLattice extends
         AbstractPredicateAbstractionLattice {
-    private ArrayList<AbstractionPredicate> predicates =
+    public static final String PREDICATE_NAME_CONBINATION_STRING = "_OR_";
+    
+    private List<AbstractionPredicate> predicates =
             new ArrayList<AbstractionPredicate>();
 
     /**
@@ -51,7 +54,7 @@ public class DisjunctivePredicateAbstractionLattice extends
      *            The predicates to generate the lattice from.
      */
     public DisjunctivePredicateAbstractionLattice(
-            ArrayList<AbstractionPredicate> applicablePredicates) {
+            List<AbstractionPredicate> applicablePredicates) {
         super();
 
         assert predicates != null : "Do not call this constructor with a null argument.";
@@ -158,7 +161,7 @@ public class DisjunctivePredicateAbstractionLattice extends
          */
         @Override
         public boolean hasNext() {
-            return nrZeroes < predicates.size() + 1;
+            return nrZeroes > -2;
         }
 
         /*
@@ -215,5 +218,10 @@ public class DisjunctivePredicateAbstractionLattice extends
     @Override
     protected AbstractPredicateAbstractionDomainElement getBottomElem() {
         return DisjunctivePredicateAbstractionDomainElement.BOTTOM;
+    }
+
+    @Override
+    public String getPredicateNameCombinationString() {
+        return PREDICATE_NAME_CONBINATION_STRING;
     }
 }

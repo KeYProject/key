@@ -106,8 +106,15 @@ public abstract class AbstractPredicateAbstractionLattice extends
     protected abstract AbstractPredicateAbstractionDomainElement getBottomElem();
 
     /**
-     * An abstract iterator which basically only sets up the bit sets
-     * used for building up complex iterators.
+     * @return The String which is used for combining the names of predicates
+     *         for lattice types where multiple predicates determine an abstract
+     *         element.
+     */
+    public abstract String getPredicateNameCombinationString();
+
+    /**
+     * An abstract iterator which basically only sets up the bit sets used for
+     * building up complex iterators.
      *
      * @author Dominic Scheurer
      */
@@ -151,7 +158,8 @@ public abstract class AbstractPredicateAbstractionLattice extends
         }
 
         /**
-         * @return The list of bit sets for all given numbers of zeroes occurrences.
+         * @return The list of bit sets for all given numbers of zeroes
+         *         occurrences.
          */
         public ArrayList<ArrayList<ImmutableFixedLengthBitSet>> getBitSetsByNumZeroes() {
             return bitSetsByNumZeroes;

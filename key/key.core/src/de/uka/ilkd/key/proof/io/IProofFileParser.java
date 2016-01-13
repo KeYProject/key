@@ -42,10 +42,11 @@ public interface IProofFileParser {
                 "abstractionPredicates"), JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE(
                 "latticeType"), JOIN_PROCEDURE("joinProc"), NUMBER_JOIN_PARTNERS(
                 "nrJoinPartners"), JOIN_NODE("joinNode"), JOIN_ID("joinId"), JOIN_DIST_FORMULA(
-                "distFormula"), USER_INTERACTION("userinteraction"), NEW_NAMES(
-                "newnames"), AUTOMODE_TIME("autoModeTime"), KeY_LOG("keyLog"), KeY_USER(
-                "keyUser"), KeY_VERSION("keyVersion"), KeY_SETTINGS(
-                "keySettings"), OPEN_GOAL("opengoal");
+                "distFormula"), JOIN_USER_CHOICES("userChoices"), USER_INTERACTION(
+                "userinteraction"), NEW_NAMES("newnames"), AUTOMODE_TIME(
+                "autoModeTime"), KeY_LOG("keyLog"), KeY_USER("keyUser"), KeY_VERSION(
+                "keyVersion"), KeY_SETTINGS("keySettings"), OPEN_GOAL(
+                "opengoal");
 
         private String rawName;
 

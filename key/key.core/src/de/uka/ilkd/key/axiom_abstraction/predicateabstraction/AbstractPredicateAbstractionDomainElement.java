@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
+import java.util.Iterator;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -23,7 +25,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
- * An abstract domain element for a predicate abstraction lattice.
+ * A base class for abstract domain elements in a predicate abstraction lattice.
  *
  * @author Dominic Scheurer
  */
@@ -103,12 +105,10 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
         return new Name(result.toString());
     }
 
-    /**
-     * @return The String which is used for combining the names of predicates
-     *         for lattice types where multiple predicates determine an abstract
-     *         element.
-     */
-    public abstract String getPredicateNameCombinationString();
+    @Override
+    public String toString() {
+        return name().toString();
+    }
 
     /*
      * (non-Javadoc)
@@ -157,6 +157,36 @@ public abstract class AbstractPredicateAbstractionDomainElement extends
     protected abstract Term combinePredicates(Term preds, Term newPred,
             Services services);
 
+    /**
+     * NOTE: This method should be defined in accordance with
+     * {@link AbstractPredicateAbstractionLattice#getPredicateNameCombinationString()}
+     * . This is probably bad design, but a substitute of the Java shortcoming
+     * that there are no abstract static methods.
+     * 
+     * @return The String which is used for combining the names of predicates
+     *         for lattice types where multiple predicates determine an abstract
+     *         element.
+     */
+    public abstract String getPredicateNameCombinationString();
+
+    @Override
+    public String toParseableString(Services services) {
+        final StringBuilder sb = new StringBuilder();
+
+        final Iterator<AbstractionPredicate> it = getPredicates().iterator();
+        while (it.hasNext()) {
+            sb.append(it.next().toParseableString(services));
+            if (it.hasNext()) {
+                sb.append(getPredicateNameCombinationString());
+            }
+        }
+
+        return sb.toString();
+    }
+
     @Override
     public abstract boolean equals(Object obj);
+
+    @Override
+    public abstract int hashCode();
 }

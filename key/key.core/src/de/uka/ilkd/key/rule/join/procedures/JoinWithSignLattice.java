@@ -13,11 +13,15 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
+import java.util.LinkedHashMap;
+
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.boollattice.BooleanLattice;
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.SignAnalysisLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -75,5 +79,10 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
     @Override
     public String toString() {
         return DISPLAY_NAME;
+    }
+
+    @Override
+    public LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
+        return new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
     }
 }
