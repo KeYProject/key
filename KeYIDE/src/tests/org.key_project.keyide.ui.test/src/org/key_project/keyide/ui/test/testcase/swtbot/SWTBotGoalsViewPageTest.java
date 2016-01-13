@@ -5,15 +5,18 @@ package org.key_project.keyide.ui.test.testcase.swtbot;
 import java.util.Iterator;
 
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.TableCollection;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
 import org.key_project.core.test.util.SuspendingStopCondition;
 import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.keyide.ui.providers.GoalsLabelProvider;
 import org.key_project.keyide.ui.views.GoalsView;
 import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -21,7 +24,9 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -64,6 +69,9 @@ public class SWTBotGoalsViewPageTest extends AbstractSWTBotKeYEditorTest {
             //check if list of goals is the same as the open goals of the proof
             assertList(proof, goalsList);
             
+            //make sure that start auto mode button is available and stop auto mode is disabled
+            assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+            assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
             
             sleepCondition.setSleep(true);
             //start auto mode and wait until it is finished
@@ -72,6 +80,9 @@ public class SWTBotGoalsViewPageTest extends AbstractSWTBotKeYEditorTest {
             sleepCondition.setSleep(false);
             TestKeYUIUtil.waitWhileAutoMode(bot, keyEditor.getUI());
             assertTrue(keyEditor.getCurrentProof().closed());
+            
+            //start auto mode button is not available anymore
+            assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             
             //check again, goalsList should be empty
             assertList(proof, goalsList);
@@ -137,6 +148,10 @@ public class SWTBotGoalsViewPageTest extends AbstractSWTBotKeYEditorTest {
             //check if list of goals is correct
             assertList(proof, goalsList);
             
+            //make sure that start auto mode button is available and stop auto mode is disabled
+            assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+            assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+            
             //start auto mode but apply only 2 rules
             SuspendingStopCondition sleepCondition = new SuspendingStopCondition();
             sleepCondition.setMaxRules(2);
@@ -151,6 +166,9 @@ public class SWTBotGoalsViewPageTest extends AbstractSWTBotKeYEditorTest {
             
             //make sure that proof is not closed => there are still open goals
             assertFalse(keyEditor.getCurrentProof().closed());
+            
+            //start auto mode should still be enabled
+            assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
        
             //make sure there are open goals on GoalsView
             assertTrue(goalsList.itemCount() > 0);
@@ -170,6 +188,7 @@ public class SWTBotGoalsViewPageTest extends AbstractSWTBotKeYEditorTest {
             //check if correct goal is selected on GoalsView
             assertSelection(outlineTree.selection(), goalsList.selection());
             
+            
             TestUtilsUtil.closeView(GoalsView.VIEW_ID);
          }
          
@@ -186,6 +205,106 @@ public class SWTBotGoalsViewPageTest extends AbstractSWTBotKeYEditorTest {
             steps);
    }
    
+   /**
+    * tests the Goals view after manual application of rules.
+    * @throws Exception
+    */
+   @Test
+   public void testGoalsView_manualRuleApplication() throws Exception {
+      IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
+
+         @Override
+         public void test(IJavaProject project,
+               KeYEnvironment<DefaultUserInterfaceControl> environment,
+               Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor,
+               KeYEditor keyEditor) throws Exception {
+            assertFalse(keyEditor.getCurrentProof().closed());
+            
+            //open GoalsView
+            TestUtilsUtil.openView(GoalsView.VIEW_ID);
+            SWTBotView goalsView = bot.viewById(GoalsView.VIEW_ID);
+            
+            //list of goals
+            SWTBotList goalsList = goalsView.bot().list();
+            
+            //check correct display of the list of goals
+            assertList(proof, goalsList);
+            
+            //check if start auto mode button is available and stop auto mode button is disabled
+            assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+            assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+            
+            //get currently shown node
+            Node node = keyEditor.getCurrentNode();
+            //make sure node is not closed
+            assertFalse(node.isClosed());
+            //make sure node has no children
+            assertEquals(0, node.childrenCount());
+            
+            //get styled text of editor
+            final SWTBotStyledText styledText = editor.bot().styledText();
+            //get point on editor with text "exc=null;"
+            Point point = TestUtilsUtil.selectText(styledText, "exc=null;");
+            
+            //go to point with cursor
+            TestUtilsUtil.setCursorLocation(styledText, point.x - 5, point.y);
+            //select rule to apply in context menu
+            TestUtilsUtil.clickContextMenu(styledText, point.x - 5, 
+                  point.y, "assignment");
+            
+            //proof should not be closed yet
+            assertFalse(keyEditor.getCurrentProof().closed());
+            //node should have a child now
+            assertEquals(node.childrenCount(), 1);
+            
+            assertEquals("assignment", MiscTools.getRuleDisplayName(node));
+            
+            assertFalse(node.isClosed());
+            
+            goalsList = goalsView.bot().list();
+            //check correct display of list of goals
+            assertList(proof, goalsList);
+            node = keyEditor.getCurrentNode();
+            
+            //apply another rule and check if list of goals is correct
+            point = TestUtilsUtil.selectText(styledText, "self = null");
+            TestUtilsUtil.setCursorLocation(styledText, point.x, point.y);
+            TestUtilsUtil.clickContextMenu(styledText, point.x, 
+                  point.y, "nullCreated");
+            
+            assertFalse(keyEditor.getCurrentProof().closed());
+            System.out.println(node.childrenCount());
+            assertEquals("nullCreated", MiscTools.getRuleDisplayName(node));
+            
+            goalsList = goalsView.bot().list();
+            assertList(proof, goalsList);
+            
+            
+            //start auto mode button should be still available, stop auto mode button is disabled
+            assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+            assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+            
+            //close goalsView
+            TestUtilsUtil.closeView(GoalsView.VIEW_ID);
+            
+         }
+      };
+      doEditorTest("SWTBotGoalsViewPageTest_testGoalsView_manualRuleApplication",
+            "data/paycard", 
+            true, 
+            TestKeYUIUtil.createOperationContractId("PayCard", 
+                  "PayCard", 
+                  "isValid()", 
+                  "0", 
+                  "normal_behavior"),
+            5,
+            false, 
+            steps
+            );
+      
+         
+      
+   }
    
    /**
     * checks if the list of goals on GoalsView is the same 
@@ -194,26 +313,25 @@ public class SWTBotGoalsViewPageTest extends AbstractSWTBotKeYEditorTest {
     * @param listOfGoals list of goals shown on GoalsView
     */
    private void assertList(Proof proof, SWTBotList listOfGoals) {
+      GoalsLabelProvider labelProvider = new GoalsLabelProvider();
       if (proof.openGoals() == null) {
          assertNull(listOfGoals);
       } else {
          assertNotNull(listOfGoals);
-         Iterator<Goal> goalIt = proof.openGoals().iterator();
-         assertEquals(listOfGoals.itemCount(), proof.openGoals().size());
-         for (int i = 0; i < listOfGoals.itemCount(); i++) {
-            if (goalIt.hasNext()) {
-               Goal goal = goalIt.next();
-               StringBuilder sb = new StringBuilder();
-               String info = listOfGoals.itemAt(i);
-               String label = "(#" + goal.node().serialNr() + ") ";
-               int labelSize = label.length();
-               sb.append(info);  
-               assertTrue(sb.length() == (labelSize + goal.toString().length()));
-               String goalInfo = sb.substring(labelSize);
-               assertEquals(goalInfo, goal.toString());
-               
-            } else {
-               fail("More elements on GoalsView than there are open goals");
+         if (proof.closed()) {
+            assertEquals(listOfGoals.itemCount(), 0);
+         } else {
+            Iterator<Goal> goalIt = proof.openGoals().iterator();
+            assertEquals(listOfGoals.itemCount(), proof.openGoals().size());
+            for (int i = 0; i < listOfGoals.itemCount(); i++) {
+               if (goalIt.hasNext()) {
+                  Goal goal = goalIt.next();
+                  assertEquals(labelProvider.getText(goal), 
+                        listOfGoals.itemAt(i));
+                  
+               } else {
+                  fail("More elements on GoalsView than there are open goals");
+               }
             }
          }
       }
@@ -232,7 +350,8 @@ public class SWTBotGoalsViewPageTest extends AbstractSWTBotKeYEditorTest {
     */
    private void assertSelection(TableCollection outlineSelection, String[] goalsSelection) {
       
-      assertEquals(outlineSelection.rowCount(), outlineSelection.columnCount(), 1);
+      assertEquals(outlineSelection.rowCount(), 
+            outlineSelection.columnCount(), 1);
       String selected = outlineSelection.get(0, 0).toString();
       String selectedGoal = goalsSelection[0];
       for (int i = 0; i < selected.length(); i++) {
