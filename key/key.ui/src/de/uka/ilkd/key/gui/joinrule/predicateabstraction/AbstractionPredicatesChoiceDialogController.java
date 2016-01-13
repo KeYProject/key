@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -53,11 +53,11 @@ import javafx.scene.web.WebView;
 import javafx.util.StringConverter;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
@@ -662,7 +662,7 @@ public class AbstractionPredicatesChoiceDialogController {
                     new JoinWithPredicateAbstraction(
                             availableAbstractionPreds,
                             latticeType.get(),
-                            new HashMap<ProgramVariable, AbstractDomainElement>())
+                            new LinkedHashMap<ProgramVariable, AbstractDomainElement>())
                             .getAbstractDomainForSort(s, MainWindow
                                     .getInstance().getMediator().getServices());
 

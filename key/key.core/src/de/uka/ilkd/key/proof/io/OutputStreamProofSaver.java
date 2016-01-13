@@ -26,6 +26,7 @@ import java.util.Vector;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
@@ -38,7 +39,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -73,7 +74,6 @@ import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Saves a proof to a given {@link OutputStream}.
@@ -425,7 +425,7 @@ public class OutputStreamProofSaver {
                                 .getValue()) {
                             tree.append(
                                     pred.toParseableString(proof.getServices()))
-                                    .append(",");
+                                    .append(", ");
                         }
                     }
                     // Delete the last ", ".
@@ -439,8 +439,27 @@ public class OutputStreamProofSaver {
 
                 }
 
-                // ((JoinWithLatticeAbstraction) concreteRule).g
-                // TODO (DS) continue here
+                final Map<ProgramVariable, AbstractDomainElement> userChoices =
+                        ((JoinWithLatticeAbstraction) concreteRule)
+                                .getUserChoices();
+                if (!userChoices.isEmpty()) {
+                    tree.append(" (userChoices \"");
+                    for (final ProgramVariable v : userChoices.keySet()) {
+                        final AbstractDomainElement elem = userChoices.get(v);
+                        tree.append("(")
+                            .append(v.sort().toString())
+                            .append(" ")
+                            .append(v.toString())
+                            .append(", `")
+                            .append(elem.toParseableString(proof.getServices()))
+                            .append("`), ");
+                    }
+                    // Delete the last ", ".
+                    tree.delete(tree.length() - 2, tree.length());
+                    
+                    tree.append("\")");
+                }
+
             }
 
             if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {

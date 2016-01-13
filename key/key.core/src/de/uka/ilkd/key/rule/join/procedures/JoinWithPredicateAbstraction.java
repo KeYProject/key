@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -56,7 +57,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     /**
      * Manually chosen lattice elements for program variables.
      */
-    private HashMap<ProgramVariable, AbstractDomainElement> userChoices = null;
+    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices = null;
 
     /**
      * Default constructor for subclasses.
@@ -78,7 +79,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     public JoinWithPredicateAbstraction(
             Iterable<AbstractionPredicate> predicates,
             Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-            HashMap<ProgramVariable, AbstractDomainElement> userChoices) {
+            LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
                 this.predicates.put(pred.getArgSort(),
@@ -188,7 +189,7 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     /**
      * @return Manually chosen lattice elements for program variables.
      */
-    public HashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
+    public LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
         return userChoices;
     }
 

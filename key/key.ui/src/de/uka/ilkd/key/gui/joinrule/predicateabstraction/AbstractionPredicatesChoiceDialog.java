@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -338,8 +339,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     class Result {
         private ArrayList<AbstractionPredicate> registeredPredicates;
         private Class<? extends AbstractPredicateAbstractionLattice> latticeType;
-        private HashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
-                new HashMap<ProgramVariable, AbstractDomainElement>();
+        private LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
+                new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
 
         public Result(
                 ArrayList<AbstractionPredicate> registeredPredicates,
@@ -375,7 +376,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         /**
          * @return Manually chosen lattice elements for program variables.
          */
-        public HashMap<ProgramVariable, AbstractDomainElement> getAbstractDomElemUserChoices() {
+        public LinkedHashMap<ProgramVariable, AbstractDomainElement> getAbstractDomElemUserChoices() {
             return abstractDomElemUserChoices;
         }
     }

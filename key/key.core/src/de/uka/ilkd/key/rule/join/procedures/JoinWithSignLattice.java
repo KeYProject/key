@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.join.procedures;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -82,7 +82,7 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
     }
 
     @Override
-    public HashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
-        return new HashMap<ProgramVariable, AbstractDomainElement>();
+    public LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
+        return new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
     }
 }

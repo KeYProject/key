@@ -225,7 +225,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
                 .append(OutputStreamProofSaver
                         .escapeCharacters(OutputStreamProofSaver.printAnything(
                                 predicateFormWithPlaceholder.second, services,
-                                false).toString())).append("'), ");
+                                false).toString())).append("')");
 
         return sb.toString();
     }
