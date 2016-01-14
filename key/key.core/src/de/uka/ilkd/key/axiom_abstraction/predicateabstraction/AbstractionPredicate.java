@@ -223,23 +223,29 @@ public abstract class AbstractionPredicate implements Function<Term, Term>,
                 .append(predicateFormWithPlaceholder.first)
                 .append("', '")
                 .append(OutputStreamProofSaver
-                        .escapeCharacters(OutputStreamProofSaver.printAnything(
-                                predicateFormWithPlaceholder.second, services,
-                                false).toString())).append("')");
+                        .escapeCharacters(OutputStreamProofSaver
+                                .printAnything(
+                                        predicateFormWithPlaceholder.second,
+                                        services, false).toString().trim()
+                                .replaceAll("(\\r|\\n|\\r\\n)+", "")))
+                .append("')");
 
         return sb.toString();
     }
 
     /**
-     * TODO: Document.
+     * Parses the String representation of an abstraction predicates.
      * 
-     * @param s
-     * @param services
-     * @return
-     * @throws ParserException If there is a syntax error.
-     * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
-     * @throws SortNotKnownException If the given sort is not known to the system.
-     */
+     * @param s {@link String} to parse.
+     * @param services The {@link Services} object.
+     * @return The parsed {@link String}.
+     * @throws ParserException
+     *             If there is a syntax error.
+     * @throws NameAlreadyBoundException
+     *             If the given placeholder is already known to the system.
+     * @throws SortNotKnownException
+     *             If the given sort is not known to the system.
+      */
     public static List<AbstractionPredicate> fromString(final String s,
             final Services services) throws ParserException {
         final ArrayList<AbstractionPredicate> result =

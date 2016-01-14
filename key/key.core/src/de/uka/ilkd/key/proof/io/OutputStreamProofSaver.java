@@ -322,7 +322,7 @@ public class OutputStreamProofSaver {
         }
         return " (newnames \"" + s.substring(1) + "\")";
     }
-    
+
     private void printSingleNode(Node node, String prefix, StringBuffer tree) {
 
         RuleApp appliedRuleApp = node.getAppliedRuleApp();
@@ -393,26 +393,31 @@ public class OutputStreamProofSaver {
                         (JoinRuleBuiltInRuleApp) appliedRuleApp;
                 JoinProcedure concreteRule = joinApp.getConcreteRule();
 
-                tree.append(" (").append(ProofElementID.JOIN_PROCEDURE.getRawName())
+                tree.append(" (")
+                        .append(ProofElementID.JOIN_PROCEDURE.getRawName())
                         .append(" \"");
                 tree.append(concreteRule.toString());
                 tree.append("\")");
 
-                tree.append(" (").append(ProofElementID.NUMBER_JOIN_PARTNERS.getRawName())
-                        .append(" \"");
+                tree.append(" (")
+                        .append(ProofElementID.NUMBER_JOIN_PARTNERS
+                                .getRawName()).append(" \"");
                 tree.append(joinApp.getJoinPartners().size());
                 tree.append("\")");
 
-                tree.append(" (").append(ProofElementID.JOIN_ID.getRawName()).append(" \"");
+                tree.append(" (").append(ProofElementID.JOIN_ID.getRawName())
+                        .append(" \"");
                 tree.append(joinApp.getJoinNode().serialNr());
                 tree.append("\")");
 
                 if (joinApp.getDistinguishingFormula() != null) {
-                    tree.append(" (").append(ProofElementID.JOIN_DIST_FORMULA.getRawName())
-                            .append(" \"");
+                    tree.append(" (")
+                            .append(ProofElementID.JOIN_DIST_FORMULA
+                                    .getRawName()).append(" \"");
                     tree.append(escapeCharacters(printAnything(
                             joinApp.getDistinguishingFormula(),
-                            proof.getServices(), false).toString()));
+                            proof.getServices(), false).toString().trim()
+                            .replaceAll("(\\r|\\n|\\r\\n)+", "")));
                     tree.append("\")");
                 }
 
@@ -424,8 +429,8 @@ public class OutputStreamProofSaver {
                                 .getPredicates().size() > 0) {
 
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_ABSTRACTION_PREDICATES.getRawName())
-                            .append(" \"");
+                            .append(ProofElementID.JOIN_ABSTRACTION_PREDICATES
+                                    .getRawName()).append(" \"");
                     for (Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts : predAbstrRule
                             .getPredicates().entrySet()) {
                         for (AbstractionPredicate pred : predsForSorts
@@ -441,8 +446,8 @@ public class OutputStreamProofSaver {
                     tree.append("\")");
 
                     tree.append(" (")
-                            .append(ProofElementID.JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE.getRawName())
-                            .append(" \"");
+                            .append(ProofElementID.JOIN_PREDICATE_ABSTRACTION_LATTICE_TYPE
+                                    .getRawName()).append(" \"");
                     tree.append(predAbstrRule.getLatticeType().getName());
                     tree.append("\")");
 
@@ -453,10 +458,12 @@ public class OutputStreamProofSaver {
                             ((JoinWithLatticeAbstraction) concreteRule)
                                     .getUserChoices();
                     if (!userChoices.isEmpty()) {
-                        tree.append(" (").append(ProofElementID.JOIN_USER_CHOICES.getRawName())
-                                .append(" \"");
+                        tree.append(" (")
+                                .append(ProofElementID.JOIN_USER_CHOICES
+                                        .getRawName()).append(" \"");
                         for (final ProgramVariable v : userChoices.keySet()) {
-                            final AbstractDomainElement elem = userChoices.get(v);
+                            final AbstractDomainElement elem =
+                                    userChoices.get(v);
                             tree.append("('")
                                     .append(v.sort().toString())
                                     .append(" ")
@@ -467,7 +474,7 @@ public class OutputStreamProofSaver {
                         }
                         // Delete the last ", ".
                         tree.delete(tree.length() - 2, tree.length());
-    
+
                         tree.append("\")");
                     }
                 }
