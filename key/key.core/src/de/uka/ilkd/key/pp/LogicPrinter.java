@@ -15,6 +15,7 @@ package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
@@ -1824,7 +1825,7 @@ public class LogicPrinter {
                                "Error while printing Java program \n"+e);
         }
         // send first executable statement range
-        printMarkingFirstStatement(sw.toString(),r);
+        printMarkingFirstStatement(sw.toString(), r, prgPrinter.getKeywordRanges());
 
     }
 
@@ -1838,23 +1839,70 @@ public class LogicPrinter {
      *
      * @param s   the string containing a program
      * @param r   the range of the first statement
+     * @param keywords the ranges of the java keywords in this program 
      */
-    private void printMarkingFirstStatement(String s,Range r)
-        throws IOException    {
-
-        int iEnd   = r.end()<=s.length()?r.end():s.length();
-        int iStart = r.start()<=iEnd?r.start():iEnd;
-        String start = s.substring(0, iStart);
-        String firstStmt = s.substring(iStart, iEnd);
-        String end = s.substring(iEnd);
-        layouter.beginC(0);
-        printVerbatim(start);
-        mark(MarkType.MARK_START_FIRST_STMT);
-        printVerbatim(firstStmt);
-        mark(MarkType.MARK_END_FIRST_STMT);
-        printVerbatim(end);
-        layouter.end();
-    }
+    private void printMarkingFirstStatement(String s,Range r, Range[] keywords)
+          throws IOException    {
+          // calculate the bounds of the first statement and split program string accordingly
+          int iEnd   = r.end() <= s.length() ? r.end() : s.length();
+          int iStart = r.start() <= iEnd ? r.start() : iEnd;
+          String start = s.substring(0, iStart);
+          String firstStmt = s.substring(iStart, iEnd);
+          String end = s.substring(iEnd);
+          // remember length of the splits
+          int startTotal = start.length();
+          int firstTotal = firstStmt.length();
+          int endTotal = end.length();
+          layouter.beginC(0);
+          // mark keywords and print the string before the first statement 
+          for (int i = 0; i < keywords.length; i++) {
+             Range keyword = keywords[i];
+             if (keyword.start() < iStart && keyword.end() < iStart) {
+                int printed = startTotal - start.length();
+                String beforeKeyword = start.substring(0, keyword.start() - printed);
+                String key = start.substring(keyword.start() - printed, keyword.end() - printed);
+                start = start.substring(keyword.end() - printed);
+                printVerbatim(beforeKeyword);
+                markStartKeyword();
+                printVerbatim(key);
+                markEndKeyword();
+             }
+          }        
+          printVerbatim(start);
+          // mark keywords in first statement and print it
+          mark(MarkType.MARK_START_FIRST_STMT);
+          for (int i = 0; i < keywords.length; i++) {
+             Range keyword = keywords[i];
+             if (keyword.start() >= iStart && keyword.end() <= iEnd) {
+                int printed = startTotal + (firstTotal - firstStmt.length());
+                String beforeKeyword = firstStmt.substring(0, keyword.start() - printed);
+                String key = firstStmt.substring(keyword.start() - printed, keyword.end() - printed);
+                firstStmt = firstStmt.substring(keyword.end() - printed);
+                printVerbatim(beforeKeyword);
+                markStartKeyword();
+                printVerbatim(key);
+                markEndKeyword();
+             }
+          }
+          printVerbatim(firstStmt);
+          mark(MarkType.MARK_END_FIRST_STMT);
+          // mark keywords and print the string after the first statement
+          for (int i = 0; i < keywords.length; i++) {
+             Range keyword = keywords[i];
+             if (keyword.end() > iEnd) {
+                int printed = startTotal + firstTotal + (endTotal - end.length());
+                String beforeKeyword = end.substring(0, keyword.start() - printed);
+                String key = end.substring(keyword.start() - printed, keyword.end() - printed);
+                end = end.substring(keyword.end() - printed);
+                printVerbatim(beforeKeyword);
+                markStartKeyword();
+                printVerbatim(key);
+                markEndKeyword();
+             }
+          }
+          printVerbatim(end);
+          layouter.end();
+      }
 
     /** Print a string containing newlines to the layouter.  This is like
      * {@link de.uka.ilkd.key.util.pp.Layouter#pre(String)}, but

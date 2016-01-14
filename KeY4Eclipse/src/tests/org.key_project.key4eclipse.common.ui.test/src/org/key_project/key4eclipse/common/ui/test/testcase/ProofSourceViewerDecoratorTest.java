@@ -69,6 +69,8 @@ public class ProofSourceViewerDecoratorTest {
       ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
       FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
       Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
+      ProofSourceViewerDecorator decorator = null;
+      StyledText text = null;
       assertNotNull(proof);
       Shell shell = new Shell();
       try {
@@ -77,9 +79,9 @@ public class ProofSourceViewerDecoratorTest {
          shell.setLayout(new FillLayout());
          // let showNode fill StyleRanges of StyledText
          ISourceViewer sourceViewer = new SourceViewer(shell, null, SWT.NONE);
-         ProofSourceViewerDecorator decorator = new ProofSourceViewerDecorator(sourceViewer);
+         decorator = new ProofSourceViewerDecorator(sourceViewer);
          decorator.showNode(proof.root(), SymbolicExecutionUtil.createNotationInfo(proof));
-         StyledText text = sourceViewer.getTextWidget();
+         text = sourceViewer.getTextWidget();
          
          // fill Array for Test with correct StyleRanges
          ArrayList<StyleRange> shouldRanges = new ArrayList<StyleRange>();
@@ -187,89 +189,97 @@ public class ProofSourceViewerDecoratorTest {
          javaKeywords = new StyleRange();
          javaKeywords.foreground = purpleColor;
          javaKeywords.fontStyle = SWT.BOLD;
-         javaKeywords.start = 277;
-         javaKeywords.length = 5;
+         javaKeywords.start = 278;
+         javaKeywords.length = 6;
          shouldRanges.add(javaKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 390;
+         keyKeywords.start = 391;
          keyKeywords.length = 1;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 397;
+         keyKeywords.start = 398;
          keyKeywords.length = 5;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 416;
+         keyKeywords.start = 417;
          keyKeywords.length = 1;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 442;
+         keyKeywords.start = 443;
          keyKeywords.length = 1;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 444;
+         keyKeywords.start = 445;
          keyKeywords.length = 7;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 478;
+         keyKeywords.start = 479;
          keyKeywords.length = 7;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 530;
+         keyKeywords.start = 531;
          keyKeywords.length = 1;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 562;
+         keyKeywords.start = 563;
          keyKeywords.length = 1;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 564;
+         keyKeywords.start = 565;
          keyKeywords.length = 1;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 567;
+         keyKeywords.start = 568;
          keyKeywords.length = 9;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 589;
+         keyKeywords.start = 590;
          keyKeywords.length = 4;
          shouldRanges.add(keyKeywords);
          keyKeywords = new StyleRange();
          keyKeywords.foreground = blueColor;
          keyKeywords.fontStyle = SWT.BOLD;
-         keyKeywords.start = 614;
+         keyKeywords.start = 615;
          keyKeywords.length = 1;
          shouldRanges.add(keyKeywords);
          // check if StyleRanges are the same
          StyleRange[] isRanges = text.getStyleRanges();
-         assertTrue ("The amount of highlights marked is not correct.", shouldRanges.size() == isRanges.length);
+         assertTrue("The amount of highlights marked is not correct.", shouldRanges.size() == isRanges.length);
          for (int i = 0; i < shouldRanges.size(); i++) {
-            assertTrue ("Mark Nr. "+ i + " is not correct.", shouldRanges.get(i).equals(isRanges[i]));
+            assertTrue("Mark Nr. " + i + " is not correct. Start: " + isRanges[i].start + " Length: " + isRanges[i], shouldRanges.get(i).equals(isRanges[i]));
          }
       
       } finally {
+         if (text != null) {
+            text.dispose();
+         }
+         proof.dispose();
+         environment.dispose();
+         if (decorator != null) {
+            decorator.dispose();
+         }
          shell.setVisible(false);
          shell.dispose();
          purpleColor.dispose();

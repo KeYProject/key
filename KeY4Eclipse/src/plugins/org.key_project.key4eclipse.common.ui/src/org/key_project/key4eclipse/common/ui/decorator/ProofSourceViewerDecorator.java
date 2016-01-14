@@ -14,9 +14,9 @@
 package org.key_project.key4eclipse.common.ui.decorator;
 
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +38,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
+
 import de.uka.ilkd.key.gui.nodeviews.HTMLSyntaxHighlighter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -155,12 +156,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * {@link Color} used for highlighting first statement.
     */
    private Color firstStatementColor = new Color(null, 167, 174, 192);
-   /**
-    * Java keywords to be highlighted.
-    */
-   private static final Pattern JAVA_KEYWORDS_PATTERN = 
-         Pattern.compile(HTMLSyntaxHighlighter.concat("(", HTMLSyntaxHighlighter.JAVA_KEYWORDS_REGEX, ")"));
-
+   
    /**
     * Text shown.
     */
@@ -247,26 +243,18 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    private void setKeywordHighlights(String str) {
       markedKeywords = new ArrayList<StyleRange>();
-      // mark java keywords in a java block
-      Matcher javaMatcher = JAVA_KEYWORDS_PATTERN.matcher(str);
-      for (Range range : printer.getInitialPositionTable().getJavaBlockRanges()) {
-         javaMatcher.region(range.start(), range.end());
-         while (javaMatcher.find()) {
-            StyleRange mark = new StyleRange();
-            mark.fontStyle = SWT.BOLD;
-            mark.foreground = purpleColor;
-            mark.start = javaMatcher.start();
-            mark.length = javaMatcher.end() - javaMatcher.start();
-            markedKeywords.add(mark); 
-         }
-      }
-      // mark KeY keywords 
       for (Range keyword : printer.getInitialPositionTable().getKeywordRanges()) {
          StyleRange mark = new StyleRange();
          mark.fontStyle = SWT.BOLD;
          mark.foreground = blueColor;
          mark.start = keyword.start();
          mark.length = keyword.length();
+         // mark java keywords as purple
+         for (Range javaBlock : printer.getInitialPositionTable().getJavaBlockRanges()) {
+            if (keyword.start() >= javaBlock.start() && keyword.end() <= javaBlock.end()) {
+               mark.foreground = purpleColor;
+            }
+         }
          markedKeywords.add(mark);
       }
    }
