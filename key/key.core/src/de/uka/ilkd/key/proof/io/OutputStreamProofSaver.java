@@ -448,28 +448,29 @@ public class OutputStreamProofSaver {
 
                 }
 
-                final Map<ProgramVariable, AbstractDomainElement> userChoices =
-                        ((JoinWithLatticeAbstraction) concreteRule)
-                                .getUserChoices();
-                if (!userChoices.isEmpty()) {
-                    tree.append(" (").append(ProofElementID.JOIN_USER_CHOICES.getRawName())
-                            .append(" \"");
-                    for (final ProgramVariable v : userChoices.keySet()) {
-                        final AbstractDomainElement elem = userChoices.get(v);
-                        tree.append("('")
-                                .append(v.sort().toString())
-                                .append(" ")
-                                .append(v.toString())
-                                .append("', `")
-                                .append(elem.toParseableString(proof
-                                        .getServices())).append("`), ");
+                if (concreteRule instanceof JoinWithLatticeAbstraction) {
+                    final Map<ProgramVariable, AbstractDomainElement> userChoices =
+                            ((JoinWithLatticeAbstraction) concreteRule)
+                                    .getUserChoices();
+                    if (!userChoices.isEmpty()) {
+                        tree.append(" (").append(ProofElementID.JOIN_USER_CHOICES.getRawName())
+                                .append(" \"");
+                        for (final ProgramVariable v : userChoices.keySet()) {
+                            final AbstractDomainElement elem = userChoices.get(v);
+                            tree.append("('")
+                                    .append(v.sort().toString())
+                                    .append(" ")
+                                    .append(v.toString())
+                                    .append("', `")
+                                    .append(elem.toParseableString(proof
+                                            .getServices())).append("`), ");
+                        }
+                        // Delete the last ", ".
+                        tree.delete(tree.length() - 2, tree.length());
+    
+                        tree.append("\")");
                     }
-                    // Delete the last ", ".
-                    tree.delete(tree.length() - 2, tree.length());
-
-                    tree.append("\")");
                 }
-
             }
 
             if (appliedRuleApp instanceof CloseAfterJoinRuleBuiltInRuleApp) {
