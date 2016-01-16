@@ -8,7 +8,7 @@
 	<!-- <property name="NUIdefault" value="${basedir}/resources/de/uka/ilkd/key/nui/NUIdefault.fxml" /> -->
 	<property name="NUIdefault" value="${build.dir}/de/uka/ilkd/key/nui/NUIdefault.fxml" />
 	<property name="components" value="${basedir}/resources/de/uka/ilkd/key/nui/components/" />
-
+	
 	<!-- Definition of classpath -->
 	<path id="key.nui.class.path">
 		<pathelement path="${basedir}/../key.util/bin" />
@@ -39,7 +39,22 @@
 			<fileset dir="${basedir}/ant-lib/" />
 		</classpath>
 	</taskdef>
-
+	
+	<!-- Reporting -->
+	<taskdef name="findbugs" 
+	    classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+	    <classpath>
+	       <fileset dir="${basedir}/ant-lib/findbugs"/>
+	    </classpath>
+	</taskdef>
+	
+	<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+	         classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar"/>
+	
+	<taskdef name="pmd" 
+		      classname="net.sourceforge.pmd.ant.PMDTask"
+	         classpath="${basedir}/ant-lib/pmd/pmd-4.2.6.jar"/>
+	
 	<!-- Definition of target START -->
 	<target name="start" depends="compile" description="Starts KeY.">
 		<java classname="de.uka.ilkd.key.nui.NUI" classpathref="key.nui.run.class.path" fork="true" > 
@@ -69,13 +84,41 @@
 	</target>
 
 	<!-- Definition of target COPY -->
-	<target name="copy" description="Copy all resources into the binary directory.">
+   <target name="copy" description="Copy all resources into the binary directory.">
 		<copy todir="${build.dir}" overwrite="true">
 			<fileset dir="${basedir}/resources/" />
 		</copy>
 	</target>
 
-
+	<!-- Generate Reports -->
+	<!-- FindBugs Report -->
+	<target name="findbugs" description="Generates FindBugs Report.">
+	   <findbugs home="${basedir}/ant-lib/findbugs" output="html" outputFile="${basedir}/reports/findBugsReport.html" >
+         <class location="${basedir}/bin" />
+	   	<auxClasspath path="${basedir}/testfx/"/>
+	   	<auxClasspath path="${basedir}/ant-lib/"/>
+		</findbugs>
+	</target>
+	
+	<!-- Checkstyle Report -->
+	<target name="checkstyle" description="Generates Checkstyle Report.">
+	  <checkstyle config="${basedir}/config/checkstyle/sun_checks.xml"
+	              classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
+	    <fileset dir="${basedir}/src" includes="**/*.java"/>
+	  	 <formatter type="xml" tofile="${basedir}/reports/checkstyle_report.xml"/>
+	  </checkstyle>
+	</target>
+	
+	<!-- PMD Report -->
+	<target name="pmd" description="Generates PMD Report.">
+	    <pmd rulesetfiles="imports">
+	        <formatter type="xml" toFile="${basedir}/reports/pmd_report.xml" toConsole="true"/>
+	        <fileset dir="${basedir}/src/">
+	            <include name="**/*.java"/>
+	        </fileset>
+	    </pmd>
+	</target>
+	
 	<!-- Author: Stefan Pilot <stef@n-pilot.de>
 	This will add new menu entries for each	GUI component defined as 
 	.fxml-File in the ${components} folder.

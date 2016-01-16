@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd version="4.2.6" timestamp="2016-01-16T18:34:25.121">
+<file name="C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\NUI.java">
+<violation beginline="4" endline="4" begincolumn="1" endcolumn="24" rule="UnusedImports" ruleset="Import Statement Rules" package="de.uka.ilkd.key.nui" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.util.Arrays'
+</violation>
+</file>
+<error filename="C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\ComponentFactory.java" msg="Error while parsing C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\ComponentFactory.java"/>
+<error filename="C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\NUIController.java" msg="Error while parsing C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\NUIController.java"/>
+<error filename="C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\SearchViewController.java" msg="Error while parsing C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\SearchViewController.java"/>
+<error filename="C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\TreeViewController.java" msg="Error while parsing C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\controller\TreeViewController.java"/>
+<error filename="C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\ProofTreeContextMenu.java" msg="Error while parsing C:\BP\GIT\key\key\key.nui\src\de\uka\ilkd\key\nui\prooftree\ProofTreeContextMenu.java"/>
+</pmd>
