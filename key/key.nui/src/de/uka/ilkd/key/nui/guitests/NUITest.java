@@ -39,7 +39,7 @@ public class NUITest extends GuiTest {
 	private static final String CONFIG_VIEWS = "#configViews";
 	private static final String OPEN_PROOFS_VIEW = "#openProofsView";
 	private static final String GOAL_VIEW = "#goalView";
-	
+
 	// IDs of the toggle groups
 	private static final String TREE_VIEW_TOGGLE = "#toggletreeView";
 	private static final String PROOF_VIEW_TOGGLE = "#toggleproofView";
@@ -48,7 +48,7 @@ public class NUITest extends GuiTest {
 
 	// the root of the scene graph
 	private Parent root = null;
-	
+
 	// the map containing the mapping: view ID <-> toggle group ID
 	private static HashMap<String, String> viewMap;
 
@@ -70,8 +70,8 @@ public class NUITest extends GuiTest {
 		// FILE
 		// Testing 'Close' is not possible (see
 		// https://github.com/TestFX/TestFX/issues/50)
-		clickOn(MENUBAR_FILE).clickOn("Open Proof...");	
-		
+		clickOn(MENUBAR_FILE).clickOn("Open Proof...");
+
 		// EDIT
 		clickOn(MENUBAR_EDIT);
 
@@ -140,15 +140,15 @@ public class NUITest extends GuiTest {
 	 * This method tests the toggle groups in the 'View' menu
 	 * 
 	 * @param hideTG
-	 * 			The ID of the toggle for hiding the view
+	 *            The ID of the toggle for hiding the view
 	 * @param leftTG
-	 * 			The ID of the toggle for moving the view to the left
+	 *            The ID of the toggle for moving the view to the left
 	 * @param middleTG
-	 * 			The ID of the toggle for moving the view to the middle
+	 *            The ID of the toggle for moving the view to the middle
 	 * @param rightTG
-	 * 			The ID of the toggle for moving the view to the right
+	 *            The ID of the toggle for moving the view to the right
 	 * @param bottomTG
-	 * 			The ID of the toggle for moving the view to the bottom
+	 *            The ID of the toggle for moving the view to the bottom
 	 */
 	private void toggleGroupTester(final String hideTG, final String leftTG, final String middleTG,
 			final String rightTG, final String bottomTG, final String view) {
