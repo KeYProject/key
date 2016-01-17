@@ -21,8 +21,8 @@ public class TreeViewTest extends GuiTest {
 
     @Override
     public Parent getRootNode() {
-        ComponentFactory factory = new ComponentFactory("");
-        root = factory.createTreeView();
+        ComponentFactory factory = ComponentFactory.getInstance();
+        root = factory.createComponent("treeView", "treeView");
         return root;
     }
 
