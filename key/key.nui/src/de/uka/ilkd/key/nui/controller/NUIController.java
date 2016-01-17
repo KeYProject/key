@@ -144,10 +144,14 @@ public class NUIController implements Initializable {
         } else {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File("resources/de/uka/ilkd/key/examples"));
-            fileChooser.setSelectedExtensionFilter(new ExtensionFilter("test", Arrays.asList(new String[]{"proof"})));
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Proof files", "*.proof");
+            fileChooser.getExtensionFilters().add(extFilter);
             File file = fileChooser.showOpenDialog(contextMenu);
-            TreeViewController t = ComponentFactory.getInstance().getController("treeView");
-            t.loadAndDisplayProof(file);
+            // only load proof if any selection was made
+            if (file != null) {
+            	TreeViewController t = ComponentFactory.getInstance().getController("treeView");
+                t.loadAndDisplayProof(file);
+            }
         }
     }
     /**
