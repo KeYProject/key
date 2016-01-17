@@ -70,8 +70,8 @@ public class NUITest extends GuiTest {
 		// FILE
 		// Testing 'Close' is not possible (see
 		// https://github.com/TestFX/TestFX/issues/50)
-		clickOn(MENUBAR_FILE).clickOn("Open Proof...");
-
+		clickOn(MENUBAR_FILE).clickOn("Open Proof...");	
+		
 		// EDIT
 		clickOn(MENUBAR_EDIT);
 

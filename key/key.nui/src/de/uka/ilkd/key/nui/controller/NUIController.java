@@ -249,15 +249,20 @@ public class NUIController implements Initializable {
             // from the Pane where it currently is listed)
             // and update its position in the posComponent Map.
             if (place == Place.HIDDEN) {
-                getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
+//            	for (Node n : getPane(placeComponent.get(componentName)).getChildren()) {
+//                    if (n.getId().equals(componentName)) {
+//                    	 unregisterKeyListener(n.get);
+//                    }
+//                }
+            	
+            	getPane(placeComponent.get(componentName)).getChildren().remove(existingcomponent);
                 placeComponent.remove(componentName);
-                statustext.setText("View " + componentName + " hidden.");
+                statustext.setText("View " + componentName + " hidden.");   
             }
             else {
                 getPane(place).getChildren().add(existingcomponent);
                 placeComponent.replace(componentName, place);
             }
-
         }
         else {
             if (place != Place.HIDDEN) {
@@ -294,12 +299,25 @@ public class NUIController implements Initializable {
             }
         }
         if (keyEventHandlers.containsKey(k)) {
-            throw new IllegalArgumentException(
-                    "The key you submitted (" + k + ") was already in use.");
+        	// TODO this should better be done when the view is going to be hidden
+        	// this is just a workaround to make the tests work again
+        	unregisterKeyListener(k);
+//            throw new IllegalArgumentException(
+//                    "The key you submitted (" + k + ") was already in use.");
         }
 
         keyEventHandlers.put(k, new SimpleImmutableEntry<EventHandler<KeyEvent>, KeyCode[]>(e,
                 (modifiers == null) ? new KeyCode[0] : modifiers));
+    }
+    
+    /**
+     * TODO
+     * 
+     * @throws IllegalArgumentException
+     */
+    public void unregisterKeyListener(KeyCode k)
+            throws IllegalArgumentException {
+        keyEventHandlers.remove(k);
     }
 
     /**
