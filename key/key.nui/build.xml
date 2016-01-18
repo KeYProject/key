@@ -8,7 +8,10 @@
 	<!-- <property name="NUIdefault" value="${basedir}/resources/de/uka/ilkd/key/nui/NUIdefault.fxml" /> -->
 	<property name="NUIdefault" value="${build.dir}/de/uka/ilkd/key/nui/NUIdefault.fxml" />
 	<property name="components" value="${basedir}/resources/de/uka/ilkd/key/nui/components/" />
-	
+	<tstamp>
+		<format property="time.stamp" pattern="yyyyMMdd-HHmmss" />
+	</tstamp>
+
 	<!-- Definition of classpath -->
 	<path id="key.nui.class.path">
 		<pathelement path="${basedir}/../key.util/bin" />
@@ -21,7 +24,7 @@
 		<pathelement path="${basedir}/../key.nui/bin" />
 		<path refid="key.nui.class.path" />
 	</path>
-	
+
 	<!-- Set properties ============== -->
 	<!-- Sets the property taclet.match to ${taclet.match} if it is not set yet, else it is set to 'vm' -->
 	<condition property="taclet.match" value="${taclet.match}" else="vm">
@@ -32,32 +35,35 @@
 		<isset property="tacletindex.threading.enabled" />
 	</condition>
 	<!-- ============================= -->
-	
+
 	<!-- Includes ANT-CONTRIB library -->
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<fileset dir="${basedir}/ant-lib/" />
 		</classpath>
 	</taskdef>
-	
+
 	<!-- Reporting -->
-	<taskdef name="findbugs" 
-	    classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
-	    <classpath>
-	       <fileset dir="${basedir}/ant-lib/findbugs"/>
-	    </classpath>
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+		<classpath>
+			<fileset dir="${basedir}/ant-lib/findbugs" />
+		</classpath>
 	</taskdef>
-	
-	<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
-	         classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar"/>
-	
-	<taskdef name="pmd" 
-		      classname="net.sourceforge.pmd.ant.PMDTask"
-	         classpath="${basedir}/ant-lib/pmd/pmd-4.2.6.jar"/>
-	
+
+	<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar" />
+
+	<path id="pmd.classpath">
+		<pathelement location="${basedir}" />
+		<fileset dir="${basedir}/ant-lib/pmd">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="pmd.classpath" />
+
 	<!-- Definition of target START -->
 	<target name="start" depends="compile" description="Starts KeY.">
-		<java classname="de.uka.ilkd.key.nui.NUI" classpathref="key.nui.run.class.path" fork="true" > 
+		<java classname="de.uka.ilkd.key.nui.NUI" classpathref="key.nui.run.class.path" fork="true">
 			<jvmarg value="-Xmx2048m" />
 			<jvmarg value="-XX:MaxPermSize=256m" />
 			<jvmarg value="-ea" />
@@ -76,49 +82,55 @@
 	<!-- Definition of target COMPILE -->
 	<target name="compile" depends="generate" description="Compile all source files into the build directory.">
 		<mkdir dir="${build.dir}" />
-		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="1.8" target="1.8" 
-			deprecation="off" debug="on" depend="${build.depend}" optimize="off"> 
-			<exclude name="**/guitests/*.java" /> <!-- GUI tests are not compiled by ANT Buildfile-->
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="1.8" target="1.8" deprecation="off" debug="on" depend="${build.depend}" optimize="off">
+			<exclude name="**/guitests/*.java" />
+			<!-- GUI tests are not compiled by ANT Buildfile-->
 			<classpath refid="key.nui.class.path" />
 		</javac>
 	</target>
 
 	<!-- Definition of target COPY -->
-   <target name="copy" description="Copy all resources into the binary directory.">
+	<target name="copy" description="Copy all resources into the binary directory.">
 		<copy todir="${build.dir}" overwrite="true">
 			<fileset dir="${basedir}/resources/" />
 		</copy>
 	</target>
 
 	<!-- Generate Reports -->
-	<!-- FindBugs Report -->
+
+	<!-- Definition of target FINDBUGS -->
 	<target name="findbugs" description="Generates FindBugs Report.">
-	   <findbugs home="${basedir}/ant-lib/findbugs" output="html" outputFile="${basedir}/reports/findBugsReport.html" >
-         <class location="${basedir}/bin" />
-	   	<auxClasspath path="${basedir}/testfx/"/>
-	   	<auxClasspath path="${basedir}/ant-lib/"/>
+		<findbugs home="${basedir}/ant-lib/findbugs" output="html" outputFile="${basedir}/reports/findBugs_${time.stamp}.html">
+			<class location="${basedir}/bin" />
+			<auxClasspath path="${basedir}/testfx-4/" />
+			<auxClasspath path="${basedir}/ant-lib/" />
 		</findbugs>
 	</target>
-	
-	<!-- Checkstyle Report -->
+
+	<!-- Definition of target CHECKSTYLE -->
 	<target name="checkstyle" description="Generates Checkstyle Report.">
-	  <checkstyle config="${basedir}/config/checkstyle/sun_checks.xml"
-	              classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
-	    <fileset dir="${basedir}/src" includes="**/*.java"/>
-	  	 <formatter type="xml" tofile="${basedir}/reports/checkstyle_report.xml"/>
-	  </checkstyle>
+		<checkstyle config="${basedir}/config/checkstyle/bp_checks.xml" classpath="${basedir}/ant-lib/checkstyle/checkstyle-6.14.1-all.jar">
+			<fileset dir="${basedir}/src" includes="**/*.java" />
+			<formatter type="xml" tofile="${basedir}/reports/checkstyle_${time.stamp}.xml" />
+		</checkstyle>
 	</target>
-	
-	<!-- PMD Report -->
+
+	<!-- Definition of target PMD -->
 	<target name="pmd" description="Generates PMD Report.">
-	    <pmd rulesetfiles="imports">
-	        <formatter type="xml" toFile="${basedir}/reports/pmd_report.xml" toConsole="true"/>
-	        <fileset dir="${basedir}/src/">
-	            <include name="**/*.java"/>
-	        </fileset>
-	    </pmd>
+		<pmd shortFilenames="true">
+			<sourceLanguage name="java" version="1.8" />
+			<ruleset>rulesets/java/design.xml</ruleset>
+			<ruleset>java-basic</ruleset>
+			<formatter type="html" toFile="${basedir}/reports/pmd_${time.stamp}.xml" toConsole="true">
+				<param name="linkPrefix" value="http://pmd.sourceforge.net/xref/" />
+			</formatter>
+			<fileset dir="${basedir}/src/">
+				<include name="**/*.java" />
+			</fileset>
+		</pmd>
 	</target>
-	
+
+
 	<!-- Author: Stefan Pilot <stef@n-pilot.de>
 	This will add new menu entries for each	GUI component defined as 
 	.fxml-File in the ${components} folder.
@@ -137,8 +149,8 @@
 			<path>
 				<!--  For each .fxml-File in the components folder that is not a dotfile-->
 				<fileset dir="${components}">
-				  <include name="*.fxml"/>
-				  <exclude name=".*"/>
+					<include name="*.fxml" />
+					<exclude name=".*" />
 				</fileset>
 			</path>
 			<sequential>
@@ -157,7 +169,7 @@
 			</sequential>
 		</for>
 	</target>
-	
+
 	<!-- Definition of target CLEAN -->
 	<target name="clean" description="Deletes all generated files and folders.">
 		<delete failonerror="false" includeemptydirs="true">
