@@ -8,6 +8,7 @@ import java.util.Random;
  * {@link QuickSort}. Have fun finding the bug!
  * <p>
  * <b>Taken from:</b> <br>
+ * Case Study by Mohammad Ali Darvish Darab in context of the paper:
  * Visual Interactive Debugger Based on Symbolic Execution
  * Reiner Hähnle, Markus Baum, Richard Bubel, and Marcel Rothe
  * 25th IEEE/ACM International Conference on Automated Software Engineering 
