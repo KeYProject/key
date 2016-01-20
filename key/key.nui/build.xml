@@ -99,7 +99,7 @@
 
 	<!-- Definition of target FINDBUGS -->
 	<target name="findbugs" description="Generates FindBugs Report.">
-		<findbugs home="${basedir}/ant-lib/findbugs" output="html" outputFile="${basedir}/reports/findBugs_${time.stamp}.html">
+		<findbugs home="${basedir}/ant-lib/findbugs" output="xml" outputFile="${basedir}/reports/findBugs_${time.stamp}.xml">
 			<class location="${basedir}/bin" />
 			<auxClasspath path="${basedir}/testfx-4/" />
 			<auxClasspath path="${basedir}/ant-lib/" />
@@ -120,7 +120,7 @@
 			<sourceLanguage name="java" version="1.8" />
 			<ruleset>rulesets/java/design.xml</ruleset>
 			<ruleset>java-basic</ruleset>
-			<formatter type="html" toFile="${basedir}/reports/pmd_${time.stamp}.xml" toConsole="true">
+			<formatter type="xml" toFile="${basedir}/reports/pmd_${time.stamp}.xml" toConsole="true">
 				<param name="linkPrefix" value="http://pmd.sourceforge.net/xref/" />
 			</formatter>
 			<fileset dir="${basedir}/src/">
