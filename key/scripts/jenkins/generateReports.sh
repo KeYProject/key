@@ -5,3 +5,5 @@ export ANT_HOME=/opt/ant/
 export ANT_OPTS="-Xmx2048m -Xms512m"
 export PATH=$PATH:/home/hudson/key/bin/
 ant -logger org.apache.tools.ant.NoBannerLogger checkstyle
+ant -logger org.apache.tools.ant.NoBannerLogger pmd
+ant -logger org.apache.tools.ant.NoBannerLogger findbugs
