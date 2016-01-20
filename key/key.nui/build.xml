@@ -5,7 +5,6 @@
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="build.dir" value="${basedir}/bin" />
 	<property name="dist.dir" value="${basedir}/../deployment" />
-	<!-- <property name="NUIdefault" value="${basedir}/resources/de/uka/ilkd/key/nui/NUIdefault.fxml" /> -->
 	<property name="NUIdefault" value="${build.dir}/de/uka/ilkd/key/nui/NUIdefault.fxml" />
 	<property name="components" value="${basedir}/resources/de/uka/ilkd/key/nui/components/" />
 	<tstamp>
