@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.Iterator;
+import java.util.AbstractMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.xml.sax.Attributes;
@@ -55,14 +56,9 @@ class RIFLHandler extends DefaultHandler {
 
         private String getParseExceptionInfo(SAXParseException spe) {
             String systemId = spe.getSystemId();
-
-            if (systemId == null) {
-                systemId = "null";
-            }
-
-            final String info = "URI=" + systemId + " Line="
-                    + spe.getLineNumber() + ": " + spe.getMessage();
-
+            if (systemId == null) { systemId = "null"; }
+            final String info =
+                    "URI=" + systemId + " Line=" + spe.getLineNumber() + ": " + spe.getMessage();
             return info;
         }
 
@@ -70,11 +66,9 @@ class RIFLHandler extends DefaultHandler {
         public void warning(SAXParseException spe) throws SAXException {
             System.out.println("Warning: " + getParseExceptionInfo(spe));
         }
-
     }
 
     private final static String DEFAULT_CATEGORY = "Spider Pig";
-
     private final static String DEFAULT_DOMAIN = "low";
 
     /** For debugging purposes. */
@@ -92,16 +86,16 @@ class RIFLHandler extends DefaultHandler {
 
     private final Map<SpecificationEntity, Pair<String,String>> sources2categories =
             new LinkedHashMap<SpecificationEntity, Pair<String,String>>();
-
     private final Map<SpecificationEntity, Pair<String,String>> sinks2categories =
             new LinkedHashMap<SpecificationEntity, Pair<String,String>>();
     private final Map<Pair<String,String>, String> categories2domains =
             new LinkedHashMap<Pair<String,String>, String>();
-    private final Map<String, String> handles2categories = new LinkedHashMap<String, String>();
-    private Set<String> domains = null;
-    private Map<String,String> flow = null;
-
+    private final Map<String, String> handles2categories =
+            new LinkedHashMap<String, String>();
+    private Set<String> domains = new LinkedHashSet<String>();
+    private Set<Entry<String, String>> flow = new LinkedHashSet<Entry<String,String>>();
     private Map<SpecificationEntity, Pair<String,String>> tmpMap = null;
+    private Type type = null;
 
     private String tmpHandle = null;
 
@@ -139,14 +133,14 @@ class RIFLHandler extends DefaultHandler {
         final Map<SpecificationEntity, String> tmp = new LinkedHashMap<SpecificationEntity, String>();
         tmp.putAll(apply(sources2categories, categories2domains));
         tmp.putAll(apply(sinks2categories, categories2domains));
-        return new DefaultSpecificationContainer(tmp);
+        return new DefaultSpecificationContainer(tmp, flow);
     }
 
     private void putField(Attributes attributes) {
         final String field = attributes.getValue("name");
         final String clazz = attributes.getValue("class");
         final String packg = attributes.getValue("package");
-        final SpecificationEntity se = new Field(field,packg,clazz);
+        final SpecificationEntity se = new Field(field,packg,clazz, type);
         handles2categories.put(tmpHandle, category);
         tmpMap.put(se, new Pair<String,String> (tmpHandle,category));
     }
@@ -156,7 +150,7 @@ class RIFLHandler extends DefaultHandler {
         final String clazz = attributes.getValue("class");
         final String method = attributes.getValue("method");
         final int param = Integer.parseInt(attributes.getValue("parameter"));
-        final SpecificationEntity se = new Parameter(param,method,packg,clazz);
+        final SpecificationEntity se = new Parameter(param,method,packg,clazz, type);
         handles2categories.put(tmpHandle, category);
         tmpMap.put(se, new Pair<String,String> (tmpHandle,category));
     }
@@ -165,7 +159,7 @@ class RIFLHandler extends DefaultHandler {
         final String packageName = attributes.getValue("package");
         final String className = attributes.getValue("class");
         final String methodName = attributes.getValue("method");
-        final SpecificationEntity se = new ReturnValue(methodName, packageName, className);
+        final SpecificationEntity se = new ReturnValue(methodName, packageName, className, type);
         handles2categories.put(tmpHandle, category);
         tmpMap.put(se, new Pair<String,String> (tmpHandle,category));
     }
@@ -174,8 +168,10 @@ class RIFLHandler extends DefaultHandler {
         final String from = attributes.getValue("from");
         final String to = attributes.getValue("to");
         assert !from.equals(to);
-        assert from.equals(DEFAULT_DOMAIN); // FIXME: For the state being
-        flow.put(from, to);
+        final Entry<String, String> e = new AbstractMap.SimpleEntry<String, String>(from, to);
+        flow.add(e);
+        // debug
+        // System.out.println(from+" "+to);
     }
 
     private void putDomain(Attributes attributes) {
@@ -199,12 +195,23 @@ class RIFLHandler extends DefaultHandler {
     }
 
     private void checkDomainAssignmentsWithFlows() {
-        final Iterator<Pair<String,String>> it = categories2domains.keySet().iterator();
+    	// This method tried to remove flows implicitly assumed by JML,
+        // but for more than two domains this would need a default "high domain".
+
+        /*final Iterator<Pair<String,String>> it = categories2domains.keySet().iterator();
         for (Pair<String,String> p = it.next(); it.hasNext(); p = it.next()) {
-            if (categories2domains.get(p).equals(flow.get(DEFAULT_DOMAIN))) {
-                it.remove();
-            }
-        }
+        	for(Entry<String,String> e : flow){
+        		if(e.getKey().equals(DEFAULT_DOMAIN) && categories2domains.containsKey(p)
+        				&& categories2domains.get(p).equals(e.getValue())){
+        			System.out.println("Remove: "+p);
+        			if (p.first.equals("h")) {
+        				throw new RuntimeException();
+        			}
+        			it.remove();
+        		}
+        	}
+            
+        }*/
     }
 
     private void checkFlows() {
@@ -232,7 +239,6 @@ class RIFLHandler extends DefaultHandler {
             setCategory(attributes);
             break;
         case "assign":
-            // TODO: now assignment directly to domain
             assignHandle(attributes);
             break;
         //case "domainassignment":
@@ -260,15 +266,15 @@ class RIFLHandler extends DefaultHandler {
         case "flow":
             putFlow(attributes);
             break;
-// a lot of elements without their own semantics
-//        case "riflspec":
-//        case "attackerio":
-//        case "top":
-//        case "bottom":
-//        case "source":
-//        case "sink":
+        // a lot of elements without their own semantics
+//      case "riflspec":
+//      case "attackerio":
+//      case "top":
+//      case "bottom":
+//      case "source":
+//      case "sink":
         case "dompair": // TODO
-//        case "domainhierarchy":
+//      case "domainhierarchy":
         case "flowpair": // TODO
 //        case "flowpolicy":
         default:
@@ -296,24 +302,27 @@ class RIFLHandler extends DefaultHandler {
         case "flowrelation":
             checkFlows();
             break;
+        default:
         }
     }
 
-// TODO: actions on closing elements?
+//  TODO: actions on closing elements?
 
     private void startDomains() {
         domains = new LinkedHashSet<String>();
     }
 
     private void startFlow() {
-        flow = new LinkedHashMap<String,String>();
+        flow = new LinkedHashSet<Entry<String,String>>();
     }
 
     private void startSinks() {
         tmpMap = sinks2categories;
+        type = Type.SINK;
     }
 
     private void startSources() {
         tmpMap = sources2categories;
+        type = Type.SOURCE;
     }
 }

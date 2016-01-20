@@ -1360,7 +1360,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public boolean hasModifiesClause(LocationVariable heap) {
-        return this.hasRealModifiesClause.get(heap);
+        Boolean result = this.hasRealModifiesClause.get(heap);
+        if(result == null) {
+            return false;
+        }
+        return result;
     }
 
     @Override
