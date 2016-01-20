@@ -2,10 +2,8 @@ package de.uka.ilkd.key.nui.controller;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nui.ComponentFactory;
@@ -145,7 +143,7 @@ public class TreeViewController implements Initializable {
      */
     public final void loadAndDisplayProof(File file) {
         displayProof(loadProof(file));
-        searchMap = null;
+        items = null;
     }
 
     /**
@@ -159,7 +157,7 @@ public class TreeViewController implements Initializable {
     public final void loadExampleProof() {
         File proofFile = new File("resources//de/uka//ilkd//key//examples//gcd.twoJoins.proof");
         loadAndDisplayProof(proofFile);
-        searchMap = null;
+        items = null;
     }
 
     /**
@@ -186,7 +184,7 @@ public class TreeViewController implements Initializable {
     /**
      * Stores all the Labels in the tree and their respective TreeItems.
      */
-    private HashMap<String, TreeItem<NUINode>> searchMap;
+    private List<TreeItem<NUINode>> items;
 
     public final int getCurrentlySelectedItemsIndex() {
         return proofTreeView.getSelectionModel().getSelectedIndex();
@@ -200,7 +198,7 @@ public class TreeViewController implements Initializable {
      * 
      * @return
      */
-    public final Map<String, TreeItem<NUINode>> getSearchMap() {
+    public final List<TreeItem<NUINode>> getItems() {
 
         class TreeToListHelper {
             /**
@@ -229,19 +227,17 @@ public class TreeViewController implements Initializable {
             }
         }
 
-        if (searchMap == null) {
-            searchMap = new HashMap<>();
-            List<TreeItem<NUINode>> l = (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
+        if (items == null) {
+            return (new TreeToListHelper()).treeToList(proofTreeView.getRoot(),
                     new LinkedList<TreeItem<NUINode>>());
-            for (TreeItem<NUINode> t : l) {
-                searchMap.put(t.getValue().getLabel(), t);
-            }
         }
-        return searchMap;
+        else
+            return items;
     }
 
     public void scrollToAndSelect(int nextLargerIdx) {
-        // TODO this is a workaround as I was not able to make this thing scroll to middle
+        // TODO this is a workaround as I was not able to make this thing scroll
+        // to middle
         proofTreeView.scrollTo((nextLargerIdx < 5) ? nextLargerIdx : (nextLargerIdx - 5));
         proofTreeView.getSelectionModel().select(nextLargerIdx);
     }

@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -60,7 +59,7 @@ public class SearchViewController implements Initializable {
     public void handleSearchButton(ActionEvent e) {
 
         TreeViewController tVC = ComponentFactory.getInstance().getController("treeView");
-        Map<String, TreeItem<NUINode>> searchMap = tVC.getSearchMap();
+        List<TreeItem<NUINode>> searchItemsArray = tVC.getItems();
 
         if (searchResults != null) {
             for (TreeItem<NUINode> t : searchResults) {
@@ -70,9 +69,10 @@ public class SearchViewController implements Initializable {
 
         searchResults = new LinkedList<>();
 
-        for (String s : searchMap.keySet()) {
-            if (s.toLowerCase().contains(SearchTextField.getText().toLowerCase())) {
-                searchResults.add(searchMap.get(s));
+        for (TreeItem<NUINode> t : searchItemsArray) {
+            if (t.getValue().getLabel().toLowerCase()
+                    .contains(SearchTextField.getText().toLowerCase())) {
+                searchResults.add(t);
             }
         }
 
@@ -165,8 +165,8 @@ public class SearchViewController implements Initializable {
         else
             handleSearchButton(e);
     }
-    
-    public void performFocusRequest(){
+
+    public void performFocusRequest() {
         SearchTextField.requestFocus();
     }
 }
