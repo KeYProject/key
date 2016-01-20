@@ -86,7 +86,7 @@ public class TreeViewController implements Initializable {
                             catch (IllegalArgumentException ex) {
                                 // SearchView already exists
                                 SearchViewController c = ComponentFactory.getInstance()
-                                        .getController("searchView");
+                                        .getController(".searchView");
                                 c.performFocusRequest();
                             }
                         }
